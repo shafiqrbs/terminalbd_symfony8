@@ -1532,61 +1532,11 @@ class AccountSalesRepository extends EntityRepository
 
     public function insertEcommerceSales(Order $entity)
     {
-        $em = $this->_em;
-        $option = $entity->getEcommerceConfig()->getGlobalOption();
-        $exist = $this->findOneBy(array('globalOption'=>$option,'ecommerce'=>$entity,'sourceInvoice'=>$entity->getId()));
-        if(empty($exist)) {
-            $accountSales = new AccountSales();
-            $accountSales->setAccountBank($entity->getAccountBank());
-            $accountSales->setAccountMobileBank($entity->getAccountMobileBank());
-            $accountSales->setGlobalOption($option);
-            $accountSales->setEcommerce($entity);
-            $accountSales->setSourceInvoice($entity->getInvoice());
-            $accountSales->setCustomer($entity->getCustomer());
-            $accountSales->setTotalAmount($entity->getTotal());
-            $accountSales->setProcessType('E-commerce');
-            $accountSales->setCreatedBy($entity->getCreatedBy());
-            $accountSales->setApprovedBy($entity->getApprovedBy());
-            $accountSales->setProcessHead('E-commerce');
-            $accountSales->setProcess('approved');
-            $accountSales->setCreated($entity->getCreated());
-            $accountSales->setUpdated($entity->getCreated());
-            $em->persist($accountSales);
-            $em->flush();
-            $this->updateCustomerBalance($accountSales);
-        }
+
 
     }
     public function insertEcommerceOrderPayable(OrderPayment $entity)
     {
-        $em = $this->_em;
-        $option = $entity->getOrder()->getEcommerceConfig()->getGlobalOption();
-        $invoice = "{$entity->getOrder()->getInvoice()}/{$entity->getId()}";
-        $exist = $this->findOneBy(array('globalOption'=>$option,'ecommerce'=>$entity->getOrder(),'sourceInvoice'=>$invoice));
-        if(empty($exist)){
-            $accountSales = new AccountSales();
-            $accountSales->setAccountBank($entity->getAccountBank());
-            $accountSales->setAccountMobileBank($entity->getAccountMobileBank());
-            $accountSales->setGlobalOption($entity->getOrder()->getEcommerceConfig()->getGlobalOption());
-            $accountSales->setEcommerce($entity->getOrder());
-            $accountSales->setSourceInvoice($invoice);
-            $accountSales->setCustomer($entity->getOrder()->getCustomer());
-            $accountSales->setTransactionMethod($entity->getTransactionMethod());
-            $accountSales->setAmount($entity->getAmount());
-            $accountSales->setProcessType('E-commerce');
-            $accountSales->setCreatedBy($entity->getCreatedBy());
-            $accountSales->setApprovedBy($entity->getApprovedBy());
-            $accountSales->setProcessHead('Advance');
-            $accountSales->setProcess('approved');
-            $accountSales->setCreated($entity->getCreated());
-            $accountSales->setUpdated($entity->getCreated());
-            $em->persist($accountSales);
-            $em->flush();
-            if($entity->getAmount() > 0 ){
-                $this->_em->getRepository('AccountingBundle:AccountCash')->insertSalesCash($accountSales);
-            }
-            $this->updateCustomerBalance($accountSales);
-        }
 
 
     }

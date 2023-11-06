@@ -1012,7 +1012,6 @@ class ItemRepository extends EntityRepository
             $entity = new Category();
             $entity->setGlobalOption($inventory->getGlobalOption());
             $entity->setInventoryConfig($inventory);
-            $entity->setEcommerceConfig($inventory->getGlobalOption()->getEcommerceConfig());
             $entity->setName($name);
             $entity->setStatus(true);
             $entity->setPermission('private');

@@ -446,28 +446,7 @@ class AccountJournalRepository extends EntityRepository
 
     public function insertEcommerceOrderPayable(OrderPayment $salesReturn)
 	{
-		$global = $salesReturn->getOrder()->getEcommerceConfig()->getGlobalOption();
-		$sales = $salesReturn->getOrder();
-		$journalSource = "Sales-Return-{$sales->getInvoice()}";
-		$entity = new AccountJournal();
-		$accountCashHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(6);
-		$accountHeadCredit = $this->_em->getRepository('AccountingBundle:AccountHead')->find(10);
-	    $transaction = $this->_em->getRepository(TransactionMethod::class)->findOneBy(array('slug'=>'mobile'));
-     	$entity->setTransactionType('Credit');
-		$entity->setAmount(abs($salesReturn->getAmount()));
-		$entity->setTransactionMethod($transaction);
-		$entity->setAccountMobileBank($salesReturn->getAccountMobileBank());
-		$entity->setApprovedBy($salesReturn->getApprovedBy());
-		$entity->setCreatedBy($salesReturn->getCreatedBy());
-		$entity->setGlobalOption($global);
-		$entity->setAccountHeadCredit($accountHeadCredit);
-		$entity->setAccountHeadDebit($accountCashHead);
-		$entity->setJournalSource($journalSource);
-		$entity->setProcess('approved');
-		$this->_em->persist($entity);
-		$this->_em->flush();
-		$this->_em->getRepository('AccountingBundle:AccountCash')->insertAccountCash($entity);
-	//	$this->_em->getRepository('AccountingBundle:Transaction')->insertAccountJournalTransaction($entity);
+
 
 	}
 

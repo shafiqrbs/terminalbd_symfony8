@@ -98,9 +98,7 @@ class ItemType extends AbstractType
             'required'    => false,
             'attr'=>array('class'=>'span12 barcode')
         ));
-            if ($this->inventoryConfig->getGlobalOption()->getEcommerceConfig()->isInventoryStock() == 1){
-                $builder->add('isWeb');
-            }
+
             if($this->inventoryConfig->getIsVendor() == 1 ){
 
                 $builder
