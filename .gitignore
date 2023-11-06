@@ -2,6 +2,7 @@
 app/bootstrap*
 
 # Symfony directories
+vendor/*
 */logs/*
 */cache/*
 web/uploads/*
@@ -26,6 +27,7 @@ web/.htaccess
 
 # Composer
 composer.phar
+composer.json
 composer.lock
 
 # IDE
