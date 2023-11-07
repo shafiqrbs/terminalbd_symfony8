@@ -18,7 +18,6 @@ api_poskeeper_stock_item:
     path:     /stock-item
     defaults: { _controller: BinduBundle:Api:stockItem }
 
-
 api_poskeeper_stock_create:
     path:     /stock-create
     defaults: { _controller: BinduBundle:Api:createStock }
