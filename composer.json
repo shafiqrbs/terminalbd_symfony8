@@ -12,6 +12,11 @@
             "": "src/"
         }
     },
+
+    "repositories": [
+        { "type": "vcs", "url": "https://shafiqabs:LzHMpQhR9bx88rNHS87v@bitbucket.org/bbpl/lessclick-system.git" },
+    ],
+
     "require": {
         "php": ">=5.3.3",
         "symfony/symfony": "~2.4",
@@ -48,7 +53,7 @@
         "symfony/security-acl": "^3.0",
         "ajaxray/php-watermark": "^0.1.1",
         "beberlei/doctrineextensions": "^1.2",
-        "lessclick-system/barcode": "^3.0"
+        "lessclick-system/barcode": "dev-master"
     },
     "scripts": {
         "symfony-scripts": [
