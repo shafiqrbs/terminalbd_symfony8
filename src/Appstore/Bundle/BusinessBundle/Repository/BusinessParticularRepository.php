@@ -494,6 +494,79 @@ class BusinessParticularRepository extends EntityRepository
         $this->remainingQnt($stock);
     }
 
+    public function updateBusinessRemainingQuantityReset($config)
+    {
+        $sqlStockPurchase = "UPDATE business_particular as stock
+             inner join (select pi.businessParticular_id, ROUND(COALESCE(SUM(pi.quantity),0),2) as purchaseQuantity
+              from business_purchase_item as pi
+              join business_particular  as ms ON  pi.businessParticular_id = ms.id
+              where  ms.businessConfig_id = {$config}
+              group by pi.businessParticular_id) as pa on stock.id = pa.businessParticular_id
+  SET stock.purchaseQuantity = pa.purchaseQuantity";
+        $qb4 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchase);
+        $qb4->execute();
+
+
+         $sqlStockReturn = "UPDATE business_particular as stock
+             inner join (select pi.businessParticular_id, ROUND(COALESCE(SUM(pi.quantity),0),2) as purchaseQuantity
+              from business_invoice_return_item as pi
+              join business_particular  as ms ON  pi.businessParticular_id = ms.id
+              where  ms.businessConfig_id =  {$config}
+              group by pi.businessParticular_id) as pa on stock.id = pa.businessParticular_id
+  SET stock.salesReturnQuantity = pa.purchaseQuantity";
+        $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockReturn);
+        $qb5->execute();
+
+
+        $sqlStockPurchaseReturn = "UPDATE business_particular as stock
+             inner join (select pi.businessParticular_id, ROUND(COALESCE(SUM(pi.quantity),0),2) as purchaseQuantity
+              from business_purchase_return_item as pi
+              join business_particular  as ms ON  pi.businessParticular_id = ms.id
+              where  ms.businessConfig_id =  {$config}
+              group by pi.businessParticular_id) as pa on stock.id = pa.businessParticular_id
+  SET stock.purchaseReturnQuantity = pa.purchaseQuantity";
+        $qb6 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchaseReturn);
+        $qb6->execute();
+
+
+        $sqlStockPurchaseReturn = "UPDATE business_particular as stock
+             inner join (select pi.item_id, ROUND(COALESCE(SUM(pi.quantity),0),2) as purchaseQuantity
+              from business_stock_adjustment as pi
+              join business_particular  as ms ON  pi.item_id = ms.id
+              where  ms.businessConfig_id = {$config}
+              group by pi.item_id) as pa on stock.id = pa.item_id
+  SET stock.adjustmentQuantity = pa.purchaseQuantity";
+        $qb7 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchaseReturn);
+        $qb7->execute();
+
+
+        $sqlStockDamage = "UPDATE business_particular as stock
+             inner join (select pi.businessParticular_id, ROUND(COALESCE(SUM(pi.quantity),0),2) as purchaseQuantity
+              from business_damage as pi
+              join business_particular  as ms ON  pi.businessParticular_id = ms.id
+              where  ms.businessConfig_id = {$config}
+              group by pi.businessParticular_id) as pa on stock.id = pa.businessParticular_id
+  SET stock.damageQuantity = pa.purchaseQuantity";
+        $qb8 = $this->getEntityManager()->getConnection()->prepare($sqlStockDamage);
+        $qb8->execute();
+
+
+        $sqlStockRemin = "UPDATE business_particular as stock
+             inner join (
+              select ele.businessParticular_id, ROUND(COALESCE(SUM(ele.quantity),0),2) as salesQuantity
+              from business_invoice_particular as ele
+              join business_particular  as ms ON  ele.businessParticular_id = ms.id
+              where  ms.businessConfig_id =  {$config}
+              group by ele.businessParticular_id
+            ) as pa on stock.id = pa.businessParticular_id
+  SET stock.remainingQuantity = ((COALESCE(stock.openingQuantity,0) + COALESCE(stock.purchaseQuantity,0) + COALESCE(stock.salesReturnQuantity,0)+ COALESCE(stock.bonusQuantity,0)+ COALESCE(stock.bonusAdjustment,0)+ COALESCE(stock.adjustmentQuantity,0)) - (COALESCE(pa.salesQuantity,0) + COALESCE(stock.purchaseReturnQuantity,0) + COALESCE(stock.damageQuantity,0)))
+ , stock.salesQuantity = pa.salesQuantity";
+        $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
+        $qb5->execute();
+
+
+    }
+
 	public function updateRemoveProductionQuantity(BusinessInvoiceParticular $invoice_particular,$fieldName=''){
 
 		$em = $this->_em;

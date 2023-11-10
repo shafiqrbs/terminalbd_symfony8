@@ -45,6 +45,9 @@
                             {% endif %}
                             <a href="{{ path('business_stock_new') }}" class=" btn red"><i class="icon-plus"></i> Add Stock</a>
                             <a target="_blank" href="{{ path('business_stock_excel') }}" class=" btn purple"><i class="icon-download"></i> Download Excel</a>
+                                {% if app.user.granted("ROLE_DOMAIN") %}
+                                <a href="{{ path('business_stock_reset') }}" class=" btn purple"><i class="icon-refresh-ccw"></i> Reset</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

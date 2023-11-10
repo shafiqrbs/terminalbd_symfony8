@@ -126,3 +126,8 @@ business_group_revised:
 business_stock_migration:
     path:     /{id}/copy-stock-migration
     defaults: { _controller: BusinessBundle:Default:copyToBusinessParticular }
+
+business_stock_reset:
+    path:     /stock-reset
+    defaults: { _controller: BusinessBundle:Default:updateRemainingQuantity }
+

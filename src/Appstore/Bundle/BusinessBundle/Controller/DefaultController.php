@@ -115,6 +115,16 @@ class DefaultController extends Controller
 
     }
 
+    public function updateRemainingQuantityAction(){
+
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $globalOption = $this->getUser()->getGlobalOption();
+        $config = $globalOption->getBusinessConfig();
+        $this->getDoctrine()->getRepository(BusinessParticular::class)->updateBusinessRemainingQuantityReset($config->getId());
+        return $this->redirect($this->generateUrl('business_stock'));
+    }
+
 
 
 
