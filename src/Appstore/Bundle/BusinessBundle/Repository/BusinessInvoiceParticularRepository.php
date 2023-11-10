@@ -7,6 +7,7 @@ use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoice;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessParticular;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessProductionElement;
+use Appstore\Bundle\BusinessBundle\Entity\BusinessPurchase;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessPurchaseItem;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Appstore\Bundle\HospitalBundle\Entity\InvoiceParticular;
@@ -879,6 +880,41 @@ class BusinessInvoiceParticularRepository extends EntityRepository
 
     }
 
+    public function removeSalesItem(BusinessInvoice $entity)
+    {
+        /* @var $particular BusinessInvoiceParticular */
+
+        $em = $this->_em;
+        if($entity->getBusinessInvoiceParticulars()){
+            foreach ($entity->getBusinessInvoiceParticulars() as $particular):
+                $particular->setQuantity(0);
+                $particular->setTotalQuantity(0);
+                $em->flush();
+                if($particular->getBusinessParticular()){
+                    $em->getRepository(BusinessParticular::class)->updateRemoveStockQuantity($particular->getBusinessParticular(),'sales');
+                }
+            endforeach;
+        }
+
+    }
+
+    public function removePurchaseItem(BusinessPurchase $entity)
+    {
+        /* @var $particular BusinessInvoiceParticular */
+
+        $em = $this->_em;
+        if($entity->getPurchaseItems()){
+            foreach ($entity->getBusinessPurchaseItems() as $particular):
+                $particular->setQuantity(0);
+                $em->flush();
+                if($particular->getBusinessParticular()){
+                    $em->getRepository(BusinessParticular::class)->updateRemoveStockQuantity($particular->getBusinessParticular(),'purchase');
+                }
+            endforeach;
+        }
+
+    }
+
     public function getCustomerItem(BusinessConfig $config, Customer $vendor)
     {
         $configId = $config->getId();
@@ -911,7 +947,6 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         $result = $qb->getQuery()->getOneOrNullResult();
         return $result['quantity'];
     }
-
 
 
     public function getCurrentStock($stock)

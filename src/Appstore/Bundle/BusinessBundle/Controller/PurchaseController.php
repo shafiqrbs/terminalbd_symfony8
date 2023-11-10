@@ -3,6 +3,7 @@
 namespace Appstore\Bundle\BusinessBundle\Controller;
 
 use Appstore\Bundle\AccountingBundle\Entity\AccountVendor;
+use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessParticular;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessPurchase;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessPurchaseItem;
@@ -473,11 +474,11 @@ class PurchaseController extends Controller
 
     	$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
 	    $entity = $this->getDoctrine()->getRepository('BusinessBundle:BusinessPurchase')->findOneBy(array('businessConfig' => $config , 'id' => $id));
-
         $em = $this->getDoctrine()->getManager();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
+        $this->getDoctrine()->getRepository(BusinessInvoiceParticular::class)->removePurchaseItem($entity);
         $em->remove($entity);
         $em->flush();
         return $this->redirect($this->generateUrl('business_purchase'));

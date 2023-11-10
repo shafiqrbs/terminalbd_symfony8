@@ -32,12 +32,14 @@ class BusinessStockHistory
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular", inversedBy="stockHistory" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"sorting" = "ASC"})
      **/
     private $item;
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessPurchaseItem")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"sorting" = "ASC"})
      **/
     private $purchaseItem;
@@ -45,6 +47,7 @@ class BusinessStockHistory
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessPurchaseReturnItem")
+      * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"sorting" = "ASC"})
      **/
     private $purchaseReturnItem;
@@ -52,6 +55,7 @@ class BusinessStockHistory
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"sorting" = "ASC"})
      **/
     private $salesItem;
@@ -59,6 +63,7 @@ class BusinessStockHistory
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceReturnItem")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"sorting" = "ASC"})
      **/
     private $salesReturnItem;
@@ -66,6 +71,7 @@ class BusinessStockHistory
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessDamage")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"sorting" = "ASC"})
      **/
     private $damageItem;
@@ -73,12 +79,14 @@ class BusinessStockHistory
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\Marketing")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"sorting" = "ASC"})
      **/
     private $marketing;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"sorting" = "ASC"})
      **/
     private $wearHouse;

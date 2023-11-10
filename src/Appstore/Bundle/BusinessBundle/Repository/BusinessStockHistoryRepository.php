@@ -244,7 +244,9 @@ class BusinessStockHistoryRepository extends EntityRepository
         if($entity->getPurchaseItems()){
 
             foreach($entity->getPurchaseItems() as $item ){
-                $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
+                if($item->getBusinessParticular()){
+                    $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
+                }
             }
         }
     }
