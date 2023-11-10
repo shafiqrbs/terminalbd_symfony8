@@ -16,6 +16,7 @@ web/fonts/*
 web/nano.save
 
 
+
 # Configuration files
 app/config/dynamic/sites.yml
 app/config/parameters.yml
