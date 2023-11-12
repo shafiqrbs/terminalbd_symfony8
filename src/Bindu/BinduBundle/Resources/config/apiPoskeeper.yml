@@ -2,10 +2,6 @@ api_poskeeper_login:
     path:     /poskeeper-otp-login
     defaults: { _controller: BinduBundle:ApiPoskeeper:login }
 
-api_setup:
-    path:     /poskeeper-setup
-    defaults: { _controller: BinduBundle:Api:setup }
-
 api_poskeeper_splash:
     path:     /poskeeper-splash
     defaults: { _controller: BinduBundle:ApiPoskeeper:splash }
