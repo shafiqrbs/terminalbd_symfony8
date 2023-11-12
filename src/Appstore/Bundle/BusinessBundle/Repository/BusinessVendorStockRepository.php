@@ -38,6 +38,9 @@ class BusinessVendorStockRepository extends EntityRepository
             $qb->join('e.vendor','v');
             $qb->andWhere("v.id = :vendorId")->setParameter('vendorId', $vendorId);
         }
+        if(!empty($grn)){
+            $qb->andWhere($qb->expr()->like("e.grn", "'%$grn%'"  ));
+        }
         if (!empty($startDate) ) {
             $datetime = new \DateTime($data['startDate']);
             $start = $datetime->format('Y-m-d 00:00:00');

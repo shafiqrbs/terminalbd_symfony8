@@ -91,7 +91,13 @@
                                                 <td  class="span1">{{ loop.index }}</td>
                                                 <td class="span3">{{ item.particular.name }}</td>
                                                 <td class="span1">{{ item.price }}</td>
-                                                <td class="span1">{{ item.quantity }}</td>
+                                                <td class="span1 numeric">
+                                                    {% if app.user.granted("ROLE_DOMAIN") %}
+                                                        <a  class="editable" data-name="quantity" href="#"  data-url="{{ path('business_vendor_stock_inline') }}" data-type="text" data-pk="{{ item.id }}" data-original-title="Change Quantity">{{ item.quantity }}</a>
+                                                    {% else %}
+                                                        {{ item.quantity }}
+                                                    {% endif %}
+                                                </td>
                                                 <td class="span1">{{ item.salesQuantity }}</td>
                                                 <td class="span1">{{ (item.quantity-item.salesQuantity) }}</td>
                                                 <td class="span1">{% if item.particular.unit is not empty %}{{ item.particular.unit.name }}{% endif %}</td>
@@ -135,12 +141,14 @@
 {% block javascriptBlock %}
     {{ parent() }}
     {% javascripts
-    '@BusinessBundle/Resources/public/js/approveProcess.js'
+        '@BusinessBundle/Resources/public/js/editable.js'
+        '@BusinessBundle/Resources/public/js/approveProcess.js'
     %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}
+    EditableWithOutReloadInit();
 {% endblock %}
 

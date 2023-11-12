@@ -57,6 +57,9 @@ business_vendor_stock_qnt:
     options:
             expose: true
 
+business_vendor_stock_inline:
+    path:     /inline-update
+    defaults: { _controller: "BusinessBundle:VendorStock:inlineUpdate" }
 
 business_vendor_stock_approved:
     path:     /{id}/invoice-approved

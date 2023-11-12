@@ -435,7 +435,6 @@ class InvoiceController extends Controller
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
-        $this->getDoctrine()->getRepository('BusinessBundle:BusinessPurchaseReturnItem')->removePurchaseReturn($entity);
         $this->getDoctrine()->getRepository(BusinessInvoiceParticular::class)->removeSalesItem($entity);
         $em->remove($entity);
         $em->flush();
@@ -633,7 +632,6 @@ class InvoiceController extends Controller
 		$this->getDoctrine()->getRepository('BusinessBundle:BusinessProductionExpense')->removeProductionExpense($sales);
 		$this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->accountBusinessSalesReverse($sales);
 		$this->getDoctrine()->getRepository('BusinessBundle:BusinessStoreLedger')->storeInvoiceReverse($sales);
-        $this->getDoctrine()->getRepository('BusinessBundle:BusinessPurchaseReturnItem')->removePurchaseReturn($sales);
         if($sales->getInvoiceReturn()){
             foreach ($sales->getInvoiceReturnItems() as $row){
                 $this->getDoctrine()->getRepository('BusinessBundle:BusinessInvoiceReturn')->removeSalesReturnItem($row);

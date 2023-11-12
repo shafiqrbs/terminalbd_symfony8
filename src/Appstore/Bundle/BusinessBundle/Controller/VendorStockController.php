@@ -242,8 +242,6 @@ class VendorStockController extends Controller
 
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $em->getRepository('BusinessBundle:BusinessVendorStock')->findOneBy(array('businessConfig' => $config , 'id' => $id));
-
-
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -374,6 +372,24 @@ class VendorStockController extends Controller
 
     public function searchVendorNameAction($vendor)
     {
+
+    }
+
+    public function inlineUpdateAction(Request $request)
+    {
+        $data = $request->request->all();
+        $em = $this->getDoctrine()->getManager();
+        /* @var $entity BusinessVendorStockItem */
+        $entity = $em->getRepository('BusinessBundle:BusinessVendorStockItem')->find($data['pk']);
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find particular entity.');
+        }
+        $quantity = abs($data['value']);
+        $entity->setQuantity($quantity);
+        $entity->setSubTotal($quantity * $entity->getPrice());
+        $em->flush();
+        $this->getDoctrine()->getRepository('BusinessBundle:BusinessVendorStock')->updateVendorStockTotalPrice($entity->getBusinessVendorStock());
+        return new Response('success');
 
     }
 
