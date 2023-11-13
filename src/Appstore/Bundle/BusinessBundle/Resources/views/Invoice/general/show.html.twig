@@ -101,10 +101,9 @@
                                     <tr class="head-blue">
                                     <th class="span1"> S/N</th>
                                         <th class="span4">Particular</th>
-                                        {% if entity.businessConfig.businessModel == 'sign' %}
-                                        <th class="span1">Size</th>
-                                        {% endif %}
-                                        <th class="span1">Qnt</th>
+                                        <th class="span2">Wearhouse</th>
+                                        <th class="span1">Quantity</th>
+                                        <th class="span1">Bonus Quantity</th>
                                         <th class="span1">Unit</th>
                                         <th class="span1">Unit Price</th>
                                         <th class="span1">Amount</th>
@@ -115,14 +114,9 @@
                                         <tr id="remove-{{ item.id }}">
                                             <td  class="">{{ loop.index }}.</td>
                                             <td class="">{{ item.particular }}<br/>{{ item.description }}</td>
-                                            {% if entity.businessConfig.businessModel == 'sign' %}
-                                            <td>
-                                            {% if item.height is not empty and item.width is not empty %}
-                                                {{ item.height }} x {{ item.width }} = {{ item.subQuantity }}
-                                            {% endif %}
-                                            </td>
-                                            {% endif %}
-                                            <td class="">{{ item.totalQuantity }}</td>
+                                            <td class="">{% if item.wearhouse %}{{ item.wearhouse.name }}{% endif %}</td>
+                                            <td class="">{{ item.quantity }}</td>
+                                            <td class="">{{ item.bonusQnt }}</td>
                                             <td class="">{{ item.unit }}</td>
                                             <td class="">{{ item.price }}</td>
                                             <td class="" id="subTotal-{{ item.id }}">{{ item.subTotal|number_format }}</td>
@@ -130,13 +124,8 @@
                                     {% endfor %}
                                     </tbody>
                                     <tfoot>
-                                    {% if entity.businessConfig.businessModel == 'sign' %}
-                                        {% set colspan = 7 %}
-                                        {% set panCol = 6 %}
-                                    {% else %}
-                                        {% set colspan = 6 %}
-                                        {% set panCol = 5 %}
-                                    {% endif %}
+                                    {% set colspan = 8 %}
+                                    {% set panCol = 7 %}
                                     <tr>
                                         <td colspan="{{ colspan }}" class="span12" style="border: 1px double #000"></td>
                                     </tr>

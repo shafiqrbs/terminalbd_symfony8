@@ -51,7 +51,7 @@
                                         <div class="clearfix">&nbsp;</div>
                                         <form class="stockInvoice" id="stockInvoice" name="stockInvoice" action="{{ path('business_invoice_accessories_add',{'invoice':entity.id}) }}" method="post">
                                             <div class="row-fluid" style="background: #dde3e6; padding-bottom: 15px; border: 2px solid #4b8df8">
-                                                <div class="span5">
+                                                <div class="span4">
                                                     <div class="control-group">
                                                         <label class="control-label" style="padding-left: 20px; font-size: 12px; text-transform: uppercase; font-weight: bold" for="name">Select Product Name<span class="required">*</span></label>
                                                         <div class="controls">
@@ -83,13 +83,23 @@
                                                         </div>
                                                     </div>
                                                 {% endif %}
-                                                <div class="span4">
+                                                <div class="span2">
                                                     <div class="control-group">
-                                                        <label class="control-label" for="name" style="padding-left: 10px; font-size: 12px; text-transform: uppercase; font-weight: bold" >Quantity & Price<span class="required">*</span></label>
+                                                        <label class="control-label" for="name" style="padding-left: 10px; font-size: 12px; text-transform: uppercase; font-weight: bold" >Quantity & Bonus<span class="required">*</span></label>
+                                                        <div class="span12" style="margin-bottom:0!important">
+                                                            <div class="input-group">
+                                                                <input type="text" class="m-wrap span6 number numeric form-control input-number input" id="quantity" name="quantity" value="1" min="1">
+                                                                <input type="text" class="m-wrap span6 number numeric form-control input-number input" id="bonusQuantity" name="bonusQuantity" placeholder="Bonus Quantity" >
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="span3">
+                                                    <div class="control-group">
+                                                        <label class="control-label" for="name" style="padding-left: 10px; font-size: 12px; text-transform: uppercase; font-weight: bold" >Price<span class="required">*</span></label>
                                                         <div class="input-append span12" style="margin-bottom:0!important">
                                                             <div class="input-group">
-                                                                <input type="number" class="m-wrap span4 form-control input-number input" id="quantity" name="quantity" value="1" min="1">
-                                                                <input type="text" class="m-wrap span3 form-control input-number input" id="salesPrice" name="salesPrice" placeholder="Price" value="" min="">
+                                                                <input type="text" class="m-wrap span6 form-control number numeric input-number input" id="salesPrice" name="salesPrice" placeholder="Price" value="" min="">
                                                                 <button type="button" class="btn yellow"  id="unit" >Unit</button>
                                                                 <button type="submit" class="btn blue" id="addAccessories" ><i class="icon-save"></i> Add</button>
                                                             </div>
@@ -149,11 +159,10 @@
                                             <tr>
                                                 <th class="span1"> Si/No</th>
                                                 <th class="span4">Particular</th>
-                                                {% if ("wearhouse" in config.stockFormat) %}
                                                 <th class="span2">Wearhouse</th>
-                                                {% endif %}
                                                 <th class="span2">Unit Price</th>
-                                                <th class="span1">Qnt</th>
+                                                <th class="span1">Quantity</th>
+                                                <th class="span1">Bonus QTY</th>
                                                 <th class="span1">Amount</th>
                                                 <th class="span2"><i class="icon-trash"></i></th>
                                             </tr>
@@ -163,9 +172,7 @@
                                                 <tr id="remove-{{ item.id }}">
                                                     <td  class="">{{ loop.index }}.</td>
                                                     <td class="">{{ item.particular }}<br/>{{ item.description|raw }}</td>
-                                                    {% if ("wearhouse" in config.stockFormat) %}
                                                     <td class="">{% if item.wearhouse %}{{ item.wearhouse.name }}{% endif %}</td>
-                                                    {% endif %}
                                                     <td class="">
                                                         <input type="hidden" name="salesItem[]" value="{{ item.id }}" >
                                                         <input type="hidden" id="subQuantity-{{ item.id }}" name="subQuantity[]" value="{{ item.subQuantity }}" >
@@ -174,6 +181,7 @@
                                                     <td class="">
                                                         <input type="text" class=" numeric td-inline-input-qnt quantity" data-id="{{ item.id }}" autocomplete = "off" min="1" max="{{ item.quantity }}"  id="quantity-{{ item.id }}" name="quantity[]" value="{{ item.quantity }}" placeholder="{{ item.quantity }}">
                                                     </td>
+                                                    <td class="">{{ item.bonusQnt }}</td>
                                                     <td class="" id="subTotal-{{ item.id }}">{{ item.subTotal|number_format }}</td>
                                                     <td class="">
                                                         <a data-id="{{ item.id }}" title="" data-url="" href="javascript:" class="btn blue mini itemUpdate" ><i class="icon-save"></i></a>
@@ -184,25 +192,25 @@
                                             </tbody>
                                             <tfoot>
                                             <tr>
-                                                <td colspan="{{ ("wearhouse" in config.stockFormat) ? 7 : 6 }}" class="span12" style="border: 1px double #000"></td>
+                                                <td colspan="8" class="span12" style="border: 1px double #000"></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="5" class="span9"><span class="pull-right"><strong>Total Amount TK.</strong> =</span></td>
+                                                <td colspan="6" class="span9"><span class="pull-right"><strong>Total Amount TK.</strong> =</span></td>
                                                 <td class="span1"><strong class="subTotal">{{ entity.subTotal|number_format }}</strong></td>
                                                 <td class="span1"></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="5" class="span9"><span class="pull-right"><strong>Vat/Tax TK.</strong> =</span></td>
+                                                <td colspan="6" class="span9"><span class="pull-right"><strong>Vat/Tax TK.</strong> =</span></td>
                                                 <td class="span1"><strong class="vat">{{ entity.vat|number_format }}</strong></td>
                                                 <td class="span1"></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="5" class="span9"><span class="pull-right"><strong>Discount TK.</strong> =</span></td>
+                                                <td colspan="6" class="span9"><span class="pull-right"><strong>Discount TK.</strong> =</span></td>
                                                 <td class="span1"><strong class="discount">{{ entity.discount|number_format }}</strong></td>
                                                 <td class="span1"></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="5" class="span9"><span class="pull-right"><strong>Received TK.</strong> =</span></td>
+                                                <td colspan="6" class="span9"><span class="pull-right"><strong>Received TK.</strong> =</span></td>
                                                 <td class="span1"><strong class="netTotal">{{ entity.total|number_format }}</strong></td>
                                                 <td class="span1"></td>
                                             </tr>

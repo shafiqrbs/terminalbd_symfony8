@@ -210,11 +210,13 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         $em = $this->_em;
         $entity = new BusinessInvoiceParticular();
         $quantity = !empty($data['quantity']) ? $data['quantity'] :1;
+        $bonusQuantity = !empty($data['bonusQuantity']) ? $data['bonusQuantity'] :0;
         $wearhouse = $this->_em->getRepository('BusinessBundle:WearHouse')->find($data['wearhouse']);
         if($wearhouse){
             $entity->setWearhouse($wearhouse);
         }
         $entity->setQuantity($quantity);
+        $entity->setBonusQnt($bonusQuantity);
 	    $entity->setTotalQuantity($quantity);
 	    $accessoriesId = $data['accessories'];
 	    $price = $data['price'];
@@ -360,6 +362,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
             $data .= "<td>";
             $data .= "<input type='text' class='numeric td-inline-input-qnt quantity' data-id='{$entity->getId()}' autocomplete='off' min=1  id='quantity-{$entity->getId()}' name='quantity[]' value='{$entity->getQuantity()}' placeholder='Qnt'>";
             $data .= "</td>";
+            $data .= "<td>{$entity->getBonusQnt()}</td>";
             $data .= "<td id='subTotal-{$entity->getId()}'>{$entity->getSubTotal()}</td>";
             $data .= "<td>";
             $data .= "<a id='{$entity->getId()}' data-id='{$entity->getId()}'  href='javascript:' class='btn blue mini itemUpdate' ><i class='icon-save'></i></a>";

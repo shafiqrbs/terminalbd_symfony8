@@ -129,8 +129,9 @@ class BusinessStockHistoryRepository extends EntityRepository
 
             /* @var $item BusinessInvoiceParticular */
 
-            $entity->setQuantity("-{$item->getTotalQuantity()}");
-            $entity->setSalesQuantity($item->getTotalQuantity());
+            $quantity = ($item->getTotalQuantity() + $item->getBonusQnt());
+            $entity->setQuantity("-{$quantity}");
+            $entity->setSalesQuantity($quantity);
             $entity->setBonusSalesQuantity($item->getBonusQnt());
             if($item->getWearhouse()){
                 $entity->setWearHouse($item->getWearhouse());
