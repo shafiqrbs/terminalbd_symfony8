@@ -634,7 +634,7 @@ class InvoiceController extends Controller
 		$this->getDoctrine()->getRepository('BusinessBundle:BusinessStoreLedger')->storeInvoiceReverse($sales);
         if($sales->getInvoiceReturn()){
             foreach ($sales->getInvoiceReturnItems() as $row){
-                $this->getDoctrine()->getRepository('BusinessBundle:BusinessInvoiceReturn')->removeSalesReturnItem($row);
+                $this->getDoctrine()->getRepository('BusinessBundle:BusinessInvoiceReturnItem')->removeSalesReturnItem($row);
             }
         }
         $sales->setIsReversed(true);
