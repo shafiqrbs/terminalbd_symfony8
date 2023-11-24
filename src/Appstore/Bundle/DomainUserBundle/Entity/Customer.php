@@ -158,6 +158,11 @@ class Customer
      **/
     protected $checkedBy;
 
+     /**
+     * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     **/
+    protected $marketing;
+
     /**
     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Designation")
     **/
@@ -1909,8 +1914,21 @@ class Customer
         $this->designation = $designation;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getMarketing()
+    {
+        return $this->marketing;
+    }
 
-
+    /**
+     * @param mixed $marketing
+     */
+    public function setMarketing($marketing)
+    {
+        $this->marketing = $marketing;
+    }
 
 
 }

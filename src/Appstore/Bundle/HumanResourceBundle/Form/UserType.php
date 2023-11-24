@@ -58,8 +58,9 @@ class UserType extends AbstractType
                 'expanded'      => false,
                 'multiple'      => false,
                 'choices' => array(
-                    'employee' => 'employee',
-                    'user' => 'user'
+                    'employee' => 'Employee',
+                    'user' => 'User',
+                    'marketing' => 'Marketing Executive',
                 ),
             ))
             ->add('roles', 'choice', array(

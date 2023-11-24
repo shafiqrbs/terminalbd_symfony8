@@ -49,6 +49,7 @@ class DomainSignType extends AbstractType
     {
         $builder
 
+
             ->add('roles', 'choice', array(
                     'attr'=>array('class'=>'category form-control'),
                     'required'=>true,

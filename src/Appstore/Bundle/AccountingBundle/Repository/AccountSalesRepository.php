@@ -441,6 +441,7 @@ class AccountSalesRepository extends EntityRepository
     {
         $amount = isset($data['amount']) ? $data['amount']:0;
         $mobile = isset($data['mobile']) ? $data['mobile']:'';
+
         $qb = $this->createQueryBuilder('e');
         $qb->select('customer.id as customerId ,customer.name as customerName , customer.mobile as customerMobile,COALESCE(SUM(e.totalAmount),0) as totalAmount, COALESCE(SUM(e.amount),0) as amount,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as customerBalance ');
         $qb->join('e.customer','customer');
@@ -1312,6 +1313,7 @@ class AccountSalesRepository extends EntityRepository
         return $accountSales;
     }
 
+
     public function insertStorePayment(BusinessInvoice $entity ,BusinessStoreLedger $sales)
     {
         $global = $sales->getBusinessConfig()->getGlobalOption();
@@ -1530,15 +1532,154 @@ class AccountSalesRepository extends EntityRepository
         return "valid";
     }
 
-    public function insertEcommerceSales(Order $entity)
+    public function insertBusinessExecutive(GlobalOption $option , $data)
     {
+        $global = $option->getId();
+        $config = $option->getBusinessConfig()->getId();
+        $em = $this->_em;
 
+        if(empty($data)){
+            $datetime = new \DateTime("now");
+            $startDate = $datetime->format('Y-m-d 00:00:00');
+            $endDate = $datetime->format('Y-m-d 23:59:59');
+        }else{
+            $startDate = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $endDate = date('Y-m-d 23:59:59',strtotime($data['endDate']));
+        }
+
+        $sql = "SELECT user.id as id,profile.name as name, SUM(sales.totalAmount) as total, SUM(invoice.subTotal) as subTotal, SUM(invoice.discount) as discount, SUM(sales.amount) as amount
+FROM account_sales as sales
+LEFT JOIN business_invoice as invoice ON invoice.id = sales.businessInvoice_id
+JOIN Customer as customer ON sales.customer_id = customer.id
+JOIN fos_user as user ON customer.marketing_id = user.id
+JOIN user_profiles as profile ON user.id = profile.user_id
+WHERE sales.globalOption_id = {$global} AND sales.process = 'approved' AND sales.created >= '2023-01-01 00:00:00' AND sales.created <= '2023-11-24 23:59:59'
+GROUP BY user.id ORDER BY sales.amount DESC";
+        $qb = $this->getEntityManager()->getConnection()->prepare($sql);
+        $qb->execute();
+        $result =  $qb->fetchAll();
+        return $result;
 
     }
-    public function insertEcommerceOrderPayable(OrderPayment $entity)
+
+    public function customerInvoice($globalOption,  $data = array())
     {
 
+        if(empty($data)){
+            $datetime = new \DateTime("now");
+            $startDate = $datetime->format('Y-m-d 00:00:00');
+            $endDate = $datetime->format('Y-m-d 23:59:59');
+        }else{
+            $startDate = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $endDate = date('Y-m-d 23:59:59',strtotime($data['endDate']));
+        }
+        $marketing = (isset($data['marketing']) and $data['marketing']) ? $data['marketing']:'';
+
+        $qb1 = $this->createQueryBuilder('e');
+        $qb1->select('customer.id as customerId ,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
+        $qb1->join('e.customer','customer');
+        $qb1->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb1->andWhere("e.process = 'approved'");
+        if($marketing){
+            $qb1->andWhere("customer.marketing = {$marketing}");
+        }
+        if (!empty($startDate) ) {
+            $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $qb1->andWhere("e.updated <= :startDate");
+            $qb1->setParameter('startDate', $start);
+        }
+
+        $qb1->groupBy('customer.id');
+        $qb1->orderBy('customer.name', 'ASC');
+        $result1 = $qb1->getQuery()->getArrayResult();
+
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('customer.id as customerId ,customer.name as customerName , customer.mobile as customerMobile,COALESCE(SUM(e.totalAmount),0) as totalAmount, COALESCE(SUM(e.amount),0) as amount,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as customerBalance ');
+        $qb->addSelect('COALESCE(SUM(invoice.discount),0) as discount','COALESCE(SUM(invoice.subTotal),0) as subTotal','COALESCE(SUM(invoice.total),0) as total');
+        $qb->leftJoin('e.businessInvoice','invoice');
+        $qb->join('e.customer','customer');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->andWhere("e.process = 'approved'");
+        if($marketing){
+            $qb->andWhere("customer.marketing = {$marketing}");
+        }
+        if (!empty($startDate) ) {
+            $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }
+        if (!empty($endDate)) {
+            $end = date('Y-m-d 23:59:59',strtotime($data['endDate']));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }
+        $qb->groupBy('customer.id');
+        $qb->orderBy('customer.name', 'ASC');
+        $result = $qb->getQuery()->getArrayResult();
+        $previous = array();
+        foreach ($result1 as $row){
+            $previous[$row['customerId']] = $row;
+        }
+        return array('current' => $result,'previous' => $previous);
 
     }
+
+    public function customerLedgerDetails($globalOption,  $data = array())
+    {
+
+        if(empty($data)){
+            $datetime = new \DateTime("now");
+            $startDate = $datetime->format('Y-m-d 00:00:00');
+            $endDate = $datetime->format('Y-m-d 23:59:59');
+        }else{
+            $startDate = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $endDate = date('Y-m-d 23:59:59',strtotime($data['endDate']));
+        }
+        $customer = (isset($data['customer']) and $data['customer']) ? $data['customer']:'';
+
+        $qb1 = $this->createQueryBuilder('e');
+        $qb1->select('customer.id as customerId ,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
+        $qb1->join('e.customer','customer');
+        $qb1->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb1->andWhere("e.process = 'approved'");
+        if($customer){
+            $qb1->andWhere("customer.id = {$customer}");
+        }
+        if (!empty($startDate) ) {
+            $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $qb1->andWhere("e.updated <= :startDate");
+            $qb1->setParameter('startDate', $start);
+        }
+        $previous = $qb1->getQuery()->getOneOrNullResult();
+
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('e.updated as created,e.accountRefNo as accountRefNo,e.processType as processType,COALESCE(e.totalAmount,0) as debit, COALESCE(e.amount,0) as credit,(COALESCE(e.totalAmount,0) - COALESCE(e.amount,0)) as balance ');
+        $qb->addSelect('invoice.discount as discount','invoice.invoice as invoiceNo','invoice.subTotal as subTotal');
+        $qb->addSelect('method.name as methodName');
+        $qb->leftJoin('e.businessInvoice','invoice');
+        $qb->leftJoin('e.transactionMethod','method');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->andWhere("e.process = 'approved'");
+        if($customer){
+            $qb->andWhere("e.customer = {$customer}");
+        }
+        if (!empty($startDate) ) {
+            $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }
+        if (!empty($endDate)) {
+            $end = date('Y-m-d 23:59:59',strtotime($data['endDate']));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }
+        $result = $qb->getQuery()->getArrayResult();
+    //    var_dump($result);
+     //   exit;
+        return array('current' => $result,'previous' => $previous);
+
+    }
+
+
 
 }

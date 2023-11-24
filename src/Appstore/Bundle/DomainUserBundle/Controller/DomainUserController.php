@@ -1,7 +1,6 @@
 <?php
 
 namespace Appstore\Bundle\DomainUserBundle\Controller;
-use Core\UserBundle\Form\MemberEditProfileType;
 use Core\UserBundle\Form\DomainEditUserType;
 use FOS\UserBundle\Model\UserManager;
 use Core\UserBundle\Entity\User;

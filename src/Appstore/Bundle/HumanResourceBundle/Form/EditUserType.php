@@ -46,6 +46,16 @@ class EditUserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('userGroup', 'choice', array(
+        'attr'=>array('class'=>'m-wrap span8'),
+        'expanded'      => false,
+        'multiple'      => false,
+        'choices' => array(
+            'employee' => 'Employee',
+            'user' => 'User',
+            'marketing' => 'Marketing Executive',
+        ),
+        ));
         $builder->add('profile', new \Appstore\Bundle\DomainUserBundle\Form\EmployeeProfileType($this->user, $this->option,$this->location));
       //  $builder->add('employeePayroll', new EmployeePayrollType($this->user, $this->option,$this->location));
     }

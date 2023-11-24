@@ -42,6 +42,7 @@ class DomainEditUserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+
             ->add('email','text', array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter your valid email address'),
                     'constraints' =>array(
                         new NotBlank(array('message'=>'Please enter your email address')),

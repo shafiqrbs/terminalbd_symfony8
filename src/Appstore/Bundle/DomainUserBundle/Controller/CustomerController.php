@@ -107,7 +107,8 @@ class CustomerController extends Controller
     private function createCreateForm(Customer $entity)
     {
         $location = $this->getDoctrine()->getRepository('SettingLocationBundle:Location');
-        $form = $this->createForm(new CustomerType($location), $entity, array(
+        $globalOption = $this->getUser()->getGlobalOption();
+        $form = $this->createForm(new CustomerType($globalOption,$location), $entity, array(
             'action' => $this->generateUrl('domain_customer_create'),
             'method' => 'POST',
             'attr' => array(
@@ -217,7 +218,8 @@ class CustomerController extends Controller
     private function createEditForm(Customer $entity)
     {
         $location = $this->getDoctrine()->getRepository('SettingLocationBundle:Location');
-        $form = $this->createForm(new CustomerEditType($location), $entity, array(
+        $globalOption = $this->getUser()->getGlobalOption();
+        $form = $this->createForm(new CustomerEditType($globalOption,$location), $entity, array(
             'action' => $this->generateUrl('domain_customer_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(

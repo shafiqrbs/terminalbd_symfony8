@@ -964,5 +964,32 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         return $qnt;
     }
 
+    public function getMarketingSalesProducts(GlobalOption $globalOption,$data)
+    {
+        $config = $globalOption->getBusinessConfig()->getId();
+        $marketing = (isset($data['marketing']) and $data['marketing']) ? $data['marketing']:'';
+        $customerId = (isset($data['customer']) and $data['customer']) ? $data['customer']:'';
+
+        $qb = $this->createQueryBuilder('pi');
+        $qb->select('p.name as itemName','p.id as itemId','SUM(pi.subTotal) as subTotal','SUM(pi.totalQuantity) as quantity','SUM(pi.bonusQnt) as bonusQuantity');
+        $qb->join('pi.businessInvoice','e');
+        $qb->join('e.customer','c');
+        $qb->join('pi.businessParticular','p');
+        $qb->where('p.businessConfig = :config')->setParameter('config', $config) ;
+        if($marketing){
+            $qb->andWhere('c.marketing = :marketing')->setParameter('marketing', $marketing) ;
+        }
+        if($customerId){
+            $qb->andWhere('c.id = :customer')->setParameter('customer', $customerId) ;
+        }
+        $qb->andWhere('e.process IN (:process)');
+        $qb->setParameter('process', array('Done','Delivered'));
+        $this->handleDateRangeFind($qb,$data);
+        $qb->groupBy('p.name');
+        $qb->orderBy('p.name','ASC');
+        $result = $qb->getQuery()->getArrayResult();
+        return  $result;
+    }
+
 
 }

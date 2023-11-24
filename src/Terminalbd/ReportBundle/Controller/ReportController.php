@@ -3,6 +3,8 @@
 namespace Terminalbd\ReportBundle\Controller;
 
 use Appstore\Bundle\AccountingBundle\Entity\Transaction;
+use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
+use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Core\UserBundle\Entity\User;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -1671,4 +1673,129 @@ class ReportController extends Controller
         );
         return new Response($htmlProcess);
     }
+
+    /**
+     * @Route("/miss-marketing-executive-report", methods={"GET", "POST"}, name="miss_marketing_executive_report")
+     * @Secure(roles="ROLE_REPORT,ROLE_REPORT_OPERATION_SALES, ROLE_DOMAIN")
+     */
+    public function missMarketingExecutiveReportAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $globalOption = $this->getUser()->getGlobalOption();
+        return $this->render('ReportBundle:Business/MarketingExecutive:index.html.twig', array(
+            'option' => $globalOption,
+        ));
+    }
+
+    /**
+     * @Route("/miss-marketing-executive-report-ajax-load", methods={"GET", "POST"}, name="miss_marketing_executive_report_ajax_load")
+     * @Secure(roles="ROLE_REPORT,ROLE_REPORT_OPERATION_SALES, ROLE_DOMAIN")
+     */
+    public function missMarketingExecutiveAjaxLoadAction()
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $global = $this->getUser()->getGlobalOption();
+        $pagination = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->insertBusinessExecutive($global,$data);
+        $htmlProcess = $this->renderView(
+            'ReportBundle:Business/MarketingExecutive:ajax-data.html.twig', array(
+                'entities' => $pagination,
+                'data' => $data,
+            )
+        );
+        return new Response($htmlProcess);
+    }
+
+    /**
+     * @Route("/miss-customer-invoice", methods={"GET", "POST"}, name="miss_customer_invoice_report")
+     * @Secure(roles="ROLE_REPORT_FINANCIAL,ROLE_REPORT, ROLE_DOMAIN")
+     */
+    public function customerInvoiceReportAction()
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $data =$_REQUEST;
+        $globalOption = $this->getUser()->getGlobalOption();
+        $executive = "";
+        $marketing = (isset($data['marketing']) and $data['marketing'] ) ? $data['marketing'] :'';
+        if($marketing){
+            $executive = $this->getDoctrine()->getRepository(User::class)->find($marketing);
+        }
+        $entities = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->customerInvoice($globalOption,$data);
+        return $this->render('ReportBundle:Default/Ledger:customer.html.twig', array(
+            'option' => $globalOption,
+            'executive' => $executive,
+            'entities' => $entities['current'],
+            'previous' => $entities['previous'],
+            'data' => $data,
+        ));
+
+    }
+
+     /**
+     * @Route("/miss-customer-invoice-ledger", methods={"GET", "POST"}, name="miss_customer_invoice_ledger_report")
+     * @Secure(roles="ROLE_REPORT_FINANCIAL,ROLE_REPORT, ROLE_DOMAIN")
+     */
+    public function customerInvoiceLedgerReportAction()
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $data =$_REQUEST;
+        $globalOption = $this->getUser()->getGlobalOption();
+        $customer = "";
+        $entities = "";
+        $customerId = (isset($data['customer']) and $data['customer'] ) ? $data['customer'] :'';
+        $customers = $this->getDoctrine()->getRepository("AccountingBundle:AccountSales")->customerOutstanding($globalOption);
+        if($customerId) {
+             if($customerId){
+                 $customer = $this->getDoctrine()->getRepository(Customer::class)->find($customerId);
+             }
+             $entities = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->customerLedgerDetails($globalOption,$data);
+        }
+        return $this->render('ReportBundle:Default/Ledger:customerDetails.html.twig', array(
+            'option' => $globalOption,
+            'customers' => $customers,
+            'customer' => $customer,
+            'entities' => ($entities) ? $entities['current'] : "",
+            'previous' => ($entities) ? $entities['previous'] : "",
+            'searchForm' => $data,
+        ));
+
+    }
+
+    /**
+     * @Route("/miss-business-product", methods={"GET", "POST"}, name="miss_business_product_report")
+     * @Secure(roles="ROLE_REPORT_FINANCIAL,ROLE_REPORT, ROLE_DOMAIN")
+     */
+    public function businessProductReportAction()
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $data =$_REQUEST;
+        $globalOption = $this->getUser()->getGlobalOption();
+        $executive = "";
+        $customer = "";
+        $marketing = (isset($data['marketing']) and $data['marketing'] ) ? $data['marketing'] :'';
+        $customerId = (isset($data['customer']) and $data['customer'] ) ? $data['customer'] :'';
+        if($marketing){
+            $executive = $this->getDoctrine()->getRepository(User::class)->find($marketing);
+        }
+        if($customerId){
+            $customer = $this->getDoctrine()->getRepository(Customer::class)->find($customerId);
+        }
+        $entities = $this->getDoctrine()->getRepository(BusinessInvoiceParticular::class)->getMarketingSalesProducts($globalOption,$data);
+        return $this->render('ReportBundle:Business/Stock:stock.html.twig', array(
+            'option' => $globalOption,
+            'marketing' => $executive,
+            'customer' => $customer,
+            'entities' => $entities,
+            'searchForm' => $data,
+        ));
+
+    }
+
+
 }

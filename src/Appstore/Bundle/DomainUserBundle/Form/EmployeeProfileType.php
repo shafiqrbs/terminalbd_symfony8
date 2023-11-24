@@ -154,10 +154,10 @@ class EmployeeProfileType extends AbstractType
                     'Full Time' => 'Full Time',
                     'Half Time' => 'Half Time',
                     'Contractual' => 'Contractual',
-                    'Hourly' => 'Hourly'
+                    'Hourly' => 'Hourly',
                 ),
             ));
-           //$builder->add('user', new UserType( $this->user, $this->global));
+
     }
     
     /**

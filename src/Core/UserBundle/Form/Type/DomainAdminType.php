@@ -46,6 +46,7 @@ class DomainSignType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+
             ->add('roles', 'choice', array(
                 'attr'=>array('class'=>'m-wrap span12 check-list'),
                 'required'=>true,

@@ -485,10 +485,10 @@ class UserRepository extends EntityRepository
     {
 
         $qb = $this->createQueryBuilder('e');
-        $array = array('user');
+        $array = array('user','executive');
         $qb->where("e.globalOption =".$option->getId());
         $qb->andWhere("e.userGroup IN (:userGroups)")->setParameter('userGroups',$array);
-      //  $qb->andWhere('e.isDelete != 1');
+        $qb->andWhere('e.isDelete != 1');
         $qb->orderBy("e.username","ASC");
         $result = $qb->getQuery()->getResult();
         return $result;
