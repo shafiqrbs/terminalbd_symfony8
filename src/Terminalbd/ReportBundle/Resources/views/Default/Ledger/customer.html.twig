@@ -38,9 +38,19 @@
                         <th class="text-right" ></th>
                     </tr>
                     <tbody>
+                    {% set subTotalSales = 0 %}
+                    {% set totalSales = 0 %}
+                    {% set totalDiscount = 0 %}
+                    {% set totalPayment = 0 %}
+
                     {% set balance = 0 %}
                     {% for entity in entities %}
+
                         {% set balance = balance + entity.customerBalance %}
+                        {% set subTotalSales = (subTotalSales + entity.subTotal) %}
+                        {% set totalSales = (totalSales + entity.totalAmount) %}
+                        {% set totalDiscount = (totalDiscount + entity.discount) %}
+                        {% set totalPayment = (totalPayment + entity.amount) %}
                         {% set openingBalance = (previous is defined and previous[entity.customerId] is defined and previous[entity.customerId] is not empty) ? previous[entity.customerId].balance : 0 %}
                         <tr>
                             <td>{{ loop.index }}</td>
@@ -61,8 +71,13 @@
                     </tbody>
                     <tfoot>
                     <tr>
-                        <th class="text-right" colspan="5">Grand Balance</th>
-                        <th class="text-right">{{ balance|number_format(2) }}</th>
+                        <td colspan="4" class="text-right"><strong>Grand Total</strong></td>
+                        <th class="text-right"><strong>{{ subTotalSales|number_format(2) }}</strong></th>
+                        <th class="text-right"><strong>{{ totalDiscount|number_format(2) }}</strong></th>
+                        <th class="text-right"><strong>{{ totalSales|number_format(2) }}</strong></th>
+                        <th class="text-right"><strong>{{ totalPayment|number_format(2) }}</strong></th>
+                        <th class="text-right"><strong>{{ (totalSales-totalPayment)|number_format(2) }}</strong></th>
+                        <th></th>
                     </tr>
                     </tfoot>
                 </table>

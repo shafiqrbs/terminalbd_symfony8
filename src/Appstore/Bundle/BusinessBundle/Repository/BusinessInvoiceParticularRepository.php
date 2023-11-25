@@ -984,7 +984,23 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         }
         $qb->andWhere('e.process IN (:process)');
         $qb->setParameter('process', array('Done','Delivered'));
-        $this->handleDateRangeFind($qb,$data);
+        if(empty($data)){
+            $datetime = new \DateTime("now");
+            $data['startDate'] = $datetime->format('Y-m-d 00:00:00');
+            $data['endDate'] = $datetime->format('Y-m-d 23:59:59');
+        }else{
+            $data['startDate'] = date('Y-m-d',strtotime($data['startDate']));
+            $data['endDate'] = date('Y-m-d',strtotime($data['endDate']));
+        }
+
+        if (!empty($data['startDate']) ) {
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $data['startDate'].' 00:00:00');
+        }
+        if (!empty($data['endDate'])) {
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate', $data['endDate'].' 23:59:59');
+        }
         $qb->groupBy('p.name');
         $qb->orderBy('p.name','ASC');
         $result = $qb->getQuery()->getArrayResult();
