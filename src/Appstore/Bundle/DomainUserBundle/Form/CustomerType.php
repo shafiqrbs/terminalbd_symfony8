@@ -49,7 +49,7 @@ class CustomerType extends AbstractType
             ->add('creditLimit','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Credit limit')))
             ->add('status')
             ->add('address','textarea', array('attr'=>array('class'=>'m-wrap span12 ','rows'=>8,'placeholder'=>'Enter customer address')))
-            /*->add('location', 'entity', array(
+            ->add('location', 'entity', array(
                 'required'    => false,
                 'empty_value' => '---Select Location---',
                 'attr'=>array('class'=>'select2 m-wrap span12'),
@@ -57,14 +57,13 @@ class CustomerType extends AbstractType
                 'choices'=> $this->LocationChoiceList(),
                 'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
-            ))*/
+            ))
             ->add('marketing', 'entity', array(
-                'required'    => true,
+                'required'    => false,
                 'class' => 'Core\UserBundle\Entity\User',
                 'empty_value' => '---Choose a marketing executive---',
                 'property' => 'userFullName',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'constraints' =>array(new NotBlank(array('message'=>'Please select to user name'))),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('u')
                         ->where("u.isDelete != 1")
