@@ -63,7 +63,7 @@ class CustomerType extends AbstractType
                 'class' => 'Core\UserBundle\Entity\User',
                 'empty_value' => '---Choose a marketing executive---',
                 'property' => 'userFullName',
-                'attr'=>array('class'=>'span12 m-wrap'),
+                'attr'=>array('class'=>'select2 span12 m-wrap'),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('u')
                         ->where("u.isDelete != 1")
