@@ -1585,7 +1585,7 @@ GROUP BY user.id ORDER BY sales.amount DESC";
         }
         if (!empty($startDate) ) {
             $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
-            $qb1->andWhere("e.updated <= :startDate");
+            $qb1->andWhere("e.updated < :startDate");
             $qb1->setParameter('startDate', $start);
         }
 
@@ -1647,7 +1647,7 @@ GROUP BY user.id ORDER BY sales.amount DESC";
         }
         if (!empty($startDate) ) {
             $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
-            $qb1->andWhere("e.updated <= :startDate");
+            $qb1->andWhere("e.updated < :startDate");
             $qb1->setParameter('startDate', $start);
         }
         $previous = $qb1->getQuery()->getOneOrNullResult();

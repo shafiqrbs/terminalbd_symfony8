@@ -71,9 +71,7 @@ class CustomerType extends AbstractType
                         ->andWhere("u.userGroup = 'marketing'")
                         ->orderBy("u.username", "ASC");
                 },
-            ))
-
-            ;
+            ));
     }
     
     /**
