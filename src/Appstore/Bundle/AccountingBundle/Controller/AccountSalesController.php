@@ -176,7 +176,12 @@ class AccountSalesController extends Controller
                 $entity->setTransactionMethod(null);
             }
             $accountConfig = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
-            if($accountConfig == 1){
+            if(isset($data['created']) and !empty($data['created'])){
+                $created = $data['created'];
+                $date = new \DateTime($created);
+                $entity->setCreated($date);
+                $entity->setUpdated($date);
+            }elseif($accountConfig == 1){
                 $datetime = new \DateTime("yesterday 23:30:30");
                 $entity->setCreated($datetime);
                 $entity->setUpdated($datetime);
