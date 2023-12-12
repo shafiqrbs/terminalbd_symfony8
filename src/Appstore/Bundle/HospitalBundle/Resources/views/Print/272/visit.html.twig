@@ -78,7 +78,7 @@
 
     </style>
 <div style="display: block">
-    {% if global.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ global.webPath('file') }}">{% endif %}
+    {% if entity.hospitalConfig.globalOption.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ entity.hospitalConfig.globalOption.webPath('file') }}">{% endif %}
     <div style="margin-top:{{ entity.hospitalConfig.printTopMargin }}px; margin-left:{{ entity.hospitalConfig.printLeftMargin }}px;margin-right:{{ entity.hospitalConfig.printLeftMargin }}px;" >
         <table class="table table-border" >
             <tr class="print-header">

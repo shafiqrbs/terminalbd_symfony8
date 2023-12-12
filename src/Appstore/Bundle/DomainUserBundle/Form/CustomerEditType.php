@@ -48,6 +48,15 @@ class CustomerEditType extends AbstractType
                         ->orderBy("u.username", "ASC");
                 },
             ))
+            ->add('location', 'entity', array(
+                'required'    => false,
+                'empty_value' => '---Select Location---',
+                'attr'=>array('class'=>' m-wrap span12'),
+                'class' => 'Setting\Bundle\LocationBundle\Entity\Location',
+                'choices'=> $this->LocationChoiceList(),
+                'choices_as_values' => true,
+                'choice_label' => 'nestedLabel',
+            ))
             ->add('name','text', array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Customer name'),
                     'constraints' =>array(
                         new NotBlank(array('message'=>'Please enter customer name'))

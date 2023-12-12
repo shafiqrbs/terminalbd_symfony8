@@ -1,9 +1,7 @@
 {% extends '::hms-print.html.twig' %}
 {% block body %}
     <div style="margin-top:{{ entity.hospitalConfig.printTopMargin }}px;margin-left:{{ entity.hospitalConfig.printLeftMargin }}px;">
-        {% if entity.hospitalConfig.isPrintHeader == 1 and entity.hospitalConfig.webHeaderPath is defined  and entity.hospitalConfig.webHeaderPath is not empty  %}
-            <img style="max-height:100px;width: 100%!important;" src="/{{ entity.hospitalConfig.webHeaderPath }}">
-        {% endif %}
+        {% if entity.hospitalConfig.globalOption.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ entity.hospitalConfig.globalOption.webPath('file') }}">{% endif %}
         <table class="table table-border" >
             <tr class="print-header">
                 <th colspan="2">

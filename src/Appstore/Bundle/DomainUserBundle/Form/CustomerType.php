@@ -52,7 +52,7 @@ class CustomerType extends AbstractType
             ->add('location', 'entity', array(
                 'required'    => false,
                 'empty_value' => '---Select Location---',
-                'attr'=>array('class'=>'select2 m-wrap span12'),
+                'attr'=>array('class'=>' m-wrap span12'),
                 'class' => 'Setting\Bundle\LocationBundle\Entity\Location',
                 'choices'=> $this->LocationChoiceList(),
                 'choices_as_values' => true,

@@ -29,23 +29,7 @@
 
     </style>
     <div id="print-container" style="margin-top:{{ entity.hospitalConfig.printTopMargin }}px;margin-left:{{ entity.hospitalConfig.printLeftMargin }}px;">
-        <table class="table" >
-            <tr>
-                <td>
-                    <div class="span4  pull-left invoice-logo-space">
-                        {% if global.templateCustomize.webPath('logo') is not empty %}   <img style="max-width: 180px; max-height:80px" src="/{{ global.templateCustomize.webPath('logo') }}">{% endif %}
-                    </div>
-                </td>
-                <td class="pull-right">
-                    <div class="span4">
-                        <ul class="unstyled">
-                            <li><strong>{{ global.name }}</strong></li>
-                            <li>{{ global.hospitalConfig.address|raw }}</li>
-                        </ul>
-                    </div>
-                </td>
-            </tr>
-        </table>
+        {% if entity.hospitalConfig.globalOption.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ entity.hospitalConfig.globalOption.webPath('file') }}">{% endif %}
         <table class="table table-border" >
             <tr class="print-header">
                 <th colspan="2">

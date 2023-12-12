@@ -1,8 +1,7 @@
 {% extends '::hms-print.html.twig' %}
 {% block body %}
-    {% if entity.hospitalConfig.isPrintHeader == 1 and entity.hospitalConfig.webHeaderPath is defined  and entity.hospitalConfig.webHeaderPath is not empty  %}
-        <img style="max-height:100px;width: 100%!important;" src="/{{ entity.hospitalConfig.webHeaderPath }}">
-    {% endif %}
+     <div>
+        {% if entity.hospitalConfig.globalOption.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ entity.hospitalConfig.globalOption.webPath('file') }}">{% endif %}
     <table class="table table-border" >
         <thead class="flip-content ">
         <tr class="print-header">
@@ -125,6 +124,7 @@
             <tr><td colspan="3">&nbsp;</td></tr>
         </table>
     {% endif %}
+     </div>
     <div class="grid-print">
         <div class="grid-print-item">
             <ul class="unstyled">

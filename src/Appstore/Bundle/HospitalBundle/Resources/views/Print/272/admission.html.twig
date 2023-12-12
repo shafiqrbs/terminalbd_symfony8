@@ -1,27 +1,8 @@
 {% extends '::hms-print.html.twig' %}
 {% block body %}
-    {%  if entity.hospitalConfig.isPrintHeader == 1 %}
-    <table class="table" style="margin-top:{{ entity.hospitalConfig.printTopMargin }}px;margin-left:{{ entity.hospitalConfig.printLeftMargin }}px;">
-        <tr>
-            <td>
-                <div class="span4  pull-left invoice-logo-space">
-                    {%  if entity.hospitalConfig.invoicePrintLogo == 1 %}
-                    {% if entity.hospitalConfig.globalOption.templateCustomize.webPath('logo') is not empty %}   <img style="max-width: 180px; max-height: 60px" src="/{{ entity.hospitalConfig.globalOption.templateCustomize.webPath('logo') }}">{% endif %}
-                    {%  endif %}
-                </div>
-            </td>
-            <td class="pull-right">
-                <div class="span4">
-                    <ul class="unstyled">
-                        <li><strong>{{ entity.hospitalConfig.globalOption.name }}</strong></li>
-                        <li><p>{{ entity.hospitalConfig.address|raw }}</p></li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-    </table>
-    {% endif %}
-    <table class="table table-border" >
+    <div>
+        {% if entity.hospitalConfig.globalOption.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ entity.hospitalConfig.globalOption.webPath('file') }}">{% endif %}
+        <table class="table table-border" >
         <thead class="flip-content ">
         <tr class="head-black">
             <th><strong class="pull-left">Bill To</strong></th><th><strong class="pull-right">Transaction</strong></th>
@@ -137,6 +118,7 @@
             <tr><td colspan="3">&nbsp;</td></tr>
         </table>
     {% endif %}
+    </div>
 {% endblock %}
 {% block cssBlock %}
     {% stylesheets filter='cssrewrite'
