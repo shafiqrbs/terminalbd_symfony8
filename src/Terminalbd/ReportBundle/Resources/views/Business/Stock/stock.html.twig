@@ -26,7 +26,8 @@
                         <th class="numeric" >Item Name</th>
                         <th class="numeric" >Quantity</th>
                         <th class="numeric" >Bonus Quantity</th>
-                        <th class="numeric" >Amount</th>
+                        <th class="numeric" >Return Quantity</th>
+                        <th class="numeric" >Net Quantity</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -38,13 +39,11 @@
                             <td class="numeric" >{{ entity.itemName }}</td>
                             <td class="numeric" >{{ entity.quantity }}</td>
                             <td class="numeric" >{{ entity.bonusQuantity }}</td>
-                            <td class="numeric" >{{ entity.subTotal|number_format(2) }}</td>
+                            <td class="numeric" >{{ (salesReturns is defined and salesReturns[entity.itemId] is defined and salesReturns[entity.itemId] is not empty) ? salesReturns[entity.itemId].quantity : 0 }}</td>
+                            <td class="numeric" >{{ (salesReturns is defined and salesReturns[entity.itemId] is defined and salesReturns[entity.itemId] is not empty) ? (entity.quantity - salesReturns[entity.itemId].quantity) : entity.quantity }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
-                    <tfoot>
-                    <tr><td colspan="4">Total Amount</td><td>{{ total|number_format(2) }}</td></tr>
-                    </tfoot>
                 </table>
             </div>
         </div>

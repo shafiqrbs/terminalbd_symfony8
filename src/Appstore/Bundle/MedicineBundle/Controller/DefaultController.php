@@ -247,10 +247,26 @@ class DefaultController extends Controller
         ignore_user_abort(true);
 	    $config = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
 	    $this->getDoctrine()->getRepository("MedicineBundle:MedicineStock")->updateRemainingQuantityReset($config);
-	  //  $this->getDoctrine()->getRepository("MedicineBundle:MedicineStockReport")->yearlyStockLedgerReport($config);
-	   // $this->getDoctrine()->getRepository("MedicineBundle:MedicineStockReport")->monthlyStockLedgerReport($config);
-        return $this->redirect($this->generateUrl('medicine_stock'));
+	    return $this->redirect($this->generateUrl('medicine_stock'));
 	}
+
+    public function monthlyStockLedgerAction(){
+
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $config = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
+        $this->getDoctrine()->getRepository("MedicineBundle:MedicineStockReport")->monthlyStockLedgerReport($config);
+        return $this->redirect($this->generateUrl('medicine_stock'));
+    }
+
+    public function yearlyStockLedgerAction(){
+
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $config = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
+        $this->getDoctrine()->getRepository("MedicineBundle:MedicineStockReport")->yearlyStockLedgerReport($config);
+        return $this->redirect($this->generateUrl('medicine_stock'));
+    }
 
     public function vendorPaymentReceiveAction($vendor)
     {

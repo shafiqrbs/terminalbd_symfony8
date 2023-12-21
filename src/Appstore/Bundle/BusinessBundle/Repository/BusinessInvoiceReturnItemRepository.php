@@ -14,6 +14,7 @@ use Appstore\Bundle\BusinessBundle\Entity\WearHouse;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Core\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
+use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 
 
 /**
@@ -191,6 +192,56 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
                 $em->flush();
             }
         endforeach;
+    }
+
+
+    public function getMarketingSalesReturnProducts(GlobalOption $globalOption,$data)
+    {
+        $config = $globalOption->getBusinessConfig()->getId();
+        $marketing = (isset($data['marketing']) and $data['marketing']) ? $data['marketing']:'';
+        $customerId = (isset($data['customer']) and $data['customer']) ? $data['customer']:'';
+
+        $qb = $this->createQueryBuilder('pi');
+        $qb->select('p.id as itemId','SUM(pi.quantity) as quantity');
+        $qb->join('pi.invoiceReturn','e');
+        $qb->join('e.customer','c');
+        $qb->join('pi.businessParticular','p');
+        $qb->where('p.businessConfig = :config')->setParameter('config', $config) ;
+        if($marketing){
+            $qb->andWhere('c.marketing = :marketing')->setParameter('marketing', $marketing) ;
+        }
+        if($customerId){
+            $qb->andWhere('c.id = :customer')->setParameter('customer', $customerId) ;
+        }
+        $qb->andWhere('e.process IN (:process)');
+        $qb->setParameter('process', array('Done','Approved'));
+        if(empty($data)){
+            $datetime = new \DateTime("now");
+            $data['startDate'] = $datetime->format('Y-m-d 00:00:00');
+            $data['endDate'] = $datetime->format('Y-m-d 23:59:59');
+        }else{
+            $data['startDate'] = date('Y-m-d',strtotime($data['startDate']));
+            $data['endDate'] = date('Y-m-d',strtotime($data['endDate']));
+        }
+
+        if (!empty($data['startDate']) ) {
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $data['startDate'].' 00:00:00');
+        }
+        if (!empty($data['endDate'])) {
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate', $data['endDate'].' 23:59:59');
+        }
+        $qb->groupBy('p.name');
+        $qb->orderBy('p.name','ASC');
+        $result = $qb->getQuery()->getArrayResult();
+        $returns = array();
+        if($result){
+            foreach ($result as $row):
+                $returns[$row['itemId']] = $row;
+            endforeach;
+        }
+        return  $returns;
     }
 
 

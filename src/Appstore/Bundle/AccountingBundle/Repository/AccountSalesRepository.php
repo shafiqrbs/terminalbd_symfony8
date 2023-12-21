@@ -1553,7 +1553,7 @@ LEFT JOIN business_invoice as invoice ON invoice.id = sales.businessInvoice_id
 JOIN Customer as customer ON sales.customer_id = customer.id
 JOIN fos_user as user ON customer.marketing_id = user.id
 JOIN user_profiles as profile ON user.id = profile.user_id
-WHERE sales.globalOption_id = {$global} AND sales.process = 'approved' AND sales.created >= '2023-01-01 00:00:00' AND sales.created <= '2023-11-24 23:59:59'
+WHERE sales.globalOption_id = {$global} AND sales.process = 'approved' AND sales.created >= '{$startDate}' AND sales.created <= '{$endDate}'
 GROUP BY user.id ORDER BY sales.amount DESC";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->execute();

@@ -38,20 +38,21 @@
                         <th class="text-right" ></th>
                     </tr>
                     <tbody>
+                    {% set opening = 0 %}
+                    {% set openingBalance = 0 %}
                     {% set subTotalSales = 0 %}
                     {% set totalSales = 0 %}
                     {% set totalDiscount = 0 %}
                     {% set totalPayment = 0 %}
-
                     {% set balance = 0 %}
                     {% for entity in entities %}
-
                         {% set balance = balance + entity.customerBalance %}
                         {% set subTotalSales = (subTotalSales + entity.subTotal) %}
                         {% set totalSales = (totalSales + entity.totalAmount) %}
                         {% set totalDiscount = (totalDiscount + entity.discount) %}
                         {% set totalPayment = (totalPayment + entity.amount) %}
                         {% set openingBalance = (previous is defined and previous[entity.customerId] is defined and previous[entity.customerId] is not empty) ? previous[entity.customerId].balance : 0 %}
+                        {% set opening = (previous is defined and previous[entity.customerId] is defined and previous[entity.customerId] is not empty) ? opening + (previous[entity.customerId].balance)|default(2) : opening + 0 %}
                         <tr>
                             <td>{{ loop.index }}</td>
                             <td class="numeric" >{{ entity.customerName|capitalize }}</td>
@@ -71,12 +72,13 @@
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td colspan="4" class="text-right"><strong>Grand Total</strong></td>
+                        <td colspan="3" class="text-right"><strong>Grand Total</strong></td>
+                        <th class="text-right"><strong>{{ opening|number_format(2) }}</strong></th>
                         <th class="text-right"><strong>{{ subTotalSales|number_format(2) }}</strong></th>
                         <th class="text-right"><strong>{{ totalDiscount|number_format(2) }}</strong></th>
                         <th class="text-right"><strong>{{ totalSales|number_format(2) }}</strong></th>
                         <th class="text-right"><strong>{{ totalPayment|number_format(2) }}</strong></th>
-                        <th class="text-right"><strong>{{ (totalSales-totalPayment)|number_format(2) }}</strong></th>
+                        <th class="text-right"><strong>{{ ((opening + totalSales) - totalPayment)|number_format(2) }}</strong></th>
                         <th></th>
                     </tr>
                     </tfoot>

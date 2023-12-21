@@ -995,6 +995,10 @@ class InvoiceController extends Controller
                 $this->getDoctrine()->getRepository('AccountingBundle:AccountPurchase')->insertTloAdjustment($entity);
             }
             $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->insertBusinessAccountInvoice($entity);
+
+            if($entity->getBusinessConfig()->isStockHistory() == 1 ) {
+                $this->getDoctrine()->getRepository('BusinessBundle:BusinessStockHistory')->processInsertSalesItem($entity);
+            }
             $em = $this->getDoctrine()->getManager();
             $entity->setProcess("Delivered");
             $entity->setApprovedBy($this->getUser());
@@ -1008,6 +1012,7 @@ class InvoiceController extends Controller
             }
             return new Response("Success");
         }
+        return new Response("Failed");
 
     }
 

@@ -4,7 +4,9 @@ namespace Terminalbd\ReportBundle\Controller;
 
 use Appstore\Bundle\AccountingBundle\Entity\Transaction;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
+use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceReturnItem;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineSalesReturnInvoice;
 use Core\UserBundle\Entity\User;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -1787,11 +1789,14 @@ class ReportController extends Controller
             $customer = $this->getDoctrine()->getRepository(Customer::class)->find($customerId);
         }
         $entities = $this->getDoctrine()->getRepository(BusinessInvoiceParticular::class)->getMarketingSalesProducts($globalOption,$data);
+        $salesReturns = $this->getDoctrine()->getRepository(BusinessInvoiceReturnItem::class)->getMarketingSalesReturnProducts($globalOption,$data);
+
         return $this->render('ReportBundle:Business/Stock:stock.html.twig', array(
             'option' => $globalOption,
             'marketing' => $executive,
             'customer' => $customer,
             'entities' => $entities,
+            'salesReturns' => $salesReturns,
             'searchForm' => $data,
         ));
 
