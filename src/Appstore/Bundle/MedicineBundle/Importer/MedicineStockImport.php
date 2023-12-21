@@ -34,7 +34,7 @@ class MedicineStockImport
     {
         $this->data = $data;
         foreach($this->data as $key => $item) {
-            $name = $item['MedicineName'];
+            $name = "{$item['MedicineName']}";
             $ProductId = isset($item['ProductId']) ? $item['ProductId']:'';
             $brand  = $this->medicineImport->getName();
             $config = $this->medicineImport->getMedicineConfig();
@@ -45,7 +45,7 @@ class MedicineStockImport
             $minStock = isset($item['MinStock']) ? $item['MinStock']:1;
             $Category = isset($item['Category']) ? $item['Category']:'';
             $Brand = isset($item['BrandName']) ? $item['BrandName']:'';
-            $Unit = isset($item['Unit']) ? $item['Unit']:'';
+            $Unit = isset($item['Unit']) ? $item['Unit']:'Pcs';
 
             if($exist) {
                 $medicine = $exist;

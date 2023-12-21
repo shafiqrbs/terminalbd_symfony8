@@ -281,6 +281,8 @@ security:
                 path:   /logout
                 target: /login
             anonymous:    true
+            form_login:
+                remember_me: true
             remember_me:
                 secret:   '%kernel.secret%'
                 lifetime: 31536000 # 1 week in seconds
