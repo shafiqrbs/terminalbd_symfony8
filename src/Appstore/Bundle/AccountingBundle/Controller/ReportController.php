@@ -503,7 +503,7 @@ class ReportController extends Controller
 		$customer ='';
 		$overview = '';
 		if(isset($data['mobile']) and !empty($data['mobile'])){
-			$customer = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->findOneBy(array('mobile'=>$data['mobile']));
+			$customer = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption' => $this->getUser()->getGlobalOption()->getId(),'mobile'=>$data['mobile']));
 			$overview = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->salesOverview($user,$data);
 		}
 		$entities = $em->getRepository('AccountingBundle:AccountSales')->customerLedger($user,$data);
