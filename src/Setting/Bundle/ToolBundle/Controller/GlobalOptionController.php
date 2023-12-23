@@ -250,6 +250,46 @@ class GlobalOptionController extends Controller
         return $this->redirect($this->generateUrl('tools_domain'));
     }
 
+     /**
+     * Reset a GlobalOption entity.
+     *
+     */
+    public function resetLogoAction(Request $request,GlobalOption $entity)
+    {
+        $em = $this->getDoctrine()->getManager();
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find GlobalOption entity.');
+        }
+        $entity->removeUpload();
+        $entity->getTemplateCustomize()->removeLogo();
+        $entity->getTemplateCustomize()->setLogo(null);
+        $template =  $entity->getTemplateCustomize();
+        if(!empty($template->getLogo())){
+            $template->removeLogo();
+            $template->setLogo(NULL);
+        }
+        if(!empty($template->getFavicon())){
+            $template->removeFavicon();
+            $template->setFavicon(NULL);
+        }
+        if(!empty($template->getHeaderBgImage())){
+            $template->removeHeaderImage();
+            $template->setHeaderBgImage(NULL);
+        }
+        if(!empty($template->getBgImage())){
+            $template->removeBodyImage();
+            $template->setBgImage(NULL);
+        }
+        if(!empty($template->getAndroidLogo())){
+            $template->removeAndroidLogo();
+            $template->setAndroidLogo(NULL);
+        }
+        $em->flush();
+        $this->get('session')->getFlashBag()->add('error',"Data has been reset successfully");
+        $referer = $request->headers->get('referer');
+        return new RedirectResponse($referer);
+    }
+
     /**
      * Creates a form to delete a GlobalOption entity by id.
      *

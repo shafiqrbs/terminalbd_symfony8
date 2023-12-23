@@ -1548,7 +1548,7 @@
                                     <div class="controls">
                                         <div data-provides="fileupload" class="fileupload fileupload-new">
                                             <div style="width: 200px; height: 150px;" class="fileupload-new thumbnail">
-                                                {% if(entity.webPath('logo') is defined ) %}
+                                                {% if(entity.webPath('logo') is defined and entity.logo) %}
                                                     <img class="fileupload-preview fileupload-exists thumbnail" alt="" src="/{{ entity.webPath('logo') }}">
                                                 {% else %}
                                                     <img alt="" src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text=no+image">
@@ -1598,7 +1598,7 @@
                                     <div class="controls">
                                         <div data-provides="fileupload" class="fileupload fileupload-new">
                                             <div style="width:150px; height: 150px;" class="fileupload-new thumbnail">
-                                                {% if(entity.webPath('favicon') is defined ) %}
+                                                {% if(entity.webPath('favicon') is defined  and entity.favicon ) %}
                                                     <img class="fileupload-preview fileupload-exists thumbnail" alt="" src="/{{ entity.webPath('favicon') }}">
                                                 {% else %}
                                                     <img alt="" src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text=no+image">

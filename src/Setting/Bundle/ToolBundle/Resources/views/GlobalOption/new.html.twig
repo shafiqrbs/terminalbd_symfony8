@@ -79,7 +79,10 @@
                         {% endif %}
                         <div class="actions">
                             <div class="btn-group">
-                                <a class="btn" href="{{ path('templatecustomize_edit',{ 'id': entity.id }) }}" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <a class="btn purple" href="{{ path('globaloption_reset_logo',{ 'id': entity.id }) }}">
+                                    Reset Logo
+                                </a>
+                                <a class="btn" href="{{ path('globaloption_reset_logo',{ 'id': entity.id }) }}" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     Design
                                     <i class="icon-angle-down"></i>
                                 </a>

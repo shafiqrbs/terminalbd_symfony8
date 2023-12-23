@@ -1734,7 +1734,11 @@ class TemplateCustomize
     public function removeLogo()
     {
 
-        if ($file = $this->getAbsolutePath()) {
+        $path = null === $this->logoFile
+            ? null
+            : $this->getUploadRootDir().'/'.$this->logoFile;
+
+        if ($file = $path) {
             unlink($file);
         }
     }

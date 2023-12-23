@@ -2389,8 +2389,6 @@ class GlobalOption
         }
     }
 
-
-
     public function upload()
     {
         // the file property can be empty if the field is not required
@@ -2431,7 +2429,5 @@ class GlobalOption
     {
         $this->linkDomain = $linkDomain;
     }
-
-
 
 }

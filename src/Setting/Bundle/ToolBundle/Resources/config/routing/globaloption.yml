@@ -39,6 +39,10 @@ globaloption_delete:
     path:     /{id}/delete
     defaults: { _controller: "SettingToolBundle:GlobalOption:delete" }
 
+globaloption_reset_logo:
+    path:     /{id}/reset-logo
+    defaults: { _controller: "SettingToolBundle:GlobalOption:resetLogo" }
+
 globaloption_modify:
     path:     /modify
     defaults: { _controller: "SettingToolBundle:GlobalOption:modify" }
