@@ -60,14 +60,12 @@
                                         <li><strong>Created:</strong>&nbsp;{{ entity.updated|date('d-m-Y') }}</li>
                                     </ul>
                                 </div>
-
                                 <div class="span4 invoice-payment">
                                     <h4>Payment Details:</h4>
                                     <ul class="unstyled">
                                         <li><strong>Sub-Total BDT:</strong>&nbsp;{{ entity.subTotal|number_format() }}</li>
                                      </ul>
                                 </div>
-
                             </div>
                             {% include('flash-message.html.twig')  %}
                             <div class="row-fluid box blue">

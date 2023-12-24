@@ -4,6 +4,7 @@ namespace Bindu\BinduBundle\Controller;
 
 use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Setting\Bundle\AppearanceBundle\Entity\TemplateCustomize;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Setting\Bundle\ToolBundle\Entity\PaymentCard;
@@ -1501,7 +1502,6 @@ class ApiPoskeeperController extends Controller
 
         }else{
 
-
             $jsonInput = '[
             {
             "invoiceId":"051900113","subTotal":"1200","discount":"200","discountType":"Flat","discountCalculation":"10","vat":"0","total":"1000","receive":"800","due":"200","customerId":"223","customerName":"Jacky","customerMobile":"01828148148","addresss":"Dhaka","transactionMethod":"cash","bankAccount":"","mobileBankAccount":"","paymentMobile":"","paymentCard":"","paymentCardNo":"","transactionId":"","salesBy":"","created":"","createdBy":"","slipNo":"","tokenNo":"","discountCoupon":"","remark":""
@@ -1526,12 +1526,12 @@ class ApiPoskeeperController extends Controller
 
            // $data = array('item' => $jsonInput,'itemCount'=> 1,'subItem'=> $jsonInputItem,'subItemCount'=> 4);
 
-
             if($entity->getMainApp()->getSlug() == 'miss'){
                 $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->insertAndroidProcess($entity,$deviceId,'sales',$data);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
                 $this->getDoctrine()->getRepository('RestaurantBundle:RestaurantAndroidProcess')->insertAndroidProcess($entity,$deviceId,'sales',$data);
             }
+
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1546,14 +1546,9 @@ class ApiPoskeeperController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-
-
         if( $this->checkApiValidation($request) == 'invalid') {
-
             return new Response('Unauthorized access.', 401);
-
         }else{
-
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->getPurchaseList($entity);
@@ -1707,6 +1702,177 @@ class ApiPoskeeperController extends Controller
     }
     public function apiOnlineVendorLedgerAction()
     {
+
+    }
+
+
+    public function stockUpdateAction(Request $request)
+    {
+
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $data = $request->request->all();
+            $entity = $this->checkApiValidation($request);
+            $stockId = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
+            $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateAndroidStock($data);
+            if($entity->getMainApp()->getSlug() == 'miss'){
+                $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getApiStock($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
+                $data = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiStock($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
+                $data = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiStock($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'business'){
+                $data = $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->getApiStock($entity);
+            }
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function stockDeleteAction(Request $request)
+    {
+
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $data = $request->request->all();
+            $entity = $this->checkApiValidation($request);
+            $stockId = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
+            if($entity->getMainApp()->getSlug() == 'miss'){
+                $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getApiStockDelete($entity,$stockId);
+            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
+                $data = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiStockDelete($entity,$stockId);
+            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
+                $data = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiStockDelete($entity,$stockId);
+            }elseif($entity->getMainApp()->getSlug() == 'business'){
+                $data = $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->getApiStockDelete($entity,$stockId);
+            }
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function customerLedgerAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $formArray = $request->request->all();
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $result = $this->getDoctrine()->getRepository("AccountingBundle:AccountSales")->apiCustomerLedger($entity,$formArray);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($result));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
+    public function customerInvoiceAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $invoice = $request->request->get('invoice');
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            if($entity->getMainApp()->getSlug() == 'miss'){
+                $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->getApiSalesInvoice($entity,$invoice);
+            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
+                $data = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiSalesInvoice($entity,$invoice);
+            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
+                $data = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiSalesInvoice($entity,$invoice);
+            }elseif($entity->getMainApp()->getSlug() == 'business'){
+                $data = $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->getApiSalesInvoice($entity,$invoice);
+            }
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
+    public function salesInvoiceMessageAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            if($entity->getMainApp()->getSlug() == 'miss'){
+                $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineParticular')->apiInvoiceMessage($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
+                $data = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->apiInvoiceMessage($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
+                $data = $this->getDoctrine()->getRepository('InventoryBundle:Item')->apiInvoiceMessage($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'business'){
+                $data = $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->apiInvoiceMessage($entity);
+            }
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
+    public function salesReceiveAction(Request $request)
+    {
+
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $data = $request->request->all();
+            /* @var $option GlobalOption */
+            $option = $this->checkApiValidation($request);
+            $status = $this->getDoctrine()->getRepository("AccountingBundle:AccountSales")->apiInsertSalesReceive($option,$data);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('status'=> $status)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
 
     }
 

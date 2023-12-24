@@ -2,6 +2,7 @@
 
 namespace Appstore\Bundle\MedicineBundle\Repository;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineAndroidProcess;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineSales;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSalesParticular;
 use Appstore\Bundle\MedicineBundle\Entity\Particular;
 use Doctrine\ORM\EntityRepository;
@@ -46,6 +47,9 @@ class MedicineAndroidProcessRepository extends EntityRepository
         $entity->setStatus(false);
         $em->persist($entity);
         $em->flush();
+        if(isset($data['mode']) and $data['mode'] === "online"){
+            $em->getRepository(MedicineSales::class)->insertApiSalesManual($option,$entity);
+        }
         return $entity;
 
     }
