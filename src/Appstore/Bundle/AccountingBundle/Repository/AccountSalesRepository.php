@@ -1434,12 +1434,12 @@ class AccountSalesRepository extends EntityRepository
     public function apiCustomerLedger(GlobalOption $globalOption,$arr)
     {
 
+       // var_dump($data);
         $qb = $this->createQueryBuilder('e');
         $qb->join('e.customer','customer');
         $qb->leftJoin('e.transactionMethod','transactionMethod');
         $qb->select('transactionMethod.name as method');
-        $qb->addSelect('customer.id as customerId');
-        $qb->addSelect('e.id as id','e.created as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.sourceInvoice as sourceInvoice');
+        $qb->addSelect('e.id as id','e.updated as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.sourceInvoice as sourceInvoice');
         $qb->where("e.globalOption = :globalOption");
         $qb->setParameter('globalOption', $globalOption);
         $this->handleSearchBetween($qb,$arr);
@@ -1449,7 +1449,6 @@ class AccountSalesRepository extends EntityRepository
         foreach ($result as $key => $row){
 
             $data[$key]['id'] = $row['id'];
-            $data[$key]['customer'] = $row['customerId'];
             $data[$key]['method'] = ($row['method']) ? $row['method']:'';
             $data[$key]['sales'] = $row['totalAmount'];
             $data[$key]['receive'] = $row['amount'];
