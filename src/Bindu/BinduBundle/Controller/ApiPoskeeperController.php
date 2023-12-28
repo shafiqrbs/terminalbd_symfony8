@@ -1518,18 +1518,19 @@ class ApiPoskeeperController extends Controller
 
 
             $data = $request->request->all();
+            var_dump($data);
 
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
 
-           // $data = array('mode' => "online/offline",'itemCount'=> 1,'itemCount'=> 1,'subItem'=> $jsonInputItem,'subItemCount'=> 4);
+            $data = array('mode' => "online/offline",'itemCount'=> 1,'itemCount'=> 1,'subItem'=> $jsonInputItem,'subItemCount'=> 4);
 
             if($entity->getMainApp()->getSlug() == 'miss'){
                 $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $this->getDoctrine()->getRepository('RestaurantBundle:RestaurantAndroidProcess')->insertAndroidProcess($entity,$deviceId,'sales',$data);
+                $this->getDoctrine()->getRepository('RestaurantBundle:RestaurantAndroidProcess')->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
             }
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
