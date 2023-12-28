@@ -1780,7 +1780,7 @@ class ApiPoskeeperController extends Controller
 
         }else{
 
-            $formArray = $request->request->all();
+            $formArray = $_REQUEST;
             var_dump($formArray);
             exit;
             /* @var $entity GlobalOption */
