@@ -1494,6 +1494,9 @@ class ApiPoskeeperController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
+        $data = $request->request->all();
+        var_dump($data);
+        exit;
 
 
         if( $this->checkApiValidation($request) == 'invalid') {
@@ -1517,9 +1520,6 @@ class ApiPoskeeperController extends Controller
 
 
 
-            $data = $request->request->all();
-            var_dump($data);
-            exit;
 
             /* @var $entity GlobalOption */
 
