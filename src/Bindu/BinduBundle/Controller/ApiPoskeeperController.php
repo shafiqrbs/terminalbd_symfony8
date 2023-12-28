@@ -1519,6 +1519,7 @@ class ApiPoskeeperController extends Controller
 
             $data = $request->request->all();
             var_dump($data);
+            exit;
 
             /* @var $entity GlobalOption */
 
