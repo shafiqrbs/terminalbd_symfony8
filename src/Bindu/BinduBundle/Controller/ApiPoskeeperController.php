@@ -1494,7 +1494,7 @@ class ApiPoskeeperController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $data = $request->request->all();
+        $data = $request->getContent();
         var_dump($data);
         exit;
 
