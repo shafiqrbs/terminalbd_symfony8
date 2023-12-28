@@ -40,10 +40,10 @@ class MedicineAndroidProcessRepository extends EntityRepository
         $entity->setMedicineConfig($option->getMedicineConfig());
         $entity->setAndroidDevice($device);
         $entity->setProcess($process);
-        $entity->setJsonItem($data['item']);
-        $entity->setItemCount($data['itemCount']);
-        $entity->setJsonSubItem($data['subItem']);
-        $entity->setSubItemCount($data['subItemCount']);
+        $entity->setJsonItem($data['sales']);
+        $entity->setItemCount($data['sales_count']);
+        $entity->setJsonSubItem($data['sales_item']);
+        $entity->setSubItemCount($data['sales_item_count']);
         $entity->setStatus(false);
         $em->persist($entity);
         $em->flush();
