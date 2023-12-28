@@ -1434,7 +1434,8 @@ class AccountSalesRepository extends EntityRepository
     public function apiCustomerLedger(GlobalOption $globalOption,$arr)
     {
 
-       // var_dump($data);
+        var_dump($arr);
+        exit;
         $qb = $this->createQueryBuilder('e');
         $qb->join('e.customer','customer');
         $qb->leftJoin('e.transactionMethod','transactionMethod');
@@ -1444,6 +1445,7 @@ class AccountSalesRepository extends EntityRepository
         $qb->where("e.globalOption = :globalOption");
         $qb->setParameter('globalOption', $globalOption);
         $this->handleSearchBetween($qb,$arr);
+        $qb->setMaxResults(100);
         $qb->orderBy('e.updated','DESC');
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
