@@ -55,7 +55,7 @@ class MedicineAndroidProcessRepository extends EntityRepository
     public function insertFlutterSalesProcess(GlobalOption $option,$device,$process,$data)
     {
         $em =  $this->_em;
-     //   $data = json_decode($data);
+        $data = json_decode($data,true);
         $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
         $entity = new MedicineAndroidProcess();
         $entity->setMedicineConfig($option->getMedicineConfig());
