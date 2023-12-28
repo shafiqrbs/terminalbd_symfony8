@@ -1781,6 +1781,8 @@ class ApiPoskeeperController extends Controller
         }else{
 
             $formArray = $request->request->all();
+            var_dump($formArray);
+            exit;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $result = $this->getDoctrine()->getRepository("AccountingBundle:AccountSales")->apiCustomerLedger($entity,$formArray);
