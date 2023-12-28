@@ -1494,7 +1494,7 @@ class ApiPoskeeperController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $data = $request->getContent();
+
 
         if( $this->checkApiValidation($request) == 'invalid') {
 
@@ -1517,13 +1517,14 @@ class ApiPoskeeperController extends Controller
 
 
 
+            $data = $request->request->all();
 
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
 
-         //   $data = array('mode' => "online/offline",'itemCount'=> 1,'itemCount'=> 1,'subItem'=> $jsonInputItem,'subItemCount'=> 4);
+           // $data = array('mode' => "online/offline",'itemCount'=> 1,'itemCount'=> 1,'subItem'=> $jsonInputItem,'subItemCount'=> 4);
 
             if($entity->getMainApp()->getSlug() == 'miss'){
                 $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
