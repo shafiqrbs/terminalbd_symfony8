@@ -40,6 +40,27 @@ class MedicineAndroidProcessRepository extends EntityRepository
         $entity->setMedicineConfig($option->getMedicineConfig());
         $entity->setAndroidDevice($device);
         $entity->setProcess($process);
+        $entity->setJsonItem($data['item']);
+        $entity->setItemCount($data['itemCount']);
+        $entity->setJsonSubItem($data['subItem']);
+        $entity->setSubItemCount($data['subItemCount']);
+        $entity->setStatus(false);
+        $em->persist($entity);
+        $em->flush();
+        return $entity;
+
+    }
+
+
+    public function insertFlutterSalesProcess(GlobalOption $option,$device,$process,$data)
+    {
+        $em =  $this->_em;
+        $data = json_decode($data);
+        $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
+        $entity = new MedicineAndroidProcess();
+        $entity->setMedicineConfig($option->getMedicineConfig());
+        $entity->setAndroidDevice($device);
+        $entity->setProcess($process);
         $entity->setJsonItem($data['sales']);
         $entity->setItemCount($data['sales_count']);
         $entity->setJsonSubItem($data['sales_item']);
@@ -53,6 +74,7 @@ class MedicineAndroidProcessRepository extends EntityRepository
         return $entity;
 
     }
+
 
 
 }
