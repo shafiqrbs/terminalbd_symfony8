@@ -33,55 +33,17 @@
                 <div class="portlet box green tabbable">
                     <div class="portlet-title">
                         <div class="caption"><i class="icon-reorder"></i>{{ entity.name }}&nbsp;( <em>{{ entity.syndicate.name }}</em> )</div>
-                        {% if entity.siteSetting.appModules is not empty %}
+
                         <div class="actions">
                             <div class="btn-group">
-                                <a class="btn red" href="{{ path('tools_domain') }}"> <i class="icon-th-list"></i> Domain</a>
-                                <a class="btn" href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                                    App Store
-                                    <i class="icon-angle-down"></i>
+                                <a class="btn red" href="{{ path('tools_option_hard_reset',{ 'id': entity.id }) }}">
+                                    Hard Reset
                                 </a>
-                                <ul class="dropdown-menu pull-right">
-
-                                    <li class="divider"></li>
-
-                                        {% for appmodule in entity.siteSetting.appModules %}
-                                        <li><a href="/{{ appmodule.slug }}/config/manage">{{ appmodule.name }}</a></li>
-                                        {% endfor %}
-
-                                    <li class="divider"></li>
-
-                                </ul>
-                            </div>
-                        </div>
-                        {% endif %}
-                        {% if entity.siteSetting.modules is not empty %}
-                        <div class="actions">
-                            <div class="btn-group">
-                                <a class="btn" href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                                    Modules
-                                    <i class="icon-angle-down"></i>
-                                </a>
-                                <ul class="dropdown-menu pull-right">
-
-                                    <li class="divider"></li>
-
-                                        {% for module in entity.siteSetting.modules %}
-                                            <li><a href="/website/{{ module.slug }}">{{ module.name }}</a></li>
-                                        {% endfor %}
-                                    <li><a href="{{ path('contactpage_modify') }}">Contact us</a></li>
-
-                                    <li class="divider"></li>
-
-                                </ul>
-                            </div>
-                        </div>
-                        {% endif %}
-                        <div class="actions">
-                            <div class="btn-group">
                                 <a class="btn purple" href="{{ path('globaloption_reset_logo',{ 'id': entity.id }) }}">
                                     Reset Logo
                                 </a>
+                                <a class="btn yellow" href="{{ path('tools_domain') }}">  Domain</a>
+
                                 <a class="btn" href="{{ path('globaloption_reset_logo',{ 'id': entity.id }) }}" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     Design
                                     <i class="icon-angle-down"></i>

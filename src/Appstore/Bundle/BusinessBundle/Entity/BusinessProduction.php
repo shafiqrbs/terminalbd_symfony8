@@ -25,12 +25,13 @@ class BusinessProduction
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular", inversedBy="businessProductions" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $businessParticular;
 
 	 /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessProductionExpense", mappedBy="businessProduction" )
-     **/
+      **/
     private  $businessProductionExpense;
 
 	/**

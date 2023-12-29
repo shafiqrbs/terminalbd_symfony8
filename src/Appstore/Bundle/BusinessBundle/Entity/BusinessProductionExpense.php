@@ -36,11 +36,13 @@ class BusinessProductionExpense
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular", inversedBy="businessProductionExpense" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $productionItem;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular", inversedBy="businessProductionExpenseItem" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $productionElement;
 

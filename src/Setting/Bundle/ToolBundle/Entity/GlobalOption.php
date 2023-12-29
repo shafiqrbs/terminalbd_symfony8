@@ -52,6 +52,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * GlobalOption
  * @UniqueEntity(fields="domain",message="This domain is already in use.")
  * @UniqueEntity(fields="mobile",message="This mobile is already in use.")
+ * @UniqueEntity(fields="hotline",message="This hotline is already in use.")
  * @UniqueEntity(fields="subDomain",message="This sub-domain is already in use.")
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Setting\Bundle\ToolBundle\Repository\GlobalOptionRepository")

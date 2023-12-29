@@ -108,10 +108,32 @@ class Builder extends ContainerAware
                 }
             }
 
+            $result = array_intersect($menuName, array('Hotel'));
+            if (!empty($result)) {
+                if ($securityContext->isGranted('ROLE_HOTEL') or $securityContext->isGranted('ROLE_DOMAIN')){
+	                $menu = $this->ReservationMenu($menu);
+                }
+            }
+
+		    $result = array_intersect($menuName, array('Election'));
+		    if (!empty($result)) {
+			    if ($securityContext->isGranted('ROLE_ELECTION')){
+				    //$menu = $this->ElectionMenu($menu);
+				    $menu = $this->CommitteeMenu($menu);
+			    }
+		    }
+
             $result = array_intersect($menuName, array('Accounting'));
             if (!empty($result)) {
                 if ($securityContext->isGranted('ROLE_ACCOUNTING')){
                     $menu = $this->AccountingMenu($menu);
+                }
+            }
+
+            $result = array_intersect($menuName, array('Assets'));
+            if (!empty($result)) {
+                if ($securityContext->isGranted('ROLE_ASSETS')){
+                    $menu = $this->AssetsMenu($menu);
                 }
             }
 
@@ -194,7 +216,7 @@ class Builder extends ContainerAware
                 $menu[$business]['Manage Sales']->addChild('Customer ', array('route' => 'domain_customer'));
             }
         }
-        if ($securityContext->isGranted('ROLE_BUSINESS_REPORT') and $config->getBusinessModel() == "distribution") {
+        if ($securityContext->isGranted('ROLE_BUSINESS_INVOICE') and $config->getBusinessModel() == "distribution") {
             $menu[$business]->addChild('Store Customer')->setAttribute('dropdown', true);
             $menu[$business]['Store Customer']->addChild('Store Ledger', array('route' => 'business_store_ledger'));
             $menu[$business]['Store Customer']->addChild('Store', array('route' => 'business_store'));

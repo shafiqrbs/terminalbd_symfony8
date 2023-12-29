@@ -24,11 +24,13 @@ class BusinessProductionElement
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular", inversedBy="productionElements" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $businessParticular;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular", inversedBy="production" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $particular;
 

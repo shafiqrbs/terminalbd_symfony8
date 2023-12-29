@@ -145,41 +145,6 @@ class BusinessConfigRepository extends EntityRepository
         $stockAdjustment = $em->createQuery('DELETE BusinessBundle:ItemStockAdjustment e WHERE e.config = '.$config);
         $stockAdjustment->execute();
 
-
-        $items = $this->_em->getRepository('BusinessBundle:BusinessParticular')->findBy(array('businessConfig'=>$config));
-
-        /* @var BusinessParticular $item */
-
-        foreach ($items as $item){
-
-            $bpx = $em->createQuery('DELETE BusinessBundle:BusinessProductionExpense e WHERE e.productionItem = '.$item->getId());
-            $bpx->execute();
-
-            $bpe = $em->createQuery('DELETE BusinessBundle:BusinessProductionElement e WHERE e.businessParticular = '.$item->getId());
-            $bpe->execute();
-
-            $bp = $em->createQuery('DELETE BusinessBundle:BusinessProduction e WHERE e.businessParticular = '.$item->getId());
-            $bp->execute();
-
-            $ip = $em->createQuery('DELETE BusinessBundle:BusinessInvoiceParticular e WHERE e.businessParticular = '.$item->getId());
-            $ip->execute();
-
-            $item->setQuantity(0);
-            $item->setPurchaseQuantity(0);
-            $item->setSalesQuantity(0);
-            $item->setSalesReturnQuantity(0);
-            $item->setPurchaseReturnQuantity(0);
-            $item->setDamageQuantity(0);
-            $item->setMinQuantity(0);
-            $item->setRemainingQuantity(0);
-            $item->setOpeningQuantity(0);
-            $item->setBonusQuantity(0);
-            $item->setBonusSalesQuantity(0);
-            $item->setBonusPurchaseQuantity(0);
-            $item->setOpeningApprove(0);
-            $this->_em->flush($item);
-        }
-
         $sales = $em->createQuery('DELETE BusinessBundle:BusinessInvoice e WHERE e.businessConfig = '.$config);
         $sales->execute();
 

@@ -5,12 +5,14 @@ namespace Setting\Bundle\ToolBundle\Controller;
 use Core\UserBundle\Entity\User;
 use Core\UserBundle\Form\SignupType;
 use Setting\Bundle\ToolBundle\Form\GlobalOptionModifyType;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Setting\Bundle\Tool\Service\RequestManager;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Setting\Bundle\ToolBundle\Form\GlobalOptionType;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * GlobalOption controller.
@@ -167,6 +169,65 @@ class GlobalOptionController extends Controller
             'subSyndicates'      => $subSyndicates,
             'edit_form'   => $editForm->createView(),
         ));
+    }
+
+    public function hardResetSystemDataAction(GlobalOption $option)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        set_time_limit(0);
+
+        if($option->getInventoryConfig()) {
+            $this->getDoctrine()->getRepository('HospitalBundle:HospitalConfig')->hospitalDelete($option);
+        }
+        if($option->getInventoryConfig()) {
+            $this->getDoctrine()->getRepository('InventoryBundle:InventoryConfig')->inventoryReset($option);
+        }
+        if($option->getMedicineConfig()) {
+            $this->getDoctrine()->getRepository('MedicineBundle:MedicineConfig')->medicineDelete($option);
+        }
+        if($option->getBusinessConfig()) {
+            $this->getDoctrine()->getRepository('BusinessBundle:BusinessConfig')->businessDelete($option);
+        }
+        if($option->getRestaurantConfig()) {
+            $this->getDoctrine()->getRepository('RestaurantBundle:RestaurantConfig')->delete($option);
+        }
+
+        if($option->getAccountingConfig()){
+            $this->getDoctrine()->getRepository('AccountingBundle:AccountingConfig')->accountingDeleteReset($option);
+        }
+
+        $account = $em->createQuery("DELETE UserBundle:User e WHERE e.globalOption = {$option->getId()} and e.domainOwner !=1 and e.username != {$option->getMobile()}");
+        if($account){
+            $account->execute();
+        }
+
+        $deletecustomer = $em->createQuery("DELETE DomainUserBundle:Customer a WHERE a.globalOption = {$option->getId()} and a.name != 'Default' and a.mobile != {$option->getMobile()}");
+        if($deletecustomer){
+            $deletecustomer->execute();
+        }
+        $existOption = $this->getDoctrine()->getRepository(GlobalOption::class)->findBy(array('hotline'=>$option->getHotline()));
+        if($option->getHotline() and count($existOption) == 1){
+            $masterUser = $this->getDoctrine()->getRepository("UserBundle:User")->findOneBy(array('globalOption'=>$option->getId(),'domainOwner'=>1,'username'=>$option->getMobile()));
+            if($masterUser){
+                $masterUser->setUsername($option->getHotline());
+                $masterUser->setUsernameCanonical($option->getHotline());
+            }
+            $masterCustomer = $this->getDoctrine()->getRepository("DomainUserBundle:Customer")->findOneBy(array('globalOption'=>$option,'name'=>"Default",'mobile'=>$option->getMobile()));
+            if($masterCustomer){
+                $masterCustomer->setMobile($option->getHotline());
+            }
+            $option->setMobile($option->getHotline());
+            $em->flush();
+        }
+        $dir = WEB_PATH . "/uploads/domain/{$option->getId()}";
+        $a = new Filesystem();
+        $a->remove($dir);
+        $a->mkdir($dir);
+        $this->get('session')->getFlashBag()->add(
+            'success',"Successfully reset data"
+        );
+        return $this->redirect($this->generateUrl('globaloption_edit', array('id' => $option->getId())));
     }
 
     /**

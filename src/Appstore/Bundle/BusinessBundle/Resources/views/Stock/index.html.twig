@@ -46,7 +46,8 @@
                             <a href="{{ path('business_stock_new') }}" class=" btn red"><i class="icon-plus"></i> Add Stock</a>
                             <a target="_blank" href="{{ path('business_stock_excel') }}" class=" btn purple"><i class="icon-download"></i> Download Excel</a>
                                 {% if app.user.granted("ROLE_DOMAIN") %}
-                                <a href="{{ path('business_stock_reset') }}" class=" btn purple"><i class="icon-refresh-ccw"></i> Reset</a>
+                                    <a href="{{ path('business_allstock_delete') }}" class=" btn yellow"><i class="icon-refresh-ccw"></i> Delete</a>
+                                    <a href="{{ path('business_stock_reset') }}" class=" btn purple"><i class="icon-refresh-ccw"></i> Reset</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -97,8 +98,8 @@
 
                                 <thead class="flip-content ">
                                 <tr class="head-blue">
-                                   <th class="numeric" >Name</th>
                                     <th class="numeric" >Barcode</th>
+                                    <th class="numeric" >Name</th>
                                     <th class="numeric" >Category</th>
                                     <th class="numeric" >Brand</th>
                                     <th class="numeric" >PP</th>
@@ -123,11 +124,11 @@
                                 <tbody>
                                 {% for entity in pagination %}
                                     <tr>
-                                        <td class="numeric" ><a href="{{ path('business_stock_edit',{'id': entity.id })}}">{{ entity.name }}</a></td>
-                                        <td class="numeric" >
+                                        <td>
                                             <a  class="editable" data-name="particularCode" href="#"  data-url="{{ path('business_stock_inline') }}" data-type="text" data-pk="{{ entity.id }}" data-original-title="Change SKU/Barcode">{{ entity.particularCode }}</a>
                                         </td>
-                                       <td class="numeric" >{% if entity.category is not empty %}{{ entity.category.name }}{% endif %}</td>
+                                        <td><a class="editable" data-name="name" data-url="{{ path('business_stock_inline') }}" data-pk="{{ entity.id }}" data-original-title="Change product name" href="{{ path('business_stock_edit',{'id': entity.id })}}">{{ entity.name }}</a></td>
+                                        <td class="numeric" >{% if entity.category is not empty %}{{ entity.category.name }}{% endif %}</td>
                                        <td class="numeric" >{% if entity.brand is not empty %}{{ entity.brand.name }}{% endif %}</td>
                                         <td class="numeric"> <a  class="editable" data-name="purchasePrice" href="#"  data-url="{{ path('business_stock_inline') }}" data-type="text" data-pk="{{ entity.id }}" data-original-title="Change purcahse price">{{ entity.purchasePrice }}</a>
                                         </td>

@@ -31,6 +31,8 @@ tools_option_reset:
     path:     /{id}/option-reset
     defaults: { _controller: "SettingToolBundle:Domain:resetSystemData" }
 
+
+
 tools_option_delete:
     path:     /{id}/option-delete
     defaults: { _controller: "SettingToolBundle:Domain:domainDelete" }

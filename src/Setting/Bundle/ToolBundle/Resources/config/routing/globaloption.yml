@@ -2,6 +2,10 @@ globaloption:
     path:     /
     defaults: { _controller: "SettingToolBundle:GlobalOption:index" }
 
+tools_option_hard_reset:
+    path:     /{id}/option-hard-reset
+    defaults: { _controller: "SettingToolBundle:GlobalOption:hardResetSystemData" }
+
 globaloption_vendor_search:
     path:     /vendor/search
     defaults: { _controller: "SettingToolBundle:GlobalOption:vendorSearch" }

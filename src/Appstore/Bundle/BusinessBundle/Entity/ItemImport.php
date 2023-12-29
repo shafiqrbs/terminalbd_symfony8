@@ -167,7 +167,7 @@ class ItemImport
 
     protected function getUploadDir()
     {
-        return 'uploads/domain/'.$this->getBusinessConfig()->getGlobalOption()->getId().'/ecommerce/';
+        return 'uploads/domain/'.$this->getBusinessConfig()->getGlobalOption()->getId().'/';
     }
 
     /**

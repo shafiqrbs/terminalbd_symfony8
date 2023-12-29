@@ -439,6 +439,8 @@ class StockController extends Controller
 		    $entity->$setField($quantity);
 		    $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->remainingQnt($entity);
 		    $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticularHistory')->processStockQuantity($entity,"opening");
+	    }elseif('name' == $data['name']) {
+		    $entity->setName($data['value']);
 	    }else{
 		    $setField = 'set' . $data['name'];
 		    $entity->$setField(abs($data['value']));
@@ -456,6 +458,17 @@ class StockController extends Controller
     public function transfer(BusinessParticular $particular)
     {
 
+    }
+
+    public function allStockDeleteAction()
+    {
+        $config = $this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
+        $em = $this->getDoctrine()->getManager();
+        $account = $em->createQuery('DELETE BusinessBundle:BusinessParticular e WHERE e.businessConfig = '.$config);
+        if(!empty($account)){
+            $account->execute();
+        }
+        return $this->redirect($this->generateUrl('business_stock'));
     }
 
 	public function autoSearchAction(Request $request)
