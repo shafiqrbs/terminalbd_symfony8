@@ -45,10 +45,6 @@ class BusinessInvoice
      **/
     private $androidProcess;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\AndroidDeviceSetup", inversedBy="medicineSales" )
-     **/
-    private  $androidDevice;
 
     /**
      * @ORM\OneToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessReverse", mappedBy="businessInvoice")
@@ -204,6 +200,14 @@ class BusinessInvoice
      * @ORM\Column(name="invoice", type="string", length=50, nullable=true)
      */
     private $invoice;
+
+
+     /**
+     * @var string
+     *
+     * @ORM\Column(name="deviceSalesId", type="string", length=50, nullable=true)
+     */
+    private $deviceSalesId;
 
 
     /**
@@ -1258,19 +1262,19 @@ class BusinessInvoice
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getAndroidDevice()
+    public function getDeviceSalesId()
     {
-        return $this->androidDevice;
+        return $this->deviceSalesId;
     }
 
     /**
-     * @param mixed $androidDevice
+     * @param string $deviceSalesId
      */
-    public function setAndroidDevice($androidDevice)
+    public function setDeviceSalesId($deviceSalesId)
     {
-        $this->androidDevice = $androidDevice;
+        $this->deviceSalesId = $deviceSalesId;
     }
 
 

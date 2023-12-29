@@ -108,32 +108,10 @@ class Builder extends ContainerAware
                 }
             }
 
-            $result = array_intersect($menuName, array('Hotel'));
-            if (!empty($result)) {
-                if ($securityContext->isGranted('ROLE_HOTEL') or $securityContext->isGranted('ROLE_DOMAIN')){
-	                $menu = $this->ReservationMenu($menu);
-                }
-            }
-
-		    $result = array_intersect($menuName, array('Election'));
-		    if (!empty($result)) {
-			    if ($securityContext->isGranted('ROLE_ELECTION')){
-				    //$menu = $this->ElectionMenu($menu);
-				    $menu = $this->CommitteeMenu($menu);
-			    }
-		    }
-
             $result = array_intersect($menuName, array('Accounting'));
             if (!empty($result)) {
                 if ($securityContext->isGranted('ROLE_ACCOUNTING')){
                     $menu = $this->AccountingMenu($menu);
-                }
-            }
-
-            $result = array_intersect($menuName, array('Assets'));
-            if (!empty($result)) {
-                if ($securityContext->isGranted('ROLE_ASSETS')){
-                    $menu = $this->AssetsMenu($menu);
                 }
             }
 
@@ -197,6 +175,90 @@ class Builder extends ContainerAware
             ->addChild("{$business}")
             ->setAttribute( 'icon', 'icon icon-bar-chart' )
             ->setAttribute('dropdown', true);
+        if ($securityContext->isGranted('ROLE_BUSINESS_INVOICE') and $config->getBusinessModel() != "association") {
+	        $menu[$business]->addChild('Manage Sales')->setAttribute('dropdown', true);
+            $menu[$business]['Manage Sales']->addChild('Add Sales', array('route' => 'business_invoice_new'))
+                ;
+            $menu[$business]['Manage Sales']->addChild('Sales', array('route' => 'business_invoice'));
+            $menu[$business]['Manage Sales']->addChild('Android Sales', array('route' => 'business_android_sales'))
+                ;
+            if($config->isConditionSales() == 1){
+                $menu[$business]['Manage Sales']->addChild('Condition Sales', array('route' => 'business_invoice_condition'))
+                    ;
+            }
+            $menu[$business]['Manage Sales']->addChild('Sales Return', array('route' => 'business_invoice_return'))
+                ;
+            $menu[$business]['Manage Sales']->addChild('Sales Return Item', array('route' => 'business_invoice_return_item'))
+                ;
+            if($securityContext->isGranted('ROLE_CRM') or $securityContext->isGranted('ROLE_DOMAIN')) {
+                $menu[$business]['Manage Sales']->addChild('Customer ', array('route' => 'domain_customer'));
+            }
+        }
+        if ($securityContext->isGranted('ROLE_BUSINESS_REPORT') and $config->getBusinessModel() == "distribution") {
+            $menu[$business]->addChild('Store Customer')->setAttribute('dropdown', true);
+            $menu[$business]['Store Customer']->addChild('Store Ledger', array('route' => 'business_store_ledger'));
+            $menu[$business]['Store Customer']->addChild('Store', array('route' => 'business_store'));
+        }
+        if( ($config->getBusinessModel() == "association" and $securityContext->isGranted('ROLE_CRM')) or ($config->getBusinessModel() == "association" and $securityContext->isGranted('ROLE_DOMAIN'))) {
+            $menu[$business]->addChild('Manage Member', array('route' => 'domain_association'));
+            $menu[$business]->addChild('Member Invoice', array('route' => 'business_invoice'));
+            if ($securityContext->isGranted('ROLE_BUSINESS_ASSOCIATION_REPORT')){
+                $menu[$business]->addChild( 'Association Reports' )
+                    ->setAttribute( 'dropdown', true );
+                $menu[$business]['Association Reports']->addChild( 'Invoice Summary', array( 'route' => 'business_report_sales_summary' ) )
+                    ;
+                $menu[$business]['Association Reports']->addChild( 'Invoice Details', array( 'route' => 'business_report_sales_details' ) )
+                    ;
+                $menu[$business]['Association Reports']->addChild( 'Customer Invoice', array( 'route' => 'business_report_customer_sales_item' ) )
+                    ;
+                $menu[$business]['Association Reports']->addChild( 'Product Wise Invoice', array( 'route' => 'business_report_sales_stock' ) )                              ;
+                $menu[$business]['Association Reports']->addChild( 'User wise Invoice', array( 'route' => 'business_report_sales_user' ) )
+                    ;
+                $menu[$business]['Association Reports']->addChild( 'User Monthly Invoice', array( 'route' => 'business_report_sales_user_monthly' ) )
+                    ;
+            }
+        }
+	    if($config->isShowStock() == 1 and $securityContext->isGranted('ROLE_BUSINESS_PURCHASE')) {
+		    $menu[$business]->addChild('Manage Purchase')->setAttribute('dropdown', true);
+		    $menu[$business]['Manage Purchase']->addChild('Purchase', array('route' => 'business_purchase'));
+		    $menu[$business]['Manage Purchase']->addChild('Add Purchase', array('route' => 'business_purchase_new'));
+		    $menu[$business]['Manage Purchase']->addChild('Purchase Return', array('route' => 'business_purchase_return'));
+            if($config->getBusinessModel() == 'distribution') {
+                $menu[$business]['Manage Purchase']->addChild(
+                    'Damage Return',
+                    array('route' => 'business_distribution_return')
+                );
+            }
+		    $menu[$business]['Manage Purchase']->addChild('Purchase Item', array('route' => 'business_purchase_item'));
+		    $menu[$business]['Manage Purchase']->addChild('Vendor', array('route' => 'business_vendor'));
+
+	    }
+        if ($config->isShowStock() == 1 and $securityContext->isGranted('ROLE_BUSINESS_STOCK')) {
+            $menu[$business]->addChild('Manage Stock')->setAttribute('dropdown', true);
+            $menu[$business]['Manage Stock']->addChild('Stock Item', array('route' => 'business_stock'));
+            $menu[$business]['Manage Stock']->addChild('Stock Import', array('route' => 'business_itemimporter'));
+            $menu[$business]['Manage Stock']->addChild('Category', array('route' => 'business_category'));
+            $menu[$business]['Manage Stock']->addChild('Stock Shortlist', array('route' => 'business_stock_shortlist'));
+            $menu[$business]['Manage Stock']->addChild('Stock History', array('route' => 'business_stock_history'));
+            $menu[$business]['Manage Stock']->addChild('Stock Adjustment', array('route' => 'business_stock_adjustment'));
+            if($config->isStockHistory() == 1) {
+                $menu[$business]['Manage Stock']->addChild('Product Ledger', array('route' => 'business_stock_ledger'));
+            }
+            $menu[$business]['Manage Stock']->addChild('Stock Report', array('route' => 'business_report_stock_report'));
+            if($config->getProductionType() == 'pre-production') {
+                $menu[$business]['Manage Stock']->addChild( 'Pre-production', array( 'route' => 'business_production' ) );
+            }
+            $menu[$business]['Manage Stock']->addChild('Stock Transfer', array('route' => 'business_stock_transfer'));
+            $menu[$business]['Manage Stock']->addChild('Manage Damage', array('route' => 'business_damage'));
+
+            if($config->getBusinessModel() == 'commission') {
+                    $menu[$business]->addChild( 'Agency Stock' )->setAttribute( 'dropdown', true );
+                    $menu[$business]['Agency Stock']->addChild('Vendor Stock Item', array('route' => 'business_vendor_stock_item'));
+                    $menu[$business]['Agency Stock']->addChild('Vendor Stock', array('route' => 'business_vendor_stock'));
+                    $menu[$business]['Agency Stock']->addChild( 'Stock Report' )->setAttribute( 'dropdown', true );
+                    $menu[$business]['Agency Stock']['Stock Report']->addChild( 'Vendor base Sales', array( 'route' => 'business_report_vendor_commission_sales' ) );
+            }
+        }
         if ($securityContext->isGranted('ROLE_BUSINESS_REPORT') and $config->getBusinessModel() != "association") {
             $menu[$business]->addChild('Reports')->setAttribute('dropdown', true);
             $menu[$business]['Reports']->addChild( 'System Overview', array( 'route' => 'business_report_system_overview' ) );
@@ -279,89 +341,6 @@ class Builder extends ContainerAware
                 $menu[$business]['Reports']['Purchase']->addChild( 'Stock Item', array( 'route' => 'business_report_item_stock' ) );
             }
 
-        }
-        if ($securityContext->isGranted('ROLE_BUSINESS_INVOICE') and $config->getBusinessModel() != "association") {
-	        $menu[$business]->addChild('Manage Sales')->setAttribute('dropdown', true);
-            $menu[$business]['Manage Sales']->addChild('Add Sales', array('route' => 'business_invoice_new'))
-                ;
-            $menu[$business]['Manage Sales']->addChild('Sales', array('route' => 'business_invoice'))
-                ;
-            if($config->isConditionSales() == 1){
-                $menu[$business]['Manage Sales']->addChild('Condition Sales', array('route' => 'business_invoice_condition'))
-                    ;
-            }
-            $menu[$business]['Manage Sales']->addChild('Sales Return', array('route' => 'business_invoice_return'))
-                ;
-            $menu[$business]['Manage Sales']->addChild('Sales Return Item', array('route' => 'business_invoice_return_item'))
-                ;
-            if($securityContext->isGranted('ROLE_CRM') or $securityContext->isGranted('ROLE_DOMAIN')) {
-                $menu[$business]['Manage Sales']->addChild('Customer ', array('route' => 'domain_customer'));
-            }
-        }
-        if ($securityContext->isGranted('ROLE_BUSINESS_REPORT') and $config->getBusinessModel() == "distribution") {
-            $menu[$business]->addChild('Store Customer')->setAttribute('dropdown', true);
-            $menu[$business]['Store Customer']->addChild('Store Ledger', array('route' => 'business_store_ledger'));
-            $menu[$business]['Store Customer']->addChild('Store', array('route' => 'business_store'));
-        }
-        if( ($config->getBusinessModel() == "association" and $securityContext->isGranted('ROLE_CRM')) or ($config->getBusinessModel() == "association" and $securityContext->isGranted('ROLE_DOMAIN'))) {
-            $menu[$business]->addChild('Manage Member', array('route' => 'domain_association'));
-            $menu[$business]->addChild('Member Invoice', array('route' => 'business_invoice'));
-            if ($securityContext->isGranted('ROLE_BUSINESS_ASSOCIATION_REPORT')){
-                $menu[$business]->addChild( 'Association Reports' )
-                    ->setAttribute( 'dropdown', true );
-                $menu[$business]['Association Reports']->addChild( 'Invoice Summary', array( 'route' => 'business_report_sales_summary' ) )
-                    ;
-                $menu[$business]['Association Reports']->addChild( 'Invoice Details', array( 'route' => 'business_report_sales_details' ) )
-                    ;
-                $menu[$business]['Association Reports']->addChild( 'Customer Invoice', array( 'route' => 'business_report_customer_sales_item' ) )
-                    ;
-                $menu[$business]['Association Reports']->addChild( 'Product Wise Invoice', array( 'route' => 'business_report_sales_stock' ) )                              ;
-                $menu[$business]['Association Reports']->addChild( 'User wise Invoice', array( 'route' => 'business_report_sales_user' ) )
-                    ;
-                $menu[$business]['Association Reports']->addChild( 'User Monthly Invoice', array( 'route' => 'business_report_sales_user_monthly' ) )
-                    ;
-            }
-        }
-	    if($config->isShowStock() == 1 and $securityContext->isGranted('ROLE_BUSINESS_PURCHASE')) {
-		    $menu[$business]->addChild('Manage Purchase')->setAttribute('dropdown', true);
-		    $menu[$business]['Manage Purchase']->addChild('Purchase', array('route' => 'business_purchase'));
-		    $menu[$business]['Manage Purchase']->addChild('Add Purchase', array('route' => 'business_purchase_new'));
-		    $menu[$business]['Manage Purchase']->addChild('Purchase Return', array('route' => 'business_purchase_return'));
-            if($config->getBusinessModel() == 'distribution') {
-                $menu[$business]['Manage Purchase']->addChild(
-                    'Damage Return',
-                    array('route' => 'business_distribution_return')
-                );
-            }
-		    $menu[$business]['Manage Purchase']->addChild('Purchase Item', array('route' => 'business_purchase_item'));
-		    $menu[$business]['Manage Purchase']->addChild('Vendor', array('route' => 'business_vendor'));
-
-	    }
-        if ($config->isShowStock() == 1 and $securityContext->isGranted('ROLE_BUSINESS_STOCK')) {
-            $menu[$business]->addChild('Manage Stock')->setAttribute('dropdown', true);
-            $menu[$business]['Manage Stock']->addChild('Stock Item', array('route' => 'business_stock'));
-            $menu[$business]['Manage Stock']->addChild('Stock Import', array('route' => 'business_itemimporter'));
-            $menu[$business]['Manage Stock']->addChild('Category', array('route' => 'business_category'));
-            $menu[$business]['Manage Stock']->addChild('Stock Shortlist', array('route' => 'business_stock_shortlist'));
-            $menu[$business]['Manage Stock']->addChild('Stock History', array('route' => 'business_stock_history'));
-            $menu[$business]['Manage Stock']->addChild('Stock Adjustment', array('route' => 'business_stock_adjustment'));
-            if($config->isStockHistory() == 1) {
-                $menu[$business]['Manage Stock']->addChild('Product Ledger', array('route' => 'business_stock_ledger'));
-            }
-            $menu[$business]['Manage Stock']->addChild('Stock Report', array('route' => 'business_report_stock_report'));
-            if($config->getProductionType() == 'pre-production') {
-                $menu[$business]['Manage Stock']->addChild( 'Pre-production', array( 'route' => 'business_production' ) );
-            }
-            $menu[$business]['Manage Stock']->addChild('Stock Transfer', array('route' => 'business_stock_transfer'));
-            $menu[$business]['Manage Stock']->addChild('Manage Damage', array('route' => 'business_damage'));
-
-            if($config->getBusinessModel() == 'commission') {
-                    $menu[$business]->addChild( 'Agency Stock' )->setAttribute( 'dropdown', true );
-                    $menu[$business]['Agency Stock']->addChild('Vendor Stock Item', array('route' => 'business_vendor_stock_item'));
-                    $menu[$business]['Agency Stock']->addChild('Vendor Stock', array('route' => 'business_vendor_stock'));
-                    $menu[$business]['Agency Stock']->addChild( 'Stock Report' )->setAttribute( 'dropdown', true );
-                    $menu[$business]['Agency Stock']['Stock Report']->addChild( 'Vendor base Sales', array( 'route' => 'business_report_vendor_commission_sales' ) );
-            }
         }
         $menu[$business]->addChild( 'Notepad', array('route' => 'domain_notepad'));
 	    if ($securityContext->isGranted('ROLE_BUSINESS_MANAGER')) {

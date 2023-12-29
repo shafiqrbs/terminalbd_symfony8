@@ -25,18 +25,18 @@ class BusinessAndroidProcessRepository extends EntityRepository
         $qb = $this->createQueryBuilder('e');
         $qb->leftJoin('e.androidDevice','a');
         $qb->select('e.id as id','e.created as created','e.itemCount as itemCount','e.status as status');
-         $qb->addSelect('a.device as device');
+        $qb->addSelect('a.device as device');
         $qb->where('e.businessConfig = :config')->setParameter('config', $config);
         $qb->orderBy('e.created',"DESC");
         $result = $qb->getQuery();
         return $result;
     }
+
     public function insertAndroidProcess(GlobalOption $option,$device,$process,$data)
     {
         $em =  $this->_em;
 
         $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
-
         $entity = new BusinessAndroidProcess();
         $entity->setBusinessConfig($option->getBusinessConfig());
         $entity->setAndroidDevice($device);
@@ -48,6 +48,7 @@ class BusinessAndroidProcessRepository extends EntityRepository
         $entity->setStatus(false);
         $em->persist($entity);
         $em->flush();
+        $this->insertApiSalesManual($option,$entity);
         return $entity;
 
     }
@@ -66,8 +67,6 @@ class BusinessAndroidProcessRepository extends EntityRepository
             $rows = '';
             $config = $option->getBusinessConfig()->getId();
             $androidProcess_id = $process->getId();
-            $androidDevice_id = $process->getAndroidDevice()->getId();
-            $optionId = $option->getId();
             $default = $em->getRepository(Customer::class)->findOneBy(array('globalOption'=>$option,'name'=>'Default'));
             $i = 0;
             $comma =',';
@@ -111,8 +110,6 @@ class BusinessAndroidProcessRepository extends EntityRepository
                         $discount = ($serviceCharge['discount']);
                         $total = ($serviceCharge['total']);
                         $received = ($serviceCharge['total']);
-                        $cardCommission = ($serviceCharge['cardCommission']);
-
                     }
                 }else{
                     $method = 'NULL';
@@ -127,15 +124,14 @@ class BusinessAndroidProcessRepository extends EntityRepository
                 }
                 if(++$i === $numItems) { $comma =  ""; }
                 $device ="In-progress";
-                $rows .='('.(int)$config.',"'.(string)$item['created'].'","'.(string)$item['created'].'",'.(string)$item['invoiceId'].','.(string)$item['invoiceId'].','.(int)$customer.','.(int)$item['createdBy'].','.(int)$item['salesBy'].','.(int)$item['createdBy'].','.(int)$method.','.(float)$item['subTotal'].','.(float)$discount.','.(float)$total.','.(float)$received.','.(float)$due.',"'.(string)$flat.'",'.(int)$item['discountCalculation'].','.$cardCommission.','.$accountBank.','.$mobileBankAccount.','.$paymentCard.','.(int)$androidProcess_id.','.(int)$androidDevice_id.',"'.(string)$device.'")'.$comma;
+                $rows .='('.(int)$config.',"'.(string)$item['created'].'","'.(string)$item['created'].'",'.(string)$item['invoiceId'].','.(string)$item['invoiceId'].','.(int)$customer.','.(int)$item['createdBy'].','.(int)$item['salesBy'].','.(int)$item['createdBy'].','.(int)$method.','.(float)$item['subTotal'].','.(float)$discount.','.(float)$total.','.(float)$received.','.(float)$due.',"'.(string)$flat.'",'.(int)$item['discountCalculation'].','.$accountBank.','.$mobileBankAccount.','.$paymentCard.','.(int)$androidProcess_id.',"'.(string)$device.'")'.$comma;
 
             endforeach;
 
-            $sql = "INSERT INTO business_invoice (businessConfig_id,created,updated,invoice,deviceSalesId,customer_id,createdBy_id,salesBy_id,approvedBy_id,transactionMethod_id,subTotal,discount,netTotal,received,due,discountType,discountCalculation,cardCommission,accountBank_id,accountMobileBank_id,cardNo,androidProcess_id,androidDevice_id,process) VALUES {$rows}";
+            $sql = "INSERT INTO business_invoice (businessConfig_id,created,updated,invoice,deviceSalesId,customer_id,createdBy_id,salesBy_id,approvedBy_id,transactionMethod_id,subTotal,discount,total,received,due,discountType,discountCalculation,accountBank_id,accountMobileBank_id,cardNo,androidProcess_id,process) VALUES {$rows}";
             $qb = $this->getEntityManager()->getConnection()->prepare($sql);
             $qb->execute();
 
-            $stockIds = array();
             if($subItems  and $numSubItems > 0 ) {
                 foreach ($subItems as $sub):
                     $deviceSalesId = $sub['salesId'];
@@ -148,14 +144,13 @@ class BusinessAndroidProcessRepository extends EntityRepository
                         if ($stockId) {
                             $salesItem->setBusinessParticular($stockId);
                             $salesItem->setParticular($stockId->getName());
-                            $salesItem->setPurchasePrice($stockId->getAveragePurchasePrice());
+                            $salesItem->setPurchasePrice($stockId->getPurchasePrice());
                             $salesItem->setPrice($stockId->getSalesPrice());
                         }
                         $salesItem->setQuantity($sub['quantity']);
                         $salesItem->setTotalQuantity($sub['quantity']);
                         $salesItem->setSubTotal($sub['subTotal']);
                         $em->persist($salesItem);
-
                     }
                 endforeach;
                 $em->flush();

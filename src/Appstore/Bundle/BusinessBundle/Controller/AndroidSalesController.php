@@ -2,9 +2,9 @@
 
 namespace Appstore\Bundle\BusinessBundle\Controller;
 
+use Appstore\Bundle\BusinessBundle\Entity\BusinessAndroidProcess;
 use Appstore\Bundle\BusinessBundle\Entity\Courier;
 use Appstore\Bundle\BusinessBundle\Form\CourierType;
-use Appstore\Bundle\MedicineBundle\Entity\MedicineAndroidProcess;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -17,83 +17,36 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AndroidSalesController extends Controller
 {
+
+    public function paginate($entities)
+    {
+        $paginator = $this->get('knp_paginator');
+        $pagination = $paginator->paginate(
+            $entities,
+            $this->get('request')->query->get('page', 1)/*page number*/,
+            25  /*limit per page*/
+        );
+        $pagination->setTemplate('SettingToolBundle:Widget:pagination.html.twig');
+        return $pagination;
+    }
+
+
     /**
-     * @Secure(roles="ROLE_DOMAIN,ROLE_MEDICINE_SALES,ROLE_MEDICINE_MANAGER");
+     * @Secure(roles="ROLE_BUSINESS_INVOICE,ROLE_DOMAIN");
      */
 
-    public function androidSalesAction()
+    public function indexAction()
     {
-        $conf = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
-        $entities = $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->getAndroidSalesList($conf,"sales");
+        $conf = $this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
+        $entities = $this->getDoctrine()->getRepository('BusinessBundle:BusinessAndroidProcess')->getAndroidSalesList($conf,"sales");
         $pagination = $this->paginate($entities);
-        $sales = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->findAndroidDeviceSales($pagination);
-        return $this->render('MedicineBundle:Sales:salesAndroid.html.twig', array(
+        return $this->render('BusinessBundle:AndroidProcess:index.html.twig', array(
             'entities' => $pagination,
-            'sales' => $sales,
         ));
     }
 
-    /**
-     * @Secure(roles="ROLE_DOMAIN,ROLE_MEDICINE_SALES,ROLE_MEDICINE_MANAGER");
-     */
 
-    public function androidSalesProcessAction($device)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->androidDeviceSalesProcess($device);
-        exit;
-    }
-
-
-    /**
-     * @Secure(roles="ROLE_DOMAIN,ROLE_MEDICINE,ROLE_MEDICINE_SALES,ROLE_MEDICINE_MANAGER");
-     */
-
-    public function insertGroupApiSalesImportAction(MedicineAndroidProcess $android)
-    {
-        $msg = "invalid";
-        set_time_limit(0);
-        ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
-        $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-
-        $removeSalesItem = $em->createQuery("DELETE MedicineBundle:MedicineSalesItem e WHERE e.androidProcess= {$android->getId()}");
-        if(!empty($removeSalesItem)){
-            $removeSalesItem->execute();
-        }
-        $removeSales = $em->createQuery("DELETE MedicineBundle:MedicineSales e WHERE e.androidProcess= {$android->getId()}");
-        if(!empty($removeSales)){
-            $removeSales->execute();
-        }
-        //  $this->androidProcessSymfony($android);
-        $status = $this->androidProcessMysql($android);
-
-        return new Response($status);
-
-
-    }
-
-
-    public function androidProcessSymfony($android){
-        $em = $this->getDoctrine()->getManager();
-
-        $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->insertApiSales($config->getGlobalOption(),$android);
-        $salses = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->findBy(array('androidProcess' => $android));
-        foreach ($salses as $sales){
-            if($sales->getProcess() == "Device"){
-                $sales->setProcess('Done');
-                $sales->setUpdated($sales->getCreated());
-                $sales->setApprovedBy($this->getUser());
-                $em->flush();
-                $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->insertMedicineAccountInvoice($sales);
-                $msg = "valid";
-            }
-        }
-
-    }
-
-    public function androidProcessMysql($android){
+    public function androidProcessMysqlAction(BusinessAndroidProcess $android){
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $em = $this->getDoctrine()->getManager();
         $status = $this->getDoctrine()->getRepository('BusinessBundle:BusinessAndroidProcess')->insertApiSalesManual($config->getGlobalOption(),$android);
@@ -101,10 +54,26 @@ class AndroidSalesController extends Controller
             $android->setStatus(true);
             $em->persist($android);
             $em->flush();
-            return 'success';
+            return new Response('success');
         }else{
-            return 'failed';
+            return new Response('failed');
         }
+    }
+
+    /**
+     * @Secure(roles="ROLE_BUSINESS_INVOICE,ROLE_DOMAIN");
+     */
+
+    public function deleteAction(BusinessAndroidProcess $entity)
+    {
+        $em = $this->getDoctrine()->getManager();
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Invoice entity.');
+        }
+        $this->getDoctrine()->getRepository(BusinessAndroidProcess::class)->removeSalesItem($entity);
+        $em->remove($entity);
+        $em->flush();
+        return new Response(json_encode(array('success' => 'success')));
     }
 
 

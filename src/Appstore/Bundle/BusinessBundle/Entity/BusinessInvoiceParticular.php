@@ -32,7 +32,7 @@ class BusinessInvoiceParticular
     private $businessInvoice;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineAndroidProcess")
+     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessAndroidProcess")
      * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $androidProcess;

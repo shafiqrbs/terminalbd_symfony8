@@ -119,6 +119,22 @@ business_group_approved:
     path:      /group/invoice/approved
     defaults: { _controller: "BusinessBundle:Invoice:invoiceGroupApproved" }
 
+business_android_sales:
+    path:      /android/sales
+    defaults: { _controller: "BusinessBundle:AndroidSales:index" }
+
+business_android_sales_process:
+    path:      /{id}/android/sales-process
+    defaults: { _controller: "BusinessBundle:AndroidSales:androidProcessMysql" }
+    options:
+        expose: true
+
+business_android_sales_delete:
+    path:      /{id}/android/sales-delete
+    defaults: { _controller: "BusinessBundle:AndroidSales:delete" }
+    options:
+        expose: true
+
 business_group_revised:
     path:     /group/invoice/revised
     defaults: { _controller: "BusinessBundle:Invoice:invoiceGroupReverse" }

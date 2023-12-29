@@ -250,7 +250,6 @@ class BusinessParticularRepository extends EntityRepository
 
             $data[$key]['global_id']            = (int) $option->getId();
             $data[$key]['item_id']              = (int) $row['stockId'];
-
             $data[$key]['category_id']          = $row['categoryId'];
             $data[$key]['categoryName']         = $row['categoryName'];
             if ($row['unitId']){
