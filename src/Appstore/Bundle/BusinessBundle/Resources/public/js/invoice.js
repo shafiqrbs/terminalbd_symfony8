@@ -473,7 +473,7 @@ var formTemporary = $("#stockInvoice").validate({
             success: function(response){
                 obj = JSON.parse(response);
                 $('#unit').html('Unit');
-                $('#particular').select2('open');
+                $('#particular').val('').trigger('change').select2('open');
                 document.getElementById('stockInvoice').reset();
                 returnData(response);
             }

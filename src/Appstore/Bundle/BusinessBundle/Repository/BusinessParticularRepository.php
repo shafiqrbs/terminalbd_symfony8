@@ -236,7 +236,7 @@ class BusinessParticularRepository extends EntityRepository
     {
         $config = $option->getBusinessConfig();
         $qb = $this->createQueryBuilder('e');
-        $qb->join('e.category','c');
+        $qb->leftJoin('e.category','c');
         $qb->leftJoin('e.unit','u');
         $qb->select('e.id as stockId','e.name as name','e.quantity as quantity','e.salesPrice as salesPrice','e.purchasePrice as purchasePrice','e.path as path');
         $qb->addSelect('u.id as unitId','u.name as unitName');
@@ -266,12 +266,7 @@ class BusinessParticularRepository extends EntityRepository
             $data[$key]['salesPrice']           = $row['salesPrice'];
             $data[$key]['purchasePrice']        = $row['purchasePrice'];
             $data[$key]['printHidden']          = "";
-            if($row['path']){
-                $path = $this->resizeFilter("uploads/domain/{$option->getId()}/product/{$row['path']}");
-                $data[$key]['imagePath']            =  $path;
-            }else{
-                $data[$key]['imagePath']            = "";
-            }
+            $data[$key]['imagePath']            = "";
 
         }
         return $data;

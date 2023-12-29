@@ -350,6 +350,8 @@ class BusinessInvoiceParticularRepository extends EntityRepository
             $data .= "<td>{$entity->getParticular()}<br/>{$entity->getDescription()}</td>";
             if(in_array('wearhouse',$sales->getBusinessConfig()->getStockFormat())) {
                 $data .= "<td>{$wearhouse}</td>";
+            }else{
+                $data .= "<td></td>";
             }
             if($sales->getBusinessConfig()->getBusinessModel() == 'sign') {
             $data .= "<td>{$subQuantity}</td>";

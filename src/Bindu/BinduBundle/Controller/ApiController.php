@@ -951,7 +951,7 @@ class ApiController extends Controller
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
                 $this->getDoctrine()->getRepository('InventoryBundle:InventoryAndroidProcess')->insertAndroidProcess($entity,$deviceId,'sales',$data);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $this->getDoctrine()->getRepository('RestaurantBundle:RestaurantAndroidProcess')->insertAndroidProcess($entity,$deviceId,'sales',$data);
+                $this->getDoctrine()->getRepository('BusinessBundle:BusinessAndroidProcess')->insertAndroidProcess($entity,$deviceId,'sales',$data);
             }
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
@@ -962,7 +962,6 @@ class ApiController extends Controller
         }
 
     }
-
 
     public function apiPurchaseAction(Request $request)
     {
@@ -1040,7 +1039,6 @@ class ApiController extends Controller
         }
 
     }
-
 
     public function apiInvoiceTokenAction(Request $request)
     {

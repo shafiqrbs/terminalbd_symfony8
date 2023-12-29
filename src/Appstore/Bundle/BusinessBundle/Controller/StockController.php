@@ -438,7 +438,7 @@ class StockController extends Controller
 		    $quantity = abs($data['value']);
 		    $entity->$setField($quantity);
 		    $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->remainingQnt($entity);
-		    $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->insertOpeningStock($entity);
+		    $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticularHistory')->processStockQuantity($entity,"opening");
 	    }else{
 		    $setField = 'set' . $data['name'];
 		    $entity->$setField(abs($data['value']));

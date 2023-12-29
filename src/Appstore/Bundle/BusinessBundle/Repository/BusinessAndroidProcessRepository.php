@@ -1,8 +1,12 @@
 <?php
 
 namespace Appstore\Bundle\BusinessBundle\Repository;
+use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
+use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessAndroidProcess;
 
+use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
+use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Doctrine\ORM\EntityRepository;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 
@@ -46,6 +50,133 @@ class BusinessAndroidProcessRepository extends EntityRepository
         $em->flush();
         return $entity;
 
+    }
+
+    public function insertApiSalesManual(GlobalOption $option,BusinessAndroidProcess $process)
+    {
+        $em = $this->_em;
+
+        $items = json_decode($process->getJsonItem(),true);
+        $subItems = json_decode($process->getJsonSubItem(),true);
+
+        $numItems = count($items);
+        $numSubItems = count($subItems);
+        $em = $this->_em;
+        if($numItems > 0 and $numSubItems > 0 ){
+            $rows = '';
+            $config = $option->getBusinessConfig()->getId();
+            $androidProcess_id = $process->getId();
+            $androidDevice_id = $process->getAndroidDevice()->getId();
+            $optionId = $option->getId();
+            $default = $em->getRepository(Customer::class)->findOneBy(array('globalOption'=>$option,'name'=>'Default'));
+            $i = 0;
+            $comma =',';
+            foreach ($items as $item):
+
+                $accountBank = (isset($item['bankAccount']) and $item['bankAccount']) ?  $item['bankAccount'] : 'NULL';
+                $mobileBankAccount = (isset($item['mobileBankAccount']) and $item['mobileBankAccount']) ?  $item['mobileBankAccount'] : 'NULL';
+                $paymentCard = (isset($item['paymentCard']) and $item['paymentCard']) ?  $item['paymentCard'] : 'NULL';
+                $flat = (isset($item['discountType']) and $item['discountType']) ?  $item['discountType'] : 'flat';
+                $receive = (isset($item['receive']) and $item['receive']) ?  $item['receive'] : 0;
+                $due = 0;
+                $cardCommission = 0;
+                if(isset($item['transactionMethod']) and $item['transactionMethod'] == 'cash'){
+                    $method = 1;
+                    $discount = ($item['discount']);
+                    $total = ($item['total']);
+                    if($item['total'] < $receive){
+                        $received = ($item['total']);
+                    }else{
+                        $received = $receive;
+                        $due = ($item['total'] - $receive);
+                    }
+                }elseif(isset($item['transactionMethod']) and $item['transactionMethod'] == 'bank'){
+                    $method = 2;
+                    $bank = $em->getRepository(AccountBank::class)->find($accountBank);
+                    if($bank and $bank->getServiceCharge() > 0) {
+
+                        $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$bank->getServiceCharge());
+                        $discount = ($serviceCharge['discount']);
+                        $total = ($serviceCharge['total']);
+                        $received = ($serviceCharge['total']);
+                        $cardCommission = ($serviceCharge['cardCommission']);
+
+                    }
+                }elseif(isset($item['transactionMethod']) and $item['transactionMethod'] == 'mobile'){
+                    $method = 3;
+                    $mobile = $em->getRepository(AccountMobileBank::class)->find($mobileBankAccount);
+                    if($mobile and $mobile->getServiceCharge() > 0) {
+
+                        $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$mobile->getServiceCharge());
+                        $discount = ($serviceCharge['discount']);
+                        $total = ($serviceCharge['total']);
+                        $received = ($serviceCharge['total']);
+                        $cardCommission = ($serviceCharge['cardCommission']);
+
+                    }
+                }else{
+                    $method = 'NULL';
+                }
+
+                if(isset($item['customerName'])  and $item['customerName'] == 'Default'){
+                    $customer = $default->getId();
+                }elseif(isset($item['customerName']) and $item['customerName'] and isset($item['customerMobile']) and $item['customerMobile']){
+                    $customer = $em->getRepository('DomainUserBundle:Customer')->newExistingCustomerForMedicineSales($option,$item['customerMobile'],$item)->getId();
+                }else{
+                    $customer = $default->getId();
+                }
+                if(++$i === $numItems) { $comma =  ""; }
+                $device ="In-progress";
+                $rows .='('.(int)$config.',"'.(string)$item['created'].'","'.(string)$item['created'].'",'.(string)$item['invoiceId'].','.(string)$item['invoiceId'].','.(int)$customer.','.(int)$item['createdBy'].','.(int)$item['salesBy'].','.(int)$item['createdBy'].','.(int)$method.','.(float)$item['subTotal'].','.(float)$discount.','.(float)$total.','.(float)$received.','.(float)$due.',"'.(string)$flat.'",'.(int)$item['discountCalculation'].','.$cardCommission.','.$accountBank.','.$mobileBankAccount.','.$paymentCard.','.(int)$androidProcess_id.','.(int)$androidDevice_id.',"'.(string)$device.'")'.$comma;
+
+            endforeach;
+
+            $sql = "INSERT INTO business_invoice (businessConfig_id,created,updated,invoice,deviceSalesId,customer_id,createdBy_id,salesBy_id,approvedBy_id,transactionMethod_id,subTotal,discount,netTotal,received,due,discountType,discountCalculation,cardCommission,accountBank_id,accountMobileBank_id,cardNo,androidProcess_id,androidDevice_id,process) VALUES {$rows}";
+            $qb = $this->getEntityManager()->getConnection()->prepare($sql);
+            $qb->execute();
+
+            $stockIds = array();
+            if($subItems  and $numSubItems > 0 ) {
+                foreach ($subItems as $sub):
+                    $deviceSalesId = $sub['salesId'];
+                    $sales = $em->getRepository('BusinessBundle:BusinessInvoice')->findOneBy(array('businessConfig' => $config, 'deviceSalesId' => $deviceSalesId));
+                    if ($sales) {
+                        $salesItem = new BusinessInvoiceParticular();
+                        $salesItem->setAndroidProcess($process);
+                        $salesItem->setBusinessInvoice($sales);
+                        $stockId = $em->getRepository('BusinessBundle:BusinessParticular')->find($sub['stockId']);
+                        if ($stockId) {
+                            $salesItem->setBusinessParticular($stockId);
+                            $salesItem->setParticular($stockId->getName());
+                            $salesItem->setPurchasePrice($stockId->getAveragePurchasePrice());
+                            $salesItem->setPrice($stockId->getSalesPrice());
+                        }
+                        $salesItem->setQuantity($sub['quantity']);
+                        $salesItem->setTotalQuantity($sub['quantity']);
+                        $salesItem->setSubTotal($sub['subTotal']);
+                        $em->persist($salesItem);
+
+                    }
+                endforeach;
+                $em->flush();
+            }
+            $total = $em->createQueryBuilder()
+                ->from('BusinessBundle:BusinessInvoice','si')
+                ->select('count(si.id) as totalCount')
+                ->where("si.androidProcess={$androidProcess_id}")
+                ->getQuery()->getSingleResult();
+            return $total['totalCount'];
+        }
+        return 0;
+
+    }
+
+    public function getCalculationBankServiceChargeManual($data,$charge){
+
+        $totalServiceCharge = (($data['total'] * $charge)/100);
+        $discount = round($data['discount'] + $totalServiceCharge);
+        $total = ( $data['subTotal'] - $discount);
+        return $data = array('total' => $total,'discount' => $discount,'cardCommission' => $totalServiceCharge);
     }
 
 

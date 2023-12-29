@@ -32,6 +32,12 @@ class BusinessInvoiceParticular
     private $businessInvoice;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineAndroidProcess")
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
+    private  $androidProcess;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular", inversedBy="businessInvoiceParticulars", cascade={"persist"} )
      * @ORM\JoinColumn(onDelete="CASCADE")
      **/
@@ -664,6 +670,24 @@ class BusinessInvoiceParticular
     {
         $this->wearhouse = $wearhouse;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAndroidProcess()
+    {
+        return $this->androidProcess;
+    }
+
+    /**
+     * @param mixed $androidProcess
+     */
+    public function setAndroidProcess($androidProcess)
+    {
+        $this->androidProcess = $androidProcess;
+    }
+
+
 
 
 }

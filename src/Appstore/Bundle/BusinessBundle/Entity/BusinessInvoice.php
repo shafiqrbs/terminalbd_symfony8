@@ -46,6 +46,11 @@ class BusinessInvoice
     private $androidProcess;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\AndroidDeviceSetup", inversedBy="medicineSales" )
+     **/
+    private  $androidDevice;
+
+    /**
      * @ORM\OneToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessReverse", mappedBy="businessInvoice")
      **/
     private $businessReverse;
@@ -1251,6 +1256,24 @@ class BusinessInvoice
     {
         $this->ait = $ait;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAndroidDevice()
+    {
+        return $this->androidDevice;
+    }
+
+    /**
+     * @param mixed $androidDevice
+     */
+    public function setAndroidDevice($androidDevice)
+    {
+        $this->androidDevice = $androidDevice;
+    }
+
+
 
 
 
