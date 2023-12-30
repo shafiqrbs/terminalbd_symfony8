@@ -54,6 +54,12 @@ business_item_unit_search:
     options:
             expose: true
 
+business_item_wearhouse_update:
+    path:     /{id}/item-wearhouse-update
+    defaults: { _controller: "BusinessBundle:Invoice:wearhouseUpdate" }
+    options:
+            expose: true
+
 business_invoice_event:
     path:     /{id}/event
     defaults: { _controller: "BusinessBundle:Invoice:addEvent" }

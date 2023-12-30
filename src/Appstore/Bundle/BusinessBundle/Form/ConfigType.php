@@ -64,6 +64,7 @@ class ConfigType extends AbstractType
                 'placeholder'=>'')
             ))
             ->add('borderWidth','text',array('attr'=>array('class'=>'m-wrap numeric span8','maxLength'=>2)))
+            ->add('fuelStation')
             ->add('isPowered')
             ->add('isUnitPrice')
 	        ->add('invoicePrintLogo')

@@ -227,12 +227,13 @@ $(document).on('click', '.itemUpdate', function() {
     var id = $(this).attr('data-id');
     var quantity = parseFloat($('#quantity-'+id).val());
     var price = parseFloat($('#salesPrice-'+id).val());
+    var waerhouse = ($('#waerhouse-'+id).val());
     var subTotal  = (quantity * price);
     $("#subTotal-"+id).html(subTotal);
     $.ajax({
         url: Routing.generate('business_invoice_item_update'),
         type: 'POST',
-        data:'itemId='+ id +'&quantity='+ quantity +'&salesPrice='+ price,
+        data:'itemId='+ id +'&quantity='+ quantity +'&salesPrice='+ price + "&waerhouse"+waerhouse,
         success: function(response) {
             obj = JSON.parse(response);
             $('.subTotal').html(obj['subTotal']);
@@ -248,6 +249,10 @@ $(document).on('click', '.itemUpdate', function() {
     })
 });
 
+$(document).on('change', '.waerhouseUpdate', function() {
+    var url = $(this).val();
+    $.get(url);
+});
 
 $(document).on("click", ".particularDelete", function() {
 

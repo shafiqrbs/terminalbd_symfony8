@@ -228,12 +228,19 @@ class BusinessConfig
      */
     private $isDescription = false;
 
-      /**
+    /**
      * @var boolean
      *
      * @ORM\Column(name="posPrint", type="boolean",  nullable=true)
      */
     private $posPrint = false;
+
+     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="fuelStation", type="boolean",  nullable=true)
+     */
+    private $fuelStation = false;
 
      /**
      * @var boolean
@@ -1739,6 +1746,24 @@ class BusinessConfig
     {
         $this->isMarketingExecutive = $isMarketingExecutive;
     }
+
+    /**
+     * @return bool
+     */
+    public function isFuelStation()
+    {
+        return $this->fuelStation;
+    }
+
+    /**
+     * @param bool $fuelStation
+     */
+    public function setFuelStation($fuelStation)
+    {
+        $this->fuelStation = $fuelStation;
+    }
+
+
 
 }
 

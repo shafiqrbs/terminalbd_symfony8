@@ -245,7 +245,7 @@ function jqueryTemporaryLoad() {
             $('#salesTemporary_discount').val(obj['initialDiscount']);
             $('#salesTemporary_due').val(obj['initialGrandTotal']);
             $('#generic-stock-hide').hide();
-            $("#genericStock").select2("val", "");
+            $('#genericStock').val('').trigger('change').select2('open');
             $('.editableText').editable();
         });
     });
@@ -432,7 +432,7 @@ function jqueryTemporaryLoad() {
                     $('#profit').html(obj['profit']);
                     $('#salesTemporary_discount').val(obj['initialDiscount']);
                     $('#salesTemporary_due').val(obj['initialGrandTotal']);
-                    $("#salesTemporaryItem_stockName").select2("val", "");
+                    $('#salesTemporaryItem_stockName').val('').trigger('change').select2('open');
                     if( $('#isShort').is(':checked') ) {
                         $("#isShort").prop("checked", false);
                         $('#uniform-isShort span').removeClass('checked');

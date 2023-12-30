@@ -477,7 +477,17 @@ class InvoiceController extends Controller
         return new Response(json_encode(array('success' => 'success')));
     }
 
-    public function particularSearchAction(BusinessParticular $particular)
+    public function wearhouseUpdateAction(BusinessInvoiceParticular $particular)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $wearHouse = $this->getDoctrine()->getRepository(WearHouse::class)->find($_REQUEST['waerhouse']);
+        $particular->setWearHouse($wearHouse);
+        $em->flush();
+        return new Response("success");
+    }
+
+     public function particularSearchAction(BusinessParticular $particular)
     {
         $returnQty = $this->getDoctrine()->getRepository('BusinessBundle:BusinessDistributionReturnItem')->returnRemainingStockItem($particular->getBusinessConfig()->getId(),$particular->getId());
         $remain = ($particular->getRemainingQuantity() - $returnQty);
@@ -487,7 +497,14 @@ class InvoiceController extends Controller
 
     public function returnResultData(BusinessInvoice $entity, $msg=''){
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository('BusinessBundle:BusinessInvoiceParticular')->getSalesItems($entity);
+       // $invoiceParticulars = $this->getDoctrine()->getRepository('BusinessBundle:BusinessInvoiceParticular')->getSalesItems($entity);
+        //$view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'item-data';
+        $wearhouses = $this->getDoctrine()->getRepository(WearHouse::class)->findBy(array('businessConfig' => $entity->getBusinessConfig(),'status'=>1),array('name'=>'ASC'));
+        $html =  $this->renderView("BusinessBundle:Invoice/item:data.html.twig", array(
+            'config' => $entity->getBusinessConfig(),
+            'entity' => $entity,
+            'wearhouses' => $wearhouses,
+        ));
         $subTotal = $entity->getSubTotal() > 0 ? $entity->getSubTotal() : 0;
         $tloPrice = $entity->getTloPrice() > 0 ? $entity->getTloPrice() : 0;
         $netTotal = $entity->getTotal() > 0 ? $entity->getTotal() : 0;
@@ -503,7 +520,7 @@ class InvoiceController extends Controller
            'due' => $due,
            'vat' => $vat,
            'discount' => $discount,
-           'invoiceParticulars' => $invoiceParticulars ,
+           'invoiceParticulars' => $html ,
            'msg' => $msg ,
            'success' => 'success'
        );
