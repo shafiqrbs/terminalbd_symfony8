@@ -570,19 +570,6 @@ class AccountMobileBank
         return $this->businessInvoice;
     }
 
-	/**
-	 * @return HotelInvoice
-	 */
-	public function getHotelInvoice() {
-		return $this->hotelInvoice;
-	}
-
-	/**
-	 * @return HotelPurchase
-	 */
-	public function getHotelPurchases() {
-		return $this->hotelPurchases;
-	}
 
 	/**
 	 * @return AccountBalanceTransfer

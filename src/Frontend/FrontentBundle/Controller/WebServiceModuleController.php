@@ -129,7 +129,7 @@ class WebServiceModuleController extends Controller
             array(
                 'globalOption'          => $globalOption,
                 'page'                  => $page,
-                'menu'                  => $menu,
+                'menu'                  => '',
                 'pageName'              => 'pageName',
             )
         );

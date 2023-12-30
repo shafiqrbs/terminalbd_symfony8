@@ -645,21 +645,6 @@ class AccountSales
         $this->restaurantInvoice = $restaurantInvoice;
     }
 
-    /**
-     * @return DmsInvoice
-     */
-    public function getDmsInvoices()
-    {
-        return $this->dmsInvoices;
-    }
-
-    /**
-     * @param DmsInvoice $dmsInvoices
-     */
-    public function setDmsInvoices($dmsInvoices)
-    {
-        $this->dmsInvoices = $dmsInvoices;
-    }
 
     /**
      * @return MedicineSales
@@ -757,19 +742,6 @@ class AccountSales
         $this->processType = $processType;
     }
 
-	/**
-	 * @return HotelInvoice
-	 */
-	public function getHotelInvoice() {
-		return $this->hotelInvoice;
-	}
-
-	/**
-	 * @param HotelInvoice $hotelInvoice
-	 */
-	public function setHotelInvoice( $hotelInvoice ) {
-		$this->hotelInvoice = $hotelInvoice;
-	}
 
     /**
      * @return AccountHead
@@ -787,37 +759,6 @@ class AccountSales
         $this->accountHead = $accountHead;
     }
 
-    /**
-     * @return \Appstore\Bundle\TallyBundle\Entity\Sales
-     */
-    public function getTallySales()
-    {
-        return $this->tallySales;
-    }
-
-    /**
-     * @param \Appstore\Bundle\TallyBundle\Entity\Sales $tallySales
-     */
-    public function setTallySales($tallySales)
-    {
-        $this->tallySales = $tallySales;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAssetsSales()
-    {
-        return $this->assetsSales;
-    }
-
-    /**
-     * @param mixed $assetsSales
-     */
-    public function setAssetsSales($assetsSales)
-    {
-        $this->assetsSales = $assetsSales;
-    }
 
 
     /**
@@ -853,23 +794,6 @@ class AccountSales
         $this->tloPrice = $tloPrice;
     }
 
-
-
-    /**
-     * @return Order
-     */
-    public function getEcommerce()
-    {
-        return $this->ecommerce;
-    }
-
-    /**
-     * @param Order $ecommerce
-     */
-    public function setEcommerce($ecommerce)
-    {
-        $this->ecommerce = $ecommerce;
-    }
 
     /**
      * @return bool

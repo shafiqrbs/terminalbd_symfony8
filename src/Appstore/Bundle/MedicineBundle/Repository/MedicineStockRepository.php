@@ -512,6 +512,7 @@ class MedicineStockRepository extends EntityRepository
             $pPrice = $config->getTpPercent();
             $dpPrice = ($pPrice + $dpVat);
         }
+        $dp = 0;
         if($dpPrice > 0){
             $dp = ($entity->getSalesPrice() - ($entity->getSalesPrice() * ($dpPrice/100)));
         }

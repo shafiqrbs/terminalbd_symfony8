@@ -788,6 +788,7 @@ class PurchaseController extends Controller
             $dpPrice = ($pPrice + $dpVat);
         }
         // $dp = ($entity->getSalesPrice() - ($entity->getSalesPrice() * ($dpPrice/100)));
+        $dp = 0;
         if($dpPrice > 0){
             $dp = ($entity->getSalesPrice() - ($entity->getSalesPrice() * ($dpPrice/100)));
             $entity->setTp($dp);

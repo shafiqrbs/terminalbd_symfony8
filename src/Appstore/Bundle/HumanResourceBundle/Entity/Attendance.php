@@ -230,11 +230,11 @@ class Attendance
     public function monthlyPresentDays()
     {
         $presents = array();
-
-        /* @var $row DailyAttendance */
-
-        foreach ($this->getDailyAttendance() as $row ){
-            $presents[] = $row->getPresentDay();
+        if($this->getDailyAttendance()){
+            /* @var $row DailyAttendance */
+            foreach ($this->getDailyAttendance() as $row ){
+                $presents[] = $row->getPresentDay();
+            }
         }
         return $presents;
     }

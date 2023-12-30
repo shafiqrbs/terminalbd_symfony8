@@ -236,10 +236,6 @@
                     {% for item in entity.hmsInvoices.invoiceParticulars  %}
                         <p>{{ loop.index }}. {{ item.particular.name }}</p>
                     {% endfor %}
-                {% elseif entity.dmsInvoices is not empty and customer is not empty and customer.globalOption.mainApp.slug == 'dms' %}
-                    {% for item in entity.dmsInvoices.invoiceParticulars  %}
-                        <p>{{ loop.index }}. {{ item.particular.name }}</p>
-                    {% endfor %}
                 {% elseif entity.restaurantInvoice is not empty and customer is not empty and customer.globalOption.mainApp.slug == 'restaurant' %}
                     {% for item in entity.restaurantInvoice.invoiceParticulars  %}
                         <p>{{ loop.index }}. {{ item.particular.name }}</p>
@@ -247,10 +243,6 @@
                 {% elseif entity.medicineSales is not empty and customer is not empty and customer.globalOption.mainApp.slug == 'miss' %}
                     {% for item in entity.medicineSales.medicineSalesItems  %}
                         <p>{{ loop.index }}. {{ item.medicineStock.name }} ({{ item.quantity }}x{{ item.salesPrice }} = {{  item.subTotal }} Tk) </p>
-                    {% endfor %}
-                {% elseif entity.hotelInvoice is not empty and customer is not empty and customer.globalOption.mainApp.slug == 'hotel' %}
-                    {% for item in entity.hotelInvoice.hotelInvoiceParticulars  %}
-                        <p>{{ loop.index }}. {{ item.hotelParticular.name }}</p>
                     {% endfor %}
                 {% endif %}
             </td>
