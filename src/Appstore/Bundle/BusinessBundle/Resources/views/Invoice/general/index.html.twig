@@ -97,6 +97,7 @@
                                     <th class="numeric" >Invoice</th>
                                     <th class="numeric" >Name</th>
                                     <th class="numeric" >Mobile</th>
+                                    <th class="numeric" >Executive</th>
                                     <th class="numeric" >Net Total</th>
                                     <th class="numeric" >Payment</th>
                                     <th class="numeric" >Due</th>
@@ -119,6 +120,7 @@
                                                 {% if entity.customer is defined and entity.customer is not empty %}{{ entity.customer.name }}{% endif %}</td>
                                             {% endif %}
                                         <td class="numeric" >{% if entity.customer is defined and entity.customer is not empty %}{{ entity.customer.mobile }}{% endif %}</td>
+                                        <td class="numeric" >{% if entity.customer is defined and entity.customer is not empty and entity.customer.marketing is defined and entity.customer.marketing is not empty  %}{{ entity.customer.marketing.profile.name }}{% endif %}</td>
                                         <td class="numeric" >{{ entity.total }}</td>
                                         <td class="numeric" >{{ entity.received }}</td>
                                         <td class="numeric" >{{ entity.due }}</td>
