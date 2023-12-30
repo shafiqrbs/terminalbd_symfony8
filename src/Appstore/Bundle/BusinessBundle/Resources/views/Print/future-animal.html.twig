@@ -25,8 +25,7 @@
                             <div class="email">Customer ID: {{ entity.customer.customerId }}</div>
                             <div class="email">Mobile No: {{ entity.customer.mobile }}</div>
                             <div class="address">Address: {{ entity.customer.address|raw }}</div>
-
-                            <div class="email">Marketing Officer: {{ (entity.marketing) ? entity.marketing.name : '' }}</div>
+                            <div class="email">Marketing Officer: {{ (entity.customer and entity.customer.marketing) ? entity.customer.marketing.profile.name : '' }}</div>
                         </div>
                         <div class="col invoice-details">
                             <div class="date">Date of Invoice: {{ entity.created|date('d-m-Y') }}</div>
