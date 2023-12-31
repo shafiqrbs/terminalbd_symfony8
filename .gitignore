@@ -19,8 +19,6 @@ web/nano.save
 
 # Configuration files
 app/config/parameters.yml
-src/Core/UserBundle/Resources/views/Security/login.html.twig
-src/Core/UserBundle/Resources/views/Security/Mobile/login.html.twig
 #src/Setting/Bundle/ToolBundle/Controller/DomainController.php
 web/.htaccess
 
