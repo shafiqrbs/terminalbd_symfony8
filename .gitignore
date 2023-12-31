@@ -18,7 +18,6 @@ web/nano.save
 
 
 # Configuration files
-app/config/dynamic/sites.yml
 app/config/parameters.yml
 src/Core/UserBundle/Resources/views/Security/login.html.twig
 src/Core/UserBundle/Resources/views/Security/Mobile/login.html.twig
