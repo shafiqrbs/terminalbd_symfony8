@@ -8,7 +8,7 @@ medicine_purchase_reverse:
 
 medicine_reverse_purchase_show:
     path:     /{id}/purchase
-    defaults: { _controller: "MedicineBundle:Purchase:reversePurchase" }
+    defaults: { _controller: "MedicineBundle:Purchase:reverseShow" }
 
 medicine_sales_reverse:
     path:     /{id}/

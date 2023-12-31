@@ -71,7 +71,7 @@ class MedicineSalesTemporary
      *
      * @ORM\Column(name="salesPrice", type="float")
      */
-    private $salesPrice;
+    private $salesPrice=0;
 
      /**
      * @var float
@@ -85,14 +85,14 @@ class MedicineSalesTemporary
      *
      * @ORM\Column(name="purchasePrice", type="float")
      */
-    private $purchasePrice;
+    private $purchasePrice=0;
 
     /**
      * @var string
      *
      * @ORM\Column(name="estimatePrice", type="decimal", nullable=true)
      */
-    private $estimatePrice;
+    private $estimatePrice =0;
 
 
     /**

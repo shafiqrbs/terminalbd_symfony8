@@ -689,7 +689,9 @@ class PurchaseController extends Controller
                 $entity->setActualPurchasePrice($stockMedicine->getSalesPrice());
                 $entity->setPurchasePrice($stockMedicine->getSalesPrice());
                 $entity->setSalesPrice($stockMedicine->getSalesPrice());
-                $entity->setPurchaseSubTotal(round($entity->getQuantity() * $stockMedicine->getSalesPrice()));
+                if($entity->getSalesPrice()){
+                    $entity->setPurchaseSubTotal(round($entity->getQuantity() * $entity->getSalesPrice()));
+                }
                 $entity->setRemainingQuantity($entity->getQuantity());
             }else{
                 $entity->setPurchaseSubTotal($entity->getSalesPrice());
@@ -1351,8 +1353,10 @@ class PurchaseController extends Controller
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $item = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->searchAutoPurchaseStockItemWithBrand($item,$inventory,$brand);
+            return new JsonResponse($item);
         }
-        return new JsonResponse($item);
+        return new Response('failed');
+
     }
 
 

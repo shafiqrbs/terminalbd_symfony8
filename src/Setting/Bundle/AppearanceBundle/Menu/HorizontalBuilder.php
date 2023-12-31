@@ -128,7 +128,7 @@ class HorizontalBuilder extends ContainerAware
                 }
             }
 
-            $applications = array('dms', 'hms', 'prescription', 'medicine');
+            $applications = array('hms', 'prescription', 'medicine');
             $result = array_intersect($arrSlugs, $applications);
             if (!empty($result)) {
                 $roles = $securityContext->getToken()->getUser()->getRoles();

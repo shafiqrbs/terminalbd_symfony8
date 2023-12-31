@@ -56,14 +56,14 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
         if (!empty($startDate) ) {
             $datetime = new \DateTime($data['startDate']);
             $start = $datetime->format('Y-m-d 00:00:00');
-            $qb->andWhere("e.updated >= :startDate");
+            $qb->andWhere("ir.updated >= :startDate");
             $qb->setParameter('startDate', $start);
         }
 
         if (!empty($endDate)) {
             $datetime = new \DateTime($data['endDate']);
             $end = $datetime->format('Y-m-d 23:59:59');
-            $qb->andWhere("e.updated <= :endDate");
+            $qb->andWhere("ir.updated <= :endDate");
             $qb->setParameter('endDate', $end);
         }
     }

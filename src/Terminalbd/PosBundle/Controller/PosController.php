@@ -370,7 +370,7 @@ class PosController extends Controller
         }else{
             $product = $this->getDoctrine()->getRepository('InventoryBundle:Item')->findOneBy(array('inventoryConfig' => $config, 'barcode' => $barcode));
         }
-        if($product->getPurchaseItems()){
+        if($product and $product->getPurchaseItems()){
             $purchaseItems = $this->getDoctrine()->getRepository(PurchaseItem::class)->getPurchaseItemRemainingProduct($product);
             $purchaseItemOption .="<option>--Select Barcode--</option>";
             foreach ($purchaseItems as $option){
@@ -379,7 +379,7 @@ class PosController extends Controller
             }
         }
 
-        if($product->getItemSerials()){
+        if($product and $product->getItemSerials()){
 
             $purchaseItems = $this->getDoctrine()->getRepository(PurchaseItemSerial::class)->getSerialProducts($product);
             $serialOption .="<option>--Select Serial No--</option>";
@@ -393,6 +393,7 @@ class PosController extends Controller
         }else{
             return new Response(json_encode(array('status'=>'empty','quantity' => '','purchase'=>'','price'=>'')));
         }
+
 
     }
 

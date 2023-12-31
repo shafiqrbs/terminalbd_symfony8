@@ -179,25 +179,29 @@ class MedicineSalesTemporaryRepository extends EntityRepository
         $em = $this->_em;
         $entity = new MedicineSalesTemporary();
         /* @var $invoiceParticular MedicineSalesTemporary*/
-        $invoiceParticular = $this->_em->getRepository('MedicineBundle:MedicineSalesTemporary')->find($data['salesItemId']);
-        if(!empty($invoiceParticular)) {
+        $salesId = (isset($data['salesItemId']) and $data['salesItemId']) ? $data['salesItemId']:0;
+        $invoiceParticular = $this->_em->getRepository('MedicineBundle:MedicineSalesTemporary')->find($salesId);
+        if(!empty($invoiceParticular) and $salesId > 0) {
             $entity = $invoiceParticular;
-            $entity->setQuantity($data['quantity']);
-            $entity->setSalesPrice($data['salesPrice']);
-            $entity->setItemPercent($data['itemPercent']);
-            if($data['itemPercent'] > 0){
-                $entity->setItemPercent( $data['itemPercent'] );
+            $qnt = (isset($data['quantity']) and $data['quantity']) ? $data['quantity']:0;
+            $salesPrice = (isset($data['salesPrice']) and $data['salesPrice']) ? $data['salesPrice']:0;
+            $itemPercent = (isset($data['itemPercent']) and $data['itemPercent']) ? $data['itemPercent']:0;
+            $entity->setQuantity($qnt);
+            $entity->setSalesPrice($salesPrice);
+            $entity->setItemPercent($itemPercent);
+            if($itemPercent > 0){
+                $entity->setItemPercent($itemPercent);
                 $salesPrice = $invoiceParticular->getMedicineStock()->getSalesPrice();
-                $initialDiscount = (($salesPrice *  $data['itemPercent'])/100);
+                $initialDiscount = (($salesPrice *  $itemPercent)/100);
                 $initialGrandTotal =($salesPrice  - $initialDiscount);
                 $entity->setSalesPrice( round( $initialGrandTotal, 2 ) );
             }else{
-                $entity->setSalesPrice( round( $data['salesPrice'], 2 ) );
+                $entity->setSalesPrice( round( $salesPrice, 2 ) );
             }
             if($entity->getMedicineStock()->getMedicineConfig()->isProfitLastpp() == 1){
-                $entity->setPurchasePrice( round( $entity->getMedicineStock()->getPurchasePrice(), 2 ) );
+                $entity->setPurchasePrice(round($entity->getMedicineStock()->getPurchasePrice(), 2 ) );
             }else{
-                $entity->setPurchasePrice( round( $entity->getMedicineStock()->getAveragePurchasePrice(), 2 ) );
+                $entity->setPurchasePrice(round($entity->getMedicineStock()->getAveragePurchasePrice(), 2 ) );
             }
             $entity->setSubTotal($entity->getSalesPrice() * $entity->getQuantity());
         }

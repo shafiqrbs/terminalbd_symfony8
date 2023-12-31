@@ -316,7 +316,6 @@ security:
         - { path: ^/education,          role: ROLE_EDUCATION }
         - { path: ^/restaurant,         role: ROLE_RESTAURANT }
         - { path: ^/election,           role: ROLE_ELECTION }
-        - { path: ^/dms,                role: ROLE_DMS }
         - { path: ^/doctor-prescription,role: ROLE_DPS }
         - { path: ^/medicine,           role: ROLE_MEDICINE }
         - { path: ^/vendor,             role: ROLE_DOMAIN }

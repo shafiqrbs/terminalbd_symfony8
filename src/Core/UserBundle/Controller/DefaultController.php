@@ -61,8 +61,6 @@ class DefaultController extends Controller
             return $this->redirect($this->generateUrl('bindu_build'));
         }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_RESTAURANT') && $enable == 1 and $mainApp == 'restaurant') {
             return $this->redirect($this->generateUrl('restaurant_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_DMS') && $enable == 1 &&  $mainApp == 'dms') {
-            return $this->redirect($this->generateUrl('dms_homepage'));
         }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_DPS') && $enable == 1 &&  $mainApp == 'dps') {
             return $this->redirect($this->generateUrl('dps_homepage'));
         }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_HOSPITAL') && $enable == 1 &&  $mainApp == 'hms' ) {
@@ -71,14 +69,8 @@ class DefaultController extends Controller
             return $this->redirect($this->generateUrl('medicine_homepage'));
         }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_BUSINESS') && $enable == 1 && $mainApp == 'business' ) {
             return $this->redirect($this->generateUrl('business_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_HOTEL') && $enable == 1 && $mainApp == 'hotel') {
-            return $this->redirect( $this->generateUrl('hotel_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_ELECTION') && $enable == 1 && $mainApp == 'election' ) {
-        	return $this->redirect($this->generateUrl('election_homepage'));
         }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_INVENTORY') && $enable == 1 && $mainApp == 'inventory') {
         	return $this->redirect($this->generateUrl('inventory_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_ECOMMERCE') && $enable == 1 && $mainApp == 'e-commerce') {
-	        return $this->redirect($this->generateUrl('ecommerce_dashboard'));
         }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_WEBSITE') && $enable == 1 && $mainApp == 'website') {
             return $this->redirect($this->generateUrl('website'));
         }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_WEBSITE') && $enable == 1 && $mainApp == 'accounting') {

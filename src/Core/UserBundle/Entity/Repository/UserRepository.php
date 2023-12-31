@@ -281,17 +281,7 @@ class UserRepository extends EntityRepository
             );
         }
 
-        $dms = array('dms');
-        $result = array_intersect($arrSlugs, $dms);
-        if (!empty($result)) {
-            $array['DMS'] = array(
-                'ROLE_DMS'                           => 'Dental',
-                'ROLE_DMS_LAB'                       => 'Dental Lab',
-                'ROLE_DMS_DOCTOR'                    => 'Dental Doctor',
-                'ROLE_DMS_MANAGER'                   => 'Dental Manager',
-                'ROLE_DMS_ADMIN'                     => 'Dental Admin',
-            );
-        }
+
 
         $miss = array('miss');
         $result = array_intersect($arrSlugs, $miss);
@@ -318,23 +308,6 @@ class UserRepository extends EntityRepository
             );
         }
 
-
-        $assets = array('assets');
-        $result = array_intersect($arrSlugs, $assets);
-        if (!empty($result)) {
-            $array['ASSETS'] = array(
-                'ROLE_ASSETS'                                      => 'Fixed Assets',
-                'ROLE_ASSETS_MANAGE'                               => 'Assets Manage',
-                'ROLE_ASSETS_DISTRIBUTION'                         => 'Assets Distribution',
-                'ROLE_ASSETS_MAINTENANCE'                          => 'Assets Maintenance',
-                'ROLE_ASSETS_DISPOSAL'                             => 'Assets Disposal',
-                'ROLE_ASSETS_STOCK'                                => 'Assets Stock',
-                'ROLE_ASSETS_CHECKER'                              => 'Assets Checker',
-                'ROLE_ASSETS_APPROVER'                             => 'Assets Approver',
-                'ROLE_ASSETS_SETTING'                              => 'Assets Setting',
-
-            );
-        }
 
         $payroll = array('payroll');
         $result = array_intersect($arrSlugs, $payroll);
@@ -363,17 +336,6 @@ class UserRepository extends EntityRepository
             );
         }
 
-        $dms = array('election');
-        $result = array_intersect($arrSlugs, $dms);
-        if (!empty($result)) {
-            $array['ELECTION'] = array(
-                'ROLE_ELECTION'                        => 'Election',
-                'ROLE_ELECTION_OPERATOR'               => 'Operator',
-                'ROLE_ELECTION_MANAGER'                => 'Manager',
-                'ROLE_ELECTION_ADMIN'                  => 'Admin',
-            );
-        }
-
         $array['Customer'] = array(
             'ROLE_CRM'                          => 'Customer',
             'ROLE_CUSTOMER_REHAB'               => 'Rehab Patient',
@@ -396,21 +358,6 @@ class UserRepository extends EntityRepository
 		    );
 	    }
 
-        $ecommerce = array('e-commerce');
-        $result = array_intersect($arrSlugs, $ecommerce);
-        if (!empty($result)) {
-
-            $array['E-commerce'] = array(
-                'ROLE_ECOMMERCE'                            => 'E-commerce',
-                'ROLE_DOMAIN_ECOMMERCE_PRODUCT'             => 'E-commerce Product',
-                'ROLE_DOMAIN_ECOMMERCE_ORDER'               => 'E-commerce Order',
-                'ROLE_DOMAIN_ECOMMERCE_PURCHASE'            => 'E-commerce Purchase',
-                'ROLE_DOMAIN_ECOMMERCE_MANAGER'             => 'E-commerce Manager',
-                'ROLE_DOMAIN_ECOMMERCE_VENDOR'              => 'E-commerce Vendor',
-                'ROLE_DOMAIN_ECOMMERCE_REPORT'              => 'E-commerce Report',
-                'ROLE_DOMAIN_ECOMMERCE_CONFIG'              => 'E-commerce Admin',
-            );
-        }
 
         $appearance = array('website','e-commerce');
         $result = array_intersect($arrSlugs, $appearance);
@@ -419,9 +366,6 @@ class UserRepository extends EntityRepository
             $array['Appearance'] = array(
 
                 'ROLE_APPEARANCE'               => 'Appearance',
-                'ROLE_DOMAIN_ECOMMERCE_MENU'    => 'E-commerce Menu',
-                'ROLE_DOMAIN_ECOMMERCE_SETTING' => 'E-commerce Setting',
-                'ROLE_DOMAIN_ECOMMERCE_WEDGET'  => 'E-commerce Wedget',
                 'ROLE_DOMAIN_WEBSITE_WEDGET'    => 'Website Wedget',
                 'ROLE_DOMAIN_WEBSITE_SETTING'   => 'Website Setting',
 

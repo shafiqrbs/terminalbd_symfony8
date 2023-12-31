@@ -138,10 +138,6 @@ class AccountPurchaseController extends Controller
 	            $entity->setProcessHead('business');
 	            $entity->setCompanyName($entity->getAccountVendor()->getCompanyName());
 	            $entity->setAccountVendor($entity->getAccountVendor());
-            }elseif($global->getMainApp()->getSlug() == 'dms'){
-	            $entity->setProcessHead('dms');
-	            $entity->setCompanyName($entity->getAccountVendor()->getCompanyName());
-	            $entity->setAccountVendor($entity->getAccountVendor());
             }else{
                 if (empty($entity->getAccountVendor()) and !empty($data['companyName']) and !empty($data['customerMobile'])){
                     $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
@@ -215,10 +211,6 @@ class AccountPurchaseController extends Controller
                 $entity->setAccountVendor($entity->getAccountVendor());
                 $entity->setCompanyName($entity->getAccountVendor()->getCompanyName());
                 $entity->setProcessHead('business');
-            }elseif($global->getMainApp()->getSlug() == 'dms'){
-                $entity->setProcessHead('dms');
-                $entity->setCompanyName($entity->getAccountVendor()->getCompanyName());
-                $entity->setAccountVendor($entity->getAccountVendor());
             }else{
                 if (empty($entity->getAccountVendor()) and !empty($data['companyName']) and !empty($data['customerMobile'])){
                     $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
