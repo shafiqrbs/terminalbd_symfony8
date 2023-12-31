@@ -29,7 +29,6 @@ class BusinessVendorStockRepository extends EntityRepository
         $startDate = isset($data['startDate'])? $data['startDate'] :'';
         $endDate = isset($data['endDate'])? $data['endDate'] :'';
 
-
         if(!empty($vendor)){
             $qb->join('e.vendor','v');
             $qb->andWhere($qb->expr()->like("v.companyName", "'%$vendor%'"  ));
@@ -44,14 +43,14 @@ class BusinessVendorStockRepository extends EntityRepository
         if (!empty($startDate) ) {
             $datetime = new \DateTime($data['startDate']);
             $start = $datetime->format('Y-m-d 00:00:00');
-            $qb->andWhere("e.updated >= :startDate");
+            $qb->andWhere("e.created >= :startDate");
             $qb->setParameter('startDate', $start);
         }
 
         if (!empty($endDate)) {
             $datetime = new \DateTime($data['endDate']);
             $end = $datetime->format('Y-m-d 23:59:59');
-            $qb->andWhere("e.updated <= :endDate");
+            $qb->andWhere("e.created <= :endDate");
             $qb->setParameter('endDate', $end);
         }
     }
@@ -63,7 +62,7 @@ class BusinessVendorStockRepository extends EntityRepository
         $qb = $this->createQueryBuilder('e');
         $qb->where('e.businessConfig = :config')->setParameter('config', $config) ;
         $this->handleSearchBetween($qb,$data);
-        $qb->orderBy('e.updated','DESC');
+        $qb->orderBy('e.created','DESC');
         $qb->getQuery();
         return  $qb;
     }
