@@ -865,99 +865,7 @@ class ApiPoskeeperController extends Controller
 
     }
 
-    public function customerAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
 
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-
-            $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->getApiCustomer($entity);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function createCustomerAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-
-            $form = $_REQUEST;
-            $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiCreateCustomer($entity,$form);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function editCustomerAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-            $entity = $this->checkApiValidation($request);
-            $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($entity,$form);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function updateCustomerAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-
-            $this->checkApiValidation($request);
-            $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($form);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
 
     public function unitAction(Request $request)
     {
@@ -1895,6 +1803,199 @@ class ApiPoskeeperController extends Controller
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(array('status'=> $status)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    /* Customer manage */
+
+    public function customerAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $entity = $this->checkApiValidation($request);
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->getApiCustomer($entity);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function createCustomerAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $form = $_REQUEST;
+            $entity = $this->checkApiValidation($request);
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiCreate($entity,$form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function editCustomerAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($entity,$form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function updateCustomerAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    /* Train Schedule API*/
+
+    public function trainListAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $entity = $this->checkApiValidation($request);
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Notepad')->getApiTrain($entity);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function createTrainAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $form = $_REQUEST;
+            $entity = $this->checkApiValidation($request);
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Notepad')->apiCreateTrain($entity,$form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function updateTrainAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function deleteTrainAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }

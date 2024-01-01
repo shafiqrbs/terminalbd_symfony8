@@ -68,6 +68,51 @@ class Notepad
 
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="trip", type="text" , length=255, nullable=true)
+     *
+     */
+    private $trip;
+
+
+     /**
+     * @var string
+     *
+     * @ORM\Column(name="tripUrl", type="text" , length=255, nullable=true)
+     *
+     */
+    private $tripUrl;
+
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="trainRoute", type="string" , length=255, nullable=true)
+     *
+     */
+    private $trainRoute;
+
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="model", type="string" , length=255, nullable=true)
+     *
+     */
+    private $model;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="days", type="string" , length=20, nullable=true)
+     *
+     */
+    private $days;
+
+
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="archive", type="boolean" )
@@ -193,6 +238,88 @@ class Notepad
 	public function setGlobalOption( $globalOption ) {
 		$this->globalOption = $globalOption;
 	}
+
+    /**
+     * @return string
+     */
+    public function getTrip()
+    {
+        return $this->trip;
+    }
+
+    /**
+     * @param string $trip
+     */
+    public function setTrip($trip)
+    {
+        $this->trip = $trip;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTripUrl()
+    {
+        return $this->tripUrl;
+    }
+
+    /**
+     * @param string $tripUrl
+     */
+    public function setTripUrl($tripUrl)
+    {
+        $this->tripUrl = $tripUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTrainRoute()
+    {
+        return $this->trainRoute;
+    }
+
+    /**
+     * @param string $trainRoute
+     */
+    public function setTrainRoute($trainRoute)
+    {
+        $this->trainRoute = $trainRoute;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModel()
+    {
+        return $this->model;
+    }
+
+    /**
+     * @param string $model
+     */
+    public function setModel($model)
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDays()
+    {
+        return $this->days;
+    }
+
+    /**
+     * @param string $days
+     */
+    public function setDays($days)
+    {
+        $this->days = $days;
+    }
+
+
 
 
 }

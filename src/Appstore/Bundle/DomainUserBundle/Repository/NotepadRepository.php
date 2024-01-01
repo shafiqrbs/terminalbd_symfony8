@@ -83,6 +83,45 @@ class NotepadRepository extends EntityRepository
 
 	}
 
+    public function getApiTrain(GlobalOption $option)
+    {
+        $qb = $this->createQueryBuilder('customer');
+        $qb->select('customer.id as id','customer.name as name','customer.days as days','customer.trainRoute as trainRoute','customer.trip as trip','customer.tripUrl as tripUrl');
+        $qb->where("customer.globalOption = :globalOption");
+        $qb->setParameter('globalOption', $option->getId());
+        $qb->orderBy('customer.model','ASC');
+        $result = $qb->getQuery()->getArrayResult();
+        return $result;
+
+    }
+
+    public function apiCreateTrain(GlobalOption $global,$data)
+    {
+        $em = $this->_em;
+        $model = ((isset($data['model']) and $data['model'])) ? ($data['model']):'';
+        $name = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
+        $days = ((isset($data['days']) and $data['days'])) ? $data['days']:'';
+        $trainRoute = ((isset($data['train_route']) and $data['train_route'])) ? $data['train_route']:'';
+        $trainTrip = ((isset($data['train_trip']) and $data['train_trip'])) ? $data['train_trip']:'';
+        $trainTripUrl = ((isset($data['train_trip_url']) and $data['train_trip_url'])) ? $data['train_trip_url']:'';
+        $entity = $em->getRepository('DomainUserBundle:Notepad')->findOneBy(array('globalOption' => $global ,'model' => $model));
+        if($entity){
+            return 'invalid';
+        }else {
+            $entity = new Notepad();
+            $entity->setModel($model);
+            $entity->setName($name);
+            $entity->setDays($days);
+            $entity->setTrainRoute($trainRoute);
+            $entity->setTrip($trainTrip);
+            $entity->setTripUrl($trainTripUrl);
+            $entity->setGlobalOption($global);
+            $em->persist($entity);
+            $em->flush();
+            return 'success';
+        }
+    }
+
 
 
 }

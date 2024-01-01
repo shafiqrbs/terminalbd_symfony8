@@ -39,7 +39,6 @@ class AccountSalesRepository extends EntityRepository
 
 		if(!empty($data))
 		{
-
 		    $startDate = isset($data['startDate'])  ? $data['startDate'] : '';
 			$endDate =   isset($data['endDate'])  ? $data['endDate'] : '';
 			$mobile =    isset($data['mobile'])? $data['mobile'] :'';
@@ -1432,10 +1431,10 @@ class AccountSalesRepository extends EntityRepository
         }
     }
 
-    public function apiCustomerLedger(GlobalOption $globalOption,$arr)
+    public function apiCustomerLedger(GlobalOption $globalOption,$array)
     {
 
-       // var_dump($data);
+
         $qb = $this->createQueryBuilder('e');
         $qb->join('e.customer','customer');
         $qb->leftJoin('e.transactionMethod','transactionMethod');
@@ -1443,7 +1442,7 @@ class AccountSalesRepository extends EntityRepository
         $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.accountRefNo as invoice','e.sourceInvoice as sourceInvoice');
         $qb->where("e.globalOption = :globalOption");
         $qb->setParameter('globalOption', $globalOption);
-        $this->handleSearchBetween($qb,$arr);
+        $this->handleSearchBetween($qb,$array);
         $qb->orderBy('e.updated','DESC');
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
