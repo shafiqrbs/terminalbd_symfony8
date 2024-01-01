@@ -475,7 +475,7 @@ class AccountSalesRepository extends EntityRepository
     {
         $amount = isset($data['amount']) ? $data['amount']:0;
         $qb = $this->createQueryBuilder('e');
-        $qb->select('customer.id as customerId ,customer.name as name , customer.mobile as mobile,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
+        $qb->select('customer.id as customerId ,customer.name as name , customer.address as address , customer.mobile as mobile,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
         $qb->join('e.customer','customer');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
         $qb->andWhere("e.process = 'approved'");

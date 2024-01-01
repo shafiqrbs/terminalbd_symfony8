@@ -34,7 +34,7 @@ class CustomerEditType extends AbstractType
     {
         $builder
             ->add('marketing', 'entity', array(
-                'required'    => true,
+                'required'    => false,
                 'class' => 'Core\UserBundle\Entity\User',
                 'empty_value' => '---Choose a marketing executive---',
                 'property' => 'userFullName',

@@ -5,6 +5,7 @@ namespace Bindu\BinduBundle\Controller;
 use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
+use Proxies\__CG__\Appstore\Bundle\AccountingBundle\Entity\AccountSales;
 use Setting\Bundle\AppearanceBundle\Entity\TemplateCustomize;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Setting\Bundle\ToolBundle\Entity\PaymentCard;
@@ -1770,7 +1771,30 @@ class ApiPoskeeperController extends Controller
 
     }
 
-    public function customerLedgerAction(Request $request)
+    public function customerOutstandingAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $data = $_REQUEST;
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $entities = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->customerSummary($entity,$data);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($entities));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
+     public function customerLedgerAction(Request $request)
     {
         set_time_limit(0);
         ignore_user_abort(true);
