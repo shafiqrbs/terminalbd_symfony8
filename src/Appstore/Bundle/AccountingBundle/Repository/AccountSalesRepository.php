@@ -39,6 +39,7 @@ class AccountSalesRepository extends EntityRepository
 
 		if(!empty($data))
 		{
+
 		    $startDate = isset($data['startDate'])  ? $data['startDate'] : '';
 			$endDate =   isset($data['endDate'])  ? $data['endDate'] : '';
 			$mobile =    isset($data['mobile'])? $data['mobile'] :'';
@@ -1439,7 +1440,7 @@ class AccountSalesRepository extends EntityRepository
         $qb->join('e.customer','customer');
         $qb->leftJoin('e.transactionMethod','transactionMethod');
         $qb->select('transactionMethod.name as method');
-        $qb->addSelect('e.id as id','e.updated as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.sourceInvoice as sourceInvoice');
+        $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.accountRefNo as invoice','e.sourceInvoice as sourceInvoice');
         $qb->where("e.globalOption = :globalOption");
         $qb->setParameter('globalOption', $globalOption);
         $this->handleSearchBetween($qb,$arr);
@@ -1447,13 +1448,14 @@ class AccountSalesRepository extends EntityRepository
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
         foreach ($result as $key => $row){
-
             $data[$key]['id'] = $row['id'];
             $data[$key]['method'] = ($row['method']) ? $row['method']:'';
             $data[$key]['sales'] = $row['totalAmount'];
             $data[$key]['receive'] = $row['amount'];
             $data[$key]['balance'] = $row['balance'];
             $data[$key]['sourceInvoice'] = ($row['sourceInvoice']) ? $row['sourceInvoice']:'';
+            $data[$key]['invoice'] = ($row['invoice']) ? $row['invoice']:'';
+            $data[$key]['created'] = $row['created']->format('d-m-Y h:i A');
             $data[$key]['updated'] = $row['updated']->format('d-m-Y h:i A');
         }
         return $data;
@@ -1464,19 +1466,25 @@ class AccountSalesRepository extends EntityRepository
     {
         $em = $this->_em;
         $user = $em->getRepository('UserBundle:User')->find($userId);
-        $entity = new AccountSales();
-        $entity->setCustomer($customer);
-        $entity->setGlobalOption($customer->getGlobalOption());
-        $entity->setProcessHead('Outstanding');
-        $entity->setCreatedBy($user);
-        $entity->setApprovedBy($user);
-        $datetime = new \DateTime("now");
-        $entity->setUpdated($datetime);
-        $entity->setProcess('approved');
-        $entity->setTotalAmount($opening);
-        $entity->setAmount(0);
-        $entity->setBalance($opening);
-        $entity->setTransactionMethod(null);
+        if($user){
+            $entity = new AccountSales();
+            $entity->setCustomer($customer);
+            $entity->setGlobalOption($customer->getGlobalOption());
+            $entity->setProcessHead('Debit');
+            $entity->setCreatedBy($user);
+            $entity->setApprovedBy($user);
+            $datetime = new \DateTime("now");
+            $entity->setUpdated($datetime);
+            $entity->setProcess('approved');
+            $entity->setTotalAmount($opening);
+            $entity->setAmount(0);
+            $entity->setBalance($opening);
+            $entity->setTransactionMethod(null);
+            $em->persist($entity);
+            $em->flush();
+            $this->updateCustomerBalance($entity);
+        }
+
 
     }
 
@@ -1485,17 +1493,17 @@ class AccountSalesRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $mobile = $data['customerId'];
-        $methodId = $data['method'];
-        $userId = $data['userId'];
-        $bankId = $data['bankAccount'];
-        $mobileId = $data['mobileAccount'];
-        $amount = $data['amount'];
-        $mode = $data['mode'];
-        $remark = $data['remark'];
+        $customer = (isset($data['customer']) and $data['customer']) ? trim($data['customer']):'';
+        $methodId = (isset($data['method']) and $data['method']) ? trim($data['method']):'';
+        $userId = (isset($data['userId']) and $data['userId']) ? trim($data['userId']):'';
+        $bankId = (isset($data['bankAccount']) and $data['bankAccount']) ? trim($data['bankAccount']):'';
+        $mobileId = (isset($data['mobileAccount']) and $data['mobileAccount']) ? trim($data['mobileAccount']):'';
+        $amount = (isset($data['amount']) and $data['amount']) ? trim(floatval($data['amount'])):'';
+        $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'';
+        $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
 
         $entity = new AccountSales();
-        $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption'=>$option, 'id' => $mobile));
+        $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption'=>$option, 'id' => $customer));
         $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(array('slug' => $methodId));
         $user = $em->getRepository('UserBundle:User')->find($userId);
         $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($bankId);

@@ -900,8 +900,9 @@ class ApiPoskeeperController extends Controller
 
             /* @var $entity GlobalOption */
 
+            $form = $_REQUEST;
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->getApiCustomer($entity);
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiCreateCustomer($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -922,9 +923,9 @@ class ApiPoskeeperController extends Controller
         }else{
 
             /* @var $entity GlobalOption */
-
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->getApiCustomer($entity);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -946,8 +947,9 @@ class ApiPoskeeperController extends Controller
 
             /* @var $entity GlobalOption */
 
-            $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->getApiCustomer($entity);
+            $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));

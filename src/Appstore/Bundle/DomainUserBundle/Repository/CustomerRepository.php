@@ -1010,12 +1010,12 @@ class CustomerRepository extends EntityRepository
     public function apiCreateCustomer(GlobalOption $global,$data)
     {
         $em = $this->_em;
-        $mobile = trim($data['mobile']);
-        $name = trim($data['name']);
-        $address = trim($data['address']);
-        $userId = trim($data['userId']);
-        $openingBalance = floatval($data['openingBalance']);
-        $email = $data['email'];
+        $mobile = ((isset($data['mobile']) and $data['mobile'])) ? ($data['mobile']):'';
+        $name = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
+        $address = ((isset($data['address']) and $data['address'])) ? $data['address']:'';
+        $email = ((isset($data['email']) and $data['email'])) ? floatval($data['email']):'';
+        $userId = ((isset($data['userId']) and $data['userId'])) ? floatval($data['userId']):'';
+        $openingBalance = trim((isset($data['openingBalance']) and $data['openingBalance'])) ? trim(floatval($data['openingBalance'])):0;
         $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption' => $global ,'mobile' => $mobile));
         if($entity){
             return 'invalid';
@@ -1035,7 +1035,7 @@ class CustomerRepository extends EntityRepository
         }
     }
 
-    public function apiUpdateCustomer(GlobalOption $globalOption,$data)
+    public function apiUpdateCustomer($data)
     {
         $em = $this->_em;
         $customerId = trim($data['customer']);
