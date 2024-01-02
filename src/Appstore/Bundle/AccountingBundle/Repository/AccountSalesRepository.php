@@ -101,10 +101,13 @@ class AccountSalesRepository extends EntityRepository
 				$qb->setParameter('cid', $customerId);
 			}
 			if (!empty($invoice)) {
-				$qb->andWhere($qb->expr()->like("e.sourceInvoice", "'%$invoice%'"  ));
+                $qb->leftJoin('e.medicineSales','sms');
+                $qb->leftJoin('e.businessInvoice','sbs');
+                $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR sms.invoice LIKE :searchTerm OR sbs.invoice LIKE :searchTerm');
+                $qb->setParameter('searchTerm', '%'.trim($invoice).'%');
 			}
 			if (!empty($medicineInvoice)) {
-				$qb->join('e.medicineSales','ms');
+				$qb->leftJoin('e.medicineSales','ms');
 				$qb->andWhere("ms.invoice = :invoice");
 				$qb->setParameter('invoice', $medicineInvoice);
 			}
@@ -1440,6 +1443,7 @@ class AccountSalesRepository extends EntityRepository
         $qb->leftJoin('e.transactionMethod','transactionMethod');
         $qb->select('transactionMethod.name as method');
         $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.accountRefNo as invoice','e.sourceInvoice as sourceInvoice');
+        $qb->addSelect('customer.id as customerId','customer.name as customerName','customer.mobile as mobile');
         $qb->where("e.globalOption = :globalOption");
         $qb->setParameter('globalOption', $globalOption);
         $this->handleSearchBetween($qb,$array);
@@ -1449,6 +1453,9 @@ class AccountSalesRepository extends EntityRepository
         foreach ($result as $key => $row){
             $data[$key]['id'] = $row['id'];
             $data[$key]['method'] = ($row['method']) ? $row['method']:'';
+            $data[$key]['customerName'] = $row['customerName'];
+            $data[$key]['customerId'] = $row['customerId'];
+            $data[$key]['mobile'] = $row['mobile'];
             $data[$key]['sales'] = $row['totalAmount'];
             $data[$key]['receive'] = $row['amount'];
             $data[$key]['balance'] = $row['balance'];

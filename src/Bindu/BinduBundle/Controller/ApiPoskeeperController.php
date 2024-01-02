@@ -1681,6 +1681,28 @@ class ApiPoskeeperController extends Controller
 
     }
 
+    public function accountSalesAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $formArray = $_REQUEST;
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $result = $this->getDoctrine()->getRepository("AccountingBundle:AccountSales")->apiCustomerLedger($entity,$formArray);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($result));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
     public function customerOutstandingAction(Request $request)
     {
         set_time_limit(0);
@@ -1704,7 +1726,7 @@ class ApiPoskeeperController extends Controller
         }
     }
 
-     public function customerLedgerAction(Request $request)
+    public function customerLedgerAction(Request $request)
     {
         set_time_limit(0);
         ignore_user_abort(true);
