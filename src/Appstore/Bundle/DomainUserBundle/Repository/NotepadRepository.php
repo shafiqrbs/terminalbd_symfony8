@@ -91,7 +91,11 @@ class NotepadRepository extends EntityRepository
         $qb->setParameter('globalOption', $option->getId());
         $qb->orderBy('customer.model','ASC');
         $result = $qb->getQuery()->getArrayResult();
-        return $result;
+        if($result){
+            return $result;
+        }else{
+            return  "";
+        }
 
     }
 

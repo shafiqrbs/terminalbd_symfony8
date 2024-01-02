@@ -88,7 +88,7 @@ class Notepad
     /**
      * @var string
      *
-     * @ORM\Column(name="trainRoute", type="string" , length=255, nullable=true)
+     * @ORM\Column(name="trainRoute", type="text" , length=255, nullable=true)
      *
      */
     private $trainRoute;
@@ -105,7 +105,7 @@ class Notepad
     /**
      * @var string
      *
-     * @ORM\Column(name="days", type="string" , length=20, nullable=true)
+     * @ORM\Column(name="days", type="string" , length=100, nullable=true)
      *
      */
     private $days;
