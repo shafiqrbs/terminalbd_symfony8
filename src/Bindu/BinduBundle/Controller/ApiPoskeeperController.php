@@ -1982,6 +1982,7 @@ class ApiPoskeeperController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
+
         if( $this->checkApiValidation($request) == 'invalid') {
 
             return new Response('Unauthorized access.', 401);
@@ -1990,12 +1991,16 @@ class ApiPoskeeperController extends Controller
 
             /* @var $entity GlobalOption */
 
-            $this->checkApiValidation($request);
-            $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($form);
+            $entity = $this->checkApiValidation($request);
+            $config = $entity->getId();
+            $em = $this->getDoctrine()->getManager();
+            $account = $em->createQuery('DELETE DomainUserBundle:Notepad e WHERE e.globalOption = '.$config);
+            if(!empty($account)){
+                $account->execute();
+            }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
+            $response->setContent(json_encode('success'));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }

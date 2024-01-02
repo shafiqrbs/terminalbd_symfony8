@@ -117,7 +117,7 @@ api_poskeeper_train_update:
 
 api_poskeeper_train_delete:
     path:     /poskeeper-train-delete
-    defaults: { _controller: BinduBundle:ApiPoskeeper:trainDelete }
+    defaults: { _controller: BinduBundle:ApiPoskeeper:deleteTrain }
     methods:  POST|GET
     options:
         expose: true
