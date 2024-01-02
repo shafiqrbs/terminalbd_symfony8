@@ -86,7 +86,7 @@ class NotepadRepository extends EntityRepository
     public function getApiTrain(GlobalOption $option)
     {
         $qb = $this->createQueryBuilder('customer');
-        $qb->select('customer.id as id','customer.name as name','customer.days as days','customer.trainRoute as trainRoute','customer.trip as trip','customer.tripUrl as tripUrl');
+        $qb->select('customer.id as id','customer.name as name','customer.model as model','customer.days as days','customer.trainRoute as trainRoute','customer.trip as trip','customer.tripUrl as tripUrl');
         $qb->where("customer.globalOption = :globalOption");
         $qb->setParameter('globalOption', $option->getId());
         $qb->orderBy('customer.model','ASC');
