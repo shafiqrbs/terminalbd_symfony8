@@ -36,99 +36,101 @@ class AccountSalesRepository extends EntityRepository
 
 	protected function handleSearchBetween($qb,$data)
 	{
+        $startDate = isset($data['startDate'])  ? $data['startDate'] : '';
+        $endDate =   isset($data['endDate'])  ? $data['endDate'] : '';
+        $mobile =    isset($data['mobile'])? $data['mobile'] :'';
+        $user =    isset($data['user'])? $data['user'] :'';
+        $customer =    isset($data['customer'])? $data['customer'] :'';
+        $customerId =    isset($data['customerId'])? $data['customerId'] :'';
+        $invoice =    isset($data['invoice'])? $data['invoice'] :'';
+        $accountRefNo =    isset($data['accountRefNo'])? $data['accountRefNo'] :'';
+        $medicineInvoice =    isset($data['medicineInvoice'])? $data['medicineInvoice'] :'';
+        $businessInvoice =    isset($data['businessInvoice'])? $data['businessInvoice'] :'';
+        $transaction =    isset($data['transactionMethod'])? $data['transactionMethod'] :'';
+        $method =    isset($data['method'])? $data['method'] :'';
+        $mode =    isset($data['mode'])? $data['mode'] :'';
+        $account =    isset($data['accountHead'])? $data['accountHead'] :'';
+        $sales =    isset($data['sales'])? $data['sales'] :'';
 
-		if(!empty($data))
-		{
-		    $startDate = isset($data['startDate'])  ? $data['startDate'] : '';
-			$endDate =   isset($data['endDate'])  ? $data['endDate'] : '';
-			$mobile =    isset($data['mobile'])? $data['mobile'] :'';
-			$user =    isset($data['user'])? $data['user'] :'';
-			$customer =    isset($data['customer'])? $data['customer'] :'';
-			$customerId =    isset($data['customerId'])? $data['customerId'] :'';
-			$invoice =    isset($data['invoice'])? $data['invoice'] :'';
-			$accountRefNo =    isset($data['accountRefNo'])? $data['accountRefNo'] :'';
-			$medicineInvoice =    isset($data['medicineInvoice'])? $data['medicineInvoice'] :'';
-			$businessInvoice =    isset($data['businessInvoice'])? $data['businessInvoice'] :'';
-			$transaction =    isset($data['transactionMethod'])? $data['transactionMethod'] :'';
-			$method =    isset($data['method'])? $data['method'] :'';
-			$mode =    isset($data['mode'])? $data['mode'] :'';
-			$account =    isset($data['accountHead'])? $data['accountHead'] :'';
-			$sales =    isset($data['sales'])? $data['sales'] :'';
+        if (!empty($startDate) ) {
+            $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }else{
+            $start = date('Y-m-d 00:00:00',strtotime(date('d-m-Y')));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }
+        if (!empty($endDate)) {
+            $end = date('Y-m-d 23:59:59',strtotime($data['endDate']));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }else{
+            $end = date('Y-m-d 23:59:59',strtotime(date('d-m-Y')));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }
+        if (!empty($accountRefNo)) {
+            $qb->andWhere("e.accountRefNo = :accountRefNo");
+            $qb->setParameter('accountRefNo', $accountRefNo);
+        }
+        if (!empty($mode)) {
+            $qb->andWhere("e.processHead = :processHead");
+            $qb->setParameter('processHead', $mode);
+        }
+        if (!empty($transaction)) {
+            $qb->andWhere("e.transactionMethod = :transaction");
+            $qb->setParameter('transaction', $transaction);
+        }
+        if (!empty($method)) {
+            $qb->andWhere("e.transactionMethod = :transaction");
+            $qb->setParameter('transaction', $method);
+        }
+        if (!empty($user)) {
+            $qb->andWhere("e.createdBy = :user");
+            $qb->setParameter('user', $user);
+        }
+        if (!empty($mobile)) {
+            $qb->join('e.customer','c');
+            $qb->andWhere("c.mobile = :mobile");
+            $qb->setParameter('mobile', $mobile);
+        }
+        if (!empty($customer)) {
+            $qb->join('e.customer','cn');
+            $qb->andWhere("cn.name = :name");
+            $qb->setParameter('name', $customer);
+        }
+        if (!empty($customerId)) {
+            $qb->andWhere("e.customer = :cid");
+            $qb->setParameter('cid', $customerId);
+        }
+        if (!empty($invoice)) {
+            $qb->leftJoin('e.medicineSales','sms');
+            $qb->leftJoin('e.businessInvoice','sbs');
+            $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR sms.invoice LIKE :searchTerm OR sbs.invoice LIKE :searchTerm');
+            $qb->setParameter('searchTerm', '%'.trim($invoice).'%');
+        }
+        if (!empty($medicineInvoice)) {
+            $qb->leftJoin('e.medicineSales','ms');
+            $qb->andWhere("ms.invoice = :invoice");
+            $qb->setParameter('invoice', $medicineInvoice);
+        }
 
-			if (!empty($startDate) ) {
-				$start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
-				$qb->andWhere("e.updated >= :startDate");
-				$qb->setParameter('startDate', $start);
-			}
-			if (!empty($endDate)) {
-				$end = date('Y-m-d 23:59:59',strtotime($data['endDate']));
-				$qb->andWhere("e.updated <= :endDate");
-				$qb->setParameter('endDate',$end);
-			}
+        if (!empty($businessInvoice)) {
+            $qb->join('e.businessInvoice','ms');
+            $qb->andWhere("ms.invoice = :invoice");
+            $qb->setParameter('invoice', $businessInvoice);
+        }
 
-			if (!empty($accountRefNo)) {
-				$qb->andWhere("e.accountRefNo = :accountRefNo");
-				$qb->setParameter('accountRefNo', $accountRefNo);
-			}
-			if (!empty($mode)) {
-				$qb->andWhere("e.processHead = :processHead");
-				$qb->setParameter('processHead', $mode);
-			}
-			if (!empty($transaction)) {
-				$qb->andWhere("e.transactionMethod = :transaction");
-				$qb->setParameter('transaction', $transaction);
-			}
-            if (!empty($method)) {
-				$qb->andWhere("e.transactionMethod = :transaction");
-				$qb->setParameter('transaction', $method);
-			}
-            if (!empty($user)) {
-                $qb->andWhere("e.createdBy = :user");
-                $qb->setParameter('user', $user);
-            }
-			if (!empty($mobile)) {
-				$qb->join('e.customer','c');
-				$qb->andWhere("c.mobile = :mobile");
-				$qb->setParameter('mobile', $mobile);
-			}
-			if (!empty($customer)) {
-				$qb->join('e.customer','cn');
-				$qb->andWhere("cn.name = :name");
-				$qb->setParameter('name', $customer);
-			}
-			if (!empty($customerId)) {
-				$qb->andWhere("e.customer = :cid");
-				$qb->setParameter('cid', $customerId);
-			}
-			if (!empty($invoice)) {
-                $qb->leftJoin('e.medicineSales','sms');
-                $qb->leftJoin('e.businessInvoice','sbs');
-                $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR sms.invoice LIKE :searchTerm OR sbs.invoice LIKE :searchTerm');
-                $qb->setParameter('searchTerm', '%'.trim($invoice).'%');
-			}
-			if (!empty($medicineInvoice)) {
-				$qb->leftJoin('e.medicineSales','ms');
-				$qb->andWhere("ms.invoice = :invoice");
-				$qb->setParameter('invoice', $medicineInvoice);
-			}
-
-			if (!empty($businessInvoice)) {
-				$qb->join('e.businessInvoice','ms');
-				$qb->andWhere("ms.invoice = :invoice");
-				$qb->setParameter('invoice', $businessInvoice);
-			}
-
-			if (!empty($sales)) {
-				$qb->andWhere("e.sales = :sales");
-				$qb->setParameter('sales', $sales);
-			}
-			if (!empty($account)) {
-				$qb->join('e.accountHead','a');
-				$qb->andWhere("a.id = :account");
-				$qb->setParameter('account', $account);
-			}
-		}
-
+        if (!empty($sales)) {
+            $qb->andWhere("e.sales = :sales");
+            $qb->setParameter('sales', $sales);
+        }
+        if (!empty($account)) {
+            $qb->join('e.accountHead','a');
+            $qb->andWhere("a.id = :account");
+            $qb->setParameter('account', $account);
+        }
 	}
 
     public function getProcessModes($global)
