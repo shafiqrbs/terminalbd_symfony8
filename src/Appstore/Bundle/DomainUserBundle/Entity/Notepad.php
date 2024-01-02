@@ -61,7 +61,7 @@ class Notepad
 	/**
      * @var string
      *
-     * @ORM\Column(name="name", type="string" , length=255, nullable=true)
+     * @ORM\Column(name="name", type="string" , nullable=true)
      *
      */
     private $name;
@@ -70,7 +70,7 @@ class Notepad
     /**
      * @var string
      *
-     * @ORM\Column(name="trip", type="text" , length=255, nullable=true)
+     * @ORM\Column(name="trip", type="text" ,nullable=true)
      *
      */
     private $trip;
@@ -79,7 +79,7 @@ class Notepad
      /**
      * @var string
      *
-     * @ORM\Column(name="tripUrl", type="text" , length=255, nullable=true)
+     * @ORM\Column(name="tripUrl", type="text" ,  nullable=true)
      *
      */
     private $tripUrl;
@@ -88,7 +88,7 @@ class Notepad
     /**
      * @var string
      *
-     * @ORM\Column(name="trainRoute", type="text" , length=255, nullable=true)
+     * @ORM\Column(name="trainRoute", type="text" ,nullable=true)
      *
      */
     private $trainRoute;
