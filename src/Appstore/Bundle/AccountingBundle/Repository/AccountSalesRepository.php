@@ -1454,11 +1454,11 @@ class AccountSalesRepository extends EntityRepository
             $data[$key]['id'] = $row['id'];
             $data[$key]['method'] = ($row['method']) ? $row['method']:'';
             $data[$key]['customerName'] = $row['customerName'];
-            $data[$key]['customerId'] = $row['customerId'];
+            $data[$key]['customerId'] = (integer)$row['customerId'];
             $data[$key]['mobile'] = $row['mobile'];
-            $data[$key]['sales'] = $row['totalAmount'];
-            $data[$key]['receive'] = $row['amount'];
-            $data[$key]['balance'] = $row['balance'];
+            $data[$key]['sales'] = floatval($row['totalAmount']);
+            $data[$key]['receive'] = floatval($row['amount']);
+            $data[$key]['balance'] = floatval($row['balance']);
             $data[$key]['sourceInvoice'] = ($row['sourceInvoice']) ? $row['sourceInvoice']:'';
             $data[$key]['invoice'] = ($row['invoice']) ? $row['invoice']:'';
             $data[$key]['created'] = $row['created']->format('d-m-Y h:i A');
