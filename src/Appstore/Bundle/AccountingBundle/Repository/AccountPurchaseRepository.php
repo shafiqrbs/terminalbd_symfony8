@@ -375,17 +375,23 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
         }
         $qb->andWhere("v.companyName = :vendor");
         $qb->setParameter('vendor', $vendor);
-        if (!empty($startDate) and !empty($endDate) ) {
-            $compareTo = new \DateTime($startDate);
-            $startDate =  $compareTo->format('Y-m-d 00:00:00');
-            $qb->andWhere("e.created >= :startDate");
-            $qb->setParameter('startDate', $startDate);
+        if (!empty($startDate) ) {
+            $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }else{
+            $start = date('Y-m-d 00:00:00',strtotime(date('d-m-Y')));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
         }
-        if (!empty($startDate) and !empty($endDate) ) {
-            $compareTo = new \DateTime($endDate);
-            $endDate =  $compareTo->format('Y-m-d 23:59:59');
-            $qb->andWhere("e.created <= :endDate");
-            $qb->setParameter('endDate', $endDate);
+        if (!empty($endDate)) {
+            $end = date('Y-m-d 23:59:59',strtotime($data['endDate']));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }else{
+            $end = date('Y-m-d 23:59:59',strtotime(date('d-m-Y')));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
         }
         $qb->orderBy('e.created', 'ASC');
         $result = $qb->getQuery();
@@ -420,63 +426,48 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
 
     protected function handleSearchBetween($qb,GlobalOption $globalOption,$data)
     {
-        if(empty($data))
-        {
-                $datetime = new \DateTime("now");
-                $startDate = $datetime->format('Y-m-d 00:00:00');
-                $endDate = $datetime->format('Y-m-d 23:59:59');
+        $grn = isset($data['grn'])  ? $data['grn'] : '';
+        $startDate = isset($data['startDate'])  ? $data['startDate'] : '';
+        $endDate =   isset($data['endDate'])  ? $data['endDate'] : '';
+        $vendor =    isset($data['vendor'])? $data['vendor'] :'';
+        $processHead =    isset($data['processHead'])? $data['processHead'] :'';
+        $transactionMethod =    isset($data['transactionMethod'])? $data['transactionMethod'] :'';
+        $user =    isset($data['user'])? $data['user'] :'';
+        $globalOption->getMainApp()->getSlug();
+        $qb->andWhere($qb->expr()->like("e.companyName", "'%$vendor%'" ));
+        if (!empty($startDate) ) {
+            $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
         }else{
-
-                $grn = isset($data['grn'])  ? $data['grn'] : '';
-                $startDate = isset($data['startDate'])  ? $data['startDate'] : '';
-                $endDate =   isset($data['endDate'])  ? $data['endDate'] : '';
-                $vendor =    isset($data['vendor'])? $data['vendor'] :'';
-                $processHead =    isset($data['processHead'])? $data['processHead'] :'';
-	            $transactionMethod =    isset($data['transactionMethod'])? $data['transactionMethod'] :'';
-                $user =    isset($data['user'])? $data['user'] :'';
-                $globalOption->getMainApp()->getSlug();
-               /* if($globalOption->getMainApp()->getSlug() == 'miss'){
-                    $qb->leftJoin('e.medicineVendor','v');
-                }elseif($globalOption->getMainApp()->getSlug() == 'inventory'){
-                    $qb->leftJoin('e.vendor','v');
-                }else{
-                    $qb->leftJoin('e.accountVendor','v');
-                }
-                if(!empty($vendor)){
-                    $qb->andWhere("v.companyName = :vendor");
-                    $qb->setParameter('vendor', $vendor);
-                }*/
-                $qb->andWhere($qb->expr()->like("e.companyName", "'%$vendor%'" ));
-                if (!empty($startDate) and !empty($endDate) ) {
-	                $compareTo = new \DateTime($startDate);
-	                $startDate =  $compareTo->format('Y-m-d 00:00:00');
-	                $qb->andWhere("e.created >= :startDate");
-                    $qb->setParameter('startDate', $startDate);
-                }
-                if (!empty($startDate) and !empty($endDate) ) {
-	                $compareTo = new \DateTime($endDate);
-	                $endDate =  $compareTo->format('Y-m-d 23:59:59');
-	                $qb->andWhere("e.created <= :endDate");
-                    $qb->setParameter('endDate', $endDate);
-                }
-                if (!empty($grn)) {
-                    $qb->andWhere("e.grn = :grn");
-                    $qb->setParameter('grn', $grn);
-                }
-                if (!empty($processHead)) {
-                   $qb->andWhere("e.processHead = :process");
-                   $qb->setParameter('process', $processHead);
-                }
-                if (!empty($user)) {
-                    $qb->join('e.createdBy','u');
-                    $qb->andWhere("u.id = :user")->setParameter('user', $user);
-                }
-	            if (!empty($transactionMethod)) {
-		        $qb->andWhere("e.transactionMethod = :transactionMethod");
-		        $qb->setParameter('transactionMethod', $transactionMethod);
-	            }
-
-
+            $start = date('Y-m-d 00:00:00',strtotime(date('d-m-Y')));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }
+        if (!empty($endDate)) {
+            $end = date('Y-m-d 23:59:59',strtotime($data['endDate']));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }else{
+            $end = date('Y-m-d 23:59:59',strtotime(date('d-m-Y')));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }
+        if (!empty($grn)) {
+            $qb->andWhere("e.grn = :grn");
+            $qb->setParameter('grn', $grn);
+        }
+        if (!empty($processHead)) {
+            $qb->andWhere("e.processHead = :process");
+            $qb->setParameter('process', $processHead);
+        }
+        if (!empty($user)) {
+            $qb->join('e.createdBy','u');
+            $qb->andWhere("u.id = :user")->setParameter('user', $user);
+        }
+        if (!empty($transactionMethod)) {
+            $qb->andWhere("e.transactionMethod = :transactionMethod");
+            $qb->setParameter('transactionMethod', $transactionMethod);
         }
 
     }

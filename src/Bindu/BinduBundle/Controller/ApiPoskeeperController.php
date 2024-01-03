@@ -3,6 +3,7 @@
 namespace Bindu\BinduBundle\Controller;
 
 use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
+use Appstore\Bundle\AccountingBundle\Entity\AccountingConfig;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Proxies\__CG__\Appstore\Bundle\AccountingBundle\Entity\AccountSales;
@@ -290,6 +291,7 @@ class ApiPoskeeperController extends Controller
                 $messenger = (string)trim($entity->getTemplateCustomize()->getFbMessenger());
                 $analytic = (string)trim($entity->getTemplateCustomize()->getGoogleAnalytic());
 
+
                 $logo = empty($entity->getTemplateCustomize()->getWebPath('logo')) ? "" : $entity->getTemplateCustomize()->getWebPath('logo');
                 //$introImage = empty($entity->getTemplateCustomize()->getWebPath('androidLogo')) ? '': $entity->getTemplateCustomize()->getWebPath('androidLogo');
                 $logo = '';
@@ -391,6 +393,7 @@ class ApiPoskeeperController extends Controller
                 $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->getApiVendor($entity);
             }
 
+            $transactionModes = $this->getDoctrine()->getRepository(AccountingConfig::class)->getTransactionModes();
             $result = $this->getDoctrine()->getRepository('SettingToolBundle:TransactionMethod')->findAll();
             $methods = array();
 
@@ -441,6 +444,7 @@ class ApiPoskeeperController extends Controller
                 }
             }
         }
+
         $jsonData = array(
             'setup'             => $data,
             'users'             => $users,
@@ -453,6 +457,8 @@ class ApiPoskeeperController extends Controller
             'payment_cards' => $cards,
             'bank_accounts' => $banks,
             'mobile_accounts' => $mobiles,
+            'transaction_mode' => $transactionModes,
+
 
         );
         $response = new Response();
@@ -1678,7 +1684,6 @@ class ApiPoskeeperController extends Controller
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
-
     }
 
     public function accountSalesAction(Request $request)
@@ -1708,13 +1713,9 @@ class ApiPoskeeperController extends Controller
         set_time_limit(0);
         ignore_user_abort(true);
         if( $this->checkApiValidation($request) == 'invalid') {
-
             return new Response('Unauthorized access.', 401);
-
         }else{
-
             $data = $_REQUEST;
-
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $entities = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->customerSummary($entity,$data);

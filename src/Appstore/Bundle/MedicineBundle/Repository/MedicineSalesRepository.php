@@ -83,19 +83,26 @@ class MedicineSalesRepository extends EntityRepository
             $qb->andWhere($qb->expr()->like("s.netTotal", "'%$amount%'"  ));
         }
 
-        if (!empty($createdStart)) {
-            $compareTo = new \DateTime($createdStart);
-            $created =  $compareTo->format('Y-m-d 00:00:00');
-            $qb->andWhere("s.created >= :createdStart");
-            $qb->setParameter('createdStart', $created);
+        if (!empty($createdStart) ) {
+            $start = date('Y-m-d 00:00:00',strtotime($createdStart));
+            $qb->andWhere("s.created >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }else{
+            $start = date('Y-m-d 00:00:00',strtotime(date('d-m-Y')));
+            $qb->andWhere("s.created >= :startDate");
+            $qb->setParameter('startDate', $start);
         }
 
         if (!empty($createdEnd)) {
-            $compareTo = new \DateTime($createdEnd);
-	        $createdEnd =  $compareTo->format('Y-m-d 23:59:59');
-            $qb->andWhere("s.created <= :createdEnd");
-            $qb->setParameter('createdEnd', $createdEnd);
+            $end = date('Y-m-d 23:59:59',strtotime($createdEnd));
+            $qb->andWhere("s.created <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }else{
+            $end = date('Y-m-d 23:59:59',strtotime(date('d-m-Y')));
+            $qb->andWhere("s.created <= :endDate");
+            $qb->setParameter('endDate',$end);
         }
+
         if(!empty($salesBy)){
             $qb->join("s.salesBy",'un');
             $qb->andWhere("un.username = :username");

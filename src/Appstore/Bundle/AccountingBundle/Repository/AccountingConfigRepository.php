@@ -156,4 +156,19 @@ class AccountingConfigRepository extends EntityRepository
         $mobile->execute();
 
     }
+
+
+    public function getTransactionModes(){
+
+        $array = array(
+           array( 'id' => "1", 'name' => "Due"),
+           array( 'id' => "2", 'name' => "Advance"),
+           array( 'id' => "3", 'name' => "Debit"),
+           array( 'id' => "4", 'name' => "Credit"),
+           array( 'id' => "5", 'name' => "Discount"),
+           array( 'id' => "5", 'name' => "Commission"),
+        );
+        return $array;
+    }
+
 }
