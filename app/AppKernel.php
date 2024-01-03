@@ -33,8 +33,8 @@ class AppKernel extends Kernel
             new Setting\Bundle\ContentBundle\SettingContentBundle(),
             new Setting\Bundle\ToolBundle\SettingToolBundle(),
             new Gregwar\ImageBundle\GregwarImageBundle(),
+
             new Product\Bundle\ProductBundle\ProductProductBundle(),
-            new Frontend\FrontentBundle\FrontendBundle(),
             new Liuggio\ExcelBundle\LiuggioExcelBundle(),
             new FOS\RestBundle\FOSRestBundle(),
             new FOS\CommentBundle\FOSCommentBundle(),

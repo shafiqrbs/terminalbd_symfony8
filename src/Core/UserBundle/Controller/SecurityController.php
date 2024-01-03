@@ -11,7 +11,8 @@
 
 namespace Core\UserBundle\Controller;
 
-use Frontend\FrontentBundle\Service\MobileDetect;
+
+use Core\UserBundle\Service\MobileDetect;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -95,17 +96,9 @@ class SecurityController extends Controller
         $detect = new MobileDetect();
         $currentDomain = $_SERVER['SERVER_NAME'];
 	    if( $detect->isMobile() OR  $detect->isTablet() ) {
-            if($currentDomain == 'www.poskeeper.com') {
-                return $this->render('BinduBundle:Frontend/Mobile:index.html.twig', $data);
-            }else{
-                return $this->render('UserBundle:Security/Mobile:login.html.twig', $data);
-            }
+            return $this->render('UserBundle:Security/Mobile:login.html.twig', $data);
 	    }else{
-	        if($currentDomain == 'www.poskeeper.com'){
-                return $this->render('BinduBundle:Frontend/Desktop:index.html.twig', $data);
-            }else{
-                return $this->render('UserBundle:Security:login.html.twig', $data);
-            }
+            return $this->render('UserBundle:Security:login.html.twig', $data);
         }
 
     }
@@ -151,29 +144,15 @@ class SecurityController extends Controller
         if ($error) {
             $error = $error->getMessage();
         }
-        $em = $this->getDoctrine()->getManager();
-        $globalOption = $em->getRepository('SettingToolBundle:GlobalOption')->findOneBy(array('subDomain'=>$subdomain));
-        $themeName = $globalOption->getSiteSetting()->getTheme()->getFolderName();
 
         $authChecker = $this->container->get('security.authorization_checker');
         $router = $this->container->get('router');
 
-        if ($authChecker->isGranted('ROLE_CUSTOMER')) {
-            return new RedirectResponse($router->generate('webservice_customer_home',array('subdomain'=> $subdomain )), 307);
-        }elseif (!empty($authChecker)) {
+       if (!empty($authChecker)) {
             return $this->redirect($this->generateUrl('landing_page'));
-        }elseif (!$authChecker->isGranted('ROLE_CUSTOMER')) {
+       }else{
             return new RedirectResponse($router->generate('homepage'), 307);
-            $referer = $this->getRequest()->headers->get('referer');
-            return $this->redirect($referer);
-        }/*else{
-            return $this->renderDomainLogin(array(
-                'last_username' => $lastUsername,
-                'error' => $error,
-                'csrf_token' => $csrfToken,
-                'globalOption'  => $globalOption,
-            ),$themeName);
-        }*/
+       }
     }
 
     /**

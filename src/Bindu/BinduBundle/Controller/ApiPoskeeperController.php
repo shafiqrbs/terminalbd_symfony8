@@ -298,7 +298,7 @@ class ApiPoskeeperController extends Controller
                 $logo = '';
                 $introImage = '';
 
-                $data = array(
+                $data = array(array(
 
                     'deviceId' => $device,
                     'vatEnable' => $vatEnable,
@@ -355,7 +355,7 @@ class ApiPoskeeperController extends Controller
                     'printFooter' => $printFooter,
                     'logo' => '',
                     'intro' => '',
-                );
+                ));
             }
 
             $slides = array();

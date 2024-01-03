@@ -1,5 +1,0 @@
-{% if widgets is defined and widgets is not empty  %}
-    {% for widget in widgets %}
-        {% render controller("FrontendBundle:WebsiteWidget:pageMobileFeatureWidget",{'globalOption':globalOption.id,'widget':widget.id}) %}
-    {% endfor %}
-{% endif %}
