@@ -314,8 +314,6 @@ class ApiPoskeeperController extends Controller
                     'locationId' => $entity->getLocation()->getId(),
                     'address' => $this->stringNullChecker($address),
                     'locationName' => $this->stringNullChecker($entity->getLocation()->getName()),
-                    'main_app' => $entity->getMainApp()->getId(),
-                    'main_app_name' => $entity->getMainApp()->getSlug(),
                     'mainApp' => $entity->getMainApp()->getId(),
                     'mainAppName' => $entity->getMainApp()->getSlug(),
                     'appsManual' => $this->stringNullChecker($entity->getMainApp()->getApplicationManual()),
