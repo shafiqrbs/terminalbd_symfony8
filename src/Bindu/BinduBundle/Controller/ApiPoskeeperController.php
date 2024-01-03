@@ -5,6 +5,7 @@ namespace Bindu\BinduBundle\Controller;
 use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
 use Appstore\Bundle\AccountingBundle\Entity\AccountingConfig;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
+use Appstore\Bundle\AccountingBundle\Entity\ExpenseCategory;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Proxies\__CG__\Appstore\Bundle\AccountingBundle\Entity\AccountSales;
 use Setting\Bundle\AppearanceBundle\Entity\TemplateCustomize;
@@ -443,6 +444,18 @@ class ApiPoskeeperController extends Controller
                     $mobiles[$key]['service_charge'] = $row->getServiceCharge();
                 }
             }
+
+            $expenseCat = $this->getDoctrine()->getRepository('AccountingBundle:ExpenseCategory')->findBy(array('globalOption'=> $entity,'status'=>1));
+            $expenseCategories = array();
+
+            /* @var $row ExpenseCategory */
+
+            if($expenseCat) {
+                foreach ($expenseCat as $key => $row) {
+                    $expenseCategories[$key]['item_id'] = (int)$row->getId();
+                    $expenseCategories[$key]['name'] = $row->getName();
+                }
+            }
         }
 
         $jsonData = array(
@@ -457,6 +470,7 @@ class ApiPoskeeperController extends Controller
             'payment_cards' => $cards,
             'bank_accounts' => $banks,
             'mobile_accounts' => $mobiles,
+            'expense_category' => $expenseCategories,
             'transaction_mode' => $transactionModes,
 
 
