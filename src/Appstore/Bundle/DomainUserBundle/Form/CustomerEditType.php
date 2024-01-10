@@ -39,7 +39,6 @@ class CustomerEditType extends AbstractType
                 'empty_value' => '---Choose a marketing executive---',
                 'property' => 'userFullName',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'constraints' =>array(new NotBlank(array('message'=>'Please select to user name'))),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('u')
                         ->where("u.isDelete != 1")
@@ -62,6 +61,7 @@ class CustomerEditType extends AbstractType
                         new NotBlank(array('message'=>'Please enter customer name'))
                     ))
             )
+            ->add('customerGroup','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Customer Group','list'=>'customerGroups')))
             ->add('referenceId','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Old reference no')))
             ->add('creditLimit','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Credit limit')))
             ->add('email','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Email address')))

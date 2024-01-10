@@ -45,6 +45,7 @@ class CustomerType extends AbstractType
                     ))
             )
             ->add('email','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Email address')))
+            ->add('customerGroup','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Customer Group','list'=>'customerGroups')))
             ->add('referenceId','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Old reference no')))
             ->add('creditLimit','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Credit limit')))
             ->add('status')

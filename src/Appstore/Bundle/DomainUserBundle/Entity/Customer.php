@@ -367,6 +367,13 @@ class Customer
     /**
      * @var string
      *
+     * @ORM\Column(name="customerGroup", type="string", length=100, nullable =true)
+     */
+    private $customerGroup;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="bloodGroup", type="string", length=20, nullable =true)
      */
     private $bloodGroup;
@@ -1929,6 +1936,24 @@ class Customer
     {
         $this->marketing = $marketing;
     }
+
+    /**
+     * @return string
+     */
+    public function getCustomerGroup()
+    {
+        return $this->customerGroup;
+    }
+
+    /**
+     * @param string $customerGroup
+     */
+    public function setCustomerGroup($customerGroup)
+    {
+        $this->customerGroup = $customerGroup;
+    }
+
+
 
 
 }

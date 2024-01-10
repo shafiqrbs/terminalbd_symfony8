@@ -91,7 +91,10 @@ class CustomerController extends Controller
         $this->get('session')->getFlashBag()->add(
             'notice',"May be you are using existing mobile no"
         );
+        $option = $this->getUser()->getGlobalOption();
+        $customerGroups = $this->getDoctrine()->getRepository(Customer::class)->findcustomerGroups($option->getId());
         return $this->render('DomainUserBundle:Customer:new.html.twig', array(
+            'customerGroups' => $customerGroups,
             'entity' => $entity,
             'form'   => $form->createView(),
         ));
@@ -125,8 +128,10 @@ class CustomerController extends Controller
     {
         $entity = new Customer();
         $form   = $this->createCreateForm($entity);
-
+        $option = $this->getUser()->getGlobalOption();
+        $customerGroups = $this->getDoctrine()->getRepository(Customer::class)->findcustomerGroups($option->getId());
         return $this->render('DomainUserBundle:Customer:new.html.twig', array(
+            'customerGroups' => $customerGroups,
             'entity' => $entity,
             'form'   => $form->createView(),
         ));
@@ -196,14 +201,14 @@ class CustomerController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('DomainUserBundle:Customer')->find($id);
-
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Customer entity.');
         }
-
         $editForm = $this->createEditForm($entity);
+        $customerGroups = $this->getDoctrine()->getRepository(Customer::class)->findcustomerGroups($entity->getGlobalOption()->getId());
         return $this->render('DomainUserBundle:Customer:edit.html.twig', array(
             'entity'      => $entity,
+            'customerGroups'      => $customerGroups,
             'form'   => $editForm->createView(),
         ));
     }

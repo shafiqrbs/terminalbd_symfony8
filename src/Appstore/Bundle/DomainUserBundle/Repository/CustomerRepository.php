@@ -448,6 +448,17 @@ class CustomerRepository extends EntityRepository
 
     }
 
+     public function findcustomerGroups($globalOption)
+    {
+        $qb = $this->createQueryBuilder('customer');
+        $qb->select('customer.customerGroup as name');
+        $qb->where("customer.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
+        $qb->groupBy('name');
+        $result = $qb->getQuery()->getArrayResult();
+        return  $result;
+
+    }
+
     protected function handleSearchBetween($qb,$data)
     {
         if($data)

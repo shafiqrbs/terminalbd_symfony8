@@ -113,8 +113,8 @@ class MedicineSalesItemRepository extends EntityRepository
 
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
         $compare = new \DateTime('now');
-        $createdStart = isset($data['startDate'])? $data['startDate'] :$compare->format('Y-m-d');
-        $createdEnd = isset($data['endDate'])? $data['endDate'] :$compare->format('Y-m-t');
+        $createdStart = isset($data['startDate'])?  date('Y-m-d',strtotime($data['startDate'])) : $compare->format('Y-m-d');
+        $createdEnd = isset($data['endDate'])?  date('Y-m-d',strtotime($data['endDate'])) : $compare->format('Y-m-t');
         $brandName = isset($data['brandName'])? $data['brandName'] :'';
         $topLimit = (isset($data['topLimit']) and $data['topLimit'] > 1) ? $data['topLimit'] :10;
         $brand = "";
@@ -123,16 +123,12 @@ class MedicineSalesItemRepository extends EntityRepository
         }
         $sql = "SELECT stock.name as name, stock.id as stockId,stock.brandName as brandName,stock.remainingQuantity as remain,stock.purchaseQuantity as purchaseQuantity,stock.salesQuantity as salesQuantity,stock.minQuantity as minQty 
                 FROM medicine_stock as stock
-                WHERE stock.medicineConfig_id = :config {$brand} AND stock.remainingQuantity > {$topLimit}  AND stock.id NOT IN  (SELECT s.id as id FROM medicine_sales_item as salesItem
+                WHERE stock.medicineConfig_id = {$config} {$brand} AND stock.remainingQuantity > {$topLimit}  AND stock.id IN  (SELECT s.id as id FROM medicine_sales_item as salesItem
              JOIN medicine_sales as sales ON salesItem.medicineSales_id = sales.id 
              JOIN medicine_stock as s ON salesItem.medicineStock_id = s.id                                                                         
-             WHERE sales.medicineConfig_id = :config AND sales.process = :process AND sales.created >= :startDate AND sales.created <= :endDate
+             WHERE sales.medicineConfig_id = {$config} AND sales.process = 'Done' AND sales.created >= '{$createdStart}' AND sales.created <= '{$createdEnd}'
              GROUP BY medicineStock_id)  ORDER BY remain DESC";
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-        $stmt->bindValue('config', $config);
-        $stmt->bindValue('process', 'Done');
-        $stmt->bindValue('startDate', $createdStart);
-        $stmt->bindValue('endDate', $createdEnd);
         if($brandName) {
             $stmt->bindValue('brandName', $brandName);
         }
