@@ -30,6 +30,37 @@
         </tr>
     {% endfor %}
 {% endif %}
+{% if config.businessModel in ['fuelstation'] %}
+    {% for item in entity.businessInvoiceParticulars %}
+        <tr id="remove-{{ item.id }}">
+            <td  class="">{{ loop.index }}.</td>
+            <td class="">{{ item.particular }}<br/>{{ item.description|raw }}</td>
+            <td class="">
+                {% if batchItems %}
+                    <select id="batchItem" name="batchItem" class="m-wrap span12 form-control batchItemUpdate">
+                        <option value="">--- Select batch item ---</option>
+                        {% for wearhouse in batchItems %}
+                            <option  {{ (item.batchItem and wearhouse.id == item.batchItem.id ) ? "selected":'' }} value="{{ path('business_item_batchitem_update',{'id':item.id,'batchItem':wearhouse.id}) }}">{{ wearhouse.invoice }} - {{ wearhouse.salesBy }} - {{ wearhouse.station }} - {{ wearhouse.itemName }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+            </td>
+            <td class="">
+                <input type="hidden" name="salesItem[]" value="{{ item.id }}" >
+                <input type="hidden" id="subQuantity-{{ item.id }}" name="subQuantity[]" value="{{ item.subQuantity }}" >
+                <input type="text" class=" numeric td-inline-input salesPrice" data-id="{{ item.id }}" autocomplete = "off"  id="salesPrice-{{ item.id }}" name="salesPrice" value="{{ item.price }}" >
+            </td>
+            <td class="">
+                <input type="text" class=" numeric td-inline-input-qnt quantity" data-id="{{ item.id }}" autocomplete = "off" min="1" max="{{ item.quantity }}"  id="quantity-{{ item.id }}" name="quantity[]" value="{{ item.quantity }}" placeholder="{{ item.quantity }}">
+            </td>
+            <td class="" id="subTotal-{{ item.id }}">{{ item.subTotal|number_format }}</td>
+            <td class="">
+                <a data-id="{{ item.id }}" title="" data-url="" href="javascript:" class="btn blue mini itemUpdate" ><i class="icon-save"></i></a>
+                <a id="{{ item.id }}" data-id="{{ item.id }}"  data-url="{{ path('business_invoice_particular_delete',{'invoice': entity.id ,'id': item.id }) }}" href="javascript:" class="btn red mini particularDelete" ><i class="icon-trash"></i></a>
+            </td>
+        </tr>
+    {% endfor %}
+{% endif %}
 {% if config.businessModel in ['commission'] %}
     {% for item in entity.businessInvoiceParticulars %}
         <tr id="remove-{{ item.id }}">

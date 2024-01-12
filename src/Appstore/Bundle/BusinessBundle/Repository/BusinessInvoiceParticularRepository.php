@@ -2,6 +2,8 @@
 
 namespace Appstore\Bundle\BusinessBundle\Repository;
 use Appstore\Bundle\AccountingBundle\Entity\AccountVendor;
+use Appstore\Bundle\BusinessBundle\Entity\BusinessBatch;
+use Appstore\Bundle\BusinessBundle\Entity\BusinessBatchParticular;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessConfig;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoice;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
@@ -72,6 +74,10 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         $wearhouse = $this->_em->getRepository('BusinessBundle:WearHouse')->find($data['wearhouse']);
         if($wearhouse){
             $entity->setWearhouse($wearhouse);
+        }
+        $batchItem = $this->_em->getRepository('BusinessBundle:BusinessBatchParticular')->find($data['batchItem']);
+        if($batchItem){
+            $entity->setBatchItem($batchItem);
         }
         $em->persist($entity);
         $em->flush();
@@ -215,6 +221,10 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         if($wearhouse){
             $entity->setWearhouse($wearhouse);
         }
+        $batchItem = $this->_em->getRepository('BusinessBundle:BusinessBatchParticular')->find($data['batchItem']);
+        if($batchItem){
+            $entity->setBatchItem($batchItem);
+        }
         $entity->setQuantity($quantity);
         $entity->setBonusQnt($bonusQuantity);
 	    $entity->setTotalQuantity($quantity);
@@ -272,7 +282,35 @@ class BusinessInvoiceParticularRepository extends EntityRepository
 
     }
 
-	public function salesStockItemProduction(BusinessInvoiceParticular $invoice_particular,BusinessProductionElement $element)
+	public function getBatchItemSales(BusinessBatch $batch)
+	{
+		$qb = $this->createQueryBuilder('e');
+		$qb->join('e.batchItem','bi');
+		$qb->select('bi.id as id','SUM(e.totalQuantity) AS quantity','SUM(e.totalQuantity * e.price) AS amount');
+		$qb->where('bi.businessBatch = :businessBatch')->setParameter('businessBatch', $batch->getId());
+        $qb->groupBy('bi.id');
+		$data = array();
+        $result = $qb->getQuery()->getArrayResult();
+        if($result){
+            foreach ($result as $row):
+                $data[$row['id']]= $row;
+            endforeach;
+        }
+        return $data;
+ 	}
+
+    public function getBatchSingleItemSales($batch)
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->join('e.batchItem','bi');
+        $qb->select('bi.id as id','SUM(e.totalQuantity) AS quantity','SUM(e.totalQuantity * e.price) AS amount');
+        $qb->where('bi.id = :businessBatch')->setParameter('businessBatch', $batch);
+        $result = $qb->getQuery()->getOneOrNullResult();
+        return $result;
+
+    }
+
+    public function salesStockItemProduction(BusinessInvoiceParticular $invoice_particular,BusinessProductionElement $element)
 	{
 		$qb = $this->createQueryBuilder('e');
 		if(!empty($element->getParticular()->getUnit()) and ($element->getParticular()->getUnit()->getName() != 'Sft')){

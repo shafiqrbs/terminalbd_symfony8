@@ -199,11 +199,12 @@ class Builder extends ContainerAware
             ->setAttribute('dropdown', true);
         if ($securityContext->isGranted('ROLE_BUSINESS_INVOICE') and $config->getBusinessModel() != "association") {
 	        $menu[$business]->addChild('Manage Sales')->setAttribute('dropdown', true);
-            $menu[$business]['Manage Sales']->addChild('Add Sales', array('route' => 'business_invoice_new'))
-                ;
+            $menu[$business]['Manage Sales']->addChild('Add Sales', array('route' => 'business_invoice_new'));
             $menu[$business]['Manage Sales']->addChild('Sales', array('route' => 'business_invoice'));
-            $menu[$business]['Manage Sales']->addChild('Android Sales', array('route' => 'business_android_sales'))
-                ;
+            if($config->isFuelStation() == 1) {
+                $menu[$business]['Manage Sales']->addChild('Fuel Station', array('route' => 'business_fuelstation'));
+            }
+            $menu[$business]['Manage Sales']->addChild('Android Sales', array('route' => 'business_android_sales'));
             if($config->isConditionSales() == 1){
                 $menu[$business]['Manage Sales']->addChild('Condition Sales', array('route' => 'business_invoice_condition'))
                     ;

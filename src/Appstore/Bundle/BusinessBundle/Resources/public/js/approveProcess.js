@@ -111,6 +111,20 @@ $(document).on("click", ".delete", function(event) {
     });
 });
 
+$(document).on("click", ".item-delete", function(event) {
+    var id = $(this).attr("data-id");
+    var url = $(this).attr("data-url");
+    $('#confirm-content').confirmModal({
+        topOffset: 0,
+        top: '25%',
+        onOkBut: function(el) {
+            $.get(url, function( data ) {
+                $(event.target).closest('tr').remove();
+            });
+        }
+    });
+});
+
 
 $(document).on("change", "#mobile, #customer", function() {
     var customer = $(this).val();

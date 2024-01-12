@@ -111,6 +111,10 @@ business_config:
     resource: "@BusinessBundle/Resources/config/routing/config.yml"
     prefix:   /config
 
+business_invoice_fuelpump:
+    resource: "@BusinessBundle/Resources/config/routing/fuelstation.yml"
+    prefix:   /fuelpump
+
 business_homepage:
     path:     /dashboard
     defaults: { _controller: BusinessBundle:Default:index }
@@ -122,6 +126,7 @@ business_group_approved:
 business_android_sales:
     path:      /android/sales
     defaults: { _controller: "BusinessBundle:AndroidSales:index" }
+
 
 business_android_sales_process:
     path:      /{id}/android/sales-process

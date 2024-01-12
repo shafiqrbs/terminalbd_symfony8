@@ -254,6 +254,11 @@ $(document).on('change', '.waerhouseUpdate', function() {
     $.get(url);
 });
 
+$(document).on('change', '.batchItemUpdate', function() {
+    var url = $(this).val();
+    $.get(url);
+});
+
 $(document).on("click", ".particularDelete", function() {
 
     var id = $(this).attr("data-id");

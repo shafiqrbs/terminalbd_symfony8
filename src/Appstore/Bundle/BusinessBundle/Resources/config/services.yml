@@ -1,8 +1,4 @@
 services:
-#    appstore_dms.example:
-#        class: Appstore\Bundle\DmsBundle\Example
-#        arguments: [@service_id, "plain_value", %parameter%]
-    
 
     appstore.business.particular.event.listener:
         class: Appstore\Bundle\BusinessBundle\EventListener\BusinessParticularListener
@@ -16,6 +12,11 @@ services:
 
     appstore.business.invoice.event.listener:
         class: Appstore\Bundle\BusinessBundle\EventListener\BusinessInvoiceListener
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+
+    appstore.business.batch.event.listener:
+        class: Appstore\Bundle\BusinessBundle\EventListener\BusinessBatchListener
         tags:
             - { name: doctrine.event_listener, event: prePersist }
 

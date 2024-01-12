@@ -60,6 +60,12 @@ business_item_wearhouse_update:
     options:
             expose: true
 
+business_item_batchitem_update:
+    path:     /{id}/item-batch-update
+    defaults: { _controller: "BusinessBundle:Invoice:batchItemUpdate" }
+    options:
+            expose: true
+
 business_invoice_event:
     path:     /{id}/event
     defaults: { _controller: "BusinessBundle:Invoice:addEvent" }

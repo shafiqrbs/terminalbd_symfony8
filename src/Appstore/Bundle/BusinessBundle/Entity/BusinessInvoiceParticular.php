@@ -59,6 +59,11 @@ class BusinessInvoiceParticular
      **/
     private $vendorStockItem;
 
+     /**
+     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessBatchParticular")
+     **/
+    private $batchItem;
+
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse")
      **/
@@ -686,6 +691,24 @@ class BusinessInvoiceParticular
     {
         $this->androidProcess = $androidProcess;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getBatchItem()
+    {
+        return $this->batchItem;
+    }
+
+    /**
+     * @param mixed $batchItem
+     */
+    public function setBatchItem($batchItem)
+    {
+        $this->batchItem = $batchItem;
+    }
+
+
 
 
 

@@ -52,6 +52,10 @@ class BusinessConfig
     private $businessReverses;
 
 
+	/**
+     * @ORM\OneToMany(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessBatch" , mappedBy="businessConfig")
+     **/
+
     /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessVendorStock", mappedBy="businessConfig")
      **/

@@ -95,11 +95,7 @@ class SecurityController extends Controller
 
         $detect = new MobileDetect();
         $currentDomain = $_SERVER['SERVER_NAME'];
-	    if( $detect->isMobile() OR  $detect->isTablet() ) {
-            return $this->render('UserBundle:Security/Mobile:login.html.twig', $data);
-	    }else{
-            return $this->render('UserBundle:Security:login.html.twig', $data);
-        }
+        return $this->render('UserBundle:Security:login.html.twig', $data);
 
     }
 

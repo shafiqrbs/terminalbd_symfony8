@@ -42,6 +42,7 @@ class ConfigType extends AbstractType
 			        'stationary' => 'Stationary',
 			        'commission' => 'Agent Commission',
 			        'event' => 'Event',
+			        'fuelstation' => 'Fuel Station',
 			        'bricks' => 'Bricks',
 			        'sawmill' => 'Sawmill',
 			        'association' => 'Association',

@@ -1,6 +1,7 @@
 <?php
 
 namespace Appstore\Bundle\BusinessBundle\Controller;
+use Appstore\Bundle\BusinessBundle\Entity\BusinessBatchParticular;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessConfig;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoice;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
@@ -164,6 +165,7 @@ class InvoiceController extends Controller
         $returnQty = $em->getRepository('BusinessBundle:BusinessDistributionReturnItem')->returnRemainingStock($config->getId());
         $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'new';
         $wearhouses = $this->getDoctrine()->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
+        $batchItems = $this->getDoctrine()->getRepository(BusinessBatchParticular::class)->getFindBatchParticular($config->getId());
 
         return $this->render("BusinessBundle:Invoice/{$view}:new.html.twig", array(
             'config' => $config,
@@ -178,6 +180,7 @@ class InvoiceController extends Controller
             'stores' => $stores,
             'particulars' => $particulars,
             'returnQty' => $returnQty,
+            'batchItems' => $batchItems,
             'form' => $editForm->createView(),
         ));
     }
@@ -304,7 +307,7 @@ class InvoiceController extends Controller
                 return $this->redirect($this->generateUrl('business_invoice_show', array('id' => $entity->getId())));
             }
         }
-
+        $balance = 0;
         $config = $entity->getBusinessConfig();
         $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->findBy(array('globalOption' => $this->getUser()->getGlobalOption(),'status'=>1),array('companyName'=>"ASC"));
         $areas = $this->getDoctrine()->getRepository('BusinessBundle:BusinessArea')->findBy(array('businessConfig' => $config,'status'=>1),array('name'=>"ASC"));
@@ -315,10 +318,16 @@ class InvoiceController extends Controller
         $particulars = $em->getRepository('BusinessBundle:BusinessParticular')->getFindWithParticular($config, $type = array('production','stock','service','virtual','pre-production','post-production'));
         $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'new';
         $wearhouses = $this->getDoctrine()->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
+        $batchItems = $this->getDoctrine()->getRepository(BusinessBatchParticular::class)->getFindBatchParticular($config->getId());
+        if($entity->getCustomer()){
+            $outstanding = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->customerSingleOutstanding($this->getUser()->getGlobalOption(),$entity->getCustomer());
+            $balance = empty($outstanding) ? 0 : $outstanding;
+        }
         return $this->render("BusinessBundle:Invoice/{$view}:new.html.twig", array(
             'config' => $config,
             'entity' => $entity,
             'vendors' => $vendors,
+            'balance' => $balance,
             'areas' => $areas,
             'couriers' => $couriers,
             'stores' => $stores,
@@ -326,6 +335,7 @@ class InvoiceController extends Controller
             'customers' => $customers,
             'marketings' => $marketings,
             'particulars' => $particulars,
+            'batchItems' => $batchItems,
             'form' => $editForm->createView(),
         ));
 
@@ -482,8 +492,21 @@ class InvoiceController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $wearHouse = $this->getDoctrine()->getRepository(WearHouse::class)->find($_REQUEST['waerhouse']);
-        $particular->setWearHouse($wearHouse);
-        $em->flush();
+        if($wearHouse){
+            $particular->setWearHouse($wearHouse);
+            $em->flush();
+        }
+        return new Response("success");
+    }
+
+    public function batchItemUpdateAction(BusinessInvoiceParticular $particular)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $batchItem = $this->getDoctrine()->getRepository(BusinessBatchParticular::class)->find($_REQUEST['batchItem']);
+        if($batchItem){
+            $particular->setBatchItem($batchItem);
+            $em->flush();
+        }
         return new Response("success");
     }
 
@@ -498,12 +521,13 @@ class InvoiceController extends Controller
     public function returnResultData(BusinessInvoice $entity, $msg=''){
 
        // $invoiceParticulars = $this->getDoctrine()->getRepository('BusinessBundle:BusinessInvoiceParticular')->getSalesItems($entity);
-        //$view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'item-data';
         $wearhouses = $this->getDoctrine()->getRepository(WearHouse::class)->findBy(array('businessConfig' => $entity->getBusinessConfig(),'status'=>1),array('name'=>'ASC'));
+        $batchItems = $this->getDoctrine()->getRepository(BusinessBatchParticular::class)->getFindBatchParticular( $entity->getBusinessConfig()->getId());
         $html =  $this->renderView("BusinessBundle:Invoice/item:data.html.twig", array(
             'config' => $entity->getBusinessConfig(),
             'entity' => $entity,
             'wearhouses' => $wearhouses,
+            'batchItems' => $batchItems,
         ));
         $subTotal = $entity->getSubTotal() > 0 ? $entity->getSubTotal() : 0;
         $tloPrice = $entity->getTloPrice() > 0 ? $entity->getTloPrice() : 0;
@@ -592,13 +616,14 @@ class InvoiceController extends Controller
         $em = $this->getDoctrine()->getManager();
         $data = $_REQUEST;
         $wearhouse = (isset($data['wearhouse']) and $data['wearhouse']) ? $data['wearhouse']:'';
+        $batchItem = (isset($data['batchItem']) and $data['batchItem']) ? $data['batchItem']:'';
         $particular = $request->request->get('customParticular');
         $price = $request->request->get('price');
         $unit = $request->request->get('unit');
         $quantity = $request->request->get('quantity');
         $description = $request->request->get('description');
 
-        $invoiceItems = array('particular' => $particular, 'quantity' => $quantity,'price' => $price,'unit' => $unit,'description' => $description,'wearhouse' => $wearhouse);
+        $invoiceItems = array('particular' => $particular, 'quantity' => $quantity,'price' => $price,'unit' => $unit,'description' => $description,'wearhouse' => $wearhouse,'batchItem' => $batchItem);
         $this->getDoctrine()->getRepository('BusinessBundle:BusinessInvoiceParticular')->insertInvoiceParticular($invoice, $invoiceItems);
         $invoice = $this->getDoctrine()->getRepository( 'BusinessBundle:BusinessInvoice' )->updateInvoiceTotalPrice($invoice);
         $msg = 'Particular added successfully';
@@ -780,13 +805,14 @@ class InvoiceController extends Controller
         $em = $this->getDoctrine()->getManager();
         $data = $_REQUEST;
         $wearhouse = (isset($data['wearhouse']) and $data['wearhouse']) ? $data['wearhouse']:'';
+        $batchItem = (isset($data['batchItem']) and $data['batchItem']) ? $data['batchItem']:'';
         $particular = $request->request->get('particular');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('salesPrice');
         $description = $request->request->get('description');
         $bonusQuantity = $request->request->get('bonusQuantity');
         if(!empty($particular)){
-            $invoiceItems = array('accessories' => $particular ,'quantity' => $quantity,'price' => $price,'description' => $description,'wearhouse' => $wearhouse,'bonusQuantity' => $bonusQuantity);
+            $invoiceItems = array('accessories' => $particular ,'quantity' => $quantity,'price' => $price,'description' => $description,'wearhouse' => $wearhouse,'batchItem' => $batchItem,'bonusQuantity' => $bonusQuantity);
             $this->getDoctrine()->getRepository('BusinessBundle:BusinessInvoiceParticular')->insertStockItem($invoice,$invoiceItems);
             $invoice = $this->getDoctrine()->getRepository( 'BusinessBundle:BusinessInvoice' )->updateInvoiceTotalPrice($invoice);
             $msg = 'Particular added successfully';
