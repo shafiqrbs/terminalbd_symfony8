@@ -306,6 +306,9 @@ $(document).on("click", ".approve", function() {
 $(document).on('change', '#particular', function() {
 
     var particular = $('#particular').val();
+    if(particular === ""){
+        return false;
+    }
     $.ajax({
         url: Routing.generate('business_particular_search',{'id':particular}),
         type: 'GET',
