@@ -328,7 +328,6 @@ class DomainController extends Controller
         if(!empty($option->getRestaurantConfig()) and $option->getRestaurantConfig()) {
             $this->getDoctrine()->getRepository('RestaurantBundle:RestaurantConfig')->delete($option);
         }
-
         $em->remove($option);
         $em->flush();
         endforeach;

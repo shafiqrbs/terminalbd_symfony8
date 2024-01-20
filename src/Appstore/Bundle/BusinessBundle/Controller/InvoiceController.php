@@ -148,6 +148,9 @@ class InvoiceController extends Controller
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
         $editForm = $this->createEditForm($entity);
+        $entity->setProcess("Created");
+        $em->flush();
+        $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->insertInvoiceProductItem($entity);
         if (in_array($entity->getProcess(), array('Done','Delivered','Canceled'))) {
             return $this->redirect($this->generateUrl('business_invoice_show', array('id' => $entity->getId())));
         }
@@ -445,6 +448,7 @@ class InvoiceController extends Controller
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
+        $entity->setProcess('Created');
         $this->getDoctrine()->getRepository(BusinessInvoiceParticular::class)->removeSalesItem($entity);
         if($entity->getInvoiceReturn()){
             foreach ($entity->getInvoiceReturnItems() as $row){

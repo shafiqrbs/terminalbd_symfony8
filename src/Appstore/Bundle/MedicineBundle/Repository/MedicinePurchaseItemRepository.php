@@ -397,16 +397,19 @@ class MedicinePurchaseItemRepository extends EntityRepository
         $entity = $this->_em->getRepository('MedicineBundle:MedicinePurchaseItem')->find($data['purchaseItemId']);
         $quantity = ((float)$data['quantity']) ? (float)$data['quantity']:0;
         $salesPrice = ((float)$data['salesPrice']) ? (float)$data['salesPrice']:0;
+        $bonusQuantity = ((float)$data['bonusQuantity']) ? (float)$data['bonusQuantity']:0;
        // $salesQnt = $entity->getSalesQuantity() + $entity->getDamageQuantity() + $entity->getPurchaseReturnQuantity();
         if($quantity > 0 and $salesPrice > 0) {
             $entity->setQuantity($quantity);
-            $entity->setBonusQuantity($data['bonusQuantity']);
             $entity->setPurchasePrice($salesPrice);
             $entity->setActualPurchasePrice($salesPrice);
             $entity->setSalesPrice($salesPrice);
             $entity->setPurchaseSubTotal($salesPrice * $quantity);
             $entity->setRemainingQuantity($quantity);
+        }else{
+            $entity->setQuantity($quantity);
         }
+        $entity->setBonusQuantity($bonusQuantity);
         $em->persist($entity);
         $em->flush();
         return $entity->getMedicinePurchase();

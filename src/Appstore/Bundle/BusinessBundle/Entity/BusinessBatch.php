@@ -24,12 +24,14 @@ class BusinessBatch
     private $id;
 
     /**
+     * @var BusinessConfig
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessConfig")
      * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $businessConfig;
 
     /**
+     * @var BusinessBatchParticular
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessBatchParticular", mappedBy="businessBatch")
      * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"id" = "ASC"})
@@ -102,7 +104,7 @@ class BusinessBatch
     }
 
     /**
-     * @return mixed
+     * @return BusinessConfig
      */
     public function getBusinessConfig()
     {
@@ -110,12 +112,13 @@ class BusinessBatch
     }
 
     /**
-     * @param mixed $businessConfig
+     * @param BusinessConfig $businessConfig
      */
     public function setBusinessConfig($businessConfig)
     {
         $this->businessConfig = $businessConfig;
     }
+
 
     /**
      * @return BusinessBatchParticular
@@ -253,6 +256,8 @@ class BusinessBatch
     {
         $this->createdBy = $createdBy;
     }
+
+
 
 
 

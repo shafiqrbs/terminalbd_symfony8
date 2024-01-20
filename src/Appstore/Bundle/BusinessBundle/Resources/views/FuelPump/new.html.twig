@@ -89,8 +89,8 @@
                                             <td>{{ item.wearhouse.name }}</td>
                                             <td>{{ item.businessParticular.name }}</td>
                                             <td>{{ item.startMeterReading }}</td>
-                                            <td class="">
-                                                {% if item.process == 'created' %}
+                                            <td class=""
+                                                {% if item.process == 'Created' %}
                                                 <input type="text" style="width:100px!important;" class="numeric td-inline-input batchItemUpdate" data-id="{{ item.id }}" autocomplete = "off" data-url="{{ path('business_fuelstation_item_update',{'id':item.id}) }}"  id="endMeterReading-{{ item.id }}" name="endMeterReading[]" value="{{ item.endMeterReading }}" >
                                                 {% endif %}
                                             </td>
@@ -104,7 +104,7 @@
                                             <td>{{ item.process|capitalize }}</td>
                                             <td>
                                                 <div class="btn-group">
-                                                    {% if item.process == 'created' %}
+                                                    {% if item.process == 'Created' %}
                                                         <a data-id="{{ item.id }}" data-url="{{ path('business_fuelstation_item_delete', {'id': item.id }) }}" href="javascript:" class="btn red mini item-delete" data-trigger = "hover" data-original-title = "Delete" ><i class="icon-trash"></i> Delete</a>
                                                         <a data-id="{{ item.id }}" data-url="{{ path('business_fuelstation_item_approve', {'id': item.id }) }}" href="javascript:" class="btn blue mini approve"><i class="icon-refresh"></i> Approve</a>
                                                     {% endif %}

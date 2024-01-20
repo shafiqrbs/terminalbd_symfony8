@@ -24,6 +24,7 @@ class BusinessBatchParticular
     private $id;
 
     /**
+     * @var BusinessBatch
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessBatch", inversedBy="businessBatchParticulars")
      * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"id" = "ASC"})
@@ -115,7 +116,7 @@ class BusinessBatchParticular
      *
      * @ORM\Column(name="process", type="string", length=50, nullable=true)
      */
-    private $process ='created';
+    private $process ='Created';
 
 
     /**
@@ -144,21 +145,7 @@ class BusinessBatchParticular
         $this->businessParticular = $businessParticular;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getBusinessBatch()
-    {
-        return $this->businessBatch;
-    }
 
-    /**
-     * @param mixed $businessBatch
-     */
-    public function setBusinessBatch($businessBatch)
-    {
-        $this->businessBatch = $businessBatch;
-    }
 
     /**
      * @return mixed
@@ -351,6 +338,24 @@ class BusinessBatchParticular
     {
         $this->customerSalesAmount = $customerSalesAmount;
     }
+
+    /**
+     * @return BusinessBatch
+     */
+    public function getBusinessBatch()
+    {
+        return $this->businessBatch;
+    }
+
+    /**
+     * @param BusinessBatch $businessBatch
+     */
+    public function setBusinessBatch($businessBatch)
+    {
+        $this->businessBatch = $businessBatch;
+    }
+
+
 
 
 

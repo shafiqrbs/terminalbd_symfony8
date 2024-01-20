@@ -2,7 +2,9 @@
 
 namespace Appstore\Bundle\BusinessBundle\Repository;
 use Appstore\Bundle\BusinessBundle\BusinessBundle;
+use Appstore\Bundle\BusinessBundle\Entity\BusinessBatchParticular;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessConfig;
+use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoice;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessParticular;
@@ -1094,8 +1096,49 @@ class BusinessInvoiceRepository extends EntityRepository
 
     }
 
+    public function insertFuelSales(BusinessBatchParticular $particular)
+    {
+        $em = $this->_em;
+        $quantity = ($particular->getQuantity() - $particular->getCustomerSalesQuantity());
+        $total = ($particular->getPrice() * $quantity);
 
+        $config = $particular->getBusinessBatch()->getBusinessConfig();
+        $entity = new BusinessInvoice();
+        $entity->setBusinessConfig($config);
+        $entity->setCreatedBy($particular->getSalesBy());
+        $entity->setSalesBy($particular->getSalesBy());
+        $customer = $em->getRepository('DomainUserBundle:Customer')->defaultCustomer($config->getGlobalOption());
+        $entity->setCustomer($customer);
+        $transactionMethod = $em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+        $entity->setTransactionMethod($transactionMethod);
+        $entity->setPaymentStatus('Paid');
+        $entity->setProcess("Delivered");
+        $entity->setApprovedBy($particular->getSalesBy());
+        $entity->setSubTotal($total);
+        $entity->setTotal($total);
+        $entity->setPayment($total);
+        $entity->setReceived($total);
+        $em->persist($entity);
+        $em->flush();
 
+        $salesItem = new BusinessInvoiceParticular();
+        $salesItem->setBusinessInvoice($entity);
+        $salesItem->setBusinessParticular($particular->getBusinessParticular());
+        $salesItem->setParticular($particular->getBusinessParticular()->getName());
+        $salesItem->setWearhouse($particular->getWearhouse());
+        $salesItem->setQuantity($quantity);
+        $salesItem->setTotalQuantity($quantity);
+        $salesItem->setPrice($particular->getPrice());
+        $salesItem->setSubTotal($total);
+        $em->persist($salesItem);
+        $em->flush();
+        $em->getRepository('AccountingBundle:AccountSales')->insertBusinessAccountInvoice($entity);
+        $em->getRepository('BusinessBundle:BusinessParticular')->getSalesUpdateQnt($salesItem);
+        if($entity->getBusinessConfig()->isStockHistory() == 1 ){
+            $em->getRepository('BusinessBundle:BusinessStockHistory')->processInsertSalesItem($entity);
+        }
+
+    }
 
 
 }

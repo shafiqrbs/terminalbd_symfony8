@@ -165,8 +165,6 @@ $(document).on("click", ".approve", function() {
     });
 });
 
-
-
 $( ".select2Particular" ).autocomplete({
     source: function( request, response ) {
         $.ajax( {

@@ -218,6 +218,8 @@ class GlobalOptionController extends Controller
                 $masterCustomer->setMobile($option->getHotline());
             }
             $option->setMobile($option->getHotline());
+            $option->setCreated(new \DateTime("now"));
+            $option->setUpdated(new \DateTime("now"));
             $em->flush();
         }
         $dir = WEB_PATH . "/uploads/domain/{$option->getId()}";

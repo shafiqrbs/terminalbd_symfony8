@@ -113,6 +113,7 @@ class User extends BaseUser
 
 
 	/**
+     * @var GlobalOption
 	 * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="users" )
 	 *  * @ORM\JoinColumns({
 	 *   @ORM\JoinColumn(name="globalOption_id", referencedColumnName="id")

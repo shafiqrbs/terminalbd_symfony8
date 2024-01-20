@@ -3,23 +3,10 @@
 namespace Appstore\Bundle\BusinessBundle\Controller;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessBatch;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessBatchParticular;
-use Appstore\Bundle\BusinessBundle\Entity\BusinessConfig;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoice;
-use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
-use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceReturnItem;
-use Appstore\Bundle\BusinessBundle\Entity\BusinessParticular;
-use Appstore\Bundle\BusinessBundle\Entity\WearHouse;
 use Appstore\Bundle\BusinessBundle\Form\BusinessBatchParticularType;
-use Appstore\Bundle\BusinessBundle\Form\InvoiceType;
-use Appstore\Bundle\DomainUserBundle\Entity\Customer;
-use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
-use Core\UserBundle\Entity\User;
 use JMS\SecurityExtraBundle\Annotation\Secure;
-use Knp\Snappy\Pdf;
-use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -173,7 +160,6 @@ class InvoiceFuelPumpController extends Controller
     public function returnResultData(BusinessBatch $invoice){
 
         $customerSales = $this->getDoctrine()->getRepository("BusinessBundle:BusinessInvoiceParticular")->getBatchItemSales($invoice);
-
         $html = $this->renderView(
             "BusinessBundle:FuelPump:item.html.twig", array('entity' => $invoice)
         );
@@ -202,10 +188,11 @@ class InvoiceFuelPumpController extends Controller
     public function itemApproveAction(BusinessBatchParticular $particular)
     {
         $em = $this->getDoctrine()->getManager();
-      //  $particular->setProcess("Approved");
+        $particular->setProcess("Approved");
         $em->flush();
+        $this->getDoctrine()->getRepository(BusinessInvoice::class)->insertFuelSales($particular);
         if($particular->getProcess() == "Approved"){
-          //  $this->getDoctrine()->getRepository(BusinessInvoice::class)->insertFuelSales($particular);
+            $this->getDoctrine()->getRepository(BusinessInvoice::class)->insertFuelSales($particular);
         }
         return new Response("success");
     }
