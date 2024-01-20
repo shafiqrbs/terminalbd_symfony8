@@ -87,7 +87,7 @@ class MedicineSalesRepository extends EntityRepository
             $start = date('Y-m-d 00:00:00',strtotime($createdStart));
             $qb->andWhere("s.created >= :startDate");
             $qb->setParameter('startDate', $start);
-        }else{
+        }elseif(empty($data)){
             $start = date('Y-m-d 00:00:00',strtotime(date('d-m-Y')));
             $qb->andWhere("s.created >= :startDate");
             $qb->setParameter('startDate', $start);
@@ -97,7 +97,7 @@ class MedicineSalesRepository extends EntityRepository
             $end = date('Y-m-d 23:59:59',strtotime($createdEnd));
             $qb->andWhere("s.created <= :endDate");
             $qb->setParameter('endDate',$end);
-        }else{
+        }elseif(empty($data)){
             $end = date('Y-m-d 23:59:59',strtotime(date('d-m-Y')));
             $qb->andWhere("s.created <= :endDate");
             $qb->setParameter('endDate',$end);

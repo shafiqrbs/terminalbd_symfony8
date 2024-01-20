@@ -56,7 +56,7 @@ class AccountSalesRepository extends EntityRepository
             $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
             $qb->andWhere("e.updated >= :startDate");
             $qb->setParameter('startDate', $start);
-        }else{
+        }elseif(empty($data)){
             $start = date('Y-m-d 00:00:00',strtotime(date('d-m-Y')));
             $qb->andWhere("e.updated >= :startDate");
             $qb->setParameter('startDate', $start);
@@ -65,7 +65,7 @@ class AccountSalesRepository extends EntityRepository
             $end = date('Y-m-d 23:59:59',strtotime($data['endDate']));
             $qb->andWhere("e.updated <= :endDate");
             $qb->setParameter('endDate',$end);
-        }else{
+        }elseif(empty($data)){
             $end = date('Y-m-d 23:59:59',strtotime(date('d-m-Y')));
             $qb->andWhere("e.updated <= :endDate");
             $qb->setParameter('endDate',$end);
