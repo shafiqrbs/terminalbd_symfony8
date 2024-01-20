@@ -12,7 +12,7 @@
 namespace Core\UserBundle\Controller;
 
 use Core\UserBundle\Entity\User;
-use Desktop\Bundle\Service\MobileDetect;
+use Core\UserBundle\Service\MobileDetect;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
@@ -36,7 +36,7 @@ class ResettingController extends Controller
      */
     public function requestAction()
     {
-        $detect = new \Frontend\FrontentBundle\Service\MobileDetect();
+        $detect = new MobileDetect();
         if($detect->isMobile() OR  $detect->isTablet() ) {
             $theme = 'Resetting/Mobile';
         }else{

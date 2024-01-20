@@ -22,6 +22,8 @@ class DefaultController extends Controller
         $globalOption = $user->getGlobalOption();
         /* @var $globalOption GlobalOption */
 
+        $this->get('settong.toolManageRepo')->createMasterDirectory($globalOption->getId());
+
         if($globalOption->getStatus() == 2 or $globalOption->getStatus() == 3 ) {
 
             $this->get('security.context')->setToken(null);

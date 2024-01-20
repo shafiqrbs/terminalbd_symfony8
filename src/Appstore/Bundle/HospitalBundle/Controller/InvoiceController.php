@@ -12,7 +12,6 @@ use Appstore\Bundle\HospitalBundle\Form\InvoiceEditType;
 use Appstore\Bundle\HospitalBundle\Form\InvoicePaymentType;
 use Appstore\Bundle\HospitalBundle\Form\InvoiceType;
 use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
-use Frontend\FrontentBundle\Service\MobileDetect;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -452,7 +451,7 @@ class InvoiceController extends Controller
         $itemStock = $purchaseItem->getItemStock();
 
         /* Device Detection code desktop or mobile */
-        $detect = new MobileDetect();
+        $detect = new \Core\UserBundle\Service\MobileDetect();
         $device = '';
         if( $detect->isMobile() || $detect->isTablet() ) {
             $device = 'mobile' ;

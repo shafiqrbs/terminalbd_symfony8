@@ -10,7 +10,6 @@ use Appstore\Bundle\InventoryBundle\Entity\SalesItemSerial;
 use Appstore\Bundle\InventoryBundle\Form\SalesType;
 use Appstore\Bundle\InventoryBundle\Service\PosItemManager;
 use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
-use Frontend\FrontentBundle\Service\MobileDetect;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Mike42\Escpos\Printer;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -653,7 +652,7 @@ class SalesController extends Controller
         $customer = isset($_REQUEST['customer']) ? $_REQUEST['customer'] : '';
 
         /* Device Detection code desktop or mobile */
-        $detect = new MobileDetect();
+        $detect = new \Core\UserBundle\Service\MobileDetect();
         $device = '';
         if( $detect->isMobile() || $detect->isTablet() ) {
             $device = 'mobile' ;

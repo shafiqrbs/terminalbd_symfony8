@@ -11,7 +11,6 @@ use Appstore\Bundle\RestaurantBundle\Form\InvoiceType;
 use Appstore\Bundle\RestaurantBundle\Form\RestaurantParticularType;
 use Appstore\Bundle\RestaurantBundle\Service\PosItemManager;
 use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
-use Frontend\FrontentBundle\Service\MobileDetect;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;

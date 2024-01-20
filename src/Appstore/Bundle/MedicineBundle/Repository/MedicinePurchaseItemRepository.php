@@ -379,13 +379,14 @@ class MedicinePurchaseItemRepository extends EntityRepository
         foreach ($purchase->getMedicinePurchaseItems() as $item){
 
             $em = $this->_em;
-            $percentage = $purchase->getDiscountCalculation();
-            echo $purchasePrice = $this->stockInstantPurchaseItemPrice($percentage,$item->getActualPurchasePrice());
-            $item->setPurchasePrice($purchasePrice);
-            $item->setPurchaseSubTotal($item->getActualPurchasePrice() * $item->getQuantity());
-            $em->persist($item);
-            $em->flush();
-
+            if($item and $item->getActualPurchasePrice()){
+                $percentage = $purchase->getDiscountCalculation();
+                $purchasePrice = $this->stockInstantPurchaseItemPrice($percentage,$item->getActualPurchasePrice());
+                $item->setPurchasePrice($purchasePrice);
+                $item->setPurchaseSubTotal($item->getActualPurchasePrice() * $item->getQuantity());
+                $em->persist($item);
+                $em->flush();
+            }
         }
     }
 
@@ -394,15 +395,17 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
         $em = $this->_em;
         $entity = $this->_em->getRepository('MedicineBundle:MedicinePurchaseItem')->find($data['purchaseItemId']);
-        $salesQnt = $entity->getSalesQuantity() + $entity->getDamageQuantity() + $entity->getPurchaseReturnQuantity();
-        if(!empty($entity) and $salesQnt  <= (float)$data['quantity']) {
-            $entity->setQuantity($data['quantity']);
+        $quantity = ((float)$data['quantity']) ? (float)$data['quantity']:0;
+        $salesPrice = ((float)$data['salesPrice']) ? (float)$data['salesPrice']:0;
+       // $salesQnt = $entity->getSalesQuantity() + $entity->getDamageQuantity() + $entity->getPurchaseReturnQuantity();
+        if($quantity > 0 and $salesPrice > 0) {
+            $entity->setQuantity($quantity);
             $entity->setBonusQuantity($data['bonusQuantity']);
-            $entity->setPurchasePrice($data['salesPrice']);
-            $entity->setActualPurchasePrice($data['salesPrice']);
-            $entity->setSalesPrice($data['salesPrice']);
-            $entity->setPurchaseSubTotal($data['salesPrice'] * $data['quantity']);
-            $entity->setRemainingQuantity($data['quantity']);
+            $entity->setPurchasePrice($salesPrice);
+            $entity->setActualPurchasePrice($salesPrice);
+            $entity->setSalesPrice($salesPrice);
+            $entity->setPurchaseSubTotal($salesPrice * $quantity);
+            $entity->setRemainingQuantity($quantity);
         }
         $em->persist($entity);
         $em->flush();

@@ -148,12 +148,15 @@ class MedicineSalesItemRepository extends EntityRepository
 
     public function salesPurchaseStockItemUpdate(MedicinePurchaseItem $item)
     {
-        $qb = $this->createQueryBuilder('e');
-        $qb->select('SUM(e.quantity) AS quantity');
-        $qb->where('e.medicinePurchaseItem = :purchaseItem')->setParameter('purchaseItem', $item->getId());
-        $qb->andWhere('e.medicineStock = :medicineStock')->setParameter('medicineStock', $item->getMedicineStock()->getId());
-        $qnt = $qb->getQuery()->getOneOrNullResult();
-        return !empty($qnt['quantity']) ? $qnt['quantity'] : 0;
+        if($item){
+            $qb = $this->createQueryBuilder('e');
+            $qb->select('SUM(e.quantity) AS quantity');
+            $qb->where('e.medicinePurchaseItem = :purchaseItem')->setParameter('purchaseItem', $item->getId());
+            $qb->andWhere('e.medicineStock = :medicineStock')->setParameter('medicineStock', $item->getMedicineStock()->getId());
+            $qnt = $qb->getQuery()->getOneOrNullResult();
+            return !empty($qnt['quantity']) ? $qnt['quantity'] : 0;
+        }
+        return 0;
     }
 
 

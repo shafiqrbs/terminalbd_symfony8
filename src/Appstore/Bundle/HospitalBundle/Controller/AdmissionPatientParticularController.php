@@ -14,7 +14,6 @@ use Appstore\Bundle\HospitalBundle\Form\InvoicePaymentType;
 use Appstore\Bundle\HospitalBundle\Form\InvoiceType;
 use Appstore\Bundle\HospitalBundle\Form\NewPatientAdmissionType;
 use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
-use Frontend\FrontentBundle\Service\MobileDetect;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;

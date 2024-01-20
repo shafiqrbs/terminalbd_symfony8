@@ -11,7 +11,6 @@ use Appstore\Bundle\HospitalBundle\Form\ConfigType;
 use Appstore\Bundle\HospitalBundle\Form\InvoiceParticularType;
 use Appstore\Bundle\HospitalBundle\Form\InvoiceType;
 use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
-use Frontend\FrontentBundle\Service\MobileDetect;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\JsonResponse;

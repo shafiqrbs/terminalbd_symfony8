@@ -359,7 +359,7 @@ class BusinessInvoiceParticular
     /**
      * @param float $purchasePrice
      */
-    public function setPurchasePrice(float $purchasePrice)
+    public function setPurchasePrice( $purchasePrice)
     {
         $this->purchasePrice = $purchasePrice;
     }
@@ -383,7 +383,7 @@ class BusinessInvoiceParticular
     /**
      * @param float $height
      */
-    public function setHeight(float $height)
+    public function setHeight( $height)
     {
         $this->height = $height;
     }
@@ -399,7 +399,7 @@ class BusinessInvoiceParticular
     /**
      * @param float $width
      */
-    public function setWidth(float $width)
+    public function setWidth( $width)
     {
         $this->width = $width;
     }
@@ -415,7 +415,7 @@ class BusinessInvoiceParticular
     /**
      * @param float $subQuantity
      */
-    public function setSubQuantity(float $subQuantity)
+    public function setSubQuantity($subQuantity)
     {
         $this->subQuantity = $subQuantity;
     }
@@ -431,7 +431,7 @@ class BusinessInvoiceParticular
     /**
      * @param float $totalQuantity
      */
-    public function setTotalQuantity(float $totalQuantity)
+    public function setTotalQuantity($totalQuantity)
     {
         $this->totalQuantity = $totalQuantity;
     }
@@ -707,11 +707,6 @@ class BusinessInvoiceParticular
     {
         $this->batchItem = $batchItem;
     }
-
-
-
-
-
 
 }
 

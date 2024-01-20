@@ -296,8 +296,7 @@ class DomainController extends Controller
         $entities = $em->getRepository('SettingToolBundle:GlobalOption')->getRemoveList($data);
         $entities = $this->paginate($entities);
         foreach ($entities as $option):
-            echo $option->getName();
-            echo $option->getId();
+
       /*
         $dir = WEB_PATH . "/uploads/domain/" . $option->getId();
         $a = new Filesystem();
@@ -341,7 +340,6 @@ class DomainController extends Controller
         );
         return $this->redirect($this->generateUrl('tools_domain'));
     }
-
 
 
     public function androidDataCleanAction()

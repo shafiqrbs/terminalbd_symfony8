@@ -605,7 +605,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
 		        $entity->setTotalQuantity($data['quantity'] * $entity->getSubQuantity() );
 		        $entity->setSubTotal( $entity->getPrice() * $entity->getTotalQuantity() );
 	        }else{
-		        $entity->setTotalQuantity( $data['quantity']);
+		        $entity->setTotalQuantity($data['quantity']);
 		        $entity->setSubTotal( $entity->getPrice() * $entity->getTotalQuantity() );
 	        }
         }

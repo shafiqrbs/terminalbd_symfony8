@@ -711,10 +711,12 @@ class PurchaseController extends Controller
             $em->persist($entity);
             $em->flush();
             $msg = 'success';
-        }else{
+        }elseif($stockMedicine){
             $msg = "{$stockMedicine->getName()} already exist";
         }
-        $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($stockMedicine,'',$pack,$minQuantity,$openStock);
+        if($stockMedicine){
+            $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($stockMedicine,'',$pack,$minQuantity,$openStock);
+        }
         $invoice = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -769,7 +771,9 @@ class PurchaseController extends Controller
         }else{
             $msg = "{$stockMedicine->getName()} already exist";
         }
-        $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($stockMedicine,'',$pack,$minQuantity,$openStock);
+        if($stockMedicine){
+            $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($stockMedicine,'',$pack,$minQuantity,$openStock);
+        }
         $invoice = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -799,14 +803,12 @@ class PurchaseController extends Controller
     }
     public function invoiceParticularDeleteAction(MedicinePurchase $invoice, MedicinePurchaseItem $particular){
 
-        $stock = $particular->getMedicineStock();
         $em = $this->getDoctrine()->getManager();
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-        $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($stock);
         $invoice = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->updatePurchaseTotalPrice($invoice);
         $msg = 'Medicine added successfully';
         $result = $this->returnResultData($invoice,$msg);
@@ -1070,9 +1072,6 @@ class PurchaseController extends Controller
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
         $entity->setProcess('Created');
-        if(!empty($entity->getMedicinePurchaseReturn())){
-            $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchaseReturn')->removePurchaseAdjustment($entity->getMedicinePurchaseReturn());
-        }
         $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getPurchaseUpdateQnt($entity);
         $em->createQuery("DELETE MedicineBundle:MedicinePurchaseItem e WHERE e.medicinePurchase ={$entity->getId()}");
         $em->remove($entity);
@@ -1178,8 +1177,8 @@ class PurchaseController extends Controller
 		    $em->flush();
 	    }
 
-        $salesQnt = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSalesItem')->salesPurchaseStockItemUpdate($entity);
-        if($data['name'] == 'Quantity' and $salesQnt <= (int)$data['value']){
+       // $salesQnt = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSalesItem')->salesPurchaseStockItemUpdate($entity);
+        if($data['name'] == 'Quantity'){
             $entity->setQuantity((int)$data['value']);
             $entity->setRemainingQuantity((int)$data['value']);
             $entity->setPurchaseSubTotal((int)$data['value'] * $entity->getActualPurchasePrice());
@@ -1347,10 +1346,10 @@ class PurchaseController extends Controller
     public function autoPurchaseStockItemSearchAction(Request $request)
     {
         $purchase = trim($_REQUEST['purchase']);
-        $entity = $this->getDoctrine()->getRepository(MedicinePurchase::class)->find($purchase);
-        $brand = $entity->getBrandName();
         $item = trim($_REQUEST['q']);
-        if ($item) {
+        $entity = $this->getDoctrine()->getRepository(MedicinePurchase::class)->find($purchase);
+        if ($item and $entity) {
+            $brand = $entity->getBrandName();
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $item = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->searchAutoPurchaseStockItemWithBrand($item,$inventory,$brand);
             return new JsonResponse($item);

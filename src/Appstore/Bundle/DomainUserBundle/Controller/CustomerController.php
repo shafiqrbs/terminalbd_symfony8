@@ -296,8 +296,8 @@ class CustomerController extends Controller
     public function autoSearchAction(Request $request)
     {
         $item = $_REQUEST['q'];
-        if ($item) {
-            $go = $this->getUser()->getGlobalOption();
+        $go = $this->getUser()->getGlobalOption();
+        if ($item and $go) {
             $item = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->searchAutoComplete($go,$item);
         }
         return new JsonResponse($item);
@@ -306,8 +306,8 @@ class CustomerController extends Controller
      public function patientSearchAction(Request $request)
     {
         $item = $_REQUEST['q'];
-        if ($item) {
-            $go = $this->getUser()->getGlobalOption();
+        $go = $this->getUser()->getGlobalOption();
+        if ($item and $go) {
             $item = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->searchPatientAutoComplete($go,$item);
         }
         return new JsonResponse($item);
@@ -402,12 +402,14 @@ class CustomerController extends Controller
     {
         $q = $_REQUEST['q'];
         $option = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->searchAutoCompleteName($option,$q);
         $items = array();
-        foreach ($entities as $entity):
-            $items[]=array('id' => $entity['id'],'value' => $entity['id']);
-        endforeach;
-        return new JsonResponse($entities);
+        if($q and $option){
+            $entities = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->searchAutoCompleteName($option,$q);
+            foreach ($entities as $entity):
+                $items[]=array('id' => $entity['id'],'value' => $entity['id']);
+            endforeach;
+        }
+        return new JsonResponse($items);
 
     }
 

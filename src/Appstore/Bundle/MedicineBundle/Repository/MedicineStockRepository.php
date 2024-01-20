@@ -416,9 +416,11 @@ class MedicineStockRepository extends EntityRepository
 
         if(!empty($purchase->getMedicinePurchaseItems())) {
             foreach ($purchase->getMedicinePurchaseItems() as $purchaseItem) {
-                 $stockItem = $purchaseItem->getMedicineStock();
-                 $this->updateRemovePurchaseQuantity($stockItem);
-                 $this->updatePurchasePrice($stockItem,$purchaseItem);
+                 if($purchaseItem->getMedicineStock()){
+                     $stockItem = $purchaseItem->getMedicineStock();
+                     $this->updateRemovePurchaseQuantity($stockItem);
+                     $this->updatePurchasePrice($stockItem,$purchaseItem);
+                 }
             }
         }
     }
