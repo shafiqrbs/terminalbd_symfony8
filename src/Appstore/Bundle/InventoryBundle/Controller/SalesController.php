@@ -279,7 +279,7 @@ class SalesController extends Controller
         $subTotal = $entity->getSubTotal() > 0 ? $entity->getSubTotal() : 0;
         $netTotal = $entity->getTotal() > 0 ? $entity->getTotal() : 0;
         $payment = $entity->getPayment() > 0 ? $entity->getPayment() : 0;
-        $due = $entity->getDue();
+        $due = $entity->getDue() > 0 ? $entity->getDue() : 0;
         $vat = $entity->getVat() > 0 ? $entity->getVat() : 0;
         $discount = $entity->getDiscount() > 0 ? $entity->getDiscount() : 0;
         $data = array(

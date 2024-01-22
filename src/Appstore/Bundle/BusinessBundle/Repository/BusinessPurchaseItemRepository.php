@@ -151,9 +151,12 @@ class BusinessPurchaseItemRepository extends EntityRepository
         if(!empty($particular->getPrice())){
 	        $entity->setSalesPrice($particular->getPrice());
         }
-        $wearhouse = $this->_em->getRepository('BusinessBundle:WearHouse')->find($data['wearhouse']);
-        if($wearhouse){
-	        $entity->setWearhouse($wearhouse);
+        $wearhouseId = (isset($data['wearhouse']) and !empty($data['wearhouse']))? $data['wearhouse']:'';
+        if($wearhouseId){
+            $wearhouse = $this->_em->getRepository('BusinessBundle:WearHouse')->find($wearhouseId);
+            if($wearhouse){
+                $entity->setWearhouse($wearhouse);
+            }
         }
         $entity->setQuantity((int)$data['quantity']);
         $totalPurchasePrice = (isset($data['price']) and !empty($data['price']))? $data['price']:0;

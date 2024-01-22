@@ -315,7 +315,7 @@ class InvoiceController extends Controller
         $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->findBy(array('globalOption' => $this->getUser()->getGlobalOption(),'status'=>1),array('companyName'=>"ASC"));
         $areas = $this->getDoctrine()->getRepository('BusinessBundle:BusinessArea')->findBy(array('businessConfig' => $config,'status'=>1),array('name'=>"ASC"));
         $marketings = $this->getDoctrine()->getRepository('BusinessBundle:Marketing')->findBy(array('businessConfig' => $config,'status'=>1),array('name'=>"ASC"));
-        $couriers = $this->getDoctrine()->getRepository('AccountingBundle:AccountCondition')->findBy(array('globalOption' => $global,'status'=>1),array('name'=>"ASC"));
+        $couriers = $this->getDoctrine()->getRepository('AccountingBundle:AccountCondition')->findBy(array('globalOption' => $this->getUser()->getGlobalOption(),'status'=>1),array('name'=>"ASC"));
         $stores = $this->getDoctrine()->getRepository('BusinessBundle:BusinessStore')->findBy(array('businessConfig' => $config,'status'=>1),array('name'=>"ASC"));
         $customers = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->findBy(array('globalOption' => $this->getUser()->getGlobalOption()),array('name'=>"ASC"));
         $particulars = $em->getRepository('BusinessBundle:BusinessParticular')->getFindWithParticular($config, $type = array('production','stock','service','virtual','pre-production','post-production'));
