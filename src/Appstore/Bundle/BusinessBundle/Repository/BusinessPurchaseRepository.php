@@ -150,6 +150,35 @@ class BusinessPurchaseRepository extends EntityRepository
 
 	}
 
+    public function dailyPurchase(User $user , $data =array())
+    {
+
+        $config =  $user->getGlobalOption()->getBusinessConfig()->getId();
+        $compare = new \DateTime();
+        $year =  $compare->format('Y');
+        $month =  $compare->format('F');
+        $year = isset($data['year'])? $data['year'] :$year;
+        $month = isset($data['month'])? $data['month'] :$month;
+        $sql = "SELECT DAY (purchase.created) as day,SUM(purchase.netTotal) AS total
+                FROM business_purchase as purchase
+                WHERE purchase.businessConfig_id = :config AND purchase.process = :process  AND YEAR(purchase.updated) =:year AND MONTH (purchase.updated) =:month
+                GROUP BY day ORDER BY day ASC";
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt->bindValue('config', $config);
+        $stmt->bindValue('process', 'Approved');
+        $stmt->bindValue('year', $year);
+        $stmt->bindValue('month', $month);
+        $stmt->execute();
+        $result =  $stmt->fetchAll();
+        $purchaseDays = array();
+        foreach ($result as $row):
+            $purchaseDays[$row['day']]=$row;
+        endforeach;
+        return $purchaseDays;
+
+
+    }
+
 
 	public function reportPurchaseOverview(User $user ,$data)
 {

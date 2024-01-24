@@ -425,6 +425,35 @@ class BusinessInvoiceRepository extends EntityRepository
 		return $result;
 	}
 
+    public function dailySales(User $user , $data =array())
+    {
+
+        $config =  $user->getGlobalOption()->getBusinessConfig()->getId();
+        $compare = new \DateTime();
+        $year =  $compare->format('Y');
+        $month =  $compare->format('F');
+        $year = isset($data['year'])? $data['year'] :$year;
+        $month = isset($data['month'])? $data['month'] :$month;
+        $sql = "SELECT DAY (sales.created) as day,SUM(sales.total) AS total
+                FROM business_invoice as sales
+                WHERE sales.businessConfig_id = :config AND sales.process = :process  AND YEAR(sales.updated) =:year AND MONTH (sales.updated) =:month
+                GROUP BY day ORDER BY day ASC";
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt->bindValue('config', $config);
+        $stmt->bindValue('process', 'Delivered');
+        $stmt->bindValue('year', $year);
+        $stmt->bindValue('month', $month);
+        $stmt->execute();
+        $result =  $stmt->fetchAll();
+        $salesDays = array();
+        foreach ($result as $row):
+            $salesDays[$row['day']]=$row;
+        endforeach;
+        return $salesDays;
+
+
+    }
+
 
     public function updateInvoiceTotalPrice(BusinessInvoice $invoice)
     {

@@ -44,44 +44,45 @@
                         </div>
                     </div>
                     <div class="portlet-body">
-                        <form class="search-form" action="" method="get" name="itemSearch">
-                            <div class="row-fluid">
-                                <div class="span12">
-                                    <table class="table table-bordered table-striped table-condensed flip-content ">
-                                        <thead class="flip-content">
-                                        <tr class="head-red">
-                                            <th class="" >Sales</th>
-                                            <th class="" >Receive</th>
-                                            <th class="" >Balance</th>
-                                            <th class="" ></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td class="numeric" ><strong>{{ summary.sales|number_format(2) }}</strong></td>
-                                            <td class="numeric" ><strong>{{ summary.receive|number_format(2) }}</strong></td>
-                                            <td class="numeric" ><strong>{{ summary.balance|number_format(2) }}</strong></td>
-                                            <td>
-                                                <form class="search-form" action="" method="get" name="itemSearch">
-                                                    <div class="row-fluid">
-                                                        <div class="span9">
-                                                            <input type="text" id="mobile" name="mobile"  class="leftMargin span12 select2Customer m-wrap" value="{% if searchForm.mobile is defined %}{{ searchForm.mobile }}{% endif %}"  autocomplete="off" placeholder="Customer mobile no">
+                        <div class="portlet-body flip-scroll">
+                            <form class="search-form" action="" method="get" name="itemSearch">
+                                <div class="row-fluid">
+                                    <div class="span12">
+                                        <table class="table table-bordered table-striped table-condensed flip-content ">
+                                            <thead class="flip-content">
+                                            <tr class="head-red">
+                                                <th class="" >Sales</th>
+                                                <th class="" >Receive</th>
+                                                <th class="" >Balance</th>
+                                                <th class="" ></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td class="numeric" ><strong>{{ summary.sales|number_format(2) }}</strong></td>
+                                                <td class="numeric" ><strong>{{ summary.receive|number_format(2) }}</strong></td>
+                                                <td class="numeric" ><strong>{{ summary.balance|number_format(2) }}</strong></td>
+                                                <td>
+                                                    <form class="search-form" action="" method="get" name="itemSearch">
+                                                        <div class="row-fluid">
+                                                            <div class="span9">
+                                                                <input type="text" id="mobile" name="mobile"  class="leftMargin span12 select2Customer m-wrap" value="{% if searchForm.mobile is defined %}{{ searchForm.mobile }}{% endif %}"  autocomplete="off" placeholder="Customer mobile no">
+                                                            </div>
+                                                            <div class="span3">
+                                                                <div class="btn-group"><button class="btn blue" type="submit"><i class="icon-search"></i></button></div>
+                                                            </div>
                                                         </div>
-                                                        <div class="span3">
-                                                            <div class="btn-group"><button class="btn blue" type="submit"><i class="icon-search"></i></button></div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
-                        <div class="portlet-body flip-scroll" id="DivIdToPrint">
+                            </form>
                             {% include('flash-message.html.twig')  %}
                             <table class="table table-bordered table-striped table-condensed flip-content ">
+
                                 <thead class="flip-content ">
                                 <tr class="head-blue">
                                     <th class="numeric" ><i class="icon-reorder"></i></th>
@@ -95,53 +96,50 @@
                                 </thead>
                                 <tbody>
                                 {% for entity in entities %}
-                                    <tr>
-                                        <td>{{ loop.index }}</td>
-                                        <th class="numeric" >{{ entity.customerName|capitalize }}</th>
-                                        <td class="numeric" >{{ entity.customerMobile }}</td>
-                                        <th class="numeric" >{{ entity.totalAmount|number_format }}</th>
-                                        <th class="numeric" >{{ entity.amount|number_format }}</th>
-                                        <th class="numeric" >{{ entity.customerBalance|number_format }}</th>
-                                        <td class="numeric" >
-                                            <div class="btn-group">
-                                            <a class="btn blue" href="{{ path('report_customer_ledger',{'mobile':entity.customerMobile}) }}"><i class="icon-plus-sign"></i> Ledger</a>
-                                            <a  class="btn yellow ledger-print" data-action="{{ path('report_customer_ledger_print',{'mobile':entity.customerMobile}) }}" href="javascript:"><i class="icon-print"></i> Print</a>
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td class="numeric" >{{ entity.customerName|capitalize }}</td>
+                                    <td class="numeric" >{{ entity.customerMobile }}</td>
+                                    <td class="numeric" >{{ entity.totalAmount|number_format }}</td>
+                                    <td class="numeric" >{{ entity.amount|number_format }}</td>
+                                    <td class="numeric" >{{ entity.customerBalance|number_format }}</td>
+                                    <td class="numeric" >
+                                        <div class="btn-group">
+                                            <a class="btn blue mini" href="{{ path('report_customer_ledger',{'mobile':entity.customerMobile}) }}"><i class="icon-plus-sign"></i> Ledger</a>
+                                            <a  class="btn yellow mini ledger-print" data-action="{{ path('report_customer_ledger_print',{'mobile':entity.customerMobile}) }}" href="javascript:"><i class="icon-print"></i> Print</a>
                                             {% if global.notificationConfig is not empty and global.notificationConfig.smsActive == 1 %}
-                                            <a  class="btn purple approve" href="javascript:" data-url="{{ path('report_sales_customer_sms',{'id':entity.customerId}) }}"><i class="icon-phone"></i> SMS</a>
+                                                <a  class="btn purple mini approve" href="javascript:" data-url="{{ path('report_sales_customer_sms',{'id':entity.customerId}) }}"><i class="icon-phone"></i> SMS</a>
                                             {% endif %}
-                                            </div>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </td>
+                                </tr>
                                 {% endfor %}
+
+
                                 </tbody>
                             </table>
                             <div class="pagination pull-center"  >
                                 {{ knp_pagination_render(entities) }}
                             </div>
                         </div>
-
                     </div>
                 </div>
 
             </div>
         </div>
     </div>
-    <style>
-        .leftMargin {
-            margin-left: 0!important;
-        }
-    </style>
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
     {% javascripts
-    '@AccountingBundle/Resources/public/js/approveProcess.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
+        '@AccountingBundle/Resources/public/js/approveProcess.js' %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock %}
+
 {% block documentready %}
     {{ parent() }}
+    EditableInit();
     AccountingApproveProcess();
 {% endblock %}
 

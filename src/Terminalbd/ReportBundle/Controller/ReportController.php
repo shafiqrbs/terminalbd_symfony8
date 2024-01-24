@@ -1677,6 +1677,96 @@ class ReportController extends Controller
     }
 
     /**
+     * @Route("/business-system-report", methods={"GET", "POST"}, name="busi_system_overview")
+     * @Secure(roles="ROLE_REPORT,ROLE_REPORT_OPERATION_SALES, ROLE_DOMAIN")
+     */
+    public function businessSystemReportAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $user = $this->getUser();
+        $transactionMethods = array(1,2,3);
+        $datetime = new \DateTime("now");
+        $dataIncome['startDate'] = $user->getGlobalOption()->getCreated()->format('Y-m-d');
+        $dataIncome['endDate'] = $datetime->format('Y-m-d');
+        $income = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->reportBusinessTotalIncome($this->getUser(),$dataIncome);
+        $transactionCashOverview = $this->getDoctrine()->getRepository('AccountingBundle:AccountCash')->cashOverview( $this->getUser(),$transactionMethods,$data);
+        $currentStockPrice = $em->getRepository('BusinessBundle:BusinessParticular')->reportCurrentStockPrice($user);
+        $accountPurchase = $em->getRepository('AccountingBundle:AccountPurchase')->accountPurchaseOverview($user, $data);
+        $accountSales = $em->getRepository('AccountingBundle:AccountSales')->salesOverview($user, $data);
+        $accountExpenditure = $em->getRepository('AccountingBundle:Expenditure')->expenditureOverview($user, $data);
+        $accountReceiveOverview = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->receiveModeOverview($user,$data);
+        $accountPaymentOverview = $this->getDoctrine()->getRepository('AccountingBundle:AccountPurchase')->paymentModeOverview($this->getUser(),$data);
+
+        return $this->render('ReportBundle:Business:index.html.twig', array(
+            'option'                => $user->getGlobalOption(),
+            'income'     => $income,
+            'transactionCashOverviews'     => $transactionCashOverview,
+            'overview'     => $accountReceiveOverview,
+            'accountPaymentOverview'     => $accountPaymentOverview,
+            'currentStockPrice'     => $currentStockPrice,
+            'accountPurchase'       => $accountPurchase,
+            'accountSales'          => $accountSales,
+            'accountExpenditure'    => $accountExpenditure,
+            'searchForm'            => $data,
+        ));
+    }
+
+    /**
+     * @Route("/business-daily-sales-purchase-report", methods={"GET", "POST"}, name="busi_daily_report")
+     * @Secure(roles="ROLE_REPORT,ROLE_REPORT_OPERATION_SALES, ROLE_DOMAIN")
+     */
+    public function businessDailyStatementReportAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $user = $this->getUser();
+        return $this->render('ReportBundle:Business/Calendar/Day:index.html.twig', array(
+            'option'                => $user->getGlobalOption(),
+
+        ));
+    }
+
+    /**
+     * @Route("/business-daily-sales-purchase-report-ajax-load", methods={"GET", "POST"}, name="busi_daily_report_ajax_load")
+     * @Secure(roles="ROLE_REPORT,ROLE_REPORT_OPERATION_SALES, ROLE_DOMAIN")
+     */
+    public function businessDailyStatementReportAjaxLoadAction()
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $global = $this->getUser()->getGlobalOption();
+        $dailyPurchase = $this->getDoctrine()->getRepository('BusinessBundle:BusinessPurchase')->dailyPurchase($this->getUser(),$data);
+        $dailySales = $this->getDoctrine()->getRepository('BusinessBundle:BusinessInvoice')->dailySales($this->getUser(),$data);
+        $htmlProcess = $this->renderView(
+            'ReportBundle:Business/Calendar/Day:ajax-data.html.twig', array(
+                'dailyPurchase' => $dailyPurchase,
+                'dailySales' => $dailySales,
+                'data' => $data,
+            )
+        );
+        return new Response($htmlProcess);
+    }
+
+    /**
+     * @Route("/business-monthly-sales-purchase-report", methods={"GET", "POST"}, name="busi_monthly_report")
+     * @Secure(roles="ROLE_REPORT,ROLE_REPORT_OPERATION_SALES, ROLE_DOMAIN")
+     */
+    public function businessMonthlyStatementReportAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $user = $this->getUser();
+        return $this->render('ReportBundle:Business/Calendar/Day:index.html.twig', array(
+            'option'                => $user->getGlobalOption(),
+
+        ));
+    }
+
+
+    /**
      * @Route("/miss-marketing-executive-report", methods={"GET", "POST"}, name="miss_marketing_executive_report")
      * @Secure(roles="ROLE_REPORT,ROLE_REPORT_OPERATION_SALES, ROLE_DOMAIN")
      */

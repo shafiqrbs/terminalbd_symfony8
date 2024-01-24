@@ -1,0 +1,51 @@
+{% extends '::base-report.html.twig' %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-12 print-bar">
+            <form name="searchForm" id="searchForm" action="{{ path('busi_daily_report_ajax_load') }}" method="post">
+            <div class="grid-container-4">
+                <div class="grid-item">
+                    <label>Invoice Mode</label>
+                    {%  set months = {1:'January',2:'February',3:'March',4:'April',5:'May',6:'June',7:'July',8:'August',9:'September',10:'October',11:'November',12:'December'} %}
+                    <select class="span12 m-wrap" name="month" id='month'>
+                        {% for key,month in months %}
+                            <option value='{{ key }}' {% if (searchForm.month is defined and searchForm.month == key) or (searchForm.month is defined and searchForm.month is empty and key == currentMonth) %} selected="selected" {% endif %} >{{ month }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="grid-item">
+                    <label>Start Date</label><br/>
+                    {%  set years = ['2018','2019','2020','2021','2022','2023','2024','2025'] %}
+                    <select class="span12 m-wrap" name="year" id="year">
+                        <option>--- Select Year---</option>
+                        {% for year in years %}
+                            <option {% if searchForm.year is defined and searchForm.year == year %}selected="selected"{% endif %} value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="grid-item">
+                    <div class="col-md-12 margin-top-15" >
+                        <button type="submit" class='btn btn-download btn-margin-left ajax-btn' value="search" name="submit" ><i class='fa fa-search'></i></button>
+                        <button class="btn purple" onclick="exportExcel()" type="button"><i class="fa fa-file"></i></button>
+                    </div>
+                </div>
+            </div>
+            </form>
+
+        </div>
+    </div>
+    <div class="loader loader-double" ></div>
+    <div id="print-area" class="downloadExcel" >
+        <div class="col-md-12" id="data-load"></div>
+    </div>
+    <script>
+        function exportExcel() {
+            var table = document.querySelector('.downloadExcel');
+            TableToExcel.convert(table);
+        }
+    </script>
+{% endblock %}
+
+
+
+

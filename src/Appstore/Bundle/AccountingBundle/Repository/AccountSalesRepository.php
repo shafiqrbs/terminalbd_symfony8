@@ -56,17 +56,9 @@ class AccountSalesRepository extends EntityRepository
             $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
             $qb->andWhere("e.updated >= :startDate");
             $qb->setParameter('startDate', $start);
-        }elseif(empty($data)){
-            $start = date('Y-m-d 00:00:00',strtotime(date('d-m-Y')));
-            $qb->andWhere("e.updated >= :startDate");
-            $qb->setParameter('startDate', $start);
         }
         if (!empty($endDate)) {
             $end = date('Y-m-d 23:59:59',strtotime($data['endDate']));
-            $qb->andWhere("e.updated <= :endDate");
-            $qb->setParameter('endDate',$end);
-        }elseif(empty($data)){
-            $end = date('Y-m-d 23:59:59',strtotime(date('d-m-Y')));
             $qb->andWhere("e.updated <= :endDate");
             $qb->setParameter('endDate',$end);
         }
@@ -466,6 +458,7 @@ class AccountSalesRepository extends EntityRepository
     public function customerOutstandingSummary($globalOption, $data = array())
     {
         $amount = isset($data['amount']) ? $data['amount']:0;
+
         $qb = $this->createQueryBuilder('e');
         $qb->select('COALESCE(SUM(e.totalAmount),0) as sales, COALESCE(SUM(e.amount),0) as receive,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
@@ -1667,7 +1660,6 @@ GROUP BY user.id ORDER BY sales.amount DESC";
             $qb1->setParameter('startDate', $start);
         }
         $previous = $qb1->getQuery()->getOneOrNullResult();
-
         $qb = $this->createQueryBuilder('e');
         $qb->select('e.updated as created,e.accountRefNo as accountRefNo,e.processType as processType,COALESCE(e.totalAmount,0) as debit, COALESCE(e.amount,0) as credit,(COALESCE(e.totalAmount,0) - COALESCE(e.amount,0)) as balance ');
         $qb->addSelect('invoice.discount as discount','invoice.invoice as invoiceNo','invoice.subTotal as subTotal');

@@ -74,6 +74,12 @@
                     {% set balance = 0 %}
                     {% set sales = 0 %}
                     {% set receive = 0 %}
+                    <tr>
+                        <td class="numeric" colspan="5">Opening Balance</td>
+                        <td class="text-right" >{% if 0 > previous['balance'] %}({{ previous['balance']|number_format }}){% endif %}</td>
+                        <td class="text-right" >{% if 0 < previous['balance'] %}{{ previous['balance']|number_format }}{% endif %}</td>
+                    </tr
+                    {% set sales = sales + previous['balance'] %}
                     {% for entity in entities %}
                         {% set sales = sales + entity.debit %}
                         {% set receive = receive + entity.credit %}
@@ -91,9 +97,13 @@
                     </tbody>
                     <tfoot>
                     <tr>
-                        <th class="text-right" colspan="5">Grand Balance</th>
+                        <th class="text-right" colspan="5"></th>
                         <th class="text-right">{{ sales|number_format(2) }}</th>
                         <th class="text-right">{{ receive|number_format(2) }}</th>
+                    </tr>
+                    <tr>
+                        <th class="text-right" colspan="6">Grand Balance</th>
+                        <th class="text-right">{{ (sales-receive)|number_format(2) }}</th>
                     </tr>
                     </tfoot>
                 </table>

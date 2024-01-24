@@ -129,6 +129,22 @@ class AccountPurchaseRepository extends EntityRepository
 
     }
 
+    public function paymentModeOverview(User $user,$data)
+    {
+        $globalOption = $user->getGlobalOption();
+        $qb = $this->createQueryBuilder('e');
+        $qb->leftJoin('e.transactionMethod','t');
+        $qb->select('e.processHead, COALESCE(SUM(e.purchaseAmount),0) AS total,COALESCE(SUM(e.payment),0) AS receive, count(e.id) AS totalCount');
+        $qb->where("e.globalOption = :globalOption");
+        $qb->setParameter('globalOption', $globalOption);
+        $qb->andWhere("e.process = 'approved'");
+        $this->handleSearchBetween($qb,$globalOption,$data);
+        $qb->groupBy('e.processHead');
+        $result = $qb->getQuery()->getArrayResult();
+        return $result;
+
+    }
+
     public function dailyPurchasePayment(User $user,$data)
     {
         $globalOption = $user->getGlobalOption();

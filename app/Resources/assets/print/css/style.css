@@ -498,7 +498,7 @@ table tr.head-gray th{
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     border: 1px solid #cacaca;
-    background: #263238;
+    background: #8e9091;
     height: 32px;
 }
 
@@ -525,6 +525,34 @@ table tr.head-yellow th{
     background: #f4c22b;
     height: 32px;
 }
+
+
+table tr.head-red th{
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    color: #ffffff;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #ef8476;
+    background-color:#cb5a5e;
+
+
+}
+
+
+table tr.head-purple th{
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    color: #ffffff;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #af5cc1;
+    background-color: #852b99;
+
+}
+
 
 table tr.footer-gray th, table tr.footer-gray td{
     border-top-left-radius: 4px;
