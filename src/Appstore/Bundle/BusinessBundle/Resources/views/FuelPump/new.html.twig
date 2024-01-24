@@ -28,6 +28,11 @@
                 <div class="portlet box green tabbable">
                     <div class="portlet-title">
                         <div class="caption"><i class="icon-reorder"></i>Manage Fuel Station Meter Reading Process</div>
+                        <div class="actions">
+                            <div class="btn-group">
+                                <a class="btn red" href="{{ path('business_fuelstation') }}"><i class="icon-plus-sign"></i> Sales Batch</a>
+                            </div>
+                        </div>
                     </div>
                     <div class="portlet-body">
                         <div class="portlet-body flip-scroll">
@@ -82,16 +87,24 @@
                                 </thead>
                                 <tbody id="invoiceParticulars">
                                 {% if entity %}
+                                    {% set totalQuantity = 0 %}
+                                    {% set customerQuantity = 0 %}
+                                    {% set totalAmount = 0 %}
+                                    {% set customerAmount = 0 %}
                                     {% for item in entity.businessBatchParticulars %}
+                                        {% set totalQuantity = totalQuantity + item.quantity %}
+                                        {% set customerQuantity = customerQuantity + item.customerSalesQuantity %}
+                                        {% set totalAmount = totalAmount + item.subTotal %}
+                                        {% set customerAmount = customerAmount + item.customerSalesAmount %}
                                         <tr>
                                             <td>{{ loop.index }}</td>
                                             <td>{{ item.salesBy.profile.name }}</td>
                                             <td>{{ item.wearhouse.name }}</td>
                                             <td>{{ item.businessParticular.name }}</td>
                                             <td>{{ item.startMeterReading }}</td>
-                                            <td class=""
+                                            <td class="">
                                                 {% if item.process == 'Created' %}
-                                                <input type="text" style="width:100px!important;" class="numeric td-inline-input batchItemUpdate" data-id="{{ item.id }}" autocomplete = "off" data-url="{{ path('business_fuelstation_item_update',{'id':item.id}) }}"  id="endMeterReading-{{ item.id }}" name="endMeterReading[]" value="{{ item.endMeterReading }}" >
+                                                    <input type="text" style="width:100px!important;" class="numeric td-inline-input batchItemUpdate" data-id="{{ item.id }}" autocomplete = "off" data-url="{{ path('business_fuelstation_item_update',{'id':item.id}) }}"  id="endMeterReading-{{ item.id }}" name="endMeterReading[]" value="{{ item.endMeterReading }}" >
                                                 {% endif %}
                                             </td>
                                             <td>{{ item.price }}</td>
@@ -112,6 +125,7 @@
                                             </td>
                                         </tr>
                                     {% endfor %}
+                                    <tr><th colspan="7">Grand Total </th><th>{{ totalQuantity }}</th><th>{{ customerQuantity }}</th><th>{{ totalQuantity-customerQuantity }}</th><th>{{ (customerAmount+totalAmount)|number_format }}</th><th>{{ customerAmount|number_format }}</th><th>{{ totalAmount|number_format }}</th><th></th><th></th></tr>
                                 {% endif %}
                                 </tbody>
                             </table>

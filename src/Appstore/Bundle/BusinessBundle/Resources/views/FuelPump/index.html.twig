@@ -35,7 +35,7 @@
                         <div class="caption"><i class="icon-reorder"></i>Manage Customer Invoice</div>
                         <div class="actions">
                             <div class="btn-group">
-                                <a class="btn red" href="{{ path('business_fuelstation_new') }}"><i class="icon-plus-sign"></i> New Invoice</a>
+                                <a class="btn red" href="{{ path('business_fuelstation_new') }}"><i class="icon-plus-sign"></i> New Sales Batch</a>
                             </div>
                         </div>
                     </div>
@@ -108,7 +108,7 @@
                                                     <a href="{{ path('business_fuelstation_edit', { 'id': entity.id }) }}" class="btn purple mini" ><i class="icon-pencil"></i> Edit</a>
                                                     <a  data-id="{{ entity.id }}" data-url="{{ path('business_fuelstation_delete', { 'id': entity.id }) }}" href="javascript:" class="btn red mini delete" data-trigger = "hover" data-original-title = "Delete" ><i class="icon-trash"></i> Delete</a>
                                                 {% endif %}
-                                                <a href="{{ path('business_invoice_show', { 'id': entity.id }) }}" class="btn blue mini"><i class="icon-eye-open"></i> View</a>
+                                                <a href="{{ path('business_fuelstation_show', { 'id': entity.id }) }}" class="btn blue mini"><i class="icon-eye-open"></i> View</a>
                                             </div>
                                         </td>
                                     </tr>

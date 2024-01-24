@@ -69,7 +69,34 @@ class BusinessStockHistoryRepository extends EntityRepository
         $qb->where("e.item = :item")->setParameter('item', $item->getId());
         $result = $qb->getQuery()->getSingleResult();
         $openingQuantity = $result['openingQuantity'];
-        return $openingQuantity;
+
+    }
+
+    public function OpeningInsertQuantity(BusinessParticular $item){
+        $em = $this->_em;
+        $exist = $this->findOneBy(array('process'=>'opening','businessConfig'=>$item->getBusinessConfig(),'item'=>$item));
+        if(empty($exist)){
+            $entity = new BusinessStockHistory();
+            $entity->setQuantity($item->getOpeningQuantity());
+            $entity->setOpening($item->getOpeningQuantity());
+            $entity->setItem($item);
+            $entity->setBusinessConfig($item->getBusinessConfig());
+            $entity->setProcess('opening');
+            $entity->setClosingQuantity(floatval($item->getOpeningQuantity()));
+            $em->persist($entity);
+            $em->flush();
+        }else{
+            $entity = $exist;
+            $entity->setQuantity($item->getOpeningQuantity());
+            $entity->setOpening($item->getOpeningQuantity());
+            $entity->setItem($item);
+            $entity->setBusinessConfig($item->getBusinessConfig());
+            $entity->setProcess('opening');
+            $entity->setClosingQuantity(floatval($item->getOpeningQuantity()));
+            $em->persist($entity);
+            $em->flush();
+        }
+
 
     }
 
@@ -86,11 +113,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
         $em = $this->_em;
         $openingQnt = 0;
-        if($fieldName == "opening"){
-            $openingQnt = $this->getItemOpeningQuantity($item);
-        }else{
-            $openingQnt = $this->getItemOpeningQuantity($item->getBusinessParticular());
-        }
+        $openingQnt = $this->getItemOpeningQuantity($item->getBusinessParticular());
 
         /* @var  $entity BusinessStockHistory */
 
@@ -170,13 +193,6 @@ class BusinessStockHistoryRepository extends EntityRepository
             $entity->setItem($item->getBusinessParticular());
             $entity->setDamageItem($item);
             $entity->setProcess('sales-return');
-
-        }elseif($fieldName == 'opening') {
-
-            $entity->setQuantity("{$item->getQuantity()}");
-            $entity->setOpening($item->getQuantity());
-            $entity->setItem($item->getBusinessParticular());
-            $entity->setProcess('opening');
 
         }elseif($fieldName == 'from-transfer') {
 

@@ -33,8 +33,6 @@ class BusinessBatch
     /**
      * @var BusinessBatchParticular
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessBatchParticular", mappedBy="businessBatch")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     * @ORM\OrderBy({"id" = "ASC"})
      **/
     private $businessBatchParticulars;
 

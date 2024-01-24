@@ -173,13 +173,45 @@ class InvoiceFuelPumpController extends Controller
     public function itemDeleteAction(BusinessBatchParticular $particular)
     {
         $em = $this->getDoctrine()->getManager();
-        $entity = $particular->getBusinessBatch();
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
         $em->remove($particular);
         $em->flush();
         return new Response("success");
+    }
+
+     /**
+     * @Secure(roles="ROLE_BUSINESS_INVOICE,ROLE_DOMAIN");
+     */
+    public function deleteAction(BusinessBatch $particular)
+    {
+        $em = $this->getDoctrine()->getManager();
+        if (!$particular) {
+            throw $this->createNotFoundException('Unable to find Invoice entity.');
+        }
+        $em->remove($particular);
+        $em->flush();
+        return new Response("success");
+    }
+
+     /**
+     * @Secure(roles="ROLE_BUSINESS_INVOICE,ROLE_DOMAIN");
+     */
+    public function showAction(BusinessBatch $entity)
+    {
+        $em = $this->getDoctrine()->getManager();
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Invoice entity.');
+        }
+        $customerSales = $this->getDoctrine()->getRepository("BusinessBundle:BusinessInvoiceParticular")->getBatchItemSales($entity);
+
+        return $this->render("BusinessBundle:FuelPump:show.html.twig", array(
+            'entity' => $entity,
+            'customerSales' => $customerSales,
+        ));
+
+
     }
 
     /**

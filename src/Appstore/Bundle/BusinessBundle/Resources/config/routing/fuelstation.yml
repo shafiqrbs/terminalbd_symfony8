@@ -33,6 +33,10 @@ business_fuelstation_delete:
     path:     /{id}/delete
     defaults: { _controller: "BusinessBundle:InvoiceFuelPump:delete" }
 
+business_fuelstation_show:
+    path:     /{id}/show
+    defaults: { _controller: "BusinessBundle:InvoiceFuelPump:show" }
+
 
 business_fuelstation_item_update:
     path:     /{id}/item-batch-update
