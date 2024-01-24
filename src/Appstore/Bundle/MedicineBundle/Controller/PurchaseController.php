@@ -667,7 +667,7 @@ class PurchaseController extends Controller
         $entity = new MedicinePurchaseItem();
         $form = $this->createPurchaseItemForm($entity,$invoice);
         $form->handleRequest($request);
-
+        $msg = "";
         $stockItem = ($data['purchaseItem']['stockName']);
         /* @var $stockMedicine MedicineStock */
 
