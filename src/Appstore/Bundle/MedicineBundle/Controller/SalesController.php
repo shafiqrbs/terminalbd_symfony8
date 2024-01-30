@@ -278,14 +278,14 @@ class SalesController extends Controller
        $form->handleRequest($request);
        $em = $this->getDoctrine()->getManager();
        $entity->setMedicineSales($invoice);
-       $stockItem = ($data['salesitem']['stockName']);
-       $itemPercent = ($data['salesitem']['itemPercent']);
-       $salesPrice = ($data['salesitem']['salesPrice']);
-       $quantity = ( $data['salesitem']['quantity'] > 0 ) ?  $data['salesitem']['quantity'] :1;
-
        /* @var $stock MedicineStock */
+       $stockItem = (isset($data['salesitem']) and $data['salesitem']['stockName']) ? $data['salesitem']['stockName'] :'';
        $stock = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->find($stockItem);
-       if($stock){
+       if(isset($data['salesitem']) and $data['salesitem'] and $stock){
+
+           $itemPercent = ($data['salesitem']['itemPercent']);
+           $salesPrice = ($data['salesitem']['salesPrice']);
+           $quantity = ( $data['salesitem']['quantity'] > 0 ) ?  $data['salesitem']['quantity'] :1;
            $entity->setMedicineStock($stock);
            $entity->setQuantity($quantity);
            if($itemPercent > 0){
@@ -318,29 +318,32 @@ class SalesController extends Controller
        $em = $this->getDoctrine()->getManager();
        $data = $_REQUEST;
        $id = $data['id'];
-       $quantity = $data['quantity'];
-       $price = $data['salesPrice'];
-       $itemPercent = empty($data['itemPercent']) ? 0 : $data['itemPercent'];
-
-       /* @var $salesItem MedicineSalesItem */
-
        $salesItem = $this->getDoctrine()->getRepository(MedicineSalesItem::class)->find($id);
-       if($itemPercent > 0){
-           $salesItem->setItemPercent($itemPercent);
-           $salesPrice = $salesItem->getMedicineStock()->getSalesPrice();
-           $initialDiscount = (($salesPrice *  $itemPercent)/100);
-           $initialGrandTotal =($salesPrice  - $initialDiscount);
-           $salesItem->setSalesPrice( round( $initialGrandTotal, 2 ) );
-       }else{
-           $salesItem->setSalesPrice( round($price, 2 ) );
+       if($salesItem){
+           $quantity = $data['quantity'];
+           $price =isset( $data['salesPrice']) ?  $data['salesPrice']:  $salesItem->getMedicineStock()->getSalesPrice();
+           $itemPercent = empty($data['itemPercent']) ? 0 : $data['itemPercent'];
+           /* @var $salesItem MedicineSalesItem */
+           if($itemPercent > 0){
+               $salesItem->setItemPercent($itemPercent);
+               $salesPrice = $salesItem->getMedicineStock()->getSalesPrice();
+               $initialDiscount = (($salesPrice *  $itemPercent)/100);
+               $initialGrandTotal =($salesPrice  - $initialDiscount);
+               $salesItem->setSalesPrice( round( $initialGrandTotal, 2 ) );
+           }else{
+               $salesItem->setSalesPrice( round($price, 2 ) );
+           }
+           $salesItem->setQuantity($quantity);
+           $salesItem->setSubTotal($salesItem->getSalesPrice() * $quantity);
+           $em->flush();
+           $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(),'sales');
+           $invoice = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->updateMedicineSalesTotalPrice($salesItem->getMedicineSales());
+           $result = $this->returnResultData($invoice,$msg='');
+           return new Response(json_encode($result));
        }
-       $salesItem->setQuantity($quantity);
-       $salesItem->setSubTotal($salesItem->getSalesPrice() * $quantity);
-       $em->flush();
-       $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(),'sales');
-       $invoice = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->updateMedicineSalesTotalPrice($salesItem->getMedicineSales());
-       $result = $this->returnResultData($invoice,$msg='');
-       return new Response(json_encode($result));
+       return new Response('failed');
+
+
    }
 
 

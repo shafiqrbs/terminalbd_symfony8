@@ -729,12 +729,13 @@ class PurchaseController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $data = $request->request->all();
-        $expirationEndDate = ($data['purchaseItem']['expirationEndDate']);
+
         $entity = new MedicinePurchaseItem();
         $form = $this->createPurchaseManualItemForm($entity,$invoice);
         $form->handleRequest($request);
 
-        $stockItem = ($data['purchaseItem']['stockName']);
+        $expirationEndDate = (isset($data['purchaseItem']['expirationEndDate']) and ($data['purchaseItem']['expirationEndDate'])) ? ($data['purchaseItem']['expirationEndDate']):'';
+        $stockItem = (isset($data['purchaseItem']['stockName']) and ($data['purchaseItem']['stockName'])) ? ($data['purchaseItem']['stockName']):'';
         /* @var $stockMedicine MedicineStock */
 
         $stockMedicine = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->find($stockItem);
@@ -747,7 +748,7 @@ class PurchaseController extends Controller
         $minQuantity = !empty($data['minQuantity']) ? $data['minQuantity'] :1;
         $openStock = !empty($data['openingQuantity']) ? $data['openingQuantity'] :0;
         $bonusQuantity = !empty($data['purchaseItem']['bonusQuantity']) ? $data['purchaseItem']['bonusQuantity'] :0;
-        if(empty($exist)){
+        if(empty($exist) and $stockItem){
             $entity->setMedicinePurchase($invoice);
             $entity->setMedicineStock($stockMedicine);
             $entity->setPurchasePrice($purchasePrice);
