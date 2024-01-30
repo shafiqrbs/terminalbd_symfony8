@@ -435,8 +435,8 @@ class StockController extends Controller
         }
 	    if('openingQuantity' == $data['name']) {
 		    $setField = 'set' . $data['name'];
-		    $quantity = abs($data['value']);
-		    $entity->$setField($quantity);
+		    $quantity = ($data['value']);
+		    $entity->setOpeningQuantity($quantity);
 		    $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->remainingQnt($entity);
 		    $this->getDoctrine()->getRepository('BusinessBundle:BusinessStockHistory')->OpeningInsertQuantity($entity);
 	    }elseif('name' == $data['name']) {

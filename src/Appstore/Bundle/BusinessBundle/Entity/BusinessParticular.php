@@ -140,19 +140,21 @@ class BusinessParticular
     private $productionType;
 
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="quantity", type="smallint", length=3, nullable=true)
-     */
-    private $quantity = 1;
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="openingQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="quantity", type="float", nullable=true)
+     */
+    private $quantity = 0;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="openingQuantity", type="float", nullable=true)
      */
     private $openingQuantity;
+
 
      /**
      * @var integer
@@ -176,103 +178,104 @@ class BusinessParticular
      */
     private $minQuantity;
 
-	/**
-     * @var integer
+    /**
+     * @var float
      *
-     * @ORM\Column(name="transferQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="transferQuantity", type="float", nullable=true)
      */
     private $transferQuantity;
 
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="stockIn", type="integer", nullable=true)
+     * @ORM\Column(name="stockIn", type="float", nullable=true)
      */
     private $stockIn = 0;
 
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="purchaseQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="purchaseQuantity", type="float", nullable=true)
      */
     private $purchaseQuantity;
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="salesQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="salesQuantity", type="float", nullable=true)
      */
     private $salesQuantity;
 
+
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="remainingQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="remainingQuantity", type="float", nullable=true)
      */
     private $remainingQuantity = 0;
 
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="purchaseReturnQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="purchaseReturnQuantity", type="float", nullable=true)
      */
     private $purchaseReturnQuantity = 0;
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="salesReturnQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="salesReturnQuantity", type="float", nullable=true)
      */
     private $salesReturnQuantity = 0;
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="damageQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="damageQuantity", type="float", nullable=true)
      */
     private $damageQuantity = 0;
 
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="bonusQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="bonusQuantity", type="float", nullable=true)
      */
     private $bonusQuantity = 0;
 
 
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="bonusAdjustment", type="integer", nullable=true)
+     * @ORM\Column(name="bonusAdjustment", type="float", nullable=true)
      */
     private $bonusAdjustment = 0;
 
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="returnBonusQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="returnBonusQuantity", type="float", nullable=true)
      */
     private $returnBonusQuantity = 0;
 
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="bonusPurchaseQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="bonusPurchaseQuantity", type="float", nullable=true)
      */
     private $bonusPurchaseQuantity = 0;
 
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="bonusSalesQuantity", type="integer", nullable=true)
+     * @ORM\Column(name="bonusSalesQuantity", type="float", nullable=true)
      */
     private $bonusSalesQuantity = 0;
 
@@ -493,21 +496,6 @@ class BusinessParticular
         $this->minimumPrice = $minimumPrice;
     }
 
-    /**
-     * @return int
-     */
-    public function getQuantity()
-    {
-        return $this->quantity;
-    }
-
-    /**
-     * @param int $quantity
-     */
-    public function setQuantity($quantity)
-    {
-        $this->quantity = $quantity;
-    }
 
     /**
      * @return bool
@@ -644,39 +632,6 @@ class BusinessParticular
         $this->file = null;
     }
 
-    /**
-     * @return int
-     */
-    public function getPurchaseQuantity()
-    {
-        return $this->purchaseQuantity;
-    }
-
-    /**
-     * @param int $purchaseQuantity
-     */
-    public function setPurchaseQuantity($purchaseQuantity)
-    {
-        $this->purchaseQuantity = $purchaseQuantity;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSalesQuantity()
-    {
-        return $this->salesQuantity;
-    }
-
-    /**
-     * @param int $salesQuantity
-     */
-    public function setSalesQuantity($salesQuantity)
-    {
-        $this->salesQuantity = $salesQuantity;
-    }
-
-
 
 
     /**
@@ -711,37 +666,7 @@ class BusinessParticular
         $this->updated = $updated;
     }
 
-    /**
-     * @return int
-     */
-    public function getOpeningQuantity()
-    {
-        return $this->openingQuantity;
-    }
 
-    /**
-     * @param int $openingQuantity
-     */
-    public function setOpeningQuantity($openingQuantity)
-    {
-        $this->openingQuantity = $openingQuantity;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMinQuantity()
-    {
-        return $this->minQuantity;
-    }
-
-    /**
-     * @param int $minQuantity
-     */
-    public function setMinQuantity($minQuantity)
-    {
-        $this->minQuantity = $minQuantity;
-    }
 
     /**
      * @return string
@@ -856,77 +781,6 @@ class BusinessParticular
         return $this->businessPurchaseItems;
     }
 
-    /**
-     * @return int
-     */
-    public function getRemainingQuantity()
-    {
-        return $this->remainingQuantity;
-    }
-
-    /**
-     * @param int $remainingQuantity
-     */
-    public function setRemainingQuantity($remainingQuantity)
-    {
-        $this->remainingQuantity = $remainingQuantity;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPurchaseReturnQuantity()
-    {
-        return $this->purchaseReturnQuantity;
-    }
-
-    /**
-     * @param int $purchaseReturnQuantity
-     */
-    public function setPurchaseReturnQuantity($purchaseReturnQuantity)
-    {
-        $this->purchaseReturnQuantity = $purchaseReturnQuantity;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSalesReturnQuantity()
-    {
-        return $this->salesReturnQuantity;
-    }
-
-    /**
-     * @param int $salesReturnQuantity
-     */
-    public function setSalesReturnQuantity($salesReturnQuantity)
-    {
-        $this->salesReturnQuantity = $salesReturnQuantity;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDamageQuantity()
-    {
-        return $this->damageQuantity;
-    }
-
-    /**
-     * @param int $damageQuantity
-     */
-    public function setDamageQuantity($damageQuantity)
-    {
-        $this->damageQuantity = $damageQuantity;
-    }
-
-    /**
-     * @return BusinessPurchaseReturnItem
-     */
-    public function getBusinessPurchaseReturnItems()
-    {
-        return $this->businessPurchaseReturnItems;
-    }
 
     /**
      * @return BusinessDamage
@@ -1048,19 +902,6 @@ class BusinessParticular
 		$this->productionSalesPrice = $productionSalesPrice;
 	}
 
-	/**
-	 * @return int
-	 */
-	public function getTransferQuantity(){
-		return $this->transferQuantity;
-	}
-
-	/**
-	 * @param int $transferQuantity
-	 */
-	public function setTransferQuantity( int $transferQuantity ) {
-		$this->transferQuantity = $transferQuantity;
-	}
 
 	/**
 	 * @return BusinessProduction
@@ -1068,22 +909,6 @@ class BusinessParticular
 	public function getBusinessProductions() {
 		return $this->businessProductions;
 	}
-
-    /**
-     * @return int
-     */
-    public function getStockIn()
-    {
-        return $this->stockIn;
-    }
-
-    /**
-     * @param int $stockIn
-     */
-    public function setStockIn($stockIn)
-    {
-        $this->stockIn = $stockIn;
-    }
 
     /**
      * @return BusinessVendorStockItem
@@ -1128,86 +953,6 @@ class BusinessParticular
     }
 
     /**
-     * @return int
-     */
-    public function getBonusQuantity()
-    {
-        return $this->bonusQuantity;
-    }
-
-    /**
-     * @param int $bonusQuantity
-     */
-    public function setBonusQuantity($bonusQuantity)
-    {
-        $this->bonusQuantity = $bonusQuantity;
-    }
-
-    /**
-     * @return int
-     */
-    public function getBonusPurchaseQuantity()
-    {
-        return $this->bonusPurchaseQuantity;
-    }
-
-    /**
-     * @param int $bonusPurchaseQuantity
-     */
-    public function setBonusPurchaseQuantity($bonusPurchaseQuantity)
-    {
-        $this->bonusPurchaseQuantity = $bonusPurchaseQuantity;
-    }
-
-    /**
-     * @return int
-     */
-    public function getBonusSalesQuantity()
-    {
-        return $this->bonusSalesQuantity;
-    }
-
-    /**
-     * @param int $bonusSalesQuantity
-     */
-    public function setBonusSalesQuantity($bonusSalesQuantity)
-    {
-        $this->bonusSalesQuantity = $bonusSalesQuantity;
-    }
-
-    /**
-     * @return float
-     */
-    public function getTloPrice()
-    {
-        return $this->tloPrice;
-    }
-
-    /**
-     * @param float $tloPrice
-     */
-    public function setTloPrice($tloPrice)
-    {
-        $this->tloPrice = $tloPrice;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isOpeningApprove()
-    {
-        return $this->openingApprove;
-    }
-
-    /**
-     * @param bool $openingApprove
-     */
-    public function setOpeningApprove($openingApprove)
-    {
-        $this->openingApprove = $openingApprove;
-    }
-
-    /**
      * @return mixed
      */
     public function getBrand()
@@ -1224,19 +969,35 @@ class BusinessParticular
     }
 
     /**
-     * @return int
+     * @return float
      */
-    public function getReturnBonusQuantity()
+    public function getQuantity()
     {
-        return $this->returnBonusQuantity;
+        return $this->quantity;
     }
 
     /**
-     * @param int $returnBonusQuantity
+     * @param float $quantity
      */
-    public function setReturnBonusQuantity($returnBonusQuantity)
+    public function setQuantity($quantity)
     {
-        $this->returnBonusQuantity = $returnBonusQuantity;
+        $this->quantity = $quantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getOpeningQuantity()
+    {
+        return $this->openingQuantity;
+    }
+
+    /**
+     * @param float $openingQuantity
+     */
+    public function setOpeningQuantity($openingQuantity)
+    {
+        $this->openingQuantity = $openingQuantity;
     }
 
     /**
@@ -1256,7 +1017,183 @@ class BusinessParticular
     }
 
     /**
+     * @return bool
+     */
+    public function isOpeningApprove()
+    {
+        return $this->openingApprove;
+    }
+
+    /**
+     * @param bool $openingApprove
+     */
+    public function setOpeningApprove($openingApprove)
+    {
+        $this->openingApprove = $openingApprove;
+    }
+
+    /**
      * @return int
+     */
+    public function getMinQuantity()
+    {
+        return $this->minQuantity;
+    }
+
+    /**
+     * @param int $minQuantity
+     */
+    public function setMinQuantity($minQuantity)
+    {
+        $this->minQuantity = $minQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getTransferQuantity()
+    {
+        return $this->transferQuantity;
+    }
+
+    /**
+     * @param float $transferQuantity
+     */
+    public function setTransferQuantity($transferQuantity)
+    {
+        $this->transferQuantity = $transferQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getStockIn()
+    {
+        return $this->stockIn;
+    }
+
+    /**
+     * @param float $stockIn
+     */
+    public function setStockIn($stockIn)
+    {
+        $this->stockIn = $stockIn;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPurchaseQuantity()
+    {
+        return $this->purchaseQuantity;
+    }
+
+    /**
+     * @param float $purchaseQuantity
+     */
+    public function setPurchaseQuantity($purchaseQuantity)
+    {
+        $this->purchaseQuantity = $purchaseQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getSalesQuantity()
+    {
+        return $this->salesQuantity;
+    }
+
+    /**
+     * @param float $salesQuantity
+     */
+    public function setSalesQuantity($salesQuantity)
+    {
+        $this->salesQuantity = $salesQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRemainingQuantity()
+    {
+        return $this->remainingQuantity;
+    }
+
+    /**
+     * @param float $remainingQuantity
+     */
+    public function setRemainingQuantity($remainingQuantity)
+    {
+        $this->remainingQuantity = $remainingQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPurchaseReturnQuantity()
+    {
+        return $this->purchaseReturnQuantity;
+    }
+
+    /**
+     * @param float $purchaseReturnQuantity
+     */
+    public function setPurchaseReturnQuantity($purchaseReturnQuantity)
+    {
+        $this->purchaseReturnQuantity = $purchaseReturnQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getSalesReturnQuantity()
+    {
+        return $this->salesReturnQuantity;
+    }
+
+    /**
+     * @param float $salesReturnQuantity
+     */
+    public function setSalesReturnQuantity($salesReturnQuantity)
+    {
+        $this->salesReturnQuantity = $salesReturnQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getDamageQuantity()
+    {
+        return $this->damageQuantity;
+    }
+
+    /**
+     * @param float $damageQuantity
+     */
+    public function setDamageQuantity($damageQuantity)
+    {
+        $this->damageQuantity = $damageQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getBonusQuantity()
+    {
+        return $this->bonusQuantity;
+    }
+
+    /**
+     * @param float $bonusQuantity
+     */
+    public function setBonusQuantity($bonusQuantity)
+    {
+        $this->bonusQuantity = $bonusQuantity;
+    }
+
+    /**
+     * @return float
      */
     public function getBonusAdjustment()
     {
@@ -1264,11 +1201,59 @@ class BusinessParticular
     }
 
     /**
-     * @param int $bonusAdjustment
+     * @param float $bonusAdjustment
      */
     public function setBonusAdjustment($bonusAdjustment)
     {
         $this->bonusAdjustment = $bonusAdjustment;
+    }
+
+    /**
+     * @return float
+     */
+    public function getReturnBonusQuantity()
+    {
+        return $this->returnBonusQuantity;
+    }
+
+    /**
+     * @param float $returnBonusQuantity
+     */
+    public function setReturnBonusQuantity($returnBonusQuantity)
+    {
+        $this->returnBonusQuantity = $returnBonusQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getBonusPurchaseQuantity()
+    {
+        return $this->bonusPurchaseQuantity;
+    }
+
+    /**
+     * @param float $bonusPurchaseQuantity
+     */
+    public function setBonusPurchaseQuantity($bonusPurchaseQuantity)
+    {
+        $this->bonusPurchaseQuantity = $bonusPurchaseQuantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getBonusSalesQuantity()
+    {
+        return $this->bonusSalesQuantity;
+    }
+
+    /**
+     * @param float $bonusSalesQuantity
+     */
+    public function setBonusSalesQuantity($bonusSalesQuantity)
+    {
+        $this->bonusSalesQuantity = $bonusSalesQuantity;
     }
 
     /**
@@ -1287,7 +1272,37 @@ class BusinessParticular
         $this->avgPurchasePrice = $avgPurchasePrice;
     }
 
+    /**
+     * @return float
+     */
+    public function getTloPrice()
+    {
+        return $this->tloPrice;
+    }
 
+    /**
+     * @param float $tloPrice
+     */
+    public function setTloPrice($tloPrice)
+    {
+        $this->tloPrice = $tloPrice;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * @param mixed $path
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
 
 }
 
