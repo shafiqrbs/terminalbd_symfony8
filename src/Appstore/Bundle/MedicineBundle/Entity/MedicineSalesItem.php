@@ -106,9 +106,9 @@ class MedicineSalesItem
     private $salesPrice;
 
     /**
-     * @var string
+     * @var float
      *
-     * @ORM\Column(name="discountPrice", type="decimal", nullable=true)
+     * @ORM\Column(name="discountPrice", type="float", nullable=true)
      */
     private $discountPrice;
 
@@ -377,21 +377,6 @@ class MedicineSalesItem
         return $this->medicineSalesReturns;
     }
 
-    /**
-     * @return string
-     */
-    public function getDiscountPrice()
-    {
-        return $this->discountPrice;
-    }
-
-    /**
-     * @param string $discountPrice
-     */
-    public function setDiscountPrice($discountPrice)
-    {
-        $this->discountPrice = $discountPrice;
-    }
 
     /**
      * @return MedicineAndroidProcess
@@ -488,6 +473,23 @@ class MedicineSalesItem
     {
         $this->deviceSalesId = $deviceSalesId;
     }
+
+    /**
+     * @return float
+     */
+    public function getDiscountPrice()
+    {
+        return $this->discountPrice;
+    }
+
+    /**
+     * @param float $discountPrice
+     */
+    public function setDiscountPrice($discountPrice)
+    {
+        $this->discountPrice = $discountPrice;
+    }
+
 
 
 

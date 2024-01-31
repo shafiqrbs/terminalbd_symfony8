@@ -689,7 +689,7 @@ class PurchaseController extends Controller
                 $entity->setActualPurchasePrice($stockMedicine->getSalesPrice());
                 $entity->setPurchasePrice($stockMedicine->getSalesPrice());
                 $entity->setSalesPrice($stockMedicine->getSalesPrice());
-                if($entity->getSalesPrice() && $entity->getQuantity() > 0){
+                if($entity->getSalesPrice() >0 && $entity->getQuantity() > 0){
                     $entity->setPurchaseSubTotal(round($entity->getQuantity() * $entity->getSalesPrice()));
                 }
                 $entity->setRemainingQuantity($entity->getQuantity());

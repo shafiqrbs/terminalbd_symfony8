@@ -317,10 +317,10 @@ class SalesController extends Controller
 
        $em = $this->getDoctrine()->getManager();
        $data = $_REQUEST;
-       $id = $data['id'];
+       $id =isset($data['id']) ?  $data['id']: 0;
        $salesItem = $this->getDoctrine()->getRepository(MedicineSalesItem::class)->find($id);
        if($salesItem){
-           $quantity = $data['quantity'];
+           $quantity =isset($data['quantity']) ?  $data['quantity']: 1;
            $price =isset( $data['salesPrice']) ?  $data['salesPrice']:  $salesItem->getMedicineStock()->getSalesPrice();
            $itemPercent = empty($data['itemPercent']) ? 0 : $data['itemPercent'];
            /* @var $salesItem MedicineSalesItem */
@@ -377,20 +377,16 @@ class SalesController extends Controller
    public function salesItemDeleteAction(MedicineSales $invoice, MedicineSalesItem $particular){
 
        $em = $this->getDoctrine()->getManager();
-    //   $item = $particular->getMedicinePurchaseItem();
        $stock = $particular->getMedicineStock();
-     //  $this->get('session')->set('item', $item);
        $this->get('session')->set('stock', $stock);
-
+       $particular->setQuantity(0);
+       $em->flush();
+       $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($stock,'sales');
        if (!$particular) {
            throw $this->createNotFoundException('Unable to find SalesItem entity.');
        }
        $em->remove($particular);
        $em->flush();
-    //   $item = $this->get('session')->get('item');
-       $stock = $this->get('session')->get('stock');
-    //   $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchaseItem')->updateRemovePurchaseItemQuantity($item,'sales');
-       $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($stock,'sales');
        $invoice = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->updateMedicineSalesTotalPrice($invoice);
        $msg = 'Medicine added successfully';
        $result = $this->returnResultData($invoice,$msg);
@@ -1055,7 +1051,8 @@ public function groupReverseAction()
     {
         $data = $request->request->all();
         $em = $this->getDoctrine()->getManager();
-        $entity = $em->getRepository('MedicineBundle:MedicineSales')->find($data['pk']);
+        $pk = isset($data['pk']) ? $data['pk']:0;
+        $entity = $em->getRepository('MedicineBundle:MedicineSales')->find($pk);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
         }

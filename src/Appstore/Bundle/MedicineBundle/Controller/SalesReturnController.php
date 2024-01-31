@@ -203,30 +203,32 @@ class SalesReturnController extends Controller
         $em = $this->getDoctrine()->getManager();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $data = $request->request->all();
-        foreach ($data['quantity'] as $key => $qnt) {
-        	if($qnt > 0 ){
-        	    $adjustment = isset($data['isAdjustment'][$data['salesItem'][$key]]) ? 1 : 0;
+        if (isset($data['quantity']) and $data['quantity']) {
+            foreach ($data['quantity'] as $key => $qnt) {
+            if ($qnt > 0) {
+                $adjustment = isset($data['isAdjustment'][$data['salesItem'][$key]]) ? 1 : 0;
                 $entity = new MedicineSalesReturn();
-		        $salesItem = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSalesItem')->find($data['salesItem'][$key]);
-		        $entity->setMedicineConfig($config);
-		        $entity->setQuantity($qnt);
-		        $entity->setAdjustment($adjustment);
-		        $entity->setMedicineStock($salesItem->getMedicineStock());
-		        if($salesItem->getMedicinePurchaseItem()){
-			        $entity->setMedicinePurchaseItem($salesItem->getMedicinePurchaseItem());
-		        }
-		        $entity->setMedicineSalesItem($salesItem);
-		        $price = empty($data['price'][$key]) ? $salesItem->getSalesPrice() : $data['price'][$key];
-		        $entity->setSalesPrice($price);
-		        $entity->setSubTotal($entity->getSalesPrice() * $entity->getQuantity());
-		        $em->persist($entity);
-		        $em->flush();
-		        if(!empty($salesItem->getMedicinePurchaseItem())) {
-			        $this->getDoctrine()->getRepository( 'MedicineBundle:MedicinePurchaseItem' )->updateRemovePurchaseItemQuantity( $salesItem->getMedicinePurchaseItem(), 'sales-return' );
-		        }
-		        $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales-return');
+                $salesItem = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSalesItem')->find($data['salesItem'][$key]);
+                $entity->setMedicineConfig($config);
+                $entity->setQuantity($qnt);
+                $entity->setAdjustment($adjustment);
+                $entity->setMedicineStock($salesItem->getMedicineStock());
+                if ($salesItem->getMedicinePurchaseItem()) {
+                    $entity->setMedicinePurchaseItem($salesItem->getMedicinePurchaseItem());
+                }
+                $entity->setMedicineSalesItem($salesItem);
+                $price = empty($data['price'][$key]) ? $salesItem->getSalesPrice() : $data['price'][$key];
+                $entity->setSalesPrice($price);
+                $entity->setSubTotal($entity->getSalesPrice() * $entity->getQuantity());
+                $em->persist($entity);
+                $em->flush();
+                if (!empty($salesItem->getMedicinePurchaseItem())) {
+                    $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchaseItem')->updateRemovePurchaseItemQuantity($salesItem->getMedicinePurchaseItem(), 'sales-return');
+                }
+                $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales-return');
 
-	        }
+            }
+        }
         }
         $this->get('session')->getFlashBag()->add(
             'success',"Data has been inserted successfully"
