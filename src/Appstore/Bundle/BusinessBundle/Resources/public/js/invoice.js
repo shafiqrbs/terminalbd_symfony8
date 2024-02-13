@@ -201,7 +201,7 @@ $(document).on('change', '.quantity , .salesPrice', function() {
     var quantity = parseFloat($('#quantity-'+id).val());
     var price = parseFloat($('#salesPrice-'+id).val());
     var subQuantity = parseFloat($('#subQuantity-'+id).val());
-    var subTotal  = (quantity * subQuantity * price);
+    var subTotal  = ((quantity * subQuantity) * price);
     $("#subTotal-"+id).html(subTotal);
     $.ajax({
         url: Routing.generate('business_invoice_item_update'),

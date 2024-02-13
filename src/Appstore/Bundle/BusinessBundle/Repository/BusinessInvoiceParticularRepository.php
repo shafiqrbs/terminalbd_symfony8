@@ -597,15 +597,15 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         if(!empty($invoiceParticular)) {
 
             /* @var $entity BusinessInvoiceParticular */
-
+            $quantity = (isset($data['quantity']) and $data['quantity'])? $data['quantity']:0;
 	        $entity = $invoiceParticular;
-	        $entity->setQuantity( $data['quantity'] );
+	        $entity->setQuantity($quantity);
 	        $entity->setPrice( $data['salesPrice'] );
 	        if ($entity->getSubQuantity() > 0 and $entity->getBusinessInvoice()->getBusinessConfig()->getBusinessModel() == "sign") {
-		        $entity->setTotalQuantity($data['quantity'] * $entity->getSubQuantity() );
+		        $entity->setTotalQuantity($quantity * $entity->getSubQuantity() );
 		        $entity->setSubTotal( $entity->getPrice() * $entity->getTotalQuantity() );
 	        }else{
-		        $entity->setTotalQuantity($data['quantity']);
+		        $entity->setTotalQuantity($quantity);
 		        $entity->setSubTotal( $entity->getPrice() * $entity->getTotalQuantity() );
 	        }
         }

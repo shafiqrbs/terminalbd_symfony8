@@ -115,11 +115,11 @@
                                             <td  class="">{{ loop.index }}.</td>
                                             <td class="">{{ item.particular }}<br/>{{ item.description }}</td>
                                             <td class="">{% if item.wearhouse %}{{ item.wearhouse.name }}{% endif %}</td>
-                                            <td class="">{{ item.quantity }}</td>
+                                            <td class="">{{ item.quantity|number_format(2) }}</td>
                                             <td class="">{{ item.bonusQnt }}</td>
                                             <td class="">{{ item.unit }}</td>
                                             <td class="">{{ item.price }}</td>
-                                            <td class="" id="subTotal-{{ item.id }}">{{ item.subTotal|number_format }}</td>
+                                            <td class="" id="subTotal-{{ item.id }}">{{ item.subTotal|number_format(2) }}</td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>

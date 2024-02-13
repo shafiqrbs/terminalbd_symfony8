@@ -91,37 +91,37 @@ class BusinessInvoiceParticular
     private $description;
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="quantity", type="smallint",  nullable=true)
+     * @ORM\Column(name="quantity", type="float",  nullable=true)
      */
     private $quantity = 0;
 
     /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="returnQnt", type="smallint", nullable=true)
+     * @ORM\Column(name="returnQnt", type="float", nullable=true)
      */
     private $returnQnt = 0;
 
      /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="damageQnt", type="smallint", nullable=true)
+     * @ORM\Column(name="damageQnt", type="float", nullable=true)
      */
     private $damageQnt = 0;
 
      /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="spoilQnt", type="smallint", nullable=true)
+     * @ORM\Column(name="spoilQnt", type="float", nullable=true)
      */
     private $spoilQnt= 0;
 
      /**
-     * @var integer
+     * @var float
      *
-     * @ORM\Column(name="bonusQnt", type="smallint", nullable=true)
+     * @ORM\Column(name="bonusQnt", type="float", nullable=true)
      */
     private $bonusQnt = 0;
 
@@ -300,21 +300,7 @@ class BusinessInvoiceParticular
         $this->particular = $particular;
     }
 
-    /**
-     * @return int
-     */
-    public function getQuantity()
-    {
-        return $this->quantity;
-    }
 
-    /**
-     * @param int $quantity
-     */
-    public function setQuantity($quantity)
-    {
-        $this->quantity = $quantity;
-    }
 
     /**
      * @return float
@@ -501,70 +487,6 @@ class BusinessInvoiceParticular
     }
 
     /**
-     * @return int
-     */
-    public function getReturnQnt()
-    {
-        return $this->returnQnt;
-    }
-
-    /**
-     * @param int $returnQnt
-     */
-    public function setReturnQnt($returnQnt)
-    {
-        $this->returnQnt = $returnQnt;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDamageQnt()
-    {
-        return $this->damageQnt;
-    }
-
-    /**
-     * @param int $damageQnt
-     */
-    public function setDamageQnt($damageQnt)
-    {
-        $this->damageQnt = $damageQnt;
-    }
-
-    /**
-     * @return int
-     */
-    public function getBonusQnt()
-    {
-        return $this->bonusQnt;
-    }
-
-    /**
-     * @param int $bonusQnt
-     */
-    public function setBonusQnt($bonusQnt)
-    {
-        $this->bonusQnt = $bonusQnt;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSpoilQnt()
-    {
-        return $this->spoilQnt;
-    }
-
-    /**
-     * @param int $spoilQnt
-     */
-    public function setSpoilQnt($spoilQnt)
-    {
-        $this->spoilQnt = $spoilQnt;
-    }
-
-    /**
      * @return float
      */
     public function getTloPrice()
@@ -707,6 +629,89 @@ class BusinessInvoiceParticular
     {
         $this->batchItem = $batchItem;
     }
+
+    /**
+     * @return float
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * @param float $quantity
+     */
+    public function setQuantity($quantity)
+    {
+        $this->quantity = $quantity;
+    }
+
+    /**
+     * @return float
+     */
+    public function getReturnQnt()
+    {
+        return $this->returnQnt;
+    }
+
+    /**
+     * @param float $returnQnt
+     */
+    public function setReturnQnt($returnQnt)
+    {
+        $this->returnQnt = $returnQnt;
+    }
+
+    /**
+     * @return float
+     */
+    public function getDamageQnt()
+    {
+        return $this->damageQnt;
+    }
+
+    /**
+     * @param float $damageQnt
+     */
+    public function setDamageQnt($damageQnt)
+    {
+        $this->damageQnt = $damageQnt;
+    }
+
+    /**
+     * @return float
+     */
+    public function getSpoilQnt()
+    {
+        return $this->spoilQnt;
+    }
+
+    /**
+     * @param float $spoilQnt
+     */
+    public function setSpoilQnt($spoilQnt)
+    {
+        $this->spoilQnt = $spoilQnt;
+    }
+
+    /**
+     * @return float
+     */
+    public function getBonusQnt()
+    {
+        return $this->bonusQnt;
+    }
+
+    /**
+     * @param float $bonusQnt
+     */
+    public function setBonusQnt($bonusQnt)
+    {
+        $this->bonusQnt = $bonusQnt;
+    }
+
+
+
 
 }
 
