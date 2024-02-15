@@ -30,17 +30,10 @@
 
                     <div class="portlet-title">
                         <div class="caption"><i class="icon-reorder"></i>Manage Diagnostic Report Prepared</div>
-                        {% if searchForm.particular is defined and searchForm.particular is not empty %}
-                            <div class="actions">
-                                <div class="btn-group">
-                                    <a class="btn red addPatient" href="javascript:"><i class="icon-plus-sign"></i> Generate Reports</a>
-                                </div>
-                            </div>
-                        {% endif %}
+
                     </div>
 
                     <div class="portlet-body">
-
                         <div class="portlet-body flip-scroll">
                             {% include('flash-message.html.twig')  %}
                             <div class="row-fluid" >
@@ -124,14 +117,9 @@
 
                             </div>
                             <table class="table table-bordered table-striped table-condensed flip-content ">
-
                                 <thead class="flip-content ">
                                 <tr class="head-blue">
-                                    <th class="" >
-                                    {% if searchForm.particular is defined and searchForm.particular is not empty %}
-                                       <input type="checkbox" id="checkAll" data-checkwhat="chkSelect">
-                                    {% endif %}
-                                    </th>
+
                                     <th class="numeric" >Created</th>
                                     <th class="numeric" >Mode</th>
                                     <th class="numeric" >Invoice No</th>
@@ -147,11 +135,7 @@
                                 {% set processes = ['Collected','In-progress'] %}
                                 {% for entity in entities %}
                                     <tr>
-                                        <td class="" >
-                                            {% if searchForm.particular is defined and searchForm.particular is not empty and entity.particularDeliveredBy is empty and entity.process != 'Done' %}
-                                            <input type="checkbox" class="chkSelect" id="checkItem-{{ entity.id }}" >
-                                            {% endif %}
-                                        </td>
+
 
                                         <td class="numeric" >{{ entity.hmsInvoice.created|date('d-m-Y h:i a') }}</td>
                                         <td class="numeric" >{{ entity.hmsinvoice.invoiceMode|capitalize }}</td>
@@ -228,6 +212,21 @@
     $('input:checkbox').not(this).prop('checked', this.checked);
     checkwhat  = $(this).data("checkwhat");
     $('input:checkbox.'+checkwhat).not(this).prop('checked', this.checked);
+    });
+
+    var itemArr = $.cookie('barcodes') ? $.cookie('barcodes').split(',') : [];
+    $('body').on('change', 'input.stockId', function(el) {
+    console.log(itemArr);
+    var val = $(this).val();
+    if($(this).prop('checked')) {
+    itemArr.push(val);
+    }else{
+    var index = itemArr.indexOf(val);
+    if (index > -1) {
+    itemArr.splice(index, 1);
+    }
+    }
+    $.cookie('barcodes', itemArr, {path: '/'});
     });
 
 {% endblock %}

@@ -2,12 +2,40 @@ hms_invoice_particular:
     path:     /
     defaults: { _controller: "HospitalBundle:InvoiceParticular:index" }
 
+hms_invoice_patient_test:
+    path:     /patient-test
+    defaults: { _controller: "HospitalBundle:InvoiceParticular:patientTest" }
+
+hms_invoice_patient_group_test:
+    path:     /patient-group-test
+    defaults: { _controller: "HospitalBundle:InvoiceParticular:patientGroupTest" }
+
+hms_invoice_group_pathology:
+    path:     /group-pathology-test
+    defaults: { _controller: "HospitalBundle:InvoiceParticular:groupPathologyTest" }
+
+
 hms_invoice_report_process:
     path:     /collection-process
     defaults: { _controller: "HospitalBundle:InvoiceParticular:reportProcess" }
 
+hms_pathological_group_report:
+    path:      /{invoice}/group-report
+    defaults: { _controller: "HospitalBundle:InvoiceParticular:groupPathologicalReport" }
+
+hms_pathological_group_report_update:
+    path:     /{invoice}/group-update
+    defaults: { _controller: "HospitalBundle:InvoiceParticular:groupUpdate" }
+    methods:  [POST, PUT]
+
+hms_invoice_group_pathological_report_update:
+    path:     /{id}/group-pathological-report-update
+    defaults: { _controller: "HospitalBundle:InvoiceParticular:groupPathologicalReportUpdate" }
+    options:
+        expose: true
+
 hms_invoice_particular_show:
-    path:     /{id}/show
+    path:     /{id}/patient-details
     defaults: { _controller: "HospitalBundle:InvoiceParticular:show" }
 
 hms_invoice_particular_preparation:

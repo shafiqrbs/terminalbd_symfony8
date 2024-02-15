@@ -4,8 +4,10 @@ namespace Appstore\Bundle\HospitalBundle\Controller;
 
 use Appstore\Bundle\HospitalBundle\Entity\Invoice;
 use Appstore\Bundle\HospitalBundle\Entity\InvoiceParticular;
+use Appstore\Bundle\HospitalBundle\Entity\InvoicePathologicalGroup;
 use Appstore\Bundle\HospitalBundle\Entity\InvoicePathologicalReport;
 use Appstore\Bundle\HospitalBundle\Entity\Particular;
+use Appstore\Bundle\HospitalBundle\Form\InvoiceGroupParticularType;
 use Appstore\Bundle\HospitalBundle\Form\InvoiceParticularType;
 use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,6 +38,9 @@ class InvoiceParticularController extends Controller
         return $pagination;
     }
 
+
+
+
     /**
      * @Secure(roles="ROLE_DOMAIN_HOSPITAL_COMMISSION,ROLE_DOMAIN_HOSPITAL_OPERATOR,ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN");
      */
@@ -65,7 +70,7 @@ class InvoiceParticularController extends Controller
     /**
      * @Secure(roles="ROLE_DOMAIN_HOSPITAL_LAB,ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_DOCTOR");
      */
-    public function reportProcessAction()
+    public function reportProcessAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
         $data = $_REQUEST;
@@ -76,24 +81,230 @@ class InvoiceParticularController extends Controller
         $assignDoctors = $this->getDoctrine()->getRepository('HospitalBundle:Particular')->getFindWithParticular($hospital,array(5));
         $referredDoctors = $this->getDoctrine()->getRepository('HospitalBundle:Particular')->getFindWithParticular($hospital,array(6));
         $particularService = $this->getDoctrine()->getRepository('HospitalBundle:InvoiceParticular')->processPathologicalReports($hospital->getId());
-
+        $selected = explode(',', $request->cookies->get('barcodes', ''));
         return $this->render('HospitalBundle:InvoiceParticular:diagnostic.html.twig', array(
             'entities' => $pagination,
             'particularService' => $particularService,
             'assignDoctors' => $assignDoctors,
+            'selected' => $selected,
             'referredDoctors' => $referredDoctors,
             'searchForm' => $data,
         ));
     }
 
+    /**
+     * @Secure(roles="ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_OPERATOR,ROLE_DOMAIN_HOSPITAL_ADMISSION,ROLE_DOMAIN_HOSPITAL_VISIT");
+     */
 
-    public function showAction(Invoice $entity)
+    public function patientTestAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $user = $this->getUser();
+        $hospital = $user->getGlobalOption()->getHospitalConfig();
+        $entities = $em->getRepository('HospitalBundle:Invoice')->invoiceLists( $user , $mode = 'diagnostic' , $data);
+        $pagination = $this->paginate($entities);
+        $employees = $this->getDoctrine()->getRepository('HospitalBundle:Invoice')->getFindEmployees($hospital->getId());
+        $processes = $this->getDoctrine()->getRepository('HospitalBundle:Invoice')->getAdmissionProcess($hospital,'diagnostic',$data);
+        $assignDoctors = $this->getDoctrine()->getRepository('HospitalBundle:Invoice')->getAssignProcess($hospital,'assign-doctor');
+        $referredDoctors = $this->getDoctrine()->getRepository('HospitalBundle:Invoice')->getAssignProcess($hospital,'referred-doctor');
+        return $this->render('HospitalBundle:InvoiceParticular:patientTest.html.twig', array(
+            'entities'                          => $pagination,
+            'assignDoctors'                     => $assignDoctors,
+            'referredDoctors'                   => $referredDoctors,
+            'processes'                         => $processes,
+            'employees'                         => $employees,
+            'searchForm'                        => $data,
+        ));
+
+    }
+
+    /**
+     * @Secure(roles="ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_OPERATOR,ROLE_DOMAIN_HOSPITAL_ADMISSION,ROLE_DOMAIN_HOSPITAL_VISIT");
+     */
+
+    public function patientGroupTestAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $user = $this->getUser();
+        $hospital = $user->getGlobalOption()->getHospitalConfig();
+        $entities = $em->getRepository('HospitalBundle:InvoicePathologicalGroup')->invoicePathologicalGroupLists( $user,$data);
+        $pagination = $this->paginate($entities);
+        $employees = $this->getDoctrine()->getRepository('HospitalBundle:Invoice')->getFindEmployees($hospital->getId());
+        $processes = $this->getDoctrine()->getRepository('HospitalBundle:Invoice')->getAdmissionProcess($hospital,'diagnostic',$data);
+        return $this->render('HospitalBundle:InvoiceParticular:patientGroupTest.html.twig', array(
+            'entities'                          => $pagination,
+            'processes'                         => $processes,
+            'employees'                         => $employees,
+            'searchForm'                        => $data,
+        ));
+
+    }
+
+
+    /**
+     * @Secure(roles="ROLE_DOMAIN_HOSPITAL_LAB,ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_DOCTOR");
+     */
+
+    public function groupPathologicalReportAction(Request $request, Invoice $invoice)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $entity = new InvoicePathologicalGroup();
+        $selected = explode(',', $request->cookies->get('barcodes', ''));
+
+        $form = $this->createGroupReportForm($entity,$invoice->getId());
+        $reportArr = array();
+
+        /** @var InvoicePathologicalReport $row */
+        $pathologies = [];
+
+        if(is_array($selected) and count($selected) > 0 and $selected[0] != "" ){
+
+            foreach ($selected as $particular):
+                $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
+                if($pathology->getParticular()->getService()->getSlug() == 'diagnostic'){
+                    $this->getDoctrine()->getRepository('HospitalBundle:InvoicePathologicalReport')->insertGroup($pathology);
+                    $pathologies[] = $pathology;
+                    if (!empty($pathology->getInvoicePathologicalReports())){
+                        foreach ($pathology->getInvoicePathologicalReports() as $row):
+                            if(!empty($row->getPathologicalReport())){
+                                $reportArr[$row->getPathologicalReport()->getId()] = $row;
+                            }
+                        endforeach;
+                    }
+                }
+            endforeach;
+            if(empty($reportArr)) {
+                unset($_COOKIE['barcodes']);
+                setcookie('barcodes', '', time() - 3600, '/');
+                return $this->redirect($this->generateUrl('hms_invoice_particular_show', array('id' => $invoice->getId())));
+            }
+            return $this->render('HospitalBundle:InvoiceParticular:group-report.html.twig', array(
+                'invoice' => $invoice,
+                'entity' => $entity,
+                'pathologies' => $pathologies,
+                'report' => $reportArr,
+                'form' => $form->createView(),
+            ));
+        }
+        return $this->redirect($this->generateUrl('hms_invoice_particular_show', array('id' => $invoice->getId())));
+
+    }
+
+
+
+    public function groupPathologicalReportUpdateAction(InvoicePathologicalReport $entity)
+    {
+        $result = $_REQUEST['result'];
+        $em = $this->getDoctrine()->getManager();
+        $entity->setResult($result);
+        $em->flush();
+        return new Response('success');
+    }
+
+
+
+    /**
+     * @Secure(roles="ROLE_DOMAIN_HOSPITAL_LAB,ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_DOCTOR");
+     */
+    public function groupUpdateAction(Request $request, Invoice $invoice)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $entity = new InvoicePathologicalGroup();
+        $selected = explode(',', $request->cookies->get('barcodes', ''));
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Particular entity.');
+        }
+        $form = $this->createGroupReportForm($entity,$invoice->getId());
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $entity->setHmsInvoice($invoice);
+            $entity->setCreatedBy($this->getUser());
+            $em->persist($entity);
+            $em->flush();
+            $this->get('session')->getFlashBag()->add(
+                'success', "Report has been created successfully"
+            );
+            /* @var $pathology InvoiceParticular */
+
+            foreach ($selected as $particular){
+                $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
+                if(empty($pathology->getInvoicePathologicalGroup())){
+                    $pathology->setInvoicePathologicalGroup($entity);
+                }
+            }
+            $em->flush();
+            unset($_COOKIE['barcodes']);
+            setcookie('barcodes', '', time() - 3600, '/');
+            return $this->redirect($this->generateUrl('hms_invoice_particular_show', array('id' => $invoice->getId())));
+        }
+        $reportArr = array();
+
+        /** @var InvoicePathologicalReport $row */
+
+        $pathologies = [];
+        foreach ($selected as $particular):
+            $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
+            if($pathology->getParticular()->getService()->getSlug() == 'diagnostic' and $pathology->getParticular()->getPathologicalReports()){
+                $this->getDoctrine()->getRepository('HospitalBundle:InvoicePathologicalReport')->insertGroup($pathology);
+                $pathologies[] = $pathology;
+                if (!empty($pathology->getInvoicePathologicalReports())){
+                    foreach ($pathology->getInvoicePathologicalReports() as $row):
+                        if(!empty($row->getPathologicalReport())){
+                            $reportArr[$row->getPathologicalReport()->getId()] = $row;
+                        }
+                    endforeach;
+                }
+            }
+        endforeach;
+        return $this->render('HospitalBundle:InvoiceParticular:group-report.html.twig', array(
+            'invoice' => $invoice,
+            'entity' => $entity,
+            'pathologies' => $pathologies,
+            'report' => $reportArr,
+            'form' => $form->createView(),
+        ));
+    }
+
+
+    /**
+     * Creates a form to edit a Invoice entity.wq
+     *
+     * @param InvoicePathologicalGroup $entity The entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createGroupReportForm(InvoicePathologicalGroup $entity,$invoice)
+    {
+        $hospitalConfig = $this->getUser()->getGlobalOption()->getHospitalConfig();
+        $em = $this->getDoctrine()->getRepository('HospitalBundle:HmsCategory');
+        $form = $this->createForm(new InvoiceGroupParticularType($hospitalConfig,$em), $entity, array(
+            'action' => $this->generateUrl('hms_pathological_group_report_update',['invoice' => $invoice]),
+            'method' => 'PUT',
+            'attr' => array(
+                'class' => 'form-horizontal',
+                'id' => 'invoiceParticular',
+                'novalidate' => 'novalidate',
+            )
+        ));
+        return $form;
+    }
+
+
+
+
+    public function showAction(Request $request,Invoice $entity)
     {
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
+        $selected = explode(',', $request->cookies->get('barcodes', ''));
+
         return $this->render('HospitalBundle:InvoiceParticular:show.html.twig', array(
             'entity' => $entity,
+            'selected' => $selected,
         ));
     }
 

@@ -979,8 +979,9 @@ class Builder extends ContainerAware
 
         if ((in_array('diagnostic', $process) && $securityContext->isGranted('ROLE_DOMAIN_HOSPITAL_LAB')) || (in_array('diagnostic', $process) && $securityContext->isGranted('ROLE_DOMAIN_HOSPITAL_DOCTOR'))) {
 
-                $menu['Hospital & Diagnostic']->addChild('Pathological & Process', array('route' => 'hms_invoice_report_process'))
-                ;
+                $menu['Hospital & Diagnostic']->addChild('Pathological & Process', array('route' => 'hms_invoice_report_process'));
+                $menu['Hospital & Diagnostic']->addChild('Patient Test', array('route' => 'hms_invoice_patient_test'));
+                $menu['Hospital & Diagnostic']->addChild('Patient Group Test', array('route' => 'hms_invoice_patient_group_test'));
         }
         if ($securityContext->isGranted('ROLE_DOMAIN_HOSPITAL_ISSUE') &&  $config->isInventory() == 1) {
             $menu['Hospital & Diagnostic']->addChild('Sales & Issue', array('route' => 'hms_sales'));

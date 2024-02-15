@@ -39,6 +39,7 @@
                         <div class="actions">
                             <div class="btn-group">
                                 <a class="btn red" href="{{ path('hms_invoice_particular') }}"><i class="icon-th-list"></i>&nbsp;Diagnostic Test</a>
+                                <a class="btn purple addPatient" href="{{ path('hms_pathological_group_report',{'invoice':entity.id}) }}"><i class="icon-plus-sign"></i> Group Reports</a>
                             </div>
                         </div>
 
@@ -48,7 +49,6 @@
 
                         <div class="portlet-body form">
                             <div class="row-fluid">
-
                                 <div class="span4">
                                     <h4>About:</h4>
                                     <ul class="unstyled">
@@ -86,6 +86,7 @@
                                         <thead class="flip-content ">
                                         <tr class="head-green">
                                             <td>&nbsp;&nbsp;<i class="icon-list"></i></td>
+                                            <th class="numeric">&nbsp;</th>
                                             <th class="numeric">Report No</th>
                                             <th class="numeric">Code</th>
                                             <th class="numeric">Particular</th>
@@ -100,6 +101,11 @@
                                             {% if item.particular.service.slug == 'diagnostic' %}
                                             <tr id="remove-{{ item.id }}">
                                                 <td><span class="badge badge-warning toggle badge-custom" id="{{ item.id  }}" ><span>[+]</span></span></td>
+                                                <td class="" >
+                                                    {% if item.invoicePathologicalGroup is empty %}
+                                                        <input type="checkbox" class="chkSelect stockId" id="checkItem-{{ item.id }}" >
+                                                    {% endif %}
+                                                </td>
                                                 <td  class="numeric">{{ entity.invoice  }}-{{ item.particular.particularCode  }}</td>
                                                 <td  class="numeric">{{ item.particular.particularCode }}</td>
                                                 <td class="numeric">{{ item.particular.name }}</td>
@@ -108,6 +114,7 @@
                                                 <th class="numeric">{% if item.particular.service.id == 1 %}<span class="tooltips" data-trigger ='hover' data-original-title='Collected by: {% if item.sampleCollectedBy is not empty %}{{ item.sampleCollectedBy }}{% endif %} , Prepared by: {% if item.particularPreparedBy is not empty %}{{ item.particularPreparedBy }}{% endif %}, Assign Doctor: {% if item.assignDoctor is not empty %}{{ item.assignDoctor.name }}{% endif %}'>{{ item.process }}</span>{% endif %}</th>
                                                 <td class="numeric">
                                                     <div class="btn-group">
+                                            {% if item.invoicePathologicalGroup is empty %}
                                                     {% if item.particular.service.slug == 'diagnostic' and item.sampleCollectedBy is empty %}
                                                         <a class="btn mini blue confirm"  data-url="{{ path('hms_invoice_particular_collection_confirm',{'id':item.id}) }}" href="javascript:"><i class="icon-ok"></i>&nbsp;Confirm</a>
                                                         <a class="btn mini green"  href="{{ path('hms_invoice_particular_collection_barcode',{'id':item.id}) }}" ><i class="icon-barcode"></i> Tag Print</a>
@@ -121,6 +128,7 @@
                                                             <a class="btn red pull-right mini" target="_blank" href="/{{ item.webPath }}"><i class="icon-download"></i> Download Report</a>
                                                         {% endif %}
                                                     {% endif %}
+                                                {% endif %}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -187,6 +195,20 @@
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}
+    var itemArr = $.cookie('barcodes') ? $.cookie('barcodes').split(',') : [];
+    $('body').on('change', 'input.stockId', function(el) {
+    console.log(itemArr);
+    var val = $(this).val();
+    if($(this).prop('checked')) {
+    itemArr.push(val);
+    }else{
+    var index = itemArr.indexOf(val);
+    if (index > -1) {
+    itemArr.splice(index, 1);
+    }
+    }
+    $.cookie('barcodes', itemArr, {path: '/'});
+    });
 {% endblock %}
 
 

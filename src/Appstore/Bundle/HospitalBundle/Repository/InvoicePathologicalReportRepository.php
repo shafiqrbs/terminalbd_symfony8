@@ -15,11 +15,30 @@ use Doctrine\ORM\EntityRepository;
 class InvoicePathologicalReportRepository extends EntityRepository
 {
 
+    public function insertGroup(InvoiceParticular $invoiceParticular)
+    {
+        $em = $this->_em;
+        $i = 0;
+        if(empty($invoiceParticular->getInvoicePathologicalReports())) {
+            if(empty($invoiceParticular->setInvoicePathologicalGroup()) and $invoiceParticular->getParticular()->getService()->getSlug() == 'diagnostic' and $invoiceParticular->getParticular()->getPathologicalReports()){
+                foreach ($invoiceParticular->getParticular()->getPathologicalReports() as $row):
+                    $entity = new InvoicePathologicalReport();
+                    $entity->setPathologicalReport($row);
+                    $entity->setInvoiceParticular($invoiceParticular);
+                    $em->persist($entity);
+                endforeach;
+            }
+            $em->flush();
+        }
+
+    }
+
     public function insert(InvoiceParticular $invoiceParticular , $data)
     {
         $this->insertPathologicalReportValue($invoiceParticular , $data);
         $this->insertMetaValue($invoiceParticular , $data);
     }
+
 
     public function insertMetaValue($invoiceParticular , $data){
 

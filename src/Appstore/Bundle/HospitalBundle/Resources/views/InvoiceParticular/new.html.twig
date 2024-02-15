@@ -106,7 +106,6 @@
                     </thead>
                     <tbody>
                     {% for item in entity.particular.pathologicalReports %}
-
                         {% if item.children is not empty %}
                         <tr id="remove-{{ item.id }}">
                             <td  class="numeric" colspan="5"><strong>{{ item.name }}</strong></td>
@@ -274,7 +273,7 @@
                     </div>
                 </div>
             </div>
-             <div class="row-fluid">
+            <div class="row-fluid">
                 <!--/span-->
                 <div class="span12">
                     <div class="control-group">

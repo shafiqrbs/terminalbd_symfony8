@@ -32,6 +32,12 @@ class InvoiceParticular
      **/
     private $hmsInvoice;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\InvoicePathologicalGroup", inversedBy="invoiceParticulars")
+     * @ORM\JoinColumn(nullable=true,onDelete="SET NULL")
+     **/
+    private $invoicePathologicalGroup;
+
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\AdmissionPatientParticular",inversedBy="invoiceParticular")
      * @ORM\JoinColumn(onDelete="CASCADE")
@@ -168,6 +174,7 @@ class InvoiceParticular
      * @ORM\Column(name="collectionDate", type="datetime", nullable=true)
      */
     private $collectionDate;
+
 
      /**
      * @var \DateTime
@@ -653,5 +660,23 @@ class InvoiceParticular
     {
         $this->discountPrice = $discountPrice;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getInvoicePathologicalGroup()
+    {
+        return $this->invoicePathologicalGroup;
+    }
+
+    /**
+     * @param mixed $invoicePathologicalGroup
+     */
+    public function setInvoicePathologicalGroup($invoicePathologicalGroup)
+    {
+        $this->invoicePathologicalGroup = $invoicePathologicalGroup;
+    }
+
+
 }
 
