@@ -163,16 +163,19 @@ class InvoiceParticularController extends Controller
         if(is_array($selected) and count($selected) > 0 and $selected[0] != "" ){
 
             foreach ($selected as $particular):
-                $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
-                if($pathology->getParticular()->getService()->getSlug() == 'diagnostic'){
-                    $this->getDoctrine()->getRepository('HospitalBundle:InvoicePathologicalReport')->insertGroup($pathology);
-                    $pathologies[] = $pathology;
-                    if (!empty($pathology->getInvoicePathologicalReports())){
-                        foreach ($pathology->getInvoicePathologicalReports() as $row):
-                            if(!empty($row->getPathologicalReport())){
-                                $reportArr[$row->getPathologicalReport()->getId()] = $row;
-                            }
-                        endforeach;
+                if($particular == "on"){
+                    $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
+                    echo $pathology->getParticular()->getService()->getSlug();
+                    if($pathology->getParticular()->getService()->getSlug() == 'diagnostic'){
+                        $this->getDoctrine()->getRepository('HospitalBundle:InvoicePathologicalReport')->insertGroup($pathology);
+                        $pathologies[] = $pathology;
+                        if (!empty($pathology->getInvoicePathologicalReports())){
+                            foreach ($pathology->getInvoicePathologicalReports() as $row):
+                                if(!empty($row->getPathologicalReport())){
+                                    $reportArr[$row->getPathologicalReport()->getId()] = $row;
+                                }
+                            endforeach;
+                        }
                     }
                 }
             endforeach;

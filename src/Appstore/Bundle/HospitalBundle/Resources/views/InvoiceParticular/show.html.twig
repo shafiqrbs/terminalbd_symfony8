@@ -103,7 +103,7 @@
                                                 <td><span class="badge badge-warning toggle badge-custom" id="{{ item.id  }}" ><span>[+]</span></span></td>
                                                 <td class="" >
                                                     {% if item.invoicePathologicalGroup is empty %}
-                                                        <input type="checkbox" class="chkSelect stockId" id="checkItem-{{ item.id }}" >
+                                                        <input type="checkbox"  {% if item.id in selected %} checked="checked" {% endif %}  class="stockId" value="{{ item.id }}" >
                                                     {% endif %}
                                                 </td>
                                                 <td  class="numeric">{{ entity.invoice  }}-{{ item.particular.particularCode  }}</td>
@@ -197,17 +197,18 @@
     {{ parent() }}
     var itemArr = $.cookie('barcodes') ? $.cookie('barcodes').split(',') : [];
     $('body').on('change', 'input.stockId', function(el) {
-    console.log(itemArr);
-    var val = $(this).val();
-    if($(this).prop('checked')) {
-    itemArr.push(val);
-    }else{
-    var index = itemArr.indexOf(val);
-    if (index > -1) {
-    itemArr.splice(index, 1);
-    }
-    }
-    $.cookie('barcodes', itemArr, {path: '/'});
+        console.log(itemArr);
+        var val = $(this).val();
+        alert(val);
+        if($(this).prop('checked')) {
+        itemArr.push(val);
+        }else{
+        var index = itemArr.indexOf(val);
+        if (index > -1) {
+        itemArr.splice(index, 1);
+        }
+        }
+        $.cookie('barcodes', itemArr, {path: '/'});
     });
 {% endblock %}
 
