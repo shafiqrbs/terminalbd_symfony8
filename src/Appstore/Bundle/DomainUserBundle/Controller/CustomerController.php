@@ -400,7 +400,7 @@ class CustomerController extends Controller
 
     public function searchAutoCompleteNameAction()
     {
-        $q = $_REQUEST['q'];
+        $q = $_REQUEST['term'];
         $option = $this->getUser()->getGlobalOption();
         $items = array();
         if($q and $option){

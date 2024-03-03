@@ -54,6 +54,11 @@ class InvoicePathologicalGroup
      **/
     private  $createdBy;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     **/
+    private  $particularDeliveredBy;
+
 
     /**
      * @var string
@@ -242,6 +247,24 @@ class InvoicePathologicalGroup
     {
         $this->updated = $updated;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getParticularDeliveredBy()
+    {
+        return $this->particularDeliveredBy;
+    }
+
+    /**
+     * @param mixed $particularDeliveredBy
+     */
+    public function setParticularDeliveredBy($particularDeliveredBy)
+    {
+        $this->particularDeliveredBy = $particularDeliveredBy;
+    }
+
+
 
 
 }

@@ -133,8 +133,6 @@
                                 {% set processes = ['Collected','In-progress'] %}
                                 {% for entity in entities %}
                                     <tr>
-
-
                                         <td class="numeric" >{{ entity.hmsInvoice.created|date('d-m-Y h:i a') }}</td>
                                         <td class="numeric" >{{ entity.hmsinvoice.invoiceMode|capitalize }}</td>
                                         <td class="numeric" >{{ entity.hmsInvoice.invoice }}</td>

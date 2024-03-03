@@ -220,13 +220,14 @@ class InvoiceFuelPumpController extends Controller
     public function itemApproveAction(BusinessBatchParticular $particular)
     {
         $em = $this->getDoctrine()->getManager();
-        $particular->setProcess("Approved");
-        $em->flush();
-        $this->getDoctrine()->getRepository(BusinessInvoice::class)->insertFuelSales($particular);
-        if($particular->getProcess() == "Approved"){
+        if($particular->getEndMeterReading() > $particular->getStartMeterReading()){
+            $particular->setProcess("Approved");
+            $em->flush();
             $this->getDoctrine()->getRepository(BusinessInvoice::class)->insertFuelSales($particular);
+            return new Response("success");
         }
-        return new Response("success");
+        return new Response("invalid");
+
     }
 
 

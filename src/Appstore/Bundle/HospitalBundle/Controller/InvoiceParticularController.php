@@ -159,23 +159,20 @@ class InvoiceParticularController extends Controller
 
         /** @var InvoicePathologicalReport $row */
         $pathologies = [];
-
+        $selected = (str_replace('on','',$selected));
         if(is_array($selected) and count($selected) > 0 and $selected[0] != "" ){
-
             foreach ($selected as $particular):
-                if($particular == "on"){
-                    $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
-                    echo $pathology->getParticular()->getService()->getSlug();
-                    if($pathology->getParticular()->getService()->getSlug() == 'diagnostic'){
-                        $this->getDoctrine()->getRepository('HospitalBundle:InvoicePathologicalReport')->insertGroup($pathology);
-                        $pathologies[] = $pathology;
-                        if (!empty($pathology->getInvoicePathologicalReports())){
-                            foreach ($pathology->getInvoicePathologicalReports() as $row):
-                                if(!empty($row->getPathologicalReport())){
-                                    $reportArr[$row->getPathologicalReport()->getId()] = $row;
-                                }
-                            endforeach;
-                        }
+                $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
+                $pathology->getParticular()->getService()->getSlug();
+                if($pathology->getParticular()->getService()->getSlug() == 'diagnostic'){
+                    $this->getDoctrine()->getRepository('HospitalBundle:InvoicePathologicalReport')->insertGroup($pathology);
+                    $pathologies[] = $pathology;
+                    if (!empty($pathology->getInvoicePathologicalReports())){
+                        foreach ($pathology->getInvoicePathologicalReports() as $row):
+                            if(!empty($row->getPathologicalReport())){
+                                $reportArr[$row->getPathologicalReport()->getId()] = $row;
+                            }
+                        endforeach;
                     }
                 }
             endforeach;
@@ -568,6 +565,20 @@ class InvoiceParticularController extends Controller
         $items[]= array('value' => 'Damage','text'=>'Damage');
         $items[]= array('value' => 'Impossible','text'=>'Impossible');
         return new JsonResponse($items);
+    }
+
+
+    public function deliveryGroupAction(InvoicePathologicalGroup $entity)
+    {
+
+        $invoice = $entity->getHmsInvoice();
+        if($invoice->getPaymentStatus() == 'Paid'){
+            $em = $this->getDoctrine()->getManager();
+            $entity->setParticularDeliveredBy($this->getUser());
+            $invoice->setProcess('Done');
+            $em->flush();
+        }
+        return $this->redirect($this->generateUrl('hms_invoice_confirm', array('id' => $entity->getHmsInvoice()->getId())));
     }
 
 

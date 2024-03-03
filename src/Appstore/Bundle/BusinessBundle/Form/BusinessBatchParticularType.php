@@ -49,7 +49,7 @@ class BusinessBatchParticularType extends AbstractType
                 'class' => 'Appstore\Bundle\BusinessBundle\Entity\BusinessParticular',
                 'empty_value' => '---Choose a item ---',
                 'property' => 'name',
-                'attr'=>array('class'=>'span12 m-wrap'),
+                'attr'=>array('class'=>'span12 m-wrap number'),
                 'constraints' =>array( new NotBlank(array('message'=>'Please select item name')) ),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')

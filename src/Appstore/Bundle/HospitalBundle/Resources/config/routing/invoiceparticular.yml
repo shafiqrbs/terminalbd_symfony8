@@ -14,6 +14,10 @@ hms_invoice_group_pathology:
     path:     /group-pathology-test
     defaults: { _controller: "HospitalBundle:InvoiceParticular:groupPathologyTest" }
 
+hms_invoice_group_pathology_approve:
+    path:     /group-pathology-approve
+    defaults: { _controller: "HospitalBundle:InvoiceParticular:deliveryGroupApprove" }
+
 
 hms_invoice_report_process:
     path:     /collection-process

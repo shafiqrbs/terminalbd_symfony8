@@ -75,7 +75,9 @@
                                             <td>{{ item.startMeterReading }}</td>
                                             <td class="">
                                                 {% if item.process == 'Created' %}
-                                                <input type="text" style="width:100px!important;" class="numeric td-inline-input batchItemUpdate" data-id="{{ item.id }}" autocomplete = "off" data-url="{{ path('business_fuelstation_item_update',{'id':item.id}) }}"  id="endMeterReading-{{ item.id }}" name="endMeterReading[]" value="{{ item.endMeterReading }}" >
+                                                    <input type="text" style="width:100px!important;" class="numeric number td-inline-input batchItemUpdate" data-id="{{ item.id }}" autocomplete = "off" data-url="{{ path('business_fuelstation_item_update',{'id':item.id}) }}"  id="endMeterReading-{{ item.id }}" name="endMeterReading[]" value="{{ item.endMeterReading }}" />
+                                                {% else %}
+                                                    {{ item.endMeterReading }}
                                                 {% endif %}
                                             </td>
                                             <td>{{ item.price }}</td>

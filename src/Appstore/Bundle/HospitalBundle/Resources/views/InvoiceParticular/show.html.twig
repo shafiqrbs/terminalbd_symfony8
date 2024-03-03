@@ -199,7 +199,6 @@
     $('body').on('change', 'input.stockId', function(el) {
         console.log(itemArr);
         var val = $(this).val();
-        alert(val);
         if($(this).prop('checked')) {
         itemArr.push(val);
         }else{
