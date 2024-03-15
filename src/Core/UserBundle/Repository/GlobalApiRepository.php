@@ -84,7 +84,7 @@ class GlobalApiRepository extends EntityRepository {
         $qb->leftJoin('e.medicineBrand','brand');
         $qb->leftJoin('e.unit','u');
         $qb->select('e.id as stockId','e.barcode as barcode','e.name as name','e.remainingQuantity as remainingQuantity','e.salesPrice as salesPrice','e.purchasePrice as purchasePrice','e.printHide as printHidden','e.path as path');
-        $qb->addSelect('e.name as brandName','brand.strength as strength');
+        $qb->addSelect('e.brandName as brandName','brand.strength as strength');
         $qb->addSelect('u.id as unitId','u.name as unitName');
         $qb->where('e.medicineConfig = :config')->setParameter('config', $config->getId()) ;
         if($config->isActiveQuantity() == 1){
