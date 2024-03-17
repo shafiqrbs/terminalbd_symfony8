@@ -369,7 +369,7 @@ class Customer
      *
      * @ORM\Column(name="customerGroup", type="string", length=100, nullable =true)
      */
-    private $customerGroup;
+    private $customerGroup='Default';
 
     /**
      * @var string

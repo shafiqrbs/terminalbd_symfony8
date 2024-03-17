@@ -6,7 +6,6 @@ use Appstore\Bundle\AccountingBundle\Entity\Transaction;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceParticular;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoiceReturnItem;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
-use Appstore\Bundle\MedicineBundle\Entity\MedicineSalesReturnInvoice;
 use Core\UserBundle\Entity\User;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -167,6 +166,26 @@ class ReportController extends Controller
         return $this->render('ReportBundle:Accounting/Sales:customerOutstanding.html.twig', array(
             'option' => $globalOption,
             'entities' => $entities,
+            'searchForm' => $data,
+        ));
+    }
+
+
+    /**
+     * @Route("/customer-group-outstanding", methods={"GET", "POST"}, name="accounting_report_group_sales_outstanding")
+     * @Secure(roles="ROLE_REPORT_FINANCIAL,ROLE_REPORT, ROLE_DOMAIN")
+     */
+    public function customerGroupOutstandingAction()
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $data =$_REQUEST;
+        $globalOption = $this->getUser()->getGlobalOption();
+        $entities = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->customerGroupOutstanding($globalOption,$data);
+        return $this->render('ReportBundle:Accounting/Sales:customerGroupOutstanding.html.twig', array(
+            'option' => $globalOption,
+            'customerGroup' => $entities['customerGroup'],
+            'entities' => $entities['outstanding'],
             'searchForm' => $data,
         ));
     }
@@ -1675,6 +1694,8 @@ class ReportController extends Controller
         );
         return new Response($htmlProcess);
     }
+
+
 
     /**
      * @Route("/business-system-report", methods={"GET", "POST"}, name="busi_system_overview")

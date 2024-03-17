@@ -455,6 +455,37 @@ class AccountSalesRepository extends EntityRepository
 
     }
 
+    public function customerGroupOutstanding($globalOption, $data = array())
+    {
+
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('customer.customerGroup as groupName,COALESCE(SUM(e.totalAmount),0) as totalAmount, COALESCE(SUM(e.amount),0) as amount,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as customerBalance ');
+        $qb->join('e.customer','customer');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->andWhere("e.process = 'approved'");
+        $qb->groupBy('customer.customerGroup');
+        $qb->having('customerBalance > 0');
+        $customerGroup = $qb->getQuery()->getArrayResult();
+
+
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('customer.id as customerId ,customer.customerGroup as groupName,customer.name as customerName , customer.mobile as customerMobile,COALESCE(SUM(e.totalAmount),0) as totalAmount, COALESCE(SUM(e.amount),0) as amount,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as customerBalance ');
+        $qb->join('e.customer','customer');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->andWhere("e.process = 'approved'");
+        $qb->groupBy('customer.id');
+        $qb->orderBy('customer.name', 'ASC');
+        $qb->having('customerBalance > 0');
+        $results = $qb->getQuery()->getArrayResult();
+        $outstanding = [];
+        foreach ($results as $row ){
+            $outstanding[$row['groupName']][]=$row;
+        }
+        $data = array('customerGroup'=>$customerGroup,'outstanding'=>$outstanding);
+        return $data;
+
+    }
+
     public function customerOutstandingSummary($globalOption, $data = array())
     {
         $amount = isset($data['amount']) ? $data['amount']:0;
