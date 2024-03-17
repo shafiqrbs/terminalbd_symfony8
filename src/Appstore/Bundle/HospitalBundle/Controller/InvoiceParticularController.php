@@ -129,7 +129,7 @@ class InvoiceParticularController extends Controller
         $data = $_REQUEST;
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
-        $entities = $em->getRepository('HospitalBundle:InvoicePathologicalGroup')->invoicePathologicalGroupLists( $user,$data);
+        $entities = $em->getRepository('HospitalBundle:InvoicePathologicalGroup')->invoicePathologicalGroupLists($user,$data);
         $pagination = $this->paginate($entities);
         $employees = $this->getDoctrine()->getRepository('HospitalBundle:Invoice')->getFindEmployees($hospital->getId());
         $processes = $this->getDoctrine()->getRepository('HospitalBundle:Invoice')->getAdmissionProcess($hospital,'diagnostic',$data);
@@ -291,8 +291,6 @@ class InvoiceParticularController extends Controller
         ));
         return $form;
     }
-
-
 
 
     public function showAction(Request $request,Invoice $entity)
@@ -502,7 +500,7 @@ class InvoiceParticularController extends Controller
         return $this->redirect($this->generateUrl('hms_invoice_particular_preparation',['id'=> $entity->getId()]));
     }
 
-     public function pathologicalReportPrintAction(Request $request ,InvoiceParticular $entity)
+    public function pathologicalReportPrintAction(Request $request ,InvoiceParticular $entity)
     {
         /** @var  $reportArr */
         $reportArr = array();
@@ -542,8 +540,6 @@ class InvoiceParticularController extends Controller
         ));
     }
 
-
-
     public function pathologicalReportDeleteAction(InvoicePathologicalReport $entity)
     {
         $em = $this->getDoctrine()->getManager();
@@ -575,10 +571,55 @@ class InvoiceParticularController extends Controller
         if($invoice->getPaymentStatus() == 'Paid'){
             $em = $this->getDoctrine()->getManager();
             $entity->setParticularDeliveredBy($this->getUser());
-            $invoice->setProcess('Done');
+            $entity->setProcess('Done');
             $em->flush();
         }
         return $this->redirect($this->generateUrl('hms_invoice_confirm', array('id' => $entity->getHmsInvoice()->getId())));
+    }
+
+    public function groupReportPrintAction(Request $request ,InvoicePathologicalGroup $entity)
+    {
+        /** @var  $reportArr */
+        $reportArr = array();
+
+        /** @var InvoicePathologicalReport $row */
+        $global = $this->getUser()->getGlobalOption();
+        $config = $global->getHospitalConfig();
+        if($config->getId() != $entity->getHmsInvoice()->getHospitalConfig()->getId()){
+            $referer = $request->headers->get('referer');
+            return new RedirectResponse($referer);
+        }
+        $barcodePrint = $entity->getHmsInvoice()->getInvoice();
+        $barcodeInvoice = $this->getBarcode($barcodePrint);
+        $barcodePrint = '';
+        $barcodeReport = $this->getBarcode($barcodePrint);
+        foreach ($entity->getInvoiceParticulars() as $item):
+            if (!empty($item->getInvoicePathologicalReports())){
+                foreach ($item->getInvoicePathologicalReports() as $row):
+                    if(!empty($row->getPathologicalReport())){
+                        $reportArr[$row->getPathologicalReport()->getId()] = $row;
+                    }
+                endforeach;
+            }
+        endforeach;
+
+       /* $hospital = $global->getHospitalConfig();
+        if($hospital->isCustomPrint() == 1){
+            $template = "Print/{$global->getId()}:pathological";
+        }else{
+            $template = "InvoiceParticular:pathologicalReportPrint";
+        }*/
+
+        $template = "InvoiceParticular:pathologicalGroupReportPrint";
+
+        return $this->render("HospitalBundle:{$template}.html.twig", array(
+            'reportGroup'            => $entity,
+            'global'            => $global,
+            'printUser'         => $this->getUser(),
+            'barcodeInvoice'    => $barcodeInvoice,
+            'barcodeReport'     => $barcodeReport,
+            'report'            => $reportArr,
+        ));
     }
 
 
