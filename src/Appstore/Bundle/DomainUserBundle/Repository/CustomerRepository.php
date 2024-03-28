@@ -1006,7 +1006,7 @@ class CustomerRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb ->from('AccountingBundle:AccountSales','e');
-        $qb->select('customer.id as customerId ,customer.name as name , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as totalAmount, COALESCE(SUM(e.amount),0) as amount,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
+        $qb->select('customer.id as customerId ,customer.name as name ,customer.email as email , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
         $qb->join('e.customer','customer');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
         $qb->andWhere("e.process = 'approved'");
