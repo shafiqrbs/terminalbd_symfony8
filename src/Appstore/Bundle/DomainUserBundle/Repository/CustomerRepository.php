@@ -1019,8 +1019,11 @@ class CustomerRepository extends EntityRepository
             $data[$key]['customer_id']          = (int) $row['customerId'];
             $data[$key]['name']                 = $row['name'];
             $data[$key]['mobile']               = $row['mobile'];
-            $data[$key]['address']               = $row['address'];
-            $data[$key]['balance']               = $row['balance'];
+            $data[$key]['address']              = $row['address'];
+            $data[$key]['email']                = $row['email'];
+            $data[$key]['debit']                = (double)$row['debit'];
+            $data[$key]['credit']               = (double)$row['credit'];
+            $data[$key]['balance']              = (double)$row['balance'];
         }
         return $data;
 
@@ -1052,6 +1055,7 @@ class CustomerRepository extends EntityRepository
         $userId = ((isset($data['userId']) and $data['userId'])) ? floatval($data['userId']):'';
         $openingBalance = trim((isset($data['openingBalance']) and $data['openingBalance'])) ? trim(floatval($data['openingBalance'])):0;
         $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption' => $global ,'mobile' => $mobile));
+        $result = [];
         if(empty($entity)){
             $entity = new Customer();
             $entity->setMobile($mobile);
@@ -1065,13 +1069,16 @@ class CustomerRepository extends EntityRepository
                 $em->getRepository("AccountingBundle:AccountSales")->apiInsertOpeningBalance($entity,$userId,$openingBalance);
             }
         }
-        $data['global_id']            = (int) $entity->getId();
-        $data['customer_id']          = (int) $entity->getCustomerId();
-        $data['name']                 = $entity->getName();
-        $data['mobile']               =  $entity->getMobile();
-        $data['address']               =  $entity->getAddress();
-        $data['balance']               = $openingBalance;
-        return $data;
+        $result['global_id']            = (int) $entity->getId();
+        $result['customer_id']          = (int) $entity->getCustomerId();
+        $result['name']                 = $entity->getName();
+        $result['mobile']               =  $entity->getMobile();
+        $result['address']              =  $entity->getAddress();
+        $result['email']                =  $entity->getEmail();
+        $result['debit']                = (double)0;
+        $result['credit']               = (double)0;
+        $result['balance']              = $openingBalance;
+        return $result;
     }
 
     public function apiUpdateCustomer($data)
