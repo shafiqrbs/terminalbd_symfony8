@@ -1002,6 +1002,30 @@ class CustomerRepository extends EntityRepository
 
     }
 
+    public function customerOutstanding($globalOption)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb ->from('AccountingBundle:AccountSales','e');
+        $qb->select('customer.id as customerId ,customer.name as name , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as totalAmount, COALESCE(SUM(e.amount),0) as amount,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
+        $qb->join('e.customer','customer');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->andWhere("e.process = 'approved'");
+        $qb->groupBy('customer.id');
+        $qb->orderBy('balance', 'ASC');
+        $result = $qb->getQuery()->getArrayResult();
+        $data = array();
+        foreach($result as $key => $row) {
+            $data[$key]['global_id']            = (int) $globalOption->getId();
+            $data[$key]['customer_id']          = (int) $row['customerId'];
+            $data[$key]['name']                 = $row['name'];
+            $data[$key]['mobile']               = $row['mobile'];
+            $data[$key]['address']               = $row['address'];
+            $data[$key]['balance']               = $row['balance'];
+        }
+        return $data;
+
+    }
+
 
     public function getCustomers($option)
     {
@@ -1028,9 +1052,7 @@ class CustomerRepository extends EntityRepository
         $userId = ((isset($data['userId']) and $data['userId'])) ? floatval($data['userId']):'';
         $openingBalance = trim((isset($data['openingBalance']) and $data['openingBalance'])) ? trim(floatval($data['openingBalance'])):0;
         $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption' => $global ,'mobile' => $mobile));
-        if($entity){
-            return 'invalid';
-        }else {
+        if(empty($entity)){
             $entity = new Customer();
             $entity->setMobile($mobile);
             $entity->setName($name);
@@ -1042,8 +1064,14 @@ class CustomerRepository extends EntityRepository
             if ($openingBalance > 0){
                 $em->getRepository("AccountingBundle:AccountSales")->apiInsertOpeningBalance($entity,$userId,$openingBalance);
             }
-            return 'success';
         }
+        $data['global_id']            = (int) $entity->getId();
+        $data['customer_id']          = (int) $entity->getCustomerId();
+        $data['name']                 = $entity->getName();
+        $data['mobile']               =  $entity->getMobile();
+        $data['address']               =  $entity->getAddress();
+        $data['balance']               = $openingBalance;
+        return $data;
     }
 
     public function apiUpdateCustomer($data)

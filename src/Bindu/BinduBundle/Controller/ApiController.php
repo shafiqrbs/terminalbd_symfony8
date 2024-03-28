@@ -331,7 +331,7 @@ class ApiController extends Controller
             $slides = array();
             $introPages = array();
             $users = $this->getDoctrine()->getRepository('UserBundle:User')->getCustomers($entity);
-            $customers = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->getApiCustomer($entity);
+            $customers = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->customerOutstanding($entity);
 
             if($entity->getMainApp()->getSlug() == 'miss'){
                 $stocks = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getApiSpalshStock($entity);

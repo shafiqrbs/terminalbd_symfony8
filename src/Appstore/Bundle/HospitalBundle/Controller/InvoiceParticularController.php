@@ -205,6 +205,20 @@ class InvoiceParticularController extends Controller
     }
 
 
+    public function showAction(Request $request,Invoice $entity)
+    {
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Invoice entity.');
+        }
+        $selected = explode(',', $request->cookies->get('barcodes', ''));
+
+        return $this->render('HospitalBundle:InvoiceParticular:show.html.twig', array(
+            'entity' => $entity,
+            'selected' => $selected,
+        ));
+    }
+
+
 
     /**
      * @Secure(roles="ROLE_DOMAIN_HOSPITAL_LAB,ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_DOCTOR");
@@ -293,18 +307,6 @@ class InvoiceParticularController extends Controller
     }
 
 
-    public function showAction(Request $request,Invoice $entity)
-    {
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Invoice entity.');
-        }
-        $selected = explode(',', $request->cookies->get('barcodes', ''));
-
-        return $this->render('HospitalBundle:InvoiceParticular:show.html.twig', array(
-            'entity' => $entity,
-            'selected' => $selected,
-        ));
-    }
 
     public function sampleCollectionAction(Invoice $entity)
     {
