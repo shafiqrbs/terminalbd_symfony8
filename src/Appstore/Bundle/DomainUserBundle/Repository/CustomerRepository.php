@@ -1071,13 +1071,13 @@ class CustomerRepository extends EntityRepository
         }
         $result['global_id']            = (int) $entity->getId();
         $result['customer_id']          = (int) $entity->getCustomerId();
-        $result['name']                 = $entity->getName();
-        $result['mobile']               =  $entity->getMobile();
-        $result['address']              =  $entity->getAddress();
-        $result['email']                =  $entity->getEmail();
+        $result['name']                 = (string)$entity->getName();
+        $result['mobile']               = (string)$entity->getMobile();
+        $result['address']              = (string)$entity->getAddress();
+        $result['email']                = (string)$entity->getEmail();
         $result['debit']                = (double)0;
         $result['credit']               = (double)0;
-        $result['balance']              = $openingBalance;
+        $result['balance']              = (double)$openingBalance;
         return $result;
     }
 
