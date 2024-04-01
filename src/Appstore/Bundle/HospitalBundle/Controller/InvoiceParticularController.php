@@ -100,6 +100,7 @@ class InvoiceParticularController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $data = $_REQUEST;
+        $data[] = array('process'=>'In-progress');
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $entities = $em->getRepository('HospitalBundle:Invoice')->invoiceLists( $user , $mode = 'diagnostic' , $data);
@@ -614,7 +615,7 @@ class InvoiceParticularController extends Controller
 
         $template = "InvoiceParticular:pathologicalGroupReportPrint";
 
-        return $this->render("HospitalBundle:{$template}.html.twig", array(
+        return $this->render("HospitalBundle:InvoiceParticular:pathologicalGroupReportPrint.html.twig", array(
             'reportGroup'            => $entity,
             'global'            => $global,
             'printUser'         => $this->getUser(),

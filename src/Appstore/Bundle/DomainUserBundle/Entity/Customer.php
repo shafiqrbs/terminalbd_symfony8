@@ -339,7 +339,7 @@ class Customer
     /**
      * @var string
      *
-     * @ORM\Column(name="email", type="string", length=100, nullable =true)
+     * @ORM\Column(name="email", type="string",nullable =true)
      */
     private $email;
 
@@ -682,7 +682,6 @@ class Customer
     public function setEmail($email)
     {
         $this->email = $email;
-
         return $this;
     }
 

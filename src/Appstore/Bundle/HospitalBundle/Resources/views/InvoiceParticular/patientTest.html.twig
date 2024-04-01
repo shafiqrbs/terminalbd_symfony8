@@ -113,23 +113,7 @@
                                     </div>
                                 </form>
                             </div>
-                            <div>
-                                <div class="tabs">
-                                    {% set mode =  searchForm.process is defined and  searchForm.process is not empty  ? searchForm.process : "In-progress" %}
-                                    <div class="tab">
-                                        <input type="radio" name="css-tabs" id="tab-all"  class="tab-switch ">
-                                        <a for="tab-all" href="{{ path('hms_invoice',{'process':'all'}) }}"  class="tab-label {% if mode|trim == 'all'  %}checked{% endif %}">All OPD</a>
-                                    </div>
-                                    {% for row in processes %}
-                                        <div class="tab">
-                                            <input type="radio" name="css-tabs" id="tab-{{ row.process }}"  class="tab-switch ">
-                                            <a for="tab-{{ row.process }}" href="{{ path('hms_invoice',{'process':row.process}) }}"  class="tab-label {% if mode|trim == row.process  %}checked{% endif %}">{{ row.process }}  <span class="btn red mini"> {{ row.total }}</span></a>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
                             <table class="table table-bordered table-striped table-condensed flip-content ">
-
                                 <thead class="flip-content ">
                                 <tr class="head-green">
                                     <th class="numeric" >Created</th>
