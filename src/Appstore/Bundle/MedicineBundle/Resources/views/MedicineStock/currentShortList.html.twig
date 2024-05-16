@@ -117,7 +117,7 @@
                                             {% endif %}
                                         </td>
                                         <td class="numeric" >{{ entity.medicineSales.createdBy }}</td>
-                                        <td class="numeric" >{{ entity.medicineStock.unit.name }}</td>
+                                        <td class="numeric" >{{ (entity.medicineStock and entity.medicineStock.unit ) ? entity.medicineStock.unit.name:'' }}</td>
                                         <td class="numeric" ><a href="javascript:" data-id="{{ entity.id }}" data-action="{{ path('medicine_stock_adjustment_close',{'id':entity.id}) }}" class="btn red mini tr-remove">Close</a> </td>
                                     </tr>
                                 {% endfor %}

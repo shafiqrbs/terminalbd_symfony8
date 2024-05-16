@@ -663,7 +663,7 @@ class PurchaseController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $data = $request->request->all();
-        $expirationEndDate = ($data['purchaseItem']['expirationEndDate']);
+        $expirationEndDate = (isset($data['purchaseItem']['expirationEndDate']) and $data['purchaseItem']['expirationEndDate'])? $data['purchaseItem']['expirationEndDate']:'';
         $entity = new MedicinePurchaseItem();
         $form = $this->createPurchaseItemForm($entity,$invoice);
         $form->handleRequest($request);
@@ -705,7 +705,7 @@ class PurchaseController extends Controller
                 $entity->setSalesPrice($salesPrice);
             }
             $this->dpGenerate($entity);
-            if(!empty($expirationEndDate)){
+            if($expirationEndDate){
                 $expirationEndDate = (new \DateTime($expirationEndDate));
                 $entity->setExpirationEndDate($expirationEndDate);
             }
