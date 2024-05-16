@@ -93,7 +93,7 @@ class InvoiceParticularController extends Controller
     }
 
     /**
-     * @Secure(roles="ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_OPERATOR,ROLE_DOMAIN_HOSPITAL_ADMISSION,ROLE_DOMAIN_HOSPITAL_VISIT");
+     * @Secure(roles="ROLE_DOMAIN_HOSPITAL_LAB,ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_OPERATOR,ROLE_DOMAIN_HOSPITAL_ADMISSION,ROLE_DOMAIN_HOSPITAL_VISIT");
      */
 
     public function patientTestAction()
@@ -121,7 +121,7 @@ class InvoiceParticularController extends Controller
     }
 
     /**
-     * @Secure(roles="ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_OPERATOR,ROLE_DOMAIN_HOSPITAL_ADMISSION,ROLE_DOMAIN_HOSPITAL_VISIT");
+     * @Secure(roles="ROLE_DOMAIN_HOSPITAL_LAB,ROLE_DOMAIN_HOSPITAL_MANAGER,ROLE_DOMAIN,ROLE_DOMAIN_HOSPITAL_OPERATOR,ROLE_DOMAIN_HOSPITAL_ADMISSION,ROLE_DOMAIN_HOSPITAL_VISIT");
      */
 
     public function patientGroupTestAction()
@@ -193,8 +193,6 @@ class InvoiceParticularController extends Controller
         return $this->redirect($this->generateUrl('hms_invoice_particular_show', array('id' => $invoice->getId())));
 
     }
-
-
 
     public function groupPathologicalReportUpdateAction(InvoicePathologicalReport $entity)
     {
@@ -614,7 +612,6 @@ class InvoiceParticularController extends Controller
         }*/
 
         $template = "InvoiceParticular:pathologicalGroupReportPrint";
-
         return $this->render("HospitalBundle:InvoiceParticular:pathologicalGroupReportPrint.html.twig", array(
             'reportGroup'            => $entity,
             'global'            => $global,

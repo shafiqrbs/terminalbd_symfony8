@@ -46,9 +46,15 @@ class AccountBankType extends AbstractType
                     new NotBlank(array('message'=>'Please input required'))
                 ),
             ))
+            ->add('serviceName','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Service name'),
+                'constraints' =>array(
+                    new NotBlank(array('message'=>'Please input required'))
+                ),
+            ))
             ->add('serviceCharge','text', array('attr'=>array('class'=>'m-wrap span12','maxLength' => 5 ,'placeholder'=>'Service charge')
              ,'constraints' =>array(new NotBlank(array('message'=>'Please input required'))),
             ))
+            ->add('file')
             ->add('accountType', 'choice', array(
                 'attr'=>array('class'=>'span12 m-wrap'),
                 'choices' => array(
@@ -88,7 +94,7 @@ class AccountBankType extends AbstractType
      */
     public function getName()
     {
-        return 'appstore_bundle_accountingbundle_AccountBank';
+        return 'accountBank';
     }
 
 

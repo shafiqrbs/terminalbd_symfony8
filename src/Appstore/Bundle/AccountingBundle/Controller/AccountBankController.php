@@ -53,6 +53,7 @@ class AccountBankController extends Controller
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $name = $entity->getBank()->getName().','.$entity->getBranch();
             $entity->setName($name);
+            $entity->upload();
             $em->persist($entity);
             $em->flush();
             $this->get('session')->getFlashBag()->add(
@@ -192,6 +193,10 @@ class AccountBankController extends Controller
         if ($editForm->isValid()) {
             $name = $entity->getBank()->getName().','.$entity->getBranch();
             $entity->setName($name);
+            if($entity->getFile()){
+                $entity->removeUpload();
+            }
+            $entity->upload();
             $em->flush();
             $this->getDoctrine()->getRepository('AccountingBundle:AccountHead')->insertBankAccount($entity);
             return $this->redirect($this->generateUrl('accountbank'));

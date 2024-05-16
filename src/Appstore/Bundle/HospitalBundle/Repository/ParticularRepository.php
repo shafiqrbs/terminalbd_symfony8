@@ -422,9 +422,12 @@ class ParticularRepository extends EntityRepository
         $qb->select('e.id as id', 'e.name as name');
         $qb->where('e.hospitalConfig = :hospital')->setParameter('hospital', $config);
         $qb->andWhere('e.service = :service')->setParameter('service', $service);
-        if ($cabins) {
-            $qb->andWhere('e.id NOT IN (:cabins)')->setParameter('cabins', $cabins);
-        }
+        /*
+            $qb->andWhere('e.isDelete != 1');
+            if ($cabins) {
+                $qb->andWhere('e.id NOT IN (:cabins)')->setParameter('cabins', $cabins);
+            }
+        */
         $result = $qb->getQuery()->getArrayResult();
         return $result;
     }
