@@ -126,7 +126,7 @@
                                                 <a  class="editable" data-name="minQuantity" href="#"  data-url="{{ path('medicine_stock_inline') }}" data-type="text" data-pk="{{ entity.id }}" data-original-title="Change min Quantity">{{ entity.minQuantity }}</a>
                                             {% endif %}
                                         </td>
-                                        <td class="numeric" >{{ entity.unit.name }}</td>
+                                        <td class="numeric" >{{ (entity and entity.unit ) ? entity.unit.name:'' }}</td>
                                     </tr>
 
                                 {% endfor %}
