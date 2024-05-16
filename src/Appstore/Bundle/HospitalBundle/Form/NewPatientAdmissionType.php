@@ -68,9 +68,9 @@ class NewPatientAdmissionType extends AbstractType
                     $qb = $er->createQueryBuilder('b');
                     $qb  ->where("b.status = 1");
                     $qb  ->andWhere("b.service = 2");
-                    if($this->cabins){
+                   /* if($this->cabins){
                         $qb    ->andWhere('b.id NOT IN (:ids)')->setParameter('ids', $this->cabins );
-                    }
+                    }*/
                     $qb ->andWhere("b.hospitalConfig =".$this->globalOption->getHospitalConfig()->getId());
                     $qb ->orderBy("b.name", "ASC");
                     return $qb;
