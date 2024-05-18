@@ -1469,6 +1469,7 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
 
             } else {
                 $data['sales_item'] = array();
+
             }
             return $data;
         }
