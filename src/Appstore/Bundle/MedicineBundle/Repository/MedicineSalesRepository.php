@@ -1450,9 +1450,9 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
             if ($entity->getMedicineSalesItems()) {
                 /* @var $item MedicineSalesItem */
                 foreach ($entity->getMedicineSalesItems() as $i => $item) {
-                    $data['sales_item'][$i]['stock_id'] = (string)$item->getMedicineStock()->getId();
-                    $data['sales_item'][$i]['sales_id'] = (string)$item->getId();
-                    $data['sales_item'][$i]['barcode'] = (string)$entity->getId();
+                    $data['sales_item'][$i]['stock_id'] = (int)$item->getMedicineStock()->getId();
+                    $data['sales_item'][$i]['sales_id'] = (int)$item->getId();
+                    $data['sales_item'][$i]['barcode'] = (int)$entity->getId();
                     $data['sales_item'][$i]['stock_name'] = (string)$item->getMedicineStock()->getName();
                     $data['sales_item'][$i]['brand_name'] = (string)$item->getMedicineStock()->getBrandName();
                     $data['sales_item'][$i]['unit'] = ($item->getMedicineStock()->getUnit()) ? (string)$item->getMedicineStock()->getUnit()->getName() : '';
