@@ -173,7 +173,7 @@ api_poskeeper_sales_update:
     options:
         expose: true
 
-api_poskeeper_purchase:s
+api_poskeeper_purchase:
     path:     /poskeeper-purchase
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiPurchase }
     methods:  POST
