@@ -1613,6 +1613,50 @@ class ApiPoskeeperController extends Controller
             return $response;
         }
     }
+    public function apiOnlineSalesDeleteAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $em = $this->getDoctrine()->getManager();
+            $entity = $this->checkApiValidation($request);
+            $salesId = $_REQUEST['id'];
+            $entities = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->find($salesId);
+            if (!$entities) {
+                throw $this->createNotFoundException('Unable to find SalesItem entity.');
+            }
+            $em->remove($entities);
+            $em->flush();
+            $response = new Response();
+            $status = array('status' =>'Success');
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($status));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+    public function apiOnlineSalesUpdateAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+            $data = $request->request->all();
+            $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->insertAndroidProcess($entity,$deviceId,'sales-updates',$data);
+            $ipAddress = $_SERVER['REMOTE_ADDR'];
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('message'=>"success", 'ipAddress'=>$ipAddress)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
     public function apiOnlinePurchaseListAction()
     {
 
@@ -1931,108 +1975,6 @@ class ApiPoskeeperController extends Controller
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    /* Train Schedule API*/
-
-    public function trainListAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-
-            $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Notepad')->getApiTrain($entity);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function createTrainAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-
-            $form = $_REQUEST;
-            $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Notepad')->apiCreateTrain($entity,$form);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function updateTrainAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-
-            $this->checkApiValidation($request);
-            $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiUpdateCustomer($form);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function deleteTrainAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-
-            $entity = $this->checkApiValidation($request);
-            $config = $entity->getId();
-            $em = $this->getDoctrine()->getManager();
-            $account = $em->createQuery('DELETE DomainUserBundle:Notepad e WHERE e.globalOption = '.$config);
-            if(!empty($account)){
-                $account->execute();
-            }
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode('success'));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }

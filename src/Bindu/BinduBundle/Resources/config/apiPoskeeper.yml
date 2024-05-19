@@ -110,33 +110,6 @@ api_poskeeper_customer_update:
     options:
         expose: true
 
-api_poskeeper_train_list:
-    path:     /poskeeper-train-list
-    defaults: { _controller: BinduBundle:ApiPoskeeper:trainList }
-    methods:  POST|GET
-    options:
-        expose: true
-
-api_poskeeper_train_create:
-    path:     /poskeeper-train-create
-    defaults: { _controller: BinduBundle:ApiPoskeeper:createTrain }
-    methods:  POST|GET
-    options:
-        expose: true
-
-api_poskeeper_train_update:
-    path:     /poskeeper-train-update
-    defaults: { _controller: BinduBundle:ApiPoskeeper:updateTrain }
-    methods:  POST|GET
-    options:
-        expose: true
-
-api_poskeeper_train_delete:
-    path:     /poskeeper-train-delete
-    defaults: { _controller: BinduBundle:ApiPoskeeper:deleteTrain }
-    methods:  POST|GET
-    options:
-        expose: true
 
 api_poskeeper_vendor_create:
     path:     /poskeeper-vendor-create
@@ -193,7 +166,14 @@ api_poskeeper_sales:
     options:
         expose: true
 
-api_poskeeper_purchase:
+api_poskeeper_sales_update:
+    path:     /poskeeper-sales-update
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSalesUpdate }
+    methods:  POST|GET
+    options:
+        expose: true
+
+api_poskeeper_purchase:s
     path:     /poskeeper-purchase
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiPurchase }
     methods:  POST
