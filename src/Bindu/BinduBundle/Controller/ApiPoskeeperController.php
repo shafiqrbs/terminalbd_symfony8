@@ -1619,18 +1619,18 @@ class ApiPoskeeperController extends Controller
             return new Response('Unauthorized access.', 401);
         }else{
             $em = $this->getDoctrine()->getManager();
-            $entity = $this->checkApiValidation($request);
+            $this->checkApiValidation($request);
             $salesId = $_REQUEST['id'];
-            $entities = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->find($salesId);
-            if (!$entities) {
+            $entity = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->find($salesId);
+            if (!$entity) {
                 throw $this->createNotFoundException('Unable to find SalesItem entity.');
             }
-            $em->remove($entities);
+            $em->remove($entity);
             $em->flush();
+            $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
-            $status = array('status' =>'Success');
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($status));
+            $response->setContent(json_encode(array('message'=>"success", 'ipAddress'=>$ipAddress)));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }

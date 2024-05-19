@@ -173,6 +173,13 @@ api_poskeeper_sales_update:
     options:
         expose: true
 
+api_poskeeper_sales_deletee:
+    path:     /poskeeper-sales-delete
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSalesDelete }
+    methods:  POST|GET
+    options:
+        expose: true
+
 api_poskeeper_purchase:
     path:     /poskeeper-purchase
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiPurchase }
