@@ -1647,7 +1647,7 @@ class ApiPoskeeperController extends Controller
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $request->request->all();
-            $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->insertAndroidProcess($entity,$deviceId,'sales-updates',$data);
+            $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->insertFlutterSalesProcess($entity,$deviceId,'sales-update',$data);
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');

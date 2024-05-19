@@ -83,6 +83,13 @@ class MedicineAndroidProcess
     private $ipAddress;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="mode", type="string", length = 100, nullable=true)
+     */
+    private $mode;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="status", type="boolean", nullable=true)
@@ -336,6 +343,26 @@ class MedicineAndroidProcess
     {
         $this->ipAddress = $ipAddress;
     }
+
+    /**
+     * @return string
+     */
+    public function getMode()
+    {
+        return $this->mode;
+    }
+
+    /**
+     * @param string $mode
+     */
+    public function setMode($mode)
+    {
+        $this->mode = $mode;
+    }
+
+
+
+    
 
 
 }
