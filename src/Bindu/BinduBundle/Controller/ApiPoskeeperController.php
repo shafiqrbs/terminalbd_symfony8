@@ -1612,8 +1612,6 @@ class ApiPoskeeperController extends Controller
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
-
-
     }
     public function apiOnlinePurchaseListAction()
     {
@@ -1632,7 +1630,6 @@ class ApiPoskeeperController extends Controller
     {
 
     }
-
 
     public function stockUpdateAction(Request $request)
     {

@@ -348,6 +348,12 @@ class MedicineSales
      */
     private $deviceApproved = false;
 
+     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_online", type="boolean" )
+     */
+    private $isOnline = false;
 
 
     /**
@@ -1213,6 +1219,24 @@ class MedicineSales
     {
         $this->cardCommission = $cardCommission;
     }
+
+    /**
+     * @return bool
+     */
+    public function isOnline()
+    {
+        return $this->isOnline;
+    }
+
+    /**
+     * @param bool $isOnline
+     */
+    public function setIsOnline($isOnline)
+    {
+        $this->isOnline = $isOnline;
+    }
+
+
 
 
 
