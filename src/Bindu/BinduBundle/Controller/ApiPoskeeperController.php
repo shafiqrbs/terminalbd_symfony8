@@ -7,6 +7,7 @@ use Appstore\Bundle\AccountingBundle\Entity\AccountingConfig;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
 use Appstore\Bundle\AccountingBundle\Entity\ExpenseCategory;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
+use Gregwar\Image\Image;
 use Proxies\__CG__\Appstore\Bundle\AccountingBundle\Entity\AccountSales;
 use Setting\Bundle\AppearanceBundle\Entity\TemplateCustomize;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
@@ -403,45 +404,27 @@ class ApiPoskeeperController extends Controller
                 $methods[$key]['name']                 = $row->getName();
             }
 
-            $paymentCards = $this->getDoctrine()->getRepository('SettingToolBundle:PaymentCard')->findAll();
-
-            $cards = array();
-
-            /* @var $row PaymentCard */
-
-            foreach($paymentCards as $key => $row) {
-                $cards[$key]['item_id']              = (int) $row->getId();
-                $cards[$key]['name']                 = $row->getName();
-            }
-
-            $accountBanks = $this->getDoctrine()->getRepository('AccountingBundle:AccountBank')->findBy(array('globalOption'=>$entity,'status'=>1));
-
-            $banks = array();
+            $accountBanks = $this->getDoctrine()->getRepository('AccountingBundle:AccountBank')->findBy(array('globalOption' => $entity,'status'=>1));
+            $methods = array();
 
             /* @var $row AccountBank */
 
             if($accountBanks){
                 foreach($accountBanks as $key => $row) {
-                    $banks[$key]['global_id']            = (int) $entity->getId();
-                    $banks[$key]['item_id']              = (int) $row->getId();
-                    $banks[$key]['name']                 = $row->getName();
-                    $banks[$key]['service_charge']       = $row->getServiceCharge();
+                    $methods[$key]['global_id']            = (int) $entity->getId();
+                    $methods[$key]['item_id']              = (int) $row->getId();
+                    $methods[$key]['name']                 = $row->getName();
+                    $methods[$key]['service_charge']       = $row->getServiceCharge();
+                    if($row->getWebPath()){
+                        $path = $this->resizeFilter($row->getWebPath(),400,400);
+                        $methods[$key]['imagePath']            =  $path;
+                    }else{
+                        $methods[$key]['imagePath']            = "";
+                    }
                 }
             }
 
-            $accountMobileBanks = $this->getDoctrine()->getRepository('AccountingBundle:AccountMobileBank')->findBy(array('globalOption'=>$entity,'status'=>1));
-            $mobiles = array();
 
-            /* @var $row AccountMobileBank */
-
-            if($accountMobileBanks) {
-                foreach ($accountMobileBanks as $key => $row) {
-                    $mobiles[$key]['global_id'] = (int)$entity->getId();
-                    $mobiles[$key]['item_id'] = (int)$row->getId();
-                    $mobiles[$key]['name'] = $row->getName();
-                    $mobiles[$key]['service_charge'] = $row->getServiceCharge();
-                }
-            }
 
             $expenseCat = $this->getDoctrine()->getRepository('AccountingBundle:ExpenseCategory')->findBy(array('globalOption'=> $entity,'status'=>1));
             $expenseCategories = array();
@@ -465,9 +448,6 @@ class ApiPoskeeperController extends Controller
             'vendors'           => $vendors,
             'stocks'            => $stocks,
             'transaction_methods' => $methods,
-            'payment_cards' => $cards,
-            'bank_accounts' => $banks,
-            'mobile_accounts' => $mobiles,
             'expense_category' => $expenseCategories,
             'transaction_mode' => $transactionModes,
 
@@ -478,6 +458,12 @@ class ApiPoskeeperController extends Controller
         $response->setContent(json_encode($jsonData));
         $response->setStatusCode(Response::HTTP_OK);
         return $response;
+    }
+
+    public function resizeFilter($pathToImage, $width = 400, $height = 400)
+    {
+        $path = '/' . Image::open(__DIR__.'/../../../../../web/' . $pathToImage)->cropResize($width, $height, 'transparent', 'top', 'left')->guess();
+        return "http://{$_SERVER['HTTP_HOST']}/{$pathToImage}";
     }
 
     public function dashboardAction(Request $request)

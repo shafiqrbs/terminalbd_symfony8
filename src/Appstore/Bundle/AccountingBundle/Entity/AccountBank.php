@@ -743,7 +743,7 @@ class AccountBank
 
     public function getUploadDir()
     {
-        return 'uploads/domain/'.$this->getGlobalOption()->getId().'/bank/';
+        return 'uploads/domain/'.$this->getGlobalOption()->getId().'/bank';
     }
 
     public function upload()
