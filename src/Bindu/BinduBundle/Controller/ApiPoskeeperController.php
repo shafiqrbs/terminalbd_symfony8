@@ -404,7 +404,7 @@ class ApiPoskeeperController extends Controller
                 foreach($accountBanks as $key => $row) {
                     $methods[$key]['method_id']            = (int) $row->getId();
                     $methods[$key]['method_name']          = $row->getName();
-                    $methods[$key]['method_mode']          = ($entity and $entity->getMethod()) ? $entity->getMethod()->getName():'';
+                    $methods[$key]['method_mode']          = ($row and $row->getMethod()) ? $row->getMethod()->getName():'';
                     $methods[$key]['service_charge']       = $row->getServiceCharge();
                     if($row->getWebPath()){
                         $path = $this->resizeFilter($row->getWebPath(),400,400);
@@ -453,18 +453,6 @@ class ApiPoskeeperController extends Controller
     {
         $path = '/' . Image::open(__DIR__.'/../../../../../web/' . $pathToImage)->cropResize($width, $height, 'transparent', 'top', 'left')->guess();
         return "http://{$_SERVER['HTTP_HOST']}/{$pathToImage}";
-    }
-
-    public function invoiceModes(){
-        $array = array(
-            "1" => "Receive from Due",
-            "2" => "Discount",
-            "3" => "Advance",
-            "4" => "Adjustment(Receive)",
-            "5" => "Adjustment(Payment)",
-        );
-
-        return $array;
     }
 
 
