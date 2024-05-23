@@ -1340,17 +1340,39 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
     }
 
 
-    public function apiSalesLists(GlobalOption $option, $search)
+    public function apiSalesLists(GlobalOption $option, $data)
     {
         $em = $this->_em;
-        var_dump($search);
-        exit;
+
         $config = $option->getMedicineConfig()->getId();
+        $vendor = isset($data['vendor_id'])? $data['vendor_id'] :'';
+        $customer = isset($data['customer_id'])? $data['customer_id'] :'';
+        $startDate = isset($data['start_date'])? $data['start_date'] :'';
+        $endEnd = (isset($data['end_date']) and $data['end_date'])? $data['end_date'] :'';
+        $keyword = isset($data['keyword'])? $data['keyword'] :'';
         $qb = $this->createQueryBuilder('s');
         $qb->where('s.medicineConfig = :config')->setParameter('config', $config) ;
-        $qb->join('s.customer','c');
-        $qb->setMaxResults(100);
+        if ($customer) {
+            $qb->andWhere('s.customer = :customer')->setParameter('customer', $customer);
+        }
+        if($keyword){
+            $qb->andWhere($qb->expr()->like("s.invoice", "'%$keyword%'"  ));
+        }
+        if ($startDate) {
+            $compareTo = new \DateTime($startDate);
+            $created =  $compareTo->format('Y-m-d 00:00:00');
+            $qb->andWhere("s.created >= :createdStart");
+            $qb->setParameter('createdStart', $created);
+        }
+
+        if ($endEnd) {
+            $compareTo = new \DateTime($endEnd);
+            $createdEnd =  $compareTo->format('Y-m-d 23:59:59');
+            $qb->andWhere("s.created <= :createdEnd");
+            $qb->setParameter('createdEnd', $createdEnd);
+        }
         $qb->orderBy('s.created','DESC');
+        $qb->setMaxResults(2000);
         $entities = $qb->getQuery()->getResult();
         $data = array();
         /* @var $entity MedicineSales */
@@ -1376,7 +1398,6 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
                 $data[$key]['discount_type'] = $entity->getDiscountType();
                 $data[$key]['revised'] = (int) $entity->getRevised();
                 $data[$key]['print_without_discount'] = (int) $entity->isPrintWithoutDiscount();
-                $data[$key]['is_hold'] = (int) 0;
                 $data[$key]['is_online'] = (int) $entity->isOnline();
                 $data[$key]['created_by_id'] = $entity->getCreatedBy()->getId();
                 $data[$key]['created_by'] = $entity->getCreatedBy()->getUserFullName();
@@ -1388,8 +1409,9 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
                 $data[$key]['customer_name'] = $entity->getCustomer()->getName();
                 $data[$key]['customer_mobile'] = $entity->getCustomer()->getMobile();
                 $data[$key]['customer_address'] = $entity->getCustomer()->getAddress();
-                $data[$key]['account_bank_id'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getId():0;
-                $data[$key]['account_bank_name'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getName():'';
+                $data[$key]['method_id'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getId():0;
+                $data[$key]['method_name'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getName():'';
+                $data[$key]['method_mode'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getName():'';
                 $data[$key]['comment'] = (string) $entity->getMode();
                 $data[$key]['token_no'] = (string) $entity->getMode();
                 $data[$key]['coupon_code'] = (string) $entity->getMode();

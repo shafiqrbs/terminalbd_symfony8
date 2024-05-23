@@ -394,15 +394,6 @@ class ApiPoskeeperController extends Controller
             }
 
             $transactionModes = $this->getDoctrine()->getRepository(AccountingConfig::class)->getTransactionModes();
-            $result = $this->getDoctrine()->getRepository('SettingToolBundle:TransactionMethod')->findAll();
-
-            $invoiceModes = array();
-            $result = $this->invoiceModes();
-
-            foreach($result as $key => $row) {
-                $invoiceModes[$key]['item_id']              = (int) $key;
-                $invoiceModes[$key]['name']                 = $row;
-            }
 
             $accountBanks = $this->getDoctrine()->getRepository('AccountingBundle:AccountBank')->findBy(array('globalOption' => $entity,'status'=>1));
             $methods = array();
@@ -440,19 +431,16 @@ class ApiPoskeeperController extends Controller
         }
 
         $jsonData = array(
-            'setup'             => $data,
-            'users'             => $users,
-            'customers'         => $customers,
-            'categories'        => $categories,
-            'brands'            => $brands,
-            'vendors'           => $vendors,
-            'stocks'            => $stocks,
-            'transaction_methods' => $methods,
-            'expense_category' => $expenseCategories,
-            'transaction_mode' => $transactionModes,
-            'invoice_modes' => $invoiceModes,
-
-
+            'brands'                => $brands,
+            'categories'            => $categories,
+            'customers'             => $customers,
+            'expense_category'      => $expenseCategories,
+            'setup'                 => $data,
+            'stocks'                => $stocks,
+            'transaction_methods'   => $methods,
+            'transaction_mode'      => $transactionModes,
+            'userss'                => $users,
+            'vendors'               => $vendors,
         );
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
@@ -1586,7 +1574,7 @@ class ApiPoskeeperController extends Controller
         }else{
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
-            $data = '';
+            $data = $_REQUEST;
             $entities = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->apiSalesLists($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
