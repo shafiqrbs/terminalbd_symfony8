@@ -440,12 +440,7 @@ class ApiPoskeeperController extends Controller
         }
 
         $jsonData = array(
-            'setup'             => $data,
-            'users'             => $users,
-            'customers'         => $customers,
-            'categories'        => $categories,
-            'brands'            => $brands,
-            'vendors'           => $vendors,
+
             'stocks'            => $stocks,
             'transaction_methods' => $methods,
             'expense_category' => $expenseCategories,

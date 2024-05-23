@@ -77,6 +77,7 @@ class GlobalApiRepository extends EntityRepository {
 
     public function getApiSplsshStock(GlobalOption $option)
     {
+
         $config = $option->getMedicineConfig();
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
@@ -95,6 +96,7 @@ class GlobalApiRepository extends EntityRepository {
         }
         $qb->andWhere('e.status = 1');
         $qb->orderBy('e.sku','ASC');
+        $qb->setMaxResults(100);
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
         foreach($result as $key => $row) {
