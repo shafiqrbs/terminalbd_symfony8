@@ -193,7 +193,7 @@ class AccountBankController extends Controller
         if ($editForm->isValid()) {
             $name = $entity->getBank()->getName().','.$entity->getBranch();
             $entity->setName($name);
-            if($entity->getFile()){
+            if($entity->getWebPath()){
                 $entity->removeUpload();
             }
             $entity->upload();
@@ -204,7 +204,7 @@ class AccountBankController extends Controller
 
         return $this->render('AccountingBundle:AccountBank:new.html.twig', array(
             'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+            'form'   => $editForm->createView(),
         ));
     }
 

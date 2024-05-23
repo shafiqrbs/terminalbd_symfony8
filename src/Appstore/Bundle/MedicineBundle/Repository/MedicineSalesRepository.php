@@ -1427,9 +1427,8 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
         /* @var $entity MedicineSales */
         $entity = $this->findOneBy(array('medicineConfig'=> $option->getMedicineConfig(),'id' => $id));
         $data = array();
+
         if($entity) {
-
-
             $data['sales_id'] = (string)$entity->getId();
             $data['device_sales_id'] = (int)$entity->getDeviceSalesId();
             $data['invoice'] = $entity->getInvoice();
@@ -1462,8 +1461,9 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
             $data['customer_name'] = $entity->getCustomer()->getName();
             $data['customer_mobile'] = $entity->getCustomer()->getMobile();
             $data['customer_address'] = $entity->getCustomer()->getAddress();
-            $data['account_bank_id'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getId():0;
-            $data['account_bank_name'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getName():'';
+            $data['method_id'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getId():0;
+            $data['method_name'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getName():'';
+            $data['method_mode'] = ($entity->getAccountBank() and $entity->getAccountBank()->getMethod()) ? $entity->getAccountBank()->getMethod()->getName():'';
             $data['comment'] = (string) $entity->getMode();
             $data['token_no'] = (string) $entity->getMode();
             $data['coupon_code'] = (string) $entity->getMode();

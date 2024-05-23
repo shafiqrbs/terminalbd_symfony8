@@ -63,7 +63,20 @@ class AccountBankType extends AbstractType
                     'Other' => 'Other'
                 ),
             ))
-            ->add('bank', 'entity', array(
+            ->add('method', 'entity', array(
+                'required'    => true,
+                'class' => 'Setting\Bundle\ToolBundle\Entity\TransactionMethod',
+                'empty_value' => '---Choose a method---',
+                'constraints' =>array(
+                    new NotBlank(array('message'=>'Please input required'))
+                ),
+                'property' => 'name',
+                'attr'=>array('class'=>'span12 select2'),
+                'query_builder' => function(EntityRepository $er){
+                    return $er->createQueryBuilder('b')
+                        ->orderBy("b.name", "ASC");
+                },
+            ))->add('bank', 'entity', array(
                 'required'    => true,
                 'class' => 'Setting\Bundle\ToolBundle\Entity\Bank',
                 'empty_value' => '---Choose a bank---',

@@ -154,12 +154,10 @@ class AccountingConfigRepository extends EntityRepository
 
         $mobile = $em->createQuery('DELETE AccountingBundle:AccountMobileBank e WHERE e.globalOption = '.$option);
         $mobile->execute();
-
     }
 
 
     public function getTransactionModes(){
-
         $array = array(
            array( 'item_id' => (int)1, 'name' => "Due"),
            array( 'item_id' => (int)2, 'name' => "Advance"),

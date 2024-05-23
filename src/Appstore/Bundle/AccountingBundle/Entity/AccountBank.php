@@ -42,6 +42,11 @@ class AccountBank
     protected $globalOption;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\TransactionMethod")
+     **/
+    private  $method;
+
+     /**
      * @ORM\OneToMany(targetEntity="Setting\Bundle\ToolBundle\Entity\InvoiceModule", mappedBy="accountBank" )
      **/
     private  $invoiceModules;
@@ -785,6 +790,24 @@ class AccountBank
     {
         $this->serviceName = $serviceName;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * @param mixed $method
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
+    }
+
+
 
 
 
