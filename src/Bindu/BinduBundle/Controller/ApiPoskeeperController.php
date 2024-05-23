@@ -439,7 +439,7 @@ class ApiPoskeeperController extends Controller
             'stocks'                => $stocks,
             'transaction_methods'   => $methods,
             'transaction_mode'      => $transactionModes,
-            'userss'                => $users,
+            'users'                => $users,
             'vendors'               => $vendors,
         );
         $response = new Response();
