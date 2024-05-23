@@ -395,13 +395,13 @@ class ApiPoskeeperController extends Controller
 
             $transactionModes = $this->getDoctrine()->getRepository(AccountingConfig::class)->getTransactionModes();
             $result = $this->getDoctrine()->getRepository('SettingToolBundle:TransactionMethod')->findAll();
-            $methods = array();
 
-            /* @var $row TransactionMethod */
+            $invoiceModes = array();
+            $result = $this->invoiceModes();
 
             foreach($result as $key => $row) {
-                $methods[$key]['item_id']              = (int) $row->getId();
-                $methods[$key]['name']                 = $row->getName();
+                $invoiceModes[$key]['item_id']              = (int) $key;
+                $invoiceModes[$key]['name']                 = $row;
             }
 
             $accountBanks = $this->getDoctrine()->getRepository('AccountingBundle:AccountBank')->findBy(array('globalOption' => $entity,'status'=>1));
@@ -417,9 +417,9 @@ class ApiPoskeeperController extends Controller
                     $methods[$key]['service_charge']       = $row->getServiceCharge();
                     if($row->getWebPath()){
                         $path = $this->resizeFilter($row->getWebPath(),400,400);
-                        $methods[$key]['imagePath']            =  $path;
+                        $methods[$key]['image_path']            =  $path;
                     }else{
-                        $methods[$key]['imagePath']            = "";
+                        $methods[$key]['image_path']            = "";
                     }
                 }
             }
@@ -450,6 +450,7 @@ class ApiPoskeeperController extends Controller
             'transaction_methods' => $methods,
             'expense_category' => $expenseCategories,
             'transaction_mode' => $transactionModes,
+            'invoice_modes' => $invoiceModes,
 
 
         );
@@ -465,6 +466,19 @@ class ApiPoskeeperController extends Controller
         $path = '/' . Image::open(__DIR__.'/../../../../../web/' . $pathToImage)->cropResize($width, $height, 'transparent', 'top', 'left')->guess();
         return "http://{$_SERVER['HTTP_HOST']}/{$pathToImage}";
     }
+
+    public function invoiceModes(){
+        $array = array(
+            "1" => "Receive from Due",
+            "2" => "Discount",
+            "3" => "Advance",
+            "4" => "Adjustment(Receive)",
+            "5" => "Adjustment(Payment)",
+        );
+
+        return $array;
+    }
+
 
     public function dashboardAction(Request $request)
     {

@@ -1343,15 +1343,12 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
     public function apiSalesLists(GlobalOption $option, $search)
     {
         $em = $this->_em;
-     //   $customer = $search['customer'];
+        var_dump($search);
+        exit;
         $config = $option->getMedicineConfig()->getId();
         $qb = $this->createQueryBuilder('s');
-        //  $qb->from(MedicineSales::class,'s');
-        // $qb->select('s.invoice');
         $qb->where('s.medicineConfig = :config')->setParameter('config', $config) ;
         $qb->join('s.customer','c');
-        //   $qb->andWhere("s.customer = :customer")->setParameter('customer', $customer);
-        // $this->handleSearchBetween($qb,$search);
         $qb->setMaxResults(100);
         $qb->orderBy('s.created','DESC');
         $entities = $qb->getQuery()->getResult();

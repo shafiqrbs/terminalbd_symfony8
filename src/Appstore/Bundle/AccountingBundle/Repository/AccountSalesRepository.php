@@ -1525,25 +1525,20 @@ class AccountSalesRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $customer = (isset($data['customer']) and $data['customer']) ? trim($data['customer']):'';
-        $methodId = (isset($data['method']) and $data['method']) ? trim($data['method']):'';
-        $userId = (isset($data['userId']) and $data['userId']) ? trim($data['userId']):'';
-        $bankId = (isset($data['bankAccount']) and $data['bankAccount']) ? trim($data['bankAccount']):'';
-        $mobileId = (isset($data['mobileAccount']) and $data['mobileAccount']) ? trim($data['mobileAccount']):'';
+        $customer = (isset($data['customer_id']) and $data['customer_id']) ? trim($data['customer_id']):'';
+        $methodId = (isset($data['method_id']) and $data['method_id']) ? trim($data['method_id']):'';
+        $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['userId']):'';
         $amount = (isset($data['amount']) and $data['amount']) ? trim(floatval($data['amount'])):'';
         $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'';
         $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
 
         $entity = new AccountSales();
         $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption'=>$option, 'id' => $customer));
-        $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(array('slug' => $methodId));
         $user = $em->getRepository('UserBundle:User')->find($userId);
-        $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($bankId);
-        $mobileAccount = $em->getRepository('AccountingBundle:AccountMobileBank')->find($mobileId);
+        $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($methodId);
         $entity->setGlobalOption($option);
         $entity->setCustomer($customer);
         $entity->setAccountRefNo(time());
-        $entity->setTransactionMethod($method);
         $entity->setCreatedBy($user);
         $entity->setApprovedBy($user);
         $entity->setProcess('approved');
@@ -1555,13 +1550,12 @@ class AccountSalesRepository extends EntityRepository
             $entity->setTotalAmount(abs($amount));
             $entity->setAmount(0);
             $entity->setTransactionMethod(null);
+            $entity->setAccountBank(null);
         }else{
             $entity->setAmount($amount);
         }
-        if($method == 'bank'){
+        if($bankAccount){
             $entity->setAccountBank($bankAccount);
-        }elseif($method == 'mobile'){
-            $entity->setAccountMobileBank($mobileAccount);
         }
         $em->persist($entity);
         $em->flush();
