@@ -17,7 +17,7 @@ use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 
 class GlobalApiRepository extends EntityRepository {
 
-    public function getCustomers(GlobalOption $option){
+    public function getUsers(GlobalOption $option){
 
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
@@ -39,8 +39,8 @@ class GlobalApiRepository extends EntityRepository {
                 $roles = unserialize(serialize($row['appRoles']));
                 $rolesSeparated = implode(",", $roles);
                 $data[$key]['user_id'] = (int) $row['id'];
-                $data[$key]['username'] = $row['username'];
-                $data[$key]['fullName'] = $row['fullName'];
+                $data[$key]['user_name'] = $row['username'];
+                $data[$key]['full_name'] = $row['fullName'];
                 $data[$key]['email'] = $row['email'];
                 $data[$key]['password'] = $row['appPassword'];
                 $data[$key]['roles'] = $rolesSeparated;
@@ -228,6 +228,8 @@ class GlobalApiRepository extends EntityRepository {
 
 
     }
+
+
 
 
 

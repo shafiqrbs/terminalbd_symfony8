@@ -359,7 +359,7 @@ class ApiPoskeeperController extends Controller
 
             $slides = array();
             $introPages = array();
-            $users = $this->getDoctrine()->getRepository('UserBundle:User')->getCustomers($entity);
+            $users = $this->getDoctrine()->getRepository('UserBundle:GlobalApi')->getUsers($entity);
             $customers = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->customerOutstanding($entity);
 
             if($entity->getMainApp()->getSlug() == 'miss'){
