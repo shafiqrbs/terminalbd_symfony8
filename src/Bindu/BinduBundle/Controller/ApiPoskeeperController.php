@@ -402,9 +402,9 @@ class ApiPoskeeperController extends Controller
 
             if($accountBanks){
                 foreach($accountBanks as $key => $row) {
-                    $methods[$key]['global_id']            = (int) $entity->getId();
-                    $methods[$key]['item_id']              = (int) $row->getId();
-                    $methods[$key]['name']                 = $row->getName();
+                    $methods[$key]['method_id']            = (int) $row->getId();
+                    $methods[$key]['method_name']          = $row->getName();
+                    $methods[$key]['method_mode']          = ($entity and $entity->getMethod()) ? $entity->getMethod()->getName():'';
                     $methods[$key]['service_charge']       = $row->getServiceCharge();
                     if($row->getWebPath()){
                         $path = $this->resizeFilter($row->getWebPath(),400,400);
