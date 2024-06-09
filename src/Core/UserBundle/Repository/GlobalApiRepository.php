@@ -105,21 +105,21 @@ class GlobalApiRepository extends EntityRepository {
             $data[$key]['item_id']              = (int) $row['stockId'];
             $printName = trim($row['name']);
             $data[$key]['category_id']      = 0;
-            $data[$key]['categoryName']     = '';
-            $data[$key]['brandName']            = $row['brandName'];
+            $data[$key]['category_name']     = '';
+            $data[$key]['brand_name']            = $row['brandName'];
             $data[$key]['barcode']              = $row['barcode'];
             $data[$key]['unit']                 = ($row['unitName']) ? $row['unitName'] : "";
             $data[$key]['name']                 = $row['name'];
-            $data[$key]['printName']            = $printName;
+            $data[$key]['print_name']            = $printName;
             $data[$key]['quantity']             = $row['remainingQuantity'];
-            $data[$key]['salesPrice']           = $row['salesPrice'];
-            $data[$key]['purchasePrice']        = $row['purchasePrice'];
-            $data[$key]['printHidden']          = ($row['printHidden']) ? $row['printHidden'] : ""; $row['printHidden'];
+            $data[$key]['sales_price']           = $row['salesPrice'];
+            $data[$key]['purchase_price']        = $row['purchasePrice'];
+            $data[$key]['print_hidden']          = ($row['printHidden']) ? $row['printHidden'] : ""; $row['printHidden'];
             if($row['path']){
                 $path = $this->resizeFilter("uploads/domain/{$option->getId()}/product/{$row['path']}");
-                $data[$key]['imagePath']            =  $path;
+                $data[$key]['image_path']            =  $path;
             }else{
-                $data[$key]['imagePath']            = "";
+                $data[$key]['image_path']            = "";
             }
 
         }
