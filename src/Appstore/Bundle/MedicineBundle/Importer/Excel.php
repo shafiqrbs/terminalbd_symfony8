@@ -36,8 +36,6 @@ class Excel
     public function import($data)
     {
         $this->data = $data;
-        var_dump($this->data);
-        exit;
         foreach($this->data as $key => $item) {
             $name = $item['MedicineName'];
             $ProductId  = $item['ProductId'];

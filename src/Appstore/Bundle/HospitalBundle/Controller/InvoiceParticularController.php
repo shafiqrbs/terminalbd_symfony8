@@ -594,22 +594,20 @@ class InvoiceParticularController extends Controller
         $barcodeInvoice = $this->getBarcode($barcodePrint);
         $barcodePrint = '';
         $barcodeReport = $this->getBarcode($barcodePrint);
+        $categories = array();
         foreach ($entity->getInvoiceParticulars() as $item):
             if (!empty($item->getInvoicePathologicalReports())){
-                foreach ($item->getInvoicePathologicalReports() as $row):
-                    if(!empty($row->getPathologicalReport())){
-                        $reportArr[$row->getPathologicalReport()->getId()] = $row;
-                    }
-                endforeach;
+                if($item->getParticular()->getCategory()){
+                    $categories[] = $item->getParticular()->getCategory();
+                    foreach ($item->getInvoicePathologicalReports() as $row):
+                        if($row->getPathologicalReport()){
+                            $reportArr[$item->getParticular()->getCategory()->getId()][] = $row;
+                        }
+                    endforeach;
+                }
+
             }
         endforeach;
-
-       /* $hospital = $global->getHospitalConfig();
-        if($hospital->isCustomPrint() == 1){
-            $template = "Print/{$global->getId()}:pathological";
-        }else{
-            $template = "InvoiceParticular:pathologicalReportPrint";
-        }*/
 
         $template = "InvoiceParticular:pathologicalGroupReportPrint";
         return $this->render("HospitalBundle:InvoiceParticular:pathologicalGroupReportPrint.html.twig", array(
@@ -618,7 +616,8 @@ class InvoiceParticularController extends Controller
             'printUser'         => $this->getUser(),
             'barcodeInvoice'    => $barcodeInvoice,
             'barcodeReport'     => $barcodeReport,
-            'report'            => $reportArr,
+            'categories'            => $categories,
+            'reports'            => $reportArr,
         ));
     }
 
