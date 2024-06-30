@@ -65,6 +65,7 @@
     </table>
     {% if categories is not empty %}
         {% for item in categories %}
+            {% if reports[item.id] is defined and reports[item.id] is not empty %}
             <table class=" reportTable" style="margin-top:20px;">
                 <caption><h4><strong>{{ item.name|capitalize }}</strong></h4></caption>
                 <thead>
@@ -76,18 +77,17 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% if reports[item.id] is defined and reports[item.id] is not empty %}
-                    {% for parent in reports[item.id] %}
-                        <tr>
-                            <td  class="span3"><strong>{{ parent.pathologicalReport.name }}</strong></td>
-                            <td class="span2">{{ parent.result }}</td>
-                            <td class="span2">{{ parent.pathologicalReport.unit }}</td>
-                            <td class="span4">{{ parent.pathologicalReport.referenceValue|raw }}</td>
-                        </tr>
-                    {% endfor %}
-                {% endif %}
+                {% for parent in reports[item.id] %}
+                    <tr>
+                        <td  class="span3"><strong>{{ parent.pathologicalReport.name }}</strong></td>
+                        <td class="span2">{{ parent.result }}</td>
+                        <td class="span2">{{ parent.pathologicalReport.unit }}</td>
+                        <td class="span4">{{ parent.pathologicalReport.referenceValue|raw }}</td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
         {% endfor %}
     {% endif %}
     <table style="margin-top:20px;font-size:12px">

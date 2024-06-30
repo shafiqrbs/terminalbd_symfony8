@@ -22,7 +22,9 @@
 </head>
 <body>
 <div style="margin-top:{{ entity.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ entity.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
+    {% if entity.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
     {% if global.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ global.webPath('file') }}">{% endif %}
+    {% endif %}
     <table class="table table-border reportTable" style="border: 3px solid #383939!important" >
         <tr class="print-header">
             <td colspan="3" style="position: relative">
@@ -161,14 +163,12 @@
             <tr><td>Comment: {{ entity.comment|raw }}</td></tr>
         </table>
     {% endif %}
-    <table class="table print-footer" style="position: fixed; bottom: 60px"  >
+    <table class="table print-footer">
         <tr>
-
             <td class="center span4">
                 <ul class="unstyled">
                     <li>Printed By</li>
                     <li><strong>{{ (printUser.profile) ? printUser.profile.name :'' }}</strong></li>
-                    <li>{% if printUser.profile and printUser.profile.designation is not empty %}{{ printUser.profile.designation.name }}{% endif %}</li>
                     <li>{{ "now"|date('d-m-Y h:i A') }}</li>
                 </ul>
             </td>

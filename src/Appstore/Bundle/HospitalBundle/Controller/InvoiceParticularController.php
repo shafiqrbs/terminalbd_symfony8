@@ -246,9 +246,11 @@ class InvoiceParticularController extends Controller
                 $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
                 if(empty($pathology->getInvoicePathologicalGroup())){
                     $pathology->setInvoicePathologicalGroup($entity);
+                    $em->persist($pathology);
+                    $em->flush();
                 }
             }
-            $em->flush();
+
             unset($_COOKIE['barcodes']);
             setcookie('barcodes', '', time() - 3600, '/');
             return $this->redirect($this->generateUrl('hms_invoice_particular_show', array('id' => $invoice->getId())));
