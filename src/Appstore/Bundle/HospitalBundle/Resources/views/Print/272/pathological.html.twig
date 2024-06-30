@@ -163,20 +163,7 @@
     {% endif %}
     <table class="table print-footer" style="position: fixed; bottom: 60px"  >
         <tr>
-            <td class="left span4">
-                {% if(entity.assignLabuser) %}
-                <ul class="unstyled">
-                    <li>Prepared By</li>
-                    <li>
-                        {% if(entity.assignLabuser and entity.assignLabuser.webSignaturePath is not empty) %}
-                            <img class="fileupload-preview fileupload-exists" alt="" src="{{ image(entity.assignLabuser.webSignaturePath).resize(180,100) }}">
-                        {% endif %}
-                    </li>
-                    <li><strong>{{ entity.assignLabuser.name }}</strong></li>
-                    <li>{% if entity.assignLabuser.doctorSignature is not empty %}{{ entity.assignLabuser.doctorSignature|raw }}{% endif %}</li>
-                </ul>
-                {% endif %}
-            </td>
+
             <td class="center span4">
                 <ul class="unstyled">
                     <li>Printed By</li>
@@ -185,13 +172,18 @@
                     <li>{{ "now"|date('d-m-Y h:i A') }}</li>
                 </ul>
             </td>
-            <td class="span4">
+            <td class="center span4">
+                {% if(entity.assignLabuser) %}
+                    <ul class="unstyled">
+                        <li>Prepared By</li>
+                        <li><strong>{{ entity.assignLabuser.name }}</strong></li>
+                        <li>{% if entity.assignLabuser.doctorSignature is not empty %}{{ entity.assignLabuser.doctorSignature|raw }}{% endif %}</li>
+                    </ul>
+                {% endif %}
+            </td>
+            <td class="center span4">
                 {% if entity.assignDoctor is not empty %}
                     <ul class="unstyled">
-                        <li> {% if(entity.assignDoctor and entity.assignDoctor.webSignaturePath is not empty) %}
-                                <img class="fileupload-preview fileupload-exists" alt="" src="{{ image(entity.assignDoctor.webSignaturePath).resize(180,100) }}">
-                            {% endif %}
-                        </li>
                         <li><strong>{{ entity.assignDoctor.name }}</strong></li>
                         <li>{{ entity.assignDoctor.doctorSignature|raw }}</li>
                     </ul>

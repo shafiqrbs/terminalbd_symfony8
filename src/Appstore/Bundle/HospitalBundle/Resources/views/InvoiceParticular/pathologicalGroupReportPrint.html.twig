@@ -98,7 +98,8 @@
             <td class="center span4">
                 <ul class="unstyled">
                     <li>Printed By</li>
-                    <li>{{ "now"|date('d-m-Y h:m') }}</li>
+                    <li><strong>{{ (printUser.profile) ? printUser.profile.name :'' }}</strong></li>
+                    <li>{{ "now"|date('d-m-Y h:i A') }}</li>
                 </ul>
             </td>
             <td class="center span4">
@@ -112,11 +113,7 @@
                 {% if reportGroup.assignDoctor is not empty %}
                     <ul class="unstyled">
                         <li><strong>{{ reportGroup.assignDoctor.name }}</strong></li>
-                        <li>{{ reportGroup.assignDoctor.educationalDegree|raw }}</li>
-                        <li>{{ reportGroup.assignDoctor.specialist|raw }}</li>
-                        {% if reportGroup.assignDoctor.category is not empty or reportGroup.assignDoctor.department is not empty %}<li> {% if reportGroup.assignDoctor.category is not empty %}{{ reportGroup.assignDoctor.category.name }}{% endif %} {% if reportGroup.assignDoctor.department is not empty %} ,{{ reportGroup.assignDoctor.department.name }}{% endif %}</li>{% endif %}
-                        <li>{{ reportGroup.assignDoctor.designation }}</li>
-                        <li>{{ reportGroup.assignDoctor.currentJob }}</li>
+                        <li>{{ reportGroup.assignDoctor.doctorSignature|raw }}</li>
                     </ul>
                 {% endif %}
             </td>
