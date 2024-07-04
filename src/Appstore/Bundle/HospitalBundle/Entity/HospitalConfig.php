@@ -240,6 +240,14 @@ class HospitalConfig
      */
     private $printMarginReportTop = 0;
 
+     /**
+     * @var smallint
+     *
+     * @ORM\Column(name="printMarginReportBottom", type="smallint",  nullable=true)
+     */
+    private $printMarginReportBottom = 0;
+
+
     /**
      * @var smallint
      *
@@ -1368,6 +1376,24 @@ class HospitalConfig
     {
         $this->isMarketingExecutive = $isMarketingExecutive;
     }
+
+    /**
+     * @return smallint
+     */
+    public function getPrintMarginReportBottom()
+    {
+        return $this->printMarginReportBottom;
+    }
+
+    /**
+     * @param smallint $printMarginReportBottom
+     */
+    public function setPrintMarginReportBottom($printMarginReportBottom)
+    {
+        $this->printMarginReportBottom = $printMarginReportBottom;
+    }
+
+
 
 
 }

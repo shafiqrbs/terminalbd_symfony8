@@ -21,9 +21,13 @@
     </script>
 </head>
 <body>
-<div style="margin-top:{{ entity.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ entity.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
+<div style="position:relative; height:100%; margin-top:{{ entity.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ entity.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
     {% if entity.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
-    {% if global.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ global.webPath('file') }}">{% endif %}
+        {% if global.webPath('file') is not empty %}
+            <div style="margin-bottom:20px; text-align:center">
+            <img style="max-height:100px" src="/{{ global.webPath('file') }}">
+            </div>
+        {% endif %}
     {% endif %}
     <table class="table table-border reportTable" style="border: 3px solid #383939!important" >
         <tr class="print-header">
@@ -172,23 +176,16 @@
                     <li>{{ "now"|date('d-m-Y h:i A') }}</li>
                 </ul>
             </td>
+            <td class="span4 center">&nbsp;</td>
             <td class="center span4">
-                {% if(entity.assignLabuser) %}
-                    <ul class="unstyled">
-                        <li>Prepared By</li>
-                        <li><strong>{{ entity.assignLabuser.name }}</strong></li>
-                        <li>{% if entity.assignLabuser.doctorSignature is not empty %}{{ entity.assignLabuser.doctorSignature|raw }}{% endif %}</li>
-                    </ul>
-                {% endif %}
+                <ul class="unstyled">
+                    <li>Prepared By</li>
+                    <li><br/><br/></li>
+                    <li><strong>{{ entity.assignLabuser.name }}</strong></li>
+                    <li><strong>{{ entity.assignLabuser.doctorSignature|raw }}</strong></li>
+                </ul>
             </td>
-            <td class="center span4">
-                {% if entity.assignDoctor is not empty %}
-                    <ul class="unstyled">
-                        <li><strong>{{ entity.assignDoctor.name }}</strong></li>
-                        <li>{{ entity.assignDoctor.doctorSignature|raw }}</li>
-                    </ul>
-                {% endif %}
-            </td>
+
         </tr>
     </table>
 </div>
@@ -261,6 +258,19 @@
         float: right;
         padding-right: 10px;
     }
+
+    .print-footer {
+        height: 50px;
+        border: 1px solid #100f0f;
+        font-size: 11px;
+        position: absolute;
+        {% if entity.hmsInvoice.hospitalConfig.reportHeight  %}
+            bottom:{{ entity.hmsInvoice.hospitalConfig.printMarginReportBottom }}px;
+        {% else %}
+            bottom:0;
+        {% endif %}
+    }
+
     .print-footer .left{
         margin-left: 30px;
     }

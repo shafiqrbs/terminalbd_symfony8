@@ -612,8 +612,15 @@ class InvoiceParticularController extends Controller
         endforeach;
 
         $template = "InvoiceParticular:pathologicalGroupReportPrint";
-        return $this->render("HospitalBundle:InvoiceParticular:pathologicalGroupReportPrint.html.twig", array(
-            'reportGroup'            => $entity,
+
+        $hospital = $global->getHospitalConfig();
+        if($hospital->isCustomPrint() == 1){
+            $template = "Print/{$global->getId()}:pathologicalGroupReportPrint";
+        }else{
+            $template = "InvoiceParticular:pathologicalGroupReportPrint";
+        }
+        return $this->render("HospitalBundle:{$template}.html.twig", array(
+             'reportGroup'            => $entity,
             'global'            => $global,
             'printUser'         => $this->getUser(),
             'barcodeInvoice'    => $barcodeInvoice,

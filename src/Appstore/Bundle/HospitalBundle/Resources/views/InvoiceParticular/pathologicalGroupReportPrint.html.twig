@@ -21,19 +21,11 @@
     </script>
 </head>
 <body>
-<div style="margin-top:{{  reportGroup.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ reportGroup.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
+<div style="position: relative; height: 100%;  margin-top:{{  reportGroup.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ reportGroup.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
     {%  if reportGroup.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
-        <table class="table reportTable">
-            <tr>
-                <td>
-                    <div class="span4 title-center text-center">
-                        {%  if reportGroup.hmsInvoice.hospitalConfig.invoicePrintLogo == 1 %}
-                            {% if reportGroup.hmsInvoice.hospitalConfig.globalOption.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ reportGroup.hmsInvoice.hospitalConfig.globalOption.webPath('file')  }}">{% endif %}
-                        {%  endif %}
-                    </div>
-                </td>
-            </tr>
-        </table>
+        <div style="margin-bottom:20px; text-align:center">
+            <img style="max-height:100px" src="/{{ global.webPath('file') }}">
+        </div>
     {% endif %}
     <table class="table table-border reportTable" style="border: 3px solid #383939!important" >
         <tr>
@@ -66,27 +58,27 @@
     {% if categories is not empty %}
         {% for item in categories %}
             {% if reports[item.id] is defined and reports[item.id] is not empty %}
-            <table class=" reportTable" style="margin-top:20px;">
-                <caption><h4><strong>{{ item.name|capitalize }}</strong></h4></caption>
-                <thead>
-                <tr class="head-black">
-                    <td class="span3">Name</td>
-                    <td class="span1">Result</td>
-                    <td class="span2">Unit</td>
-                    <td class="span4">Reference</td>
-                </tr>
-                </thead>
-                <tbody>
-                {% for parent in reports[item.id] %}
-                    <tr>
-                        <td  class="span3"><strong>{{ parent.pathologicalReport.name }}</strong></td>
-                        <td class="span2">{{ parent.result }}</td>
-                        <td class="span2">{{ parent.pathologicalReport.unit }}</td>
-                        <td class="span4">{{ parent.pathologicalReport.referenceValue|raw }}</td>
+                <table class=" reportTable" style="margin-top:20px;">
+                    <caption><h4><strong>{{ item.name|capitalize }}</strong></h4></caption>
+                    <thead>
+                    <tr class="head-black">
+                        <td class="span3">Name</td>
+                        <td class="span1">Result</td>
+                        <td class="span2">Unit</td>
+                        <td class="span4">Reference</td>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for parent in reports[item.id] %}
+                        <tr>
+                            <td  class="span3"><strong>{{ parent.pathologicalReport.name }}</strong></td>
+                            <td class="span2">{{ parent.result }}</td>
+                            <td class="span2">{{ parent.pathologicalReport.unit }}</td>
+                            <td class="span4">{{ parent.pathologicalReport.referenceValue|raw }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -102,21 +94,16 @@
                     <li>{{ "now"|date('d-m-Y h:i A') }}</li>
                 </ul>
             </td>
+            <td class="span4 center">&nbsp;</td>
             <td class="center span4">
                 <ul class="unstyled">
                     <li>Prepared By</li>
+                    <li><br/><br/></li>
                     <li><strong>{{ reportGroup.assignLabuser.name }}</strong></li>
-                    <li><strong>{{ reportGroup.assignLabuser.doctorSignature }}</strong></li>
+                    <li><strong>{{ reportGroup.assignLabuser.doctorSignature|raw }}</strong></li>
                 </ul>
             </td>
-            <td class="span4 center">
-                {% if reportGroup.assignDoctor is not empty %}
-                    <ul class="unstyled">
-                        <li><strong>{{ reportGroup.assignDoctor.name }}</strong></li>
-                        <li>{{ reportGroup.assignDoctor.doctorSignature|raw }}</li>
-                    </ul>
-                {% endif %}
-            </td>
+
         </tr>
     </table>
 </div>
@@ -180,6 +167,18 @@
         float: right;
         padding-right: 10px;
     }
+
+    .print-footer {
+        height: 50px;
+        border: 1px solid #100f0f;
+        font-size: 11px;
+        position: absolute;
+        {% if reportGroup.hmsInvoice.hospitalConfig.reportHeight  %}
+            bottom:{{ reportGroup.hmsInvoice.hospitalConfig.printMarginReportBottom }}px;
+        {% else %}
+            bottom:0;
+        {% endif %}
+    }
     .print-footer .left{
         margin-left: 30px;
     }
@@ -197,5 +196,6 @@
         min-height:{{ reportGroup.hmsInvoice.hospitalConfig.reportHeight }}px;
     {% endif %}
     }
+
 </style>
 </html>

@@ -81,6 +81,7 @@ class ConfigType extends AbstractType
             ->add('printMarginReportLeft','text',array('attr'=>array('class'=>'m-wrap numeric span12')))
             ->add('reportHeight','text',array('attr'=>array('class'=>'m-wrap numeric span12')))
             ->add('printMarginReportTop','text',array('attr'=>array('class'=>'m-wrap numeric span12')))
+            ->add('printMarginReportBottom','text',array('attr'=>array('class'=>'m-wrap numeric span12')))
         ;
     }
     
