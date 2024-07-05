@@ -1,7 +1,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>{{ entity.hmsInvoice.invoice }}</title>
+    <title>{{ entity.hmsInvoice.customer.name }}-{{ entity.hmsInvoice.invoice }}</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="" name="description"/>
     <meta content="" name="author"/>
@@ -21,36 +21,33 @@
     </script>
 </head>
 <body>
-    <div style="margin-top:{{  entity.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ entity.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
-    {%  if entity.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
-        <table class="table reportTable">
-            <tr>
-                <td>
-                    <div class="span4 title-center text-center">
-                        {{ entity.hmsInvoice.hospitalConfig.address|raw }}
-                    </div>
-                </td>
-            </tr>
-        </table>
+<div style="position: relative; height:{{ entity.hmsInvoice.hospitalConfig.reportHeight~'px' ? entity.hmsInvoice.hospitalConfig.reportHeight:'auto' }};  margin-top:{{  entity.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ entity.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
+    {% if entity.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
+        {% if global.webPath('file') is not empty %}
+            <div style="margin-bottom:20px; text-align:center">
+                <img style="max-height:100px" src="/{{ global.webPath('file') }}">
+            </div>
+        {% endif %}
     {% endif %}
-        <table class="table table-border reportTable" style="border: 3px solid #383939!important" >
+    <table class="table table-border reportTable" style="border: 3px solid #383939!important" >
         <tr class="print-header">
             <td colspan="3" style="position: relative">
-                <span class="barcode-left">{{ barcodeInvoice|raw }}</span>
+                <span class="barcode-left">{#{{ barcodeInvoice|raw }}#}</span>
                 <strong class="title title-center" >{{ entity.particular.category.name }} REPORT</strong>
                 <span class="barcode-right">{{ barcodeReport|raw }}</span>
             </th>
         </tr>
         <tr>
-            <td style="width: 40%!important;">
+            <td style="width: 35%!important;">
                 <ul class="unstyled">
                     <li><label>Invoice No:</label> {{ entity.hmsInvoice.invoice }}</li>
-                    <li><label>Patient Name:</label> {{ entity.hmsInvoice.customer.name }}</li>
+                    <li><label>Patient ID:</label> {{ entity.hmsInvoice.customer.customerId }}</li>
+                    <li><label>Name:</label> {{ entity.hmsInvoice.customer.name }}</li>
                     <li><label>Sample:</label> {{ entity.particular.sepcimen }}</li>
-                    <li><label>Ref. By:</label> {% if entity.hmsInvoice.assignDoctor is not empty %}<strong>{{ entity.assignDoctor.name }}</strong>{% endif %}</li>
+                    <li><label>Ref. By:</label> {% if entity.hmsInvoice.assignDoctor is not empty %}<strong>{{ entity.hmsInvoice.assignDoctor.name }}</strong>{% endif %}</li>
                 </ul>
             </td>
-            <td class="" style="width:25%!important;">
+            <td class="" style="width:30%!important;">
                 <ul class="unstyled" >
                     <li><label>Age:</label> {{ entity.hmsInvoice.customer.age }} {{ entity.hmsInvoice.customer.ageType }}</li>
                     <li><label>Gender:</label> {{ entity.hmsInvoice.customer.gender }} </li>
@@ -71,31 +68,30 @@
         </tr>
         <tr><td colspan="3"><strong>Investigation Name:</strong> {{ entity.particular.name }}</td></tr>
     </table>
-        {% if entity.particular.reportFormat == 1 %}
-            {% if entity.particular.pathologicalReports is defined and  entity.particular.pathologicalReports is not empty  %}
-
-                <table class="table reportTable" style="margin-top:20px;min-height:{{  entity.hmsInvoice.hospitalConfig.reportHeight }}px">
+    {% if entity.particular.reportFormat == 1 %}
+        {% if entity.particular.pathologicalReports is defined and  entity.particular.pathologicalReports is not empty  %}
+            <table class="table reportTable" style="margin-top:20px;min-height:{{  entity.hmsInvoice.hospitalConfig.reportHeight }}px">
                 <tbody>
                 <tr>
-                        <td>
-                            {% if entity.particular.pathologicalReports is not empty %}
-                                {% for item in entity.particular.pathologicalReports %}
-                                    {% if item.children is not empty %}
-                                        <div class="span6" data-match-height="report-block" style="float: left; display:block; margin-bottom:15px!important;">
-                                            <ul class="unstyled span12">
-                                                <li><h2><strong>{{ item.name }}</strong></h2></li>
-                                                {% for child in item.children %}
-                                                    <li><span class="span3" style="display:inline-block;width:180px">{{ child.name }}</span> {% if report is not empty and report[child.id] is defined and report[child.id] is not empty %}{{ report[child.id].result }}{% endif %}
-                                                        {% if entity.particular.reportUnitHide != 1 %}  {{ child.unit }} {% endif %}
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        </td>
-                    </tr>
+                    <td>
+                        {% if entity.particular.pathologicalReports is not empty %}
+                            {% for item in entity.particular.pathologicalReports %}
+                                {% if item.children is not empty %}
+                                    <div class="span6" data-match-height="report-block" style="float: left; display:block; margin-bottom:15px!important;">
+                                        <ul class="unstyled span12">
+                                            <li><h2><strong>{{ item.name }}</strong></h2></li>
+                                            {% for child in item.children %}
+                                                <li><span class="span3" style="display:inline-block;width:180px">{{ child.name }}</span> {% if report is not empty and report[child.id] is defined and report[child.id] is not empty %}{{ report[child.id].result }}{% endif %}
+                                                    {% if entity.particular.reportUnitHide != 1 %}  {{ child.unit }} {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
                 {% if  entity.invoicePathologicalReports is defined and entity.invoicePathologicalReports is not empty %}
                     <tr><td>&nbsp;</td></tr>
                     {% for meta in entity.invoicePathologicalReports %}
@@ -107,19 +103,19 @@
                 <tr><td colspan="4">Comment: {{ entity.comment|raw }}</td></tr>
                 </tbody>
             </table>
-            {% endif %}
-        {% else %}
-            {% if entity.particular.pathologicalReports is defined and  entity.particular.pathologicalReports is not empty  %}
+        {% endif %}
+    {% else %}
+        {% if entity.particular.pathologicalReports is defined and  entity.particular.pathologicalReports is not empty  %}
 
-                <table class=" reportTable" style="margin-top:20px;">
+            <table class=" reportTable" style="margin-top:20px;">
                 <thead>
                 <tr class="head-black">
-                    <td class="span3">Name</th>
-                    <td class="span1">Result</th>
+                    <th class="span3">Name</th>
+                    <th class="right">Result</th>
                     {% if entity.particular.reportUnitHide != 1 %}
-                    <td class="span2">Unit</th>
+                        <th class="span2">Unit</th>
                     {% endif %}
-                    <td class="span4">Reference</th>
+                    <th class="span4">Reference</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -132,9 +128,9 @@
                             {% for child in item.children %}
                                 <tr>
                                     <td  class="span3">{{ child.name }}</td>
-                                    <td class="span1">{% if report is not empty and report[child.id] is defined and report[child.id] is not empty %}{{ report[child.id].result }}{% endif %}</td>
+                                    <td class="right">{% if report is not empty and report[child.id] is defined and report[child.id] is not empty %}{{ report[child.id].result }}{% endif %}</td>
                                     {% if entity.particular.reportUnitHide != 1 %}
-                                    <td class="span2">{{ child.unit }}</td>
+                                        <td class="span2">{{ child.unit }}</td>
                                     {% endif %}
                                     <td class="span4">{{ child.referenceValue|raw }}</td>
                                 </tr>
@@ -142,9 +138,9 @@
                         {% elseif item.parent is empty %}
                             <tr id="remove-{{ item.id }}">
                                 <td  class="span4">{{ item.name }}</td>
-                                <td class="span1">{% if item.children is empty %}{% if report is not empty and report[item.id] is defined and report[item.id] is not empty %}{{ report[item.id].result }}{% endif %}{% endif %}</td>
+                                <td class="right">{% if item.children is empty %}{% if report is not empty and report[item.id] is defined and report[item.id] is not empty %}{{ report[item.id].result }}{% endif %}{% endif %}</td>
                                 {% if entity.particular.reportUnitHide != 1 %}
-                                <td class="span2">{{ item.unit }}</td>
+                                    <td class="span2">{{ item.unit }}</td>
                                 {% endif %}
                                 <td class="span4">{{ item.referenceValue|raw }}</td>
                             </tr>
@@ -159,52 +155,48 @@
                     {% endfor %}
                 {% endif %}
                 <tr><td colspan="4">Comment: {{ entity.comment|raw }}</td></tr>
-
                 </tbody>
             </table>
-            {% endif %}
         {% endif %}
-        {% if entity.reportContent and entity.particular.isReportContent == 1 %}
-            {{ entity.reportContent|raw }}
-        {% endif %}
-        {% if  entity.particular.isReportContent != 1 and entity.particular.pathologicalReports is defined and  entity.particular.pathologicalReports is empty %}
-            <table class="reportTable">
-                <tr><td>Comment: {{ entity.comment|raw }}</td></tr>
-            </table>
-        {% endif %}
-            <table class="table print-footer" style="position: fixed; bottom: 40px"  >
-            <tr>
-                <td class="left span4">
-                    <ul class="unstyled">
-                        <li>Prepared By</li>
-                        <li><strong>{{ entity.particularPreparedBy.profile.name }}</strong></li>
-                        <li>{% if entity.particularPreparedBy.profile.designation is not empty %}{{ entity.particularPreparedBy.profile.designation.name }}{% endif %}</li>
-                    </ul>
-                </td>
-                <td class="center span4">
-                    <ul class="unstyled">
-                        <li>Printed By</li>
-                        <li><strong>{{ printUser.profile.name }}</strong></li>
-                        {#<li>{% if entity.particularPreparedBy.profile.designation is not empty %}{{ printUser.profile.designation.name }}{% endif %}</li>#}
-                    </ul>
-                </td>
-                <td class="span4">
-                    {% if entity.assignDoctor is not empty %}
-                        <ul class="unstyled">
-                            <li><strong>{{ entity.assignDoctor.name }}</strong></li>
-                            <li>{{ entity.assignDoctor.educationalDegree|raw }}</li>
-                            <li>{{ entity.assignDoctor.specialist|raw }}</li>
-                            {% if entity.assignDoctor.category is not empty or entity.assignDoctor.department is not empty %}<li> {% if entity.assignDoctor.category is not empty %}{{ entity.assignDoctor.category.name }}{% endif %} {% if entity.assignDoctor.department is not empty %} ,{{ entity.assignDoctor.department.name }}{% endif %}</li>{% endif %}
-                            <li>{{ entity.assignDoctor.designation }}</li>
-                            <li>{{ entity.assignDoctor.currentJob }}</li>
-                        </ul>
-                    {% endif %}
-                </td>
-            </tr>
+    {% endif %}
+    {% if entity.reportContent and entity.particular.isReportContent == 1 %}
+        {{ entity.reportContent|raw }}
+    {% endif %}
+    {% if  entity.particular.isReportContent != 1 and entity.particular.pathologicalReports is defined and  entity.particular.pathologicalReports is empty %}
+        <table class="reportTable">
+            <tr><td>Comment: {{ entity.comment|raw }}</td></tr>
         </table>
-    </div>
+    {% endif %}
+    <table class="table print-footer">
+        <tr>
+            <td class="center span6">
+                <ul class="unstyled">
+                    <li>Printed By</li>
+                    <li><strong>{{ (printUser.profile) ? printUser.profile.name :'' }}</strong></li>
+                    <li>{{ "now"|date('d-m-Y h:i A') }}</li>
+                </ul>
+            </td>
+            <td class="center span6">
+                <ul class="unstyled">
+                    <li>Prepared By</li>
+                    <li><br/><br/></li>
+                    <li><strong>{{ entity.assignLabuser.name }}</strong></li>
+                    <li><strong>{{ entity.assignLabuser.doctorSignature|raw }}</strong></li>
+                </ul>
+            </td>
+
+        </tr>
+    </table>
+</div>
 </body>
 <style>
+    ul li {
+        list-style: none;
+        padding: 0 !important;
+        margin: 0 !important;
+        height: 18px;
+        line-height: 18px;
+    }
     table.reportTable{
         width: 100%!important;
         collapse: 0;
@@ -224,7 +216,7 @@
         font-weight: bold;
     }
     table.reportTable tr th.center, table.reportTable tr td.center{
-        text-align: left;
+        text-align: right;
         padding-left: 8px;
     }
     table.reportTable tr td.left{
@@ -235,8 +227,9 @@
         text-align: right;
         padding-right: 15px;
     }
+
     table label{
-        width: 80px;
+        width: 90px;
         display: inline-block;
         text-decoration: none;
     }
@@ -264,6 +257,19 @@
         float: right;
         padding-right: 10px;
     }
+
+    .print-footer {
+        height: 50px;
+        border: 1px solid #100f0f;
+        font-size: 11px;
+        position: absolute;
+    {% if entity.hmsInvoice.hospitalConfig.printMarginReportBottom  %}
+        bottom:{{ entity.hmsInvoice.hospitalConfig.printMarginReportBottom }}px;
+    {% else %}
+        bottom:0;
+    {% endif %}
+    }
+
     .print-footer .left{
         margin-left: 30px;
     }
@@ -277,9 +283,6 @@
     table.report-table {
         display:inline-block;
         width: 100%;
-    {% if entity.hmsInvoice.hospitalConfig.reportHeight  %}
-        min-height:{{ entity.hmsInvoice.hospitalConfig.reportHeight }}px;
-    {% endif %}
     }
 </style>
 </html>
