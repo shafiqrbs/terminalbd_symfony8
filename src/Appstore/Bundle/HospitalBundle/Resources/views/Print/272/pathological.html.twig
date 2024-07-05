@@ -21,7 +21,7 @@
     </script>
 </head>
 <body>
-<div style="position:relative; height:100%; margin-top:{{ entity.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ entity.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
+<div style="position: relative; height:{{ entity.hmsInvoice.hospitalConfig.reportHeight~'px' ? entity.hmsInvoice.hospitalConfig.reportHeight:'auto' }};  margin-top:{{  entity.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ entity.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
     {% if entity.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
         {% if global.webPath('file') is not empty %}
             <div style="margin-bottom:20px; text-align:center">
@@ -264,7 +264,7 @@
         border: 1px solid #100f0f;
         font-size: 11px;
         position: absolute;
-        {% if entity.hmsInvoice.hospitalConfig.reportHeight  %}
+        {% if entity.hmsInvoice.hospitalConfig.printMarginReportBottom  %}
             bottom:{{ entity.hmsInvoice.hospitalConfig.printMarginReportBottom }}px;
         {% else %}
             bottom:0;
@@ -284,9 +284,6 @@
     table.report-table {
         display:inline-block;
         width: 100%;
-    {% if entity.hmsInvoice.hospitalConfig.reportHeight  %}
-        min-height:{{ entity.hmsInvoice.hospitalConfig.reportHeight }}px;
-    {% endif %}
     }
 </style>
 </html>

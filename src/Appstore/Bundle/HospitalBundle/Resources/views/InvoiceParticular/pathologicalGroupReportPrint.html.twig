@@ -21,7 +21,7 @@
     </script>
 </head>
 <body>
-<div style="position: relative; height: 100%;  margin-top:{{  reportGroup.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ reportGroup.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
+<div style="position: relative; height:{{ reportGroup.hmsInvoice.hospitalConfig.reportHeight~'px' ? reportGroup.hmsInvoice.hospitalConfig.reportHeight:'auto' }};  margin-top:{{  reportGroup.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ reportGroup.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
     {%  if reportGroup.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
         <div style="margin-bottom:20px; text-align:center">
             <img style="max-height:100px" src="/{{ global.webPath('file') }}">
@@ -87,15 +87,15 @@
     </table>
     <table class="table print-footer">
         <tr>
-            <td class="center span4">
+            <td class="center span6">
                 <ul class="unstyled">
                     <li>Printed By</li>
                     <li><strong>{{ (printUser.profile) ? printUser.profile.name :'' }}</strong></li>
                     <li>{{ "now"|date('d-m-Y h:i A') }}</li>
                 </ul>
             </td>
-            <td class="span4 center">&nbsp;</td>
-            <td class="center span4">
+
+            <td class="center span6">
                 <ul class="unstyled">
                     <li>Prepared By</li>
                     <li><br/><br/></li>
@@ -173,12 +173,13 @@
         border: 1px solid #100f0f;
         font-size: 11px;
         position: absolute;
-        {% if reportGroup.hmsInvoice.hospitalConfig.reportHeight  %}
-            bottom:{{ reportGroup.hmsInvoice.hospitalConfig.printMarginReportBottom }}px;
-        {% else %}
-            bottom:0;
-        {% endif %}
+    {% if reportGroup.hmsInvoice.hospitalConfig.printMarginReportBottom  %}
+        bottom:{{ reportGroup.hmsInvoice.hospitalConfig.printMarginReportBottom }}px;
+    {% else %}
+        bottom:0;
+    {% endif %}
     }
+
     .print-footer .left{
         margin-left: 30px;
     }
@@ -192,9 +193,6 @@
     table.report-table {
         display:inline-block;
         width: 100%;
-    {% if reportGroup.hmsInvoice.hospitalConfig.reportHeight  %}
-        min-height:{{ reportGroup.hmsInvoice.hospitalConfig.reportHeight }}px;
-    {% endif %}
     }
 
 </style>
