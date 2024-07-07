@@ -96,7 +96,6 @@ class GlobalApiRepository extends EntityRepository {
         }
         $qb->andWhere('e.status = 1');
         $qb->orderBy('e.sku','ASC');
-        $qb->setMaxResults(100);
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
         foreach($result as $key => $row) {
