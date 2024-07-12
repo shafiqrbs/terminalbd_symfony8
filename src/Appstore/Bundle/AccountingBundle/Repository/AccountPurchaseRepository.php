@@ -4,17 +4,21 @@ namespace Appstore\Bundle\AccountingBundle\Repository;
 use Appstore\Bundle\AccountingBundle\Entity\AccountJournal;
 use Appstore\Bundle\AccountingBundle\Entity\AccountProfit;
 use Appstore\Bundle\AccountingBundle\Entity\AccountPurchase;
+use Appstore\Bundle\AccountingBundle\Entity\AccountSales;
 use Appstore\Bundle\AccountingBundle\Entity\AccountVendor;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessInvoice;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessPurchase;
 use Appstore\Bundle\BusinessBundle\Entity\BusinessPurchaseReturn;
+use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Appstore\Bundle\HospitalBundle\Entity\HmsPurchase;
 use Appstore\Bundle\InventoryBundle\Entity\Purchase;
 use Appstore\Bundle\InventoryBundle\Entity\PurchaseReturn;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchaseReturn;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineVendor;
 use Core\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchase;
+use Proxies\__CG__\Setting\Bundle\ToolBundle\Entity\TransactionMethod;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Setting\Bundle\ToolBundle\Event\Glo;
 
@@ -30,6 +34,7 @@ class AccountPurchaseRepository extends EntityRepository
 
     public function findWithSearch($globalOption,$data = '')
     {
+
         $qb = $this->createQueryBuilder('e');
         $qb->where("e.globalOption = :globalOption");
         $qb->setParameter('globalOption', $globalOption->getId());
@@ -278,6 +283,133 @@ class AccountPurchaseRepository extends EntityRepository
         return $result;
     }
 
+
+    public function apiVendorMedicineOutstanding($globalOption)
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
+        $qb->join('e.medicineVendor','vendor');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->andWhere("e.process = 'approved'");
+        $qb->groupBy('vendor.id');
+        $qb->orderBy('vendor.id','ASC');
+        $result = $qb->getQuery()->getArrayResult();
+        return $result;
+    }
+
+    public function apiInsertPurchasePayment(GlobalOption $option, $data)
+    {
+
+        $em = $this->_em;
+        $vendor = (isset($data['vendor_id']) and $data['vendor_id']) ? trim($data['vendor_id']):'';
+        $methodId = (isset($data['method_id']) and $data['method_id']) ? trim($data['method_id']):'';
+        $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['user_id']):'';
+        $amount = (isset($data['amount']) and $data['amount']) ? trim(floatval($data['amount'])):'';
+        $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'';
+        $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
+
+        $entity = new AccountPurchase();
+        $customer = $em->getRepository('MedicineBundle:MedicineVendor')->findOneBy(array('medicineConfig'=> $option->getMedicineConfig(), 'id' => $vendor));
+        $user = $em->getRepository('UserBundle:User')->find($userId);
+        $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($methodId);
+        $entity->setGlobalOption($option);
+        $entity->setMedicineVendor($customer);
+        $entity->setAccountRefNo(time());
+        $entity->setCreatedBy($user);
+        $entity->setProcess('In-progress');
+        $entity->setProcessHead($mode);
+        $entity->setRemark($remark);
+        $datetime = new \DateTime("now");
+        $entity->setUpdated($datetime);
+        if($mode == 'opening'){
+            $entity->setTotalAmount(abs($amount));
+            $entity->setPayment(0);
+            $entity->setTransactionMethod(null);
+            $entity->setAccountBank(null);
+        }else{
+            $entity->setPayment($amount);
+        }
+        if($bankAccount){
+            $entity->setAccountBank($bankAccount);
+            $entity->setTransactionMethod($bankAccount->getMethod());
+        }
+        if(empty($bankAccount)){
+           $method = $em->getRepository(TransactionMethod::class)->findOneBy(array('slug'=>'cash'));
+           $entity->setTransactionMethod($method);
+        }
+        $em->persist($entity);
+        $em->flush();
+        $accountPurchase = $this->updateVendorBalance($entity);
+        $accountPurchase->getId();
+        if($entity->getPayment() > 0){
+            $em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
+        }
+        return $entities = $this->apiPurchase($option);
+
+    }
+
+    public function apiPurchase(GlobalOption $globalOption,$data =[])
+    {
+
+        $keyword = isset($data['keyword'])  ? $data['keyword'] : '';
+        $startDate = (isset($data['start_date']) and $data['start_date'])  ? $data['start_date'] : '';
+        $endDate =   (isset($data['end_date']) and $data['end_date'])   ? $data['end_date'] : '';
+        $vendor =    isset($data['vendor_id'])? $data['vendor_id'] :'';
+        $qb = $this->createQueryBuilder('e');
+        $qb->leftJoin('e.createdBy','u');
+        $qb->leftJoin('e.approvedBy','ab');
+        $qb->leftJoin('e.accountBank','accountBank');
+        $qb->leftJoin('e.medicineVendor','vendor');
+        $qb->leftJoin('e.transactionMethod','transactionMethod');
+        $qb->select('transactionMethod.name as method');
+        $qb->addSelect('u.username as username');
+        $qb->addSelect('ab.username as approvedBy');
+        $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.purchaseAmount as totalAmount','e.payment as amount','e.balance as balance','e.accountRefNo as invoice','e.sourceInvoice as sourceInvoice');
+        $qb->addSelect('vendor.id as vendor_id','vendor.name as name','vendor.mobile as mobile');
+        $qb->addSelect('accountBank.name as account_name');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
+        if($vendor){
+            $qb->andWhere("vendor.id = :vendor")->setParameter('vendor', $vendor);
+        }
+        if ($keyword) {
+            $qb->leftJoin('e.medicinePurchase','sbs');
+            $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR sms.invoice LIKE :searchTerm');
+            $qb->setParameter('searchTerm', '%'.trim($keyword).'%');
+        }
+        if ($startDate) {
+            $start = date('Y-m-d 00:00:00',strtotime($startDate));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }
+        if ($endDate) {
+            $end = date('Y-m-d 23:59:59',strtotime($endDate));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }
+        $qb->orderBy('e.updated','DESC');
+        $qb->setMaxResults('5000');
+        $result = $qb->getQuery()->getArrayResult();
+        $data = array();
+        foreach ($result as $key => $row){
+            $data[$key]['id'] = (integer)$row['id'];
+            $data[$key]['method'] = ($row['method']) ? $row['method']:'';
+            $data[$key]['name'] = $row['name'];
+            $data[$key]['created_by'] = $row['username'];
+            $data[$key]['approved_by'] = $row['approvedBy'];
+            $data[$key]['mobile'] = $row['mobile'];
+            $data[$key]['total'] = floatval($row['totalAmount']);
+            $data[$key]['amount'] = floatval($row['amount']);
+            $data[$key]['balance'] = floatval($row['balance']);
+            $data[$key]['source_invoice'] = ($row['sourceInvoice']) ? $row['sourceInvoice']:'';
+            $data[$key]['account_bank'] = ($row['account_bank']) ? $row['account_bank']:'';
+            $data[$key]['invoice'] = ($row['invoice']) ? $row['invoice']:'';
+            $data[$key]['created'] = $row['created']->format('d-m-Y h:i A');
+            $data[$key]['updated'] = $row['updated']->format('d-m-Y h:i A');
+        }
+        return $data;
+
+    }
+
     public function vendorMedicineOutstandingOld($globalOption,$data = array())
     {
 
@@ -443,14 +575,17 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
     protected function handleSearchBetween($qb,GlobalOption $globalOption,$data)
     {
         $grn = isset($data['grn'])  ? $data['grn'] : '';
-        $startDate = isset($data['startDate'])  ? $data['startDate'] : '';
-        $endDate =   isset($data['endDate'])  ? $data['endDate'] : '';
+        $startDate = (isset($data['startDate']) and $data['startDate'])  ? $data['startDate'] : '';
+        $endDate =   (isset($data['endDate']) and $data['endDate'])  ? $data['endDate'] : '';
         $vendor =    isset($data['vendor'])? $data['vendor'] :'';
+        $name =    isset($data['name'])? $data['name'] :'';
         $processHead =    isset($data['processHead'])? $data['processHead'] :'';
         $transactionMethod =    isset($data['transactionMethod'])? $data['transactionMethod'] :'';
         $user =    isset($data['user'])? $data['user'] :'';
         $globalOption->getMainApp()->getSlug();
-        $qb->andWhere($qb->expr()->like("e.companyName", "'%$vendor%'" ));
+        if($vendor){
+            $qb->andWhere($qb->expr()->like("e.companyName", "'%$vendor%'" ));
+        }
         if (!empty($startDate) ) {
             $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
             $qb->andWhere("e.updated >= :startDate");
@@ -469,6 +604,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
             $qb->andWhere("e.updated <= :endDate");
             $qb->setParameter('endDate',$end);
         }
+
         if (!empty($grn)) {
             $qb->andWhere("e.grn = :grn");
             $qb->setParameter('grn', $grn);
@@ -850,39 +986,6 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
 
 	}
 
-	public function insertHotelAccountPurchase(HotelPurchase $entity) {
-
-		$global          = $entity->getHotelConfig()->getGlobalOption();
-		$em              = $this->_em;
-		$accountPurchase = new AccountPurchase();
-		$accountPurchase->setGlobalOption( $global );
-		$accountPurchase->setHotelPurchase($entity);
-		$accountPurchase->setAccountVendor( $entity->getVendor() );
-		$accountPurchase->setAccountBank( $entity->getAccountBank() );
-		$accountPurchase->setAccountMobileBank( $entity->getAccountMobileBank() );
-		if (!empty( $entity->getTransactionMethod())) {
-			$accountPurchase->setTransactionMethod( $entity->getTransactionMethod() );
-		}
-		$accountPurchase->setPurchaseAmount($entity->getNetTotal());
-		$accountPurchase->setPayment($entity->getPayment());
-		$accountPurchase->setCompanyName($entity->getVendor()->getCompanyName());
-		$accountPurchase->setGrn($entity->getGrn());
-		$accountPurchase->setProcessHead('hotel');
-		$accountPurchase->setProcessType('Purchase');
-		$accountPurchase->setReceiveDate($entity->getReceiveDate());
-		$accountPurchase->setProcess('approved');
-		$accountPurchase->setApprovedBy($entity->getApprovedBy());
-		$em->persist($accountPurchase);
-		$em->flush();
-		$this->updateVendorBalance($accountPurchase);
-		if($accountPurchase->getPayment() > 0 ){
-			$this->_em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
-		}
-		return $accountPurchase;
-
-	}
-
-
     public function removeApprovedAccountPurchase(Purchase $purchase)
     {
         $em = $this->_em;
@@ -919,6 +1022,25 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
 			$accountCash->execute();
 		}
 	}
+
+
+    public function apiInsertOpeningBalance(MedicineVendor $vendor,$opening)
+    {
+        $em = $this->_em;
+        $entity = new AccountPurchase();
+        $entity->setMedicineVendor($vendor);
+        $entity->setGlobalOption($vendor->getMedicineConfig()->getGlobalOption());
+        $entity->setProcessHead('Credit');
+        $datetime = new \DateTime("now");
+        $entity->setUpdated($datetime);
+        $entity->setProcess('approved');
+        $entity->setTotalAmount($opening);
+        $entity->setPayment(0);
+        $entity->setBalance($opening);
+        $entity->setTransactionMethod(null);
+        $em->persist($entity);
+        $em->flush();
+    }
 
 
 

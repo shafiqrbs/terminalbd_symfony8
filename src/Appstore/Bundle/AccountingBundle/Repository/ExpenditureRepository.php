@@ -199,6 +199,7 @@ class ExpenditureRepository extends EntityRepository
 
     }
 
+
     public function lastInsertExpenditure(Expenditure $entity)
     {
 
@@ -459,7 +460,6 @@ class ExpenditureRepository extends EntityRepository
         }
 
     }
-
 
 
 }

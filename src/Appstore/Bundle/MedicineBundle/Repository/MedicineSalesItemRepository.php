@@ -24,7 +24,7 @@ class MedicineSalesItemRepository extends EntityRepository
 
     public  function reportSalesItemPurchaseSalesOverview(User $user, $data = array()){
 
-        $userBranch = $user->getProfile()->getBranches();
+
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $qb = $this->createQueryBuilder('si');
@@ -39,10 +39,6 @@ class MedicineSalesItemRepository extends EntityRepository
         $qb->andWhere('s.process = :process');
         $qb->setParameter('process', 'Done');
         $this->handleSearchBetween($qb,$data);
-        if ($userBranch){
-            $qb->andWhere("s.branches = :branch");
-            $qb->setParameter('branch', $userBranch);
-        }
         $result = $qb->getQuery()->getOneOrNullResult();
         return $result;
     }
@@ -567,10 +563,7 @@ class MedicineSalesItemRepository extends EntityRepository
 			$qb->addSelect('item.barcode AS barcode');
 		}
 		$this->handleSearchStockBetween($qb,$data);
-		if ($userBranch){
-			$qb->andWhere("s.branches = :branch");
-			$qb->setParameter('branch', $userBranch);
-		}
+
 		$qb->groupBy('si.'.$group);
         $qb->orderBy("{$sort}",$direction);
 		return $qb->getQuery();

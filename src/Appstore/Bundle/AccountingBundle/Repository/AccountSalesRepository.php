@@ -125,6 +125,55 @@ class AccountSalesRepository extends EntityRepository
         }
 	}
 
+
+    /**
+     * @param $qb
+     * @param $data
+     */
+
+    protected function apiHandleSearchBetween($qb,$data)
+    {
+        $startDate = (isset($data['start_date']) and $data['start_date'])  ? $data['start_date'] : '';
+        $endDate =   (isset($data['end_date']) and $data['end_date'])  ? $data['end_date'] : '';
+        $user =    (isset($data['user']) and $data['user']) ? $data['user'] :'';
+        $customer_id =    (isset($data['customer_id']) and $data['customer_id']) ? $data['customer_id'] :'';
+        $customer =    (isset($data['customer']) and $data['customer'])? $data['customer'] :'';
+        $keyword =    (isset($data['keyword']) and $data['keyword'])? $data['keyword'] :'';
+
+        if (!empty($startDate) ) {
+            $start = date('Y-m-d 00:00:00',strtotime($data['start_date']));
+            $qb->andWhere("e.created >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }
+        if (!empty($endDate)) {
+            $end = date('Y-m-d 23:59:59',strtotime($data['end_date']));
+            $qb->andWhere("e.created <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }
+
+        if (!empty($user)) {
+            $qb->andWhere("e.createdBy = :user");
+            $qb->setParameter('user', $user);
+        }
+
+        if (!empty($customer_id)) {
+            $qb->andWhere("e.customer = :customer_id")->setParameter('customer_id', $customer_id);
+        }
+        if (!empty($customer)) {
+            $qb->andWhere('customer.name LIKE :searchTerm OR customer.mobile LIKE :searchTerm')->setParameter('searchTerm', '%'.trim($customer).'%');
+        }
+
+        if (!empty($keyword)) {
+            $qb->leftJoin('e.medicineSales','sms');
+            $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR sms.invoice LIKE :searchTerm');
+            $qb->setParameter('searchTerm', '%'.trim($keyword).'%');
+        }
+        if (!empty($account)) {
+            $qb->andWhere("e.accountBank = :account");
+            $qb->setParameter('account', $account);
+        }
+    }
+
     public function getProcessModes($global)
     {
         $qb = $this->createQueryBuilder('e');
@@ -514,6 +563,8 @@ class AccountSalesRepository extends EntityRepository
         $result = $qb->getQuery()->getArrayResult();
         return $result;
     }
+
+
 
     public function reportCustomerDetails($globalOption, $data = array())
     {
@@ -1127,7 +1178,6 @@ class AccountSalesRepository extends EntityRepository
 
 	/* =============  Medicine Module ================= */
 
-
 	public function insertMedicineAccountInvoice(MedicineSales $entity)
     {
         $em = $this->_em;
@@ -1262,7 +1312,6 @@ class AccountSalesRepository extends EntityRepository
 
 	/* =============  Business Module ================= */
 
-
     public function insertBusinessAccountInvoice(BusinessInvoice $entity)
     {
         $em = $this->_em;
@@ -1341,7 +1390,6 @@ class AccountSalesRepository extends EntityRepository
         $this->updateCustomerBalance($accountSales);
         return $accountSales;
     }
-
 
     public function insertStorePayment(BusinessInvoice $entity ,BusinessStoreLedger $sales)
     {
@@ -1434,10 +1482,7 @@ class AccountSalesRepository extends EntityRepository
 		}
 	}
 
-
-
 	/* =============  All Sales Reverse Module ================= */
-
 
 	public function accountReverse(AccountSales $entity)
 	{
@@ -1460,32 +1505,68 @@ class AccountSalesRepository extends EntityRepository
         }
     }
 
-    public function apiCustomerLedger(GlobalOption $globalOption,$array)
+    public function apiCustomerOutstanding($globalOption, $data = array())
     {
 
+        $amount = isset($data['amount']) ? $data['amount']:0;
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('customer.id as customerId ,customer.name as name , customer.address as address , customer.mobile as mobile,customer.email as email,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
+        $qb->join('e.customer','customer');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->andWhere("e.process = 'approved'");
+        $qb->groupBy('customer.id');
+        $this->apiHandleSearchBetween($qb,$data);
+        $qb->orderBy('customer.name', 'DESC');
+        $result = $qb->getQuery()->getArrayResult();
+        $data = array();
+        foreach ($result as $key => $row){
+            $data[$key]['customer_id'] = (integer)$row['customerId'];
+            $data[$key]['name'] = $row['name'];
+            $data[$key]['mobile'] = $row['mobile'];
+            $data[$key]['address'] = $row['address'];
+            $data[$key]['email'] = $row['email'];
+            $data[$key]['debit'] = floatval($row['debit']);
+            $data[$key]['credit'] = floatval($row['credit']);
+            $data[$key]['balance'] = floatval($row['balance']);
+
+        }
+        return $data;
+    }
+
+    public function apiSales(GlobalOption $globalOption,$array)
+    {
 
         $qb = $this->createQueryBuilder('e');
         $qb->join('e.customer','customer');
         $qb->leftJoin('e.transactionMethod','transactionMethod');
+        $qb->leftJoin('e.accountBank','accountBank');
+        $qb->leftJoin('e.createdBy','u');
+        $qb->leftJoin('e.approvedBy','ab');
         $qb->select('transactionMethod.name as method');
+        $qb->addSelect('u.username as username');
+        $qb->addSelect('ab.username as approvedBy');
         $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.accountRefNo as invoice','e.sourceInvoice as sourceInvoice');
         $qb->addSelect('customer.id as customerId','customer.name as customerName','customer.mobile as mobile');
-        $qb->where("e.globalOption = :globalOption");
-        $qb->setParameter('globalOption', $globalOption);
-        $this->handleSearchBetween($qb,$array);
+        $qb->addSelect('accountBank.name as account_bank');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
+        $this->apiHandleSearchBetween($qb,$array);
+        $qb->setMaxResults('5000');
         $qb->orderBy('e.updated','DESC');
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
         foreach ($result as $key => $row){
             $data[$key]['id'] = $row['id'];
             $data[$key]['method'] = ($row['method']) ? $row['method']:'';
-            $data[$key]['customerName'] = $row['customerName'];
-            $data[$key]['customerId'] = (integer)$row['customerId'];
+            $data[$key]['name'] = $row['customerName'];
+            $data[$key]['created_by'] = $row['username'];
+            $data[$key]['approved_by'] = $row['approvedBy'];
+            $data[$key]['customer_id'] = (integer)$row['customerId'];
             $data[$key]['mobile'] = $row['mobile'];
-            $data[$key]['sales'] = floatval($row['totalAmount']);
-            $data[$key]['receive'] = floatval($row['amount']);
+            $data[$key]['total'] = floatval($row['totalAmount']);
+            $data[$key]['amount'] = floatval($row['amount']);
             $data[$key]['balance'] = floatval($row['balance']);
-            $data[$key]['sourceInvoice'] = ($row['sourceInvoice']) ? $row['sourceInvoice']:'';
+            $data[$key]['source_invoice'] = ($row['sourceInvoice']) ? $row['sourceInvoice']:'';
+            $data[$key]['account_bank'] = ($row['account_bank']) ? $row['account_bank']:'';
             $data[$key]['invoice'] = ($row['invoice']) ? $row['invoice']:'';
             $data[$key]['created'] = $row['created']->format('d-m-Y h:i A');
             $data[$key]['updated'] = $row['updated']->format('d-m-Y h:i A');
@@ -1520,18 +1601,16 @@ class AccountSalesRepository extends EntityRepository
 
     }
 
-
     public function apiInsertSalesReceive(GlobalOption $option, $data)
     {
 
         $em = $this->_em;
         $customer = (isset($data['customer_id']) and $data['customer_id']) ? trim($data['customer_id']):'';
         $methodId = (isset($data['method_id']) and $data['method_id']) ? trim($data['method_id']):'';
-        $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['userId']):'';
+        $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['user_id']):'';
         $amount = (isset($data['amount']) and $data['amount']) ? trim(floatval($data['amount'])):'';
         $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'';
         $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
-
         $entity = new AccountSales();
         $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption'=>$option, 'id' => $customer));
         $user = $em->getRepository('UserBundle:User')->find($userId);

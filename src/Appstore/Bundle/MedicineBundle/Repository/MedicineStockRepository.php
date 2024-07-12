@@ -697,8 +697,13 @@ class MedicineStockRepository extends EntityRepository
     {
         $query = $this->createQueryBuilder('e');
         $query->join('e.medicineConfig', 'ic');
+        $query->leftJoin('e.rackNo', 'rack');
+        $query->leftJoin('e.unit', 'unit');
+        $query->leftJoin('e.medicineBrand', 'brand');
+        $query->leftJoin('brand.medicineGeneric', 'generic');
         $query->select('e.id as id');
-        $query->addSelect("CONCAT(e.name,' => MRP - ', e.salesPrice) as text");
+      //  $query->addSelect("CONCAT(e.name,' => MRP - ', e.salesPrice) as text");
+        $query->addSelect("CASE WHEN (e.rackNo IS NULL) THEN CONCAT(e.name,' [',e.remainingQuantity, '] ','- Tk.', e.salesPrice,'-',e.brandName)  ELSE CONCAT(e.name,' [',e.remainingQuantity, '] ', rack.name , '- Tk.', e.salesPrice,'-',e.brandName)  END as text");
         $query->where("ic.id = :config")->setParameter('config', $config->getId());
         if($brand){
             $query->andWhere("e.brandName = :brandName")->setParameter('brandName', $brand);
@@ -711,7 +716,7 @@ class MedicineStockRepository extends EntityRepository
         $query->andWhere('e.status =1');
         $query->groupBy('e.name');
         $query->orderBy('e.name', 'ASC');
-        $query->setMaxResults( '50' );
+        $query->setMaxResults( '100' );
         return $query->getQuery()->getResult();
 
     }

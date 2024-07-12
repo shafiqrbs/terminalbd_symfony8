@@ -139,6 +139,15 @@ class MedicineVendor
      */
     private $tpPercent = 0;
 
+    /**
+     * @var float
+     *
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $openingBalance = 0;
+
+
+
 
 
     /**
@@ -415,6 +424,21 @@ class MedicineVendor
         $this->tpPercent = $tpPercent;
     }
 
+    /**
+     * @return float
+     */
+    public function getOpeningBalance()
+    {
+        return $this->openingBalance;
+    }
+
+    /**
+     * @param float $openingBalance
+     */
+    public function setOpeningBalance($openingBalance)
+    {
+        $this->openingBalance = $openingBalance;
+    }
 
 }
 

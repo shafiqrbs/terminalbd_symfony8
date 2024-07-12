@@ -1,6 +1,7 @@
 <?php
 
 namespace Appstore\Bundle\MedicineBundle\Repository;
+use Appstore\Bundle\AccountingBundle\Entity\AccountPurchase;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineConfig;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineVendor;
 use Core\UserBundle\Entity\User;
@@ -145,6 +146,44 @@ class MedicineVendorRepository extends EntityRepository
 	    return $result;
     }
 
+
+    public function apiCreateVendor(GlobalOption $option , $data)
+    {
+        $mobile = ((isset($data['mobile']) and $data['mobile'])) ? ($data['mobile']):'';
+        $name = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
+        $companyName = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
+        $address = ((isset($data['address']) and $data['address'])) ? $data['address']:'';
+        $email = ((isset($data['email']) and $data['email'])) ? floatval($data['email']):'';
+        $openingBalance = trim((isset($data['openingBalance']) and $data['openingBalance'])) ? trim(floatval($data['openingBalance'])):0;
+        $em  = $this->_em;
+        $config = $option->getMedicineConfig();
+        $entity = $this->findOneBy(array('medicineConfig' => $config,'companyName' => $name));
+        $result =[];
+        if(empty($entity)) {
+            $entity = new MedicineVendor();
+            $entity->setMedicineConfig($config);
+            $entity->setMobile($mobile);
+            $entity->setName($name);
+            $entity->setCompanyName($companyName);
+            $entity->setEmail($email);
+            $entity->setAddress($address);
+            $em->persist($entity);
+            $em->flush();
+            if ($openingBalance > 0) {
+                $em->getRepository("AccountingBundle:AccountPurchase")->apiInsertOpeningBalance($entity, $openingBalance);
+            }
+            $result['global_id']            = (int) $entity->getId();
+            $result['name']                 = (string)$entity->getName();
+            $result['mobile']               = (string)$entity->getMobile();
+            $result['address']              = (string)$entity->getAddress();
+            $result['email']                = (string)$entity->getEmail();
+            $result['debit']                = (double)0;
+            $result['credit']               = (double)0;
+            $result['balance']              = (double)$openingBalance;
+        }
+        return $em->getRepository(AccountPurchase::class)->apiVendorMedicineOutstanding($option);
+    }
+
     public function updateVendorCompanyName(MedicineVendor $vendor)
     {
         $com = $vendor->getCompanyName();
@@ -159,6 +198,26 @@ class MedicineVendorRepository extends EntityRepository
             ->execute();
 
     }
+
+    public function apiUpdateVendor($data)
+    {
+        $em = $this->_em;
+        $id = trim($data['vendor_id']);
+        $name = trim($data['name']);
+        $address = trim($data['address']);
+        $mobile = trim($data['mobile']);
+        $email = $data['email'];
+        $customer = $this->find($id);
+        $customer->setName($name);
+        $customer->setCompanyName($name);
+        $customer->setAddress($address);
+        $customer->setMobile($mobile);
+        $customer->setEmail($email);
+        $em->persist($customer);
+        $em->flush();
+        return $em->getRepository(AccountPurchase::class)->apiVendorMedicineOutstanding($option);
+    }
+
 
     public function  copyToMedicineVendor($from, $to)
     {

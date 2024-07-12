@@ -362,7 +362,7 @@ class MedicineSalesRepository extends EntityRepository
 
     public  function reportSalesItemPurchaseSalesOverview(User $user, $data = array()){
 
-        $userBranch = $user->getProfile()->getBranches();
+
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $qb = $this->createQueryBuilder('s');
@@ -376,10 +376,6 @@ class MedicineSalesRepository extends EntityRepository
         $qb->andWhere('s.process = :process');
         $qb->setParameter('process', 'Done');
         $this->handleSearchBetween($qb,$data);
-        if ($userBranch){
-            $qb->andWhere("s.branches = :branch");
-            $qb->setParameter('branch', $userBranch);
-        }
         $result = $qb->getQuery()->getOneOrNullResult();
         return $result;
     }
@@ -387,7 +383,7 @@ class MedicineSalesRepository extends EntityRepository
     public function reportSalesTransactionOverview(User $user , $data = array())
     {
 
-        $userBranch = $user->getProfile()->getBranches();
+
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $qb = $this->createQueryBuilder('s');
@@ -398,10 +394,6 @@ class MedicineSalesRepository extends EntityRepository
         $qb->andWhere('s.process = :process');
         $qb->setParameter('process', 'Done');
         $this->handleSearchBetween($qb,$data);
-        if ($userBranch){
-            $qb->andWhere("s.branches = :branch");
-            $qb->setParameter('branch', $userBranch);
-        }
         $qb->groupBy("s.transactionMethod");
         $res = $qb->getQuery();
         return $result = $res->getArrayResult();
@@ -410,7 +402,7 @@ class MedicineSalesRepository extends EntityRepository
     public function reportSalesProcessOverview(User $user,$data)
     {
 
-        $userBranch = $user->getProfile()->getBranches();
+
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $qb = $this->createQueryBuilder('s');
@@ -418,9 +410,7 @@ class MedicineSalesRepository extends EntityRepository
         $qb->where('s.medicineConfig = :config');
         $qb->setParameter('config', $config);
         $this->handleSearchBetween($qb,$data);
-        if ($userBranch){
-            $qb->andWhere("s.branches = :branch")->setParameter('branch', $userBranch);
-        }
+
         $qb->groupBy("s.process");
         $res = $qb->getQuery();
         return $result = $res->getArrayResult();
@@ -562,7 +552,7 @@ class MedicineSalesRepository extends EntityRepository
     public function salesReport( User $user , $data)
     {
 
-        $userBranch = $user->getProfile()->getBranches();
+
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $qb = $this->createQueryBuilder('s');
@@ -582,9 +572,6 @@ class MedicineSalesRepository extends EntityRepository
         $qb->setParameter('config', $config);
         $qb->andWhere('s.process = :process');
         $qb->setParameter('process', 'Done');
-        if(!empty($userBranch)){
-            $qb->andWhere("s.branches =".$userBranch);
-        }
         $this->handleSearchBetween($qb,$data);
         $qb->orderBy('s.updated','DESC');
         $result = $qb->getQuery();
@@ -595,7 +582,7 @@ class MedicineSalesRepository extends EntityRepository
     public function salesUserReport( User $user , $data)
     {
 
-        $userBranch = $user->getProfile()->getBranches();
+
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $qb = $this->createQueryBuilder('s');
@@ -612,9 +599,6 @@ class MedicineSalesRepository extends EntityRepository
         $qb->setParameter('config', $config);
         $qb->andWhere('s.process = :process');
         $qb->setParameter('process', 'Done');
-        if(!empty($userBranch)){
-            $qb->andWhere("s.branches =".$userBranch);
-        }
         $this->handleSearchBetween($qb,$data);
         $qb->groupBy('salesBy');
         $qb->orderBy('total','DESC');
@@ -626,7 +610,7 @@ class MedicineSalesRepository extends EntityRepository
     public function salesPurchasePriceReport(User $user,$data,$x)
     {
 
-        $userBranch = $user->getProfile()->getBranches();
+
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $ids = array();
@@ -643,9 +627,6 @@ class MedicineSalesRepository extends EntityRepository
         $qb->andWhere('s.process = :process');
         $qb->setParameter('process', 'Done');
         $qb->andWhere("s.id IN (:salesId)")->setParameter('salesId', $ids);
-        if(!empty($userBranch)){
-            $qb->andWhere("s.branches =".$userBranch);
-        }
         $this->handleSearchBetween($qb,$data);
         $qb->orderBy('totalPurchaseAmount','DESC');
         $qb->groupBy('salesId');
@@ -661,7 +642,7 @@ class MedicineSalesRepository extends EntityRepository
 
 	public  function reportSalesItem(User $user, $data=''){
 
-		$userBranch = $user->getProfile()->getBranches();
+
 		$config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 		$group = isset($data['group']) ? $data['group'] :'medicineStock';
 
@@ -683,7 +664,7 @@ class MedicineSalesRepository extends EntityRepository
 
     public  function reportSalesStockItem(User $user, $data=''){
 
-        $userBranch = $user->getProfile()->getBranches();
+
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
         $group = isset($data['group']) ? $data['group'] :'medicineStock';
 
@@ -703,10 +684,7 @@ class MedicineSalesRepository extends EntityRepository
             $qb->addSelect('item.barcode AS barcode');
         }
         $this->handleSearchStockBetween($qb,$data);
-        if ($userBranch){
-            $qb->andWhere("s.branches = :branch");
-            $qb->setParameter('branch', $userBranch);
-        }
+
         $qb->groupBy('si.'.$group);
         $qb->orderBy('s.created','DESC');
         return $qb;
@@ -715,7 +693,6 @@ class MedicineSalesRepository extends EntityRepository
     public function monthlySales(User $user , $data =array())
     {
 
-        $userBranch = $user->getProfile()->getBranches();
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $compare = new \DateTime();
@@ -764,7 +741,7 @@ class MedicineSalesRepository extends EntityRepository
 
     public function salesUserPurchasePriceReport(User $user,$data)
     {
-        $userBranch = $user->getProfile()->getBranches();
+
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $qb = $this->createQueryBuilder('s');
@@ -776,9 +753,7 @@ class MedicineSalesRepository extends EntityRepository
         $qb->setParameter('config', $config);
         $qb->andWhere('s.process = :process');
         $qb->setParameter('process', 'Done');
-        if(!empty($userBranch)){
-            $qb->andWhere("s.branches =".$userBranch);
-        }
+
         $this->handleSearchBetween($qb,$data);
         $qb->orderBy('totalPurchaseAmount','DESC');
         $qb->groupBy('salesBy');
