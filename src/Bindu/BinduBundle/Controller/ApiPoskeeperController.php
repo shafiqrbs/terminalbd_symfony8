@@ -7,6 +7,7 @@ use Appstore\Bundle\AccountingBundle\Entity\AccountingConfig;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
 use Appstore\Bundle\AccountingBundle\Entity\ExpenseCategory;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Gregwar\Image\Image;
 use Proxies\__CG__\Appstore\Bundle\AccountingBundle\Entity\AccountSales;
 use Setting\Bundle\AppearanceBundle\Entity\TemplateCustomize;
@@ -926,7 +927,7 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $stock = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->insertAndroidStock($entity,$data);
+            $stock = $this->getDoctrine()->getRepository(AppsApi::class)->apiInsertStock($entity,$data);
             $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getApiStock($entity);
             $array = array(
                 'stockId'=> $stock->getId(),
@@ -941,7 +942,7 @@ class ApiPoskeeperController extends Controller
 
     }
 
-    public function stockEditAction(Request $request)
+    public function editStockAction(Request $request)
     {
         set_time_limit(0);
         ignore_user_abort(true);
@@ -953,11 +954,50 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
             $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getStockEdit($entity,$id);
+            $data = $this->getDoctrine()->getRepository(AppsApi::class)->getStockEdit($entity,$id);
 
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+    public function deleteStockAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+
+            /* @var $entity GlobalOption */
+            $em = $this->getDoctrine()->getManager();
+            $stockId = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
+            $entity = $this->getDoctrine()->getRepository(MedicineStock::class)->find($stockId);
+            if(empty($entity)) {
+                $status = 'failed';
+            }
+            try {
+                $em->remove($entity);
+                $em->flush();
+                $status = 'success';
+
+            } catch (ForeignKeyConstraintViolationException $e) {
+                $entity->setStatus(false);
+                $entity->setIsDelete(true);
+                $em->persist($entity);
+                $em->flush();
+                $status = 'warning';
+            }catch (\Exception $e) {
+                $status = 'invalid';
+            }
+            $ipAddress = $_SERVER['REMOTE_ADDR'];
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('message'=>$status, 'ipAddress'=>$ipAddress)));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
@@ -979,8 +1019,8 @@ class ApiPoskeeperController extends Controller
             $data = $request->request->all();
             $entity = $this->checkApiValidation($request);
             $stockId = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
-            $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateAndroidStock($stockId,$data);
-            $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getStockEdit($entity,$stockId);
+            $this->getDoctrine()->getRepository(AppsApi::class)->apiUpdateStock($entity,$data);
+            $data = $this->getDoctrine()->getRepository(AppsApi::class)->getStockEdit($entity,$stockId);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -1427,9 +1467,6 @@ class ApiPoskeeperController extends Controller
 
     }
 
-
-
-
     public function apiInvoiceTokenAction(Request $request)
     {
         set_time_limit(0);
@@ -1602,15 +1639,19 @@ class ApiPoskeeperController extends Controller
             $this->checkApiValidation($request);
             $salesId = $_REQUEST['id'];
             $entity = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->find($salesId);
-            if (!$entity) {
-                throw $this->createNotFoundException('Unable to find SalesItem entity.');
+            if(empty($entity)) {
+                $status = 'failed';
+            }elseif($entity){
+                $em->remove($entity);
+                $em->flush();
+                $status = 'success';
+            }else{
+                $status = 'failed';
             }
-            $em->remove($entity);
-            $em->flush();
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode(array('message'=>"success", 'ipAddress'=>$ipAddress)));
+            $response->setContent(json_encode(array('message'=>$status, 'ipAddress'=>$ipAddress)));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }

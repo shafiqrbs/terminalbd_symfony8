@@ -33,18 +33,18 @@ api_poskeeper_stock_create:
 
 api_poskeeper_stock_edit:
     path:     /poskeeper-stock-edit
-    defaults: { _controller: BinduBundle:ApiPoskeeper:stockEdit }
+    defaults: { _controller: BinduBundle:ApiPoskeeper:editStock }
 
 api_poskeeper_stock_update:
     path:     /poskeeper-stock-update
-    defaults: { _controller: BinduBundle:ApiPoskeeper:stockUpdate }
+    defaults: { _controller: BinduBundle:ApiPoskeeper:updateStock }
     methods:  POST
     options:
         expose: true
 
 api_poskeeper_stock_delete:
     path:     /poskeeper-stock-delete
-    defaults: { _controller: BinduBundle:ApiPoskeeper:stockDelete }
+    defaults: { _controller: BinduBundle:ApiPoskeeper:deleteStock }
 
 api_poskeeper_sales_create:
     path:     /poskeeper-sales-create

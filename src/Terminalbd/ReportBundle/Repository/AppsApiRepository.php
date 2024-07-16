@@ -11,6 +11,7 @@ use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchase;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchaseItem;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSales;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSalesItem;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineVendor;
 use Core\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
@@ -874,6 +875,107 @@ class AppsApiRepository extends EntityRepository
         $discount = round($data['discount'] + $totalServiceCharge);
         $total = ( $data['sub_total'] - $discount);
         return $data = array('net_total' => $total,'discount' => $discount,'cardCommission' => $totalServiceCharge);
+    }
+
+
+
+    public function apiInsertStock(GlobalOption $option,$data)
+    {
+        $config = $option->getMedicineConfig();
+        $em = $this->_em;
+        $find = $em->getRepository(MedicineStock::class)->findOneBy(array('medicineConfig'=>$config,'name' => $data['name']));
+        if(empty($find)){
+            $entity = new MedicineStock();
+            $entity->setMedicineConfig($config);
+            $entity->setName($data['name']);
+            $entity->setBrandName($data['brand_name']);
+            if($data['unit_id']){
+                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(array('id' => $data['unit_id']));
+                $entity->setUnit($unit);
+            }else{
+                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(array('name'=>'Pcs'));
+                $entity->setUnit($unit);
+            }
+            if($data['category_id']){
+                $category = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(array('medicineConfig'=>$config,'id' => $data['category_id']));
+                $entity->setCategory($category);
+            }
+            $entity->setOpeningQuantity($data['opening_quantity']);
+            $entity->setRemainingQuantity($data['opening_quantity']);
+            $entity->setSalesPrice($data['sales_price']);
+            if($data['purchase_price']){
+                $entity->setPurchasePrice($data['purchase_price']);
+            }else{
+                $purchasePrice = ((float)$data['sales_price']-(((float)$data['sales_price'] * 10)/100));
+                $entity->setPurchasePrice($purchasePrice);
+            }
+            $entity->setDescription($data['description']);
+            $entity->setMinQuantity($data['min_quantity']);
+            $entity->setMode('medicine');
+            $em->persist($entity);
+            $em->flush();
+            return $entity;
+        }
+        return $find;
+    }
+
+    public function apiUpdateStock($option,$data)
+    {
+
+        $em = $this->_em;
+        $entity = $em->getRepository(MedicineStock::class)->find($data['id']);
+        /* @var $entity MedicineStock */
+        if($entity){
+            $entity->setName($data['name']);
+            $entity->setBrandName($data['brand_name']);
+            if($data['category_id']){
+                $category = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(array('id' => $data['category_id']));
+                $entity->setCategory($category);
+            }
+            if($data['unit_id']){
+                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(array('id' => $data['unit_id']));
+                $entity->setUnit($unit);
+            }else{
+                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(array('name'=>'Pcs'));
+                $entity->setUnit($unit);
+            }
+            $entity->setSalesPrice($data['sales_price']);
+            if($data['purchase_price']){
+                $entity->setPurchasePrice($data['purchase_price']);
+            }else{
+                $purchasePrice = ((float)$data['sales_price']-(((float)$data['sales_price'] * 10)/100));
+                $entity->setPurchasePrice($purchasePrice);
+            }
+            $entity->setDescription($data['description']);
+            $entity->setMinQuantity($data['min_quantity']);
+            $entity->setMode('medicine');
+            $em->persist($entity);
+            $em->flush();
+          //  return $this->getStockEdit($option,$entity->getId());
+        }
+        return 'invalid';
+
+    }
+
+    public function getStockEdit(GlobalOption $option,$id)
+    {
+        $em = $this->_em;
+        $entity = $em->getRepository(MedicineStock::class)->find($id);
+        $data = array();
+        if($entity){
+            $data['id'] = (integer)$entity->getId();
+            $data['name'] = (String)$entity->getName();
+            $data['category_id'] = ($entity->getCategory()) ?  (integer)$entity->getCategory()->getId():0;
+            $data['category_name'] = ($entity->getCategory()) ? (String)$entity->getCategory()->getName():'';
+            $data['brand_name'] = (String)$entity->getBrandName();
+            $data['sales_price'] = (float)$entity->getSalesPrice();
+            $data['purchase_price'] = (float)$entity->getPurchasePrice();
+            $data['min_quantity'] = (float)$entity->getMinQuantity();
+            $data['unit_id'] = (string)$entity->getUnit()->getId();
+            $data['unit_name'] = (string)$entity->getUnit()->getName();
+            $data['description'] = (string)$entity->getDescription();
+        }
+        return $data;
     }
 
 
