@@ -1642,7 +1642,7 @@ class AccountSalesRepository extends EntityRepository
         if($entity->getAmount() > 0 and in_array($entity->getProcessHead(),array( 'Due','Advance')) ){
             $em->getRepository('AccountingBundle:AccountCash')->insertSalesCash($entity);
         }
-        return "valid";
+        return "success";
     }
 
     public function insertBusinessExecutive(GlobalOption $option , $data)

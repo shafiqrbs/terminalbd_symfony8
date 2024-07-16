@@ -344,7 +344,8 @@ class AccountPurchaseRepository extends EntityRepository
         if($entity->getPayment() > 0){
             $em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
         }
-        return $entities = $this->apiPurchase($option);
+        return "success";
+       // return $entities = $this->apiPurchase($option);
 
     }
 

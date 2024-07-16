@@ -102,7 +102,7 @@ api_poskeeper_account_receive:
     defaults: { _controller: BinduBundle:ApiPoskeeper:salesReceive }
     methods:  POST|GET
     options:
-        expose: true
+            exp ose: true
 
 api_poskeeper_customer_create:
     path:     /poskeeper-customer-create
