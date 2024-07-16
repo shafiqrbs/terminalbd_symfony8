@@ -175,6 +175,13 @@ class MedicinePurchase
      */
     private $revised;
 
+     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="isOnline", type="boolean", nullable=true)
+     */
+    private $isOnline;
+
     /**
      * @var datetime
      *
@@ -862,7 +869,7 @@ class MedicinePurchase
     /**
      * @param string $invoiceMode
      */
-    public function setInvoiceMode(string $invoiceMode)
+    public function setInvoiceMode($invoiceMode)
     {
         $this->invoiceMode = $invoiceMode;
     }
@@ -930,6 +937,24 @@ class MedicinePurchase
     {
         $this->brandName = $brandName;
     }
+
+    /**
+     * @return bool
+     */
+    public function isOnline()
+    {
+        return $this->isOnline;
+    }
+
+    /**
+     * @param bool $isOnline
+     */
+    public function setIsOnline($isOnline)
+    {
+        $this->isOnline = $isOnline;
+    }
+
+
 
 
 }

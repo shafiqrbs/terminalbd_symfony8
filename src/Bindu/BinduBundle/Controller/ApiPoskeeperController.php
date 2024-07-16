@@ -16,6 +16,7 @@ use Setting\Bundle\ToolBundle\Entity\TransactionMethod;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Terminalbd\ReportBundle\Entity\AppsApi;
 
 class ApiPoskeeperController extends Controller
 {
@@ -1426,64 +1427,6 @@ class ApiPoskeeperController extends Controller
 
     }
 
-    public function apiPurchaseAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-            return new Response('Unauthorized access.', 401);
-        }else{
-            /* @var $entity GlobalOption */
-            $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->getPurchaseList($entity);
-            $ipAddress = $_SERVER['REMOTE_ADDR'];
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function apiAddPurchaseAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-
-
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-            $entity = $this->checkApiValidation($request);
-            $deviceId = $request->headers->get('X-DEVICE-ID');
-
-            $jsonInput = '[
-            {
-            "invoiceId":"051900113","subTotal":"1200","discount":"200","discountType":"Flat","discountCalculation":"10","total":"1000","receive":"800","due":"200","vendorId":"223","created":"","createdBy":"","invoiceMode":"","process":""
-            }
-        ]';
-
-            $jsonInputItem = '[
-            {"purchaseId":"051900113","stockId":"10717","purchasePrice":"25","quantity":"2","subTotal":"50","measurement_id":1,"unit":"Pcs"}
-          
-        ]';
-
-            $data = $request->request->all();
-            $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->insertAndroidProcess($entity,$deviceId,'purchase',$data);
-            $ipAddress = $_SERVER['REMOTE_ADDR'];
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode(array('message'=>"success", 'ipAddress'=>$ipAddress)));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
 
 
 
@@ -1505,135 +1448,6 @@ class ApiPoskeeperController extends Controller
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode("success"));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function apiOnlineSalesListAction(Request $request)
-    {
-        if( $this->checkApiValidation($request) == 'invalid') {
-            return new Response('Unauthorized access.', 401);
-        }else{
-            $entity = $this->checkApiValidation($request);
-            $deviceId = $request->headers->get('X-DEVICE-ID');
-            $data = $_REQUEST;
-            $entities = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->apiSalesLists($entity,$data);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($entities));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-
-    }
-    public function apiOnlineSalesDetailsAction(Request $request)
-    {
-        if( $this->checkApiValidation($request) == 'invalid') {
-            return new Response('Unauthorized access.', 401);
-        }else{
-            $entity = $this->checkApiValidation($request);
-            $deviceId = $request->headers->get('X-DEVICE-ID');
-            $salesId = $_REQUEST['id'];
-            $entities = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->apiSalesInvoiceDetails($entity,$salesId);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($entities));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-    }
-    public function apiOnlineSalesDeleteAction(Request $request)
-    {
-        if( $this->checkApiValidation($request) == 'invalid') {
-            return new Response('Unauthorized access.', 401);
-        }else{
-            $em = $this->getDoctrine()->getManager();
-            $this->checkApiValidation($request);
-            $salesId = $_REQUEST['id'];
-            $entity = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->find($salesId);
-            if (!$entity) {
-                throw $this->createNotFoundException('Unable to find SalesItem entity.');
-            }
-            $em->remove($entity);
-            $em->flush();
-            $ipAddress = $_SERVER['REMOTE_ADDR'];
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode(array('message'=>"success", 'ipAddress'=>$ipAddress)));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-    }
-    public function apiOnlineSalesUpdateAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-            return new Response('Unauthorized access.', 401);
-        }else{
-
-            /* @var $entity GlobalOption */
-            $entity = $this->checkApiValidation($request);
-            $deviceId = $request->headers->get('X-DEVICE-ID');
-            $data = $request->request->all();
-            $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->insertFlutterSalesProcess($entity,$deviceId,'sales-update',$data);
-            $ipAddress = $_SERVER['REMOTE_ADDR'];
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode(array('message'=>"success", 'ipAddress'=>$ipAddress)));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-    }
-
-    public function apiOnlinePurchaseListAction()
-    {
-
-    }
-    public function apiOnlineExpenseListAction()
-    {
-
-    }
-
-    public function apiOnlineCustomerLedgerAction()
-    {
-
-    }
-    public function apiOnlineVendorLedgerAction()
-    {
-
-    }
-
-    public function stockUpdateAction(Request $request)
-    {
-
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            $data = $request->request->all();
-            $entity = $this->checkApiValidation($request);
-            $stockId = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
-            $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateAndroidStock($data);
-            if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getApiStock($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiStock($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiStock($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->getApiStock($entity);
-            }
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
@@ -1671,6 +1485,136 @@ class ApiPoskeeperController extends Controller
         }
     }
 
+    public function stockUpdateAction(Request $request)
+    {
+
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $data = $request->request->all();
+            $entity = $this->checkApiValidation($request);
+            $stockId = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
+            $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->updateAndroidStock($data);
+            if($entity->getMainApp()->getSlug() == 'miss'){
+                $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getApiStock($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
+                $data = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiStock($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
+                $data = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiStock($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'business'){
+                $data = $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->getApiStock($entity);
+            }
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    /* Sales manage */
+
+
+    public function apiCreateSalesAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+
+            $jsonInput = '[
+                {
+                "invoiceId":"051900113","subTotal":"1200","discount":"200","discountType":"Flat","discountCalculation":"10","total":"1000","receive":"800","due":"200","vendorId":"223","created":"","createdBy":"","invoiceMode":"","process":""
+                }
+            ]';
+
+            $jsonInputItem = '[
+             {"purchaseId":"051900113","stockId":"10717","purchasePrice":"25","quantity":"2","subTotal":"50","measurement_id":1,"unit":"Pcs"}
+            ]';
+
+            $data = $request->request->all();
+
+            $status = $this->getDoctrine()->getRepository(AppsApi::class)->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
+            $ipAddress = $_SERVER['REMOTE_ADDR'];
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('message'=> $status, 'ipAddress'=>$ipAddress)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function apiOnlineSalesAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+            $data = $_REQUEST;
+            $entities = $this->getDoctrine()->getRepository(AppsApi::class)->apiSalesLists($entity,$data);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($entities));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
+    public function apiOnlineSalesDetailsAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+            $salesId = $_REQUEST['id'];
+            $entities = $this->getDoctrine()->getRepository(AppsApi::class)->apiSalesInvoiceDetails($entity,$salesId);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($entities));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
+    public function apiOnlineSalesDeleteAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $em = $this->getDoctrine()->getManager();
+            $this->checkApiValidation($request);
+            $salesId = $_REQUEST['id'];
+            $entity = $this->getDoctrine()->getRepository("MedicineBundle:MedicineSales")->find($salesId);
+            if (!$entity) {
+                throw $this->createNotFoundException('Unable to find SalesItem entity.');
+            }
+            $em->remove($entity);
+            $em->flush();
+            $ipAddress = $_SERVER['REMOTE_ADDR'];
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('message'=>"success", 'ipAddress'=>$ipAddress)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
 
 
     public function customerInvoiceAction(Request $request)
@@ -1938,6 +1882,105 @@ class ApiPoskeeperController extends Controller
 
     /* Manage Vendor */
 
+
+    public function apiCreatePurchaseAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+
+            $jsonInput = '[
+                {
+                "invoiceId":"051900113","subTotal":"1200","discount":"200","discountType":"Flat","discountCalculation":"10","total":"1000","receive":"800","due":"200","vendorId":"223","created":"","createdBy":"","invoiceMode":"","process":""
+                }
+            ]';
+
+            $jsonInputItem = '[
+             {"purchaseId":"051900113","stockId":"10717","purchasePrice":"25","quantity":"2","subTotal":"50","measurement_id":1,"unit":"Pcs"}
+            ]';
+
+            $data = $request->request->all();
+            $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->insertFlutterPurchaseProcess($entity,$deviceId,'purchase',$data);
+            $ipAddress = $_SERVER['REMOTE_ADDR'];
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('message'=> $status, 'ipAddress'=>$ipAddress)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function apiOnlinePurchaseAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+            $data = $_REQUEST;
+            $entities = $this->getDoctrine()->getRepository("ReportBundle:AppsApi")->apiPurchaseLists($entity,$data);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($entities));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
+    public function apiOnlinePurchaseDetailsAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+            $salesId = $_REQUEST['id'];
+            $entities = $this->getDoctrine()->getRepository("ReportBundle:AppsApi")->apiPurchaseInvoiceDetails($entity,$salesId);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($entities));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
+    public function apiOnlinePurchaseDeleteAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $em = $this->getDoctrine()->getManager();
+            $this->checkApiValidation($request);
+            $salesId = $_REQUEST['id'];
+            $entity = $this->getDoctrine()->getRepository("MedicineBundle:MedicinePurchase")->find($salesId);
+            if(empty($entity)) {
+                $status = 'failed';
+            }elseif($entity){
+                $em->remove($entity);
+                $em->flush();
+                $status = 'success';
+            }else{
+                $status = 'failed';
+            }
+            $ipAddress = $_SERVER['REMOTE_ADDR'];
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('message'=>$status, 'ipAddress'=>$ipAddress)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
     public function purchasePaymentAction(Request $request)
     {
 
@@ -1981,7 +2024,7 @@ class ApiPoskeeperController extends Controller
         }
     }
 
-     public function vendorOutstandingAction(Request $request)
+    public function vendorOutstandingAction(Request $request)
     {
         set_time_limit(0);
         ignore_user_abort(true);
@@ -2115,7 +2158,6 @@ class ApiPoskeeperController extends Controller
 
     }
 
-
     /* Manage Expenditure */
 
     public function apiExpenseBatchAction(Request $request)
@@ -2248,6 +2290,53 @@ class ApiPoskeeperController extends Controller
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function apiExpenseDeleteAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $entity = $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiDeleteExpense($entity,$form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function apiExpenseApproveAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveExpense($entity,$form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }

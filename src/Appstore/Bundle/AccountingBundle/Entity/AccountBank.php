@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Setting\Bundle\ToolBundle\Entity\Bank;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Setting\Bundle\ToolBundle\Entity\InvoiceModule;
+use Setting\Bundle\ToolBundle\Entity\TransactionMethod;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -42,6 +43,7 @@ class AccountBank
     protected $globalOption;
 
     /**
+     * @var TransactionMethod
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\TransactionMethod")
      **/
     private  $method;

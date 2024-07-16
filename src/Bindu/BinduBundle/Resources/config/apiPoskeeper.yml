@@ -10,13 +10,7 @@ api_poskeeper_splash:
     path:     /poskeeper-splash
     defaults: { _controller: BinduBundle:ApiPoskeeper:splash }
 
-api_poskeeper_online_sales_list:
-    path:     /poskeeper-online-sales-list
-    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSalesList }
 
-api_poskeeper_online_sales_details:
-    path:     /poskeeper-online-sales-details
-    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSalesDetails }
 
 api_poskeeper_app:
     path:     /poskeeper-shop-type
@@ -52,6 +46,27 @@ api_poskeeper_stock_delete:
     path:     /poskeeper-stock-delete
     defaults: { _controller: BinduBundle:ApiPoskeeper:stockDelete }
 
+api_poskeeper_sales_create:
+    path:     /poskeeper-sales-create
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiCreateSales }
+    methods:  POST|GET
+    options:
+        expose: true
+
+api_poskeeper_online_sales_delete:
+    path:     /poskeeper-online-sales-delete
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSalesDelete }
+    methods:  POST|GET
+    options:
+        expose: true
+
+api_poskeeper_online_sales_list:
+    path:     /poskeeper-online-sales
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSales }
+
+api_poskeeper_online_sales_details:
+    path:     /poskeeper-online-sales-details
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSalesDetails }
 
 api_poskeeper_account_sales:
     path:     /poskeeper-account-sales
@@ -104,6 +119,37 @@ api_poskeeper_customer_update:
         expose: true
 
 
+api_poskeeper_online_purchase:
+    path:     /poskeeper-online-purchase
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlinePurchase }
+    methods:  POST|GET
+    options:
+       expose: true
+
+api_poskeeper_online_purchase_details:
+    path:     /poskeeper-online-purchase-details
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlinePurchaseDetails }
+    methods:  POST|GET
+    options:
+        expose: true
+
+
+
+api_poskeeper_purchase_create:
+    path:     /poskeeper-purchase-create
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiCreatePurchase }
+    methods:  POST|GET
+    options:
+        expose: true
+
+api_poskeeper_online_purchase_delete:
+    path:     /poskeeper-online-purchase-delete
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlinePurchaseDelete }
+    methods:  POST|GET
+    options:
+        expose: true
+
+
 api_poskeeper_vendor:
     path:     /poskeeper-vendor
     defaults: { _controller: BinduBundle:ApiPoskeeper:vendorOutstanding }
@@ -147,12 +193,6 @@ api_poskeeper_vendor_update:
     options:
         expose: true
 
-api_poskeeper_vendor_invoice_details:
-    path:     /poskeeper-vendor-invoice-details
-    defaults: { _controller: BinduBundle:ApiPoskeeper:vendorInvoice }
-    methods:  POST|GET
-    options:
-        expose: true
 
 api_poskeeper_vendor_payment:
     path:     /poskeeper-payment
@@ -235,13 +275,13 @@ api_poskeeper_expense_create:
 api_poskeeper_expense_approve:
     path:     /poskeeper-expense-approve
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiExpenseApprove }
-    methods:  POST
+    methods:  POST|GET
     options:
         expose: true
 
 api_poskeeper_expense_delete:
     path:     /poskeeper-expense-delete
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiExpenseDelete }
-    methods:  POST
+    methods:  get
     options:
         expose: true
