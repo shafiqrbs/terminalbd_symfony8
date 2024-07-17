@@ -386,7 +386,7 @@ class ApiPoskeeperController extends Controller
             }
 
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $vendors = $this->getDoctrine()->getRepository('MedicineBundle:MedicineVendor')->getApiVendor($entity);
+                $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountPurchase')->apiVendorMedicineOutstanding($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
                 $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->getApiVendor($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
@@ -2075,7 +2075,7 @@ class ApiPoskeeperController extends Controller
             $data = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $entities = $this->getDoctrine()->getRepository('AccountingBundle:AccountPurchase')->apiVendorMedicineOutstanding($entity,$data);
+            $entities = $this->getDoctrine()->getRepository('AccountingBundle:AccountPurchase')->apiVendorMedicineOutstanding($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));

@@ -294,7 +294,20 @@ class AccountPurchaseRepository extends EntityRepository
         $qb->groupBy('vendor.id');
         $qb->orderBy('vendor.id','ASC');
         $result = $qb->getQuery()->getArrayResult();
-        return $result;
+        $data = array();
+        foreach($result as $key => $row) {
+            $data[$key]['global_id']            = (int) $globalOption->getId();
+            $data[$key]['vendor_id']            = (int) $row['vendor_id'];
+            $data[$key]['name']                 = $row['name'];
+            $data[$key]['mobile']               = $row['mobile'];
+            $data[$key]['address']              = $row['address'];
+            $data[$key]['email']                = $row['email'];
+            $data[$key]['debit']                = (double)$row['debit'];
+            $data[$key]['credit']               = (double)$row['credit'];
+            $data[$key]['balance']              = (double)$row['balance'];
+        }
+        return $data;
+
     }
 
     public function apiInsertPurchasePayment(GlobalOption $option, $data)

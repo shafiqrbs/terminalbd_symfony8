@@ -165,7 +165,7 @@ class AccountSalesRepository extends EntityRepository
 
         if (!empty($keyword)) {
             $qb->leftJoin('e.medicineSales','sms');
-            $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR sms.invoice LIKE :searchTerm');
+            $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR sms.invoice LIKE :searchTerm OR customer.name LIKE :searchTerm OR customer.mobile LIKE :searchTerm');
             $qb->setParameter('searchTerm', '%'.trim($keyword).'%');
         }
         if (!empty($account)) {
@@ -1550,7 +1550,7 @@ class AccountSalesRepository extends EntityRepository
         $qb->addSelect('accountBank.name as account_bank');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
         $this->apiHandleSearchBetween($qb,$array);
-        $qb->setMaxResults('5000');
+        $qb->setMaxResults('500');
         $qb->orderBy('e.updated','DESC');
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
