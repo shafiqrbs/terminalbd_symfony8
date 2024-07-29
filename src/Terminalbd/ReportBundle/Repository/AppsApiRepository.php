@@ -307,16 +307,19 @@ class AppsApiRepository extends EntityRepository
         $em = $this->_em;
         $config = $option->getMedicineConfig()->getId();
         $vendor = isset($data['vendor_id'])? $data['vendor_id'] :'';
-        $customer = isset($data['customer_id'])? $data['customer_id'] :'';
-        $startDate = isset($data['start_date'])? $data['start_date'] :'';
+        $customer = (isset($data['customer_id']) and $data['customer_id'])? $data['customer_id'] :'';
+        $startDate = (isset($data['start_date']) and $data['start_date'])? $data['start_date'] :'';
         $endEnd = (isset($data['end_date']) and $data['end_date'])? $data['end_date'] :'';
         $keyword = isset($data['keyword'])? $data['keyword'] :'';
         $qb = $em->createQueryBuilder();
         $qb->from(MedicineSales::class,'s');
+        $qb->join('s.customer','c');
         $qb->select('s');
         $qb->where('s.medicineConfig = :config')->setParameter('config', $config) ;
+      //  $qb->andWhere('c.id = :customer')->setParameter('customer', $customer);
         if ($customer) {
-            $qb->andWhere('s.customer = :customer')->setParameter('customer', $customer);
+         //   $qb->andWhere("c.id = {$customer}");
+            $qb->andWhere('c.id = :customer')->setParameter('customer', $customer);
         }
         if($keyword){
             $qb->andWhere($qb->expr()->like("s.invoice", "'%$keyword%'"  ));
@@ -616,6 +619,7 @@ class AppsApiRepository extends EntityRepository
         $qb->from('MedicineBundle:MedicinePurchase','s');
         $qb->select('s');
         $qb->where('s.medicineConfig = :config')->setParameter('config', $config) ;
+        $qb->andWhere('s.medicineVendor IS NOT NULL');
         if ($vendor) {
             $qb->andWhere('s.medicineVendor = :medicineVendor')->setParameter('medicineVendor', $vendor);
         }
