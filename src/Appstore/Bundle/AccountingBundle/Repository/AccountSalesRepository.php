@@ -1542,12 +1542,14 @@ class AccountSalesRepository extends EntityRepository
         $qb->leftJoin('e.accountBank','accountBank');
         $qb->leftJoin('e.createdBy','u');
         $qb->leftJoin('e.approvedBy','ab');
+        $qb->leftJoin('e.medicineSales','md');
         $qb->select('transactionMethod.name as method');
         $qb->addSelect('u.username as username');
         $qb->addSelect('ab.username as approvedBy');
-        $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.accountRefNo as invoice','e.sourceInvoice as sourceInvoice');
+        $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.accountRefNo as invoice');
         $qb->addSelect('customer.id as customerId','customer.name as customerName','customer.mobile as mobile');
         $qb->addSelect('accountBank.name as account_bank');
+        $qb->addSelect('md.id as sourceInvoice');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
         $this->apiHandleSearchBetween($qb,$array);
         $qb->setMaxResults('500');
