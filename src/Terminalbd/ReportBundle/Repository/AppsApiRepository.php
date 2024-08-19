@@ -236,8 +236,8 @@ class AppsApiRepository extends EntityRepository
         $amount = (isset($item['amount']) and $item['amount'])? trim($item['amount']):0;
         $method = (isset($item['method_id']) and $item['method_id'])? $item['method_id']:'';
         $category = (isset($item['category_id']) and $item['category_id'])? $item['category_id']:'';
-        $touser = (isset($item['toUser_id']) and $item['toUser_id'])? $item['toUser_id']:'';
-        $createdBy = (isset($item['createdBy_id']) and $item['createdBy_id'])? $item['createdBy_id']:'';
+        $touser = (isset($item['to_user_id']) and $item['to_user_id'])? $item['to_user_id']:'';
+        $createdBy = (isset($item['created_by_id']) and $item['createdBy_id'])? $item['created_by_id']:'';
         $description = (isset($item['remark']) and $item['remark'])? $item['remark']:'';
 
         $sales = new Expenditure();
@@ -765,7 +765,7 @@ class AppsApiRepository extends EntityRepository
         $em->persist($entity);
         $em->flush();
         if(isset($data['mode']) and $data['mode'] === "online"){
-            $em->getRepository(MedicineSales::class)->insertApiPurchase($option,$entity);
+            $this->insertApiPurchase($option,$entity);
         }
         if($entity){
             return "success";

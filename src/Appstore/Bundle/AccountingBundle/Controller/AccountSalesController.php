@@ -482,6 +482,7 @@ class AccountSalesController extends Controller
             $outstanding = number_format($entity->getAmount(),2);
 
             $msg = "Sir, Your payment received BDT {$outstanding} TK, Thanks for being with us.";
+
             $msg = nl2br("=={$orgName}==  Dear {$msg}");
             if($entity->isSmsAlert() == 1 and $entity->getGlobalOption()->getAccountingConfig()->isSalesReceiveSms() == 1 and $entity->getGlobalOption()->getSmsSenderTotal() and $entity->getGlobalOption()->getSmsSenderTotal()->getRemaining() > 0 and $entity->getGlobalOption()->getNotificationConfig()->getSmsActive() == 1) {
                 $this->send($msg,$mobile);

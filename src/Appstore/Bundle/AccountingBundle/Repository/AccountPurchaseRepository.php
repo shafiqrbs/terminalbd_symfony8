@@ -388,7 +388,7 @@ class AccountPurchaseRepository extends EntityRepository
             $qb->andWhere("vendor.id = :vendor")->setParameter('vendor', $vendor);
         }
         if ($keyword) {
-            $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR sms.invoice LIKE :searchTerm');
+            $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR mp.grn LIKE :searchTerm');
             $qb->setParameter('searchTerm', '%'.trim($keyword).'%');
         }
         if ($startDate) {

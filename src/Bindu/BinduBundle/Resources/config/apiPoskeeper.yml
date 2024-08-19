@@ -136,7 +136,7 @@ api_poskeeper_online_purchase_details:
 
 
 api_poskeeper_purchase_create:
-    path:     /poskeeper-purchase-create
+    path:     /poskeeper-purchase
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiCreatePurchase }
     methods:  POST|GET
     options:
