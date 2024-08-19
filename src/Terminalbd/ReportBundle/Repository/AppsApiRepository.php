@@ -1,11 +1,9 @@
 <?php
 namespace Terminalbd\ReportBundle\Repository;
 use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
-use Appstore\Bundle\AccountingBundle\Entity\Expenditure;
+use Appstore\Bundle\AccountingBundle\Entity\AccountSales;
+use Appstore\Bundle\AccountingBundle\Entity\AccountPurchase;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
-use Appstore\Bundle\InventoryBundle\Entity\InventoryConfig;
-use Appstore\Bundle\InventoryBundle\Entity\Purchase;
-use Appstore\Bundle\InventoryBundle\Entity\Vendor;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineAndroidProcess;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchase;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchaseItem;
@@ -89,6 +87,117 @@ class AppsApiRepository extends EntityRepository
         if (!empty($keyword)) {
             $qb->andWhere($qb->expr()->like("e.accountRefNo", "'%$keyword%'" ));
         }
+
+    }
+
+    public function apiSales(GlobalOption $globalOption,$array)
+    {
+
+        $em = $this->_em;
+        $qb = $em->createQueryBuilder();
+        $qb->from(AccountSales::class,'e');
+        $qb->join('e.customer','customer');
+        $qb->leftJoin('e.transactionMethod','transactionMethod');
+        $qb->leftJoin('e.accountBank','accountBank');
+        $qb->leftJoin('e.createdBy','u');
+        $qb->leftJoin('e.approvedBy','ab');
+        $qb->leftJoin('e.medicineSales','md');
+        $qb->select('transactionMethod.name as method');
+        $qb->addSelect('u.username as username');
+        $qb->addSelect('ab.username as approvedBy');
+        $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.totalAmount as totalAmount','e.amount as amount','e.balance as balance','e.accountRefNo as invoice');
+        $qb->addSelect('customer.id as customerId','customer.name as customerName','customer.mobile as mobile');
+        $qb->addSelect('accountBank.name as account_bank');
+        $qb->addSelect('md.id as sourceInvoice');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
+        $this->apiHandleSearchBetween($qb,$array);
+        $qb->setMaxResults('500');
+        $qb->orderBy('e.updated','DESC');
+        $result = $qb->getQuery()->getArrayResult();
+        $data = array();
+        foreach ($result as $key => $row){
+            $data[$key]['id'] = (integer) $row['id'];
+            $data[$key]['method'] = ($row['method']) ? $row['method']:'';
+            $data[$key]['name'] = $row['customerName'];
+            $data[$key]['created_by'] = $row['username'];
+            $data[$key]['approved_by'] = $row['approvedBy'];
+            $data[$key]['customer_id'] = (integer)$row['customerId'];
+            $data[$key]['mobile'] = $row['mobile'];
+            $data[$key]['total'] = floatval($row['totalAmount']);
+            $data[$key]['amount'] = floatval($row['amount']);
+            $data[$key]['balance'] = floatval($row['balance']);
+            $data[$key]['source_invoice'] =  ($row['sourceInvoice']) ? (integer) $row['sourceInvoice']:null;
+            $data[$key]['account_bank'] = ($row['account_bank']) ? $row['account_bank']:'';
+            $data[$key]['invoice'] = ($row['invoice']) ? $row['invoice']:'';
+            $data[$key]['created'] = $row['created']->format('d-m-Y h:i A');
+            $data[$key]['updated'] = $row['updated']->format('d-m-Y h:i A');
+        }
+        return $data;
+
+    }
+
+    public function apiPurchase(GlobalOption $globalOption,$data =[])
+    {
+
+        $keyword = isset($data['keyword'])  ? $data['keyword'] : '';
+        $startDate = (isset($data['start_date']) and $data['start_date'])  ? $data['start_date'] : '';
+        $endDate =   (isset($data['end_date']) and $data['end_date'])   ? $data['end_date'] : '';
+        $vendor =    isset($data['vendor_id'])? $data['vendor_id'] :'';
+        $em = $this->_em;
+        $qb = $em->createQueryBuilder();
+        $qb->from(AccountPurchase::class,'e');
+        $qb->leftJoin('e.createdBy','u');
+        $qb->leftJoin('e.approvedBy','ab');
+        $qb->leftJoin('e.accountBank','accountBank');
+        $qb->leftJoin('e.medicineVendor','vendor');
+        $qb->leftJoin('e.transactionMethod','transactionMethod');
+        $qb->leftJoin('e.medicinePurchase','mp');
+        $qb->select('transactionMethod.name as method');
+        $qb->addSelect('u.username as username');
+        $qb->addSelect('ab.username as approvedBy');
+        $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.purchaseAmount as totalAmount','e.payment as amount','e.balance as balance','e.accountRefNo as invoice');
+        $qb->addSelect('vendor.id as vendor_id','vendor.name as name','vendor.mobile as mobile');
+        $qb->addSelect('accountBank.name as account_name');
+        $qb->addSelect('mp.id as sourceInvoice');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
+        if($vendor){
+            $qb->andWhere("vendor.id = :vendor")->setParameter('vendor', $vendor);
+        }
+        if ($keyword) {
+            $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR mp.grn LIKE :searchTerm');
+            $qb->setParameter('searchTerm', '%'.trim($keyword).'%');
+        }
+        if ($startDate) {
+            $start = date('Y-m-d 00:00:00',strtotime($startDate));
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $start);
+        }
+        if ($endDate) {
+            $end = date('Y-m-d 23:59:59',strtotime($endDate));
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate',$end);
+        }
+        $qb->orderBy('e.updated','DESC');
+        $qb->setMaxResults('5000');
+        $result = $qb->getQuery()->getArrayResult();
+        $data = array();
+        foreach ($result as $key => $row){
+            $data[$key]['id'] = (integer)$row['id'];
+            $data[$key]['method'] = ($row['method']) ? $row['method']:'';
+            $data[$key]['name'] = $row['name'];
+            $data[$key]['created_by'] = $row['username'];
+            $data[$key]['approved_by'] = $row['approvedBy'];
+            $data[$key]['mobile'] = $row['mobile'];
+            $data[$key]['total'] = floatval($row['totalAmount']);
+            $data[$key]['amount'] = floatval($row['amount']);
+            $data[$key]['balance'] = floatval($row['balance']);
+            $data[$key]['source_invoice'] = ($row['sourceInvoice']) ? (integer) $row['sourceInvoice']:null;
+            $data[$key]['account_bank'] = ($row['account_bank']) ? $row['account_bank']:'';
+            $data[$key]['invoice'] = ($row['invoice']) ? $row['invoice']:'';
+            $data[$key]['created'] = $row['created']->format('d-m-Y h:i A');
+            $data[$key]['updated'] = $row['updated']->format('d-m-Y h:i A');
+        }
+        return $data;
 
     }
 
@@ -880,8 +989,6 @@ class AppsApiRepository extends EntityRepository
         $total = ( $data['sub_total'] - $discount);
         return $data = array('net_total' => $total,'discount' => $discount,'cardCommission' => $totalServiceCharge);
     }
-
-
 
     public function apiInsertStock(GlobalOption $option,$data)
     {

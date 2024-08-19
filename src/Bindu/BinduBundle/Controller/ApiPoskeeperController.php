@@ -1758,7 +1758,7 @@ class ApiPoskeeperController extends Controller
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository("AccountingBundle:AccountSales")->apiSales($entity,$formArray);
+            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiSales($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -1799,7 +1799,7 @@ class ApiPoskeeperController extends Controller
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository("AccountingBundle:AccountSales")->apiSales($entity,$formArray);
+            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiSales($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -2056,7 +2056,7 @@ class ApiPoskeeperController extends Controller
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository("AccountingBundle:AccountPurchase")->apiPurchase($entity,$formArray);
+            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiPurchase($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -2097,7 +2097,7 @@ class ApiPoskeeperController extends Controller
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository("AccountingBundle:AccountPurchase")->apiPurchase($entity,$formArray);
+            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiPurchase($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -2350,8 +2350,8 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiDeleteExpense($entity,$form);
+            $id = $_REQUEST['id'];
+            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiDeleteExpense($entity,$id);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -2374,7 +2374,7 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveExpense($entity,$form);
+            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveExpense($entity,$id);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
