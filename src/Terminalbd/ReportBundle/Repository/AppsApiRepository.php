@@ -3,6 +3,7 @@ namespace Terminalbd\ReportBundle\Repository;
 use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
 use Appstore\Bundle\AccountingBundle\Entity\AccountSales;
 use Appstore\Bundle\AccountingBundle\Entity\AccountPurchase;
+use Appstore\Bundle\AccountingBundle\Entity\Expenditure;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineAndroidProcess;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchase;
@@ -13,6 +14,7 @@ use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineVendor;
 use Core\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
+use Setting\Bundle\ToolBundle\Entity\TransactionMethod;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Symfony\Component\HttpFoundation\Response;
 use Terminalbd\PosBundle\Entity\Pos;
@@ -716,6 +718,82 @@ class AppsApiRepository extends EntityRepository
         $em->getRepository('AccountingBundle:AccountSales')->insertMedicineAccountInvoice($purchase);
     }
 
+    public function apiInsertSalesReceive(GlobalOption $option, $data)
+    {
+
+        $em = $this->_em;
+        $customer = (isset($data['customer_id']) and $data['customer_id']) ? trim($data['customer_id']):'';
+        $methodId = (isset($data['method_id']) and $data['method_id']) ? trim($data['method_id']):'';
+        $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['user_id']):'';
+        $amount = (isset($data['amount']) and $data['amount']) ? trim(floatval($data['amount'])):'';
+        $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'';
+        $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
+        $entity = new AccountSales();
+        $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption'=>$option, 'id' => $customer));
+        $user = $em->getRepository('UserBundle:User')->find($userId);
+        $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($methodId);
+        $entity->setGlobalOption($option);
+        $entity->setCustomer($customer);
+        $entity->setAccountRefNo(time());
+        $entity->setCreatedBy($user);
+        $entity->setApprovedBy($user);
+        $entity->setProcess('approved');
+        $entity->setProcessHead($mode);
+        $entity->setRemark($remark);
+        $datetime = new \DateTime("now");
+        $entity->setUpdated($datetime);
+        if($mode == 'opening'){
+            $entity->setTotalAmount(abs($amount));
+            $entity->setAmount(0);
+            $entity->setTransactionMethod(null);
+            $entity->setAccountBank(null);
+        }else{
+            $entity->setAmount($amount);
+        }
+        if($bankAccount){
+            $entity->setAccountBank($bankAccount);
+        }
+        $em->persist($entity);
+        $em->flush();
+        $em->getRepository(AccountSales::class)->updateCustomerBalance($entity);
+        if($entity->getAmount() > 0 and in_array($entity->getProcessHead(),array( 'Due','Advance')) ){
+            $em->getRepository('AccountingBundle:AccountCash')->insertSalesCash($entity);
+        }
+        return "success";
+    }
+
+    public function apiDeleteSales($id)
+    {
+        $em = $this->_em;
+        $entity = $em->createQuery("DELETE AccountingBundle:AccountSales e WHERE e.id = {$id}");
+        if(!empty($entity)){
+            $entity->execute();
+        }
+        return 'success';
+    }
+
+    public function apiApproveSales(GlobalOption $option, $data)
+    {
+        $em = $this->_em;
+        $entity = $em->getRepository(AccountSales::class)->find($data['id']);
+        $user = $em->getRepository(User::class)->find($data['user']);
+        if (!empty($entity) and $entity->getProcess() != "approved" ) {
+            $entity->setProcess('approved');
+            $entity->setApprovedBy($user);
+            $accountConfig = $option->getAccountingConfig()->isAccountClose();
+            if($accountConfig == 1){
+                $datetime = new \DateTime("yesterday 23:30:30");
+                $entity->setCreated($datetime);
+                $entity->setUpdated($datetime);
+            }
+            $em->flush();
+            $em->getRepository('AccountingBundle:AccountCash')->insertSalesCash($entity);
+            return 'success';
+        } else {
+            return 'failed';
+        }
+    }
+
     public function apiPurchaseLists(GlobalOption $option, $data = array())
     {
         $em = $this->_em;
@@ -784,6 +862,91 @@ class AppsApiRepository extends EntityRepository
         endforeach;
         return $data;
 
+    }
+
+    public function apiInsertPurchasePayment(GlobalOption $option, $data)
+    {
+
+        $em = $this->_em;
+        $vendor = (isset($data['vendor_id']) and $data['vendor_id']) ? trim($data['vendor_id']):'';
+        $methodId = (isset($data['method_id']) and $data['method_id']) ? trim($data['method_id']):'';
+        $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['user_id']):'';
+        $amount = (isset($data['amount']) and $data['amount']) ? trim(floatval($data['amount'])):'';
+        $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'';
+        $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
+
+        $entity = new AccountPurchase();
+        $customer = $em->getRepository('MedicineBundle:MedicineVendor')->findOneBy(array('medicineConfig'=> $option->getMedicineConfig(), 'id' => $vendor));
+        $user = $em->getRepository('UserBundle:User')->find($userId);
+        /* @var $bankAccount AccountBank */
+        $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($methodId);
+        $entity->setGlobalOption($option);
+        $entity->setMedicineVendor($customer);
+        $entity->setAccountRefNo(time());
+        $entity->setCreatedBy($user);
+        $entity->setProcess('In-progress');
+        $entity->setProcessHead($mode);
+        $entity->setRemark($remark);
+        $datetime = new \DateTime("now");
+        $entity->setUpdated($datetime);
+        if($mode == 'opening'){
+            $entity->setTotalAmount(abs($amount));
+            $entity->setPayment(0);
+            $entity->setTransactionMethod(null);
+            $entity->setAccountBank(null);
+        }else{
+            $entity->setPayment($amount);
+        }
+        if($bankAccount){
+            $entity->setAccountBank($bankAccount);
+            $entity->setTransactionMethod($bankAccount->getMethod());
+        }
+        if(empty($bankAccount)){
+            $method = $em->getRepository(TransactionMethod::class)->findOneBy(array('slug'=>'cash'));
+            $entity->setTransactionMethod($method);
+        }
+        $em->persist($entity);
+        $em->flush();
+        $accountPurchase = $this->updateVendorBalance($entity);
+        $accountPurchase->getId();
+        if($entity->getPayment() > 0){
+            $em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
+        }
+        return "success";
+        // return $entities = $this->apiPurchase($option);
+
+    }
+
+    public function apiDeleteAccountPurchase($id)
+    {
+        $em = $this->_em;
+        $entity = $em->createQuery("DELETE AccountingBundle:AccountPurchase e WHERE e.id = {$id}");
+        if(!empty($entity)){
+            $entity->execute();
+        }
+        return 'success';
+    }
+
+    public function apiApproveAccountPurchase(GlobalOption $option, $data)
+    {
+        $em = $this->_em;
+        $entity = $em->getRepository(AccountPurchase::class)->find($data['id']);
+        $user = $em->getRepository(User::class)->find($data['user']);
+        if (!empty($entity) and $entity->getProcess() != "approved" ) {
+            $entity->setProcess('approved');
+            $entity->setApprovedBy($user);
+            $accountConfig = $option->getAccountingConfig()->isAccountClose();
+            if($accountConfig == 1){
+                $datetime = new \DateTime("yesterday 23:30:30");
+                $entity->setCreated($datetime);
+                $entity->setUpdated($datetime);
+            }
+            $em->flush();
+            $em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($entity);
+            return 'success';
+        } else {
+            return 'failed';
+        }
     }
 
     public function apiPurchaseInvoiceDetails(GlobalOption $option, $id)

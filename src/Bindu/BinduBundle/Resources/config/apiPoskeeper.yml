@@ -97,12 +97,27 @@ api_poskeeper_customer_invoice_details:
     options:
         expose: true
 
-api_poskeeper_account_receive:
+api_poskeeper_account_sales_receive:
     path:     /poskeeper-account-receive
     defaults: { _controller: BinduBundle:ApiPoskeeper:salesReceive }
     methods:  POST|GET
     options:
-            exp ose: true
+        expose: true
+
+api_poskeeper_account_sales_delete:
+    path:     /poskeeper-account-sales-delete
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiAccountingSalesDelete }
+    methods:  POST|GET
+    options:
+        expose: true
+
+
+api_poskeeper_account_sales_approve:
+    path:     /poskeeper-account-sales-approve
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiAccountingSalesApprove }
+    methods:  POST|GET
+    options:
+        expose: true
 
 api_poskeeper_customer_create:
     path:     /poskeeper-customer-create
@@ -161,6 +176,21 @@ api_poskeeper_vendor:
 api_poskeeper_account_payment:
     path:     /poskeeper-account-payment
     defaults: { _controller: BinduBundle:ApiPoskeeper:purchasePayment }
+    methods:  POST|GET
+    options:
+        expose: true
+
+api_poskeeper_account_purchase_delete:
+    path:     /poskeeper-account-purchase-delete
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiAccountingPurchaseDelete }
+    methods:  POST|GET
+    options:
+        expose: true
+
+
+api_poskeeper_account_purchase_approve:
+    path:     /poskeeper-account-purchase-approve
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiAccountingPurchaseApprove }
     methods:  POST|GET
     options:
         expose: true

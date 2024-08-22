@@ -1663,11 +1663,8 @@ class ApiPoskeeperController extends Controller
         set_time_limit(0);
         ignore_user_abort(true);
         if( $this->checkApiValidation($request) == 'invalid') {
-
             return new Response('Unauthorized access.', 401);
-
         }else{
-
             $invoice = $request->request->get('invoice');
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
@@ -1727,18 +1724,63 @@ class ApiPoskeeperController extends Controller
         set_time_limit(0);
         ignore_user_abort(true);
         if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $data = $request->request->all();
+            /* @var $option GlobalOption */
+            $option = $this->checkApiValidation($request);
+            $status = $this->getDoctrine()->getRepository(AppsApi::class)->apiInsertSalesReceive($option,$data);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('status'=> $status)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+
+    public function apiAccountingSalesDeleteAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
 
             return new Response('Unauthorized access.', 401);
 
         }else{
 
-            $data = $request->request->all();
-            /* @var $option GlobalOption */
-            $option = $this->checkApiValidation($request);
-            $status = $this->getDoctrine()->getRepository("AccountingBundle:AccountSales")->apiInsertSalesReceive($option,$data);
+            /* @var $entity GlobalOption */
+
+            $entity = $this->checkApiValidation($request);
+            $id = $_REQUEST['id'];
+            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiDeleteSales($id);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode(array('status'=> $status)));
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function apiAccountingSalesApproveAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveSales($entity,$form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
@@ -2036,10 +2078,57 @@ class ApiPoskeeperController extends Controller
             $data = $request->request->all();
             /* @var $option GlobalOption */
             $option = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository("AccountingBundle:AccountPurchase")->apiInsertPurchasePayment($option,$data);
+            $result = $this->getDoctrine()->getRepository("ReportBundle:AppsApi")->apiInsertPurchasePayment($option,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function apiAccountingPurchaseDeleteAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $entity = $this->checkApiValidation($request);
+            $id = $_REQUEST['id'];
+            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiDeleteAccountPurchase($id);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function apiAccountingPurchaseApproveAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveAccountPurchase($entity,$form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
@@ -2374,7 +2463,7 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveExpense($entity,$id);
+            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveExpense($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
