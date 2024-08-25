@@ -312,6 +312,6 @@ api_poskeeper_expense_approve:
 api_poskeeper_expense_delete:
     path:     /poskeeper-expense-delete
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiExpenseDelete }
-    methods:  get
+    methods:  POST|GET
     options:
         expose: true

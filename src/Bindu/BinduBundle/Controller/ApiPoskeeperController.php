@@ -2440,10 +2440,10 @@ class ApiPoskeeperController extends Controller
 
             $entity = $this->checkApiValidation($request);
             $id = $_REQUEST['id'];
-            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiDeleteExpense($entity,$id);
+            $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiDeleteExpense($entity,$id);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
+            $response->setContent(json_encode(array('status'=>$status)));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
@@ -2463,10 +2463,10 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveExpense($entity,$form);
+            $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveExpense($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
+            $response->setContent(json_encode(array('status' => $status)));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }

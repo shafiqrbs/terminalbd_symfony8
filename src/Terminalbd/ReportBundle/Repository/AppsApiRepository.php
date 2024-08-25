@@ -384,8 +384,8 @@ class AppsApiRepository extends EntityRepository
     public function apiApproveExpense(GlobalOption $option, $data)
     {
         $em = $this->_em;
-        $expenditure = $this->find($data['id']);
-        $user = $em->getRepository(User::class)->find($data['user']);
+        $expenditure = $em->getRepository(Expenditure::class)->find($data['id']);
+        $user = $em->getRepository(User::class)->find($data['user_id']);
         if (!empty($expenditure) and $expenditure->getProcess() != "approved" ) {
             $expenditure->setProcess('approved');
             $expenditure->setApprovedBy($user);
@@ -397,9 +397,9 @@ class AppsApiRepository extends EntityRepository
             }
             $em->flush();
             $em->getRepository('AccountingBundle:AccountCash')->insertExpenditureCash($expenditure);
-            return $entities = $this->apiExpense($option);
+            return 'success';
         } else {
-            return new Response('failed');
+            return 'failed';
         }
     }
 
@@ -409,8 +409,9 @@ class AppsApiRepository extends EntityRepository
         $entity = $em->createQuery("DELETE AccountingBundle:Expenditure e WHERE e.id = {$id}");
         if(!empty($entity)){
             $entity->execute();
+            return 'success';
         }
-        return $entities = $this->apiExpense($option);
+        return 'failed';
     }
 
     public function apiSalesLists(GlobalOption $option, $data)
