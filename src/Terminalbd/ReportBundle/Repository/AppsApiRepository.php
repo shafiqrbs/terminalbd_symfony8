@@ -777,7 +777,7 @@ class AppsApiRepository extends EntityRepository
     {
         $em = $this->_em;
         $entity = $em->getRepository(AccountSales::class)->find($data['id']);
-        $user = $em->getRepository(User::class)->find($data['user']);
+        $user = $em->getRepository(User::class)->find($data['user_id']);
         if (!empty($entity) and $entity->getProcess() != "approved" ) {
             $entity->setProcess('approved');
             $entity->setApprovedBy($user);
@@ -924,15 +924,16 @@ class AppsApiRepository extends EntityRepository
         $entity = $em->createQuery("DELETE AccountingBundle:AccountPurchase e WHERE e.id = {$id}");
         if(!empty($entity)){
             $entity->execute();
+            return "success";
         }
-        return 'success';
+        return 'failed';
     }
 
     public function apiApproveAccountPurchase(GlobalOption $option, $data)
     {
         $em = $this->_em;
         $entity = $em->getRepository(AccountPurchase::class)->find($data['id']);
-        $user = $em->getRepository(User::class)->find($data['user']);
+        $user = $em->getRepository(User::class)->find($data['user_id']);
         if (!empty($entity) and $entity->getProcess() != "approved" ) {
             $entity->setProcess('approved');
             $entity->setApprovedBy($user);
