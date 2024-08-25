@@ -725,29 +725,22 @@ class AppsApiRepository extends EntityRepository
         $entity->setCustomer($customer);
         $entity->setAccountRefNo(time());
         $entity->setCreatedBy($user);
-        $entity->setApprovedBy($user);
-        $entity->setProcess('approved');
         $entity->setProcessHead($mode);
         $entity->setRemark($remark);
         $datetime = new \DateTime("now");
         $entity->setUpdated($datetime);
-        if($mode == 'opening'){
-            $entity->setTotalAmount(abs($amount));
-            $entity->setAmount(0);
-            $entity->setTransactionMethod(null);
-            $entity->setAccountBank(null);
-        }else{
-            $entity->setAmount($amount);
-        }
+        $entity->setAmount($amount);
         if($bankAccount){
             $entity->setAccountBank($bankAccount);
         }
         $em->persist($entity);
         $em->flush();
-        $em->getRepository(AccountSales::class)->updateCustomerBalance($entity);
-        if($entity->getAmount() > 0 and in_array($entity->getProcessHead(),array( 'Due','Advance')) ){
+
+      /*
+       $em->getRepository(AccountSales::class)->updateCustomerBalance($entity);
+      if($entity->getAmount() > 0 and in_array($entity->getProcessHead(),array( 'Due','Advance')) ){
             $em->getRepository('AccountingBundle:AccountCash')->insertSalesCash($entity);
-        }
+        }*/
         return "success";
     }
 
@@ -776,6 +769,7 @@ class AppsApiRepository extends EntityRepository
                 $entity->setUpdated($datetime);
             }
             $em->flush();
+            $em->getRepository(AccountSales::class)->updateCustomerBalance($entity);
             $em->getRepository('AccountingBundle:AccountCash')->insertSalesCash($entity);
             return 'success';
         } else {
@@ -926,6 +920,7 @@ class AppsApiRepository extends EntityRepository
                 $entity->setUpdated($datetime);
             }
             $em->flush();
+            $em->getRepository(AccountPurchase::class)->updateVendorBalance($entity);
             $em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($entity);
             return 'success';
         } else {
