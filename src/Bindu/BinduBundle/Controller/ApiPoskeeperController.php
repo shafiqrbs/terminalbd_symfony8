@@ -2078,10 +2078,10 @@ class ApiPoskeeperController extends Controller
             $data = $request->request->all();
             /* @var $option GlobalOption */
             $option = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository("ReportBundle:AppsApi")->apiInsertPurchasePayment($option,$data);
+            $status = $this->getDoctrine()->getRepository("ReportBundle:AppsApi")->apiInsertPurchasePayment($option,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($result));
+            $response->setContent(json_encode(array('status' => $status)));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }

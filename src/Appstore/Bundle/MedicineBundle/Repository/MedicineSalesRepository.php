@@ -336,7 +336,6 @@ class MedicineSalesRepository extends EntityRepository
     {
 
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
-
         $qb = $this->createQueryBuilder('s');
         $qb->select('sum(s.subTotal) as subTotal , sum(s.netTotal) as total ,sum(s.received) as totalPayment , count(s.id) as totalVoucher, sum(s.due) as totalDue, sum(s.discount) as totalDiscount, sum(s.vat) as totalVat');
         $qb->where('s.medicineConfig = :config');

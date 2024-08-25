@@ -34,8 +34,8 @@ class AppsApiRepository extends EntityRepository
     protected function apiHandleSearchBetween($qb,$data)
     {
         $datetime = new \DateTime("now");
-        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $datetime->format('Y-m-d 00:00:00');
-        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']: $datetime->format('Y-m-d 23:59:59');
+        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $datetime->format('d-m-Y');
+        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']: $datetime->format('d-m-Y');
         $toUser         = (isset($data['to_user_id']) and $data['to_user_id']) ? $data['to_user_id'] :'';
         $user           = (isset($data['user_id']) and $data['user_id'])? $data['user_id'] :'';
         $keyword        = (isset($data['keyword']) and $data['keyword']) ? $data['keyword'] :'';
@@ -110,7 +110,7 @@ class AppsApiRepository extends EntityRepository
         $qb->addSelect('md.id as sourceInvoice');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
         $this->apiHandleSearchBetween($qb,$array);
-        $qb->setMaxResults('500');
+        $qb->setMaxResults('2000');
         $qb->orderBy('e.updated','DESC');
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
@@ -156,7 +156,7 @@ class AppsApiRepository extends EntityRepository
         $qb->addSelect('ab.username as approvedBy');
         $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.purchaseAmount as totalAmount','e.payment as amount','e.balance as balance','e.accountRefNo as invoice');
         $qb->addSelect('vendor.id as vendor_id','vendor.name as name','vendor.mobile as mobile');
-        $qb->addSelect('accountBank.name as account_name');
+        $qb->addSelect('accountBank.name as account_bank');
         $qb->addSelect('mp.id as sourceInvoice');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
         if($vendor){
@@ -166,18 +166,9 @@ class AppsApiRepository extends EntityRepository
             $qb->andWhere('e.sourceInvoice LIKE :searchTerm OR mp.grn LIKE :searchTerm');
             $qb->setParameter('searchTerm', '%'.trim($keyword).'%');
         }
-        if ($startDate) {
-            $start = date('Y-m-d 00:00:00',strtotime($startDate));
-            $qb->andWhere("e.updated >= :startDate");
-            $qb->setParameter('startDate', $start);
-        }
-        if ($endDate) {
-            $end = date('Y-m-d 23:59:59',strtotime($endDate));
-            $qb->andWhere("e.updated <= :endDate");
-            $qb->setParameter('endDate',$end);
-        }
+        $this->apiHandleSearchBetween($qb,$data);
         $qb->orderBy('e.updated','DESC');
-        $qb->setMaxResults('5000');
+        $qb->setMaxResults(2000);
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
         foreach ($result as $key => $row){
@@ -208,9 +199,9 @@ class AppsApiRepository extends EntityRepository
         $categorySql = '';
         $keywordSql = '';
         $accountHeadSql = '';
-
-        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']:'';
-        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:'';
+        $datetime = new \DateTime("now");
+        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $datetime->format('Y-m-d 00:00:00');
+        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']: $datetime->format('Y-m-d 11:59:59');
         $toUser         = (isset($data['to_user_id']) and $data['to_user_id']) ? $data['to_user_id'] :'';
         $user           = (isset($data['user_id']) and $data['user_id'])? $data['user_id'] :'';
         $keyword        = (isset($data['keyword']) and $data['keyword']) ? $data['keyword'] :'';
@@ -234,10 +225,10 @@ class AppsApiRepository extends EntityRepository
         from Expenditure as e
         join fos_user  as tu ON  e.toUser_id = tu.id
         join fos_user  as u ON  e.createdBy_id = u.id
-        join fos_user  as aub ON  e.approvedBy_id = aub.id
+        left join fos_user  as aub ON  e.approvedBy_id = aub.id
         join expenseCategory  as ec ON  e.expenseCategory_id = ec.id
         join account_head  as ah ON  ec.accountHead_id = ah.id
-        where e.globalOption_id = :globalOption {$dateSql} {$keywordSql} {$categorySql} {$accountHeadSql} ORDER BY e.created DESC LIMIT 2000";
+        where e.globalOption_id = :globalOption {$dateSql} {$keywordSql} {$categorySql} {$accountHeadSql} ORDER BY e.created DESC LIMIT 200";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('globalOption', $option->getId());
         $qb->execute();
@@ -825,7 +816,7 @@ class AppsApiRepository extends EntityRepository
             $qb->setParameter('createdEnd', $createdEnd);
         }
         $qb->orderBy('s.created','DESC');
-        $qb->setMaxResults(2000);
+        $qb->setMaxResults(500);
         $entities = $qb->getQuery()->getResult();
         $data = array();
         /* @var $entity MedicinePurchase */
@@ -905,13 +896,7 @@ class AppsApiRepository extends EntityRepository
         }
         $em->persist($entity);
         $em->flush();
-        $accountPurchase = $this->updateVendorBalance($entity);
-        $accountPurchase->getId();
-        if($entity->getPayment() > 0){
-            $em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
-        }
         return "success";
-        // return $entities = $this->apiPurchase($option);
 
     }
 

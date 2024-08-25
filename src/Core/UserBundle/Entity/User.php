@@ -120,7 +120,6 @@ class User extends BaseUser
 	 * })
 	 * @ORM\JoinColumn(onDelete="CASCADE")
 	 **/
-
 	protected $globalOption;
 
 	/**
