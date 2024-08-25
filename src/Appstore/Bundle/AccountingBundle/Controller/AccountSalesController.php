@@ -150,9 +150,6 @@ class AccountSalesController extends Controller
         $data = $request->request->all();
         if($form->isValid() && empty($method)){
             $entity->setGlobalOption($option);
-            if(!empty($this->getUser()->getProfile()->getBranches())){
-                $entity->setBranches($this->getUser()->getProfile()->getBranches());
-            }
             $customer = $form["customer"]->getData();
             if (empty($customer) and !empty($data['customerMobile'])){
                 $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
@@ -205,9 +202,6 @@ class AccountSalesController extends Controller
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $entity->setGlobalOption($option);
-            if(!empty($this->getUser()->getProfile()->getBranches())){
-                $entity->setBranches($this->getUser()->getProfile()->getBranches());
-            }
             $customer = $form["customer"]->getData();
             if (empty($customer) and !empty($data['customerMobile'])){
                 $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
@@ -314,9 +308,6 @@ class AccountSalesController extends Controller
         $entity->setCustomer($sales->getCustomer());
         $entity->setTransactionMethod($this->getDoctrine()->getRepository('SettingToolBundle:TransactionMethod')->find(1));
         $entity->setProcessHead('Due');
-        if(!empty($this->getUser()->getProfile()->getBranches())){
-            $entity->setBranches($this->getUser()->getProfile()->getBranches());
-        }
         $em->persist($entity);
         $em->flush();
         $form   = $this->createEditForm($entity);

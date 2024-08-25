@@ -16,9 +16,6 @@ use Core\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 use Setting\Bundle\ToolBundle\Entity\TransactionMethod;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
-use Symfony\Component\HttpFoundation\Response;
-use Terminalbd\PosBundle\Entity\Pos;
-use Terminalbd\PosBundle\Entity\PosItem;
 
 /**
  * VendorRepository
@@ -36,9 +33,9 @@ class AppsApiRepository extends EntityRepository
      */
     protected function apiHandleSearchBetween($qb,$data)
     {
-
-        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']:'';
-        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:'';
+        $datetime = new \DateTime("now");
+        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $datetime->format('Y-m-d 00:00:00');
+        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']: $datetime->format('Y-m-d 23:59:59');
         $toUser         = (isset($data['to_user_id']) and $data['to_user_id']) ? $data['to_user_id'] :'';
         $user           = (isset($data['user_id']) and $data['user_id'])? $data['user_id'] :'';
         $keyword        = (isset($data['keyword']) and $data['keyword']) ? $data['keyword'] :'';
