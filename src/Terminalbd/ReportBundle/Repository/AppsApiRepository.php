@@ -110,7 +110,7 @@ class AppsApiRepository extends EntityRepository
         $qb->addSelect('md.id as sourceInvoice');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
         $this->apiHandleSearchBetween($qb,$array);
-        $qb->setMaxResults('2000');
+        $qb->setMaxResults(2000);
         $qb->orderBy('e.updated','DESC');
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
