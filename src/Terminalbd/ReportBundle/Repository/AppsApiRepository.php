@@ -4,8 +4,11 @@ use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
 use Appstore\Bundle\AccountingBundle\Entity\AccountSales;
 use Appstore\Bundle\AccountingBundle\Entity\AccountPurchase;
 use Appstore\Bundle\AccountingBundle\Entity\Expenditure;
+use Appstore\Bundle\AccountingBundle\Entity\ExpenseCategory;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineAndroidProcess;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineParticular;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineParticularType;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchase;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchaseItem;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSales;
@@ -14,8 +17,11 @@ use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineVendor;
 use Core\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
+use Gregwar\Image\Image;
+use Setting\Bundle\ToolBundle\Entity\ProductUnit;
 use Setting\Bundle\ToolBundle\Entity\TransactionMethod;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * VendorRepository
@@ -33,9 +39,9 @@ class AppsApiRepository extends EntityRepository
      */
     protected function apiHandleSearchBetween($qb,$data)
     {
-        $datetime = new \DateTime("now");
-        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $datetime->format('d-m-Y');
-        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']: $datetime->format('d-m-Y');
+
+        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: '';
+        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']: '';
         $toUser         = (isset($data['to_user_id']) and $data['to_user_id']) ? $data['to_user_id'] :'';
         $user           = (isset($data['user_id']) and $data['user_id'])? $data['user_id'] :'';
         $keyword        = (isset($data['keyword']) and $data['keyword']) ? $data['keyword'] :'';
@@ -69,12 +75,15 @@ class AppsApiRepository extends EntityRepository
             $qb->andWhere("e.accountHead = :accountHead");
             $qb->setParameter('accountHead', $accountHead);
         }
+
         if (!empty($customer)) {
             $qb->andWhere("e.customer = :customer")->setParameter('customer', $customer);
         }
+
         if (!empty($vendor)) {
             $qb->andWhere("e.medicineVendor = :medicineVendor")->setParameter('medicineVendor', $vendor);
         }
+
         if (!empty($transactionMethod)) {
             $qb->andWhere("e.transactionMethod = :transactionMethod");
             $qb->setParameter('transactionMethod', $transactionMethod);
@@ -89,10 +98,402 @@ class AppsApiRepository extends EntityRepository
 
     }
 
-    public function apiSales(GlobalOption $globalOption,$array)
+
+    function hex6ToHex8($hex6) {
+        return str_replace("#","0xFF",$hex6);
+    }
+
+    function random_color_code() {
+        $red = str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT);
+        $green = str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT);
+        $blue = str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT);
+        return '#' . $red . $green . $blue;
+    }
+
+    public function stringNullChecker($var){
+        if (is_null($var)) {
+            return "";
+        } else {
+            return (string) $var;
+        }
+    }
+
+    public function numberNullChecker($var){
+        if (is_null($var)) {
+            return 0;
+        } else {
+            return (float) $var;
+        }
+    }
+
+    public function getApiSetup(GlobalOption $entity,$device)
+    {
+        /* @var $entity GlobalOption */
+        $address = $entity->getMedicineConfig()->getAddress();
+        $vatPercentage = $entity->getMedicineConfig()->getVatPercentage();
+        $vatRegNo = $entity->getMedicineConfig()->getVatRegNo();
+        $vatEnable = $entity->getMedicineConfig()->isVatEnable();
+        $footerMessage = $entity->getMedicineConfig()->getPrintFooterText();
+        if ($footerMessage) {
+            $printFooter = $footerMessage;
+        } else {
+            $printFooter = "Thanks For Visiting our pharmacy";
+        }
+        $mobile = empty($entity->getHotline()) ? $entity->getMobile() : $entity->getHotline();
+        $androidHeaderBg = (string)trim($entity->getTemplateCustomize()->getMobileHeaderBgColor());
+        $bodyBg = (string)trim($entity->getTemplateCustomize()->getBodyColor());
+        $appPrimaryColor = (string)trim($entity->getTemplateCustomize()->getAppPrimaryColor());
+        $appSecondaryColor = (string)trim($entity->getTemplateCustomize()->getAppSecondaryColor());
+        $appBarColor = (string)trim($entity->getTemplateCustomize()->getAppBarColor());
+        $appTextTitle = (string)trim($entity->getTemplateCustomize()->getAppTextTitle());
+        $appTextColor = (string)trim($entity->getTemplateCustomize()->getAppTextColor());
+        $appCartColor = (string)trim($entity->getTemplateCustomize()->getAppCartColor());
+        $appMoreColor = (string)trim($entity->getTemplateCustomize()->getAppMoreColor());
+        $appDiscountColor = (string)trim($entity->getTemplateCustomize()->getAppDiscountColor());
+        $appBorderActiveColor = (string)trim($entity->getTemplateCustomize()->getAppBorderActiveColor());
+        $appBorderInactiveColor = (string)trim($entity->getTemplateCustomize()->getAppBorderInactiveColor());
+        $appBorderColor = (string)trim($entity->getTemplateCustomize()->getAppBorderColor());
+        $appPositiveColor = (string)trim($entity->getTemplateCustomize()->getAppPositiveColor());
+        $appNegativeColor = (string)trim($entity->getTemplateCustomize()->getAppNegativeColor());
+        $appIconColor = (string)trim($entity->getTemplateCustomize()->getAndroidIconColor());
+        $appAnchorColor = (string)trim($entity->getTemplateCustomize()->getAndroidAnchorColor());
+        $appAnchorHoverColor = (string)trim($entity->getTemplateCustomize()->getAndroidAnchorHoverColor());
+        $searchPageBgColor = (string)trim($entity->getTemplateCustomize()->getSearchPageBgColor());
+        $appFooterBgColor = (string)trim($entity->getTemplateCustomize()->getMobileFooterBgColor());
+        $appFooterIconBgColor = (string)trim($entity->getTemplateCustomize()->getMobileFooterAnchorBg());
+        $appFooterIconColor = (string)trim($entity->getTemplateCustomize()->getMobileFooterAnchorColor());
+        $appFooterIconColorHover = (string)trim($entity->getTemplateCustomize()->getMobileFooterAnchorColorHover());
+
+        $appSuccessColor = (string)trim($entity->getTemplateCustomize()->getAppSuccessColor());
+        $appNoticeColor = (string)trim($entity->getTemplateCustomize()->getAppNoticeColor());
+        $appCloseColor = (string)trim($entity->getTemplateCustomize()->getAppCloseColor());
+        $morePageColor = (string)trim($entity->getTemplateCustomize()->getAppMoreColor());
+        $inputBgColor = (string)trim($entity->getTemplateCustomize()->getInputBgColor());
+        $inputBgFocusColor = (string)trim($entity->getTemplateCustomize()->getInputBgFocusColor());
+
+        $tawk = (string)trim($entity->getTemplateCustomize()->getTawk());
+        $pixel = (string)trim($entity->getTemplateCustomize()->getFacebookPixel());
+        $messenger = (string)trim($entity->getTemplateCustomize()->getFbMessenger());
+        $analytic = (string)trim($entity->getTemplateCustomize()->getGoogleAnalytic());
+        $logo = empty($entity->getWebPath('logo')) ? "" : $entity->getWebPath('logo');
+        $introImage = empty($entity->getTemplateCustomize()->getWebPath('androidLogo')) ? '': $entity->getTemplateCustomize()->getWebPath('androidLogo');
+        $config = $entity->getMedicineConfig();
+        $data = array(array(
+
+            'deviceId' => $device,
+            'vatEnable' => $vatEnable,
+            'setupId' => $entity->getId(),
+            'uniqueCode' => $entity->getUniqueCode(),
+            'name' => $entity->getName(),
+            'mobile' => $mobile,
+            'tawk' => $this->stringNullChecker($tawk),
+            'pixel' => $this->stringNullChecker($pixel),
+            'messenger' => $this->stringNullChecker($messenger),
+            'analytic' => $this->stringNullChecker($analytic),
+            'email' => $this->stringNullChecker($entity->getEmail()),
+            'locationId' => $entity->getLocation()->getId(),
+            'address' => $this->stringNullChecker($address),
+            'locationName' => $this->stringNullChecker($entity->getLocation()->getName()),
+            'symbol' => $config->getCurrency() ? $config->getCurrency()->getSymbol() : '',
+            'currency' => $config->getCurrency() ? $config->getCurrency()->getName():'',
+            'mainApp' => $entity->getMainApp()->getId(),
+            'mainAppName' => $entity->getMainApp()->getSlug(),
+            'appsManual' => $this->stringNullChecker($entity->getMainApp()->getApplicationManual()),
+            'website' => $this->stringNullChecker($entity->getDomain()),
+            'vatRegNo' => $this->stringNullChecker($vatRegNo),
+            'vatPercentage' => $this->numberNullChecker($vatPercentage),
+            'bodyBg' => empty($bodyBg) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($bodyBg),
+            'appHeaderBg' => empty($androidHeaderBg) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($androidHeaderBg),
+            'appPrimaryColor' => empty($appPrimaryColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appPrimaryColor),
+            'appSecondaryColor' => empty($appSecondaryColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appSecondaryColor),
+            'appBarColor' => empty($appBarColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appBarColor),
+            'appTextTitle' => empty($appTextTitle) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appTextTitle),
+            'appTextColor' => empty($appTextColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appTextColor),
+            'appCartColor' => empty($appCartColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appCartColor),
+            'appMoreColor' => empty($appMoreColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appMoreColor),
+            'appBorderColor' => empty($appBorderColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appBorderColor),
+            'appBorderActiveColor' => empty($appBorderActiveColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appBorderActiveColor),
+            'appBorderInactiveColor' => empty($appBorderInactiveColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appBorderInactiveColor),
+            'appPositiveColor' => empty($appPositiveColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appPositiveColor),
+            'appNegativeColor' => empty($appNegativeColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appNegativeColor),
+            'appDiscountColor' => empty($appDiscountColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appDiscountColor),
+            'appIconColor' => empty($appIconColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appIconColor),
+            'appAnchorColor' => empty($appAnchorColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appAnchorColor),
+            'appAnchorHoverColor' => empty($appAnchorHoverColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appAnchorHoverColor),
+            'searchPageBgColor' => empty($searchPageBgColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($searchPageBgColor),
+            'morePageBgColor' => empty($morePageColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($morePageColor),
+            'appFooterBgColor' => empty($appFooterBgColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appFooterBgColor),
+            'appFooterIconBgColor' => empty($appFooterIconBgColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appFooterIconBgColor),
+            'appFooterIconColor' => empty($appFooterIconColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appFooterIconColor),
+            'appFooterIconColorHover' => empty($appFooterIconColorHover) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appFooterIconColorHover),
+            'appSuccessColor' => empty($appSuccessColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appSuccessColor),
+            'appNoticeColor' => empty($appNoticeColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appNoticeColor),
+            'appCloseColor' => empty($appCloseColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appCloseColor),
+            'inputBgColor' => empty($inputBgColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($inputBgColor),
+            'inputBgFocusColor' => empty($inputBgFocusColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($inputBgFocusColor),
+            // 'logo'      =>  $this->imageBase64($logo),
+            'printFooter' => $printFooter,
+            'logo' => $introImage,
+            'intro' => '',
+        ));
+        return $data;
+
+    }
+
+    public function getApiUsers(GlobalOption $option){
+
+        $em = $this->_em;
+        $qb = $em->createQueryBuilder();
+        $qb->from(User::class,'e');
+        $qb->join('e.profile','p');
+        $qb->join('e.globalOption','g');
+        $qb->select('e.username as username','e.email as email', 'e.id as id', 'e.appPassword as appPassword', 'e.appRoles as appRoles');
+        $qb->addSelect('p.name as fullName');
+        $qb->where("e.globalOption =".$option->getId());
+        $qb->andWhere("g.status =1");
+        $qb->andWhere('e.domainOwner = 2');
+        $qb->andWhere('e.enabled = 1');
+        $qb->andWhere('e.isDelete != 1');
+        $qb->orderBy("p.name","ASC");
+        $result = $qb->getQuery()->getArrayResult();
+        $data =array();
+        if($result){
+            foreach($result as $key => $row){
+                $roles = unserialize(serialize($row['appRoles']));
+                $rolesSeparated = implode(",", $roles);
+                $data[$key]['user_id'] = (int) $row['id'];
+                $data[$key]['user_name'] = $row['username'];
+                $data[$key]['full_name'] = $row['fullName'];
+                $data[$key]['email'] = $row['email'];
+                $data[$key]['password'] = $row['appPassword'];
+                $data[$key]['roles'] = $rolesSeparated;
+
+            }
+        }
+
+        return $data;
+
+    }
+
+    public function getApiStock(GlobalOption $option)
+    {
+
+        $config = $option->getMedicineConfig();
+        $em = $this->_em;
+        $qb = $em->createQueryBuilder();
+        $qb->from('MedicineBundle:MedicineStock','e');
+        $qb->leftJoin('e.unit','u');
+        $qb->leftJoin('e.category','c');
+        $qb->select('e.id as stockId','e.barcode as barcode','e.name as name','e.remainingQuantity as remainingQuantity','e.salesPrice as salesPrice','e.purchasePrice as purchasePrice','e.printHide as printHidden','e.path as path');
+        $qb->addSelect('e.brandName as brandName');
+        $qb->addSelect('c.id as category_id','c.name as category');
+        $qb->addSelect('u.id as unitId','u.name as unitName');
+        $qb->where('e.medicineConfig = :config')->setParameter('config', $config->getId()) ;
+        if($config->isActiveQuantity() == 1){
+            $qb->andWhere('e.purchaseQuantity > :searchTerm OR e.openingQuantity > :searchTerm')->setParameter('searchTerm', 0);
+        }
+        if($config->isRemainingQuantity() == 1){
+            $qb->andWhere('e.remainingQuantity > :searchTerm')->setParameter('searchTerm', 0);
+        }
+        $qb->andWhere('e.status = 1');
+        $qb->orderBy('e.name','ASC');
+        $result = $qb->getQuery()->getArrayResult();
+        $data = array();
+        foreach($result as $key => $row) {
+
+            $data[$key]['global_id']            = (int) $option->getId();
+            $data[$key]['item_id']              = (int) $row['stockId'];
+            $printName = trim($row['name']);
+            $data[$key]['category_id']      = (int) $row['category_id'];;
+            $data[$key]['category_name']     = trim($row['category']);
+            $data[$key]['brand_name']            = trim($row['brandName']);
+            $data[$key]['barcode']              = $row['barcode'];
+            $data[$key]['unit']                 = ($row['unitName']) ? $row['unitName'] : "";
+            $data[$key]['name']                 = $printName;
+            $data[$key]['print_name']           = $printName;
+            $data[$key]['quantity']             = $row['remainingQuantity'];
+            $data[$key]['sales_price']           = $row['salesPrice'];
+            $data[$key]['purchase_price']        = $row['purchasePrice'];
+            $data[$key]['print_hidden']          = ($row['printHidden']) ? $row['printHidden'] : ""; $row['printHidden'];
+            if($row['path']){
+                $path = $this->resizeFilter("uploads/domain/{$option->getId()}/product/{$row['path']}");
+                $data[$key]['image_path']            =  $path;
+            }else{
+                $data[$key]['image_path']            = "";
+            }
+
+        }
+        return $data;
+    }
+
+    public function getApiParticular(GlobalOption $option,$slug)
+    {
+
+        $config = $option->getMedicineConfig()->getId();
+        $em = $this->_em;
+        $qb = $em->createQueryBuilder();
+        $qb->from(MedicineParticular::class,'e');
+        $qb->join('e.particularType','pt');
+        $qb->select('e.name','e.id','e.slug');
+        $qb->where("e.medicineConfig = :medicineConfig");
+        $qb->setParameter('medicineConfig', $config);
+        $qb->andWhere("pt.slug = '{$slug}'");
+        $result = $qb->getQuery()->getArrayResult();
+        $data = array();
+        $idName = "{$slug}_id";
+        if($result){
+            foreach($result as $key => $row) {
+                $data[$key][$idName]    = (int) $row['id'];
+                $data[$key]['name']           = $row['name'];
+                $data[$key]['slug']           = $row['slug'];
+            }
+        }
+        return $data;
+    }
+
+    public function getApiCustomerOutstanding($globalOption)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb ->from('AccountingBundle:AccountSales','e');
+        $qb->select('customer.id as customerId ,customer.name as name ,customer.email as email , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
+        $qb->join('e.customer','customer');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->groupBy('customer.id');
+        $qb->orderBy('name', 'ASC');
+        $result = $qb->getQuery()->getArrayResult();
+        $data = array();
+        foreach($result as $key => $row) {
+            $data[$key]['global_id']            = (int) $globalOption->getId();
+            $data[$key]['customer_id']          = (int) $row['customerId'];
+            $data[$key]['name']                 = $row['name'];
+            $data[$key]['mobile']               = $row['mobile'];
+            $data[$key]['address']              = $row['address'];
+            $data[$key]['email']                = $row['email'];
+            $data[$key]['debit']                = (double)$row['debit'];
+            $data[$key]['credit']               = (double)$row['credit'];
+            $data[$key]['balance']              = (double)$row['balance'];
+        }
+        return $data;
+
+    }
+
+    public function apiApiVendorOutstanding($globalOption)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb ->from('AccountingBundle:AccountPurchase','e');
+        $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.email as email,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
+        $qb->join('e.medicineVendor','vendor');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->groupBy('vendor.id');
+        $qb->orderBy('vendor.name','ASC');
+        $result = $qb->getQuery()->getArrayResult();
+        $data = array();
+        foreach($result as $key => $row) {
+            $data[$key]['global_id']            = (int) $globalOption->getId();
+            $data[$key]['vendor_id']            = (int) $row['vendor_id'];
+            $data[$key]['name']                 = $row['name'];
+            $data[$key]['mobile']               = $row['mobile'];
+            $data[$key]['address']              = $row['address'];
+            $data[$key]['email']                = $row['email'];
+            $data[$key]['debit']                = (double)$row['debit'];
+            $data[$key]['credit']               = (double)$row['credit'];
+            $data[$key]['balance']              = (double)$row['balance'];
+        }
+        return $data;
+
+    }
+
+    public function getTransactionModes(){
+        $array = array(
+            array( 'item_id' => (int)1, 'name' => "Due"),
+            array( 'item_id' => (int)2, 'name' => "Advance"),
+            array( 'item_id' => (int)3, 'name' => "Debit"),
+            array( 'item_id' => (int)4, 'name' => "Credit"),
+            array( 'item_id' => (int)5, 'name' => "Discount"),
+            array( 'item_id' => (int)6, 'name' => "Commission"),
+        );
+        return $array;
+    }
+
+    public function getApiMethodTransaction($entity){
+
+        $em = $this->_em;
+        $methods = array();
+        $accountBanks = $em->getRepository(AccountBank::class)->findBy(array('globalOption' => $entity->getId(),'status'=>1));
+
+        /* @var $row AccountBank */
+
+        if($accountBanks){
+            foreach($accountBanks as $key => $row) {
+                $methods[$key]['method_id']            = (int) $row->getId();
+                $methods[$key]['method_name']          = $row->getName();
+                $methods[$key]['method_mode']          = ($row and $row->getMethod()) ? $row->getMethod()->getName():'';
+                $methods[$key]['service_charge']       = $row->getServiceCharge();
+                $methods[$key]['is_default']       = ($row->isDefault() == 1) ? 1:0;
+                if($row->getWebPath()){
+                    $path = $this->resizeFilter($row->getWebPath(),120,120);
+                    $methods[$key]['image_path']            =  $path;
+                }else{
+                    $methods[$key]['image_path']            = "";
+                }
+            }
+        }
+        return $methods;
+    }
+
+    public function resizeFilter($pathToImage, $width = 400, $height = 400)
+    {
+        $path = '/' . Image::open(__DIR__.'/../../../../../web/' . $pathToImage)->cropResize($width, $height, 'transparent', 'top', 'left')->guess();
+        return "http://{$_SERVER['HTTP_HOST']}/{$pathToImage}";
+    }
+
+    public function getApiExpenseCategory($entity){
+
+        $em = $this->_em;
+
+        $expenseCat = $em->getRepository(ExpenseCategory::class)->findBy(array('globalOption'=> $entity,'status'=>1));
+        $expenseCategories = array();
+
+        /* @var $row ExpenseCategory */
+
+        if($expenseCat) {
+            foreach ($expenseCat as $key => $row) {
+                $expenseCategories[$key]['category_id'] = (int)$row->getId();
+                $expenseCategories[$key]['name'] = $row->getName();
+            }
+        }
+        return $expenseCategories;
+    }
+
+    public function getApiProductUnit(){
+        $em = $this->_em;
+        $qb = $em->createQueryBuilder();
+        $qb->from(ProductUnit::class,'e');
+        $qb->select('e.id as id , e.name as name');
+        $qb->groupBy('e.name');
+        $qb->orderBy('e.name', 'ASC');
+        $result =  $qb->getQuery()->getResult();
+        $data = array();
+
+        /* @var $row ProductUnit */
+
+        foreach($result as $key => $row) {
+
+            $data[$key]['unit_id']          = (int) $row['id'];
+            $data[$key]['name']             = $row['name'];
+        }
+        return $data;
+
+    }
+
+    public function apiAccountSales(GlobalOption $globalOption,$array)
     {
 
         $em = $this->_em;
+        $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:50; // Example: the current page number
+        $offset = ($currentPage - 1) * $itemsPerPage;
+
         $qb = $em->createQueryBuilder();
         $qb->from(AccountSales::class,'e');
         $qb->join('e.customer','customer');
@@ -110,7 +511,8 @@ class AppsApiRepository extends EntityRepository
         $qb->addSelect('md.id as sourceInvoice');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
         $this->apiHandleSearchBetween($qb,$array);
-        $qb->setMaxResults(2000);
+        $qb->setFirstResult($offset);
+        $qb->setMaxResults($itemsPerPage);
         $qb->orderBy('e.updated','DESC');
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
@@ -135,12 +537,14 @@ class AppsApiRepository extends EntityRepository
 
     }
 
-    public function apiPurchase(GlobalOption $globalOption,$data =[])
+    public function apiAccountPurchase(GlobalOption $globalOption,$data =[])
     {
 
+        $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:50; // Example: the current page number
+        $offset = ($currentPage - 1) * $itemsPerPage;
+
         $keyword = isset($data['keyword'])  ? $data['keyword'] : '';
-        $startDate = (isset($data['start_date']) and $data['start_date'])  ? $data['start_date'] : '';
-        $endDate =   (isset($data['end_date']) and $data['end_date'])   ? $data['end_date'] : '';
         $vendor =    isset($data['vendor_id'])? $data['vendor_id'] :'';
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
@@ -168,7 +572,8 @@ class AppsApiRepository extends EntityRepository
         }
         $this->apiHandleSearchBetween($qb,$data);
         $qb->orderBy('e.updated','DESC');
-        $qb->setMaxResults(2000);
+        $qb->setFirstResult($offset);
+        $qb->setMaxResults($itemsPerPage);
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
         foreach ($result as $key => $row){
@@ -402,11 +807,15 @@ class AppsApiRepository extends EntityRepository
         return 'failed';
     }
 
-    public function apiSalesLists(GlobalOption $option, $data)
+    public function apiInventorySales(GlobalOption $option, $data)
     {
         $em = $this->_em;
+
+        $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:50; // Example: the current page number
+        $offset = ($currentPage - 1) * $itemsPerPage;
+
         $config = $option->getMedicineConfig()->getId();
-        $vendor = isset($data['vendor_id'])? $data['vendor_id'] :'';
         $customer = (isset($data['customer_id']) and $data['customer_id'])? $data['customer_id'] :'';
         $startDate = (isset($data['start_date']) and $data['start_date'])? $data['start_date'] :'';
         $endEnd = (isset($data['end_date']) and $data['end_date'])? $data['end_date'] :'';
@@ -416,9 +825,7 @@ class AppsApiRepository extends EntityRepository
         $qb->join('s.customer','c');
         $qb->select('s');
         $qb->where('s.medicineConfig = :config')->setParameter('config', $config) ;
-      //  $qb->andWhere('c.id = :customer')->setParameter('customer', $customer);
         if ($customer) {
-         //   $qb->andWhere("c.id = {$customer}");
             $qb->andWhere('c.id = :customer')->setParameter('customer', $customer);
         }
         if($keyword){
@@ -430,7 +837,6 @@ class AppsApiRepository extends EntityRepository
             $qb->andWhere("s.created >= :createdStart");
             $qb->setParameter('createdStart', $created);
         }
-
         if ($endEnd) {
             $compareTo = new \DateTime($endEnd);
             $createdEnd =  $compareTo->format('Y-m-d 23:59:59');
@@ -438,7 +844,8 @@ class AppsApiRepository extends EntityRepository
             $qb->setParameter('createdEnd', $createdEnd);
         }
         $qb->orderBy('s.created','DESC');
-        $qb->setMaxResults(2000);
+        $qb->setFirstResult($offset); // Set the offset
+        $qb->setMaxResults($itemsPerPage);
         $entities = $qb->getQuery()->getResult();
         $data = array();
         /* @var $entity MedicineSales */
@@ -777,13 +1184,17 @@ class AppsApiRepository extends EntityRepository
         }
     }
 
-    public function apiPurchaseLists(GlobalOption $option, $data = array())
+    public function apiInventoryPurchase(GlobalOption $option, $data = array())
     {
         $em = $this->_em;
+
+        $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:50; // Example: the current page number
+        $offset = ($currentPage - 1) * $itemsPerPage;
         $config = $option->getMedicineConfig()->getId();
         $vendor = isset($data['vendor_id'])? $data['vendor_id'] :'';
-        $startDate = isset($data['start_date'])? $data['start_date'] : date('y-m-d');
-        $endEnd = (isset($data['end_date']) and $data['end_date'])? $data['end_date'] : date('y-m-d');
+        $startDate = isset($data['start_date'])? $data['start_date'] : '';
+        $endEnd = (isset($data['end_date']) and $data['end_date'])? $data['end_date'] : '';
         $keyword = isset($data['keyword'])? $data['keyword'] :'';
         $qb = $em->createQueryBuilder();
         $qb->from('MedicineBundle:MedicinePurchase','s');
@@ -810,7 +1221,8 @@ class AppsApiRepository extends EntityRepository
             $qb->setParameter('createdEnd', $createdEnd);
         }
         $qb->orderBy('s.created','DESC');
-        $qb->setMaxResults(500);
+        $qb->setFirstResult($offset);
+        $qb->setMaxResults($itemsPerPage);
         $entities = $qb->getQuery()->getResult();
         $data = array();
         /* @var $entity MedicinePurchase */

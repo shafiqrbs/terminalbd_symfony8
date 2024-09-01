@@ -3,16 +3,12 @@
 namespace Bindu\BinduBundle\Controller;
 
 use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
-use Appstore\Bundle\AccountingBundle\Entity\AccountingConfig;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
-use Appstore\Bundle\AccountingBundle\Entity\ExpenseCategory;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Gregwar\Image\Image;
-use Proxies\__CG__\Appstore\Bundle\AccountingBundle\Entity\AccountSales;
 use Setting\Bundle\AppearanceBundle\Entity\TemplateCustomize;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
-use Setting\Bundle\ToolBundle\Entity\PaymentCard;
 use Setting\Bundle\ToolBundle\Entity\TransactionMethod;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -197,7 +193,7 @@ class ApiPoskeeperController extends Controller
         $uniqueCode = $formData['uniqueCode'];
         $mobile = $formData['mobile'];
         $deviceId = $formData['deviceId'];
-        $data = array();
+        $setup = array();
         $entity = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->findOneBy(array('uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1));
         if (empty($entity) and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
             return new Response('Unauthorized access.', 401);
@@ -205,243 +201,75 @@ class ApiPoskeeperController extends Controller
 
             $device = $this->getDoctrine()->getRepository('SettingToolBundle:AndroidDeviceSetup')->insert($entity, $deviceId);
             if ($device) {
-                /* @var $entity GlobalOption */
-
-                $address = '';
-                $vatRegNo = '';
-                $vatPercentage = '';
-                $vatEnable = '';
-                $printFooter = "";
-
-                if ($entity->getMainApp()->getSlug() == "miss") {
-                    $address = $entity->getMedicineConfig()->getAddress();
-                    $vatPercentage = $entity->getMedicineConfig()->getVatPercentage();
-                    $vatRegNo = $entity->getMedicineConfig()->getVatRegNo();
-                    $vatEnable = $entity->getMedicineConfig()->isVatEnable();
-                    $footerMessage = $entity->getMedicineConfig()->getPrintFooterText();
-                    if ($footerMessage) {
-                        $printFooter = $footerMessage;
-                    } else {
-                        $printFooter = "Thanks For Visiting our pharmacy";
-                    }
-                } elseif ($entity->getMainApp()->getSlug() == "business") {
-                    $address = $entity->getBusinessConfig()->getAddress();
-                    $vatPercentage = $entity->getBusinessConfig()->getVatPercentage();
-                    $vatRegNo = $entity->getBusinessConfig()->getVatRegNo();
-                    $vatEnable = $entity->getBusinessConfig()->getVatEnable();
-                    $footerMessage = $entity->getBusinessConfig()->getPrintFooterText();
-                    if ($footerMessage) {
-                        $printFooter = $footerMessage;
-                    } else {
-                        $printFooter = "Thanks For Visiting our business store";
-                    }
-                } elseif ($entity->getMainApp()->getSlug() == "restaurant") {
-                    $address = $entity->getRestaurantConfig()->getAddress();
-                    $vatPercentage = $entity->getRestaurantConfig()->getVatPercentage();
-                    $vatRegNo = $entity->getRestaurantConfig()->getVatRegNo();
-                    $vatEnable = $entity->getRestaurantConfig()->getVatEnable();
-                    $footerMessage = $entity->getRestaurantConfig()->getPrintFooterText();
-                    if ($footerMessage) {
-                        $printFooter = $footerMessage;
-                    } else {
-                        $printFooter = "Thanks For Visiting our restaurant";
-                    }
-                } elseif ($entity->getMainApp()->getSlug() == "inventory") {
-                    $address = $entity->getInventoryConfig()->getAddress();
-                    $vatPercentage = $entity->getInventoryConfig()->getVatPercentage();
-                    $vatRegNo = $entity->getInventoryConfig()->getVatRegNo();
-                    $vatEnable = $entity->getInventoryConfig()->getVatEnable();
-                    $footerMessage = $entity->getInventoryConfig()->getPrintFooterText();
-                    if ($footerMessage) {
-                        $printFooter = $footerMessage;
-                    } else {
-                        $printFooter = "Thanks For Visiting our shop";
-                    }
-                }
-                $mobile = empty($entity->getHotline()) ? $entity->getMobile() : $entity->getHotline();
-                $androidHeaderBg = (string)trim($entity->getTemplateCustomize()->getMobileHeaderBgColor());
-                $bodyBg = (string)trim($entity->getTemplateCustomize()->getBodyColor());
-                $appPrimaryColor = (string)trim($entity->getTemplateCustomize()->getAppPrimaryColor());
-                $appSecondaryColor = (string)trim($entity->getTemplateCustomize()->getAppSecondaryColor());
-                $appBarColor = (string)trim($entity->getTemplateCustomize()->getAppBarColor());
-                $appTextTitle = (string)trim($entity->getTemplateCustomize()->getAppTextTitle());
-                $appTextColor = (string)trim($entity->getTemplateCustomize()->getAppTextColor());
-                $appCartColor = (string)trim($entity->getTemplateCustomize()->getAppCartColor());
-                $appMoreColor = (string)trim($entity->getTemplateCustomize()->getAppMoreColor());
-                $appDiscountColor = (string)trim($entity->getTemplateCustomize()->getAppDiscountColor());
-                $appBorderActiveColor = (string)trim($entity->getTemplateCustomize()->getAppBorderActiveColor());
-                $appBorderInactiveColor = (string)trim($entity->getTemplateCustomize()->getAppBorderInactiveColor());
-                $appBorderColor = (string)trim($entity->getTemplateCustomize()->getAppBorderColor());
-                $appPositiveColor = (string)trim($entity->getTemplateCustomize()->getAppPositiveColor());
-                $appNegativeColor = (string)trim($entity->getTemplateCustomize()->getAppNegativeColor());
-                $appIconColor = (string)trim($entity->getTemplateCustomize()->getAndroidIconColor());
-                $appAnchorColor = (string)trim($entity->getTemplateCustomize()->getAndroidAnchorColor());
-                $appAnchorHoverColor = (string)trim($entity->getTemplateCustomize()->getAndroidAnchorHoverColor());
-                $searchPageBgColor = (string)trim($entity->getTemplateCustomize()->getSearchPageBgColor());
-                $appFooterBgColor = (string)trim($entity->getTemplateCustomize()->getMobileFooterBgColor());
-                $appFooterIconBgColor = (string)trim($entity->getTemplateCustomize()->getMobileFooterAnchorBg());
-                $appFooterIconColor = (string)trim($entity->getTemplateCustomize()->getMobileFooterAnchorColor());
-                $appFooterIconColorHover = (string)trim($entity->getTemplateCustomize()->getMobileFooterAnchorColorHover());
-
-                $appSuccessColor = (string)trim($entity->getTemplateCustomize()->getAppSuccessColor());
-                $appNoticeColor = (string)trim($entity->getTemplateCustomize()->getAppNoticeColor());
-                $appCloseColor = (string)trim($entity->getTemplateCustomize()->getAppCloseColor());
-                $morePageColor = (string)trim($entity->getTemplateCustomize()->getAppMoreColor());
-                $inputBgColor = (string)trim($entity->getTemplateCustomize()->getInputBgColor());
-                $inputBgFocusColor = (string)trim($entity->getTemplateCustomize()->getInputBgFocusColor());
-
-                $tawk = (string)trim($entity->getTemplateCustomize()->getTawk());
-                $pixel = (string)trim($entity->getTemplateCustomize()->getFacebookPixel());
-                $messenger = (string)trim($entity->getTemplateCustomize()->getFbMessenger());
-                $analytic = (string)trim($entity->getTemplateCustomize()->getGoogleAnalytic());
-
-
-                $logo = empty($entity->getTemplateCustomize()->getWebPath('logo')) ? "" : $entity->getTemplateCustomize()->getWebPath('logo');
-                //$introImage = empty($entity->getTemplateCustomize()->getWebPath('androidLogo')) ? '': $entity->getTemplateCustomize()->getWebPath('androidLogo');
-                $logo = '';
-                $introImage = '';
-
-                $data = array(array(
-
-                    'deviceId' => $device,
-                    'vatEnable' => $vatEnable,
-                    'setupId' => $entity->getId(),
-                    'uniqueCode' => $entity->getUniqueCode(),
-                    'name' => $entity->getName(),
-                    'mobile' => $mobile,
-                    'tawk' => $this->stringNullChecker($tawk),
-                    'pixel' => $this->stringNullChecker($pixel),
-                    'messenger' => $this->stringNullChecker($messenger),
-                    'analytic' => $this->stringNullChecker($analytic),
-                    'email' => $this->stringNullChecker($entity->getEmail()),
-                    'locationId' => $entity->getLocation()->getId(),
-                    'address' => $this->stringNullChecker($address),
-                    'locationName' => $this->stringNullChecker($entity->getLocation()->getName()),
-                    'mainApp' => $entity->getMainApp()->getId(),
-                    'mainAppName' => $entity->getMainApp()->getSlug(),
-                    'appsManual' => $this->stringNullChecker($entity->getMainApp()->getApplicationManual()),
-                    'website' => $this->stringNullChecker($entity->getDomain()),
-                    'vatRegNo' => $this->stringNullChecker($vatRegNo),
-                    'vatPercentage' => $this->numberNullChecker($vatPercentage),
-                    'bodyBg' => empty($bodyBg) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($bodyBg),
-                    'appHeaderBg' => empty($androidHeaderBg) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($androidHeaderBg),
-                    'appPrimaryColor' => empty($appPrimaryColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appPrimaryColor),
-                    'appSecondaryColor' => empty($appSecondaryColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appSecondaryColor),
-                    'appBarColor' => empty($appBarColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appBarColor),
-                    'appTextTitle' => empty($appTextTitle) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appTextTitle),
-                    'appTextColor' => empty($appTextColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appTextColor),
-                    'appCartColor' => empty($appCartColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appCartColor),
-                    'appMoreColor' => empty($appMoreColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appMoreColor),
-                    'appBorderColor' => empty($appBorderColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appBorderColor),
-                    'appBorderActiveColor' => empty($appBorderActiveColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appBorderActiveColor),
-                    'appBorderInactiveColor' => empty($appBorderInactiveColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appBorderInactiveColor),
-                    'appPositiveColor' => empty($appPositiveColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appPositiveColor),
-                    'appNegativeColor' => empty($appNegativeColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appNegativeColor),
-                    'appDiscountColor' => empty($appDiscountColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appDiscountColor),
-                    'appIconColor' => empty($appIconColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appIconColor),
-                    'appAnchorColor' => empty($appAnchorColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appAnchorColor),
-                    'appAnchorHoverColor' => empty($appAnchorHoverColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appAnchorHoverColor),
-                    'searchPageBgColor' => empty($searchPageBgColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($searchPageBgColor),
-                    'morePageBgColor' => empty($morePageColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($morePageColor),
-                    'appFooterBgColor' => empty($appFooterBgColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appFooterBgColor),
-                    'appFooterIconBgColor' => empty($appFooterIconBgColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appFooterIconBgColor),
-                    'appFooterIconColor' => empty($appFooterIconColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appFooterIconColor),
-                    'appFooterIconColorHover' => empty($appFooterIconColorHover) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appFooterIconColorHover),
-                    'appSuccessColor' => empty($appSuccessColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appSuccessColor),
-                    'appNoticeColor' => empty($appNoticeColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appNoticeColor),
-                    'appCloseColor' => empty($appCloseColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($appCloseColor),
-                    'inputBgColor' => empty($inputBgColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($inputBgColor),
-                    'inputBgFocusColor' => empty($inputBgFocusColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($inputBgFocusColor),
-                    // 'logo'      =>  $this->imageBase64($logo),
-                    'printFooter' => $printFooter,
-                    'logo' => '',
-                    'intro' => '',
-                ));
+                $setup = $this->getDoctrine()->getRepository(AppsApi::class)->getApiSetup($entity,$device);
             }
-
-            $slides = array();
-            $introPages = array();
-            $users = $this->getDoctrine()->getRepository('UserBundle:GlobalApi')->getUsers($entity);
-            $customers = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->customerOutstanding($entity);
-
-            if($entity->getMainApp()->getSlug() == 'miss'){
-                $stocks = $this->getDoctrine()->getRepository('UserBundle:GlobalApi')->getApiSplsshStock($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $stocks = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiStock($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $stocks = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiStock($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $stocks = $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->getApiStock($entity);
-            }
-
-            if($entity->getMainApp()->getSlug() == 'miss'){
-                $categories = $this->getDoctrine()->getRepository('MedicineBundle:MedicineParticularType')->getApiCategory($entity);
-                $brands = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getBrands($entity->getMedicineConfig()->getId());
-            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $categories = $this->getDoctrine()->getRepository('RestaurantBundle:Category')->getApiCategory($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $categories = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiCategory($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $categories = $this->getDoctrine()->getRepository('BusinessBundle:Category')->getApiCategory($entity);
-            }
-
-            if($entity->getMainApp()->getSlug() == 'miss'){
-                $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountPurchase')->apiVendorMedicineOutstanding($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->getApiVendor($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $vendors = $this->getDoctrine()->getRepository('InventoryBundle:Vendor')->getApiVendor($entity);
-            }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->getApiVendor($entity);
-            }
-
-            $transactionModes = $this->getDoctrine()->getRepository(AccountingConfig::class)->getTransactionModes();
-
-            $accountBanks = $this->getDoctrine()->getRepository('AccountingBundle:AccountBank')->findBy(array('globalOption' => $entity,'status'=>1));
-            $methods = array();
-
-            /* @var $row AccountBank */
-
-            if($accountBanks){
-                foreach($accountBanks as $key => $row) {
-                    $methods[$key]['method_id']            = (int) $row->getId();
-                    $methods[$key]['method_name']          = $row->getName();
-                    $methods[$key]['method_mode']          = ($row and $row->getMethod()) ? $row->getMethod()->getName():'';
-                    $methods[$key]['service_charge']       = $row->getServiceCharge();
-                    if($row->getWebPath()){
-                        $path = $this->resizeFilter($row->getWebPath(),400,400);
-                        $methods[$key]['image_path']            =  $path;
-                    }else{
-                        $methods[$key]['image_path']            = "";
-                    }
-                }
-            }
-
-
-
-            $expenseCat = $this->getDoctrine()->getRepository('AccountingBundle:ExpenseCategory')->findBy(array('globalOption'=> $entity,'status'=>1));
-            $expenseCategories = array();
-
-            /* @var $row ExpenseCategory */
-
-            if($expenseCat) {
-                foreach ($expenseCat as $key => $row) {
-                    $expenseCategories[$key]['item_id'] = (int)$row->getId();
-                    $expenseCategories[$key]['name'] = $row->getName();
-                }
-            }
+            $users = $this->getDoctrine()->getRepository(AppsApi::class)->getApiUsers($entity);
+            $customers = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
+            $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
+            $stocks = $this->getDoctrine()->getRepository(AppsApi::class)->getApiStock($entity);
+            $categories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'category');
+            $brands = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
+            $methods = $this->getDoctrine()->getRepository(AppsApi::class)->getApiMethodTransaction($entity);
+            $expenseCategories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiExpenseCategory($entity->getId());
+            $units = $this->getDoctrine()->getRepository(AppsApi::class)->getApiProductUnit();
         }
-
         $jsonData = array(
             'brands'                => $brands,
             'categories'            => $categories,
             'customers'             => $customers,
             'expense_category'      => $expenseCategories,
-            'setup'                 => $data,
+            'setup'                 => $setup,
             'stocks'                => $stocks,
             'transaction_methods'   => $methods,
-            'transaction_mode'      => $transactionModes,
-            'users'                => $users,
+            'users'                 => $users,
+            'units'                 => $units,
+            'vendors'               => $vendors,
+        );
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setContent(json_encode($jsonData));
+        $response->setStatusCode(Response::HTTP_OK);
+        return $response;
+    }
+
+    public function masterdataAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $formData = $request->request->all();
+        $key =  $this->getParameter('x-api-key');
+        $value =  $this->getParameter('x-api-value');
+        $uniqueCode = $formData['uniqueCode'];
+        $mobile = $formData['mobile'];
+        $deviceId = $formData['deviceId'];
+        $setup = array();
+        $entity = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->findOneBy(array('uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1));
+        if (empty($entity) and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
+            return new Response('Unauthorized access.', 401);
+        }else {
+
+            $device = $this->getDoctrine()->getRepository('SettingToolBundle:AndroidDeviceSetup')->insert($entity, $deviceId);
+            if ($device) {
+                $setup = $this->getDoctrine()->getRepository(AppsApi::class)->getApiSetup($entity, $device);
+            }
+            $users = $this->getDoctrine()->getRepository(AppsApi::class)->getApiUsers($entity);
+            $customers = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
+            $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
+            $categories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'category');
+            $brands = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
+            $methods = $this->getDoctrine()->getRepository(AppsApi::class)->getApiMethodTransaction($entity);
+            $expenseCategories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiExpenseCategory($entity->getId());
+            $units = $this->getDoctrine()->getRepository(AppsApi::class)->getApiProductUnit();
+        }
+        $jsonData = array(
+            'brands'                => $brands,
+            'categories'            => $categories,
+            'customers'             => $customers,
+            'expense_category'      => $expenseCategories,
+            'setup'                 => $setup,
+            'transaction_methods'   => $methods,
+            'users'                 => $users,
+            'units'                 => $units,
             'vendors'               => $vendors,
         );
         $response = new Response();
@@ -456,7 +284,6 @@ class ApiPoskeeperController extends Controller
         $path = '/' . Image::open(__DIR__.'/../../../../../web/' . $pathToImage)->cropResize($width, $height, 'transparent', 'top', 'left')->guess();
         return "http://{$_SERVER['HTTP_HOST']}/{$pathToImage}";
     }
-
 
     public function dashboardAction(Request $request)
     {
@@ -790,10 +617,10 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getApiStock($entity);
+            $stocks = $this->getDoctrine()->getRepository(AppsApi::class)->getApiStock($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
+            $response->setContent(json_encode($stocks));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
@@ -861,8 +688,6 @@ class ApiPoskeeperController extends Controller
 
     }
 
-
-
     public function unitAction(Request $request)
     {
         set_time_limit(0);
@@ -908,8 +733,6 @@ class ApiPoskeeperController extends Controller
         }
 
     }
-
-
 
     public function createStockAction(Request $request)
     {
@@ -964,6 +787,7 @@ class ApiPoskeeperController extends Controller
         }
 
     }
+
     public function deleteStockAction(Request $request)
     {
         set_time_limit(0);
@@ -1604,7 +1428,7 @@ class ApiPoskeeperController extends Controller
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $_REQUEST;
-            $entities = $this->getDoctrine()->getRepository(AppsApi::class)->apiSalesLists($entity,$data);
+            $entities = $this->getDoctrine()->getRepository(AppsApi::class)->apiInventorySales($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -1800,7 +1624,7 @@ class ApiPoskeeperController extends Controller
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiSales($entity,$formArray);
+            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountSales($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -1841,7 +1665,7 @@ class ApiPoskeeperController extends Controller
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiSales($entity,$formArray);
+            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountSales($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -1863,7 +1687,7 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
             $data = $_REQUEST;
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->apiCustomerOutstanding($entity,$data);
+            $data = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -1883,7 +1707,7 @@ class ApiPoskeeperController extends Controller
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository("AccountingBundle:AccountSales")->apiSales($entity,$formArray);
+            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountSales($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -2011,7 +1835,7 @@ class ApiPoskeeperController extends Controller
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $_REQUEST;
-            $entities = $this->getDoctrine()->getRepository("ReportBundle:AppsApi")->apiPurchaseLists($entity,$data);
+            $entities = $this->getDoctrine()->getRepository("ReportBundle:AppsApi")->apiInventoryPurchase($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -2145,7 +1969,7 @@ class ApiPoskeeperController extends Controller
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiPurchase($entity,$formArray);
+            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountPurchase($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -2186,7 +2010,7 @@ class ApiPoskeeperController extends Controller
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiPurchase($entity,$formArray);
+            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountPurchase($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));

@@ -3,6 +3,7 @@
 namespace Appstore\Bundle\MedicineBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Setting\Bundle\ToolBundle\Entity\Currency;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 
 /**
@@ -94,6 +95,12 @@ class MedicineConfig
      * @ORM\OrderBy({"companyName" = "ASC"})
      **/
     private $medicineVendors;
+
+     /**
+     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Currency")
+     * @ORM\OrderBy({"name" = "ASC"})
+     **/
+    private $currency;
 
     /**
      * @var string
@@ -341,13 +348,6 @@ class MedicineConfig
      * @ORM\Column(name="vatRegNo", type="string",  nullable=true)
      */
     private $vatRegNo;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="currency", type="string",  nullable=true)
-     */
-    private $currency="৳";
 
 
     /**
@@ -882,7 +882,7 @@ class MedicineConfig
     }
 
     /**
-     * @return string
+     * @return Currency
      */
     public function getCurrency()
     {
@@ -890,12 +890,14 @@ class MedicineConfig
     }
 
     /**
-     * @param string $currency
+     * @param Currency $currency
      */
     public function setCurrency($currency)
     {
         $this->currency = $currency;
     }
+
+
 
     /**
      * @return bool

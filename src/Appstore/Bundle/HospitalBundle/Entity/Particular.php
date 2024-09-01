@@ -103,7 +103,7 @@ class Particular
     private $assignDoctorInvoices;
 
     /**
-     * @ORM\OneToMany(targetEntity="Appstore\Bundle\HospitalBundle\Entity\invoiceParticular", mappedBy="assignDoctor")
+     * @ORM\OneToMany(targetEntity="Appstore\Bundle\HospitalBundle\Entity\InvoiceParticular", mappedBy="assignDoctor")
      **/
     private $invoiceParticularDoctor;
 

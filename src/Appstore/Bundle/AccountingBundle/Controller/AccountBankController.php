@@ -56,6 +56,9 @@ class AccountBankController extends Controller
             $entity->upload();
             $em->persist($entity);
             $em->flush();
+            if($entity->isDefault() == 1){
+                $this->getDoctrine()->getRepository(AccountBank::class)->setupDefault($entity);
+            }
             $this->get('session')->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
@@ -198,6 +201,9 @@ class AccountBankController extends Controller
             }
             $entity->upload();
             $em->flush();
+            if($entity->isDefault() == 1){
+                $this->getDoctrine()->getRepository(AccountBank::class)->setupDefault($entity);
+            }
             $this->getDoctrine()->getRepository('AccountingBundle:AccountHead')->insertBankAccount($entity);
             return $this->redirect($this->generateUrl('accountbank'));
         }

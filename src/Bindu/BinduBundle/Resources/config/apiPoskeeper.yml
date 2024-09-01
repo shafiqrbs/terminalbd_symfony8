@@ -11,6 +11,9 @@ api_poskeeper_splash:
     defaults: { _controller: BinduBundle:ApiPoskeeper:splash }
 
 
+api_poskeeper_masterdata:
+    path:     /poskeeper-masterdata
+    defaults: { _controller: BinduBundle:ApiPoskeeper:masterdata }
 
 api_poskeeper_app:
     path:     /poskeeper-shop-type

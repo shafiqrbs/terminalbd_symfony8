@@ -269,6 +269,13 @@ class AccountBank
      */
     private $status = true;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="isDefault" ,type="boolean")
+     */
+    private $isDefault = false;
+
 
     /**
      * Get id
@@ -489,13 +496,6 @@ class AccountBank
         $this->globalOption = $globalOption;
     }
 
-    /**
-     * @return Order
-     */
-    public function getOrders()
-    {
-        return $this->orders;
-    }
 
     /**
      * @return string
@@ -539,15 +539,6 @@ class AccountBank
     }
 
     /**
-     * @return AccountOnlineOrder
-     */
-    public function getAccountOnlineOrders()
-    {
-        return $this->accountOnlineOrders;
-    }
-
-
-    /**
      * @return Invoice
      */
     public function getHmsInvoices()
@@ -569,22 +560,6 @@ class AccountBank
     public function getInvoiceTransactions()
     {
         return $this->invoiceTransactions;
-    }
-
-    /**
-     * @return PreOrderPayment
-     */
-    public function getPreOrderPayments()
-    {
-        return $this->preOrderPayments;
-    }
-
-    /**
-     * @return OrderPayment
-     */
-    public function getOrderPayments()
-    {
-        return $this->orderPayments;
     }
 
     /**
@@ -809,9 +784,21 @@ class AccountBank
         $this->method = $method;
     }
 
+    /**
+     * @return bool
+     */
+    public function isDefault()
+    {
+        return $this->isDefault;
+    }
 
-
-
+    /**
+     * @param bool $isDefault
+     */
+    public function setIsDefault($isDefault)
+    {
+        $this->isDefault = $isDefault;
+    }
 
 }
 

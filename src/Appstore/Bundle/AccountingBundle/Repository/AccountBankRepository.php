@@ -1,6 +1,7 @@
 <?php
 
 namespace Appstore\Bundle\AccountingBundle\Repository;
+use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
 use Doctrine\ORM\EntityRepository;
 use Proxies\__CG__\Appstore\Bundle\DomainUserBundle\Entity\PaymentSalary;
 use Setting\Bundle\ToolBundle\Service\DatabaseArchive;
@@ -142,6 +143,25 @@ class AccountBankRepository extends EntityRepository
             }
         }
 
+    }
+
+    public function setupDefault(AccountBank $bank)
+    {
+        $em = $this->_em;
+        $globalOption = $bank->getGlobalOption()->getId();
+        $qb = $this->createQueryBuilder('e');
+        $qb->where("e.globalOption = :globalOption");
+        $qb->setParameter('globalOption', $globalOption);
+        $qb->andWhere("e.id != {$bank->getId()}");
+        $result = $qb->getQuery()->getResult();
+
+        /* @var $row AccountBank */
+
+        foreach ($result as $row):
+            $row->setIsDefault(false);
+            $em->persist($row);
+            $em->flush();
+        endforeach;
     }
 
 }

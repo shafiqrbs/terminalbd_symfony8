@@ -2056,22 +2056,6 @@ class GlobalOption
         $this->organizationName = $organizationName;
     }
 
-    /**
-     * @return ProcurementConfig
-     */
-    public function getProcurementConfig()
-    {
-        return $this->procurementConfig;
-    }
-
-    /**
-     * @return AssetsConfig
-     */
-    public function getAssetsConfig()
-    {
-        return $this->assetsConfig;
-    }
-
 
     /**
      * @return string

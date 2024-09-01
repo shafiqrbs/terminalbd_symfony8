@@ -26,12 +26,14 @@ class ConfigType extends AbstractType
             ->add('tpPercent','text', array('attr'=>array('class'=>'m-wrap span8 ','maxlength'=> 4,'placeholder'=>'TP Percent')))
             ->add('tpVatPercent','text', array('attr'=>array('class'=>'m-wrap span8 ','maxlength'=> 4,'placeholder'=>'TP vat Percent')))
             ->add('instantVendorPercentage','text', array('attr'=>array('class'=>'m-wrap span8 ','maxlength'=> 4,'placeholder'=>'Instant vendor item percentage')))
-            ->add('currency', 'choice', array(
-                'attr'=>array('class'=>'span8'),
-                'choices' => array(
-                    '৳'       => 'Taka(৳)',
-                    '$'       => 'Dollar($)'
-                ),
+
+            ->add('currency', 'entity', array(
+                'required'    => false,
+                'class' => 'Setting\Bundle\ToolBundle\Entity\Currency',
+                'empty_value' => '--Select Currency--',
+                'property' => 'nameWithCode',
+                'attr'=>array('class'=>'m-wrap span12 inputs')
+
             ))
             ->add('itemSearch', 'choice', array(
                 'attr'=>array('class'=>'span12'),
