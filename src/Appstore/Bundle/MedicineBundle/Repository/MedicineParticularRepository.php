@@ -62,4 +62,28 @@ class MedicineParticularRepository extends EntityRepository
         return $entity;
     }
 
+    public function updateBrand(MedicineConfig $config,$name)
+    {
+        $em = $this->_em;
+        $type = $em->getRepository(MedicineParticularType::class)->findOneBy(array('slug'=>'brand'));
+        $exist = $em->getRepository(MedicineParticular::class)->findOneBy(array('medicineConfig' => $config,'particularType' => $type->getId(),'name' => $name));
+        if(empty($exist)){
+            $entity = new MedicineParticular();
+            $entity->setMedicineConfig($config);
+            $entity->setParticularType($type);
+            $entity->setName($name);
+            $entity->isStatus(true);
+            $em->persist($entity);
+            $em->flush();
+            return $entity;
+        }else{
+            $entity = $exist;
+            $entity->setName($name);
+            $em->persist($entity);
+            $em->flush();
+            return $entity;
+        }
+
+    }
+
 }

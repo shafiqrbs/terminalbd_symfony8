@@ -1182,4 +1182,15 @@ class MedicineStockRepository extends EntityRepository
 
     }
 
+    public function getMedicineBrandMissingStock(MedicineConfig $config){
+
+        $qb = $this->createQueryBuilder('e');
+        $qb->where('e.medicineConfig = :config')->setParameter('config',$config->getId());
+        $qb->andWhere('e.accessoriesBrand IS NULL');
+        $qb->setMaxResults(2000);
+        $result = $qb->getQuery()->getResult();
+        return $result;
+
+    }
+
 }

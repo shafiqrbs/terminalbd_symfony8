@@ -146,7 +146,8 @@ medicine_group_sales_approved:
     path:      /group/sales/approved
     defaults: { _controller: "MedicineBundle:Sales:groupApproved" }
 
-
-
+medicine_update_brand:
+    path:     /medicine-update-brand
+    defaults: { _controller: "MedicineBundle:Default:medicineBrandUpdate" }
 
 

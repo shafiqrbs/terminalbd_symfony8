@@ -312,9 +312,31 @@ class DefaultController extends Controller
             return new Response('success');
         }
         return new Response('failed');
-
-
     }
+
+    public function medicineBrandUpdateAction()
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+
+        $em = $this->getDoctrine()->getManager();
+        $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
+        $entities = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getMedicineBrandMissingStock($config);
+        /* @var $item MedicineStock */
+        foreach ($entities as $item){
+            $brand = $this->getDoctrine()->getRepository('MedicineBundle:MedicineParticular')->updateBrand($config,$item->getBrandName());
+            $item->setAccessoriesBrand($brand);
+            $em->persist($item);
+            $em->flush();
+        }
+        if(count($entities) == 0){
+            return $this->redirect($this->generateUrl('medicine_stock'));
+        }else{
+            echo "Not Done!!!";
+            exit;
+        }
+    }
+
 
 }
 
