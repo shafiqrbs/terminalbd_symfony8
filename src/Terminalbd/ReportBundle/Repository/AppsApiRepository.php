@@ -491,7 +491,7 @@ class AppsApiRepository extends EntityRepository
 
         $em = $this->_em;
         $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
-        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:50; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
         $offset = ($currentPage - 1) * $itemsPerPage;
 
         $qb = $em->createQueryBuilder();
@@ -541,7 +541,7 @@ class AppsApiRepository extends EntityRepository
     {
 
         $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
-        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:50; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
         $offset = ($currentPage - 1) * $itemsPerPage;
 
         $keyword = isset($data['keyword'])  ? $data['keyword'] : '';
@@ -812,7 +812,7 @@ class AppsApiRepository extends EntityRepository
         $em = $this->_em;
 
         $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
-        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:50; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
         $offset = ($currentPage - 1) * $itemsPerPage;
 
         $config = $option->getMedicineConfig()->getId();
@@ -1059,7 +1059,7 @@ class AppsApiRepository extends EntityRepository
         $em = $this->_em;
 
         $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
-        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:50; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
         $offset = ($currentPage - 1) * $itemsPerPage;
         $config = $option->getMedicineConfig()->getId();
         $vendor = isset($data['vendor_id'])? $data['vendor_id'] :'';
