@@ -85,7 +85,7 @@ class MedicineAndroidProcess
     /**
      * @var string
      *
-     * @ORM\Column(name="mode", type="string", length = 100, nullable=true)
+     * @ORM\Column(name="mode", type="string", length = 50, nullable=true)
      */
     private $mode;
 

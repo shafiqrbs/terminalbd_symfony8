@@ -233,7 +233,7 @@ class AppsApiRepository extends EntityRepository
             'inputBgFocusColor' => empty($inputBgFocusColor) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($inputBgFocusColor),
             // 'logo'      =>  $this->imageBase64($logo),
             'printFooter' => $printFooter,
-            'logo' => $introImage,
+            'logo' => $logo,
             'intro' => '',
         ));
         return $data;
@@ -971,136 +971,6 @@ class AppsApiRepository extends EntityRepository
 
     }
 
-    public function insertFlutterSalesProcess(GlobalOption $option,$device,$process,$data)
-    {
-        $em =  $this->_em;
-       // $entity = $em->getRepository(MedicineAndroidProcess::class)->find(88585);
-       // $this->insertApiSales($option,$entity);
-        $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
-        $entity = new MedicineAndroidProcess();
-        $entity->setMedicineConfig($option->getMedicineConfig());
-        $entity->setAndroidDevice($device);
-        $entity->setProcess($process);
-        $entity->setJsonItem($data['jsonItem']);
-        $entity->setStatus(false);
-        $em->persist($entity);
-        $em->flush();
-        if(isset($data['mode']) and $data['mode'] === "online"){
-            $em->getRepository(MedicineSales::class)->insertApiSales($option,$entity);
-        }
-        if($entity){
-            return "success";
-        }
-        return 'failed';
-    }
-
-    public function insertApiSales(GlobalOption $option,MedicineAndroidProcess $process)
-    {
-        $em = $this->_em;
-        $items = json_decode($process->getJsonItem(),true);
-        $numItems = count($items);
-        if($numItems > 0 ){
-            $config = $option->getMedicineConfig();
-            foreach ($items as $item):
-                $method= (isset($item['method_id']) and $item['method_id']) ?  $item['method_id'] : '';
-                $flat = (isset($item['discount_type']) and $item['discount_type']) ?  $item['discount_type'] : 'flat';
-                $received = (isset($item['received']) and $item['received']) ?  $item['received'] : 0;
-                $subTotal = (isset($item['sub_total']) and $item['sub_total']) ?  $item['sub_total'] : 0;
-                $purchasePrice = (isset($item['purchase_price']) and $item['purchase_price']) ?  $item['purchase_price'] : 0;
-                $total = (isset($item['net_total']) and $item['net_total']) ?  $item['net_total'] : 0;
-                $vat = (isset($item['vat']) and $item['vat']) ?  $item['vat'] : 0;
-                $delivery = (isset($item['delivery_charge']) and $item['delivery_charge']) ?  $item['delivery_charge'] : 0;
-                $discount = (isset($item['discount']) and $item['discount']) ?  $item['discount'] : 0;
-                $discountcal = (isset($item['discount_calculation']) and $item['discount_calculation']) ?  $item['discount_calculation'] : 0;
-                $customer = (isset($item['customer_id']) and $item['customer_id']) ?  $item['customer_id'] : '';
-                $invoice = (isset($item['invoice']) and $item['invoice']) ?  $item['invoice'] : '';
-                $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
-                $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
-                $sales_item = (isset($item['sales_item']) and $item['sales_item']) ?  $item['sales_item'] : '';
-                $purchase = new MedicineSales();
-                $purchase->setMedicineConfig($config);
-                $purchase->setInvoice($invoice);
-                $purchase->setAndroidProcess($process);
-                if($createdBy){
-                    $purchase->setSalesBy($em->getRepository(User::class)->find($salesBy));
-                }
-                 if($createdBy){
-                    $purchase->setCreatedBy($em->getRepository(User::class)->find($createdBy));
-                }
-                if($customer){
-                    $purchase->setCustomer($em->getRepository(Customer::class)->find($customer));
-                }
-                if($method){
-                    $trans = $em->getRepository(AccountBank::class)->find($method);
-                    $purchase->setAccountBank($trans);
-                    if($trans->getMethod()){
-                        $purchase->setTransactionMethod($trans->getMethod());
-                        if($method and $method->getServiceCharge() > 0) {
-                            $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$method->getServiceCharge());
-                            $discount = ($serviceCharge['discount']);
-                            $total = ($serviceCharge['total']);
-                            $received = ($serviceCharge['total']);
-                            $cardCommission = ($serviceCharge['cardCommission']);
-                            $purchase->setCardCommission($cardCommission);
-
-                        }
-                    }
-
-                }
-                $purchase->setPurchasePrice($purchasePrice);
-                $purchase->setVat($vat);
-                $purchase->setDeliveryCharge($delivery);
-                $purchase->setSubTotal($subTotal);
-                $purchase->setDiscount($discount);
-                $purchase->setDiscountCalculation($discountcal);
-                $purchase->setDiscountType($flat);
-                $purchase->setNetTotal($total);
-                $purchase->setPayment($received);
-                $purchase->setReceived($received);
-                $purchase->setAndroidProcess($process);
-                $purchase->setProcess('In-progress');
-                $em->persist($purchase);
-                $em->flush();
-                if($sales_item){
-                    $this->insertSalesItem($purchase,$sales_item);
-                }
-                $this->approveSalesProcess($purchase);
-            endforeach;
-        }
-        //  return $this->apiPurchaseLists($option);
-    }
-
-    public function insertSalesItem(MedicineSales $purchase,$data){
-
-        $em = $this->_em;
-        $records = json_decode($data);
-        foreach ($records as $key => $sub):
-            if($sub) {
-                $salesItem = new MedicineSalesItem();
-                $salesItem->setAndroidProcess($purchase->getAndroidProcess());
-                $salesItem->setMedicineSales($purchase);
-                $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($sub->stock_id);
-                if ($stockId) {
-                    $salesItem->setMedicineStock($stockId);
-                }
-                if (isset($sub->quantity) and $sub->quantity) {
-                    $salesItem->setQuantity($sub->quantity);
-                }
-                if (isset($sub->purchase_price) and $sub->purchase_price) {
-                    $salesItem->setPurchasePrice(floatval($sub->purchase_price));
-                }
-                if (isset($sub->item_percent) and $sub->item_percent) {
-                    $salesItem->setItemPercent(floatval($sub['item_percent']));
-                }
-                if (isset($sub->sales_price) and $sub->sales_price) {
-                    $salesItem->setSalesPrice(floatval($sub->sales_price));
-                }
-                $salesItem->setSubTotal(floatval($salesItem->getSalesPrice() * $salesItem->getQuantity()));
-                $em->persist($salesItem);
-            }
-        endforeach;
-        $em->flush();
-    }
 
     public function approveSalesProcess(MedicineSales $purchase){
         $em = $this->_em;
@@ -1412,28 +1282,154 @@ class AppsApiRepository extends EntityRepository
         return 'failed';
     }
 
-    public function insertFlutterPurchaseProcess(GlobalOption $option,$device,$process,$data)
+
+    public function insertFlutterSalesProcess(GlobalOption $option,$device,$process,$data)
     {
         $em =  $this->_em;
-      //  $entity = $em->getRepository(MedicineAndroidProcess::class)->find(88584);
-     //   $this->insertApiPurchase($option,$entity);
-
+        $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : 'offline';
         $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
         $entity = new MedicineAndroidProcess();
         $entity->setMedicineConfig($option->getMedicineConfig());
         $entity->setAndroidDevice($device);
         $entity->setProcess($process);
-        $entity->setJsonItem($data['jsonItem']);
+        $entity->setJsonItem($data['sales']);
         $entity->setStatus(false);
         $em->persist($entity);
         $em->flush();
-        if(isset($data['mode']) and $data['mode'] === "online"){
+        if($mode === "online"){
+            $this->insertApiSales($option,$entity);
+        }
+        return $entity;
+
+    }
+
+    public function insertApiSales(GlobalOption $option,MedicineAndroidProcess $process)
+    {
+        $em = $this->_em;
+        $items = json_decode($process->getJsonItem(),true);
+        $numItems = count($items);
+        if($numItems > 0 ){
+            $config = $option->getMedicineConfig();
+            foreach ($items as $item):
+                $method= (isset($item['method_id']) and $item['method_id']) ?  $item['method_id'] : '';
+                $flat = (isset($item['discount_type']) and $item['discount_type']) ?  $item['discount_type'] : 'flat';
+                $received = (isset($item['received']) and $item['received']) ?  $item['received'] : 0;
+                $subTotal = (isset($item['sub_total']) and $item['sub_total']) ?  $item['sub_total'] : 0;
+                $purchasePrice = (isset($item['purchase_price']) and $item['purchase_price']) ?  $item['purchase_price'] : 0;
+                $total = (isset($item['net_total']) and $item['net_total']) ?  $item['net_total'] : 0;
+                $vat = (isset($item['vat']) and $item['vat']) ?  $item['vat'] : 0;
+                $delivery = (isset($item['delivery_charge']) and $item['delivery_charge']) ?  $item['delivery_charge'] : 0;
+                $discount = (isset($item['discount']) and $item['discount']) ?  $item['discount'] : 0;
+                $discountcal = (isset($item['discount_calculation']) and $item['discount_calculation']) ?  $item['discount_calculation'] : 0;
+                $customer = (isset($item['customer_id']) and $item['customer_id']) ?  $item['customer_id'] : '';
+                $invoice = (isset($item['invoice']) and $item['invoice']) ?  $item['invoice'] : '';
+                $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
+                $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
+                $sales_item = (isset($item['sales_item']) and $item['sales_item']) ?  $item['sales_item'] : '';
+                $purchase = new MedicineSales();
+                $purchase->setMedicineConfig($config);
+                $purchase->setInvoice($invoice);
+                $purchase->setAndroidProcess($process);
+                if($createdBy){
+                    $purchase->setSalesBy($em->getRepository(User::class)->find($salesBy));
+                }
+                if($createdBy){
+                    $purchase->setCreatedBy($em->getRepository(User::class)->find($createdBy));
+                }
+                if($customer){
+                    $purchase->setCustomer($em->getRepository(Customer::class)->find($customer));
+                }
+                if($method){
+                    $trans = $em->getRepository(AccountBank::class)->find($method);
+                    $purchase->setAccountBank($trans);
+                    if($trans->getMethod()){
+                        $purchase->setTransactionMethod($trans->getMethod());
+                        if($method and $method->getServiceCharge() > 0) {
+                            $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$method->getServiceCharge());
+                            $discount = ($serviceCharge['discount']);
+                            $total = ($serviceCharge['total']);
+                            $received = ($serviceCharge['total']);
+                            $cardCommission = ($serviceCharge['cardCommission']);
+                            $purchase->setCardCommission($cardCommission);
+
+                        }
+                    }
+
+                }
+                $purchase->setPurchasePrice($purchasePrice);
+                $purchase->setVat($vat);
+                $purchase->setDeliveryCharge($delivery);
+                $purchase->setSubTotal($subTotal);
+                $purchase->setDiscount($discount);
+                $purchase->setDiscountCalculation($discountcal);
+                $purchase->setDiscountType($flat);
+                $purchase->setNetTotal($total);
+                $purchase->setPayment($received);
+                $purchase->setReceived($received);
+                $purchase->setAndroidProcess($process);
+                $purchase->setProcess('In-progress');
+                $em->persist($purchase);
+                $em->flush();
+                if($sales_item){
+                    $this->insertSalesItem($purchase,$sales_item);
+                }
+                $this->approveSalesProcess($purchase);
+            endforeach;
+        }
+        //  return $this->apiPurchaseLists($option);
+    }
+
+    public function insertSalesItem(MedicineSales $purchase,$data){
+
+        $em = $this->_em;
+        $records = json_decode($data);
+        foreach ($records as $key => $sub):
+            if($sub) {
+                $salesItem = new MedicineSalesItem();
+                $salesItem->setAndroidProcess($purchase->getAndroidProcess());
+                $salesItem->setMedicineSales($purchase);
+                $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($sub->stock_id);
+                if ($stockId) {
+                    $salesItem->setMedicineStock($stockId);
+                }
+                if (isset($sub->quantity) and $sub->quantity) {
+                    $salesItem->setQuantity($sub->quantity);
+                }
+                if (isset($sub->purchase_price) and $sub->purchase_price) {
+                    $salesItem->setPurchasePrice(floatval($sub->purchase_price));
+                }
+                if (isset($sub->item_percent) and $sub->item_percent) {
+                    $salesItem->setItemPercent(floatval($sub['item_percent']));
+                }
+                if (isset($sub->sales_price) and $sub->sales_price) {
+                    $salesItem->setSalesPrice(floatval($sub->sales_price));
+                }
+                $salesItem->setSubTotal(floatval($salesItem->getSalesPrice() * $salesItem->getQuantity()));
+                $em->persist($salesItem);
+            }
+        endforeach;
+        $em->flush();
+    }
+
+    public function insertFlutterPurchaseProcess(GlobalOption $option,$device,$process,$data)
+    {
+        $em =  $this->_em;
+        $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : 'offline';
+        $purchase = (isset($data['purchase']) and $data['purchase']) ? $data['purchase'] : '';
+        $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
+        $entity = new MedicineAndroidProcess();
+        $entity->setMedicineConfig($option->getMedicineConfig());
+        $entity->setAndroidDevice($device);
+        $entity->setProcess($process);
+        $entity->setJsonItem($purchase);
+        $entity->setStatus(false);
+        $em->persist($entity);
+        $em->flush();
+        if($mode === "online"){
             $this->insertApiPurchase($option,$entity);
         }
-        if($entity){
-            return "success";
-        }
-        return 'failed';
+        return $entity;
+
     }
 
     public function insertApiPurchase(GlobalOption $option,MedicineAndroidProcess $process)
@@ -1488,7 +1484,7 @@ class AppsApiRepository extends EntityRepository
                 $this->approveProcess($purchase);
             endforeach;
         }
-      //  return $this->apiPurchaseLists($option);
+        //  return $this->apiPurchaseLists($option);
     }
 
     public function insertPurchaseItem(MedicinePurchase $purchase,$data){
@@ -1521,6 +1517,7 @@ class AppsApiRepository extends EntityRepository
         endforeach;
         $em->flush();
     }
+
 
     public function approveProcess(MedicinePurchase $purchase){
         $em = $this->_em;

@@ -1252,35 +1252,14 @@ class ApiPoskeeperController extends Controller
 
         }else{
 
-            $jsonInput = '[
-            {
-            "invoiceId":"051900113","subTotal":"1200","discount":"200","discountType":"Flat","discountCalculation":"10","vat":"0","total":"1000","receive":"800","due":"200","customerId":"223","customerName":"Jacky","customerMobile":"01828148148","addresss":"Dhaka","transactionMethod":"cash","bankAccount":"","mobileBankAccount":"","paymentMobile":"","paymentCard":"","paymentCardNo":"","transactionId":"","salesBy":"","created":"","createdBy":"","slipNo":"","tokenNo":"","discountCoupon":"","remark":""
-            }
-            ]';
-
-            $jsonInputItem = '[
-                {"salesId":"051900113","stockId":"7087","unitPrice":"120","quantity":"2","subTotal":"240"},
-                {"salesId":"051900113","stockId":"1295","unitPrice":"120","quantity":"2","subTotal":"240"},
-                {"salesId":"051900113","stockId":"7088","unitPrice":"120","quantity":"2","subTotal":"240"},
-                {"salesId":"051900113","stockId":"7420","unitPrice":"120","quantity":"2","subTotal":"240"}
-            ]';
-
-
-
             $data = $request->request->all();
-
             /* @var $entity GlobalOption */
-
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
 
            // $data = array('mode' => "online/offline",'itemCount'=> 1,'itemCount'=> 1,'subItem'=> $jsonInputItem,'subItemCount'=> 4);
 
-            if($entity->getMainApp()->getSlug() == 'miss'){
-                $this->getDoctrine()->getRepository('MedicineBundle:MedicineAndroidProcess')->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
-            }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $this->getDoctrine()->getRepository('RestaurantBundle:RestaurantAndroidProcess')->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
-            }
+            $this->getDoctrine()->getRepository(AppsApi::class)->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1804,17 +1783,6 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
-
-            $jsonInput = '[
-                {
-                "invoiceId":"051900113","subTotal":"1200","discount":"200","discountType":"Flat","discountCalculation":"10","total":"1000","receive":"800","due":"200","vendorId":"223","created":"","createdBy":"","invoiceMode":"","process":""
-                }
-            ]';
-
-            $jsonInputItem = '[
-             {"purchaseId":"051900113","stockId":"10717","purchasePrice":"25","quantity":"2","subTotal":"50","measurement_id":1,"unit":"Pcs"}
-            ]';
-
             $data = $request->request->all();
             $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->insertFlutterPurchaseProcess($entity,$deviceId,'purchase',$data);
             $ipAddress = $_SERVER['REMOTE_ADDR'];

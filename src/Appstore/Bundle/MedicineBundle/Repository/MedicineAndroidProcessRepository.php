@@ -52,27 +52,4 @@ class MedicineAndroidProcessRepository extends EntityRepository
     }
 
 
-    public function insertFlutterSalesProcess(GlobalOption $option,$device,$process,$data)
-    {
-        $em =  $this->_em;
-        $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
-        $entity = new MedicineAndroidProcess();
-        $entity->setMedicineConfig($option->getMedicineConfig());
-        $entity->setAndroidDevice($device);
-        $entity->setProcess($process);
-        $entity->setJsonItem($data['sales']);
-        $entity->setItemCount($data['sales_count']);
-        $entity->setSubItemCount($data['sales_item_count']);
-        $entity->setStatus(false);
-        $em->persist($entity);
-        $em->flush();
-        if(isset($data['mode']) and $data['mode'] === "online"){
-            $em->getRepository(MedicineSales::class)->insertApiSalesManual($option,$entity);
-        }
-        return $entity;
-
-    }
-
-
-
 }
