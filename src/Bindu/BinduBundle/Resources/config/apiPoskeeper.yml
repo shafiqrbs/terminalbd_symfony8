@@ -269,12 +269,6 @@ api_poskeeper_sales_deletee:
     options:
         expose: true
 
-api_poskeeper_purchase:
-    path:     /poskeeper-purchase
-    defaults: { _controller: BinduBundle:ApiPoskeeper:apiPurchase }
-    methods:  POST
-    options:
-        expose: true
 
 
 api_poskeeper_expense:

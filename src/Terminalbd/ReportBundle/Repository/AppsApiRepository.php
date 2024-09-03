@@ -1416,6 +1416,7 @@ class AppsApiRepository extends EntityRepository
         $em =  $this->_em;
         $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : 'offline';
         $purchase = (isset($data['purchase']) and $data['purchase']) ? $data['purchase'] : '';
+
         $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
         $entity = new MedicineAndroidProcess();
         $entity->setMedicineConfig($option->getMedicineConfig());
