@@ -49,6 +49,14 @@ api_poskeeper_stock_delete:
     path:     /poskeeper-stock-delete
     defaults: { _controller: BinduBundle:ApiPoskeeper:deleteStock }
 
+
+api_poskeeper_order_process:
+    path:     /poskeeper-order-process
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOrderProcess }
+    methods:  POST|GET
+    options:
+        expose: true
+
 api_poskeeper_sales_create:
     path:     /poskeeper-sales-create
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiCreateSales }

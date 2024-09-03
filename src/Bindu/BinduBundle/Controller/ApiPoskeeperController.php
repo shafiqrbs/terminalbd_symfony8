@@ -1361,6 +1361,32 @@ class ApiPoskeeperController extends Controller
     /* Sales manage */
 
 
+    public function apiOrderProcessAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+            $data = $request->request->all();
+            $status = $this->getDoctrine()->getRepository(AppsApi::class)->insertFlutterOrderProcess($entity,$deviceId,$data);
+            $ipAddress = $_SERVER['REMOTE_ADDR'];
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('message'=> $status, 'ipAddress'=>$ipAddress)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
     public function apiCreateSalesAction(Request $request)
     {
         set_time_limit(0);

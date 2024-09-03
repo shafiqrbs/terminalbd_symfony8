@@ -1283,21 +1283,31 @@ class AppsApiRepository extends EntityRepository
     }
 
 
-    public function insertFlutterSalesProcess(GlobalOption $option,$device,$process,$data)
+    public function insertFlutterOrderProcess(GlobalOption $option,$device,$data)
     {
         $em =  $this->_em;
+        $process = (isset($data['process']) and $data['process']) ? $data['process'] : '';
         $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : 'offline';
+        $content = (isset($data['content']) and $data['content']) ? $data['content'] : '';
+        $isApprove = (isset($data['is_approve']) and $data['is_approve']) ? 1 : 0;
+        $user = (isset($data['approved_by']) and $data['approved_by']) ? $data['approved_by'] : '';
+
         $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
         $entity = new MedicineAndroidProcess();
         $entity->setMedicineConfig($option->getMedicineConfig());
         $entity->setAndroidDevice($device);
         $entity->setProcess($process);
-        $entity->setJsonItem($data['sales']);
+        $entity->setMode($mode);
+        $entity->setJsonItem($content);
+        $entity->setCreatedBy($em->getRepository(User::class)->find($user));
+        $entity->setIsApprove($isApprove);
         $entity->setStatus(false);
         $em->persist($entity);
         $em->flush();
-        if($mode === "online"){
+        if($mode === "online" and $process == 'sales'){
             $this->insertApiSales($option,$entity);
+        }elseif($mode === "online" and $process == 'purchase'){
+            $this->insertApiPurchase($option,$entity);
         }
         return $entity;
 
@@ -1326,57 +1336,59 @@ class AppsApiRepository extends EntityRepository
                 $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
                 $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
                 $sales_item = (isset($item['sales_item']) and $item['sales_item']) ?  $item['sales_item'] : '';
-                $purchase = new MedicineSales();
-                $purchase->setMedicineConfig($config);
-                $purchase->setInvoice($invoice);
-                $purchase->setAndroidProcess($process);
+                $sales = new MedicineSales();
+                $sales->setMedicineConfig($config);
+                $sales->setInvoice($invoice);
+                $sales->setAndroidProcess($process);
                 if($createdBy){
-                    $purchase->setSalesBy($em->getRepository(User::class)->find($salesBy));
+                    $sales->setSalesBy($em->getRepository(User::class)->find($salesBy));
                 }
                 if($createdBy){
-                    $purchase->setCreatedBy($em->getRepository(User::class)->find($createdBy));
+                    $sales->setCreatedBy($em->getRepository(User::class)->find($createdBy));
                 }
                 if($customer){
-                    $purchase->setCustomer($em->getRepository(Customer::class)->find($customer));
+                    $sales->setCustomer($em->getRepository(Customer::class)->find($customer));
                 }
                 if($method){
                     $trans = $em->getRepository(AccountBank::class)->find($method);
-                    $purchase->setAccountBank($trans);
+                    $sales->setAccountBank($trans);
                     if($trans->getMethod()){
-                        $purchase->setTransactionMethod($trans->getMethod());
+                        $sales->setTransactionMethod($trans->getMethod());
                         if($method and $method->getServiceCharge() > 0) {
                             $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$method->getServiceCharge());
                             $discount = ($serviceCharge['discount']);
                             $total = ($serviceCharge['total']);
                             $received = ($serviceCharge['total']);
                             $cardCommission = ($serviceCharge['cardCommission']);
-                            $purchase->setCardCommission($cardCommission);
+                            $sales->setCardCommission($cardCommission);
 
                         }
                     }
 
                 }
-                $purchase->setPurchasePrice($purchasePrice);
-                $purchase->setVat($vat);
-                $purchase->setDeliveryCharge($delivery);
-                $purchase->setSubTotal($subTotal);
-                $purchase->setDiscount($discount);
-                $purchase->setDiscountCalculation($discountcal);
-                $purchase->setDiscountType($flat);
-                $purchase->setNetTotal($total);
-                $purchase->setPayment($received);
-                $purchase->setReceived($received);
-                $purchase->setAndroidProcess($process);
-                $purchase->setProcess('In-progress');
-                $em->persist($purchase);
+                $sales->setPurchasePrice($purchasePrice);
+                $sales->setVat($vat);
+                $sales->setDeliveryCharge($delivery);
+                $sales->setSubTotal($subTotal);
+                $sales->setDiscount($discount);
+                $sales->setDiscountCalculation($discountcal);
+                $sales->setDiscountType($flat);
+                $sales->setNetTotal($total);
+                $sales->setPayment($received);
+                $sales->setReceived($received);
+                $sales->setAndroidProcess($process);
+                $sales->setProcess('Approved');
+                $sales->setApprovedBy($process->getCreatedBy());
+                $em->persist($sales);
                 $em->flush();
                 if($sales_item){
-                    $this->insertSalesItem($purchase,$sales_item);
+                    $this->insertSalesItem($sales,$sales_item);
                 }
-                $this->approveSalesProcess($purchase);
+                $em->getRepository(MedicineStock::class)->getSalesUpdateQnt($sales);
+                $em->getRepository(AccountSales::class)->insertMedicineAccountInvoice($sales);
+
             endforeach;
         }
-        //  return $this->apiPurchaseLists($option);
     }
 
     public function insertSalesItem(MedicineSales $purchase,$data){
@@ -1409,29 +1421,6 @@ class AppsApiRepository extends EntityRepository
             }
         endforeach;
         $em->flush();
-    }
-
-    public function insertFlutterPurchaseProcess(GlobalOption $option,$device,$process,$data)
-    {
-        $em =  $this->_em;
-        $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : 'offline';
-        $purchase = (isset($data['purchase']) and $data['purchase']) ? $data['purchase'] : '';
-        var_dump($data);
-        exit;
-        $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
-        $entity = new MedicineAndroidProcess();
-        $entity->setMedicineConfig($option->getMedicineConfig());
-        $entity->setAndroidDevice($device);
-        $entity->setProcess($process);
-        $entity->setJsonItem($purchase);
-        $entity->setStatus(false);
-        $em->persist($entity);
-        $em->flush();
-        if($mode === "online"){
-            $this->insertApiPurchase($option,$entity);
-        }
-        return $entity;
-
     }
 
     public function insertApiPurchase(GlobalOption $option,MedicineAndroidProcess $process)
@@ -1519,7 +1508,6 @@ class AppsApiRepository extends EntityRepository
         endforeach;
         $em->flush();
     }
-
 
     public function approveProcess(MedicinePurchase $purchase){
         $em = $this->_em;

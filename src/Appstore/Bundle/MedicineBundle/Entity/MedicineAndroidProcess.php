@@ -52,6 +52,12 @@ class MedicineAndroidProcess
     private  $medicinePurchaseItem;
 
 
+     /**
+     * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     **/
+    private  $createdBy;
+
+
     /**
      * @var string
      *
@@ -95,6 +101,13 @@ class MedicineAndroidProcess
      * @ORM\Column(name="status", type="boolean", nullable=true)
      */
     private $status = false;
+
+     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="isApprove", type="boolean", nullable=true)
+     */
+    private $isApprove = false;
 
     /**
      * @var integer
@@ -359,6 +372,41 @@ class MedicineAndroidProcess
     {
         $this->mode = $mode;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * @param mixed $createdBy
+     */
+    public function setCreatedBy($createdBy)
+    {
+        $this->createdBy = $createdBy;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isApprove()
+    {
+        return $this->isApprove;
+    }
+
+    /**
+     * @param bool $isApprove
+     */
+    public function setIsApprove($isApprove)
+    {
+        $this->isApprove = $isApprove;
+    }
+
+
+
 
 
 

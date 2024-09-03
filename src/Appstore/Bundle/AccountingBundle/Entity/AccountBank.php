@@ -769,7 +769,7 @@ class AccountBank
     }
 
     /**
-     * @return mixed
+     * @return TransactionMethod
      */
     public function getMethod()
     {
