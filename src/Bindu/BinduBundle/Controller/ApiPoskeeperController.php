@@ -2162,6 +2162,80 @@ class ApiPoskeeperController extends Controller
 
     }
 
+    public function apiExpenseCreateAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $deviceId = $request->headers->get('X-DEVICE-ID');
+        $ipAddress = $_SERVER['REMOTE_ADDR'];
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $entity = $this->checkApiValidation($request);
+            $data = $request->request->all();
+            $status =$this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiInsertExpense($entity,$data);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('status' => $status)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function apiExpenseDeleteAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $entity = $this->checkApiValidation($request);
+            $id = $_REQUEST['id'];
+            $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiDeleteExpense($entity,$id);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('status'=>$status)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function apiExpenseApproveAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $form = $_REQUEST;
+            $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveExpense($entity,$form);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('status' => $status)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+
     public function apiExpenseCategoryAction(Request $request)
     {
         set_time_limit(0);
@@ -2218,77 +2292,5 @@ class ApiPoskeeperController extends Controller
 
     }
 
-    public function apiExpenseCreateAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        $deviceId = $request->headers->get('X-DEVICE-ID');
-        $ipAddress = $_SERVER['REMOTE_ADDR'];
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-
-            $entity = $this->checkApiValidation($request);
-            $data = $request->request->all();
-            $entities =$this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiInsertExpense($entity,$data);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($entities));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function apiExpenseDeleteAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-
-            $entity = $this->checkApiValidation($request);
-            $id = $_REQUEST['id'];
-            $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiDeleteExpense($entity,$id);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode(array('status'=>$status)));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
-
-    public function apiExpenseApproveAction(Request $request)
-    {
-        set_time_limit(0);
-        ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            /* @var $entity GlobalOption */
-            $entity = $this->checkApiValidation($request);
-            $form = $_REQUEST;
-            $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveExpense($entity,$form);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode(array('status' => $status)));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-
-    }
 
 }

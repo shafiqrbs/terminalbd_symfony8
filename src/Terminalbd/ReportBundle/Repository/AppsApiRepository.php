@@ -598,14 +598,17 @@ class AppsApiRepository extends EntityRepository
     public function apiExpense(GlobalOption $option , $data = array())
     {
 
+        $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
+        $offset = ($currentPage - 1) * $itemsPerPage;
 
         $dateSql = '';
         $categorySql = '';
         $keywordSql = '';
         $accountHeadSql = '';
         $datetime = new \DateTime("now");
-        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $datetime->format('Y-m-d 00:00:00');
-        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']: $datetime->format('Y-m-d 11:59:59');
+        $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']:'';
+        $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:'';
         $toUser         = (isset($data['to_user_id']) and $data['to_user_id']) ? $data['to_user_id'] :'';
         $user           = (isset($data['user_id']) and $data['user_id'])? $data['user_id'] :'';
         $keyword        = (isset($data['keyword']) and $data['keyword']) ? $data['keyword'] :'';
@@ -632,7 +635,7 @@ class AppsApiRepository extends EntityRepository
         left join fos_user  as aub ON  e.approvedBy_id = aub.id
         join expenseCategory  as ec ON  e.expenseCategory_id = ec.id
         join account_head  as ah ON  ec.accountHead_id = ah.id
-        where e.globalOption_id = :globalOption {$dateSql} {$keywordSql} {$categorySql} {$accountHeadSql} ORDER BY e.created DESC LIMIT 200";
+        where e.globalOption_id = :globalOption {$dateSql} {$keywordSql} {$categorySql} {$accountHeadSql} ORDER BY e.created DESC LIMIT  {$offset},{$itemsPerPage}";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('globalOption', $option->getId());
         $qb->execute();
@@ -769,8 +772,10 @@ class AppsApiRepository extends EntityRepository
         $sales->setProcess("In-progress");
         $em->persist($sales);
         $em->flush();
-        return $entities = $this->apiExpense($option);
-
+        if($sales){
+            return 'success';
+        }
+        return 'success';
     }
 
     public function apiApproveExpense(GlobalOption $option, $data)

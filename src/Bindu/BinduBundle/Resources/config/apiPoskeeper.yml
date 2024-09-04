@@ -282,28 +282,28 @@ api_poskeeper_sales_deletee:
 api_poskeeper_expense:
     path:     /poskeeper-account-expense
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiExpense }
-    methods:  POST
+    methods:  POST|GET
     options:
         expose: true
 
 api_poskeeper_expense_category:
     path:     /poskeeper-expense-category
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiExpenseCategory }
-    methods:  POST
+    methods:  POST|GET
     options:
         expose: true
 
 api_poskeeper_expense_head:
     path:     /poskeeper-expense-head
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiExpenseHead }
-    methods:  POST
+    methods:  POST|GET
     options:
         expose: true
 
 api_poskeeper_expense_create:
     path:     /poskeeper-expense-create
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiExpenseCreate }
-    methods:  POST
+    methods:  POST|GET
     options:
         expose: true
 
