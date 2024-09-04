@@ -8,7 +8,6 @@ use Appstore\Bundle\AccountingBundle\Entity\ExpenseCategory;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineAndroidProcess;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineParticular;
-use Appstore\Bundle\MedicineBundle\Entity\MedicineParticularType;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchase;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchaseItem;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSales;
@@ -490,8 +489,8 @@ class AppsApiRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
-        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
+        $currentPage = (isset($array['page']) and $array['page']) ? $array['page']:1; // Example: the current page number
+        $itemsPerPage = (isset($array['limit']) and $array['limit']) ? $array['limit']:25; // Example: the current page number
         $offset = ($currentPage - 1) * $itemsPerPage;
 
         $qb = $em->createQueryBuilder();
