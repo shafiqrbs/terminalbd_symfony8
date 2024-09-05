@@ -2235,7 +2235,6 @@ class ApiPoskeeperController extends Controller
 
     }
 
-
     public function apiExpenseCategoryAction(Request $request)
     {
         set_time_limit(0);
@@ -2288,6 +2287,34 @@ class ApiPoskeeperController extends Controller
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
 
+        }
+
+    }
+
+    /* Manage Expenditure */
+
+    public function apiLogsAction(Request $request)
+    {
+        set_time_limit(0);
+        ignore_user_abort(true);
+        $deviceId = $request->headers->get('X-DEVICE-ID');
+        $ipAddress = $_SERVER['REMOTE_ADDR'];
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            /* @var $entity GlobalOption */
+
+            $entity = $this->checkApiValidation($request);
+            $data = $request->request->all();
+            $status =$this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiInsertLogs($entity,$data);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode(array('status' => $status)));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
         }
 
     }

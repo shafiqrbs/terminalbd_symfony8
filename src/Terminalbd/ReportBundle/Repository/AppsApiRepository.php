@@ -21,6 +21,7 @@ use Setting\Bundle\ToolBundle\Entity\ProductUnit;
 use Setting\Bundle\ToolBundle\Entity\TransactionMethod;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Symfony\Component\HttpFoundation\Response;
+use Terminalbd\ReportBundle\Entity\AppsApi;
 
 /**
  * VendorRepository
@@ -1122,7 +1123,7 @@ class AppsApiRepository extends EntityRepository
                 $data[$key]['created_by'] = $entity->getCreatedBy()->getUserFullName();
                 $data[$key]['approved_by'] = $entity->getCreatedBy()->getUserFullName();
                 $data[$key]['vendor_id'] = (int) $entity->getMedicineVendor()->getId();
-                $data[$key]['name'] = $entity->getMedicineVendor()->getName();
+                $data[$key]['name'] = $entity->getMedicineVendor()->getCompanyName();
                 $data[$key]['mobile'] = $entity->getMedicineVendor()->getMobile();
                 $data[$key]['address'] = $entity->getMedicineVendor()->getAddress();
                 $data[$key]['method_id'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getId():0;
@@ -1220,6 +1221,7 @@ class AppsApiRepository extends EntityRepository
     {
         $em     = $this->_em;
         /* @var $entity MedicinePurchase */
+
         $entity = $em->getRepository(MedicinePurchase::class)->findOneBy(array('medicineConfig'=> $option->getMedicineConfig()->getId(),'id' => $id));
         $data = array();
         if($entity) {
@@ -1241,7 +1243,7 @@ class AppsApiRepository extends EntityRepository
             $data['created_by'] = $entity->getCreatedBy()->getUserFullName();
             $data['approved_by'] = $entity->getCreatedBy()->getUserFullName();
             $data['vendor_id'] = (int) $entity->getMedicineVendor()->getId();
-            $data['name'] = $entity->getMedicineVendor()->getName();
+            $data['name'] = $entity->getMedicineVendor()->getCompanyName();
             $data['mobile'] = $entity->getMedicineVendor()->getMobile();
             $data['address'] = $entity->getMedicineVendor()->getAddress();
             $data['method_id'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getId():0;
@@ -1634,6 +1636,22 @@ class AppsApiRepository extends EntityRepository
             $data['description'] = (string)$entity->getDescription();
         }
         return $data;
+    }
+
+    public function apiInsertLogs($option,$data)
+    {
+        $em = $this->_em;
+        $entity = new AppsApi();
+        $entity->setGlobalOption($option);
+        $entity->setContent($data['content']);
+        $user = $em->getRepository(User::class)->find($data['user_id']);
+        if($user){
+            $entity->setCreatedBy($user);
+        }
+        $em->persist($entity);
+        $em->flush();
+        return "success";
+
     }
 
 
