@@ -745,7 +745,7 @@ class AppsApiRepository extends EntityRepository
         $method = (isset($item['method_id']) and $item['method_id'])? $item['method_id']:'';
         $category = (isset($item['category_id']) and $item['category_id'])? $item['category_id']:'';
         $touser = (isset($item['to_user_id']) and $item['to_user_id'])? $item['to_user_id']:'';
-        $createdBy = (isset($item['created_by_id']) and $item['createdBy_id'])? $item['created_by_id']:'';
+        $createdBy = (isset($item['created_by_id']) and $item['created_by_id'])? $item['created_by_id']:'';
         $description = (isset($item['remark']) and $item['remark'])? $item['remark']:'';
 
         $sales = new Expenditure();
