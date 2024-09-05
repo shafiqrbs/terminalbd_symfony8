@@ -609,7 +609,6 @@ class AppsApiRepository extends EntityRepository
         $datetime = new \DateTime("now");
         $startDate      = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']:'';
         $endDate        = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:'';
-        $toUser         = (isset($data['to_user_id']) and $data['to_user_id']) ? $data['to_user_id'] :'';
         $user           = (isset($data['user_id']) and $data['user_id'])? $data['user_id'] :'';
         $keyword        = (isset($data['keyword']) and $data['keyword']) ? $data['keyword'] :'';
         $accountHead    = (isset($data['account_head_id']) and $data['account_head_id']) ? $data['account_head_id'] :'';
@@ -620,6 +619,9 @@ class AppsApiRepository extends EntityRepository
         }
         if($keyword){
             $keywordSql =  "AND e.accountRefNo LIKE '%{$keyword}%'";
+        }
+        if($user){
+            $toUser =  "AND  e.toUser_id = {$user}";
         }
         if($category){
             $categorySql =  "AND ec.id = {$category}";
@@ -635,7 +637,7 @@ class AppsApiRepository extends EntityRepository
         left join fos_user  as aub ON  e.approvedBy_id = aub.id
         join expenseCategory  as ec ON  e.expenseCategory_id = ec.id
         join account_head  as ah ON  ec.accountHead_id = ah.id
-        where e.globalOption_id = :globalOption {$dateSql} {$keywordSql} {$categorySql} {$accountHeadSql} ORDER BY e.created DESC LIMIT  {$offset},{$itemsPerPage}";
+        where e.globalOption_id = :globalOption {$dateSql} {$keywordSql} {$toUser} {$categorySql} {$accountHeadSql} ORDER BY e.created DESC LIMIT  {$offset},{$itemsPerPage}";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('globalOption', $option->getId());
         $qb->execute();
