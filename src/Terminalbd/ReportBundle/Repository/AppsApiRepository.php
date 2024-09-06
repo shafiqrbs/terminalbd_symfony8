@@ -951,26 +951,26 @@ class AppsApiRepository extends EntityRepository
             if ($entity->getMedicineSalesItems()) {
                 /* @var $item MedicineSalesItem */
                 foreach ($entity->getMedicineSalesItems() as $i => $item) {
-                    $data['sales_item'][$i]['id'] = (int)$item->getId();
-                    $data['sales_item'][$i]['stock_id'] = (int)$item->getMedicineStock()->getId();
-                    $data['sales_item'][$i]['sales_id'] = (string)$entity->getId();
-                    $data['sales_item'][$i]['barcode'] = (string)$entity->getId();
-                    $data['sales_item'][$i]['stock_name'] = (string)$item->getMedicineStock()->getName();
-                    $data['sales_item'][$i]['brand_name'] = (string)$item->getMedicineStock()->getBrandName();
-                    $data['sales_item'][$i]['unit'] = ($item->getMedicineStock()->getUnit()) ? (string)$item->getMedicineStock()->getUnit()->getName() : '';
-                    $data['sales_item'][$i]['mrp_price'] = (Double)$item->getMrpPrice();
-                    $data['sales_item'][$i]['sales_price'] = (Double)$item->getSalesPrice();
-                    $data['sales_item'][$i]['discount_price'] = (Double)$item->getDiscountPrice();
-                    $data['sales_item'][$i]['purchase_price'] = (Double)$item->getPurchasePrice();
-                    $data['sales_item'][$i]['item_percent'] = (Double)$item->getItemPercent();
-                    $data['sales_item'][$i]['custom_price'] = (Double)$item->getDiscountPrice();
-                    $data['sales_item'][$i]['quantity'] = (Double)$item->getQuantity();
-                    $data['sales_item'][$i]['sub_total'] = (Double)$item->getSubTotal();
-                    $data['sales_item'][$i]['discount_percent'] = (Double)$item->getDiscountPrice();
+                    $data['items'][$i]['id'] = (int)$item->getId();
+                    $data['items'][$i]['stock_id'] = (int)$item->getMedicineStock()->getId();
+                    $data['items'][$i]['sales_id'] = (string)$entity->getId();
+                    $data['items'][$i]['barcode'] = (string)$entity->getId();
+                    $data['items'][$i]['stock_name'] = (string)$item->getMedicineStock()->getName();
+                    $data['items'][$i]['brand_name'] = (string)$item->getMedicineStock()->getBrandName();
+                    $data['items'][$i]['unit'] = ($item->getMedicineStock()->getUnit()) ? (string)$item->getMedicineStock()->getUnit()->getName() : '';
+                    $data['items'][$i]['mrp_price'] = (Double)$item->getMrpPrice();
+                    $data['items'][$i]['sales_price'] = (Double)$item->getSalesPrice();
+                    $data['items'][$i]['discount_price'] = (Double)$item->getDiscountPrice();
+                    $data['items'][$i]['purchase_price'] = (Double)$item->getPurchasePrice();
+                    $data['items'][$i]['item_percent'] = (Double)$item->getItemPercent();
+                    $data['items'][$i]['custom_price'] = (Double)$item->getDiscountPrice();
+                    $data['items'][$i]['quantity'] = (Double)$item->getQuantity();
+                    $data['items'][$i]['sub_total'] = (Double)$item->getSubTotal();
+                    $data['items'][$i]['discount_percent'] = (Double)$item->getDiscountPrice();
                 }
 
             } else {
-                $data['sales_item'] = array();
+                $data['items'] = array();
 
             }
             return $data;
@@ -1257,22 +1257,22 @@ class AppsApiRepository extends EntityRepository
 
                 foreach ($entity->getMedicinePurchaseItems() as $i => $item) {
 
-                    $data['item'][$i]['id'] = (int)$item->getId();
-                    $data['item'][$i]['stock_id'] = (int)$item->getMedicineStock()->getId();
-                    $data['item'][$i]['sales_id'] = (string)$entity->getId();
-                    $data['item'][$i]['barcode'] = (string)$entity->getId();
-                    $data['item'][$i]['stock_name'] = (string)$item->getMedicineStock()->getName();
-                    $data['item'][$i]['brand_name'] = (string)$item->getMedicineStock()->getBrandName();
-                    $data['item'][$i]['unit'] = ($item->getMedicineStock()->getUnit()) ? (string)$item->getMedicineStock()->getUnit()->getName() : '';
-                    $data['item'][$i]['sales_price'] = (Double)$item->getSalesPrice();
-                    $data['item'][$i]['purchase_price'] = (Double)$item->getPurchasePrice();
-                    $data['item'][$i]['item_percent'] = (Double)$item->getItemPercent();
-                    $data['item'][$i]['quantity'] = (Double)$item->getQuantity();
-                    $data['item'][$i]['sub_total'] = (Double)($item->getPurchasePrice() * $item->getQuantity());
+                    $data['items'][$i]['id'] = (int)$item->getId();
+                    $data['items'][$i]['stock_id'] = (int)$item->getMedicineStock()->getId();
+                    $data['items'][$i]['sales_id'] = (string)$entity->getId();
+                    $data['items'][$i]['barcode'] = (string)$entity->getId();
+                    $data['items'][$i]['stock_name'] = (string)$item->getMedicineStock()->getName();
+                    $data['items'][$i]['brand_name'] = (string)$item->getMedicineStock()->getBrandName();
+                    $data['items'][$i]['unit'] = ($item->getMedicineStock()->getUnit()) ? (string)$item->getMedicineStock()->getUnit()->getName() : '';
+                    $data['items'][$i]['sales_price'] = (Double)$item->getSalesPrice();
+                    $data['items'][$i]['purchase_price'] = (Double)$item->getPurchasePrice();
+                    $data['items'][$i]['item_percent'] = (Double)$item->getItemPercent();
+                    $data['items'][$i]['quantity'] = (Double)$item->getQuantity();
+                    $data['items'][$i]['sub_total'] = (Double)($item->getPurchasePrice() * $item->getQuantity());
                 }
 
             } else {
-                $data['item'] = array();
+                $data['items'] = array();
 
             }
             return $data;
@@ -1343,7 +1343,7 @@ class AppsApiRepository extends EntityRepository
                 $invoice = (isset($item['invoice']) and $item['invoice']) ?  $item['invoice'] : '';
                 $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
                 $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
-                $sales_item = (isset($item['sales_item']) and $item['sales_item']) ?  $item['sales_item'] : '';
+                $sales_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $sales = new MedicineSales();
                 $sales->setMedicineConfig($config);
                 $sales->setInvoice($invoice);
@@ -1449,7 +1449,7 @@ class AppsApiRepository extends EntityRepository
                 $vendor = (isset($item['vendor_id']) and $item['vendor_id']) ?  $item['vendor_id'] : '';
                 $invoice = (isset($item['invoice']) and $item['invoice']) ?  $item['invoice'] : '';
                 $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
-                $purchase_item = (isset($item['purchase_item']) and $item['purchase_item']) ?  $item['purchase_item'] : '';
+                $purchase_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $purchase = new MedicinePurchase();
                 $purchase->setMedicineConfig($config);
                 $purchase->setInvoice($invoice);
