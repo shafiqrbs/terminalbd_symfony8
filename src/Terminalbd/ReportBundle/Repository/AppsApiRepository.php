@@ -126,7 +126,7 @@ class AppsApiRepository extends EntityRepository
         }
     }
 
-    public function getApiSetup(GlobalOption $entity,$device)
+    public function getApiSetup(GlobalOption $entity,$device = '')
     {
         /* @var $entity GlobalOption */
         $address = $entity->getMedicineConfig()->getAddress();

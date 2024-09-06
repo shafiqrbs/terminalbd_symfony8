@@ -236,22 +236,13 @@ class ApiPoskeeperController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $formData = $request->request->all();
-        $key =  $this->getParameter('x-api-key');
-        $value =  $this->getParameter('x-api-value');
-        $uniqueCode = $formData['uniqueCode'];
-        $mobile = $formData['mobile'];
-        $deviceId = $formData['deviceId'];
-        $setup = array();
-        $entity = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->findOneBy(array('uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1));
-        if (empty($entity) and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
+        if( $this->checkApiValidation($request) == 'invalid') {
             return new Response('Unauthorized access.', 401);
-        }else {
-
-            $device = $this->getDoctrine()->getRepository('SettingToolBundle:AndroidDeviceSetup')->insert($entity, $deviceId);
-            if ($device) {
-                $setup = $this->getDoctrine()->getRepository(AppsApi::class)->getApiSetup($entity, $device);
-            }
+        }else{
+            /* @var $entity GlobalOption */
+            $entity = $this->checkApiValidation($request);
+            $setup = $this->getDoctrine()->getRepository(AppsApi::class)->getApiSetup($entity,'');
+            $entity = $this->checkApiValidation($request);
             $users = $this->getDoctrine()->getRepository(AppsApi::class)->getApiUsers($entity);
             $customers = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
             $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
@@ -266,7 +257,7 @@ class ApiPoskeeperController extends Controller
             'categories'            => $categories,
             'customers'             => $customers,
             'expense_category'      => $expenseCategories,
-            'setup'                 => $setup,
+            'setup'                 => $setup,s
             'transaction_methods'   => $methods,
             'users'                 => $users,
             'units'                 => $units,

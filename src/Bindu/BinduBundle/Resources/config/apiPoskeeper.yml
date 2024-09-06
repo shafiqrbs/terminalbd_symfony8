@@ -14,6 +14,9 @@ api_poskeeper_splash:
 api_poskeeper_masterdata:
     path:     /poskeeper-masterdata
     defaults: { _controller: BinduBundle:ApiPoskeeper:masterdata }
+    methods:  POST|GET
+    options:
+        expose: true
 
 api_poskeeper_app:
     path:     /poskeeper-shop-type
@@ -276,8 +279,6 @@ api_poskeeper_sales_deletee:
     methods:  POST|GET
     options:
         expose: true
-
-
 
 api_poskeeper_expense:
     path:     /poskeeper-account-expense
