@@ -257,7 +257,7 @@ class ApiPoskeeperController extends Controller
             'categories'            => $categories,
             'customers'             => $customers,
             'expense_category'      => $expenseCategories,
-            'setup'                 => $setup,s
+            'setup'                 => $setup,
             'transaction_methods'   => $methods,
             'users'                 => $users,
             'units'                 => $units,
