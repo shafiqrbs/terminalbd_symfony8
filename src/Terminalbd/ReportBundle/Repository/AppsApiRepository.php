@@ -132,7 +132,7 @@ class AppsApiRepository extends EntityRepository
         $address = $entity->getMedicineConfig()->getAddress();
         $vatPercentage = $entity->getMedicineConfig()->getVatPercentage();
         $vatRegNo = $entity->getMedicineConfig()->getVatRegNo();
-        $vatEnable = $entity->getMedicineConfig()->isVatEnable();
+        $vatEnable = ($entity->getMedicineConfig()->isVatEnable() == true) ? 1 : 0;
         $footerMessage = $entity->getMedicineConfig()->getPrintFooterText();
         if ($footerMessage) {
             $printFooter = $footerMessage;
