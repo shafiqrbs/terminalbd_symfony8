@@ -242,7 +242,6 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $setup = $this->getDoctrine()->getRepository(AppsApi::class)->getApiSetup($entity,'');
-            $entity = $this->checkApiValidation($request);
             $users = $this->getDoctrine()->getRepository(AppsApi::class)->getApiUsers($entity);
             $customers = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
             $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
