@@ -703,7 +703,7 @@ class MedicineStockRepository extends EntityRepository
         $query->leftJoin('brand.medicineGeneric', 'generic');
         $query->select('e.id as id');
       //  $query->addSelect("CONCAT(e.name,' => MRP - ', e.salesPrice) as text");
-        $query->addSelect("CASE WHEN (e.rackNo IS NULL) THEN CONCAT(e.name,' [',e.remainingQuantity, '] ','- Tk.', e.salesPrice,'-',e.brandName)  ELSE CONCAT(e.name,' [',e.remainingQuantity, '] ', rack.name , '- Tk.', e.salesPrice,'-',e.brandName)  END as text");
+        $query->addSelect("CASE WHEN (e.rackNo IS NULL) THEN CONCAT(e.name,' [',e.remainingQuantity, '] ','- Tk.', e.salesPrice)  ELSE CONCAT(e.name,' [',e.remainingQuantity, '] ', rack.name , '- Tk.', e.salesPrice)  END as text");
         $query->where("ic.id = :config")->setParameter('config', $config->getId());
         if($brand){
             $query->andWhere("e.brandName = :brandName")->setParameter('brandName', $brand);
