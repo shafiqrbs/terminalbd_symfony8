@@ -328,21 +328,24 @@ class AppsApiRepository extends EntityRepository
 
     public function getApiSingleStock($option,$id)
     {
-        $qb = $this->createQueryBuilder('e');
+        $em = $this->_em;
+        $qb = $em->createQueryBuilder();
+        $qb->from('MedicineBundle:MedicineStock','e');
         $qb->leftJoin('e.category','category');
         $qb->leftJoin('e.unit','u');
         $qb->select('e.id as stockId','e.barcode as barcode','e.name as name','e.remainingQuantity as remainingQuantity','e.salesPrice as salesPrice','e.purchasePrice as purchasePrice','e.printHide as printHidden','e.path as path');
-        $qb->addSelect('e.name as brandName','brand.strength as strength');
+        $qb->addSelect('e.name as brandName');
         $qb->addSelect('u.id as unitId','u.name as unitName');
-        $qb->addSelect('category.id as categoryId','category.name as categoryName');
-        $qb->addSelect('brand.id as brandId','brand.name as brandName');
+        $qb->addSelect('category.id as category_id','category.name as categoryName');
         $qb->where("e.id = {$id}");
-        $row = $qb->getQuery()->getSingleScalarResult();
+        $row = $qb->getQuery()->getOneOrNullResult();
+
+
         $data['global_id']            = (int) $option->getId();
         $data['item_id']              = (int) $row['stockId'];
         $printName = trim($row['name']);
         $data['category_id']      = (int) $row['category_id'];;
-        $data['category_name']     = trim($row['category']);
+        $data['category_name']     = trim($row['categoryName']);
         $data['brand_name']            = trim($row['brandName']);
         $data['barcode']              = $row['barcode'];
         $data['unit']                 = ($row['unitName']) ? $row['unitName'] : "";
@@ -1600,8 +1603,10 @@ class AppsApiRepository extends EntityRepository
             }
             if($data['brand_id']){
                 $brand = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(array('medicineConfig'=>$config,'id' => $data['brand_id']));
-                $entity->setAccessoriesBrand($brand);
-                $entity->setBrandName($brand->getName());
+               if($brand){
+                   $entity->setAccessoriesBrand($brand);
+                   $entity->setBrandName($brand->getName());
+               }
             }
             $entity->setOpeningQuantity($data['opening_quantity']);
             $entity->setRemainingQuantity($data['opening_quantity']);
