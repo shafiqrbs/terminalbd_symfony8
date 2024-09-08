@@ -1639,6 +1639,8 @@ class AppsApiRepository extends EntityRepository
         if($entity){
             $data['id'] = (integer)$entity->getId();
             $data['name'] = (String)$entity->getName();
+            $data['brand_id'] = ($entity->getAccessoriesBrand()) ?  (integer)$entity->getAccessoriesBrand()->getId():0;
+            $data['brand_name'] = ($entity->getAccessoriesBrand()) ?  (integer)$entity->getAccessoriesBrand()->getName():'';
             $data['category_id'] = ($entity->getCategory()) ?  (integer)$entity->getCategory()->getId():0;
             $data['category_name'] = ($entity->getCategory()) ? (String)$entity->getCategory()->getName():'';
             $data['brand_name'] = (String)$entity->getBrandName();
