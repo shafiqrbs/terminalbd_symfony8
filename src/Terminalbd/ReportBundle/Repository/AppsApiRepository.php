@@ -1552,7 +1552,6 @@ class AppsApiRepository extends EntityRepository
             $entity = new MedicineStock();
             $entity->setMedicineConfig($config);
             $entity->setName($data['name']);
-            $entity->setBrandName($data['brand_name']);
             if($data['unit_id']){
                 $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(array('id' => $data['unit_id']));
                 $entity->setUnit($unit);
@@ -1563,6 +1562,11 @@ class AppsApiRepository extends EntityRepository
             if($data['category_id']){
                 $category = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(array('medicineConfig'=>$config,'id' => $data['category_id']));
                 $entity->setCategory($category);
+            }
+            if($data['brand_id']){
+                $brand = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(array('medicineConfig'=>$config,'id' => $data['brand_id']));
+                $entity->setAccessoriesBrand($brand);
+                $entity->setBrandName($brand->getName());
             }
             $entity->setOpeningQuantity($data['opening_quantity']);
             $entity->setRemainingQuantity($data['opening_quantity']);
