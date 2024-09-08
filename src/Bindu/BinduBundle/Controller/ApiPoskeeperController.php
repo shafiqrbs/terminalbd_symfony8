@@ -741,14 +741,10 @@ class ApiPoskeeperController extends Controller
 
             $entity = $this->checkApiValidation($request);
             $stock = $this->getDoctrine()->getRepository(AppsApi::class)->apiInsertStock($entity,$data);
-            $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getApiStock($entity);
-            $array = array(
-                'stockId'=> $stock->getId(),
-                'stock' => $data
-            );
+            $data = $this->getDoctrine()->getRepository(AppsApi::class)->getApiSingleStock($stock->getId());
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($array));
+            $response->setContent(json_encode($data));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }

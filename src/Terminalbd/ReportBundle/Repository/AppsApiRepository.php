@@ -326,6 +326,41 @@ class AppsApiRepository extends EntityRepository
         return $data;
     }
 
+    public function getApiSingleStock($option,$id)
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->leftJoin('e.category','category');
+        $qb->leftJoin('e.unit','u');
+        $qb->select('e.id as stockId','e.barcode as barcode','e.name as name','e.remainingQuantity as remainingQuantity','e.salesPrice as salesPrice','e.purchasePrice as purchasePrice','e.printHide as printHidden','e.path as path');
+        $qb->addSelect('e.name as brandName','brand.strength as strength');
+        $qb->addSelect('u.id as unitId','u.name as unitName');
+        $qb->addSelect('category.id as categoryId','category.name as categoryName');
+        $qb->addSelect('brand.id as brandId','brand.name as brandName');
+        $qb->where("e.id = {$id}");
+        $row = $qb->getQuery()->getSingleScalarResult();
+        $data['global_id']            = (int) $option->getId();
+        $data['item_id']              = (int) $row['stockId'];
+        $printName = trim($row['name']);
+        $data['category_id']      = (int) $row['category_id'];;
+        $data['category_name']     = trim($row['category']);
+        $data['brand_name']            = trim($row['brandName']);
+        $data['barcode']              = $row['barcode'];
+        $data['unit']                 = ($row['unitName']) ? $row['unitName'] : "";
+        $data['name']                 = $printName;
+        $data['print_name']           = $printName;
+        $data['quantity']             = $row['remainingQuantity'];
+        $data['sales_price']           = $row['salesPrice'];
+        $data['purchase_price']        = $row['purchasePrice'];
+        $data['print_hidden']          = ($row['printHidden']) ? $row['printHidden'] : ""; $row['printHidden'];
+        if($row['path']){
+            $path = $this->resizeFilter("uploads/domain/{$option->getId()}/product/{$row['path']}");
+            $data['image_path']            =  $path;
+        }else{
+            $data['image_path']            = "";
+        }
+        return $data;
+    }
+
     public function getApiParticular(GlobalOption $option,$slug)
     {
 

@@ -999,6 +999,8 @@ class MedicineStockRepository extends EntityRepository
         return $data;
     }
 
+
+
     public function resizeFilter($pathToImage, $width = 256, $height = 256)
     {
         $path = '/' . Image::open(__DIR__.'/../../../../../web/' . $pathToImage)->cropResize($width, $height, 'transparent', 'top', 'left')->guess();
