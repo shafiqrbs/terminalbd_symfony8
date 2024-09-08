@@ -1592,12 +1592,18 @@ class AppsApiRepository extends EntityRepository
 
         $em = $this->_em;
         $entity = $em->getRepository(MedicineStock::class)->find($data['id']);
+
         /* @var $entity MedicineStock */
+
         if($entity){
             $entity->setName($data['name']);
-            $entity->setBrandName($data['brand_name']);
+            if($data['brand_id']){
+                $brand = $em->getRepository('MedicineBundle:MedicineParticular')->find($data['brand_id']);
+                $entity->setAccessoriesBrand($brand);
+                $entity->setBrandName($brand->getName());
+            }
             if($data['category_id']){
-                $category = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(array('id' => $data['category_id']));
+                $category = $em->getRepository('MedicineBundle:MedicineParticular')->find($data['category_id']);
                 $entity->setCategory($category);
             }
             if($data['unit_id']){
