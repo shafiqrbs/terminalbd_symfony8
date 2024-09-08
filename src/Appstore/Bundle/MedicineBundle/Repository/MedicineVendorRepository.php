@@ -153,7 +153,7 @@ class MedicineVendorRepository extends EntityRepository
         $name = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
         $companyName = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
         $address = ((isset($data['address']) and $data['address'])) ? $data['address']:'';
-        $email = ((isset($data['email']) and $data['email'])) ? floatval($data['email']):'';
+        $email = ((isset($data['email']) and $data['email'])) ? ($data['email']):'';
         $openingBalance = trim((isset($data['openingBalance']) and $data['openingBalance'])) ? trim(floatval($data['openingBalance'])):0;
         $em  = $this->_em;
         $config = $option->getMedicineConfig();
@@ -172,7 +172,8 @@ class MedicineVendorRepository extends EntityRepository
             if ($openingBalance > 0) {
                 $em->getRepository("AccountingBundle:AccountPurchase")->apiInsertOpeningBalance($entity, $openingBalance);
             }
-            $result['global_id']            = (int) $entity->getId();
+            $result['global_id']            = (int) $option->getId();
+            $result['vendor_id']            = (int) $entity->getId();
             $result['name']                 = (string)$entity->getName();
             $result['mobile']               = (string)$entity->getMobile();
             $result['address']              = (string)$entity->getAddress();
@@ -180,8 +181,12 @@ class MedicineVendorRepository extends EntityRepository
             $result['debit']                = (double)0;
             $result['credit']               = (double)0;
             $result['balance']              = (double)$openingBalance;
+            return $result;
         }
-        return $em->getRepository(AccountPurchase::class)->apiVendorMedicineOutstanding($option);
+        return $result;
+
+
+    //    return $em->getRepository(AccountPurchase::class)->apiVendorMedicineOutstanding($option);
     }
 
     public function updateVendorCompanyName(MedicineVendor $vendor)

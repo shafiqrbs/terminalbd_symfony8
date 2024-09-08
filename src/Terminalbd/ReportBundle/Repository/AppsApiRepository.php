@@ -814,6 +814,10 @@ class AppsApiRepository extends EntityRepository
         return 'failed';
     }
 
+    public function numberFormat($number){
+        return number_format((float)$number, 2, '.', '');
+    }
+
     public function apiInventorySales(GlobalOption $option, $data)
     {
         $em = $this->_em;
@@ -1317,7 +1321,7 @@ class AppsApiRepository extends EntityRepository
         }elseif($mode === "online" and $process == 'purchase'){
             $this->insertApiPurchase($option,$entity);
         }
-        return $entity;
+        return 'success';
 
     }
 
