@@ -1415,10 +1415,8 @@ class AppsApiRepository extends EntityRepository
                             $received = ($serviceCharge['total']);
                             $cardCommission = ($serviceCharge['cardCommission']);
                             $sales->setCardCommission($cardCommission);
-
                         }
                     }
-
                 }
                 $sales->setPurchasePrice($purchasePrice);
                 $sales->setVat($vat);
