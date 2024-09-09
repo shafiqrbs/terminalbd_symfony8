@@ -1405,16 +1405,19 @@ class AppsApiRepository extends EntityRepository
                 }
                 if($method){
                     $trans = $em->getRepository(AccountBank::class)->find($method);
-                    $sales->setAccountBank($trans);
-                    if($trans->getMethod()){
+
+                    if($trans->getMethod()) {
                         $sales->setTransactionMethod($trans->getMethod());
-                        if($trans and $trans->getServiceCharge() > 0) {
-                            $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$trans->getServiceCharge());
-                            $discount = ($serviceCharge['discount']);
-                            $total = ($serviceCharge['total']);
-                            $received = ($serviceCharge['total']);
-                            $cardCommission = ($serviceCharge['cardCommission']);
-                            $sales->setCardCommission($cardCommission);
+                        if ($trans->getMethod()->getSlug() == 'bank'){
+                            $sales->setAccountBank($trans);
+                            if ($trans and $trans->getServiceCharge() > 0) {
+                                $serviceCharge = $this->getCalculationBankServiceChargeManual($item, $trans->getServiceCharge());
+                                $discount = ($serviceCharge['discount']);
+                                $total = ($serviceCharge['total']);
+                                $received = ($serviceCharge['total']);
+                                $cardCommission = ($serviceCharge['cardCommission']);
+                                $sales->setCardCommission($cardCommission);
+                            }
                         }
                     }
                 }
