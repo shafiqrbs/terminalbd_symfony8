@@ -1409,7 +1409,7 @@ class AppsApiRepository extends EntityRepository
                     if($trans->getMethod()){
                         $sales->setTransactionMethod($trans->getMethod());
                         if($trans and $trans->getServiceCharge() > 0) {
-                            $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$method->getServiceCharge());
+                            $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$trans->getServiceCharge());
                             $discount = ($serviceCharge['discount']);
                             $total = ($serviceCharge['total']);
                             $received = ($serviceCharge['total']);
