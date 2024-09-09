@@ -375,19 +375,20 @@ class MedicinePurchaseItemRepository extends EntityRepository
     public function updatePurchaseItemPrice(MedicinePurchase $purchase)
     {
         /* @var  $item MedicinePurchaseItem */
-
-        foreach ($purchase->getMedicinePurchaseItems() as $item){
-
-            $em = $this->_em;
-            if($item and $item->getActualPurchasePrice()){
-                $percentage = $purchase->getDiscountCalculation();
-                $purchasePrice = $this->stockInstantPurchaseItemPrice($percentage,$item->getActualPurchasePrice());
-                $item->setPurchasePrice($purchasePrice);
-                $item->setPurchaseSubTotal($item->getActualPurchasePrice() * $item->getQuantity());
-                $em->persist($item);
-                $em->flush();
+        $em = $this->_em;
+        if($purchase->getMedicinePurchaseItems()){
+            foreach ($purchase->getMedicinePurchaseItems() as $item){
+                if($item and $item->getActualPurchasePrice()){
+                    $percentage = $purchase->getDiscountCalculation();
+                    $purchasePrice = $this->stockInstantPurchaseItemPrice($percentage,$item->getActualPurchasePrice());
+                    $item->setPurchasePrice($purchasePrice);
+                    $item->setPurchaseSubTotal($item->getActualPurchasePrice() * $item->getQuantity());
+                    $em->persist($item);
+                    $em->flush();
+                }
             }
         }
+
     }
 
     public function updatePurchaseItem($data)

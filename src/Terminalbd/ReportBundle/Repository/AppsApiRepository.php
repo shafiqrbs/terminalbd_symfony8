@@ -669,10 +669,11 @@ class AppsApiRepository extends EntityRepository
             $accountHeadSql =  "AND ah.id = {$accountHead}";
         }
 
-        $sql = "SELECT CAST(e.id AS UNSIGNED) AS id, e.accountRefNo AS invoice,  e.remark AS remark, CAST(e.amount AS DECIMAL(10, 2)) AS amount, ec.id AS category_id, ec.name AS category,ah.id AS account_head_id,ah.name AS account_head, u.id AS creatdBy_id, tu.username AS touser, u.username AS created_by,u.username AS created_by, u.username AS approved_by, DATE_FORMAT(e.created,'%d-%m-%Y') as created
+        $sql = "SELECT CAST(e.id AS UNSIGNED) AS id, e.accountRefNo AS invoice, ab.serviceName as method,  e.remark AS remark, CAST(e.amount AS DECIMAL(10, 2)) AS amount, ec.id AS category_id, ec.name AS category,ah.id AS account_head_id,ah.name AS account_head, u.id AS creatdBy_id, tu.username AS touser, u.username AS created_by,u.username AS created_by, u.username AS approved_by, DATE_FORMAT(e.created,'%d-%m-%Y') as created
         from Expenditure as e
         join fos_user  as tu ON  e.toUser_id = tu.id
         join fos_user  as u ON  e.createdBy_id = u.id
+        left join account_bank  as ab ON  e.accountBank_id = ab.id
         left join fos_user  as aub ON  e.approvedBy_id = aub.id
         join expenseCategory  as ec ON  e.expenseCategory_id = ec.id
         join account_head  as ah ON  ec.accountHead_id = ah.id
@@ -1398,13 +1399,16 @@ class AppsApiRepository extends EntityRepository
                 }
                 if($customer){
                     $sales->setCustomer($em->getRepository(Customer::class)->find($customer));
+                }else{
+                    $customerId =$em->getRepository(Customer::class)->findOneBy(array('globalOption'=>$option,'name'=>'Default'));
+                    $sales->setCustomer($customerId);
                 }
                 if($method){
                     $trans = $em->getRepository(AccountBank::class)->find($method);
                     $sales->setAccountBank($trans);
                     if($trans->getMethod()){
                         $sales->setTransactionMethod($trans->getMethod());
-                        if($method and $method->getServiceCharge() > 0) {
+                        if($trans and $trans->getServiceCharge() > 0) {
                             $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$method->getServiceCharge());
                             $discount = ($serviceCharge['discount']);
                             $total = ($serviceCharge['total']);
@@ -1483,15 +1487,17 @@ class AppsApiRepository extends EntityRepository
             foreach ($items as $item):
                 $method= (isset($item['method_id']) and $item['method_id']) ?  $item['method_id'] : '';
                 $flat = (isset($item['discount_type']) and $item['discount_type']) ?  $item['discount_type'] : 'flat';
-                $received = (isset($item['receive']) and $item['receive']) ?  $item['receive'] : 0;
+                $received = (isset($item['received']) and $item['received']) ?  $item['received'] : 0;
                 $subTotal = (isset($item['sub_total']) and $item['sub_total']) ?  $item['sub_total'] : 0;
-                $total = (isset($item['total']) and $item['total']) ?  $item['total'] : 0;
+                $total = (isset($item['net_total']) and $item['net_total']) ?  $item['net_total'] : 0;
                 $discount = (isset($item['discount']) and $item['discount']) ?  $item['discount'] : 0;
                 $discountcal = (isset($item['discount_calculation']) and $item['discount_calculation']) ?  $item['discount_calculation'] : 0;
                 $vendor = (isset($item['vendor_id']) and $item['vendor_id']) ?  $item['vendor_id'] : '';
                 $invoice = (isset($item['invoice']) and $item['invoice']) ?  $item['invoice'] : '';
                 $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
                 $purchase_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
+
+
                 $purchase = new MedicinePurchase();
                 $purchase->setMedicineConfig($config);
                 $purchase->setInvoice($invoice);
@@ -1504,10 +1510,13 @@ class AppsApiRepository extends EntityRepository
                 }
                 if($method){
                     $trans = $em->getRepository(AccountBank::class)->find($method);
-                    $purchase->setAccountBank($trans);
-                    if($trans->getMethod()){
-                        $purchase->setTransactionMethod($trans->getMethod());
+                    if($trans){
+                        $purchase->setAccountBank($trans);
+                        if($trans->getMethod()){
+                            $purchase->setTransactionMethod($trans->getMethod());
+                        }
                     }
+
                 }
                 $purchase->setSubTotal($subTotal);
                 $purchase->setDiscount($discount);
@@ -1532,6 +1541,7 @@ class AppsApiRepository extends EntityRepository
 
         $em = $this->_em;
         $records = json_decode($data);
+
         foreach ($records as $key => $sub):
             if($sub) {
                 $salesItem = new MedicinePurchaseItem();
@@ -1546,13 +1556,20 @@ class AppsApiRepository extends EntityRepository
                 }
                 if (isset($sub->purchase_price) and $sub->purchase_price) {
                     $salesItem->setPurchasePrice(floatval($sub->purchase_price));
+                    $salesItem->setActualPurchasePrice(floatval($sub->purchase_price));
+                }else{
+                    $salesItem->setPurchasePrice(floatval($stockId->getPurchasePrice()));
+                    $salesItem->setActualPurchasePrice(floatval($stockId->getPurchasePrice()));
                 }
                 if (isset($sub->item_percent) and $sub->item_percent) {
                     $salesItem->setItemPercent(floatval($sub['item_percent']));
                 }
                 if (isset($sub->sales_price) and $sub->sales_price) {
                     $salesItem->setSalesPrice(floatval($sub->sales_price));
+                }else{
+                    $salesItem->setSalesPrice(floatval($stockId->getSalesPrice()));
                 }
+                $salesItem->setPurchaseSubTotal(floatval($salesItem->getPurchasePrice()) * $salesItem->getQuantity());
                 $em->persist($salesItem);
             }
         endforeach;
