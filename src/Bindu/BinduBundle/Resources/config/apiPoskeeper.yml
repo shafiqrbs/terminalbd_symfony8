@@ -322,6 +322,14 @@ api_poskeeper_expense_delete:
     options:
         expose: true
 
+api_poskeeper_table:
+    path:     /restaurant-table
+    defaults: { _controller: BinduBundle:ApiPoskeeper:tokenNo }
+
+api_poskeeper_discount_coupon:
+    path:     /restaurant-discount-coupon
+    defaults: { _controller: BinduBundle:ApiPoskeeper:discountCoupon }
+
 api_poskeeper_logs:
     path:     /poskeeper-logs
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiLogs }
