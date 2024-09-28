@@ -164,13 +164,14 @@
                                         <td class="numeric" >{{ entity.deliveryDateTime }}</td>
                                         <td class="numeric" >{{ entity.paymentStatus }}</td>
                                         <td class="numeric" >
-                                            {% if entity.revised == 1 %}
+                                      {#      {% if entity.revised == 1 %}
                                                 <a target="_blank" href="{{ path('hms_invoice_reverse_show', { 'id': entity.id }) }}" class="btn black mini"><i class="icon-retweet"></i> Revised</a>
                                             {% elseif entity.process == 'Returned' %}
                                                <span class="btn mini yellow">{{ entity.process }}</span>
                                             {% else %}
                                                 {{ entity.process }}
-                                            {% endif %}
+                                            {% endif %}#}
+                                            {{ entity.process }}
                                         </td>
                                         <td class="numeric" >{% if entity.commissionApproved == 1 %}{{ entity.updated|date('d-m-Y') }}{% endif %}</td>
                                         <td class="numeric" >
