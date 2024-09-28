@@ -15,14 +15,15 @@ use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 class CouponRepository extends EntityRepository
 {
 
-    public function getValidCouponCode(GlobalOption $globalOption , $code)
+    public function getValidCouponCode(GlobalOption $globalOption , $data)
     {
 
         $config = $globalOption->getRestaurantConfig()->getId();
         $datetime = new \DateTime("now");
         $today_startdatetime = $datetime->format('Y-m-d 00:00:00');
         $today_enddatetime = $datetime->format('Y-m-d 23:59:59');
-
+        $code = (isset($data['coupon_code']) and $data['coupon_code']) ? $data['coupon_code']:'';
+        $amount = (isset($data['amount']) and $data['amount']) ? $data['amount']:'';
 
         $qb = $this->createQueryBuilder('coupon');
         $qb->where("coupon.status = 1");
@@ -33,8 +34,25 @@ class CouponRepository extends EntityRepository
         $qb->setParameter('startDate', $today_startdatetime);
         $qb->andWhere('coupon.endDate >= :endDate');
         $qb->setParameter('endDate', $today_enddatetime);
-        $result = $qb->getQuery()->getOneOrNullResult();
-        return $result;
+        $qb->andWhere('coupon.amount <= :amount');
+        $qb->setParameter('amount', $amount);
+        $row = $qb->getQuery()->getOneOrNullResult();
+        $data = array();
+        if($row){
+            $data['id'] = (int) $row->getId();
+            $data['name'] = $row->getName();
+            $data['coupon_code'] = $row->getCouponCode();
+            $data['amount'] = $row->getAmount();
+            $data['limit_amount'] = $row->getAmountLimit();
+            $data['valid_amount'] = $row->getValidAmount();
+            $data['start_date'] = $row->getStartDate()->format('Y-m-d');
+            $data['end_date'] = $row->getEndDate()->format('Y-m-d');
+            $data['percentage'] = $row->getPercentage();
+            $data['quantity'] = $row->getQuantity();
+            $data['remaining_quantity'] = $row->getRemainingQuantity();
+            $data['status'] = $row->getStatus();
+        }
+        return $data;
 
 
     }

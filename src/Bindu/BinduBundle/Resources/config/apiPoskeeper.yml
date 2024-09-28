@@ -330,6 +330,13 @@ api_poskeeper_discount_coupon:
     path:     /poskeeper-restaurant-discount-coupon
     defaults: { _controller: BinduBundle:ApiPoskeeper:discountCoupon }
 
+api_poskeeper_valid_coupon:
+    path:     /poskeeper-restaurant-valid-coupon
+    defaults: { _controller: BinduBundle:ApiPoskeeper:validCoupon }
+    methods:  POST|GET
+    options:
+        expose: true
+
 api_poskeeper_logs:
     path:     /poskeeper-logs
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiLogs }

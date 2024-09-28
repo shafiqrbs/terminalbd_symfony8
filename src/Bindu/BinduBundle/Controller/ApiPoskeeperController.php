@@ -2298,6 +2298,26 @@ class ApiPoskeeperController extends Controller
         }
     }
 
+    public function validCouponAction(Request $request)
+    {
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $data = $_REQUEST;
+            $entity = $this->checkApiValidation($request);
+            $data = $this->getDoctrine()->getRepository('RestaurantBundle:Coupon')->getValidCouponCode($entity,$data);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
     public function tableAction(Request $request)
     {
 
