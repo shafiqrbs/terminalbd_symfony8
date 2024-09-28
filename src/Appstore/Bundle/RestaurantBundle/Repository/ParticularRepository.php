@@ -109,7 +109,7 @@ class ParticularRepository extends EntityRepository
         $qb = $this->createQueryBuilder('e');
         $qb->join('e.category','c');
         $qb->leftJoin('e.unit','u');
-        $qb->select('e.id as stockId','e.name as name','e.quantity as quantity','e.price as salesPrice','e.purchasePrice as purchasePrice','e.path as path');
+        $qb->select('e.id as stockId','e.barcode as barcode','e.name as name','e.quantity as quantity','e.price as salesPrice','e.purchasePrice as purchasePrice','e.path as path');
         $qb->addSelect('u.id as unitId','u.name as unitName');
         $qb->addSelect('c.id as categoryId','c.name as categoryName');
         $qb->where('e.restaurantConfig = :config');
@@ -117,13 +117,14 @@ class ParticularRepository extends EntityRepository
         $qb->orderBy('e.sorting','ASC');
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
-
         foreach($result as $key => $row) {
+            $printName = trim($row['name']);
             $data[$key]['global_id']            = (int) $option->getId();
             $data[$key]['item_id']              = (int) $row['stockId'];
-
-            $data[$key]['category_id']          = $row['categoryId'];
-            $data[$key]['categoryName']         = $row['categoryName'];
+            $data[$key]['category_id']          = (int)$row['categoryId'];
+            $data[$key]['category_name']         = trim($row['categoryName']);
+            $data[$key]['brand_name']            = '';
+            $data[$key]['barcode']              = $row['barcode'];
             if ($row['unitId']){
                 $data[$key]['unit_id']          = $row['unitId'];
                 $data[$key]['unit']             = $row['unitName'];
@@ -131,17 +132,17 @@ class ParticularRepository extends EntityRepository
                 $data[$key]['unit_id']          = 0;
                 $data[$key]['unit']             = '';
             }
-            $data[$key]['name']                 = $row['name'];
-            $data[$key]['printName']            = $row['name'];
-            $data[$key]['quantity']             = $row['quantity'];
-            $data[$key]['salesPrice']           = $row['salesPrice'];
-            $data[$key]['purchasePrice']        = $row['purchasePrice'];
-            $data[$key]['printHidden']          = "";
+            $data[$key]['name']                 = $printName;
+            $data[$key]['print_name']            = $printName;
+            $data[$key]['quantity']             = (int)$row['quantity'];
+            $data[$key]['sales_price']           = $row['salesPrice'];
+            $data[$key]['purchase_price']        = $row['purchasePrice'];
+            $data[$key]['print_hidden']          = "";
             if($row['path']){
                 $path = $this->resizeFilter("uploads/domain/{$option->getId()}/product/{$row['path']}");
-            $data[$key]['imagePath']            =  $path;
+            $data[$key]['image_path']            =  $path;
             }else{
-            $data[$key]['imagePath']            = "";
+            $data[$key]['image_Path']            = "";
             }
         }
         return $data;
@@ -536,11 +537,9 @@ class ParticularRepository extends EntityRepository
         /* @var $row Particular */
 
         $data = array();
-
         foreach($result as $key => $row){
-
-            $data[$key]['tokenId'] = (int) $row['id'];
-            $data[$key]['tokenName'] = $row['name'];
+            $data[$key]['id'] = (int) $row['id'];
+            $data[$key]['table_name'] = $row['name'];
         }
         return $data;
 

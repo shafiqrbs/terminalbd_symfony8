@@ -105,6 +105,14 @@ class Particular
     private $name;
 
 
+     /**
+     * @var string
+     *
+     * @ORM\Column(name="barcode", type="string", length=100, nullable=true)
+     */
+    private $barcode;
+
+
     /**
      * @var float
      *
@@ -1137,6 +1145,72 @@ class Particular
     {
         $this->productionQuantity = $productionQuantity;
     }
+
+    /**
+     * @return string
+     */
+    public function getBarcode()
+    {
+        return $this->barcode;
+    }
+
+    /**
+     * @param string $barcode
+     */
+    public function setBarcode($barcode)
+    {
+        $this->barcode = $barcode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhoneNo()
+    {
+        return $this->phoneNo;
+    }
+
+    /**
+     * @param string $phoneNo
+     */
+    public function setPhoneNo($phoneNo)
+    {
+        $this->phoneNo = $phoneNo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * @param mixed $path
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
+
 
 
 }

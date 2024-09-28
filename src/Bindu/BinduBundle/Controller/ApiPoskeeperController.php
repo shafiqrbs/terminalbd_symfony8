@@ -205,13 +205,29 @@ class ApiPoskeeperController extends Controller
             }
             $users = $this->getDoctrine()->getRepository(AppsApi::class)->getApiUsers($entity);
             $customers = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
-            $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
-            $stocks = $this->getDoctrine()->getRepository(AppsApi::class)->getApiStock($entity);
-            $categories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'category');
-            $brands = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
             $methods = $this->getDoctrine()->getRepository(AppsApi::class)->getApiMethodTransaction($entity);
             $expenseCategories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiExpenseCategory($entity->getId());
             $units = $this->getDoctrine()->getRepository(AppsApi::class)->getApiProductUnit();
+
+            if($entity->getMainApp()->getSlug() == 'miss'){
+                $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
+                $stocks = $this->getDoctrine()->getRepository(AppsApi::class)->getApiStock($entity);
+                $categories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'category');
+                $brands = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
+            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
+                $stocks = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiStock($entity);
+                $categories = $this->getDoctrine()->getRepository('RestaurantBundle:Category')->getApiCategory($entity);
+                $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->getApiVendor($entity);
+                $brands = '';
+            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
+                $stocks = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiStock($entity);
+                $categories = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiCategory($entity);
+                $vendors = $this->getDoctrine()->getRepository('InventoryBundle:Vendor')->getApiVendor($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'business'){
+                $stocks = $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->getApiStock($entity);
+                $categories = $this->getDoctrine()->getRepository('BusinessBundle:Category')->getApiCategory($entity);
+                $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->getApiVendor($entity);
+            }
         }
         $jsonData = array(
             'brands'                => $brands,
@@ -245,11 +261,25 @@ class ApiPoskeeperController extends Controller
             $users = $this->getDoctrine()->getRepository(AppsApi::class)->getApiUsers($entity);
             $customers = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
             $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
-            $categories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'category');
-            $brands = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
             $methods = $this->getDoctrine()->getRepository(AppsApi::class)->getApiMethodTransaction($entity);
             $expenseCategories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiExpenseCategory($entity->getId());
             $units = $this->getDoctrine()->getRepository(AppsApi::class)->getApiProductUnit();
+
+            if($entity->getMainApp()->getSlug() == 'miss'){
+                $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
+                $categories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'category');
+                $brands = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
+            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
+                $categories = $this->getDoctrine()->getRepository('RestaurantBundle:Category')->getApiCategory($entity);
+                $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->getApiVendor($entity);
+                $brands = '';
+            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
+                $categories = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiCategory($entity);
+                $vendors = $this->getDoctrine()->getRepository('InventoryBundle:Vendor')->getApiVendor($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'business'){
+                $categories = $this->getDoctrine()->getRepository('BusinessBundle:Category')->getApiCategory($entity);
+                $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->getApiVendor($entity);
+            }
         }
         $jsonData = array(
             'brands'                => $brands,
@@ -593,7 +623,7 @@ class ApiPoskeeperController extends Controller
 
     }
 
-    public function StockItemAction(Request $request)
+    public function stockItemAction(Request $request)
     {
 
         set_time_limit(0);
@@ -607,7 +637,15 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $stocks = $this->getDoctrine()->getRepository(AppsApi::class)->getApiStock($entity);
+            if($entity->getMainApp()->getSlug() == 'miss'){
+                $stocks = $this->getDoctrine()->getRepository(AppsApi::class)->getApiStock($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
+                $stocks = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiStock($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'inventory'){
+                $stocks = $this->getDoctrine()->getRepository('InventoryBundle:Item')->getApiStock($entity);
+            }elseif($entity->getMainApp()->getSlug() == 'business'){
+                $stocks = $this->getDoctrine()->getRepository('BusinessBundle:BusinessParticular')->getApiStock($entity);
+            }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($stocks));
@@ -1170,43 +1208,7 @@ class ApiPoskeeperController extends Controller
 
     }
 
-    public function discountCouponAction(Request $request)
-    {
 
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('RestaurantBundle:Coupon')->getApiDiscountCoupon($entity);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-    }
-
-    public function tokenNoAction(Request $request)
-    {
-
-        if( $this->checkApiValidation($request) == 'invalid') {
-
-            return new Response('Unauthorized access.', 401);
-
-        }else{
-
-            $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiRestaurantToken($entity);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode($data));
-            $response->setStatusCode(Response::HTTP_OK);
-            return $response;
-        }
-    }
 
     public function apiPingAction(Request $request){
 
@@ -2275,6 +2277,41 @@ class ApiPoskeeperController extends Controller
 
         }
 
+    }
+
+    public function discountCouponAction(Request $request)
+    {
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+
+            return new Response('Unauthorized access.', 401);
+
+        }else{
+
+            $entity = $this->checkApiValidation($request);
+            $data = $this->getDoctrine()->getRepository('RestaurantBundle:Coupon')->getApiDiscountCoupon($entity);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
+    public function tableAction(Request $request)
+    {
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $entity = $this->checkApiValidation($request);
+            $data = $this->getDoctrine()->getRepository('RestaurantBundle:Particular')->getApiRestaurantToken($entity);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
     }
 
     /* Manage Expenditure */

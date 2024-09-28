@@ -69,7 +69,7 @@ class CategoryRepository extends EntityRepository
 
             $data[$key]['global_id']        = (int) $option->getId();
             $data[$key]['category_id']      = (int) $row['id'];
-            $data[$key]['name']             = $row['name'];
+            $data[$key]['name']             = trim($row['name']);
             $data[$key]['slug']             = $row['slug'];
 
         }

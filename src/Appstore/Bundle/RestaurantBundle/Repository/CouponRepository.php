@@ -53,17 +53,17 @@ class CouponRepository extends EntityRepository
 
         foreach($result as $key => $row ){
 
-            $data[$key]['couponId'] = (int) $row->getId();
-            $data[$key]['couponName'] = $row->getName();
-            $data[$key]['couponCode'] = $row->getCouponCode();
+            $data[$key]['id'] = (int) $row->getId();
+            $data[$key]['name'] = $row->getName();
+            $data[$key]['coupon_code'] = $row->getCouponCode();
             $data[$key]['amount'] = $row->getAmount();
-            $data[$key]['limitAmount'] = $row->getAmountLimit();
-            $data[$key]['validAmount'] = $row->getValidAmount();
-            $data[$key]['startDate'] = $row->getStartDate()->format('Y-m-d');
-            $data[$key]['endDate'] = $row->getEndDate()->format('Y-m-d');
+            $data[$key]['limit_amount'] = $row->getAmountLimit();
+            $data[$key]['valid_amount'] = $row->getValidAmount();
+            $data[$key]['start_date'] = $row->getStartDate()->format('Y-m-d');
+            $data[$key]['end_date'] = $row->getEndDate()->format('Y-m-d');
             $data[$key]['percentage'] = $row->getPercentage();
             $data[$key]['quantity'] = $row->getQuantity();
-            $data[$key]['remainingQuantity'] = $row->getRemainingQuantity();
+            $data[$key]['remaining_quantity'] = $row->getRemainingQuantity();
             $data[$key]['status'] = $row->getStatus();
         }
         return $data;
