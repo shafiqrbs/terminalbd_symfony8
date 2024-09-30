@@ -67,7 +67,6 @@ class CategoryRepository extends EntityRepository
 
         foreach($result as $key => $row) {
 
-            $data[$key]['global_id']        = (int) $option->getId();
             $data[$key]['category_id']      = (int) $row['id'];
             $data[$key]['name']             = trim($row['name']);
             $data[$key]['slug']             = $row['slug'];
