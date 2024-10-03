@@ -72,6 +72,12 @@ class RestaurantConfig
     private $reverses;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Currency")
+     * @ORM\OrderBy({"name" = "ASC"})
+     **/
+    private $currency;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="salesMode", type="string", length=50,nullable = true)
@@ -98,6 +104,13 @@ class RestaurantConfig
      * @ORM\Column(name="sdPercentage", type="smallint",  nullable=true)
      */
     private $sdPercentage;
+
+     /**
+     * @var smallint
+     *
+     * @ORM\Column(name="servicePercentage", type="smallint",  nullable=true)
+     */
+    private $servicePercentage;
 
     /**
      * @var smallint
@@ -866,7 +879,7 @@ class RestaurantConfig
     /**
      * @return bool
      */
-    public function getVatEnable()
+    public function isVatEnable()
     {
         return $this->vatEnable;
     }
@@ -1501,6 +1514,42 @@ class RestaurantConfig
     {
         $this->systemReset = $systemReset;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * @param mixed $currency
+     */
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
+    }
+
+    /**
+     * @return smallint
+     */
+    public function getServicePercentage()
+    {
+        return $this->servicePercentage;
+    }
+
+    /**
+     * @param smallint $servicePercentage
+     */
+    public function setServicePercentage($servicePercentage)
+    {
+        $this->servicePercentage = $servicePercentage;
+    }
+
+
+
+
 
 
 }

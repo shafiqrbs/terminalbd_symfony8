@@ -23,9 +23,18 @@ class ConfigType extends AbstractType
 
             ->add('vatRegNo','text', array('attr'=>array('class'=>'m-wrap span8','placeholder'=>'Enter vat registration no')))
             ->add('vatPercentage','integer',array('attr'=>array('class'=>'m-wrap numeric span5','max'=> 100)))
+            ->add('servicePercentage','integer',array('attr'=>array('class'=>'m-wrap numeric span5','max'=> 100)))
             ->add('address','textarea',array('attr'=>array('class'=>'m-wrap span11','rows'=>5,'placeholder'=> "Enter office/store address")))
             ->add('invoiceNote','textarea',array('attr'=>array('class'=>'m-wrap span11','rows' => 3,'placeholder'=> "Enter invoice notes")))
             ->add('printFooterText','textarea',array('attr'=>array('class'=>'m-wrap span11','rows' => 3,'placeholder'=> "Enter print footer text")))
+            ->add('currency', 'entity', array(
+                'required'    => false,
+                'class' => 'Setting\Bundle\ToolBundle\Entity\Currency',
+                'empty_value' => '--Select Currency--',
+                'property' => 'nameWithCode',
+                'attr'=>array('class'=>'m-wrap span12 inputs select2')
+
+            ))
             ->add('autoPayment')
             ->add('isCustomer')
             ->add('vatEnable')

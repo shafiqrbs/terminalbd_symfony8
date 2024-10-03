@@ -129,16 +129,29 @@ class AppsApiRepository extends EntityRepository
     public function getApiSetup(GlobalOption $entity,$device = '')
     {
         /* @var $entity GlobalOption */
-        $address = $entity->getMedicineConfig()->getAddress();
-        $vatPercentage = $entity->getMedicineConfig()->getVatPercentage();
-        $vatRegNo = $entity->getMedicineConfig()->getVatRegNo();
-        $vatEnable = ($entity->getMedicineConfig()->isVatEnable() == true) ? 1 : 0;
-        $footerMessage = $entity->getMedicineConfig()->getPrintFooterText();
+        $sdPercent = '';
+        $servicePercent = '';
+        if($entity->getMainApp()->getSlug() == 'restaurant') {
+            $config = $entity->getRestaurantConfig();
+            $servicePercent = $config->getServicePercentage();
+            $sdPercent = $config->getSdPercentage();
+        }elseif($entity->getMainApp()->getSlug() == 'business'){
+            $config = $entity->getBusinessConfig();
+        }else{
+            $config = $entity->getMedicineConfig();
+        }
+        $address = $config->getAddress();
+        $vatPercentage = $config->getVatPercentage();
+
+        $vatRegNo = $config->getVatRegNo();
+        $vatEnable = ($config->isVatEnable() == true) ? 1 : 0;
+        $footerMessage = $config->getPrintFooterText();
         if ($footerMessage) {
             $printFooter = $footerMessage;
         } else {
             $printFooter = "Thanks For Visiting our pharmacy";
         }
+
         $mobile = empty($entity->getHotline()) ? $entity->getMobile() : $entity->getHotline();
         $androidHeaderBg = (string)trim($entity->getTemplateCustomize()->getMobileHeaderBgColor());
         $bodyBg = (string)trim($entity->getTemplateCustomize()->getBodyColor());
@@ -177,7 +190,8 @@ class AppsApiRepository extends EntityRepository
         $analytic = (string)trim($entity->getTemplateCustomize()->getGoogleAnalytic());
         $logo = empty($entity->getWebPath('logo')) ? "" : $entity->getWebPath('logo');
         $introImage = empty($entity->getTemplateCustomize()->getWebPath('androidLogo')) ? '': $entity->getTemplateCustomize()->getWebPath('androidLogo');
-        $config = $entity->getMedicineConfig();
+
+
         $data = array(array(
 
             'deviceId' => $device,

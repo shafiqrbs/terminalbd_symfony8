@@ -51,6 +51,17 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                 <div class="span2">
+                                     <div class="control-group">
+                                         <label class="control-label " for="currency">Currency</label>
+                                         <div class="control">
+                                             {{ form_widget(form.currency) }}
+                                             {{ form_errors(form.currency) }}
+                                         </div>
+                                     </div>
+                                </div>
+
                                 <div class="span2">
                                     <div class="control-group">
                                         <label class="control-label " for="vatPercentage">Pay For &nbsp;</label>
@@ -165,7 +176,7 @@
                                     </div>
                                     <div class="span4">
                                         <div class="row-fluid">
-                                            <div class="span6">
+                                            <div class="span4">
                                                 <div class="control-group">
                                                     <label class="control-label " for="vatPercentage">Vat Registration No &nbsp;</label>
                                                     <div class="control">
@@ -174,12 +185,21 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="span6">
+                                            <div class="span4">
                                                 <div class="control-group">
-                                                    <label class="control-label " for="vatPercentage">Vat Percentage &nbsp;</label>
+                                                    <label class="control-label " for="vatPercentage">Vat(%) &nbsp;</label>
                                                     <div class="control">
                                                         {{ form_widget(form.vatPercentage) }}
                                                         {{ form_errors(form.vatPercentage) }}%
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="span4">
+                                                <div class="control-group">
+                                                    <label class="control-label " for="vatPercentage">Service(%) &nbsp;</label>
+                                                    <div class="control">
+                                                        {{ form_widget(form.servicePercentage) }}
+                                                        {{ form_errors(form.servicePercentage) }}%
                                                     </div>
                                                 </div>
                                             </div>
