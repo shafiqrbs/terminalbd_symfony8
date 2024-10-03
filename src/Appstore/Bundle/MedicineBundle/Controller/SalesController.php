@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Terminalbd\ReportBundle\Entity\AppsApi;
 
 
 class SalesController extends Controller
@@ -759,7 +760,12 @@ class SalesController extends Controller
             $removeSales->execute();
         }
       //  $this->androidProcessSymfony($android);
-        $status = $this->androidProcessMysql($android);
+        if($android->getMode() == 'offline'){
+            $this->getDoctrine()->getRepository(AppsApi::class)->offlineAndroidProcess($android);
+            $status = 'success';
+        }else{
+            $status = $this->androidProcessMysql($android);
+        }
 
         return new Response($status);
 

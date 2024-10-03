@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Terminalbd\ReportBundle\Entity\AppsApi;
 
 
 /**
@@ -1335,7 +1336,12 @@ class PurchaseController extends Controller
         if(!empty($removeSales)){
             $removeSales->execute();
         }
-        $msg = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->insertApiPurchase($config->getGlobalOption(),$android);
+        if($android->getMode() == 'offline'){
+            $this->getDoctrine()->getRepository(AppsApi::class)->offlineAndroidProcess($android);
+             $msg == "valid";
+        }else{
+             $msg = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->insertApiPurchase($config->getGlobalOption(),$android);
+        }
         if($msg == "valid"){
             $android->setStatus(true);
             $em->persist($android);

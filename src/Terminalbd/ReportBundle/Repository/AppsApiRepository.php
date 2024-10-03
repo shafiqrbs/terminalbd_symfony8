@@ -142,7 +142,6 @@ class AppsApiRepository extends EntityRepository
         }
         $address = $config->getAddress();
         $vatPercentage = $config->getVatPercentage();
-
         $vatRegNo = $config->getVatRegNo();
         $vatEnable = ($config->isVatEnable() == true) ? 1 : 0;
         $footerMessage = $config->getPrintFooterText();
@@ -1378,6 +1377,15 @@ class AppsApiRepository extends EntityRepository
 
     }
 
+    public function offlineAndroidProcess(MedicineAndroidProcess $entity){
+        $option = $entity->getMedicineConfig()->getGlobalOption();
+        if($entity->getMode() === "offline" and $entity->getProcess() == 'sales'){
+            $this->insertApiSales($option,$entity);
+        }elseif($entity->getMode() === "offline" and $entity->getProcess() == 'purchase'){
+            $this->insertApiPurchase($option,$entity);
+        }
+    }
+
     public function insertApiSales(GlobalOption $option,MedicineAndroidProcess $process)
     {
         $em = $this->_em;
@@ -1658,6 +1666,8 @@ class AppsApiRepository extends EntityRepository
         }
         return $find;
     }
+
+
 
     public function apiUpdateStock($option,$data)
     {
