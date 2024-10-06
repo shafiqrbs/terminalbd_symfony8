@@ -1453,6 +1453,7 @@ class AppsApiRepository extends EntityRepository
                 $sales->setNetTotal($total);
                 $sales->setPayment($received);
                 $sales->setReceived($received);
+                $sales->setDue($total-$received);
                 $sales->setAndroidProcess($process);
                 $sales->setProcess('Approved');
                 $sales->setApprovedBy($process->getCreatedBy());
