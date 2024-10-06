@@ -1554,7 +1554,9 @@ class AppsApiRepository extends EntityRepository
                 if($purchase_item){
                     $this->insertPurchaseItem($purchase,$purchase_item);
                 }
-                $this->approveProcess($purchase);
+                if($process->isApprove() == true){
+                    $this->approveProcess($purchase);
+                }
             endforeach;
         }
         //  return $this->apiPurchaseLists($option);
