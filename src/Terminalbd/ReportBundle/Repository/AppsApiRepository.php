@@ -193,7 +193,7 @@ class AppsApiRepository extends EntityRepository
 
         $data = array(array(
 
-            'deviceId' => $device,
+            'deviceId' => (string) $device,
             'vatEnable' => $vatEnable,
             'setupId' => $entity->getId(),
             'uniqueCode' => $entity->getUniqueCode(),
