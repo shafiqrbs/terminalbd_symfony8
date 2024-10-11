@@ -134,7 +134,7 @@
                             {% for entity in entities %}
                                 <tr id="salesRemove-{{ entity.id }}">
                                     <td class="numeric" >{{ entity.created|date('d-m-Y') }}</td>
-                                    <td class="numeric" >{{ entity.invoice }}</td>
+                                    <td class="numeric" ><a href="{{ path('medicine_sales_show', { 'id': entity.id }) }}" target="_blank">{{ entity.invoice }}</a></td>
                                     <td class="numeric" >{% if entity.name != "Default" %}{{ entity.name }}{% endif %}</td>
                                     <td class="numeric" >{% if entity.name != "Default" %}{{ entity.mobile }}{% endif %}</td>
                                     <td class="numeric" >{{ entity.transactionMethod }}</td>
