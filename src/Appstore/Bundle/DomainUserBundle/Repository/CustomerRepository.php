@@ -1070,7 +1070,7 @@ class CustomerRepository extends EntityRepository
             }
         }
         $result['global_id']            = (int) $entity->getId();
-        $result['customer_id']          = (int) $entity->getCustomerId();
+        $result['customer_id']          = (int) $entity->getId();
         $result['name']                 = (string)$entity->getName();
         $result['mobile']               = (string)$entity->getMobile();
         $result['address']              = (string)$entity->getAddress();

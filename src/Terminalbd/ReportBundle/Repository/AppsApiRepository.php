@@ -190,9 +190,7 @@ class AppsApiRepository extends EntityRepository
         $logo = empty($entity->getWebPath('logo')) ? "" : $entity->getWebPath('logo');
         $introImage = empty($entity->getTemplateCustomize()->getWebPath('androidLogo')) ? '': $entity->getTemplateCustomize()->getWebPath('androidLogo');
 
-
         $data = array(array(
-
             'deviceId' => (int) $device,
             'vatEnable' => $vatEnable,
             'setupId' => $entity->getId(),
@@ -1055,7 +1053,7 @@ class AppsApiRepository extends EntityRepository
         $methodId = (isset($data['method_id']) and $data['method_id']) ? trim($data['method_id']):'';
         $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['user_id']):'';
         $amount = (isset($data['amount']) and $data['amount']) ? trim(floatval($data['amount'])):'';
-        $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'';
+        $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'Due';
         $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
         $entity = new AccountSales();
         $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption'=>$option, 'id' => $customer));
@@ -1209,7 +1207,10 @@ class AppsApiRepository extends EntityRepository
         /* @var $bankAccount AccountBank */
         $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($methodId);
         $entity->setGlobalOption($option);
-        $entity->setMedicineVendor($customer);
+        if($customer){
+            $entity->setMedicineVendor($customer);
+            $entity->setCompanyName($customer->getCompanyName());
+        }
         $entity->setAccountRefNo(time());
         $entity->setCreatedBy($user);
         $entity->setProcess('In-progress');
