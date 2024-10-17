@@ -1069,7 +1069,7 @@ class CustomerRepository extends EntityRepository
                 $em->getRepository("AccountingBundle:AccountSales")->apiInsertOpeningBalance($entity,$userId,$openingBalance);
             }
         }
-        $result['global_id']            = (int) $entity->getId();
+        $result['global_id']            = (int) $global->getId();
         $result['customer_id']          = (int) $entity->getId();
         $result['name']                 = (string)$entity->getName();
         $result['mobile']               = (string)$entity->getMobile();
