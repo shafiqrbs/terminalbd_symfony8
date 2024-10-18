@@ -1068,8 +1068,13 @@ class AppsApiRepository extends EntityRepository
         $datetime = new \DateTime("now");
         $entity->setUpdated($datetime);
         $entity->setAmount($amount);
-        if($bankAccount){
+        $entity->setTransactionMethod($bankAccount->getMethod());
+        if($bankAccount and $bankAccount->getMethod()->getSlug() != 'cash'){
             $entity->setAccountBank($bankAccount);
+        }
+        if(empty($bankAccount)){
+            $method = $em->getRepository(TransactionMethod::class)->findOneBy(array('slug'=>'cash'));
+            $entity->setTransactionMethod($method);
         }
         $em->persist($entity);
         $em->flush();
@@ -1226,9 +1231,9 @@ class AppsApiRepository extends EntityRepository
         }else{
             $entity->setPayment($amount);
         }
-        if($bankAccount){
+        $entity->setTransactionMethod($bankAccount->getMethod());
+        if($bankAccount and $bankAccount->getMethod()->getSlug() != 'cash'){
             $entity->setAccountBank($bankAccount);
-            $entity->setTransactionMethod($bankAccount->getMethod());
         }
         if(empty($bankAccount)){
             $method = $em->getRepository(TransactionMethod::class)->findOneBy(array('slug'=>'cash'));
