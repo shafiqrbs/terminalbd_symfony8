@@ -411,11 +411,13 @@ class MedicineStockRepository extends EntityRepository
     }
 
     public function getPurchaseUpdateQnt(MedicinePurchase $purchase){
+        $em = $this->_em;
 
         /** @var  $purchaseItem MedicinePurchaseItem */
 
-        if(!empty($purchase->getMedicinePurchaseItems())) {
-            foreach ($purchase->getMedicinePurchaseItems() as $purchaseItem) {
+        $getMedicinePurchaseItems = $em->getRepository(MedicinePurchaseItem::class)->findBy(array('medicinePurchase'=>$purchase->getId()));
+        if($getMedicinePurchaseItems) {
+            foreach ($getMedicinePurchaseItems as $purchaseItem) {
                  if($purchaseItem->getMedicineStock()){
                      $stockItem = $purchaseItem->getMedicineStock();
                      $this->updateRemovePurchaseQuantity($stockItem);
@@ -524,13 +526,14 @@ class MedicineStockRepository extends EntityRepository
     public function getSalesUpdateQnt(MedicineSales $invoice){
 
         $em = $this->_em;
-
         /** @var $item MedicineSalesItem */
-        if($invoice->getMedicineSalesItems()){
-            foreach($invoice->getMedicineSalesItems() as $item ){
+
+        $salesItems = $em->getRepository(MedicineSalesItem::class)->findBy(array('medicineSales' => $invoice->getId()));
+        if($salesItems){
+            foreach($salesItems as $item ){
                 /** @var  $stock MedicineStock */
                 $stock = $item->getMedicineStock();
-                $qnt = $this->_em->getRepository('MedicineBundle:MedicineSalesItem')->salesStockItemUpdate($stock);
+                $qnt = $em->getRepository('MedicineBundle:MedicineSalesItem')->salesStockItemUpdate($stock);
                 $stock->setSalesQuantity($qnt);
                 $em->persist($stock);
                 $em->flush();

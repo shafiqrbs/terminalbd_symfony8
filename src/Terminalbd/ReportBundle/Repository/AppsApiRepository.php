@@ -1352,6 +1352,44 @@ class AppsApiRepository extends EntityRepository
         return 'failed';
     }
 
+    public function apiSyncList(GlobalOption $entity){
+
+        $config = $entity->getMedicineConfig()->getId();
+        $em = $this->_em;
+        $qb = $em->createQueryBuilder();
+        $qb->from(MedicineAndroidProcess::class,'e');
+        $qb->leftJoin('e.androidDevice','a');
+        $qb->select('e.id as id','e.process as process','e.created as created','e.status as status');
+        $qb->addSelect('a.device as device');
+        $qb->where('e.medicineConfig = :config')->setParameter('config', $config);
+        //  $qb->andWhere('e.mode = :process')->setParameter('process', 'offline');
+        $qb->andWhere('e.status = 0');
+        $qb->orderBy('e.created',"DESC");
+        $result = $qb->getQuery()->getArrayResult();
+        $data = [];
+        foreach ($result as $key => $entity):
+            if($entity) {
+                $data[$key]['id'] = (int)$entity['id'];
+                $data[$key]['device_name'] = (string)$entity['device'];
+                $data[$key]['process'] = (string)$entity['process'];
+                $data[$key]['created'] = $entity['created']->format('d-m-Y h:i:s');
+            }
+        endforeach;
+        return $data;
+
+    }
+
+    public function apiSyncProcess($processId){
+        $em = $this->_em;
+        $entity = $em->getRepository(MedicineAndroidProcess::class)->find($processId);
+        $option = $entity->getMedicineConfig()->getGlobalOption();
+        if($entity->getMode() === "offline" and $entity->getProcess() == 'sales'){
+            $this->insertApiSales($option,$entity);
+        }elseif($entity->getMode() === "offline" and $entity->getProcess() == 'purchase'){
+            $this->insertApiPurchase($option,$entity);
+        }
+        return 'success';
+    }
 
     public function insertFlutterOrderProcess(GlobalOption $option,$device,$data)
     {
@@ -1383,14 +1421,7 @@ class AppsApiRepository extends EntityRepository
 
     }
 
-    public function offlineAndroidProcess(MedicineAndroidProcess $entity){
-        $option = $entity->getMedicineConfig()->getGlobalOption();
-        if($entity->getMode() === "offline" and $entity->getProcess() == 'sales'){
-            $this->insertApiSales($option,$entity);
-        }elseif($entity->getMode() === "offline" and $entity->getProcess() == 'purchase'){
-            $this->insertApiPurchase($option,$entity);
-        }
-    }
+
 
     public function insertApiSales(GlobalOption $option,MedicineAndroidProcess $process)
     {
@@ -1433,7 +1464,6 @@ class AppsApiRepository extends EntityRepository
                 }
                 if($method){
                     $trans = $em->getRepository(AccountBank::class)->find($method);
-
                     if($trans->getMethod()) {
                         $sales->setTransactionMethod($trans->getMethod());
                         if ($trans->getMethod()->getSlug() == 'bank'){
@@ -1470,7 +1500,6 @@ class AppsApiRepository extends EntityRepository
                 }
                 $em->getRepository(MedicineStock::class)->getSalesUpdateQnt($sales);
                 $em->getRepository(AccountSales::class)->insertMedicineAccountInvoice($sales);
-
             endforeach;
         }
     }
@@ -1505,6 +1534,7 @@ class AppsApiRepository extends EntityRepository
             }
         endforeach;
         $em->flush();
+
     }
 
     public function insertApiPurchase(GlobalOption $option,MedicineAndroidProcess $process)
@@ -1621,6 +1651,8 @@ class AppsApiRepository extends EntityRepository
         $em->getRepository('MedicineBundle:MedicineStock')->getPurchaseUpdateQnt($purchase);
         $em->getRepository('AccountingBundle:AccountPurchase')->insertMedicineAccountPurchase($purchase);
     }
+
+
 
     public function getCalculationBankServiceChargeManual($data,$charge){
 

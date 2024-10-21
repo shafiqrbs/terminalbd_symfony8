@@ -60,6 +60,20 @@ api_poskeeper_order_process:
     options:
         expose: true
 
+api_poskeeper_sync_lists:
+    path:     /poskeeper-sync-list
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiSyncList }
+    methods:  POST|GET
+    options:
+        expose: true
+
+api_poskeeper_order_process_:
+    path:     /poskeeper-sync-process
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiSyncProcess }
+    methods:  POST|GET
+    options:
+        expose: true
+
 api_poskeeper_sales_create:
     path:     /poskeeper-sales-create
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiCreateSales }
