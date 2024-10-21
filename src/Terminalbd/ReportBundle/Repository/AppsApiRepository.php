@@ -608,7 +608,7 @@ class AppsApiRepository extends EntityRepository
         $qb->addSelect('u.username as username');
         $qb->addSelect('ab.username as approvedBy');
         $qb->addSelect('e.id as id','e.created as created','e.updated as updated','e.purchaseAmount as totalAmount','e.payment as amount','e.balance as balance','e.accountRefNo as invoice');
-        $qb->addSelect('vendor.id as vendor_id','vendor.name as name','vendor.mobile as mobile');
+        $qb->addSelect('vendor.id as vendor_id','vendor.companyName as name','vendor.mobile as mobile');
         $qb->addSelect('accountBank.name as account_bank');
         $qb->addSelect('mp.id as sourceInvoice');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
