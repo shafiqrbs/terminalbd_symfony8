@@ -10,6 +10,16 @@ api_poskeeper_splash:
     path:     /poskeeper-splash
     defaults: { _controller: BinduBundle:ApiPoskeeper:splash }
 
+api_poskeeper_dashboard:
+    path:     /poskeeper-dashboard
+    defaults: { _controller: BinduBundle:ApiPoskeeper:dashboard }
+
+api_poskeeper_bank_account:
+    path:     /poskeeper-bank-account
+    defaults: { _controller: BinduBundle:ApiPoskeeper:bankAccountBalance }
+    methods:  POST|GET
+    options:
+        expose: true
 
 api_poskeeper_masterdata:
     path:     /poskeeper-masterdata

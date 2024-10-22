@@ -350,11 +350,11 @@ class MedicineSalesRepository extends EntityRepository
     {
         $config =  $option->getMedicineConfig()->getId();
         $qb = $this->createQueryBuilder('s');
-        $qb->select('sum(s.netTotal) as total ,sum(s.received) as salesReceive , count(s.id) as voucher');
+        $qb->select('sum(s.netTotal) as total ,sum(s.received) as salesReceive , count(s.id) as voucher, (sum(s.netTotal) - sum(s.received)) as due');
         $qb->where('s.medicineConfig = :config')->setParameter('config', $config);
         $qb->andWhere('s.process = :process')->setParameter('process', 'Done');
-        $qb->andWhere('s.androidDevice = :device')->setParameter('device', $data['device']);
-        $this->handleSearchBetween($qb,$data);
+    //    $qb->andWhere('s.androidDevice = :device')->setParameter('device', $data['device']);
+       // $this->handleSearchBetween($qb,$data);
         return $qb->getQuery()->getOneOrNullResult();
     }
 

@@ -1364,7 +1364,7 @@ class AppsApiRepository extends EntityRepository
         $qb = $em->createQueryBuilder();
         $qb->from(MedicineAndroidProcess::class,'e');
         $qb->leftJoin('e.androidDevice','a');
-        $qb->select('e.id as id','e.process as process','e.created as created','e.status as status');
+        $qb->select('e.id as id','e.process as process','e.created as created','e.mode as mode','e.status as status');
         $qb->addSelect('a.device as device');
         $qb->where('e.medicineConfig = :config')->setParameter('config', $config);
         //  $qb->andWhere('e.mode = :process')->setParameter('process', 'offline');
@@ -1377,7 +1377,8 @@ class AppsApiRepository extends EntityRepository
                 $data[$key]['id'] = (int)$entity['id'];
                 $data[$key]['device_name'] = (string)$entity['device'];
                 $data[$key]['process'] = (string)$entity['process'];
-                $data[$key]['created'] = $entity['created']->format('d-m-Y h:i:s');
+                $data[$key]['mode'] = (string)$entity['mode'];
+                $data[$key]['created'] = $entity['created']->format('d-m-Y h:i A');
             }
         endforeach;
         return $data;

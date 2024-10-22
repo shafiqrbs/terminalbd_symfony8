@@ -3,8 +3,10 @@
 namespace Bindu\BinduBundle\Controller;
 
 use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
+use Appstore\Bundle\AccountingBundle\Entity\AccountCash;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
+use Core\UserBundle\Entity\User;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Gregwar\Image\Image;
 use Setting\Bundle\AppearanceBundle\Entity\TemplateCustomize;
@@ -313,21 +315,27 @@ class ApiPoskeeperController extends Controller
         }else{
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
+            $data = $request->request->all();
             $datetime = new \DateTime("now");
             $data['startDate'] = $datetime->format('Y-m-d');
             $data['endDate'] = $datetime->format('Y-m-d');
             $data['device'] = $deviceId;
+
             $purchaseCashOverview = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->androidDevicePurchaseOverview($entity,$data);
             $salesCashOverview = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->androidDeviceSalesOverview($entity,$data);
             $expenditureOverview = $this->getDoctrine()->getRepository('AccountingBundle:Expenditure')->androidDeviceExpenditureOverview($entity,$data);
+            $transactionCashOverview = $this->getDoctrine()->getRepository('AccountingBundle:AccountCash')->apiTransactionCashOverview($entity,$data);
+
             $data = array(
                 'globalOption'              => $entity->getId(),
-                'expenditureOverview'       => $expenditureOverview ,
-                'totalSales'                => $salesCashOverview['total'] ,
-                'salesReceive'              => $salesCashOverview['salesReceive'] ,
-                'salesVoucher'              => $salesCashOverview['voucher'] ,
-                'purchaseTotal'             => $purchaseCashOverview['total'] ,
-                'purchasePayment'           => $purchaseCashOverview['payment'] ,
+                'expenditureOverview'       => number_format($expenditureOverview,2) ,
+                'totalSales'                => number_format($salesCashOverview['total'],2) ,
+                'salesReceive'              => number_format($salesCashOverview['salesReceive'],2) ,
+                'salesDue'                  => number_format($salesCashOverview['due'],2) ,
+                'salesVoucher'              => number_format($salesCashOverview['voucher'],2) ,
+                'purchaseTotal'             => number_format($purchaseCashOverview['total'],2) ,
+                'purchasePayment'           => number_format($purchaseCashOverview['payment'],2) ,
+                'transactionCashOverview'   => $transactionCashOverview,
             );
 
             $response = new Response();
@@ -337,6 +345,22 @@ class ApiPoskeeperController extends Controller
             return $response;
         }
 
+    }
+
+    public function bankAccountBalanceAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else {
+            $entity = $this->checkApiValidation($request);
+            $method_id = $request->request->get('method_id');
+            $entities = $this->getDoctrine()->getRepository(AccountCash::class)->apiAccountDetails($entity->getId(),$method_id);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($entities));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
     }
 
     public function loginAction(Request $request)
@@ -555,7 +579,9 @@ class ApiPoskeeperController extends Controller
 
     }
 
-    public function editUserAction(Request $request)
+
+
+     public function editUserAction(Request $request)
     {
         $username = $request->request->get('user_id');
         $user = $this->getDoctrine()->getManager()->getRepository("UserBundle:User")

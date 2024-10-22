@@ -211,6 +211,32 @@ class AccountCashRepository extends EntityRepository
 
     }
 
+    public function apiTransactionCashOverview($entity,$data)
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('tm.id as id,tm.name as name,(COALESCE(SUM(e.debit),0) - COALESCE(SUM(e.credit),0)) as amount');
+        $qb->join('e.transactionMethod','tm');
+        $qb->where("e.globalOption = :globalOption");
+        $qb->setParameter('globalOption', $entity->getId());
+        $qb->groupBy('tm.id');
+        $result = $qb->getQuery()->getArrayResult();
+        return $result;
+
+    }
+
+    public function apiAccountDetails($option,$accountId)
+    {
+        $em = $this->_em;
+        $qb = $this->createQueryBuilder('e');
+        $qb->join('e.accountBank','ab');
+        $qb->select('ab.id as id,ab.name as name,(COALESCE(SUM(e.debit),0) - COALESCE(SUM(e.credit),0)) as amount');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $option);
+        $qb->andWhere("ab.method = :method")->setParameter('method',$accountId);
+        $qb->groupBy("ab.id");
+        $result = $qb->getQuery()->getArrayResult();
+        return $result;
+    }
+
     public function transactionBankCashOverview(User $user, $data = array())
     {
         $globalOption = $user->getGlobalOption();
