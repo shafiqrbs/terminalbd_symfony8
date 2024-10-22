@@ -1447,7 +1447,7 @@ class ApiPoskeeperController extends Controller
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
-            $response->setContent(json_encode(array('message'=> $status, 'ipAddress'=>$ipAddress)));
+            $response->setContent(json_encode(array('status'=> $status, 'ipAddress'=>$ipAddress)));
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
