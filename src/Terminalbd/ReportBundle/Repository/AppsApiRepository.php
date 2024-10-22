@@ -1055,6 +1055,7 @@ class AppsApiRepository extends EntityRepository
         $amount = (isset($data['amount']) and $data['amount']) ? trim(floatval($data['amount'])):'';
         $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'Due';
         $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
+        $isApprove = (isset($data['is_approve']) and $data['is_approve']) ? $data['is_approve'] : 0;
         $entity = new AccountSales();
         $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption'=>$option, 'id' => $customer));
         $user = $em->getRepository('UserBundle:User')->find($userId);
@@ -1068,8 +1069,8 @@ class AppsApiRepository extends EntityRepository
         $datetime = new \DateTime("now");
         $entity->setUpdated($datetime);
         $entity->setAmount($amount);
-        $entity->setTransactionMethod($bankAccount->getMethod());
         if($bankAccount and $bankAccount->getMethod()->getSlug() != 'cash'){
+            $entity->setTransactionMethod($bankAccount->getMethod());
             $entity->setAccountBank($bankAccount);
         }
         if(empty($bankAccount)){
@@ -1078,12 +1079,11 @@ class AppsApiRepository extends EntityRepository
         }
         $em->persist($entity);
         $em->flush();
-
-      /*
-       $em->getRepository(AccountSales::class)->updateCustomerBalance($entity);
-      if($entity->getAmount() > 0 and in_array($entity->getProcessHead(),array( 'Due','Advance')) ){
-            $em->getRepository('AccountingBundle:AccountCash')->insertSalesCash($entity);
-        }*/
+        if($isApprove === 1){
+            $approve['id'] = $entity->getId();
+            $approve['user_id'] = $entity->getCreatedBy()->getId();
+            $this->apiApproveAccountSales($entity->getGlobalOption(),$approve);
+        }
         return "success";
     }
 
@@ -1097,7 +1097,7 @@ class AppsApiRepository extends EntityRepository
         return 'success';
     }
 
-    public function apiApproveSales(GlobalOption $option, $data)
+    public function apiApproveAccountSales(GlobalOption $option, $data)
     {
         $em = $this->_em;
         $entity = $em->getRepository(AccountSales::class)->find($data['id']);
@@ -1205,6 +1205,7 @@ class AppsApiRepository extends EntityRepository
         $amount = (isset($data['amount']) and $data['amount']) ? trim(floatval($data['amount'])):'';
         $mode = (isset($data['mode']) and $data['mode']) ? trim($data['mode']):'';
         $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
+        $isApprove = (isset($data['is_approve']) and $data['is_approve']) ? trim($data['is_approve']):'';
 
         $entity = new AccountPurchase();
         $customer = $em->getRepository('MedicineBundle:MedicineVendor')->findOneBy(array('medicineConfig'=> $option->getMedicineConfig(), 'id' => $vendor));
@@ -1241,6 +1242,11 @@ class AppsApiRepository extends EntityRepository
         }
         $em->persist($entity);
         $em->flush();
+        if($isApprove === 1){
+            $approve['id'] = $entity->getId();
+            $approve['user_id'] = $entity->getCreatedBy()->getId();
+            $this->apiApproveAccountPurchase($entity->getGlobalOption(),$approve);
+        }
         return "success";
 
     }

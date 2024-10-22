@@ -1647,7 +1647,7 @@ class ApiPoskeeperController extends Controller
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveSales($entity,$form);
+            $status = $this->getDoctrine()->getRepository('ReportBundle:AppsApi')->apiApproveAccountSales($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(array('status'=> $status)));

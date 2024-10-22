@@ -67,7 +67,7 @@ api_poskeeper_sync_lists:
     options:
         expose: true
 
-api_poskeeper_order_process_:
+api_poskeeper_sync_process:
     path:     /poskeeper-sync-process
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiSyncProcess }
     methods:  POST|GET
