@@ -1123,7 +1123,6 @@ class AppsApiRepository extends EntityRepository
     public function apiInventoryPurchase(GlobalOption $option, $data = array())
     {
         $em = $this->_em;
-
         $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
         $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
         $offset = ($currentPage - 1) * $itemsPerPage;
