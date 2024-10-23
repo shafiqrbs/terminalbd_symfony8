@@ -328,14 +328,14 @@ class ApiPoskeeperController extends Controller
 
             $data = array(
                 'globalOption'              => $entity->getId(),
-                'expenditureOverview'       => number_format($expenditureOverview,2) ,
-                'totalSales'                => number_format($salesCashOverview['total'],2) ,
-                'salesReceive'              => number_format($salesCashOverview['salesReceive'],2) ,
-                'salesDue'                  => number_format($salesCashOverview['due'],2) ,
-                'salesVoucher'              => number_format($salesCashOverview['voucher'],2) ,
-                'purchaseTotal'             => number_format($purchaseCashOverview['total'],2) ,
-                'purchasePayment'           => number_format($purchaseCashOverview['payment'],2) ,
-                'transactionCashOverview'   => $transactionCashOverview,
+                'expenditure'       => number_format($expenditureOverview,2) ,
+                'sales'                => number_format($salesCashOverview['total'],2) ,
+                'receive'              => number_format($salesCashOverview['salesReceive'],2) ,
+                'due'                  => number_format($salesCashOverview['due'],2) ,
+                'voucher'              => number_format($salesCashOverview['voucher'],2) ,
+                'purchase'             => number_format($purchaseCashOverview['total'],2) ,
+                'payment'           => number_format($purchaseCashOverview['payment'],2) ,
+                'transaction_overview'   => $transactionCashOverview,
             );
 
             $response = new Response();

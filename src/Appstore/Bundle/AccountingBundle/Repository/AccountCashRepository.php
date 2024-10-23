@@ -231,6 +231,7 @@ class AccountCashRepository extends EntityRepository
         $qb->join('e.accountBank','ab');
         $qb->leftJoin('ab.bank','bank');
         $qb->select('ab.id as id,ab.name as name,bank.name as bankName,(COALESCE(SUM(e.debit),0) - COALESCE(SUM(e.credit),0)) as amount');
+        $qb->addSelect('ab.serviceName as service_name,ab.accountNo as account_no,bank.name as bank_name');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $option);
         $qb->andWhere("e.transactionMethod = :method")->setParameter('method',$accountId);
         $qb->groupBy("ab.id");
