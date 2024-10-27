@@ -1936,7 +1936,6 @@ class AppsApiRepository extends EntityRepository
             $data['category_name'] = ($entity->getCategory()) ? (String)$entity->getCategory()->getName():'';
             $data['brand_id'] = ($entity->getAccessoriesBrand()) ?  (integer)$entity->getAccessoriesBrand()->getId():0;
             $data['brand_name'] = (String)$entity->getBrandName();
-
             $data['min_quantity'] = (float)$entity->getMinQuantity();
             $data['unit_id'] = (string)$entity->getUnit()->getId();
             $data['unit_name'] = (string)$entity->getUnit()->getName();
