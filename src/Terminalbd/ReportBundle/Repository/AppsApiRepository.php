@@ -1932,17 +1932,22 @@ class AppsApiRepository extends EntityRepository
         if($entity){
             $data['id'] = (integer)$entity->getId();
             $data['name'] = (String)$entity->getName();
-            $data['brand_id'] = ($entity->getAccessoriesBrand()) ?  (integer)$entity->getAccessoriesBrand()->getId():0;
-            $data['brand_name'] = ($entity->getAccessoriesBrand()) ?  (integer)$entity->getAccessoriesBrand()->getName():'';
             $data['category_id'] = ($entity->getCategory()) ?  (integer)$entity->getCategory()->getId():0;
             $data['category_name'] = ($entity->getCategory()) ? (String)$entity->getCategory()->getName():'';
+            $data['brand_id'] = ($entity->getAccessoriesBrand()) ?  (integer)$entity->getAccessoriesBrand()->getId():0;
             $data['brand_name'] = (String)$entity->getBrandName();
-            $data['sales_price'] = (float)$entity->getSalesPrice();
-            $data['purchase_price'] = (float)$entity->getPurchasePrice();
+
             $data['min_quantity'] = (float)$entity->getMinQuantity();
             $data['unit_id'] = (string)$entity->getUnit()->getId();
             $data['unit_name'] = (string)$entity->getUnit()->getName();
             $data['description'] = (string)$entity->getDescription();
+            $data['remaining_quantity'] = (string)$entity->getRemainingQuantity();
+            $data['sales_price'] = (string)number_format($entity->getSalesPrice(),2);
+            $data['purchase_price'] = (string)number_format($entity->getPurchasePrice(),2);
+            $data['avg_purchase_price'] = (string)number_format($entity->getAveragePurchasePrice(),2);
+            $data['avg_sales_price'] = (string)number_format($entity->getAverageSalesPrice(),2);
+            $data['adjust_quantity'] = (integer) $entity->getAdjustmentQuantity();
+            $data['bonus_quantity'] = (integer) $entity->getBonusQuantity();
         }
         return $data;
     }
