@@ -382,12 +382,23 @@ class MedicinePurchaseItemRepository extends EntityRepository
                     $percentage = $purchase->getDiscountCalculation();
                     $purchasePrice = $this->stockInstantPurchaseItemPrice($percentage,$item->getActualPurchasePrice());
                     $item->setPurchasePrice($purchasePrice);
+                    $purchaseAvgPrice = $this->purchaseAvgPrice($item,$purchasePrice);
+                    $item->setPurchaseAvgPrice($purchaseAvgPrice);
                     $item->setPurchaseSubTotal($item->getActualPurchasePrice() * $item->getQuantity());
                     $em->persist($item);
                     $em->flush();
                 }
             }
         }
+
+    }
+
+    public function purchaseAvgPrice(MedicinePurchaseItem $item,$purchasePrice)
+    {
+        $quantity = ($item->getMedicineStock()->getRemainingQuantity() + $item->getQuantity());
+        $amount = (($item->getMedicineStock()->getRemainingQuantity() * $item->getMedicineStock()->getPurchasePrice()) + ($item->getQuantity() * $purchasePrice));
+        $avg = ($amount / $quantity);
+        return $avg;
 
     }
 

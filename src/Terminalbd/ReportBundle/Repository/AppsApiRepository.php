@@ -14,6 +14,7 @@ use Appstore\Bundle\MedicineBundle\Entity\MedicineSales;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSalesItem;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineVendor;
+use Appstore\Bundle\RestaurantBundle\Entity\Invoice;
 use Core\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 use Gregwar\Image\Image;
@@ -955,6 +956,93 @@ class AppsApiRepository extends EntityRepository
 
     }
 
+    public function apiRestaurantSales(GlobalOption $option, $data)
+    {
+        $em = $this->_em;
+
+        $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
+        $offset = ($currentPage - 1) * $itemsPerPage;
+
+        $config = $option->getRestaurantConfig()->getId();
+        $customer = (isset($data['customer_id']) and $data['customer_id'])? $data['customer_id'] :'';
+        $startDate = (isset($data['start_date']) and $data['start_date'])? $data['start_date'] :'';
+        $endEnd = (isset($data['end_date']) and $data['end_date'])? $data['end_date'] :'';
+        $keyword = isset($data['keyword'])? $data['keyword'] :'';
+        $qb = $em->createQueryBuilder();
+        $qb->from(MedicineSales::class,'s');
+        $qb->join('s.customer','c');
+        $qb->select('s');
+        $qb->where('s.restaurantConfig = :config')->setParameter('config', $config) ;
+        if ($customer) {
+            $qb->andWhere('c.id = :customer')->setParameter('customer', $customer);
+        }
+        if($keyword){
+            $qb->andWhere($qb->expr()->like("s.invoice", "'%$keyword%'"  ));
+        }
+        if ($startDate) {
+            $compareTo = new \DateTime($startDate);
+            $created =  $compareTo->format('Y-m-d 00:00:00');
+            $qb->andWhere("s.created >= :createdStart");
+            $qb->setParameter('createdStart', $created);
+        }
+        if ($endEnd) {
+            $compareTo = new \DateTime($endEnd);
+            $createdEnd =  $compareTo->format('Y-m-d 23:59:59');
+            $qb->andWhere("s.created <= :createdEnd");
+            $qb->setParameter('createdEnd', $createdEnd);
+        }
+        $qb->orderBy('s.created','DESC');
+        $qb->setFirstResult($offset); // Set the offset
+        $qb->setMaxResults($itemsPerPage);
+        $entities = $qb->getQuery()->getResult();
+        $data = array();
+        /* @var $entity Invoice */
+        foreach ($entities as $key => $entity):
+            if($entity) {
+                $data[$key]['sales_id'] = (string)$entity->getId();
+                $data[$key]['device_sales_id'] = (int)$entity->getDeviceSalesId();
+                $data[$key]['invoice'] = $entity->getInvoice();
+                $data[$key]['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
+                $data[$key]['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
+                $data[$key]['sub_total'] = (Double) $entity->getSubTotal();
+                $data[$key]['discount'] = (Double) $entity->getDiscount();
+                $data[$key]['discount_calculation'] = (Double) $entity->getDiscountCalculation();
+                $data[$key]['vat'] = (Double)$entity->getVat();
+                $data[$key]['sd'] = 0;
+                $data[$key]['net_total'] = (Double) $entity->getTotal();
+                $data[$key]['purchase_price'] = (Double) $entity->getPurchasePrice();
+                $data[$key]['received'] =(Double) $entity->getPayment();
+                $data[$key]['due'] = (Double) $entity->getDue();
+                $data[$key]['delivery_charge'] = 0;
+                $data[$key]['payment_in_word'] = (int) $entity->getTotal();
+                $data[$key]['process'] = $entity->getProcess();
+                $data[$key]['discount_type'] = $entity->getDiscountType();
+                $data[$key]['revised'] = (int) $entity->getTotal();
+                $data[$key]['print_without_discount'] = 0;
+                $data[$key]['is_online'] = (int) 1;
+                $data[$key]['created_by_id'] = $entity->getCreatedBy()->getId();
+                $data[$key]['created_by'] = $entity->getCreatedBy()->getUserFullName();
+                $data[$key]['sales_by_id'] = $entity->getSalesBy()->getId();
+                $data[$key]['sales_by'] = $entity->getSalesBy()->getUserFullName();
+                $data[$key]['approved_by_id'] = $entity->getCreatedBy()->getId();
+                $data[$key]['approved_by'] = $entity->getCreatedBy()->getUserFullName();
+                $data[$key]['customer_id'] = (int) $entity->getCustomer()->getId();
+                $data[$key]['customer_name'] = $entity->getCustomer()->getName();
+                $data[$key]['customer_mobile'] = $entity->getCustomer()->getMobile();
+                $data[$key]['customer_address'] = $entity->getCustomer()->getAddress();
+                $data[$key]['method_id'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getId():0;
+                $data[$key]['method_name'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getName():'';
+                $data[$key]['method_mode'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getName():'';
+                $data[$key]['comment'] = (string) $entity->getComment();
+                $data[$key]['token_no'] = (string) 'None';
+                $data[$key]['coupon_code'] = (string) 'None';
+            }
+        endforeach;
+        return $data;
+
+    }
+
     public function apiSalesInvoiceDetails(GlobalOption $option, $id)
     {
         $em     = $this->_em;
@@ -1032,6 +1120,82 @@ class AppsApiRepository extends EntityRepository
 
     }
 
+    public function apiSalesRestaurantDetails(GlobalOption $option, $id)
+    {
+        $em     = $this->_em;
+        /* @var $entity MedicineSales */
+        $entity = $em->getRepository(MedicineSales::class)->findOneBy(array('medicineConfig'=> $option->getMedicineConfig(),'id' => $id));
+        $data = array();
+
+        if($entity) {
+            $data['sales_id'] = (string)$entity->getId();
+            $data['device_sales_id'] = (int)$entity->getDeviceSalesId();
+            $data['invoice'] = $entity->getInvoice();
+            $data['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
+            $data['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
+            $data['sub_total'] = (Double) $entity->getSubTotal();
+            $data['discount'] = (Double) $entity->getDiscount();
+            $data['discount_calculation'] = (Double) $entity->getDiscountCalculation();
+            $data['vat'] = (Double)$entity->getVat();
+            $data['sd'] = 0;
+            $data['net_total'] = (Double) $entity->getNetTotal();
+            $data['purchase_price'] = (Double) $entity->getPurchasePrice();
+            $data['received'] =(Double) $entity->getReceived();
+            $data['due'] = (Double) $entity->getDue();
+            $data['delivery_charge'] = (Double) $entity->getDeliveryCharge();
+            $data['payment_in_word'] = (int) $entity->getNetTotal();
+            $data['process'] = $entity->getProcess();
+            $data['discount_type'] = $entity->getDiscountType();
+            $data['revised'] = (int) $entity->getRevised();
+            $data['print_without_discount'] = (int) $entity->isPrintWithoutDiscount();
+            $data['is_hold'] = (int) 0;
+            $data['is_online'] = (int) $entity->isOnline();
+            $data['created_by_id'] = $entity->getCreatedBy()->getId();
+            $data['created_by'] = $entity->getCreatedBy()->getUserFullName();
+            $data['sales_by_id'] = $entity->getSalesBy()->getId();
+            $data['sales_by'] = $entity->getSalesBy()->getUserFullName();
+            $data['approved_by_id'] = $entity->getCreatedBy()->getId();
+            $data['approved_by'] = $entity->getCreatedBy()->getUserFullName();
+            $data['customer_id'] = (int) $entity->getCustomer()->getId();
+            $data['customer_name'] = $entity->getCustomer()->getName();
+            $data['customer_mobile'] = $entity->getCustomer()->getMobile();
+            $data['customer_address'] = $entity->getCustomer()->getAddress();
+            $data['method_id'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getId():0;
+            $data['method_name'] = ($entity->getAccountBank()) ? $entity->getAccountBank()->getName():'';
+            $data['method_mode'] = ($entity->getAccountBank() and $entity->getAccountBank()->getMethod()) ? $entity->getAccountBank()->getMethod()->getName():'';
+            $data['comment'] = (string) $entity->getMode();
+            $data['token_no'] = (string) $entity->getMode();
+            $data['coupon_code'] = (string) $entity->getMode();
+
+            if ($entity->getMedicineSalesItems()) {
+                /* @var $item MedicineSalesItem */
+                foreach ($entity->getMedicineSalesItems() as $i => $item) {
+                    $data['items'][$i]['id'] = (int)$item->getId();
+                    $data['items'][$i]['stock_id'] = (int)$item->getMedicineStock()->getId();
+                    $data['items'][$i]['sales_id'] = (string)$entity->getId();
+                    $data['items'][$i]['barcode'] = (string)$entity->getId();
+                    $data['items'][$i]['stock_name'] = (string)$item->getMedicineStock()->getName();
+                    $data['items'][$i]['brand_name'] = (string)$item->getMedicineStock()->getBrandName();
+                    $data['items'][$i]['unit'] = ($item->getMedicineStock()->getUnit()) ? (string)$item->getMedicineStock()->getUnit()->getName() : '';
+                    $data['items'][$i]['mrp_price'] = (Double)$item->getMrpPrice();
+                    $data['items'][$i]['sales_price'] = (Double)$item->getSalesPrice();
+                    $data['items'][$i]['discount_price'] = (Double)$item->getDiscountPrice();
+                    $data['items'][$i]['purchase_price'] = (Double)$item->getPurchasePrice();
+                    $data['items'][$i]['item_percent'] = (Double)$item->getItemPercent();
+                    $data['items'][$i]['custom_price'] = (Double)$item->getDiscountPrice();
+                    $data['items'][$i]['quantity'] = (Double)$item->getQuantity();
+                    $data['items'][$i]['sub_total'] = (Double)$item->getSubTotal();
+                    $data['items'][$i]['discount_percent'] = (Double)$item->getDiscountPrice();
+                }
+
+            } else {
+                $data['items'] = array();
+
+            }
+            return $data;
+        }
+
+    }
 
     public function approveSalesProcess(MedicineSales $purchase){
         $em = $this->_em;

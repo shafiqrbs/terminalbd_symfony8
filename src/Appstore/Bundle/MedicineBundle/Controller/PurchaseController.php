@@ -686,6 +686,7 @@ class PurchaseController extends Controller
             // $quantity = ($pack * $quantity);
             $entity->setQuantity($quantity);
             $entity->setBonusQuantity($bonusQuantity);
+
             if(!empty($stockMedicine) and empty($salesPrice)){
                 $entity->setActualPurchasePrice($stockMedicine->getSalesPrice());
                 $entity->setPurchasePrice($stockMedicine->getSalesPrice());

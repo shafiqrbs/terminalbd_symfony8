@@ -321,8 +321,13 @@ class ApiPoskeeperController extends Controller
             $data['endDate'] = $datetime->format('Y-m-d');
             $data['device'] = $deviceId;
 
-            $purchaseCashOverview = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->androidDevicePurchaseOverview($entity,$data);
-            $salesCashOverview = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->androidDeviceSalesOverview($entity,$data);
+            if($entity->getMainApp()->getSlug() == 'miss'){
+                $purchaseCashOverview = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->androidDevicePurchaseOverview($entity,$data);
+                $salesCashOverview = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->androidDeviceSalesOverview($entity,$data);
+            }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
+                $purchaseCashOverview = $this->getDoctrine()->getRepository('RestaurantBundle:Purchase')->androidDevicePurchaseOverview($entity,$data);
+                $salesCashOverview = $this->getDoctrine()->getRepository('RestaurantBundle:Invoice')->androidDeviceSalesOverview($entity,$data);
+            }
             $expenditureOverview = $this->getDoctrine()->getRepository('AccountingBundle:Expenditure')->androidDeviceExpenditureOverview($entity,$data);
             $transactionCashOverview = $this->getDoctrine()->getRepository('AccountingBundle:AccountCash')->apiTransactionCashOverview($entity,$data);
 
@@ -1552,7 +1557,6 @@ class ApiPoskeeperController extends Controller
             return $response;
         }
     }
-
 
     public function customerInvoiceAction(Request $request)
     {

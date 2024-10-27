@@ -5,6 +5,7 @@ use Appstore\Bundle\RestaurantBundle\Entity\Particular;
 use Appstore\Bundle\RestaurantBundle\Entity\Purchase;
 use Appstore\Bundle\RestaurantBundle\Entity\PurchaseItem;
 use Doctrine\ORM\EntityRepository;
+use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 
 
 /**
@@ -15,6 +16,23 @@ use Doctrine\ORM\EntityRepository;
  */
 class PurchaseRepository extends EntityRepository
 {
+
+    protected function handleSearchBetween($qb,$data)
+    {
+        $startDate = isset($data['startDate'])? $data['startDate'] :'';
+        $endDate = isset($data['endDate'])? $data['endDate'] :'';
+
+        if (!empty($startDate) ) {
+            $datetime = new \DateTime($data['startDate']);
+            $start = $datetime->format('Y-m-d 00:00:00');
+            $qb->andWhere("e.created >= :startDate")->setParameter('startDate', $start);
+        }
+        if (!empty($endDate)) {
+            $datetime = new \DateTime($data['endDate']);
+            $end = $datetime->format('Y-m-d 23:59:59');
+            $qb->andWhere("e.created <= :endDate")->setParameter('endDate', $end);
+        }
+    }
 
     public function updatePurchaseTotalPrice(Purchase $entity)
     {
@@ -71,6 +89,20 @@ class PurchaseRepository extends EntityRepository
             $em->flush();
             $em->getRepository('RestaurantBundle:Particular')->remainingQnt($particular);
         }
+    }
+
+    public function androidDevicePurchaseOverview(GlobalOption $option ,$data)
+    {
+        $config =  $option->getRestaurantConfig()->getId();
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('sum(e.netTotal) as total ,sum(e.payment) as payment');
+        $qb->where('e.restaurantConfig = :config');
+        $qb->setParameter('config', $config);
+        $qb->andWhere('e.process = :process');
+        $qb->setParameter('process', 'approved');
+        $this->handleSearchBetween($qb,$data);
+        return $qb->getQuery()->getOneOrNullResult();
+
     }
 
 

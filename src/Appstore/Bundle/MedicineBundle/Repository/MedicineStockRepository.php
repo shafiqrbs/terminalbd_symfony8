@@ -485,11 +485,7 @@ class MedicineStockRepository extends EntityRepository
         $avg = $em->getRepository('MedicineBundle:MedicinePurchaseItem')->getPurchaseSalesAvg($stock);
         $stock->setPurchasePrice($item->getPurchasePrice());
 	    $stock->setSalesPrice($item->getSalesPrice());
-	    if($avg['purchase']){
-            $stock->setAveragePurchasePrice(floatval($avg['purchase']));
-        }else{
-            $stock->setAveragePurchasePrice($item->getPurchasePrice());
-        }
+        $stock->setAveragePurchasePrice($item->getPurchaseAvgPrice());
         if($avg['sales']){
             $stock->setAverageSalesPrice(floatval($avg['sales']));
         }else{

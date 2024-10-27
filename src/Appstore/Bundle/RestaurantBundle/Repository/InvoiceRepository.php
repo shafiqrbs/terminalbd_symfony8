@@ -784,6 +784,20 @@ class InvoiceRepository extends EntityRepository
 
     }
 
+    public function androidDeviceSalesOverview(GlobalOption $option ,$data)
+    {
+        $config =  $option->getRestaurantConfig()->getId();
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('sum(e.total) as total ,sum(e.payment) as payment');
+        $qb->where('e.restaurantConfig = :config');
+        $qb->setParameter('config', $config);
+        $qb->andWhere('e.process = :process');
+        $qb->setParameter('process', 'approved');
+        $this->handleSearchBetween($qb,$data);
+        return $qb->getQuery()->getOneOrNullResult();
+
+    }
+
 
 
 }
