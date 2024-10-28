@@ -1930,7 +1930,7 @@ class AppsApiRepository extends EntityRepository
             $array['brand_name'] = (String)$entity->getBrandName();
             $array['barcode'] = (String)$entity->getBarcode();
             $array['unit'] = (string)$entity->getUnit()->getName();
-            $array['quantity'] = (string)$entity->getRemainingQuantity();
+            $array['quantity'] = (integer)$entity->getRemainingQuantity();
             $array['sales_price'] = (float)$entity->getSalesPrice();
             $array['purchase_price'] = (float)$entity->getPurchasePrice();
             $array['print_hidden'] = '';
