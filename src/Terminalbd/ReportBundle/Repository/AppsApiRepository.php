@@ -1918,7 +1918,24 @@ class AppsApiRepository extends EntityRepository
             $entity->setMode('medicine');
             $em->persist($entity);
             $em->flush();
-          //  return $this->getStockEdit($option,$entity->getId());
+
+            $array = array();
+            $printName = trim($entity->getName());
+            $array['global_id'] = (integer)$option->getId();
+            $array['item_id'] = (integer)$entity->getId();
+            $array['name'] = (String)$printName;
+            $array['print_name'] = (String)$printName;
+            $array['category_id'] = ($entity->getCategory()) ?  (integer)$entity->getCategory()->getId():null;
+            $array['category_name'] = ($entity->getCategory()) ? (String)$entity->getCategory()->getName():'';
+            $array['brand_name'] = (String)$entity->getBrandName();
+            $array['barcode'] = (String)$entity->getBarcode();
+            $array['unit'] = (string)$entity->getUnit()->getName();
+            $array['quantity'] = (string)$entity->getRemainingQuantity();
+            $array['sales_price'] = (float)$entity->getSalesPrice();
+            $array['purchase_price'] = (float)$entity->getPurchasePrice();
+            $array['print_hidden'] = '';
+            $array['image_path'] = '';
+            return $array;
         }
         return 'invalid';
 
