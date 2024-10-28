@@ -2427,10 +2427,12 @@ class ApiPoskeeperController extends Controller
             $data = $request->request->all();
             $user_name = strtolower($data['user_name']);
             $name = ucfirst($data['name']);
-            $mobile = $data['mobile'];
-            $email = $data['email'];
-            $address = $data['address'];
-            $userRole = $data['user_role'];
+            $emailApp = $user_name.'@gmail.com';
+            $email = (isset($data['email']) and $data['email']) ? $data['email'] : $emailApp;
+            $password = (isset($data['password']) and $data['password']) ? $data['password'] :'@123456';
+            $address = (isset($data['address']) and $data['address']) ? $data['address'] :'';
+            $mobile = (isset($data['mobile']) and $data['mobile']) ? $data['mobile'] :'';
+            $userRole = (isset($data['user_role']) and $data['user_role']) ? $data['user_role'] :'';
             $em = $this->getDoctrine()->getManager();
             $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
             $user = $em->getRepository('UserBundle:User')->findOneBy(array('username'=> $user_name,'userGroup'=> 'user','enabled'=> 1));
@@ -2438,11 +2440,11 @@ class ApiPoskeeperController extends Controller
             /* @var $user User */
 
             if(empty($user)){
-
                 $user = new User();
-                $a = mt_rand(1000,9999);
+                $a = $password;
                 $user->setGlobalOption($entity);
                 $user->setPlainPassword($a);
+                $user->setAppPassword($a);
                 $user->setEnabled(true);
                 $user->setUsername($user_name);
                 if(empty($data['email'])){
@@ -2468,22 +2470,13 @@ class ApiPoskeeperController extends Controller
                 $profile->setAddress($address);
                 $em->persist($profile);
                 $em->flush();
-
-            }else{
-
-                $a = "@123456";
-                $user->setPlainPassword($a);
-                $this->get('fos_user.user_manager')->updateUser($user);
-                $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('setting_tool.post.change_password', new \Setting\Bundle\ToolBundle\Event\PasswordChangeSmsEvent($user,$a));
-
             }
             $entity = $this->getDoctrine()->getRepository(User::class)->find($user->getId());
             $returnData['user_id'] = (int) $entity->getId();
             $returnData['user_name'] = $entity->getUsername();
             $returnData['email'] = $entity->getEmail();
             $returnData['full_name'] = ($entity->getProfile()) ? $entity->getProfile()->getName():'';
-            $returnData['password'] = $a;
+            $returnData['password'] = $entity->getAppPassword();
             $returnData['roles'] = $user->getAppRoles();
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
