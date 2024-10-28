@@ -2500,6 +2500,7 @@ class ApiPoskeeperController extends Controller
             $name = (isset($data['name']) and $data['name']) ? $data['name'] : '';
             $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : '';
             $em = $this->getDoctrine()->getManager();
+
             $config = $entity->getMedicineConfig();
 
             $type = $em->getRepository(MedicineParticularType::class)->findOneBy(array('slug' => $mode));
@@ -2522,8 +2523,8 @@ class ApiPoskeeperController extends Controller
             }else{
                 $returnData['brand_id'] = (int) $entity->getId();
             }
-            $returnData['name'] = $entity->getUsername();
-            $returnData['slug'] = $entity->getEmail();
+            $returnData['name'] = $entity->getName();
+            $returnData['slug'] = $entity->getSlug();
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($returnData));
