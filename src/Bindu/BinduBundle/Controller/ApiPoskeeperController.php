@@ -2503,7 +2503,7 @@ class ApiPoskeeperController extends Controller
             $config = $entity->getMedicineConfig();
 
             $type = $em->getRepository(MedicineParticularType::class)->findOneBy(array('slug' => $mode));
-            $user = $em->getRepository(MedicineParticular::class)->findOneBy(array('medicine_config'=> $config,'particularType'=> $type,'name'=> $name));
+            $user = $em->getRepository(MedicineParticular::class)->findOneBy(array('medicineConfig'=> $config,'particularType'=> $type,'name'=> $name));
 
             /* @var $user MedicineParticular */
 
