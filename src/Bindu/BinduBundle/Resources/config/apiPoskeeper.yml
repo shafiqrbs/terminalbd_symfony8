@@ -50,6 +50,9 @@ api_poskeeper_stock_create:
 api_poskeeper_stock_edit:
     path:     /poskeeper-stock-edit
     defaults: { _controller: BinduBundle:ApiPoskeeper:editStock }
+    methods:  POST|GET
+    options:
+        expose: true
 
 api_poskeeper_stock_update:
     path:     /poskeeper-stock-update
