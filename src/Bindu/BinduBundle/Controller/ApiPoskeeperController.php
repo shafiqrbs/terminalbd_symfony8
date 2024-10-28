@@ -2423,6 +2423,7 @@ class ApiPoskeeperController extends Controller
         if( $this->checkApiValidation($request) == 'invalid') {
             return new Response('Unauthorized access.', 401);
         }else{
+            $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
             $user_name = strtolower($data['user_name']);
             $name = ucfirst($data['name']);
@@ -2440,6 +2441,7 @@ class ApiPoskeeperController extends Controller
 
                 $user = new User();
                 $a = mt_rand(1000,9999);
+                $user->setGlobalOption($entity);
                 $user->setPlainPassword($a);
                 $user->setEnabled(true);
                 $user->setUsername($user_name);
