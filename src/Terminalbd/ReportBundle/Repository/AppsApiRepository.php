@@ -1932,9 +1932,9 @@ class AppsApiRepository extends EntityRepository
         if($entity){
             $data['id'] = (integer)$entity->getId();
             $data['name'] = (String)$entity->getName();
-            $data['category_id'] = ($entity->getCategory()) ?  (integer)$entity->getCategory()->getId():'';
+            $data['category_id'] = ($entity->getCategory()) ?  (integer)$entity->getCategory()->getId():null;
             $data['category_name'] = ($entity->getCategory()) ? (String)$entity->getCategory()->getName():'';
-            $data['brand_id'] = ($entity->getAccessoriesBrand()) ?  (integer)$entity->getAccessoriesBrand()->getId():'';
+            $data['brand_id'] = ($entity->getAccessoriesBrand()) ?  (integer)$entity->getAccessoriesBrand()->getId():null;
             $data['brand_name'] = (String)$entity->getBrandName();
             $data['min_quantity'] = (float)$entity->getMinQuantity();
             $data['unit_id'] = (string)$entity->getUnit()->getId();
