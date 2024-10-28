@@ -370,3 +370,10 @@ api_poskeeper_logs:
     methods:  POST|GET
     options:
         expose: true
+
+api_poskeeper_user_register:
+    path:     /poskeeper-user-create
+    defaults: { _controller: BinduBundle:ApiPoskeeper:userRegister }
+    methods:  POST|GET
+    options:
+        expose: true

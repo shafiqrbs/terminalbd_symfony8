@@ -6,6 +6,7 @@ use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
 use Appstore\Bundle\AccountingBundle\Entity\AccountCash;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
+use Core\UserBundle\Entity\Profile;
 use Core\UserBundle\Entity\User;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Gregwar\Image\Image;
@@ -2414,6 +2415,80 @@ class ApiPoskeeperController extends Controller
             $response->setStatusCode(Response::HTTP_OK);
             return $response;
         }
+    }
+
+
+    public function userRegisterAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $data = $request->request->all();
+            $user_name = strtolower($data['user_name']);
+            $name = ucfirst($data['name']);
+            $mobile = $data['mobile'];
+            $email = $data['email'];
+            $address = $data['address'];
+            $userRole = $data['user_role'];
+            $em = $this->getDoctrine()->getManager();
+            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
+            $user = $em->getRepository('UserBundle:User')->findOneBy(array('username'=> $user_name,'userGroup'=> 'user','enabled'=> 1));
+
+            /* @var $user User */
+
+            if(empty($user)){
+
+                $user = new User();
+                $a = mt_rand(1000,9999);
+                $user->setPlainPassword($a);
+                $user->setEnabled(true);
+                $user->setUsername($user_name);
+                if(empty($data['email'])){
+                    $user->setEmail($user_name.'@gmail.com');
+                }else{
+                    $user->setEmail($email);
+                }
+                $user->setRoles(array('ROLE_USER'));
+                if($userRole == 'Manager'){
+                    $user->setAppRoles(array("ROLE_MANAGER,ROLE_PURCHASE,ROLE_SALES,ROLE_EXPENSE,ROLE_STOCK"));
+                }else{
+                    $user->setAppRoles(array("ROLE_PURCHASE,ROLE_SALES,ROLE_EXPENSE,ROLE_STOCK"));
+                }
+                $user->setUserGroup('user');
+                $user->setEnabled(1);
+                $em->persist($user);
+                $em->flush();
+
+                $profile = new Profile();
+                $profile->setUser($user);
+                $profile->setName($name);
+                $profile->setMobile($mobile);
+                $profile->setAddress($address);
+                $em->persist($profile);
+                $em->flush();
+
+            }else{
+
+                $a = "@123456";
+                $user->setPlainPassword($a);
+                $this->get('fos_user.user_manager')->updateUser($user);
+                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher->dispatch('setting_tool.post.change_password', new \Setting\Bundle\ToolBundle\Event\PasswordChangeSmsEvent($user,$a));
+
+            }
+            $returnData['user_id'] = (int) $user->getId();
+            $returnData['user_name'] = $user->getUsername();
+            $returnData['email'] = $user->getEmail();
+            $returnData['full_name'] = $user->getProfile()->getName();
+            $returnData['password'] = $a;
+            $returnData['roles'] = $user->getAppRoles();
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($returnData));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
     }
 
     /* Manage Expenditure */
