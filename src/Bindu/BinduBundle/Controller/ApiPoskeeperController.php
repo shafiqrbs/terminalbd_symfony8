@@ -5,6 +5,8 @@ namespace Bindu\BinduBundle\Controller;
 use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
 use Appstore\Bundle\AccountingBundle\Entity\AccountCash;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineParticular;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineParticularType;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Core\UserBundle\Entity\Profile;
 use Core\UserBundle\Entity\User;
@@ -2486,6 +2488,86 @@ class ApiPoskeeperController extends Controller
         }
 
     }
+
+    public function createMasterDataAction(Request $request)
+    {
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $entity = $this->checkApiValidation($request);
+            $data = $request->request->all();
+            $name = (isset($data['name']) and $data['name']) ? $data['name'] : '';
+            $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : '';
+            $em = $this->getDoctrine()->getManager();
+            $config = $entity->getMedicineConfig();
+
+            $type = $em->getRepository(MedicineParticularType::class)->findOneBy(array('slug' => $mode));
+            $user = $em->getRepository(MedicineParticular::class)->findOneBy(array('medicine_config'=> $config,'particularType'=> $type,'name'=> $name));
+
+            /* @var $user MedicineParticular */
+
+            if(empty($user)){
+                $user = new MedicineParticular();
+                $user->setMedicineConfig($config);
+                $user->setParticularType($type);
+                $user->setName($name);
+                $em->persist($user);
+                $em->flush();
+            }
+
+            $entity = $this->getDoctrine()->getRepository(MedicineParticular::class)->find($user->getId());
+            if($entity->getParticularType()->getSlug() == 'category'){
+                $returnData['category_id'] = (int) $entity->getId();
+            }else{
+                $returnData['brand_id'] = (int) $entity->getId();
+            }
+            $returnData['name'] = $entity->getUsername();
+            $returnData['slug'] = $entity->getEmail();
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($returnData));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function updateMasterDataAction(Request $request)
+    {
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $entity = $this->checkApiValidation($request);
+            $data = $request->request->all();
+            $id = (isset($data['id']) and $data['id']) ? $data['id'] : '';
+            $name = (isset($data['name']) and $data['name']) ? $data['name'] : '';
+            $em = $this->getDoctrine()->getManager();
+            $user = $em->getRepository(MedicineParticular::class)->find($id);
+            /* @var $user MedicineParticular */
+            if($user){
+                $user->setName($name);
+                $em->persist($user);
+                $em->flush();
+            }
+            $entity = $this->getDoctrine()->getRepository(MedicineParticular::class)->find($user->getId());
+            if($entity->getParticularType()->getSlug() == 'category'){
+                $returnData['category_id'] = (int) $entity->getId();
+            }else{
+                $returnData['brand_id'] = (int) $entity->getId();
+            }
+            $returnData['name'] = $entity->getName();
+            $returnData['slug'] = $entity->getSlug();
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($returnData));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
 
     /* Manage Expenditure */
 

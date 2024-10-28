@@ -377,3 +377,17 @@ api_poskeeper_user_register:
     methods:  POST|GET
     options:
         expose: true
+
+api_poskeeper_masterdata_create:
+    path:     /poskeeper-masterdata-create
+    defaults: { _controller: BinduBundle:ApiPoskeeper:createMasterData }
+    methods:  POST|GET
+    options:
+        expose: true
+
+api_poskeeper_masterdata_update:
+    path:     /poskeeper-masterdata-update
+    defaults: { _controller: BinduBundle:ApiPoskeeper:updateMasterData }
+    methods:  POST|GET
+    options:
+        expose: true
