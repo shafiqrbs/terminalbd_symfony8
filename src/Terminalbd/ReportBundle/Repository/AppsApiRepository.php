@@ -1945,6 +1945,12 @@ class AppsApiRepository extends EntityRepository
             $data['purchase_price'] = (string)number_format($entity->getPurchasePrice(),2);
             $data['avg_purchase_price'] = (string)number_format($entity->getAveragePurchasePrice(),2);
             $data['avg_sales_price'] = (string)number_format($entity->getAverageSalesPrice(),2);
+            $data['sales_quantity'] = (integer) $entity->getSalesQuantity();
+            $data['purchase_quantity'] = (integer) $entity->getPurchaseQuantity();
+            $data['opening_quantity'] = (integer) $entity->getOpeningQuantity();
+            $data['damage_quantity'] = (integer) $entity->getDamageQuantity();
+            $data['sales_return_quantity'] = (integer) $entity->getSalesReturnQuantity();
+            $data['purchase_return_quantity'] = (integer) $entity->getPurchaseReturnQuantity();
             $data['adjust_quantity'] = (integer) $entity->getAdjustmentQuantity();
             $data['bonus_quantity'] = (integer) $entity->getBonusQuantity();
         }
