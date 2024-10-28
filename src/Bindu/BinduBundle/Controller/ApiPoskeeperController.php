@@ -2478,10 +2478,11 @@ class ApiPoskeeperController extends Controller
                 $dispatcher->dispatch('setting_tool.post.change_password', new \Setting\Bundle\ToolBundle\Event\PasswordChangeSmsEvent($user,$a));
 
             }
-            $returnData['user_id'] = (int) $user->getId();
-            $returnData['user_name'] = $user->getUsername();
-            $returnData['email'] = $user->getEmail();
-            $returnData['full_name'] = $user->getProfile()->getName();
+            $entity = $this->getDoctrine()->getRepository(User::class)->find($user->getId());
+            $returnData['user_id'] = (int) $entity->getId();
+            $returnData['user_name'] = $entity->getUsername();
+            $returnData['email'] = $entity->getEmail();
+            $returnData['full_name'] = ($entity->getProfile()) ? $entity->getProfile()->getName():'';
             $returnData['password'] = $a;
             $returnData['roles'] = $user->getAppRoles();
             $response = new Response();
