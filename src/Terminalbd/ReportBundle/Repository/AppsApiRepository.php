@@ -404,10 +404,10 @@ class AppsApiRepository extends EntityRepository
     public function getApiCustomerOutstanding($globalOption)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb ->from('AccountingBundle:AccountSales','e');
+        $qb ->from('DomainUserBundle:Customer','customer');
         $qb->select('customer.id as customerId ,customer.name as name ,customer.email as email , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
-        $qb->join('e.customer','customer');
-        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
+        $qb->join('customer.accountSales','e');
+        $qb->where("customer.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
         $qb->groupBy('customer.id');
         $qb->orderBy('name', 'ASC');
         $result = $qb->getQuery()->getArrayResult();
@@ -430,9 +430,9 @@ class AppsApiRepository extends EntityRepository
     public function apiApiVendorOutstanding($globalOption)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb ->from('AccountingBundle:AccountPurchase','e');
+        $qb ->from('MedicineBundle:MedicineVendor','vendor');
         $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.email as email,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
-        $qb->join('e.medicineVendor','vendor');
+        $qb->join('vendor.accountPurchases','e');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
         $qb->groupBy('vendor.id');
         $qb->orderBy('vendor.name','ASC');
