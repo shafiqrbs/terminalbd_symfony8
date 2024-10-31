@@ -383,7 +383,7 @@ class AppsApiRepository extends EntityRepository
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
         $qb->from(MedicineParticular::class,'e');
-        $qb->join('e.particularType','pt');
+        $qb->leftJoin('e.particularType','pt');
         $qb->select('e.name','e.id','e.slug');
         $qb->where("e.medicineConfig = :medicineConfig");
         $qb->setParameter('medicineConfig', $config);
@@ -406,7 +406,7 @@ class AppsApiRepository extends EntityRepository
         $qb = $this->_em->createQueryBuilder();
         $qb ->from('DomainUserBundle:Customer','customer');
         $qb->select('customer.id as customerId ,customer.name as name ,customer.email as email , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
-        $qb->join('customer.accountSales','e');
+        $qb->leftJoin('customer.accountSales','e');
         $qb->where("customer.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
         $qb->groupBy('customer.id');
         $qb->orderBy('name', 'ASC');
