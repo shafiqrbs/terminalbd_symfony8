@@ -51,7 +51,7 @@ class AccountBankController extends Controller
 
             $em = $this->getDoctrine()->getManager();
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
-            $name = $entity->getBank()->getName().','.$entity->getBranch();
+            $name = $entity->getServiceName();
             $entity->setName($name);
             $entity->upload();
             $em->persist($entity);
@@ -194,7 +194,7 @@ class AccountBankController extends Controller
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
-            $name = $entity->getBank()->getName().','.$entity->getBranch();
+            $name = $entity->getServiceName();
             $entity->setName($name);
             if($entity->getWebPath()){
                 $entity->removeUpload();
