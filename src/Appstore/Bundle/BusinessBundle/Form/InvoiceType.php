@@ -50,6 +50,7 @@ class InvoiceType extends AbstractType
                 'choices' => array(
                     'flat' => 'Flat',
                     'percentage' => 'Percentage',
+                    'package' => 'Package',
                 ),
             ))
            /* ->add('discount','hidden')*/

@@ -163,6 +163,7 @@ class Customer
      **/
     protected $marketing;
 
+
     /**
     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Designation")
     **/
@@ -230,6 +231,13 @@ class Customer
      * @ORM\Column(name="name", type="string", length=100, nullable =true)
      */
     private $name;
+
+      /**
+     * @var string
+     *
+     * @ORM\Column(name="proprietorName", type="string", length=100, nullable =true)
+     */
+    private $proprietorName;
 
     /**
      * @var string
@@ -1950,6 +1958,22 @@ class Customer
     public function setCustomerGroup($customerGroup)
     {
         $this->customerGroup = $customerGroup;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProprietorName()
+    {
+        return $this->proprietorName;
+    }
+
+    /**
+     * @param string $proprietorName
+     */
+    public function setProprietorName($proprietorName)
+    {
+        $this->proprietorName = $proprietorName;
     }
 
 

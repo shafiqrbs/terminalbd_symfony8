@@ -278,6 +278,13 @@ class BusinessConfig
     /**
      * @var boolean
      *
+     * @ORM\Column(name="isArea", type="boolean",  nullable=true)
+     */
+    private $isArea = false;
+
+    /**
+     * @var boolean
+     *
      * @ORM\Column(name="salesReturn", type="boolean",  nullable=true)
      */
     private $salesReturn = false;
@@ -1765,6 +1772,22 @@ class BusinessConfig
     public function setFuelStation($fuelStation)
     {
         $this->fuelStation = $fuelStation;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArea()
+    {
+        return $this->isArea;
+    }
+
+    /**
+     * @param bool $isArea
+     */
+    public function setIsArea($isArea)
+    {
+        $this->isArea = $isArea;
     }
 
 

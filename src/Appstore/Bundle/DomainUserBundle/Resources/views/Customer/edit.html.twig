@@ -67,6 +67,20 @@
                                     <div class="row-fluid">
                                         <div class="span12">
                                             <div class="control-group">
+                                                <label class="control-label" for="firstName">Proprietor Name</label>
+                                                <div class="controls">
+                                                    <div class="input-icon left">
+                                                        <i class="icon-user"></i>
+                                                        {{ form_widget(form.proprietorName) }}
+                                                        {{ form_errors(form.proprietorName) }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span12">
+                                            <div class="control-group">
                                                 <label class="control-label" for="firstName">Customer Group</label>
                                                 <div class="controls">
                                                     {{ form_widget(form.customerGroup) }}

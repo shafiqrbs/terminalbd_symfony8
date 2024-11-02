@@ -38,7 +38,8 @@ class CustomerType extends AbstractType
                     ))
             )
             ->add('alternativeMobile','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Alternative mobile no')))
-
+            ->add('customerGroup','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Customer Group','list'=>'customerGroups')))
+            ->add('proprietorName','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Proprietor Name')))
             ->add('mobile','text', array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Mobile no'),
                     'constraints' =>array(
                         new NotBlank(array('message'=>'Please enter mobile no'))

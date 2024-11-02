@@ -387,13 +387,12 @@ class InvoiceController extends Controller
 		if($discountType == 'flat'){
 			$total = ($subTotal  - $discountCal);
 			$discount = $discountCal;
-		}else{
-			$discount = ($subTotal*$discountCal)/100;
+		}elseif($discountType == 'percentage'){
+			$discount = ($subTotal * $discountCal)/100;
 			$total = ($subTotal  - $discount);
 		}
 		$vat = 0;
 		if($total > $discount ){
-
 			$entity->setDiscountType($discountType);
 			$entity->setDiscountCalculation($discountCal);
 			$entity->setDiscount(round($discount));
