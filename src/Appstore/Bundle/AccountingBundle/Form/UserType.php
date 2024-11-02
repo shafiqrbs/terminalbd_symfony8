@@ -39,6 +39,7 @@ class UserType extends AbstractType
                 'choices' => array(
                     'employee' => 'Employee',
                     'stakeholder' => 'Stakeholder',
+                    'marketing' => 'Marketing Executive',
                     'other' => 'Other',
                 ),
             ));
