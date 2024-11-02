@@ -37,6 +37,7 @@ class CustomerType extends AbstractType
                         new NotBlank(array('message'=>'Please enter customer name'))
                     ))
             )
+            ->add('openingBalance','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Opening Balance')))
             ->add('alternativeMobile','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Alternative mobile no')))
             ->add('customerGroup','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Customer Group','list'=>'customerGroups')))
             ->add('proprietorName','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Proprietor Name')))

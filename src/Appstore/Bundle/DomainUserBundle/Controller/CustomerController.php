@@ -74,6 +74,7 @@ class CustomerController extends Controller
      */
     public function createAction(Request $request)
     {
+        $userId = $this->getUser()->getId();
         $entity = new Customer();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
@@ -86,6 +87,9 @@ class CustomerController extends Controller
 	        $entity->setMobile($mobile);
             $em->persist($entity);
             $em->flush();
+            if ($entity->getOpeningBalance() > 0){
+                $em->getRepository("AccountingBundle:AccountSales")->apiInsertOpeningBalance($entity,$userId,$entity->getOpeningBalance());
+            }
             return $this->redirect($this->generateUrl('domain_customer'));
         }
         $this->get('session')->getFlashBag()->add(

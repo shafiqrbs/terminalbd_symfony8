@@ -275,6 +275,13 @@ class Customer
     private $company;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="openingBalance", type="float", nullable =true)
+     */
+    private $openingBalance;
+
+     /**
      * @var string
      *
      * @ORM\Column(name="process", type="string", length=50, nullable =true)
@@ -1975,6 +1982,26 @@ class Customer
     {
         $this->proprietorName = $proprietorName;
     }
+
+    /**
+     * @return float
+     */
+    public function getOpeningBalance()
+    {
+        return $this->openingBalance;
+    }
+
+    /**
+     * @param float $openingBalance
+     */
+    public function setOpeningBalance($openingBalance)
+    {
+        $this->openingBalance = $openingBalance;
+    }
+
+
+
+
 
 
 
