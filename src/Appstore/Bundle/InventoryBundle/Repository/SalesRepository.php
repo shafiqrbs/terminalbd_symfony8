@@ -556,9 +556,7 @@ class SalesRepository extends EntityRepository
     public function reportSalesOverview(User $user ,$data)
     {
 
-
         $inventory =  $user->getGlobalOption()->getInventoryConfig()->getId();
-
         $qb = $this->createQueryBuilder('s');
         $qb->select('sum(s.subTotal) as subTotal , sum(s.total) as total ,sum(s.payment) as totalPayment , count(s.id) as totalVoucher, count(s.totalItem) as totalItem, sum(s.due) as totalDue, sum(s.discount) as totalDiscount, sum(s.vat) as totalVat');
         $qb->where('s.inventoryConfig = :inventory');

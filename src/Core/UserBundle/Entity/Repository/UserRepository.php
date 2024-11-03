@@ -438,12 +438,13 @@ class UserRepository extends EntityRepository
         return $result;
     }
 
-    public function insertAccountUser(GlobalOption $option,$group,$mobile)
+    public function insertAccountUser(GlobalOption $option,$group)
     {
         $user = new User();
         $em = $this->_em;
-        $email = $mobile."@gmail.com";
-        $user->setUsername($mobile);
+        $username = time();
+        $email = $username."@gmail.com";
+        $user->setUsername($username);
         $user->setEmail($email);
         $user->setPassword('@123456');
         if($group == 'marketing'){

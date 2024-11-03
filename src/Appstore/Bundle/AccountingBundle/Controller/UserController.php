@@ -92,7 +92,7 @@ class UserController extends Controller
             $globalOption = $this->getUser()->getGlobalOption();
             $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
-	        $user = $this->getDoctrine()->getRepository('UserBundle:User')->insertAccountUser($globalOption,$entity->getUserGroup(),$mobile);
+	        $user = $this->getDoctrine()->getRepository('UserBundle:User')->insertAccountUser($globalOption,$entity->getUserGroup());
 	        $entity->setUser($user);
             $em->persist($entity);
             $em->flush();
@@ -162,7 +162,6 @@ class UserController extends Controller
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Customer entity.');
         }
-
         $editForm = $this->createEditForm($entity);
         return $this->render('AccountingBundle:User:new.html.twig', array(
             'entity'      => $entity,
@@ -198,21 +197,19 @@ class UserController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('UserBundle:Profile')->find($id);
+        /* @var $entity Profile */
 
+        $entity = $em->getRepository('UserBundle:Profile')->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Customer entity.');
         }
-
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-
         if ($editForm->isValid()) {
 	        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
 	        if($entity->getUserGroup() =='marketing'){
                 $entity->getUser()->setUserGroup('marketing');
-                $entity->getUser()->getUserGroup();
             }
 	        $em->persist($entity);
             $em->flush();
