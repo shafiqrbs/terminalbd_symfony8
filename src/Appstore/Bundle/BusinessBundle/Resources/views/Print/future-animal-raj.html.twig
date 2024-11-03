@@ -1,11 +1,11 @@
 {% extends '::baseprint.html.twig' %}
 {% block body %}
     <script type="text/javascript">
-     /*   window.print();
+        window.print();
         setTimeout(function () {
             window.open('', '_self', '');
             window.close();
-        }, 2000);*/
+        }, 2000);
     </script>
     <div id="invoice"  style="position: relative; padding-top: 0;">
         <div class="invoice overflow-auto" style="margin-top:{{ config.printTopMargin }}px!important;">
@@ -37,6 +37,7 @@
                             <div class="email">Made By:  {{ (entity.createdBy) ? entity.createdBy.profile.name : '' }}</div>
                         </div>
                     </div>
+                    <br/>
                     {% if print == 'print' %}
                         {% if entity.businessInvoiceParticulars is defined and  entity.businessInvoiceParticulars is not empty  %}
                             <table class="table table-body" style="border: 1px solid #999999!important; margin-top: 20px">
