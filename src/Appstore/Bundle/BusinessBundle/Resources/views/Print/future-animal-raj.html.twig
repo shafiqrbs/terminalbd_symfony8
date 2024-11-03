@@ -32,7 +32,7 @@
                         <div class="col invoice-details">
                             <div class="date">Date of Invoice: {{ entity.created|date('d-m-Y') }}</div>
                             <div class="date">Order Date: {{ entity.updated|date('d-m-Y') }}</div>
-                            <div class="email">Discount:  {{ entity.discountType }}</div>
+                            <div class="email">Discount Type:  {{ entity.discountType|capitalize }}</div>
                             <div class="email">Payment Mode:  {{ (entity.transactionMethod) ? entity.transactionMethod.name : '' }}</div>
                             <div class="email">Made By:  {{ (entity.createdBy) ? entity.createdBy.profile.name : '' }}</div>
                         </div>
