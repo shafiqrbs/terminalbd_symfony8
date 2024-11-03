@@ -287,11 +287,11 @@
                                     {% if entity.businessConfig.isArea == 1 %}
                                     <div class="row-fluid">
                                         <div class="span12" >
-                                        <select name="marketing" id="marketing" class="span12 m-wrap">
+                                        <select name="area" id="area" class="span12 m-wrap">
                                             <option>--Select area</option>
                                             {% if areas is not empty %}
                                                 {% for area in areas %}
-                                                    <option value="{{ area.id }}">{{ area.name }}</option>
+                                                    <option {% if entity.area is not empty and entity.area.id ==  area.id %} selected="selected" {% endif %} value="{{ area.id }}">{{ area.name }}</option>
                                                 {% endfor %}
                                             {% endif %}
                                         </select>
