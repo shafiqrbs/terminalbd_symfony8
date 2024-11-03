@@ -92,7 +92,7 @@ class UserController extends Controller
             $globalOption = $this->getUser()->getGlobalOption();
             $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
-	        $user = $this->getDoctrine()->getRepository('UserBundle:User')->insertAccountUser($globalOption,$mobile,$data);
+	        $user = $this->getDoctrine()->getRepository('UserBundle:User')->insertAccountUser($globalOption,$entity->getUserGroup(),$mobile);
 	        $entity->setUser($user);
             $em->persist($entity);
             $em->flush();
@@ -210,6 +210,11 @@ class UserController extends Controller
         if ($editForm->isValid()) {
 	        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
+	        if($entity->getUserGroup() =='marketing'){
+                $entity->getUser()->setUserGroup('marketing');
+                $entity->getUser()->getUserGroup();
+            }
+	        $em->persist($entity);
             $em->flush();
             if($entity->getUserGroup() != 'other'){
                 $this->getDoctrine()->getRepository('AccountingBundle:AccountHead')->insertUserAccount($entity);

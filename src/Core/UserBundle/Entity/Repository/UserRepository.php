@@ -438,7 +438,7 @@ class UserRepository extends EntityRepository
         return $result;
     }
 
-    public function insertAccountUser(GlobalOption $option,$mobile,$data)
+    public function insertAccountUser(GlobalOption $option,$group,$mobile)
     {
         $user = new User();
         $em = $this->_em;
@@ -446,9 +446,14 @@ class UserRepository extends EntityRepository
         $user->setUsername($mobile);
         $user->setEmail($email);
         $user->setPassword('@123456');
-        $user->setUserGroup('account');
+        if($group == 'marketing'){
+            $user->setUserGroup('marketing');
+        }else{
+            $user->setUserGroup('account');
+        }
         $user->setGlobalOption($option);
         $user->setDomainOwner(2);
+        $user->setEnabled(1);
         $em->persist($user);
         $em->flush();
         return $user;

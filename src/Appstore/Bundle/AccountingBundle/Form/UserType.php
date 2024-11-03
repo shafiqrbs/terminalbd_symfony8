@@ -32,7 +32,7 @@ class UserType extends AbstractType
             )
             ->add('address','textarea', array('attr'=>array('class'=>'m-wrap span12 ','rows'=>4,'placeholder'=>'Enter customer address')))
             ->add('userGroup', 'choice', array(
-                'attr'=>array('class'=>'span12 m-wrap'),
+                'attr' => array('class'=>'span12 m-wrap'),
                 'expanded'      =>false,
                 'required'    => true,
                 'multiple'      =>false,
@@ -63,9 +63,4 @@ class UserType extends AbstractType
         return 'profile';
     }
 
-    protected function LocationChoiceList()
-    {
-        return $syndicateTree = $this->location->getLocationOptionGroup();
-
-    }
 }
