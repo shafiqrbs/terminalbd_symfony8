@@ -1047,13 +1047,14 @@ class CustomerRepository extends EntityRepository
 
     public function apiCreateCustomer(GlobalOption $global,$data)
     {
+
         $em = $this->_em;
         $mobile = ((isset($data['mobile']) and $data['mobile'])) ? ($data['mobile']):'';
         $name = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
         $address = ((isset($data['address']) and $data['address'])) ? $data['address']:'';
         $email = ((isset($data['email']) and $data['email'])) ? floatval($data['email']):'';
-        $userId = ((isset($data['userId']) and $data['userId'])) ? floatval($data['userId']):'';
-        $openingBalance = trim((isset($data['openingBalance']) and $data['openingBalance'])) ? trim(floatval($data['openingBalance'])):0;
+        $userId = ((isset($data['user_id']) and $data['user_id'])) ? floatval($data['user_id']):'';
+        $openingBalance = (isset($data['opening_balance']) and $data['opening_balance']) ? trim(floatval($data['opening_balance'])):0;
         $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption' => $global ,'mobile' => $mobile));
         $result = [];
         if(empty($entity)){
@@ -1062,6 +1063,7 @@ class CustomerRepository extends EntityRepository
             $entity->setName($name);
             $entity->setEmail($email);
             $entity->setAddress($address);
+            $entity->setOpeningBalance($openingBalance);
             $entity->setGlobalOption($global);
             $em->persist($entity);
             $em->flush();

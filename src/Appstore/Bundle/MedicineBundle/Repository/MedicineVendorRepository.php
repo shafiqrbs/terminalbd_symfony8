@@ -154,7 +154,8 @@ class MedicineVendorRepository extends EntityRepository
         $companyName = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
         $address = ((isset($data['address']) and $data['address'])) ? $data['address']:'';
         $email = ((isset($data['email']) and $data['email'])) ? ($data['email']):'';
-        $openingBalance = trim((isset($data['openingBalance']) and $data['openingBalance'])) ? trim(floatval($data['openingBalance'])):0;
+        $user_id = ((isset($data['user_id']) and $data['user_id'])) ? ($data['user_id']):'';
+        $openingBalance = (isset($data['opening_balance']) and $data['opening_balance']) ? trim(floatval($data['opening_balance'])):0;
         $em  = $this->_em;
         $config = $option->getMedicineConfig();
         $entity = $this->findOneBy(array('medicineConfig' => $config,'companyName' => $name));
@@ -170,7 +171,7 @@ class MedicineVendorRepository extends EntityRepository
             $em->persist($entity);
             $em->flush();
             if ($openingBalance > 0) {
-                $em->getRepository("AccountingBundle:AccountPurchase")->apiInsertOpeningBalance($entity, $openingBalance);
+                $em->getRepository("AccountingBundle:AccountPurchase")->apiInsertOpeningBalance($entity,$user_id, $openingBalance);
             }
             $result['global_id']            = (int) $option->getId();
             $result['vendor_id']            = (int) $entity->getId();

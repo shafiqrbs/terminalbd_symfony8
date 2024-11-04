@@ -44,6 +44,13 @@ class AppsApi
      */
     private $ipAddress;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="version", type="text", length=20, nullable=true)
+     */
+    private $version;
+
 
     /**
      * @Gedmo\Blameable(on="create")
@@ -168,6 +175,24 @@ class AppsApi
     {
         $this->updated = $updated;
     }
+
+    /**
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * @param string $version
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
+    }
+
+
 
 
 

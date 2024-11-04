@@ -334,6 +334,8 @@ class ApiPoskeeperController extends Controller
             $expenditureOverview = $this->getDoctrine()->getRepository('AccountingBundle:Expenditure')->androidDeviceExpenditureOverview($entity,$data);
             $transactionCashOverview = $this->getDoctrine()->getRepository('AccountingBundle:AccountCash')->apiTransactionCashOverview($entity,$data);
 
+            $version = $this->getDoctrine()->getRepository(AppsApi::class)->find(1);
+            $versionNo = ($version) ? $version->getVersion():'1.1';
             $data = array(
                 'globalOption'              => $entity->getId(),
                 'expenditure'       => number_format($expenditureOverview,2) ,
@@ -342,8 +344,9 @@ class ApiPoskeeperController extends Controller
                 'due'                  => number_format($salesCashOverview['due'],2) ,
                 'voucher'              => number_format($salesCashOverview['voucher'],2) ,
                 'purchase'             => number_format($purchaseCashOverview['total'],2) ,
-                'payment'           => number_format($purchaseCashOverview['payment'],2) ,
-                'transaction_overview'   => $transactionCashOverview,
+                'payment'              => number_format($purchaseCashOverview['payment'],2) ,
+                'transaction_overview' => $transactionCashOverview,
+                'version'   => (string) $versionNo,
             );
 
             $response = new Response();

@@ -1039,9 +1039,10 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
 	}
 
 
-    public function apiInsertOpeningBalance(MedicineVendor $vendor,$opening)
+    public function apiInsertOpeningBalance(MedicineVendor $vendor,$user_id,$opening)
     {
         $em = $this->_em;
+        $user = $em->getRepository(User::class)->find($user_id);
         $entity = new AccountPurchase();
         $entity->setMedicineVendor($vendor);
         $entity->setGlobalOption($vendor->getMedicineConfig()->getGlobalOption());
@@ -1051,6 +1052,8 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
         $entity->setProcess('approved');
         $entity->setTotalAmount($opening);
         $entity->setPayment(0);
+        $entity->setCreatedBy($user);
+        $entity->setApprovedBy($user);
         $entity->setBalance($opening);
         $entity->setTransactionMethod(null);
         $em->persist($entity);
