@@ -1046,11 +1046,12 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
         $entity = new AccountPurchase();
         $entity->setMedicineVendor($vendor);
         $entity->setGlobalOption($vendor->getMedicineConfig()->getGlobalOption());
+        $entity->setCompanyName($vendor->getCompanyName());
         $entity->setProcessHead('Credit');
         $datetime = new \DateTime("now");
         $entity->setUpdated($datetime);
         $entity->setProcess('approved');
-        $entity->setTotalAmount($opening);
+        $entity->setPurchaseAmount($opening);
         $entity->setPayment(0);
         $entity->setCreatedBy($user);
         $entity->setApprovedBy($user);
@@ -1059,7 +1060,4 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
         $em->persist($entity);
         $em->flush();
     }
-
-
-
 }
