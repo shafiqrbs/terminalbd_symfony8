@@ -1052,9 +1052,9 @@ class CustomerRepository extends EntityRepository
         $mobile = ((isset($data['mobile']) and $data['mobile'])) ? ($data['mobile']):'';
         $name = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
         $address = ((isset($data['address']) and $data['address'])) ? $data['address']:'';
-        $email = ((isset($data['email']) and $data['email'])) ? floatval($data['email']):'';
+        $email = ((isset($data['email']) and $data['email'])) ? $data['email']:'';
         $userId = ((isset($data['user_id']) and $data['user_id'])) ? floatval($data['user_id']):'';
-        $openingBalance = (isset($data['opening_balance']) and $data['opening_balance']) ? trim(floatval($data['opening_balance'])):0;
+        $openingBalance = (isset($data['opening_balance']) and $data['opening_balance']) ? floatval($data['opening_balance']):0;
         $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(array('globalOption' => $global ,'mobile' => $mobile));
         $result = [];
         if(empty($entity)){
@@ -1067,8 +1067,8 @@ class CustomerRepository extends EntityRepository
             $entity->setGlobalOption($global);
             $em->persist($entity);
             $em->flush();
-            if ($openingBalance > 0){
-                $em->getRepository("AccountingBundle:AccountSales")->apiInsertOpeningBalance($entity,$userId,$openingBalance);
+            if ($entity->getOpeningBalance() > 0){
+                $em->getRepository("AccountingBundle:AccountSales")->apiInsertOpeningBalance($entity,$userId);
             }
         }
         $result['global_id']            = (int) $global->getId();
@@ -1079,7 +1079,7 @@ class CustomerRepository extends EntityRepository
         $result['email']                = (string)$entity->getEmail();
         $result['debit']                = (double)0;
         $result['credit']               = (double)0;
-        $result['balance']              = (double)$openingBalance;
+        $result['balance']              = (double)$entity->getOpeningBalance();
         return $result;
     }
 

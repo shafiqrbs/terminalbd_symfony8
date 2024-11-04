@@ -1577,7 +1577,7 @@ class AccountSalesRepository extends EntityRepository
 
     }
 
-    public function apiInsertOpeningBalance(Customer $customer,$userId,$opening)
+    public function apiInsertOpeningBalance(Customer $customer,$userId)
     {
         $em = $this->_em;
         $user = $em->getRepository('UserBundle:User')->find($userId);
@@ -1591,13 +1591,13 @@ class AccountSalesRepository extends EntityRepository
             $datetime = new \DateTime("now");
             $entity->setUpdated($datetime);
             $entity->setProcess('approved');
-            $entity->setTotalAmount($opening);
+            $entity->setTotalAmount($customer->getOpeningBalance());
             $entity->setAmount(0);
-            $entity->setBalance($opening);
+            $entity->setBalance($customer->getOpeningBalance());
             $entity->setTransactionMethod(null);
             $em->persist($entity);
             $em->flush();
-            $this->updateCustomerBalance($entity);
+           // $this->updateCustomerBalance($entity);
         }
 
 
