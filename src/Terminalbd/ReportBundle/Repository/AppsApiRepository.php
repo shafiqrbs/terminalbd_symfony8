@@ -1671,6 +1671,9 @@ class AppsApiRepository extends EntityRepository
                 $em->getRepository(MedicineStock::class)->getSalesUpdateQnt($sales);
                 $em->getRepository(AccountSales::class)->insertMedicineAccountInvoice($sales);
             endforeach;
+            $process->setStatus(true);
+            $em->persist($process);
+            $em->flush();
         }
     }
 
