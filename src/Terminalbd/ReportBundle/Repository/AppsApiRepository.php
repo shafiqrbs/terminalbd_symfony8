@@ -1829,7 +1829,7 @@ class AppsApiRepository extends EntityRepository
         $totalServiceCharge = (($data['net_total'] * $charge)/100);
         $discount = round($data['discount'] + $totalServiceCharge);
         $total = ( $data['sub_total'] - $discount);
-        return $data = array('net_total' => $total,'discount' => $discount,'cardCommission' => $totalServiceCharge);
+        return $data = array('total' => $total,'discount' => $discount,'cardCommission' => $totalServiceCharge);
     }
 
     public function apiInsertStock(GlobalOption $option,$data)
