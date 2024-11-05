@@ -1339,7 +1339,7 @@ class PurchaseController extends Controller
             $removeSales->execute();
         }
         if($android->getMode() == 'offline'){
-            $this->getDoctrine()->getRepository(AppsApi::class)->offlineAndroidProcess($android);
+             $this->getDoctrine()->getRepository(AppsApi::class)->apiSyncProcess($android->getId());
              $msg = "valid";
         }else{
              $msg = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->insertApiPurchase($config->getGlobalOption(),$android);

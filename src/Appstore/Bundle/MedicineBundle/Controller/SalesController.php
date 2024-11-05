@@ -761,7 +761,7 @@ class SalesController extends Controller
         }
       //  $this->androidProcessSymfony($android);
         if($android->getMode() == 'offline'){
-            $this->getDoctrine()->getRepository(AppsApi::class)->offlineAndroidProcess($android);
+            $this->getDoctrine()->getRepository(AppsApi::class)->apiSyncProcess($android->getId());
             $status = 'success';
         }else{
             $status = $this->androidProcessMysql($android);

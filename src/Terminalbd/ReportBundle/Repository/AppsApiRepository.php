@@ -1531,7 +1531,7 @@ class AppsApiRepository extends EntityRepository
         $qb->select('e.id as id','e.process as process','e.created as created','e.mode as mode','e.status as status');
         $qb->addSelect('a.device as device');
         $qb->where('e.medicineConfig = :config')->setParameter('config', $config);
-        //  $qb->andWhere('e.mode = :process')->setParameter('process', 'offline');
+        $qb->andWhere('e.mode = :process')->setParameter('process', 'offline');
         $qb->andWhere('e.status = 0');
         $qb->orderBy('e.created',"DESC");
         $result = $qb->getQuery()->getArrayResult();
