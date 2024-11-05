@@ -1768,6 +1768,9 @@ class AppsApiRepository extends EntityRepository
                     $this->approveProcess($purchase);
                 }
             endforeach;
+            $process->setStatus(true);
+            $em->persist($process);
+            $em->flush();
         }
         //  return $this->apiPurchaseLists($option);
     }
