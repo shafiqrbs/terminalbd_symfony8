@@ -440,6 +440,8 @@ class BusinessPurchaseRepository extends EntityRepository
             $entity->setPayment($return->getPayment());
             $entity->setCreatedBy($return->getCreatedBy());
             $entity->setApprovedBy($return->getCreatedBy());
+            $entity->setCreated($return->getCreated());
+            $entity->setUpdated($return->getUpdated());
             $entity->setProcess("Approved");
             $em->persist($entity);
             $em->flush();

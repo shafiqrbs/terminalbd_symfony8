@@ -135,6 +135,15 @@ class BusinessInvoiceReturn
 
 
     /**
+     * @param \DateTime $created
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
+
+    /**
      * Get created
      *
      * @return \DateTime
@@ -359,6 +368,12 @@ class BusinessInvoiceReturn
     {
         $this->businessInvoice = $businessInvoice;
     }
+
+
+
+
+
+
 
 
 }

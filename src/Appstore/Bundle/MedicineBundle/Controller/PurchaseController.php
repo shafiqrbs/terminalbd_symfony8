@@ -623,11 +623,10 @@ class PurchaseController extends Controller
         }
         $entity->setPurchasePrice(abs($data['value']));
         $em->flush();
-
         $stock = $entity->getMedicineStock();
         $updatePrice = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchaseItem')->getPurchaseSalesAvg($stock);
         if(!empty($updatePrice['purchase'])){
-            $stock->setAveragePurchasePrice($updatePrice['purchase']);
+          //  $stock->setAveragePurchasePrice($updatePrice['purchase']);
         }
         $em->persist($stock);
         $em->flush();
@@ -1010,6 +1009,8 @@ class PurchaseController extends Controller
             $em->flush();
             if($purchase->getInvoiceMode() == 'invoice') {
                 $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchaseItem')->updatePurchaseItemPrice($purchase);
+            }else{
+                $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchaseItem')->updateManualPurchaseItemAvgPrice($purchase);
             }
             $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getPurchaseUpdateQnt($purchase);
             if(!empty($purchase->getMedicinePurchaseReturn())){

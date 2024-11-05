@@ -393,6 +393,24 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
     }
 
+    public function updateManualPurchaseItemAvgPrice(MedicinePurchase $purchase)
+    {
+        /* @var  $item MedicinePurchaseItem */
+        $em = $this->_em;
+        if($purchase->getMedicinePurchaseItems()){
+            foreach ($purchase->getMedicinePurchaseItems() as $item){
+                if($item and $item->getActualPurchasePrice()){
+                    $purchasePrice = $item->getPurchasePrice();
+                    $purchaseAvgPrice = $this->purchaseAvgPrice($item,$purchasePrice);
+                    $item->setPurchaseAvgPrice($purchaseAvgPrice);
+                    $em->persist($item);
+                    $em->flush();
+                }
+            }
+        }
+
+    }
+
     public function purchaseAvgPrice(MedicinePurchaseItem $item,$purchasePrice)
     {
         $quantity = ($item->getMedicineStock()->getRemainingQuantity() + $item->getQuantity());

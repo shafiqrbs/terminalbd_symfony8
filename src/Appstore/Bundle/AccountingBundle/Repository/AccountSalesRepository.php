@@ -1380,6 +1380,8 @@ class AccountSalesRepository extends EntityRepository
         $accountSales->setGlobalOption($global);
         $accountSales->setCustomer($sales->getCustomer());
         $accountSales->setSourceInvoice($sales->getInvoice());
+        $accountSales->setCreated($sales->getCreated());
+        $accountSales->setUpdated($sales->getCreated());
         $accountSales->setAmount($amount);
         $accountSales->setProcessHead('Sales-Return');
         $accountSales->setProcessType('Sales-Return');

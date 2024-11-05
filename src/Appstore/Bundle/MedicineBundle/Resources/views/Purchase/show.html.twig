@@ -177,8 +177,8 @@
                                                             <a href="javascript:" id="expirationDate-{{ item.id }}" class="expirationDate" data-type="date" data-name="expirationDate" data-pk="{{ item.id }}" data-url="{{ path('medicine_purchaseitem_inline_update') }}" data-title="Enter Expiration Date" >{% if item.expirationEndDate is not empty %}{{ item.expirationEndDate|date('d-m-Y') }}{% endif %}</a>
                                                         </td>
                                                         <td class="span1">{{ item.quantity }}</td>
-                                                        <td class="span1">{{ item.purchasePrice }}</td>
                                                         <td class="span1">{{ item.salesPrice }}</td>
+                                                        <td class="span1">{{ item.purchasePrice }}</td>
                                                         <td class="span1">{{ (item.purchasePrice * item.quantity)|number_format }}</td>
                                                     </tr>
                                                 {% endfor %}

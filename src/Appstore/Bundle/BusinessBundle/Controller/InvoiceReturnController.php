@@ -181,6 +181,12 @@ class InvoiceReturnController extends Controller
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
         $data = $request->request->all();
+        $created = $data['created'];
+        if($created){
+            $date = new \DateTime($created);
+            $entity->setCreated($date);
+            $entity->setUpdated($date);
+        }
         $entity->setProcess('Done');
         $entity->setAdjustment($data['adjustment']);
         $entity->setPayment($data['payment']);

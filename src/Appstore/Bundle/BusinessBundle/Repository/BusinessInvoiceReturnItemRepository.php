@@ -158,7 +158,6 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
         $price = $data['price'];
         $itemProcess = $data['itemProcess'];
         $wearhouse = (isset($data['wearhouse']) and $data['wearhouse']) ? $data['wearhouse'] : '';
-        var_dump($wearhouse);
         foreach ($itemIds as $key  => $itemId):
             $exist = $em->getRepository('BusinessBundle:BusinessInvoiceReturnItem')->findOneBy(array('invoiceReturn'=>$entity,'businessParticular'=>$itemId));
             if($exist and $quantity[$key] > 0){
