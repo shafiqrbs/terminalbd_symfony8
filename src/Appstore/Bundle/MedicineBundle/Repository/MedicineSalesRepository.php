@@ -51,11 +51,12 @@ class MedicineSalesRepository extends EntityRepository
         $customer = isset($data['customer'])? $data['customer'] :'';
         $customerName = isset($data['name'])? $data['name'] :'';
         $customerMobile = isset($data['mobile'])? $data['mobile'] :'';
-        $createdStart = isset($data['startDate'])? $data['startDate'] :'';
-	    $createdEnd = isset($data['endDate'])? $data['endDate'] :'';
+        $createdStart = (isset($data['startDate']) and $data['startDate'])? $data['startDate'] :'';
+	    $createdEnd = (isset($data['endDate']) and $data['endDate'])? $data['endDate'] :'';
 	    $amount = isset($data['amount'])? $data['amount'] :'';
         $process = isset($data['process'])? $data['process'] :'';
         $due = isset($data['due'])? $data['due'] :'';
+
 	    if (!empty($invoice)) {
             $qb->andWhere($qb->expr()->like("s.invoice", "'%$invoice%'"  ));
         }
@@ -84,7 +85,7 @@ class MedicineSalesRepository extends EntityRepository
         }
 
         if (!empty($createdStart) ) {
-            $start = date('Y-m-d 00:00:00',strtotime($createdStart));
+            $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
             $qb->andWhere("s.created >= :startDate");
             $qb->setParameter('startDate', $start);
         }elseif(empty($data)){
@@ -92,7 +93,6 @@ class MedicineSalesRepository extends EntityRepository
             $qb->andWhere("s.created >= :startDate");
             $qb->setParameter('startDate', $start);
         }
-
         if (!empty($createdEnd)) {
             $end = date('Y-m-d 23:59:59',strtotime($createdEnd));
             $qb->andWhere("s.created <= :endDate");
@@ -346,6 +346,19 @@ class MedicineSalesRepository extends EntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    public function apiReportSalesOverview(GlobalOption $option)
+    {
+
+        $config =  $option->getMedicineConfig()->getId();
+        $qb = $this->createQueryBuilder('s');
+        $qb->select('sum(s.subTotal) as subTotal , sum(s.netTotal) as total ,sum(s.received) as totalPayment , count(s.id) as totalVoucher, sum(s.due) as totalDue, sum(s.discount) as totalDiscount, sum(s.vat) as totalVat');
+        $qb->where('s.medicineConfig = :config');
+        $qb->setParameter('config', $config);
+        $qb->andWhere('s.process = :process');
+        $qb->setParameter('process', 'Done');
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
     public function androidDeviceSalesOverview(GlobalOption $option ,$data)
     {
         $config =  $option->getMedicineConfig()->getId();
@@ -375,6 +388,25 @@ class MedicineSalesRepository extends EntityRepository
         $qb->andWhere('s.process = :process');
         $qb->setParameter('process', 'Done');
         $this->handleSearchBetween($qb,$data);
+        $result = $qb->getQuery()->getOneOrNullResult();
+        return $result;
+    }
+
+    public  function apiReportSalesItemPurchaseSalesOverview(GlobalOption $option){
+
+
+        $config =  $option->getMedicineConfig()->getId();
+
+        $qb = $this->createQueryBuilder('s');
+        $qb->join('s.medicineSalesItems','si');
+        $qb->select('SUM(si.quantity) AS quantity');
+        $qb->addSelect('COUNT(si.id) AS totalItem');
+        $qb->addSelect('SUM(si.quantity * si.purchasePrice) AS totalPurchase');
+        $qb->addSelect('SUM(si.quantity * si.salesPrice) AS totalSales');
+        $qb->where('s.medicineConfig = :config');
+        $qb->setParameter('config', $config);
+        $qb->andWhere('s.process = :process');
+        $qb->setParameter('process', 'Done');
         $result = $qb->getQuery()->getOneOrNullResult();
         return $result;
     }

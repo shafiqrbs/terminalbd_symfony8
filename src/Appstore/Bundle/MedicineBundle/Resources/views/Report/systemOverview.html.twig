@@ -103,7 +103,7 @@
                             <div class="span6">
                                 <table class="table table-bordered table-striped table-condensed flip-content ">
                                     <tr><th class="numeric" >Total Amount</th><td>{{ accountSales.totalAmount|number_format }}</td></tr>
-                                    <tr><th class="numeric" >Payment Amount</th><td>{{ accountSales.receiveAmount|number_format }}</td></tr>
+                                    <tr><th class="numeric" >Receive Amount</th><td>{{ accountSales.receiveAmount|number_format }}</td></tr>
                                     <tr><th class="numeric" >Due Amount</th><td>{{ (accountSales.totalAmount - accountSales.receiveAmount)|number_format }}</td></tr>
                                 </table>
                             </div>

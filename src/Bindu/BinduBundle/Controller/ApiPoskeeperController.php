@@ -320,10 +320,9 @@ class ApiPoskeeperController extends Controller
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $request->request->all();
             $datetime = new \DateTime("now");
-            $data['startDate'] = $datetime->format('Y-m-d');
-            $data['endDate'] = $datetime->format('Y-m-d');
+            $data['startDate'] = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']:$datetime->format('Y-m-d');
+            $data['endDate'] = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:$datetime->format('Y-m-d');
             $data['device'] = $deviceId;
-
             if($entity->getMainApp()->getSlug() == 'miss'){
                 $purchaseCashOverview = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->androidDevicePurchaseOverview($entity,$data);
                 $salesCashOverview = $this->getDoctrine()->getRepository('MedicineBundle:MedicineSales')->androidDeviceSalesOverview($entity,$data);
@@ -347,6 +346,85 @@ class ApiPoskeeperController extends Controller
                 'payment'              => number_format($purchaseCashOverview['payment'],2) ,
                 'transaction_overview' => $transactionCashOverview,
                 'version'   => (string) $versionNo,
+            );
+
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
+    public function systemOverviewAction(Request $request)
+    {
+
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+            $data = $request->request->all();
+            $transactionMethods = array(1,2,3);
+            $datetime = new \DateTime("now");
+            $user = $this->getDoctrine()->getRepository(User::class)->find($_REQUEST['user_id']);
+            $dataIncome['startDate'] = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $entity->getCreated()->format('Y-m-d');
+            $dataIncome['endDate'] = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:$datetime->format('Y-m-d');
+            $data['startDate'] = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $entity->getCreated()->format('Y-m-d');
+            $data['endDate'] = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:$datetime->format('Y-m-d');
+            $income = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->reportMedicineTotalIncome($user,$dataIncome);
+            $transactionCashOverview = $this->getDoctrine()->getRepository('AccountingBundle:AccountCash')->cashOverview($user,$transactionMethods,$data);
+            $currentStockPrice = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->reportCurrentStockPrice($user);
+            $accountPurchase = $this->getDoctrine()->getRepository('AccountingBundle:AccountPurchase')->accountPurchaseOverview($user, $data);
+            $accountSales = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->salesOverview($user, $data);
+
+            $current_stock = array(
+                'quantity'       => $currentStockPrice['quantity'] ,
+                'salesPrice'     => number_format($currentStockPrice['salesPrice'],2) ,
+                'purchasePrice'  => number_format($currentStockPrice['purchasePrice'],2) ,
+                'profit'            => number_format(($currentStockPrice['salesPrice']-$currentStockPrice['purchasePrice']),2) ,
+            );
+
+            $totalExpense = 0;
+            foreach ($income['expenditures'] as $expense):
+                $totalExpense = $totalExpense + $expense['amount'];
+            endforeach;
+            $incomeArr = array(
+                'sales'       => number_format($income['sales'],2) ,
+                'purchase'       => number_format($income['purchase'],2) ,
+                'expense'       => number_format($totalExpense,2) ,
+                'profit'       => number_format(($income['sales'] - ($income['purchase']+$totalExpense)),2) ,
+            );
+            $receivable = ($accountSales['totalAmount'] - $accountSales['receiveAmount']);
+            $payable = ($accountPurchase['purchaseAmount'] - $accountPurchase['payment']);
+            $purchaseArr = array(
+                'purchase'       => number_format($accountPurchase['purchaseAmount'],2) ,
+                'amount'       => number_format($accountPurchase['payment'],2) ,
+                'payable'       => number_format($payable,2) ,
+            );
+
+            $salesArr = array(
+                'sales'       => number_format($accountSales['totalAmount'],2) ,
+                'amount'       => number_format($accountSales['receiveAmount'],2) ,
+                'receivable'       => number_format($receivable,2) ,
+            );
+
+            $transaction = array(
+                'cash'       => number_format((($transactionCashOverview['openingBalance']+$transactionCashOverview['debit']) - $transactionCashOverview['credit']),2) ,
+                'stock_price'       => number_format($currentStockPrice['purchasePrice'],2) ,
+                'receivable'       => number_format($receivable,2) ,
+                'payable'       => number_format(($accountPurchase['purchaseAmount'] - $accountPurchase['payment']),2) ,
+                'capital'       => number_format(((($currentStockPrice['purchasePrice'] + $receivable + (($transactionCashOverview['openingBalance'] + $transactionCashOverview['debit']) - $transactionCashOverview['credit'])) - $payable)),2) ,
+            );
+
+            $data = array(
+                'globalOption'              => $entity->getId(),
+                'current_stock'             => $current_stock ,
+                'income'                    => $incomeArr ,
+                'purchase'                  => $purchaseArr ,
+                'sales'                     => $salesArr ,
+                'transaction'               => $transaction ,
             );
 
             $response = new Response();

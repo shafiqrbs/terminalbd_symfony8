@@ -247,6 +247,23 @@ class AccountSalesRepository extends EntityRepository
 
     }
 
+    public function apiSalesOverview($globalOption)
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('COALESCE(SUM(e.totalAmount),0) AS totalAmount, COALESCE(SUM(e.amount),0) AS receiveAmount, COALESCE(SUM(e.amount),0) AS dueAmount, COALESCE(SUM(e.amount),0) AS returnAmount ');
+        $qb->where("e.globalOption = :globalOption");
+        $qb->setParameter('globalOption', $globalOption);
+        if(!empty($process)){
+            $qb->andWhere("e.processHead IN (:process)");
+            $qb->setParameter('process', $process);
+        }
+        $qb->andWhere("e.process = 'approved'");
+        $result = $qb->getQuery()->getSingleResult();
+        $data =  array('totalAmount'=> $result['totalAmount'],'receiveAmount'=>$result['receiveAmount'],'dueAmount'=>$result['dueAmount'],'returnAmount'=>$result['returnAmount']);
+        return $data;
+
+    }
+
 
     public function userBaseSalesOverview(User $user,$data, $process = [])
     {
