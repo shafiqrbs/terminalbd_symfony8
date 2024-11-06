@@ -293,7 +293,7 @@ class MedicinePurchaseRepository extends EntityRepository
         $qb->select('sum(e.netTotal) as total ,sum(e.payment) as payment');
         $qb->where('e.medicineConfig = :config');
         $qb->setParameter('config', $config);
-        $qb->andWhere('e.androidDevice = :device')->setParameter('device', $data['device']);
+      //  $qb->andWhere('e.androidDevice = :device')->setParameter('device', $data['device']);
         $qb->andWhere('e.process = :process');
         $qb->setParameter('process', 'approved');
         $this->handleSearchBetween($qb,$data);
