@@ -1661,7 +1661,7 @@ class AppsApiRepository extends EntityRepository
                 $sales->setReceived($received);
                 $sales->setDue($total-$received);
                 $sales->setAndroidProcess($process);
-                $sales->setProcess('Approved');
+                $sales->setProcess('Done');
                 $sales->setApprovedBy($process->getCreatedBy());
                 $em->persist($sales);
                 $em->flush();
@@ -1718,6 +1718,7 @@ class AppsApiRepository extends EntityRepository
         if($numItems > 0 ){
             $config = $option->getMedicineConfig();
             foreach ($items as $item):
+
                 $method= (isset($item['method_id']) and $item['method_id']) ?  $item['method_id'] : '';
                 $flat = (isset($item['discount_type']) and $item['discount_type']) ?  $item['discount_type'] : 'flat';
                 $received = (isset($item['received']) and $item['received']) ?  $item['received'] : 0;
@@ -1730,7 +1731,6 @@ class AppsApiRepository extends EntityRepository
                 $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
                 $purchase_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
 
-
                 $purchase = new MedicinePurchase();
                 $purchase->setMedicineConfig($config);
                 $purchase->setInvoice($invoice);
@@ -1741,6 +1741,7 @@ class AppsApiRepository extends EntityRepository
                 if($vendor){
                     $purchase->setMedicineVendor($em->getRepository(MedicineVendor::class)->find($vendor));
                 }
+
                 if($method){
                     $trans = $em->getRepository(AccountBank::class)->find($method);
                     if($trans){
@@ -1749,7 +1750,6 @@ class AppsApiRepository extends EntityRepository
                             $purchase->setTransactionMethod($trans->getMethod());
                         }
                     }
-
                 }
                 $purchase->setSubTotal($subTotal);
                 $purchase->setDiscount($discount);
