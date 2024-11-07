@@ -973,8 +973,10 @@ class AppsApiRepository extends EntityRepository
         $qb = $em->createQueryBuilder();
         $qb->from(MedicineSalesReturnInvoice::class,'s');
         $qb->join('s.customer','c');
+        $qb->join('s.medicineSales','ms');
         $qb->select('s');
         $qb->where('s.medicineConfig = :config')->setParameter('config', $config) ;
+        $qb->andWhere('s.process = :process')->setParameter('process', 'approved') ;
         if ($customer) {
             $qb->andWhere('c.id = :customer')->setParameter('customer', $customer);
         }
