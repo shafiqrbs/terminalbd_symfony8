@@ -1717,6 +1717,7 @@ class AppsApiRepository extends EntityRepository
     {
         $em = $this->_em;
         $items = json_decode($process->getJsonItem(),true);
+
         $numItems = count($items);
         if($numItems > 0 ){
             $config = $option->getMedicineConfig();
@@ -1746,13 +1747,11 @@ class AppsApiRepository extends EntityRepository
                 if($sales_item){
                     $this->insertSalesReturnItem($entity,$sales_item);
                 }
-                $em->getRepository(MedicineStock::class)->getSalesUpdateQnt($sales);
-                $em->getRepository(AccountSales::class)->insertMedicineAccountInvoice($sales);
                 if($entity->getAdjustment() > 0){
-                    $em->getRepository('AccountingBundle:AccountSales')->insertMedicineAccountSalesReturnInvoice($sales);
+                    $em->getRepository('AccountingBundle:AccountSales')->insertMedicineAccountSalesReturnInvoice($entity);
                 }
                 if($entity->getPayment() > 0){
-                    $em->getRepository('AccountingBundle:AccountJournal')->insertMedicineAccountSalesReturnInvoice($sales);
+                    $em->getRepository('AccountingBundle:AccountJournal')->insertMedicineAccountSalesReturnInvoice($entity);
                 }
                 $entity->setProcess('approved');
             endforeach;
@@ -1768,8 +1767,7 @@ class AppsApiRepository extends EntityRepository
         $records = json_decode($data);
         foreach ($records as $key => $sub):
             if($sub) {
-
-                /* @avr $salesItem MedicineSalesItem **/
+                /** @avr $salesItem MedicineSalesItem */
                 $salesItem = $em->getRepository(MedicineSalesItem::class)->find($sub->sales_item_id);
 
                 $entity = new MedicineSalesReturn();
@@ -1784,6 +1782,8 @@ class AppsApiRepository extends EntityRepository
                     $entity->setSalesPrice(floatval($sub->sales_price));
                 }
                 $entity->setSubTotal(floatval($entity->getSalesPrice() * $entity->getQuantity()));
+                $entity->setCreatedBy($purchase->getCreatedBy());
+                $entity->setProcess('approved');
                 $em->persist($entity);
                 $em->flush();
                 $em->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales-return');
