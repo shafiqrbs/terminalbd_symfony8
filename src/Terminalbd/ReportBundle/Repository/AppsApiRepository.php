@@ -958,6 +958,87 @@ class AppsApiRepository extends EntityRepository
 
     }
 
+    public function apiInventorySalesReturn(GlobalOption $option, $data)
+    {
+        $em = $this->_em;
+
+        $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
+        $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
+        $offset = ($currentPage - 1) * $itemsPerPage;
+        $config = $option->getMedicineConfig()->getId();
+        $customer = (isset($data['customer_id']) and $data['customer_id'])? $data['customer_id'] :'';
+        $startDate = (isset($data['start_date']) and $data['start_date'])? $data['start_date'] :'';
+        $endEnd = (isset($data['end_date']) and $data['end_date'])? $data['end_date'] :'';
+        $keyword = isset($data['keyword'])? $data['keyword'] :'';
+        $qb = $em->createQueryBuilder();
+        $qb->from(MedicineSalesReturnInvoice::class,'s');
+        $qb->join('s.customer','c');
+        $qb->select('s');
+        $qb->where('s.medicineConfig = :config')->setParameter('config', $config) ;
+        if ($customer) {
+            $qb->andWhere('c.id = :customer')->setParameter('customer', $customer);
+        }
+        if($keyword){
+            $qb->andWhere($qb->expr()->like("s.invoice", "'%$keyword%'"  ));
+        }
+        if ($startDate) {
+            $compareTo = new \DateTime($startDate);
+            $created =  $compareTo->format('Y-m-d 00:00:00');
+            $qb->andWhere("s.created >= :createdStart");
+            $qb->setParameter('createdStart', $created);
+        }
+        if ($endEnd) {
+            $compareTo = new \DateTime($endEnd);
+            $createdEnd =  $compareTo->format('Y-m-d 23:59:59');
+            $qb->andWhere("s.created <= :createdEnd");
+            $qb->setParameter('createdEnd', $createdEnd);
+        }
+        $qb->orderBy('s.created','DESC');
+        $qb->setFirstResult($offset); // Set the offset
+        $qb->setMaxResults($itemsPerPage);
+        $entities = $qb->getQuery()->getResult();
+        $data = array();
+        /* @var $entity MedicineSalesReturnInvoice */
+        foreach ($entities as $key => $entity):
+            if($entity) {
+                $data[$key]['sales_return_id'] = (int) $entity->getId();
+                $data[$key]['sales_return_invoice'] = $entity->getInvoice();
+                $data[$key]['sales_id'] = (int) $entity->getMedicineSales()->getId();
+                $data[$key]['sales_invoice'] = $entity->getMedicineSales()->getInvoice();
+                $data[$key]['created_at'] = $entity->getCreated()->format('d-m-Y');
+                $data[$key]['updated_at'] = $entity->getUpdated()->format('d-m-Y');
+                $data[$key]['sub_total'] = (Double) $entity->getSubTotal();
+                $data[$key]['payment'] = (Double) $entity->getPayment();
+                $data[$key]['adjustment'] = (Double) $entity->getAdjustment();
+                $data[$key]['created_by'] = ($entity->getCreatedBy()) ? $entity->getCreatedBy()->getUserFullName():'';
+                $data[$key]['approved_by'] = ( $entity->getCreatedBy())? $entity->getCreatedBy()->getUserFullName():'';
+                $data[$key]['customer_id'] = (int) $entity->getCustomer()->getId();
+                $data[$key]['customer_name'] = $entity->getCustomer()->getName();
+                $data[$key]['customer_mobile'] = $entity->getCustomer()->getMobile();
+                $data[$key]['customer_address'] = $entity->getCustomer()->getAddress();
+                $data[$key]['comment'] = (string) $entity->getComment();
+                if ($entity->getMedicineSalesReturns()) {
+                    /* @var $item MedicineSalesReturn */
+                    foreach ($entity->getMedicineSalesReturns() as $i => $item) {
+                        $data[$key]['items'][$i]['id'] = (int)$item->getId();
+                        $data[$key]['items'][$i]['stock_id'] = (int)$item->getMedicineStock()->getId();
+                        $data[$key]['items'][$i]['stock_name'] = (string)$item->getMedicineStock()->getName();
+                        $data[$key]['items'][$i]['brand_name'] = (string)$item->getMedicineStock()->getBrandName();
+                        $data[$key]['items'][$i]['unit'] = ($item->getMedicineStock()->getUnit()) ? (string)$item->getMedicineStock()->getUnit()->getName() : '';
+                        $data[$key]['items'][$i]['sales_price'] = (Double)$item->getSalesPrice();
+                        $data[$key]['items'][$i]['quantity'] = (Double)$item->getQuantity();
+                        $data[$key]['items'][$i]['sub_total'] = (Double)$item->getSubTotal();
+                    }
+                } else {
+                    $data['items'] = array();
+
+                }
+            }
+        endforeach;
+        return $data;
+
+    }
+
     public function apiRestaurantSales(GlobalOption $option, $data)
     {
         $em = $this->_em;

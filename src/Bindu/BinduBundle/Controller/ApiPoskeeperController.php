@@ -1597,6 +1597,23 @@ class ApiPoskeeperController extends Controller
         }
     }
 
+    public function apiOnlineSalesReturnAction(Request $request)
+    {
+        if( $this->checkApiValidation($request) == 'invalid') {
+            return new Response('Unauthorized access.', 401);
+        }else{
+            $entity = $this->checkApiValidation($request);
+            $deviceId = $request->headers->get('X-DEVICE-ID');
+            $data = $_REQUEST;
+            $entities = $this->getDoctrine()->getRepository(AppsApi::class)->apiInventorySalesReturn($entity,$data);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($entities));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+    }
+
     public function apiOnlineSalesDetailsAction(Request $request)
     {
         if( $this->checkApiValidation($request) == 'invalid') {

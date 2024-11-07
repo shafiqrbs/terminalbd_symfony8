@@ -106,6 +106,10 @@ api_poskeeper_online_sales_list:
     path:     /poskeeper-online-sales
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSales }
 
+api_poskeeper_online_sales_return_list:
+    path:     /poskeeper-online-sales-return
+    defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSalesReturn }
+
 api_poskeeper_online_sales_details:
     path:     /poskeeper-online-sales-details
     defaults: { _controller: BinduBundle:ApiPoskeeper:apiOnlineSalesDetails }
