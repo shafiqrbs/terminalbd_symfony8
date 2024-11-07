@@ -414,8 +414,12 @@ class MedicinePurchaseItemRepository extends EntityRepository
     public function purchaseAvgPrice(MedicinePurchaseItem $item,$purchasePrice)
     {
         $quantity = ($item->getMedicineStock()->getRemainingQuantity() + $item->getQuantity());
-        $amount = (($item->getMedicineStock()->getRemainingQuantity() * $item->getMedicineStock()->getPurchasePrice()) + ($item->getQuantity() * $purchasePrice));
-        $avg = ($amount / $quantity);
+        if($item->getMedicineStock()->getRemainingQuantity() > 0){
+            $amount = (($item->getMedicineStock()->getRemainingQuantity() * $item->getMedicineStock()->getPurchasePrice()) + ($item->getQuantity() * $purchasePrice));
+            $avg = ($amount / $quantity);
+        }else{
+            $avg = $purchasePrice;
+        }
         return $avg;
 
     }
