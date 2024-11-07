@@ -483,21 +483,17 @@ class MedicineStockRepository extends EntityRepository
     public function updatePurchasePrice(MedicineStock $stock,MedicinePurchaseItem $item)
     {
         $em = $this->_em;
-        $avg = $em->getRepository('MedicineBundle:MedicinePurchaseItem')->getPurchaseSalesAvg($stock);
+        //$avg = $em->getRepository('MedicineBundle:MedicinePurchaseItem')->getPurchaseSalesAvg($stock);
         $stock->setPurchasePrice($item->getPurchasePrice());
 	    $stock->setSalesPrice($item->getSalesPrice());
         $stock->setAveragePurchasePrice($item->getPurchaseAvgPrice());
-        if($avg['sales']){
-            $stock->setAverageSalesPrice(floatval($avg['sales']));
-        }else{
-            $stock->setAverageSalesPrice($item->getSalesPrice());
-        }
-        if($avg['tradePrice']){
+        $stock->setAverageSalesPrice($item->getSalesAvgPrice());
+       /* if($avg['tradePrice']){
             $stock->setTradePrice(floatval($avg['tradePrice']));
         }else{
             $tp = $this->dpGenerate($item);
             $stock->setTradePrice($tp);
-        }
+        }*/
         $em->persist($stock);
         $em->flush();
     }
