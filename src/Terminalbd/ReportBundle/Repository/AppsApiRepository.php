@@ -12,6 +12,8 @@ use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchase;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchaseItem;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSales;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSalesItem;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineSalesReturn;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineSalesReturnInvoice;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineVendor;
 use Appstore\Bundle\RestaurantBundle\Entity\Invoice;
@@ -1584,13 +1586,14 @@ class AppsApiRepository extends EntityRepository
         $em->flush();
         if($mode === "online" and $process == 'sales'){
             $this->insertApiSales($option,$entity);
+        }elseif($mode === "online" and $process == 'sales-return'){
+            $this->insertApiSalesReturn($option,$entity);
         }elseif($mode === "online" and $process == 'purchase'){
             $this->insertApiPurchase($option,$entity);
         }
         return 'success';
 
     }
-
 
 
     public function insertApiSales(GlobalOption $option,MedicineAndroidProcess $process)
@@ -1704,6 +1707,85 @@ class AppsApiRepository extends EntityRepository
                 }
                 $salesItem->setSubTotal(floatval($salesItem->getSalesPrice() * $salesItem->getQuantity()));
                 $em->persist($salesItem);
+            }
+        endforeach;
+        $em->flush();
+
+    }
+
+     public function insertApiSalesReturn(GlobalOption $option,MedicineAndroidProcess $process)
+    {
+        $em = $this->_em;
+        $items = json_decode($process->getJsonItem(),true);
+        $numItems = count($items);
+        if($numItems > 0 ){
+            $config = $option->getMedicineConfig();
+            foreach ($items as $item):
+                $total = (isset($item['net_total']) and $item['net_total']) ?  $item['net_total'] : 0;
+                $customer = (isset($item['customer_id']) and $item['customer_id']) ?  $item['customer_id'] : '';
+                $payment = (isset($item['payment']) and $item['payment']) ?  $item['payment'] : '';
+                $remark = (isset($item['comment']) and $item['comment']) ?  $item['comment'] : '';
+                $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
+                $sales_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
+                $adjustment = round($total - $payment);
+                $customer = $em->getRepository(Customer::class)->findOneBy(array('globalOption' => $option,'id'=>$customer));
+                $entity = new MedicineSalesReturnInvoice();
+                $entity->setMedicineConfig($config);
+                $entity->setCustomer($customer);
+                $entity->setSubTotal($total);
+                $entity->setPayment($payment);
+                if($createdBy){
+                    $entity->setCreatedBy($em->getRepository(User::class)->find($createdBy));
+                    $entity->setApprovedBy($em->getRepository(User::class)->find($createdBy));
+                }
+                $entity->setComment($remark);
+                $entity->setAdjustment($adjustment);
+                $em->persist($entity);
+                $em->flush();
+                if($sales_item){
+                    $this->insertSalesReturnItem($entity,$sales_item);
+                }
+                $em->getRepository(MedicineStock::class)->getSalesUpdateQnt($sales);
+                $em->getRepository(AccountSales::class)->insertMedicineAccountInvoice($sales);
+                if($entity->getAdjustment() > 0){
+                    $em->getRepository('AccountingBundle:AccountSales')->insertMedicineAccountSalesReturnInvoice($sales);
+                }
+                if($entity->getPayment() > 0){
+                    $em->getRepository('AccountingBundle:AccountJournal')->insertMedicineAccountSalesReturnInvoice($sales);
+                }
+                $entity->setProcess('approved');
+            endforeach;
+            $process->setStatus(true);
+            $em->persist($process);
+            $em->flush();
+        }
+    }
+
+    public function insertSalesReturnItem(MedicineSalesReturnInvoice $purchase,$data){
+
+        $em = $this->_em;
+        $records = json_decode($data);
+        foreach ($records as $key => $sub):
+            if($sub) {
+
+                /* @avr $salesItem MedicineSalesItem **/
+                $salesItem = $em->getRepository(MedicineSalesItem::class)->find($sub->sales_item_id);
+
+                $entity = new MedicineSalesReturn();
+                $entity->setMedicineConfig($purchase->getMedicineConfig());
+                $entity->setMedicineSalesReturnInvoice($purchase);
+                $entity->setMedicineStock($salesItem->getMedicineStock());
+                $entity->setMedicineSalesItem($salesItem);
+                if (isset($sub->quantity) and $sub->quantity) {
+                    $entity->setQuantity($sub->quantity);
+                }
+                if (isset($sub->sales_price) and $sub->sales_price) {
+                    $entity->setSalesPrice(floatval($sub->sales_price));
+                }
+                $entity->setSubTotal(floatval($entity->getSalesPrice() * $entity->getQuantity()));
+                $em->persist($entity);
+                $em->flush();
+                $em->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales-return');
             }
         endforeach;
         $em->flush();
@@ -1827,7 +1909,6 @@ class AppsApiRepository extends EntityRepository
         $em->getRepository('MedicineBundle:MedicineStock')->getPurchaseUpdateQnt($purchase);
         $em->getRepository('AccountingBundle:AccountPurchase')->insertMedicineAccountPurchase($purchase);
     }
-
 
 
     public function getCalculationBankServiceChargeManual($data,$charge){

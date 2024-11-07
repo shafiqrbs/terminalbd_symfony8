@@ -62,6 +62,7 @@ class CustomerEditType extends AbstractType
                     ))
             )
             ->add('customerGroup','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Customer Group','list'=>'customerGroups')))
+            ->add('discountPercent','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Discount Percent')))
             ->add('referenceId','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Old reference no')))
             ->add('proprietorName','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Proprietor Name')))
             ->add('creditLimit','text', array('attr'=>array('class'=>'m-wrap span12 ','placeholder'=>'Credit limit')))

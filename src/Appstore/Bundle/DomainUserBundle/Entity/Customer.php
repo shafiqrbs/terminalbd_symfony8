@@ -583,6 +583,14 @@ class Customer
     private $creditLimit;
 
 
+     /**
+     * @var float
+     *
+     * @ORM\Column(name="discountPercent", type="float", nullable=true)
+     */
+    private $discountPercent;
+
+
     /**
      * @var boolean
      *
@@ -1998,6 +2006,24 @@ class Customer
     {
         $this->openingBalance = $openingBalance;
     }
+
+    /**
+     * @return float
+     */
+    public function getDiscountPercent()
+    {
+        return $this->discountPercent;
+    }
+
+    /**
+     * @param float $discountPercent
+     */
+    public function setDiscountPercent($discountPercent)
+    {
+        $this->discountPercent = $discountPercent;
+    }
+
+
 
 
 

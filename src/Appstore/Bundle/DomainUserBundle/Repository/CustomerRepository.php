@@ -685,7 +685,7 @@ class CustomerRepository extends EntityRepository
 
         $query->select('e.mobile as id');
         $query->addSelect('e.id as customer');
-        $query->addSelect('CONCAT(e.mobile, \' - \', e.name, \' (\', e.customerId, \')\') AS text');
+        $query->addSelect('CASE WHEN (e.discountPercent IS NOT NULL) THEN CONCAT(e.mobile, \' - \', e.name, \' (\', e.customerId, \')\', \'- \',e.discountPercent, \'%\') ELSE  CONCAT(e.mobile, \' - \', e.name, \' (\', e.customerId, \')\') AS text');
         $query->where($query->expr()->like("e.mobile", "'$q%'"  ));
         $query->orWhere($query->expr()->like("e.name", "'%$q%'"  ));
         $query->orWhere($query->expr()->like("e.customerId", "'%$q%'"  ));

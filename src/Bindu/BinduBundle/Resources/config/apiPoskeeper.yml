@@ -94,12 +94,6 @@ api_poskeeper_sync_process:
     options:
         expose: true
 
-api_poskeeper_sales_create:
-    path:     /poskeeper-sales-create
-    defaults: { _controller: BinduBundle:ApiPoskeeper:apiCreateSales }
-    methods:  POST|GET
-    options:
-        expose: true
 
 api_poskeeper_online_sales_delete:
     path:     /poskeeper-online-sales-delete
