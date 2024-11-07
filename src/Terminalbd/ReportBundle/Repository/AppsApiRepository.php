@@ -1721,17 +1721,18 @@ class AppsApiRepository extends EntityRepository
         if($numItems > 0 ){
             $config = $option->getMedicineConfig();
             foreach ($items as $item):
-                $total = (isset($item['net_total']) and $item['net_total']) ?  $item['net_total'] : 0;
-                $customer = (isset($item['customer_id']) and $item['customer_id']) ?  $item['customer_id'] : '';
-                $payment = (isset($item['payment']) and $item['payment']) ?  $item['payment'] : '';
+                $sales = (isset($item['sales_id']) and $item['sales_id']) ?  $item['sales_id'] : 0;
+                $total = (isset($item['sub_total']) and $item['sub_total']) ?  $item['sub_total'] : 0;
+                $payment = (isset($item['receive']) and $item['receive']) ?  $item['receive'] : '';
                 $remark = (isset($item['comment']) and $item['comment']) ?  $item['comment'] : '';
                 $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
                 $sales_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $adjustment = round($total - $payment);
-                $customer = $em->getRepository(Customer::class)->findOneBy(array('globalOption' => $option,'id'=>$customer));
+                $sales = $em->getRepository(MedicineSales::class)->find($sales);
                 $entity = new MedicineSalesReturnInvoice();
                 $entity->setMedicineConfig($config);
-                $entity->setCustomer($customer);
+                $entity->setMedicineSales($sales);
+                $entity->setCustomer($sales->getCustomer());
                 $entity->setSubTotal($total);
                 $entity->setPayment($payment);
                 if($createdBy){

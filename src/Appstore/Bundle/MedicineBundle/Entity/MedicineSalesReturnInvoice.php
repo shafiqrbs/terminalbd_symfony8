@@ -43,6 +43,12 @@ class MedicineSalesReturnInvoice
     private $medicineSalesReturns;
 
 
+      /**
+     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineSales")
+     **/
+    private $medicineSales;
+
+
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="medicineSales" ,cascade={"persist"} )
      **/
@@ -637,6 +643,24 @@ class MedicineSalesReturnInvoice
     {
         return $this->medicineSalesReturns;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getMedicineSales()
+    {
+        return $this->medicineSales;
+    }
+
+    /**
+     * @param mixed $medicineSales
+     */
+    public function setMedicineSales($medicineSales)
+    {
+        $this->medicineSales = $medicineSales;
+    }
+
+
 
 
 }
