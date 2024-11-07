@@ -61,14 +61,9 @@ class MedicinePurchaseRepository extends EntityRepository
             $qb->andWhere("v.id = :vendorId")->setParameter('vendorId', $vendorId);
         }
 
-
         if (!empty($startDate) ) {
             $datetime = new \DateTime($data['startDate']);
             $start = $datetime->format('Y-m-d 00:00:00');
-            $qb->andWhere("e.created >= :startDate");
-            $qb->setParameter('startDate', $start);
-        }elseif(empty($data)){
-            $start = date('Y-m-d 00:00:00',strtotime(date('d-m-Y')));
             $qb->andWhere("e.created >= :startDate");
             $qb->setParameter('startDate', $start);
         }
@@ -78,10 +73,6 @@ class MedicinePurchaseRepository extends EntityRepository
             $end = $datetime->format('Y-m-d 23:59:59');
             $qb->andWhere("e.created <= :endDate");
             $qb->setParameter('endDate', $end);
-        }elseif(empty($data)){
-            $end = date('Y-m-d 23:59:59',strtotime(date('d-m-Y')));
-            $qb->andWhere("e.created <= :endDate");
-            $qb->setParameter('endDate',$end);
         }
     }
 

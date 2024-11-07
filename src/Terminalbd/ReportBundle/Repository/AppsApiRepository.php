@@ -213,7 +213,7 @@ class AppsApiRepository extends EntityRepository
             'mainApp' => $entity->getMainApp()->getId(),
             'mainAppName' => $entity->getMainApp()->getSlug(),
             'appsManual' => $this->stringNullChecker($entity->getMainApp()->getApplicationManual()),
-            'website' => $this->stringNullChecker($entity->getDomain()),
+            'website' => 'www.poskeeper.com',
             'vatRegNo' => $this->stringNullChecker($vatRegNo),
             'vatPercentage' => $this->numberNullChecker($vatPercentage),
             'bodyBg' => empty($bodyBg) ? $this->hex6ToHex8($this->random_color_code()) : $this->hex6ToHex8($bodyBg),

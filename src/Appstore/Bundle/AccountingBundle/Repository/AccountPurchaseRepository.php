@@ -605,17 +605,10 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
             $start = date('Y-m-d 00:00:00',strtotime($data['startDate']));
             $qb->andWhere("e.updated >= :startDate");
             $qb->setParameter('startDate', $start);
-        }else{
-            $start = date('Y-m-d 00:00:00',strtotime(date('d-m-Y')));
-            $qb->andWhere("e.updated >= :startDate");
-            $qb->setParameter('startDate', $start);
         }
+
         if (!empty($endDate)) {
             $end = date('Y-m-d 23:59:59',strtotime($data['endDate']));
-            $qb->andWhere("e.updated <= :endDate");
-            $qb->setParameter('endDate',$end);
-        }else{
-            $end = date('Y-m-d 23:59:59',strtotime(date('d-m-Y')));
             $qb->andWhere("e.updated <= :endDate");
             $qb->setParameter('endDate',$end);
         }

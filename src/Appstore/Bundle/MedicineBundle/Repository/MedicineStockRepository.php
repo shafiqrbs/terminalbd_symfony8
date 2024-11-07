@@ -265,7 +265,7 @@ class MedicineStockRepository extends EntityRepository
 
 	    $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 	    $qb = $this->createQueryBuilder('e');
-	    $qb->select('SUM(e.averagePurchasePrice * e.remainingQuantity) as purchasePrice, SUM(e.salesPrice * e.remainingQuantity) as salesPrice, SUM(e.remainingQuantity) as quantity, SUM(e.salesQuantity) as salesQuantity');
+	    $qb->select('SUM(e.purchasePrice * e.remainingQuantity) as purchasePrice, SUM(e.salesPrice * e.remainingQuantity) as salesPrice, SUM(e.remainingQuantity) as quantity, SUM(e.salesQuantity) as salesQuantity');
 	    $qb->where('e.medicineConfig = :config')->setParameter('config', $config) ;
 	    $result = $qb->getQuery()->getOneOrNullResult();
 	    return $result;
