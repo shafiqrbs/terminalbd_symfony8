@@ -161,6 +161,13 @@ class MedicinePurchaseItem
      */
     private $purchaseAvgPrice;
 
+     /**
+     * @var float
+     *
+     * @ORM\Column(name="salesAvgPrice", type="float", nullable = true)
+     */
+    private $salesAvgPrice;
+
     /**
      * @var float
      *
@@ -762,6 +769,24 @@ class MedicinePurchaseItem
     {
         $this->purchaseAvgPrice = $purchaseAvgPrice;
     }
+
+    /**
+     * @return float
+     */
+    public function getSalesAvgPrice()
+    {
+        return $this->salesAvgPrice;
+    }
+
+    /**
+     * @param float $salesAvgPrice
+     */
+    public function setSalesAvgPrice($salesAvgPrice)
+    {
+        $this->salesAvgPrice = $salesAvgPrice;
+    }
+
+
 
 
 

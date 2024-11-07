@@ -411,8 +411,9 @@ class MedicineStockRepository extends EntityRepository
     }
 
     public function getPurchaseUpdateQnt(MedicinePurchase $purchase){
-        $em = $this->_em;
 
+
+        $em = $this->_em;
         /** @var  $purchaseItem MedicinePurchaseItem */
 
         $getMedicinePurchaseItems = $em->getRepository(MedicinePurchaseItem::class)->findBy(array('medicinePurchase'=>$purchase->getId()));

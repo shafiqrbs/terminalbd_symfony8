@@ -317,6 +317,8 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
 
 
+
+
     public function salesMedicinePurchaseItemUpdate(MedicinePurchaseItem $item,$fieldName='')
     {
 
@@ -384,6 +386,8 @@ class MedicinePurchaseItemRepository extends EntityRepository
                     $item->setPurchasePrice($purchasePrice);
                     $purchaseAvgPrice = $this->purchaseAvgPrice($item,$purchasePrice);
                     $item->setPurchaseAvgPrice($purchaseAvgPrice);
+                    $salesAvgPrice = $this->salesAvgPrice($item,$item->getSalesPrice());
+                    $item->setSalesAvgPrice($salesAvgPrice);
                     $item->setPurchaseSubTotal($item->getActualPurchasePrice() * $item->getQuantity());
                     $em->persist($item);
                     $em->flush();
@@ -403,6 +407,8 @@ class MedicinePurchaseItemRepository extends EntityRepository
                     $purchasePrice = $item->getPurchasePrice();
                     $purchaseAvgPrice = $this->purchaseAvgPrice($item,$purchasePrice);
                     $item->setPurchaseAvgPrice($purchaseAvgPrice);
+                    $salesAvgPrice = $this->salesAvgPrice($item,$item->getSalesPrice());
+                    $item->setSalesAvgPrice($salesAvgPrice);
                     $em->persist($item);
                     $em->flush();
                 }
@@ -419,6 +425,19 @@ class MedicinePurchaseItemRepository extends EntityRepository
             $avg = ($amount / $quantity);
         }else{
             $avg = $purchasePrice;
+        }
+        return $avg;
+
+    }
+
+    public function salesAvgPrice(MedicinePurchaseItem $item,$salesPrice)
+    {
+        $quantity = ($item->getMedicineStock()->getRemainingQuantity() + $item->getQuantity());
+        if($item->getMedicineStock()->getRemainingQuantity() > 0){
+            $amount = (($item->getMedicineStock()->getRemainingQuantity() * $item->getMedicineStock()->getSalesPrice()) + ($item->getQuantity() * $salesPrice));
+            $avg = ($amount / $quantity);
+        }else{
+            $avg = $salesPrice;
         }
         return $avg;
 
