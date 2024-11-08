@@ -393,10 +393,12 @@ class UserRepository extends EntityRepository
         $array = array();
         $array['Android Apps'] = array(
             'ROLE_MANAGER'                                   => 'Manager',
-            'ROLE_PURCHASE'                                  => 'Purchase',
-            'ROLE_SALES'                                     => 'Sales',
-            'ROLE_EXPENSE'                                   => 'Expense',
-            'ROLE_STOCK'                                     => 'Stock',
+            'ROLE_PURCHASE'                                  => 'Inventory Purchase',
+            'ROLE_SALES'                                     => 'Inventory Sales',
+            'ROLE_STOCK'                                     => 'Inventory Stock',
+            'ROLE_ACCOUNT_RECEIVE'                           => 'Account Receive',
+            'ROLE_ACCOUNT_PAYMENT'                           => 'Account Payment',
+            'ROLE_EXPENSE'                                   => 'Account Expense',
         );
 
 
