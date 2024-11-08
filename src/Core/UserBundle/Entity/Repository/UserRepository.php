@@ -399,6 +399,7 @@ class UserRepository extends EntityRepository
             'ROLE_ACCOUNT_RECEIVE'                           => 'Account Receive',
             'ROLE_ACCOUNT_PAYMENT'                           => 'Account Payment',
             'ROLE_EXPENSE'                                   => 'Account Expense',
+            'ROLE_SETTING'                                   => 'Setting',
         );
 
 
