@@ -550,7 +550,7 @@ class UserRepository extends EntityRepository
         $entity = new User();
         $entity->setGlobalOption($setup);
         $entity->setEnabled(true);
-        $entity->setDomainOwner(1);
+        $entity->setDomainOwner(2);
         $entity->setUsername($mobile);
         $entity->setEmail($mobile.'@gmail.com');
         $entity->setPlainPassword($password);
@@ -560,9 +560,8 @@ class UserRepository extends EntityRepository
             $entity->setDomainOwner(1);
         }else{
             $entity->setRoles(array('ROLE_MEDICINE,ROLE_MEDICINE_SALES'));
-            $entity->setDomainOwner(2);
         }
-        $roels = array('ROLE_MANAGER,ROLE_PURCHASE,ROLE_SALES,ROLE_EXPENSE,ROLE_STOCK');
+        $roels = array('ROLE_PURCHASE,ROLE_SALES,ROLE_ACCOUNT_PAYMENT,ROLE_ACCOUNT_RECEIVE,ROLE_STOCK');
         $entity->setAppRoles($roels);
         $em->persist($entity);
         $em->flush();

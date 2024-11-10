@@ -2561,6 +2561,8 @@ class ApiPoskeeperController extends Controller
                 }else{
                     $user->setAppRoles(array("ROLE_PURCHASE,ROLE_SALES,ROLE_STOCK,ROLE_ACCOUNT_RECEIVE,ROLE_ACCOUNT_PAYMENT"));
                 }
+                $entity->setRoles(array('ROLE_MEDICINE,ROLE_MEDICINE_SALES'));
+                $entity->setDomainOwner(2);
                 $user->setUserGroup('user');
                 $user->setEnabled(1);
                 $em->persist($user);
