@@ -2555,11 +2555,11 @@ class ApiPoskeeperController extends Controller
                 }
                 $user->setRoles(array('ROLE_USER'));
                 if($userRole == 'Admin'){
-                    $user->setAppRoles(array("ROLE_MANAGER,ROLE_SETTING,ROLE_PURCHASE,ROLE_SALES,ROLE_EXPENSE,ROLE_STOCK,ROLE_ACCOUNT_RECEIVE,ROLE_ACCOUNT_PAYMEN"));
+                    $user->setAppRoles(array("ROLE_MANAGER,ROLE_SETTING,ROLE_PURCHASE,ROLE_SALES,ROLE_EXPENSE,ROLE_STOCK,ROLE_ACCOUNT_RECEIVE,ROLE_ACCOUNT_PAYMENT"));
                 }elseif($userRole == 'Manager'){
                     $user->setAppRoles(array("ROLE_MANAGER,ROLE_PURCHASE,ROLE_SALES,ROLE_EXPENSE,ROLE_STOCK,ROLE_ACCOUNT_RECEIVE,ROLE_ACCOUNT_PAYMENT"));
                 }else{
-                    $user->setAppRoles(array("ROLE_PURCHASE,ROLE_SALES,ROLE_STOCK"));
+                    $user->setAppRoles(array("ROLE_PURCHASE,ROLE_SALES,ROLE_STOCK,ROLE_ACCOUNT_RECEIVE,ROLE_ACCOUNT_PAYMENT"));
                 }
                 $user->setUserGroup('user');
                 $user->setEnabled(1);
