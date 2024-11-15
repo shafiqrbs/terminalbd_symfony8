@@ -1703,6 +1703,7 @@ class AppsApiRepository extends EntityRepository
                 $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
                 $sales_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
+                $created = new \DateTime(strtotime($created));
                 $sales = new MedicineSales();
                 $sales->setMedicineConfig($config);
                 $sales->setInvoice($invoice);
@@ -1902,6 +1903,7 @@ class AppsApiRepository extends EntityRepository
                 $purchase_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $purchase_mode = (isset($item['purchase_mode']) and $item['purchase_mode'] and $item['purchase_mode'] == 'purchase_with_mrp') ? 'invoice' : 'manual';
                 $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
+                $created = new \DateTime(strtotime($created));
 
                 $purchase = new MedicinePurchase();
                 $purchase->setCreated($created);
@@ -1916,7 +1918,6 @@ class AppsApiRepository extends EntityRepository
                 if($vendor){
                     $purchase->setMedicineVendor($em->getRepository(MedicineVendor::class)->find($vendor));
                 }
-
                 if($method){
                     $trans = $em->getRepository(AccountBank::class)->find($method);
                     if($trans){
