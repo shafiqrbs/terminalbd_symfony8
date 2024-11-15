@@ -1702,6 +1702,7 @@ class AppsApiRepository extends EntityRepository
                 $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
                 $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
                 $sales_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
+                $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
                 $sales = new MedicineSales();
                 $sales->setMedicineConfig($config);
                 $sales->setInvoice($invoice);
@@ -1735,6 +1736,9 @@ class AppsApiRepository extends EntityRepository
                         }
                     }
                 }
+                $sales->setPurchasePrice($purchasePrice);
+                $sales->setCreated($created);
+                $sales->setUpdated($created);
                 $sales->setPurchasePrice($purchasePrice);
                 $sales->setVat($vat);
                 $sales->setDeliveryCharge($delivery);
@@ -1896,10 +1900,15 @@ class AppsApiRepository extends EntityRepository
                 $invoice = (isset($item['invoice']) and $item['invoice']) ?  $item['invoice'] : '';
                 $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
                 $purchase_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
+                $purchase_mode = (isset($item['purchase_mode']) and $item['purchase_mode'] and $item['purchase_mode'] == 'purchase_with_mrp') ? 'invoice' : 'manual';
+                $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
 
                 $purchase = new MedicinePurchase();
+                $purchase->setCreated($created);
+                $purchase->setUpdated($created);
                 $purchase->setMedicineConfig($config);
                 $purchase->setInvoice($invoice);
+                $purchase->setInvoiceMode($purchase_mode);
                 $purchase->setDevicePurchaseId($invoice);
                 if($createdBy){
                     $purchase->setCreatedBy($em->getRepository(User::class)->find($createdBy));
@@ -1958,12 +1967,15 @@ class AppsApiRepository extends EntityRepository
                 if (isset($sub->quantity) and $sub->quantity) {
                     $salesItem->setQuantity($sub->quantity);
                 }
-                if (isset($sub->purchase_price) and $sub->purchase_price) {
+                if (isset($sub->purchase_price) and $sub->purchase_price and $purchase->getInvoiceMode() == 'manual') {
                     $salesItem->setPurchasePrice(floatval($sub->purchase_price));
                     $salesItem->setActualPurchasePrice(floatval($sub->purchase_price));
+                 }elseif(isset($sub->sales_price) and $sub->sales_price and $purchase->getInvoiceMode() == 'invoice') {
+                    $salesItem->setPurchasePrice(floatval($sub->sales_price));
+                    $salesItem->setActualPurchasePrice(floatval($sub->sales_price));
                 }else{
-                    $salesItem->setPurchasePrice(floatval($stockId->getPurchasePrice()));
-                    $salesItem->setActualPurchasePrice(floatval($stockId->getPurchasePrice()));
+                    $salesItem->setPurchasePrice(floatval($stockId->getSalesPrice()));
+                    $salesItem->setActualPurchasePrice(floatval($stockId->getSalesPrice()));
                 }
                 if (isset($sub->item_percent) and $sub->item_percent) {
                     $salesItem->setItemPercent(floatval($sub['item_percent']));

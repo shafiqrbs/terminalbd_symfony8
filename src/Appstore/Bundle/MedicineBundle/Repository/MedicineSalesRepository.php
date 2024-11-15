@@ -729,7 +729,7 @@ class MedicineSalesRepository extends EntityRepository
         $compare = new \DateTime();
         $year =  $compare->format('Y');
         $year = isset($data['year'])? $data['year'] :$year;
-        $sql = "SELECT sales.salesBy_id as salesBy, MONTH (sales.created) as month,SUM(sales.netTotal) AS total
+        $sql = "SELECT sales.salesBy_id as salesBy, MONTH (sales.created) as month,SUM(sales.netTotal) AS total,SUM(sales.received ) AS received
                 FROM medicine_sales as sales
                 WHERE sales.medicineConfig_id = :config AND sales.process = :process  AND YEAR(sales.created) =:year
                 GROUP BY month , salesBy ORDER BY salesBy ASC";
@@ -747,14 +747,13 @@ class MedicineSalesRepository extends EntityRepository
 	public function currentMonthSales(User $user , $data =array())
 	{
 
-
 		$config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 		$compare    = new \DateTime();
 		$year       = $compare->format('Y');
 		$month      = $compare->format('m');
 		$year       = isset($data['year'])? $data['year'] :$year;
 
-		$sql = "SELECT sales.salesBy_id as salesBy, MONTH (sales.created) as month, SUM(sales.netTotal) AS total
+		$sql = "SELECT sales.salesBy_id as salesBy, MONTH (sales.created) as month, SUM(sales.netTotal) AS total,SUM(sales.received ) AS received
                 FROM medicine_sales as sales
                 WHERE sales.medicineConfig_id = :config AND sales.process = :process  AND YEAR(sales.created) =:year AND MONTH(sales.created) =:month
                 GROUP BY month , salesBy ORDER BY salesBy ASC";
@@ -767,8 +766,28 @@ class MedicineSalesRepository extends EntityRepository
 		$result =  $stmt->fetchAll();
 		return $result;
 
-
 	}
+
+    public function dailyUserSales(GlobalOption $option , $data =array())
+    {
+
+        $config =  $option->getMedicineConfig()->getId();
+        $startDate       = isset($data['start_date'])? $data['start_date'] : new \DateTime('Y-m-d');
+        $endDate       = isset($data['end_date'])? $data['end_date'] : new \DateTime('Y-m-d');
+        $sql = "SELECT sales.salesBy_id as salesBy, MONTH (sales.created) as month, SUM(sales.netTotal) AS total, SUM(sales.received ) AS received
+                FROM medicine_sales as sales
+                WHERE sales.medicineConfig_id = :config AND sales.process = :process  AND DATE(sales.created) >=:start AND DATE(sales.created) <= :end
+                GROUP BY month , salesBy ORDER BY salesBy ASC";
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt->bindValue('config', $config);
+        $stmt->bindValue('process', 'Done');
+        $stmt->bindValue('start', $startDate);
+        $stmt->bindValue('end', $endDate);
+        $stmt->execute();
+        $result =  $stmt->fetchAll();
+        return $result;
+
+    }
 
     public function salesUserPurchasePriceReport(User $user,$data)
     {

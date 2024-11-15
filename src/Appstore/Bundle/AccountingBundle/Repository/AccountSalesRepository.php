@@ -247,6 +247,69 @@ class AccountSalesRepository extends EntityRepository
 
     }
 
+    public function UserSalesReceive(GlobalOption $option,$data, $process = [])
+    {
+
+        $em = $this->_em;
+        $qb = $em->createQueryBuilder();
+        $qb->from('UserBundle:User','s');
+        $qb->leftJoin('s.accountSales','e');
+        $qb->select('COALESCE(SUM(e.totalAmount),0) AS total, COALESCE(SUM(e.amount),0) AS amount ');
+        $qb->addSelect('s.id as salesById','s.username as salesBy');
+        $qb->where("e.globalOption = :globalOption");
+        $qb->setParameter('globalOption', $option->getId());
+        if(!empty($process)){
+            $qb->andWhere("e.processHead IN (:process)");
+            $qb->setParameter('process', $process);
+        }
+        $qb->andWhere("e.process = 'approved'");
+        $this->handleSearchBetween($qb,$data);
+        $qb->groupBy("s.id");
+        $result = $qb->getQuery()->getArrayResult();
+
+        $qb1 = $this->createQueryBuilder('e');
+        $qb1->select('COALESCE(SUM(e.amount),0) AS due_receive');
+        $qb1->addSelect('s.id as salesById','s.username as salesBy');
+        $qb1->join('e.createdBy','s');
+        $qb1->where("e.globalOption = :globalOption");
+        $qb1->setParameter('globalOption', $option->getId());
+        $qb1->andWhere("e.processHead ='Due'");
+        $qb1->andWhere("e.process = 'approved'");
+        $this->handleSearchBetween($qb1,$data);
+        $qb1->groupBy("s.id");
+        $dueData = $qb1->getQuery()->getArrayResult();
+
+        // Initialize grouped array
+        $groupedData = array();
+
+        // Single loop to group all data by salesById
+        foreach ($result as $sale) {
+            $salesById = $sale['salesById'];
+            // Initialize or update group
+            if (!isset($groupedData[$salesById])) {
+                $groupedData[$salesById] = array(
+                    'salesById' => $salesById,
+                    'salesBy' => $sale['salesBy'],
+                    'total' => (float)$sale['total'],
+                    'amount' => (float)$sale['amount'],
+                    'due_receive' => 0
+                );
+            }
+
+            // Add due_receive data if exists
+            foreach ($dueData as $due) {
+                if ($due['salesById'] == $salesById) {
+                    $groupedData[$salesById]['due_receive'] = (float)$due['due_receive'];
+                    break;
+                }
+            }
+        }
+
+        $result = array_values($groupedData);
+        return $result;
+
+    }
+
     public function apiSalesOverview($globalOption)
     {
         $qb = $this->createQueryBuilder('e');
