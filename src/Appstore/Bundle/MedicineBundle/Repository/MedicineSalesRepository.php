@@ -583,7 +583,6 @@ class MedicineSalesRepository extends EntityRepository
     public function salesReport( User $user , $data)
     {
 
-
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 
         $qb = $this->createQueryBuilder('s');

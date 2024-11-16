@@ -182,7 +182,9 @@ class MedicineSalesItemRepository extends EntityRepository
         $stockIds = array();
         foreach ($entities as $item) {
             $stockIds[] = $item->getMedicineStock()->getId();
+
             /* @var  $item MedicineSalesTemporary */
+
             $entity = new MedicineSalesItem();
             $entity->setMedicineSales( $sales );
             $entity->setMedicineStock( $item->getMedicineStock() );
@@ -196,11 +198,13 @@ class MedicineSalesItemRepository extends EntityRepository
             if($item->getMedicinePurchaseItem()) {
                 $entity->setMedicinePurchaseItem( $item->getMedicinePurchaseItem() );
             }
+
             if ( $sales->getDiscountType() == 'percentage' ) {
                 $entity->setDiscountPrice( $this->itemDiscountPrice( $sales, $item->getSalesPrice() ) );
             } else {
                 $entity->setDiscountPrice( $item->getSalesPrice() );
             }
+
             $em->persist($entity);
             if($item->getMedicinePurchaseItem()) {
                 $em->getRepository( 'MedicineBundle:MedicinePurchaseItem' )->updateRemovePurchaseItemQuantity( $item->getMedicinePurchaseItem(), 'sales' );

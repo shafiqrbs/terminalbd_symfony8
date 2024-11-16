@@ -185,7 +185,7 @@
                 {% for item in entity.medicineSalesItems %}
                     <tr>
                         <td class="span8 left">{{ loop.index }}. {{ item.medicineStock.name }}</td>
-                        <td class="span2 center">{{ item.mrpPrice|number_format(2) }}</td>
+                        <td class="span2 center">{{ item.salesPrice|number_format(2) }}</td>
                         <td class="span2 center">{{ item.quantity }}</td>
                         <td class="span2 right">{{ item.subTotal|number_format(2) }}</td>
                     </tr>
@@ -232,7 +232,6 @@
             </tr>
             {% endif %}
         {% endif %}
-
         <tr>
             <td colspan="4" class="span12 center footer">
                 {% if entity.medicineConfig.printFooterText is not empty %}

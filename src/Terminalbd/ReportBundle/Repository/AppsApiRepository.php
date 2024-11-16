@@ -1773,6 +1773,7 @@ class AppsApiRepository extends EntityRepository
         $em = $this->_em;
         $records = json_decode($data);
         foreach ($records as $key => $sub):
+
             if($sub) {
                 $salesItem = new MedicineSalesItem();
                 $salesItem->setAndroidProcess($purchase->getAndroidProcess());
@@ -1780,6 +1781,7 @@ class AppsApiRepository extends EntityRepository
                 $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($sub->stock_id);
                 if ($stockId) {
                     $salesItem->setMedicineStock($stockId);
+                    $salesItem->setMrpPrice($stockId->getSalesPrice());
                 }
                 if (isset($sub->quantity) and $sub->quantity) {
                     $salesItem->setQuantity($sub->quantity);
@@ -1796,6 +1798,7 @@ class AppsApiRepository extends EntityRepository
                 $salesItem->setSubTotal(floatval($salesItem->getSalesPrice() * $salesItem->getQuantity()));
                 $em->persist($salesItem);
             }
+
         endforeach;
         $em->flush();
 
