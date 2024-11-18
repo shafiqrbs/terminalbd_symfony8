@@ -254,6 +254,80 @@ class AppsApiRepository extends EntityRepository
 
     }
 
+    public function colourPlate( $mode = 'light')
+    {
+        if($mode == 'light'){
+            $colorObject =  array(
+                'primary_color_900' => '0xFF004021',
+                'primary_color_800' => '0xFF00542B',
+                'primary_color_700' => '0xFF006D38',
+                'primary_color_600' => '0xFF008B48',
+                'primary_color_500' => '0xFF00994F',
+                'primary_color_400' => '0xFF33AD72',
+                'primary_color_300' => '0xFF54BB89',
+                'primary_color_200' => '0xFF8AD0AE',
+                'primary_color_100' => '0xFFB0DFC8',
+                'primary_color_50' => '0xFFF4F4F5',
+                'secondary_color_900' => '0xFF141D21',
+                'secondary_color_800' => '0xFF1A252B',
+                'secondary_color_700' => '0xFF223038',
+                'secondary_color_600' => '0xFF2C3E48',
+                'secondary_color_500' => '0xFF30444F',
+                'secondary_color_400' => '0xFF596972',
+                'secondary_color_300' => '0xFF748289',
+                'secondary_color_200' => '0xFFA0A9AE',
+                'secondary_color_100' => '0xFFBFC5C8',
+                'secondary_color_50' => '0xFFFDFDFD',
+                'text_color_900' => '0xFF000000',
+                'text_color_800' => '0xFF0D0D0D',
+                'text_color_700' => '0xFF1A1A1A',
+                'text_color_600' => '0xFF262626',
+                'text_color_500' => '0xFF000000',
+                'text_color_400' => '0xFF333333',
+                'text_color_300' => '0xFF595959',
+                'text_color_200' => '0xFF737373',
+                'text_color_100' => '0xFF8C8C8C',
+                'text_color_50' => '0xFFE6E6E6'
+            );
+
+        }else {
+
+            $colorObject = array(
+                'primary_color_900' => '0xFF181C14',
+                'primary_color_800' => '0xFF222A1E',
+                'primary_color_700' => '0xFF2C3828',
+                'primary_color_600' => '0xFF364632',
+                'primary_color_500' => '0xFF40543C',
+                'primary_color_400' => '0xFF4A6246',
+                'primary_color_300' => '0xFF547050',
+                'primary_color_200' => '0xFF5E7C5A',
+                'primary_color_100' => '0xFF688864',
+                'primary_color_50' => '0xFF72946E',
+                'secondary_color_900' => '0xFFF5F5F5',
+                'secondary_color_800' => '0xFFF0F0F0',
+                'secondary_color_700' => '0xFFEBEBEB',
+                'secondary_color_600' => '0xFFE6E6E6',
+                'secondary_color_500' => '0xFFE0E0E0',
+                'secondary_color_400' => '0xFFDBDBDB',
+                'secondary_color_300' => '0xFFD6D6D6',
+                'secondary_color_200' => '0xFFD1D1D1',
+                'secondary_color_100' => '0xFFCCCCCC',
+                'secondary_color_50' => '0xFFC7C7C7',
+                'text_color_900' => '0xFFFFFFFF',
+                'text_color_800' => '0xFFF9F9F9',
+                'text_color_700' => '0xFFF2F2F2',
+                'text_color_600' => '0xFFEBEBEB',
+                'text_color_500' => '0xFFE4E4E4',
+                'text_color_400' => '0xFFDDDDDD',
+                'text_color_300' => '0xFFD6D6D6',
+                'text_color_200' => '0xFFCFCFCF',
+                'text_color_100' => '0xFFC8C8C8',
+                'text_color_50' => '0xFFC1C1C1'
+            );
+        }
+        return $colorObject;
+    }
+
     public function getApiUsers(GlobalOption $option){
 
         $em = $this->_em;

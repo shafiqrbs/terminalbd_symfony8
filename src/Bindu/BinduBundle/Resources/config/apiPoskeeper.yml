@@ -6,6 +6,13 @@ api_poskeeper_setup:
     path:     /poskeeper-setup
     defaults: { _controller: BinduBundle:ApiPoskeeper:setup }
 
+api_poskeeper_plate:
+    path:     /poskeeper-color-plate
+    defaults: { _controller: BinduBundle:ApiPoskeeper:colorPlate }
+    methods:  POST|GET
+    options:
+        expose: true
+
 api_poskeeper_splash:
     path:     /poskeeper-splash
     defaults: { _controller: BinduBundle:ApiPoskeeper:splash }
