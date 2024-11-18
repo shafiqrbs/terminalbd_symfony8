@@ -2144,7 +2144,7 @@ class AppsApiRepository extends EntityRepository
             $data['unit_id'] = (string)$entity->getUnit()->getId();
             $data['unit_name'] = (string)$entity->getUnit()->getName();
             $data['description'] = (string)$entity->getDescription();
-            $data['remaining_quantity'] = (string)$entity->getRemainingQuantity();
+            $data['remaining_quantity'] = (integer)$entity->getRemainingQuantity();
             $data['sales_price'] = (string)number_format($entity->getSalesPrice(),2);
             $data['purchase_price'] = (string)number_format($entity->getPurchasePrice(),2);
             $data['avg_purchase_price'] = (string)number_format($entity->getAveragePurchasePrice(),2);
