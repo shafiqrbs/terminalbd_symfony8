@@ -257,7 +257,7 @@ class AppsApiRepository extends EntityRepository
     public function colourPlate( $mode = 'light')
     {
         if($mode == 'light'){
-            $colorObject =  array(
+            $colorObject =  array(array(
                 'primary_color_900' => '0xFF004021',
                 'primary_color_800' => '0xFF00542B',
                 'primary_color_700' => '0xFF006D38',
@@ -288,11 +288,11 @@ class AppsApiRepository extends EntityRepository
                 'text_color_200' => '0xFF737373',
                 'text_color_100' => '0xFF8C8C8C',
                 'text_color_50' => '0xFFE6E6E6'
-            );
+            ));
 
         }else {
 
-            $colorObject = array(
+            $colorObject =  array(array(
                 'primary_color_900' => '0xFF181C14',
                 'primary_color_800' => '0xFF222A1E',
                 'primary_color_700' => '0xFF2C3828',
@@ -323,7 +323,7 @@ class AppsApiRepository extends EntityRepository
                 'text_color_200' => '0xFFCFCFCF',
                 'text_color_100' => '0xFFC8C8C8',
                 'text_color_50' => '0xFFC1C1C1'
-            );
+            ));
         }
         return $colorObject;
     }
