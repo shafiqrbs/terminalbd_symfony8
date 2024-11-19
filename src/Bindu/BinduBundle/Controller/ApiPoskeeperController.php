@@ -248,7 +248,7 @@ class ApiPoskeeperController extends Controller
             'users'                 => $users,
             'units'                 => $units,
             'vendors'               => $vendors,
-            'color_plate'           => $color_plate,
+           // 'color_plate'           => $color_plate,
         );
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
