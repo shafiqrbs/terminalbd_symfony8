@@ -28,6 +28,13 @@ api_poskeeper_system_overview:
     options:
         expose: true
 
+api_poskeeper_system_user_sales:
+    path:     /poskeeper-user-sales-overview
+    defaults: { _controller: BinduBundle:ApiPoskeeper:userSalesOverview }
+    methods:  POST|GET
+    options:
+        expose: true
+
 api_poskeeper_bank_account:
     path:     /poskeeper-bank-account
     defaults: { _controller: BinduBundle:ApiPoskeeper:bankAccountBalance }
