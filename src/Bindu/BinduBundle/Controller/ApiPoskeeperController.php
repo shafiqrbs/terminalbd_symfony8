@@ -370,7 +370,7 @@ class ApiPoskeeperController extends Controller
                 'payment'              => number_format($purchaseCashOverview['payment'],2) ,
                 'transaction_overview' => $transactionCashOverview,
                 'version'   => (int) $versionNo,
-                'update_url'   => (string) 'https://drive.google.com/drive/u/3/folders/1JxcvMRxtP1C_If9QSQ3L4VjMA15dM4pl',
+                'update_url'   => 'https://drive.google.com/drive/u/3/folders/1JxcvMRxtP1C_If9QSQ3L4VjMA15dM4pl',
             );
 
             $response = new Response();
