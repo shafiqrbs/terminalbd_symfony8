@@ -358,7 +358,7 @@ class ApiPoskeeperController extends Controller
             $transactionCashOverview = $this->getDoctrine()->getRepository('AccountingBundle:AccountCash')->apiTransactionCashOverview($entity,$data);
 
           //  $version = $this->getDoctrine()->getRepository(AppsApi::class)->find(1);
-            $versionNo = 1;
+            $versionNo = 2;
             $data = array(
                 'globalOption'              => $entity->getId(),
                 'expenditure'       => number_format($expenditureOverview,2) ,
