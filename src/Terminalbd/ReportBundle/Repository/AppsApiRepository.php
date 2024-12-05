@@ -1781,6 +1781,8 @@ class AppsApiRepository extends EntityRepository
                 $created = new \DateTime($created);
                 $sales = new MedicineSales();
                 $sales->setMedicineConfig($config);
+               // $sales->setCreated($created);
+              //  $sales->setUpdated($created);
                 $sales->setInvoice($invoice);
                 $sales->setAndroidProcess($process);
                 if($createdBy){
@@ -1822,8 +1824,6 @@ class AppsApiRepository extends EntityRepository
                     }
                 }
                 $sales->setPurchasePrice($purchasePrice);
-                $sales->setCreated($created);
-                $sales->setUpdated($created);
                 $sales->setPurchasePrice($purchasePrice);
                 $sales->setVat($vat);
                 $sales->setDeliveryCharge($delivery);
@@ -1992,8 +1992,8 @@ class AppsApiRepository extends EntityRepository
                 $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
                 $created = new \DateTime($created);
                 $purchase = new MedicinePurchase();
-                $purchase->setCreated($created);
-                $purchase->setUpdated($created);
+             //   $purchase->setCreated($created);
+             //   $purchase->setUpdated($created);
                 $purchase->setMedicineConfig($config);
                 $purchase->setInvoice($invoice);
                 $purchase->setInvoiceMode($purchase_mode);
