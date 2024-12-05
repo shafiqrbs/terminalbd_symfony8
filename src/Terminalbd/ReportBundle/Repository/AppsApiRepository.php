@@ -1761,6 +1761,7 @@ class AppsApiRepository extends EntityRepository
         if($numItems > 0 ){
             $config = $option->getMedicineConfig();
             foreach ($items as $item):
+                $sales_id= (isset($item['sales_id']) and $item['sales_id']) ?  $item['sales_id'] : '';
                 $method= (isset($item['method_id']) and $item['method_id']) ?  $item['method_id'] : '';
                 $flat = (isset($item['discount_type']) and $item['discount_type']) ?  $item['discount_type'] : 'flat';
                 $received = (isset($item['received']) and $item['received']) ?  $item['received'] : 0;
@@ -1777,7 +1778,7 @@ class AppsApiRepository extends EntityRepository
                 $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
                 $sales_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
-                $created = new \DateTime(strtotime($created));
+             //   $created = new \DateTime(date('Y-M-d H:i',$sales_id));
                 $sales = new MedicineSales();
                 $sales->setMedicineConfig($config);
                 $sales->setInvoice($invoice);
@@ -1796,7 +1797,7 @@ class AppsApiRepository extends EntityRepository
                 }
                 if($method){
                     $trans = $em->getRepository(AccountBank::class)->find($method);
-                    if($trans->getMethod()) {
+                    if($trans and $trans->getMethod()) {
                         $sales->setTransactionMethod($trans->getMethod());
                         if ($trans->getMethod()->getSlug() == 'bank'){
                             $sales->setAccountBank($trans);
@@ -1809,11 +1810,14 @@ class AppsApiRepository extends EntityRepository
                                 $sales->setCardCommission($cardCommission);
                             }
                         }
+                    }else{
+                        $method = $em->getRepository(TransactionMethod::class)->findOneBy(array('slug'=>'cash'));
+                        $sales->setTransactionMethod($method);
                     }
                 }
                 $sales->setPurchasePrice($purchasePrice);
-                $sales->setCreated($created);
-                $sales->setUpdated($created);
+            //    $sales->setCreated($created);
+            //    $sales->setUpdated($created);
                 $sales->setPurchasePrice($purchasePrice);
                 $sales->setVat($vat);
                 $sales->setDeliveryCharge($delivery);
@@ -1983,8 +1987,8 @@ class AppsApiRepository extends EntityRepository
                 $created = new \DateTime(strtotime($created));
 
                 $purchase = new MedicinePurchase();
-                $purchase->setCreated($created);
-                $purchase->setUpdated($created);
+              //  $purchase->setCreated($created);
+              //  $purchase->setUpdated($created);
                 $purchase->setMedicineConfig($config);
                 $purchase->setInvoice($invoice);
                 $purchase->setInvoiceMode($purchase_mode);
