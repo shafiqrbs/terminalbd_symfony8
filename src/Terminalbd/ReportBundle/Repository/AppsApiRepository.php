@@ -1778,7 +1778,7 @@ class AppsApiRepository extends EntityRepository
                 $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
                 $sales_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
-             //   $created = new \DateTime(date('Y-M-d H:i',$sales_id));
+                $created = new \DateTime($created);
                 $sales = new MedicineSales();
                 $sales->setMedicineConfig($config);
                 $sales->setInvoice($invoice);
@@ -1790,7 +1790,13 @@ class AppsApiRepository extends EntityRepository
                     $sales->setCreatedBy($em->getRepository(User::class)->find($createdBy));
                 }
                 if($customer){
-                    $sales->setCustomer($em->getRepository(Customer::class)->find($customer));
+                    $cus = $em->getRepository(Customer::class)->find($customer);
+                    if($cus){
+                        $sales->setCustomer($cus);
+                    }else{
+                        $customerId =$em->getRepository(Customer::class)->findOneBy(array('globalOption'=>$option,'name'=>'Default'));
+                        $sales->setCustomer($customerId);
+                    }
                 }else{
                     $customerId =$em->getRepository(Customer::class)->findOneBy(array('globalOption'=>$option,'name'=>'Default'));
                     $sales->setCustomer($customerId);
@@ -1816,8 +1822,8 @@ class AppsApiRepository extends EntityRepository
                     }
                 }
                 $sales->setPurchasePrice($purchasePrice);
-            //    $sales->setCreated($created);
-            //    $sales->setUpdated($created);
+                $sales->setCreated($created);
+                $sales->setUpdated($created);
                 $sales->setPurchasePrice($purchasePrice);
                 $sales->setVat($vat);
                 $sales->setDeliveryCharge($delivery);
@@ -1984,11 +1990,10 @@ class AppsApiRepository extends EntityRepository
                 $purchase_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $purchase_mode = (isset($item['purchase_mode']) and $item['purchase_mode'] and $item['purchase_mode'] == 'purchase_with_mrp') ? 'invoice' : 'manual';
                 $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
-                $created = new \DateTime(strtotime($created));
-
+                $created = new \DateTime($created);
                 $purchase = new MedicinePurchase();
-              //  $purchase->setCreated($created);
-              //  $purchase->setUpdated($created);
+                $purchase->setCreated($created);
+                $purchase->setUpdated($created);
                 $purchase->setMedicineConfig($config);
                 $purchase->setInvoice($invoice);
                 $purchase->setInvoiceMode($purchase_mode);
