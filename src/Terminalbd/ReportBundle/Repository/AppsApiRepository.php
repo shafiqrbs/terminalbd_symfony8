@@ -1778,13 +1778,12 @@ class AppsApiRepository extends EntityRepository
                 $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
                 $sales_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
-                $created = new \DateTime($created);
+                //$created = new \DateTime($created);
+                $created = $process->getCreated();
                 $sales = new MedicineSales();
                 $sales->setMedicineConfig($config);
-               // $sales->setCreated($created);
-              //  $sales->setUpdated($created);
-                $sales->setCreated($process->getCreated());
-                $sales->setUpdated($process->getCreated());
+                $sales->setCreated($created);
+                $sales->setUpdated($created);
                 $sales->setInvoice($invoice);
                 $sales->setAndroidProcess($process);
                 if($createdBy){
@@ -1992,10 +1991,11 @@ class AppsApiRepository extends EntityRepository
                 $purchase_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $purchase_mode = (isset($item['purchase_mode']) and $item['purchase_mode'] and $item['purchase_mode'] == 'purchase_with_mrp') ? 'invoice' : 'manual';
                 $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
-                $created = new \DateTime($created);
+                //$created = new \DateTime($created);
+                $created = $process->getCreated();
                 $purchase = new MedicinePurchase();
-                $purchase->setCreated($process->getCreated());
-                $purchase->setUpdated($process->getCreated());
+                $purchase->setCreated($created);
+                $purchase->setUpdated($created);
                 $purchase->setMedicineConfig($config);
                 $purchase->setInvoice($invoice);
                 $purchase->setInvoiceMode($purchase_mode);
