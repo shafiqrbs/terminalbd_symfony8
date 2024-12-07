@@ -497,7 +497,7 @@ class AppsApiRepository extends EntityRepository
             $data[$key]['email']                = $row['email'];
             $data[$key]['debit']                = (double)$row['debit'];
             $data[$key]['credit']               = (double)$row['credit'];
-            $data[$key]['balance']              = (double)$row['balance'];
+            $data[$key]['balance']              = number_format((double)$row['balance'],2, '.', '');
         }
         return $data;
 
