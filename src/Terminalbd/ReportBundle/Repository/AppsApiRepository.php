@@ -652,7 +652,8 @@ class AppsApiRepository extends EntityRepository
             $data[$key]['mobile'] = $row['mobile'];
             $data[$key]['total'] = floatval($row['totalAmount']);
             $data[$key]['amount'] = floatval($row['amount']);
-            $data[$key]['balance'] = floatval($row['balance']);
+           // $data[$key]['balance'] = floatval($row['balance']);
+            $data[$key]['balance']              = number_format(floatval($row['balance']),2, '.', '');
             $data[$key]['source_invoice'] =  ($row['sourceInvoice']) ? (integer) $row['sourceInvoice']:null;
             $data[$key]['account_bank'] = ($row['account_bank']) ? $row['account_bank']:'';
             $data[$key]['invoice'] = ($row['invoice']) ? $row['invoice']:'';
