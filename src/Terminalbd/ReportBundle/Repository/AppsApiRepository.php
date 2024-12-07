@@ -1858,8 +1858,8 @@ class AppsApiRepository extends EntityRepository
 
         $em = $this->_em;
         $records = json_decode($data);
+        $totalPurchasePrice = 0;
         foreach ($records as $key => $sub):
-
             if($sub) {
                 $salesItem = new MedicineSalesItem();
                 $salesItem->setAndroidProcess($purchase->getAndroidProcess());
@@ -1867,13 +1867,17 @@ class AppsApiRepository extends EntityRepository
                 $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($sub->stock_id);
                 if ($stockId) {
                     $salesItem->setMedicineStock($stockId);
-                    $salesItem->setMrpPrice($stockId->getSalesPrice());
+                    $salesItem->setMrpPrice(floatval($stockId->getSalesPrice()));
                 }
                 if (isset($sub->quantity) and $sub->quantity) {
                     $salesItem->setQuantity($sub->quantity);
                 }
-                if (isset($sub->purchase_price) and $sub->purchase_price) {
-                    $salesItem->setPurchasePrice(floatval($sub->purchase_price));
+                if($purchase->getMedicineConfig()->isProfitLastpp() == 1){
+                    $salesItem->setPurchasePrice(floatval($stockId->getPurchasePrice()));
+                    $totalPurchasePrice += floatval($stockId->getPurchasePrice());
+                }else{
+                    $salesItem->setPurchasePrice(floatval($stockId->getAveragePurchasePrice()));
+                    $totalPurchasePrice += floatval($stockId->getAveragePurchasePrice());
                 }
                 if (isset($sub->item_percent) and $sub->item_percent) {
                     $salesItem->setItemPercent(floatval($sub['item_percent']));
@@ -1884,8 +1888,9 @@ class AppsApiRepository extends EntityRepository
                 $salesItem->setSubTotal(floatval($salesItem->getSalesPrice() * $salesItem->getQuantity()));
                 $em->persist($salesItem);
             }
-
         endforeach;
+        $em->flush();
+        $purchase->setPurchasePrice($totalPurchasePrice);
         $em->flush();
 
     }
