@@ -650,9 +650,9 @@ class AppsApiRepository extends EntityRepository
             $data[$key]['approved_by'] = $row['approvedBy'];
             $data[$key]['customer_id'] = (integer)$row['customerId'];
             $data[$key]['mobile'] = $row['mobile'];
-            $data[$key]['total'] = floatval($row['totalAmount']);
-            $data[$key]['amount'] = floatval($row['amount']);
-            $data[$key]['balance'] = floatval($row['balance']);
+            $data[$key]['total'] = round(floatval($row['totalAmount']),2);
+            $data[$key]['amount'] = round(floatval($row['amount']),2);
+            $data[$key]['balance'] = round(floatval($row['balance']),2);
            // $data[$key]['balance']              = number_format(floatval($row['balance']),2, '.', '');
             $data[$key]['source_invoice'] =  ($row['sourceInvoice']) ? (integer) $row['sourceInvoice']:null;
             $data[$key]['account_bank'] = ($row['account_bank']) ? $row['account_bank']:'';
@@ -1888,6 +1888,7 @@ class AppsApiRepository extends EntityRepository
                 $salesItem->setSubTotal(floatval($salesItem->getSalesPrice() * $salesItem->getQuantity()));
                 $em->persist($salesItem);
             }
+
         endforeach;
         $em->flush();
         $purchase->setPurchasePrice($totalPurchasePrice);
