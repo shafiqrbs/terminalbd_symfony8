@@ -1082,8 +1082,8 @@ class AppsApiRepository extends EntityRepository
                 $data[$key]['sales_return_invoice'] = $entity->getInvoice();
                 $data[$key]['sales_id'] = (int) $entity->getMedicineSales()->getId();
                 $data[$key]['sales_invoice'] = $entity->getMedicineSales()->getInvoice();
-                $data[$key]['created_at'] = $entity->getCreated()->format('d-m-Y');
-                $data[$key]['updated_at'] = $entity->getUpdated()->format('d-m-Y');
+                $data[$key]['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
+                $data[$key]['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
                 $data[$key]['sub_total'] = (Double) $entity->getSubTotal();
                 $data[$key]['payment'] = (Double) $entity->getPayment();
                 $data[$key]['adjustment'] = (Double) $entity->getAdjustment();
