@@ -235,7 +235,7 @@ class ApiPoskeeperController extends Controller
                 $categories = $this->getDoctrine()->getRepository('BusinessBundle:Category')->getApiCategory($entity);
                 $vendors = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->getApiVendor($entity);
             }
-            $color_plate = $this->getDoctrine()->getRepository(AppsApi::class)->colourPlate('light');
+           // $color_plate = $this->getDoctrine()->getRepository(AppsApi::class)->colourPlate('default');
         }
         $jsonData = array(
             'brands'                => $brands,
@@ -248,7 +248,7 @@ class ApiPoskeeperController extends Controller
             'users'                 => $users,
             'units'                 => $units,
             'vendors'               => $vendors,
-           // 'color_plate'           => $color_plate,
+           // 'color_plate'           => [$color_plate],
         );
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
@@ -312,18 +312,14 @@ class ApiPoskeeperController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        if( $this->checkApiValidation($request) == 'invalid') {
-            return new Response('Unauthorized access.', 401);
-        }else{
-            $color = $_REQUEST['color_plate'];
-            $color_plate = $this->getDoctrine()->getRepository(AppsApi::class)->colourPlate($color);
-        }
+        $color = $_REQUEST['color_plate'];
+        $color_plate = $this->getDoctrine()->getRepository(AppsApi::class)->colourPlate($color);
         $jsonData = array(
             'color_plate'           => $color_plate,
         );
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
-        $response->setContent(json_encode($jsonData));
+        $response->setContent(json_encode($color_plate));
         $response->setStatusCode(Response::HTTP_OK);
         return $response;
     }
