@@ -378,13 +378,16 @@ class MedicinePurchaseItemRepository extends EntityRepository
     {
         /* @var  $item MedicinePurchaseItem */
         $em = $this->_em;
-        if($purchase->getMedicinePurchaseItems()){
-            foreach ($purchase->getMedicinePurchaseItems() as $item){
+        $medicinePurchaseItems = $this->findBy(array('medicinePurchase' => $purchase));
+        if($medicinePurchaseItems){
+            foreach ($medicinePurchaseItems as $item){
                 if($item and $item->getActualPurchasePrice()){
                     $percentage = $purchase->getDiscountCalculation();
-                    $purchasePrice = $this->stockInstantPurchaseItemPrice($percentage,$item->getActualPurchasePrice());
-                    $item->setPurchasePrice($purchasePrice);
-                    $purchaseAvgPrice = $this->purchaseAvgPrice($item,$purchasePrice);
+                    if($percentage > 0){
+                        $purchasePrice = $this->stockInstantPurchaseItemPrice($percentage,$item->getActualPurchasePrice());
+                        $item->setPurchasePrice($purchasePrice);
+                    }
+                    $purchaseAvgPrice = $this->purchaseAvgPrice($item,$item->getPurchasePrice());
                     $item->setPurchaseAvgPrice($purchaseAvgPrice);
                     $salesAvgPrice = $this->salesAvgPrice($item,$item->getSalesPrice());
                     $item->setSalesAvgPrice($salesAvgPrice);
@@ -564,7 +567,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
     {
 
         $discount = (($price * $percentage )/100);
-       echo $purchasePrice = ($price - $discount);
+        $purchasePrice = ($price - $discount);
         return round($purchasePrice,2);
 
     }

@@ -314,9 +314,6 @@ class ApiPoskeeperController extends Controller
         ignore_user_abort(true);
         $color = $_REQUEST['color_plate'];
         $color_plate = $this->getDoctrine()->getRepository(AppsApi::class)->colourPlate($color);
-        $jsonData = array(
-            'color_plate'           => $color_plate,
-        );
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         $response->setContent(json_encode($color_plate));

@@ -255,7 +255,7 @@ class AppsApiRepository extends EntityRepository
 
     }
 
-    public function colourPlate($mode = 'default')
+    public function colourPlate()
     {
         $em = $this->_em;
         $colorList = array(); // Initialize as a list using traditional array syntax
@@ -1935,7 +1935,7 @@ class AppsApiRepository extends EntityRepository
             foreach ($items as $item):
 
                 $method= (isset($item['method_id']) and $item['method_id']) ?  $item['method_id'] : '';
-                $flat = (isset($item['discount_type']) and $item['discount_type']) ?  $item['discount_type'] : 'flat';
+                $flat = (isset($item['discount_type']) and $item['discount_type']) ?  $item['discount_type'] : 'percentage';
                 $received = (isset($item['received']) and $item['received']) ?  $item['received'] : 0;
                 $subTotal = (isset($item['sub_total']) and $item['sub_total']) ?  $item['sub_total'] : 0;
                 $total = (isset($item['net_total']) and $item['net_total']) ?  $item['net_total'] : 0;
@@ -1946,9 +1946,8 @@ class AppsApiRepository extends EntityRepository
                 $createdBy = (isset($item['created_by_id']) and $item['created_by_id']) ?  $item['created_by_id'] : '';
                 $purchase_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $purchase_mode = (isset($item['purchase_mode']) and $item['purchase_mode'] and $item['purchase_mode'] == 'purchase_with_mrp') ? 'invoice' : 'manual';
-                $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
-                //$created = new \DateTime($created);
-                $created = $process->getCreated();
+                $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : $process->getCreated();
+                $created = new \DateTime($created);
                 $purchase = new MedicinePurchase();
                 $purchase->setCreated($created);
                 $purchase->setUpdated($created);
@@ -1973,8 +1972,13 @@ class AppsApiRepository extends EntityRepository
                 }
                 $purchase->setSubTotal($subTotal);
                 $purchase->setDiscount($discount);
-                $purchase->setDiscountCalculation($discountcal);
-                $purchase->setDiscountType($flat);
+                if($discount > 0){
+                    $percentage = (($discount * 100 )/$subTotal);
+                    $percen = number_format((float)$percentage, 2, '.', '');
+                    $purchase->setDiscountCalculation($percen);
+                }
+                $dType = ($discount > 0 ) ? 'percentage':'';
+                $purchase->setDiscountType($dType);
                 $purchase->setNetTotal($total);
                 $purchase->setPayment($received);
                 $purchase->setAndroidProcess($process);
@@ -2012,22 +2016,17 @@ class AppsApiRepository extends EntityRepository
                 if (isset($sub->quantity) and $sub->quantity) {
                     $salesItem->setQuantity($sub->quantity);
                 }
-                if (isset($sub->purchase_price) and $sub->purchase_price and $purchase->getInvoiceMode() == 'manual') {
-                    $salesItem->setPurchasePrice(floatval($sub->purchase_price));
-                    $salesItem->setActualPurchasePrice(floatval($sub->purchase_price));
-                 }elseif(isset($sub->sales_price) and $sub->sales_price and $purchase->getInvoiceMode() == 'invoice') {
-                    $salesItem->setPurchasePrice(floatval($sub->sales_price));
-                    $salesItem->setActualPurchasePrice(floatval($sub->sales_price));
+                if (isset($sub->price) and $sub->price and $purchase->getInvoiceMode() == 'manual') {
+                    $salesItem->setPurchasePrice(floatval($sub->price));
+                    $salesItem->setActualPurchasePrice(floatval($stockId->getPurchasePrice()));
+                    $salesItem->setSalesPrice(floatval($stockId->getSalesPrice()));
+                 }elseif(isset($sub->price) and $sub->price and $purchase->getInvoiceMode() == 'invoice') {
+                    $salesItem->setPurchasePrice(floatval($sub->price));
+                    $salesItem->setActualPurchasePrice(floatval($sub->price));
+                    $salesItem->setSalesPrice(floatval($sub->price));
                 }else{
                     $salesItem->setPurchasePrice(floatval($stockId->getSalesPrice()));
                     $salesItem->setActualPurchasePrice(floatval($stockId->getSalesPrice()));
-                }
-                if (isset($sub->item_percent) and $sub->item_percent) {
-                    $salesItem->setItemPercent(floatval($sub['item_percent']));
-                }
-                if (isset($sub->sales_price) and $sub->sales_price) {
-                    $salesItem->setSalesPrice(floatval($sub->sales_price));
-                }else{
                     $salesItem->setSalesPrice(floatval($stockId->getSalesPrice()));
                 }
                 $salesItem->setPurchaseSubTotal(floatval($salesItem->getPurchasePrice()) * $salesItem->getQuantity());
