@@ -185,7 +185,7 @@ class ReportController extends Controller
             'inventory' => $config,
             'salesAmount' => $salesAmount,
             'employees' => $employees,
-            'branches' => $this->getUser()->getGlobalOption()->getBranches(),
+            'branches' => '',
             'searchForm' => $data,
         ));
 

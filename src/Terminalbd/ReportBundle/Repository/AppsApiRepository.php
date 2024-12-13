@@ -1605,6 +1605,7 @@ class AppsApiRepository extends EntityRepository
                     $data['items'][$i]['brand_name'] = (string)$item->getMedicineStock()->getBrandName();
                     $data['items'][$i]['unit'] = ($item->getMedicineStock()->getUnit()) ? (string)$item->getMedicineStock()->getUnit()->getName() : '';
                     $data['items'][$i]['sales_price'] = (Double)$item->getSalesPrice();
+                    $data['items'][$i]['price'] = (Double)$item->getPurchasePrice();
                     $data['items'][$i]['purchase_price'] = (Double)$item->getPurchasePrice();
                     $data['items'][$i]['item_percent'] = (Double)$item->getItemPercent();
                     $data['items'][$i]['quantity'] = (Double)$item->getQuantity();

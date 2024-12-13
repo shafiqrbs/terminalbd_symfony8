@@ -528,7 +528,7 @@ class ReportController extends Controller
                 'BusinessBundle:Report:condition/detailsPdf.html.twig', array(
                     'option'        => $user->getGlobalOption(),
                     'marketing'     => $customer,
-                    'couriers'      => $couriers,
+                    'couriers'      => '',
                     'entities'      => $entities,
                     'searchForm'    => $data,
                 )
