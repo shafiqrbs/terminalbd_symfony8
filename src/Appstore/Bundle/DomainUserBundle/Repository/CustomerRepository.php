@@ -1086,17 +1086,25 @@ class CustomerRepository extends EntityRepository
     public function apiUpdateCustomer($data)
     {
         $em = $this->_em;
-        $customerId = trim($data['customer']);
+        $customerId = trim($data['customer_id']);
         $name = trim($data['name']);
         $address = trim($data['address']);
         $email = $data['email'];
+        /* @var $customer Customer */
         $customer = $this->find($customerId);
         $customer->setName($name);
         $customer->setAddress($address);
         $customer->setEmail($email);
         $em->persist($customer);
         $em->flush();
-        return 'success';
+
+        $result['global_id']            = (int) $customer->getGlobalOption()->getId();
+        $result['customer_id']          = (int) $customer->getId();
+        $result['name']                 = (string)$customer->getName();
+        $result['mobile']               = (string)$customer->getMobile();
+        $result['address']              = (string)$customer->getAddress();
+        $result['email']                = (string)$customer->getEmail();
+        return $result;
     }
 
 }

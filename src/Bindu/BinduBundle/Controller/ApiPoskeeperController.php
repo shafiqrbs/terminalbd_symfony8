@@ -1952,7 +1952,6 @@ class ApiPoskeeperController extends Controller
             $form = $_REQUEST;
             $entity = $this->checkApiValidation($request);
             $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiCreateCustomer($entity,$form);
-            $data = $this->getDoctrine()->getRepository('DomainUserBundle:Customer')->apiCreateCustomer($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
