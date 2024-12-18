@@ -1246,16 +1246,18 @@ class AppsApiRepository extends EntityRepository
             $data['invoice'] = $entity->getInvoice();
             $data['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
             $data['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
-            $data['sub_total'] = (Double) $entity->getSubTotal();
-            $data['discount'] = (Double) $entity->getDiscount();
-            $data['discount_calculation'] = (Double) $entity->getDiscountCalculation();
-            $data['vat'] = (Double)$entity->getVat();
+
+            $data['sub_total'] = round(floatval($entity->getSubTotal()),2);
+            $data['discount'] = round(floatval($entity->getDiscount()),2);
+            $data['discount_calculation'] = round(floatval($entity->getDiscountCalculation()),2);
+            $data['vat'] = round(floatval($entity->getVat()),2);
             $data['sd'] = 0;
-            $data['net_total'] = (Double) $entity->getNetTotal();
-            $data['purchase_price'] = (Double) $entity->getPurchasePrice();
-            $data['received'] =(Double) $entity->getReceived();
-            $data['due'] = (Double) $entity->getDue();
-            $data['delivery_charge'] = (Double) $entity->getDeliveryCharge();
+            $data['net_total'] = round(floatval($entity->getPurchasePrice()),2);
+            $data['purchase_price'] = round(floatval($entity->getPurchasePrice()),2);
+            $data['received'] = round(floatval($entity->getPayment()),2);
+            $data['due'] = round(floatval($entity->getDue()),2);
+            $data['delivery_charge'] = round(floatval($entity->getDeliveryCharge()),2);
+
             $data['payment_in_word'] = (int) $entity->getNetTotal();
             $data['process'] = $entity->getProcess();
             $data['discount_type'] = $entity->getDiscountType();
@@ -1444,14 +1446,16 @@ class AppsApiRepository extends EntityRepository
                 $data[$key]['invoice'] = $entity->getInvoice();
                 $data[$key]['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
                 $data[$key]['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
-                $data[$key]['sub_total'] = (Double) $entity->getSubTotal();
-                $data[$key]['discount'] = (Double) $entity->getDiscount();
-                $data[$key]['discount_calculation'] = (Double) $entity->getDiscountCalculation();
-                $data[$key]['sd'] = 0;
-                $data[$key]['vat'] = 0;
-                $data[$key]['net_total'] = (Double) $entity->getNetTotal();
-                $data[$key]['received'] =(Double) $entity->getPayment();
-                $data[$key]['due'] = (Double) $entity->getDue();
+
+                $data['sub_total'] = round(floatval($entity->getSubTotal()),2);
+                $data['discount'] = round(floatval($entity->getDiscount()),2);
+                $data['discount_calculation'] = round(floatval($entity->getDiscountCalculation()),2);
+                $data['vat'] = 0;
+                $data['sd'] = 0;
+                $data['net_total'] = round(floatval($entity->getNetTotal()),2);
+                $data['received'] = round(floatval($entity->getPayment()),2);
+                $data['due'] = round(floatval($entity->getDue()),2);
+
                 $data[$key]['process'] = $entity->getProcess();
                 $data[$key]['discount_type'] = $entity->getDiscountType();
                 $data[$key]['is_online'] = (int) $entity->isOnline();
@@ -1573,14 +1577,16 @@ class AppsApiRepository extends EntityRepository
             $data['invoice'] = $entity->getInvoice();
             $data['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
             $data['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
-            $data['sub_total'] = (Double) $entity->getSubTotal();
-            $data['discount'] = (Double) $entity->getDiscount();
-            $data['discount_calculation'] = (Double) $entity->getDiscountCalculation();
-            $data['sd'] = 0;
+
+            $data['sub_total'] = round(floatval($entity->getSubTotal()),2);
+            $data['discount'] = round(floatval($entity->getDiscount()),2);
+            $data['discount_calculation'] = round(floatval($entity->getDiscountCalculation()),2);
             $data['vat'] = 0;
-            $data['net_total'] = (Double) $entity->getNetTotal();
-            $data['received'] =(Double) $entity->getPayment();
-            $data['due'] = (Double) $entity->getDue();
+            $data['sd'] = 0;
+            $data['net_total'] = round(floatval($entity->getNetTotal()),2);
+            $data['received'] = round(floatval($entity->getPayment()),2);
+            $data['due'] = round(floatval($entity->getDue()),2);
+
             $data['process'] = $entity->getProcess();
             $data['discount_type'] = $entity->getDiscountType();
             $data['is_online'] = (int) $entity->isOnline();
