@@ -1,6 +1,8 @@
 <?php
 
 namespace Appstore\Bundle\DomainUserBundle\Repository;
+use Appstore\Bundle\AccountingBundle\Entity\AccountPurchase;
+use Appstore\Bundle\AccountingBundle\Entity\AccountSales;
 use Appstore\Bundle\DomainUserBundle\Entity\Customer;
 use Appstore\Bundle\DomainUserBundle\Entity\CustomerAddress;
 use Appstore\Bundle\HospitalBundle\Entity\Invoice;
@@ -9,6 +11,7 @@ use Core\UserBundle\Entity\Profile;
 use Core\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
+use Terminalbd\ReportBundle\Entity\AppsApi;
 
 /**
  * CustomerRepository
@@ -1097,14 +1100,7 @@ class CustomerRepository extends EntityRepository
         $customer->setEmail($email);
         $em->persist($customer);
         $em->flush();
-
-        $result['global_id']            = (int) $customer->getGlobalOption()->getId();
-        $result['customer_id']          = (int) $customer->getId();
-        $result['name']                 = (string)$customer->getName();
-        $result['mobile']               = (string)$customer->getMobile();
-        $result['address']              = (string)$customer->getAddress();
-        $result['email']                = (string)$customer->getEmail();
-        return $result;
+        return $em->getRepository(AppsApi::class)->apiCustomerMedicineOutstanding($customer->getGlobalOption()->getId(),$customer->getId());
     }
 
 }

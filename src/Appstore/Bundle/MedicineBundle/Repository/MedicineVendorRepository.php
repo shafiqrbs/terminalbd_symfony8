@@ -7,6 +7,7 @@ use Appstore\Bundle\MedicineBundle\Entity\MedicineVendor;
 use Core\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
+use Terminalbd\ReportBundle\Entity\AppsApi;
 
 
 /**
@@ -221,7 +222,7 @@ class MedicineVendorRepository extends EntityRepository
         $customer->setEmail($email);
         $em->persist($customer);
         $em->flush();
-        return $em->getRepository(AccountPurchase::class)->apiVendorMedicineOutstanding($option);
+        return $em->getRepository(AppsApi::class)->apiVendorMedicineOutstanding($customer->getMedicineConfig()->getGlobalOption()->getId(),$customer->getId());
     }
 
 

@@ -444,9 +444,10 @@ class AppsApiRepository extends EntityRepository
             $data[$key]['mobile']               = $row['mobile'];
             $data[$key]['address']              = $row['address'];
             $data[$key]['email']                = $row['email'];
-            $data[$key]['debit']                = (double)$row['debit'];
-            $data[$key]['credit']               = (double)$row['credit'];
-            $data[$key]['balance']              = number_format((double)$row['balance'],2, '.', '');
+            $data[$key]['debit']                = round(floatval($row['debit']),2);
+            $data[$key]['credit']               = round(floatval($row['credit']),2);
+            $data[$key]['balance']              = round(floatval($row['balance']),2);
+
         }
         return $data;
 
@@ -470,9 +471,9 @@ class AppsApiRepository extends EntityRepository
             $data[$key]['mobile']               = $row['mobile'];
             $data[$key]['address']              = $row['address'];
             $data[$key]['email']                = $row['email'];
-            $data[$key]['debit']                = (double)$row['debit'];
-            $data[$key]['credit']               = (double)$row['credit'];
-            $data[$key]['balance']              = (double)$row['balance'];
+            $data[$key]['debit']                = round(floatval($row['debit']),2);
+            $data[$key]['credit']               = round(floatval($row['credit']),2);
+            $data[$key]['balance']              = round(floatval($row['balance']),2);
         }
         return $data;
 
@@ -599,10 +600,9 @@ class AppsApiRepository extends EntityRepository
             $data[$key]['approved_by'] = $row['approvedBy'];
             $data[$key]['customer_id'] = (integer)$row['customerId'];
             $data[$key]['mobile'] = $row['mobile'];
-            $data[$key]['total'] = round(floatval($row['totalAmount']),2);
-            $data[$key]['amount'] = round(floatval($row['amount']),2);
-            $data[$key]['balance'] = round(floatval($row['balance']),2);
-           // $data[$key]['balance']              = number_format(floatval($row['balance']),2, '.', '');
+            $data[$key]['total']                = round(floatval($row['totalAmount']),2);
+            $data[$key]['amount']               = round(floatval($row['amount']),2);
+            $data[$key]['balance']              = round(floatval($row['balance']),2);
             $data[$key]['source_invoice'] =  ($row['sourceInvoice']) ? (integer) $row['sourceInvoice']:null;
             $data[$key]['account_bank'] = ($row['account_bank']) ? $row['account_bank']:'';
             $data[$key]['invoice'] = ($row['invoice']) ? $row['invoice']:'';
@@ -659,9 +659,9 @@ class AppsApiRepository extends EntityRepository
             $data[$key]['created_by'] = $row['username'];
             $data[$key]['approved_by'] = $row['approvedBy'];
             $data[$key]['mobile'] = $row['mobile'];
-            $data[$key]['total'] = floatval($row['totalAmount']);
-            $data[$key]['amount'] = floatval($row['amount']);
-            $data[$key]['balance'] = floatval($row['balance']);
+            $data[$key]['total']                = round(floatval($row['totalAmount']),2);
+            $data[$key]['amount']               = round(floatval($row['amount']),2);
+            $data[$key]['balance']              = round(floatval($row['balance']),2);
             $data[$key]['source_invoice'] = ($row['sourceInvoice']) ? (integer) $row['sourceInvoice']:null;
             $data[$key]['account_bank'] = ($row['account_bank']) ? $row['account_bank']:'';
             $data[$key]['invoice'] = ($row['invoice']) ? $row['invoice']:'';
@@ -944,16 +944,18 @@ class AppsApiRepository extends EntityRepository
                 $data[$key]['invoice'] = $entity->getInvoice();
                 $data[$key]['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
                 $data[$key]['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
-                $data[$key]['sub_total'] = (Double) $entity->getSubTotal();
-                $data[$key]['discount'] = (Double) $entity->getDiscount();
-                $data[$key]['discount_calculation'] = (Double) $entity->getDiscountCalculation();
-                $data[$key]['vat'] = (Double)$entity->getVat();
+
+                $data[$key]['sub_total'] = round(floatval($entity->getSubTotal()),2);
+                $data[$key]['discount'] = round(floatval($entity->getDiscount()),2);
+                $data[$key]['discount_calculation'] = round(floatval($entity->getDiscountCalculation()),2);
+                $data[$key]['vat'] = round(floatval($entity->getVat()),2);
                 $data[$key]['sd'] = 0;
-                $data[$key]['net_total'] = (Double) $entity->getNetTotal();
-                $data[$key]['purchase_price'] = (Double) $entity->getPurchasePrice();
-                $data[$key]['received'] =(Double) $entity->getReceived();
-                $data[$key]['due'] = (Double) $entity->getDue();
-                $data[$key]['delivery_charge'] = (Double) $entity->getDeliveryCharge();
+                $data[$key]['net_total'] = round(floatval($entity->getNetTotal()),2);
+                $data[$key]['purchase_price'] = round(floatval($entity->getPurchasePrice()),2);
+                $data[$key]['received'] = round(floatval($entity->getReceived()),2);
+                $data[$key]['due'] = round(floatval($entity->getDue()),2);
+                $data[$key]['delivery_charge'] =round(floatval($entity->getDeliveryCharge()),2);
+
                 $data[$key]['payment_in_word'] = (int) $entity->getNetTotal();
                 $data[$key]['process'] = $entity->getProcess();
                 $data[$key]['discount_type'] = $entity->getDiscountType();
@@ -1114,15 +1116,15 @@ class AppsApiRepository extends EntityRepository
                 $data[$key]['invoice'] = $entity->getInvoice();
                 $data[$key]['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
                 $data[$key]['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
-                $data[$key]['sub_total'] = (Double) $entity->getSubTotal();
-                $data[$key]['discount'] = (Double) $entity->getDiscount();
-                $data[$key]['discount_calculation'] = (Double) $entity->getDiscountCalculation();
-                $data[$key]['vat'] = (Double)$entity->getVat();
+                $data[$key]['sub_total'] = round(floatval($entity->getSubTotal()),2);
+                $data[$key]['discount'] = round(floatval($entity->getDiscount()),2);
+                $data[$key]['discount_calculation'] = round(floatval($entity->getDiscountCalculation()),2);
+                $data[$key]['vat'] = round(floatval($entity->getVat()),2);
                 $data[$key]['sd'] = 0;
-                $data[$key]['net_total'] = (Double) $entity->getTotal();
-                $data[$key]['purchase_price'] = (Double) $entity->getPurchasePrice();
-                $data[$key]['received'] =(Double) $entity->getPayment();
-                $data[$key]['due'] = (Double) $entity->getDue();
+                $data[$key]['net_total'] = round(floatval($entity->getPurchasePrice()),2);
+                $data[$key]['purchase_price'] = round(floatval($entity->getPurchasePrice()),2);
+                $data[$key]['received'] = round(floatval($entity->getPayment()),2);
+                $data[$key]['due'] = round(floatval($entity->getDue()),2);
                 $data[$key]['delivery_charge'] = 0;
                 $data[$key]['payment_in_word'] = (int) $entity->getTotal();
                 $data[$key]['process'] = $entity->getProcess();
@@ -1165,16 +1167,18 @@ class AppsApiRepository extends EntityRepository
             $data['invoice'] = $entity->getInvoice();
             $data['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
             $data['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
-            $data['sub_total'] = (Double) $entity->getSubTotal();
-            $data['discount'] = (Double) $entity->getDiscount();
-            $data['discount_calculation'] = (Double) $entity->getDiscountCalculation();
-            $data['vat'] = (Double)$entity->getVat();
+
+            $data['sub_total'] = round(floatval($entity->getSubTotal()),2);
+            $data['discount'] = round(floatval($entity->getDiscount()),2);
+            $data['discount_calculation'] = round(floatval($entity->getDiscountCalculation()),2);
+            $data['vat'] = round(floatval($entity->getVat()),2);
             $data['sd'] = 0;
-            $data['net_total'] = (Double) $entity->getNetTotal();
-            $data['purchase_price'] = (Double) $entity->getPurchasePrice();
-            $data['received'] =(Double) $entity->getReceived();
-            $data['due'] = (Double) $entity->getDue();
-            $data['delivery_charge'] = (Double) $entity->getDeliveryCharge();
+            $data['net_total'] = round(floatval($entity->getPurchasePrice()),2);
+            $data['purchase_price'] = round(floatval($entity->getPurchasePrice()),2);
+            $data['received'] = round(floatval($entity->getPayment()),2);
+            $data['due'] = round(floatval($entity->getDue()),2);
+            $data['delivery_charge'] = round(floatval($entity->getDeliveryCharge()),2);
+
             $data['payment_in_word'] = (int) $entity->getNetTotal();
             $data['process'] = $entity->getProcess();
             $data['discount_type'] = $entity->getDiscountType();
@@ -2217,6 +2221,51 @@ class AppsApiRepository extends EntityRepository
         return "success";
 
     }
+
+    public function apiVendorMedicineOutstanding($globalOption,$vendorId)
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
+        $qb->join('e.medicineVendor','vendor');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
+        $qb->andWhere("vendor.id = :vendorId")->setParameter('vendorId',$vendorId);
+        $row = $qb->getQuery()->getOneOrNullResult();
+        $data = array();
+        $data['global_id']            = (int) $globalOption;
+        $data['vendor_id']            = (int) $vendorId;
+        $data['name']                 = $row['name'];
+        $data['mobile']               = $row['mobile'];
+        $data['address']              = $row['address'];
+        $data['email']                = $row['email'];
+        $data['debit']                = (double)$row['debit'];
+        $data['credit']               = (double)$row['credit'];
+        $data['balance']              = (double)$row['balance'];
+        return $data;
+
+    }
+
+    public function apiCustomerMedicineOutstanding($globalOption,$customer)
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('customer.id as customer_id ,customer.name as name ,customer.mobile as mobile,customer.email as email,customer.address as address,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ','COALESCE(SUM(e.totalAmount),0)  as debit ','COALESCE(SUM(e.amount),0) as credit');
+        $qb->join('e.customer','customer');
+        $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
+        $qb->andWhere("customer.id = :customerId")->setParameter('customerId',$customer);
+        $row = $qb->getQuery()->getOneOrNullResult();
+        $data = array();
+        $data['global_id']            = (int) $globalOption;
+        $data['customer_id']            = (int) $customer;
+        $data['name']                 = $row['name'];
+        $data['mobile']               = $row['mobile'];
+        $data['address']              = $row['address'];
+        $data['email']                = $row['email'];
+        $data['debit']                = (double)$row['debit'];
+        $data['credit']               = (double)$row['credit'];
+        $data['balance']              = (double)$row['balance'];
+        return $data;
+
+    }
+
 
 
 
