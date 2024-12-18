@@ -413,6 +413,7 @@ class AppsApiRepository extends EntityRepository
         $qb->where("e.medicineConfig = :medicineConfig");
         $qb->setParameter('medicineConfig', $config);
         $qb->andWhere("pt.slug = '{$slug}'");
+        $qb->orderBy('e.name','ASC');
         $result = $qb->getQuery()->getArrayResult();
         $data = array();
         $idName = "{$slug}_id";
