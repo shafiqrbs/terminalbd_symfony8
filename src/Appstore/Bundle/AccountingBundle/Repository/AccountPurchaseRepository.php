@@ -287,7 +287,7 @@ class AccountPurchaseRepository extends EntityRepository
     public function apiVendorMedicineOutstanding($globalOption)
     {
         $qb = $this->createQueryBuilder('e');
-        $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
+        $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.email as email,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
         $qb->join('e.medicineVendor','vendor');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
         $qb->andWhere("e.process = 'approved'");
@@ -302,9 +302,9 @@ class AccountPurchaseRepository extends EntityRepository
             $data[$key]['mobile']               = $row['mobile'];
             $data[$key]['address']              = $row['address'];
             $data[$key]['email']                = $row['email'];
-            $data[$key]['debit']                = (double)$row['debit'];
-            $data[$key]['credit']               = (double)$row['credit'];
-            $data[$key]['balance']              = (double)$row['balance'];
+            $data[$key]['debit']                = round(floatval($row['debit']),2);
+            $data[$key]['credit']               = round(floatval($row['credit']),2);
+            $data[$key]['balance']              = round(floatval($row['balance']),2);
         }
         return $data;
 

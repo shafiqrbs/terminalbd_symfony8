@@ -1447,14 +1447,14 @@ class AppsApiRepository extends EntityRepository
                 $data[$key]['created_at'] = $entity->getCreated()->format('d-m-Y h:i A');
                 $data[$key]['updated_at'] = $entity->getUpdated()->format('d-m-Y h:i A');
 
-                $data['sub_total'] = round(floatval($entity->getSubTotal()),2);
-                $data['discount'] = round(floatval($entity->getDiscount()),2);
-                $data['discount_calculation'] = round(floatval($entity->getDiscountCalculation()),2);
-                $data['vat'] = 0;
-                $data['sd'] = 0;
-                $data['net_total'] = round(floatval($entity->getNetTotal()),2);
-                $data['received'] = round(floatval($entity->getPayment()),2);
-                $data['due'] = round(floatval($entity->getDue()),2);
+                $data[$key]['sub_total'] = round(floatval($entity->getSubTotal()),2);
+                $data[$key]['discount'] = round(floatval($entity->getDiscount()),2);
+                $data[$key]['discount_calculation'] = round(floatval($entity->getDiscountCalculation()),2);
+                $data[$key]['vat'] = 0;
+                $data[$key]['sd'] = 0;
+                $data[$key]['net_total'] = round(floatval($entity->getNetTotal()),2);
+                $data[$key]['received'] = round(floatval($entity->getPayment()),2);
+                $data[$key]['due'] = round(floatval($entity->getDue()),2);
 
                 $data[$key]['process'] = $entity->getProcess();
                 $data[$key]['discount_type'] = $entity->getDiscountType();
@@ -2230,8 +2230,10 @@ class AppsApiRepository extends EntityRepository
 
     public function apiVendorMedicineOutstanding($globalOption,$vendorId)
     {
-        $qb = $this->createQueryBuilder('e');
-        $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
+        $qb = $this->_em;
+        $qb = $qb->createQueryBuilder();
+        $qb = $qb->from(AccountPurchase::class,'e');
+        $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.email as email,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
         $qb->join('e.medicineVendor','vendor');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
         $qb->andWhere("vendor.id = :vendorId")->setParameter('vendorId',$vendorId);
@@ -2243,16 +2245,18 @@ class AppsApiRepository extends EntityRepository
         $data['mobile']               = $row['mobile'];
         $data['address']              = $row['address'];
         $data['email']                = $row['email'];
-        $data['debit']                = (double)$row['debit'];
-        $data['credit']               = (double)$row['credit'];
-        $data['balance']              = (double)$row['balance'];
+        $data['debit']                = round(floatval($row['debit']),2);
+        $data['credit']               = round(floatval($row['credit']),2);
+        $data['balance']              = round(floatval($row['balance']),2);
         return $data;
 
     }
 
     public function apiCustomerMedicineOutstanding($globalOption,$customer)
     {
-        $qb = $this->createQueryBuilder('e');
+        $qb = $this->_em;
+        $qb = $qb->createQueryBuilder();
+        $qb = $qb->from(AccountSales::class,'e');
         $qb->select('customer.id as customer_id ,customer.name as name ,customer.mobile as mobile,customer.email as email,customer.address as address,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ','COALESCE(SUM(e.totalAmount),0)  as debit ','COALESCE(SUM(e.amount),0) as credit');
         $qb->join('e.customer','customer');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption);
@@ -2265,9 +2269,9 @@ class AppsApiRepository extends EntityRepository
         $data['mobile']               = $row['mobile'];
         $data['address']              = $row['address'];
         $data['email']                = $row['email'];
-        $data['debit']                = (double)$row['debit'];
-        $data['credit']               = (double)$row['credit'];
-        $data['balance']              = (double)$row['balance'];
+        $data['debit']                =  round(floatval($row['debit']),2);
+        $data['credit']               =  round(floatval($row['credit']),2);
+        $data['balance']              =  round(floatval($row['balance']),2);
         return $data;
 
     }

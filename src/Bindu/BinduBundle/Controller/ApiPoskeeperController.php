@@ -10,6 +10,7 @@ use Appstore\Bundle\MedicineBundle\Entity\MedicineParticular;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineParticularType;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSales;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineVendor;
 use Core\UserBundle\Entity\Profile;
 use Core\UserBundle\Entity\User;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
@@ -2312,7 +2313,7 @@ class ApiPoskeeperController extends Controller
 
             $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository('AccountingBundle:AccountVendor')->apiUpdateVendor($form);
+            $data = $this->getDoctrine()->getRepository(MedicineVendor::class)->apiUpdateVendor($form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
