@@ -338,12 +338,17 @@ class ApiPoskeeperController extends Controller
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $array = $request->request->all();
             $datetime = new \DateTime("now");
-            $user = $this->getDoctrine()->getRepository(User::class)->find($array['user_id']);
-            $data = array();
-            if($user and in_array('ROLE_MANAGER',$user->getAppRoles())){
-                $data['userId'] = '';
-            }elseif($user){
-                $data['userId'] = (isset($array['user_id']) and $array['user_id']) ? $array['user_id']:'';
+            $user_id = (isset($array['user_id']) and $array['user_id']) ? $array['user_id']:'';
+            if($user_id){
+                $user = $this->getDoctrine()->getRepository(User::class)->find($array['user_id']);
+                $data = array();
+                if($user and in_array('ROLE_MANAGER',$user->getAppRoles())){
+                    $data['userId'] = '';
+                }elseif($user){
+                    $data['userId'] = (isset($array['user_id']) and $array['user_id']) ? $array['user_id']:'';
+                }else{
+                    $data['userId'] = '';
+                }
             }else{
                 $data['userId'] = '';
             }

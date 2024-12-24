@@ -280,8 +280,6 @@ api_poskeeper_vendor_update:
     defaults: { _controller: BinduBundle:ApiPoskeeper:updateVendor }
     methods:  POST
 
-
-
 api_poskeeper_vendor_payment:
     path:     /poskeeper-payment
     defaults: { _controller: BinduBundle:ApiPoskeeper:purchasePayment }
