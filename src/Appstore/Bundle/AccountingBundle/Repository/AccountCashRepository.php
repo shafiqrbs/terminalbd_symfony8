@@ -213,11 +213,28 @@ class AccountCashRepository extends EntityRepository
 
     public function apiTransactionCashOverview($entity,$data)
     {
+        $userId =    isset($data['userId'])? $data['userId'] :'';
+        $startDate      = isset($data['startDate']) and $data['startDate'] != '' ? $data['startDate']:'';
+        $endDate        = isset($data['endDate']) and $data['endDate'] != '' ? $data['endDate']:'';
+
         $qb = $this->createQueryBuilder('e');
         $qb->select('tm.id as id,tm.name as name,(COALESCE(SUM(e.debit),0) - COALESCE(SUM(e.credit),0)) as amount');
         $qb->join('e.transactionMethod','tm');
         $qb->where("e.globalOption = :globalOption");
         $qb->setParameter('globalOption', $entity->getId());
+        if(!empty($startDate) and !empty($endDate)){
+            $start = new \DateTime($data['startDate']);
+            $startDate = $start->format('Y-m-d 00:00:00');
+            $end = new \DateTime($data['endDate']);
+            $endDate = $end->format('Y-m-d 23:59:59');
+            $qb->andWhere("e.updated >= :startDate");
+            $qb->setParameter('startDate', $startDate);
+            $qb->andWhere("e.updated <= :endDate");
+            $qb->setParameter('endDate', $endDate);
+        }
+        if ($userId) {
+            $qb->andWhere("e.createdBy = :createdBy")->setParameter('createdBy', $userId);
+        }
         $qb->groupBy('tm.id');
         $result = $qb->getQuery()->getArrayResult();
         return $result;

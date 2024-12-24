@@ -336,10 +336,19 @@ class ApiPoskeeperController extends Controller
         }else{
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
-            $data = $request->request->all();
+            $array = $request->request->all();
             $datetime = new \DateTime("now");
-            $data['startDate'] = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']:$datetime->format('Y-m-d');
-            $data['endDate'] = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:$datetime->format('Y-m-d');
+            $user = $this->getDoctrine()->getRepository(User::class)->find($array['user_id']);
+            $data = array();
+            if($user and in_array('ROLE_MANAGER',$user->getAppRoles())){
+                $data['userId'] = '';
+            }elseif($user){
+                $data['userId'] = (isset($array['user_id']) and $array['user_id']) ? $array['user_id']:'';
+            }else{
+                $data['userId'] = '';
+            }
+            $data['startDate'] = (isset($array['start_date']) and $array['start_date']) ? $array['start_date']:$datetime->format('Y-m-d');
+            $data['endDate'] = (isset($array['end_date']) and $array['end_date']) ? $array['end_date']:$datetime->format('Y-m-d');
             $data['device'] = $deviceId;
             if($entity->getMainApp()->getSlug() == 'miss'){
                 $purchaseCashOverview = $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->androidDevicePurchaseOverview($entity,$data);

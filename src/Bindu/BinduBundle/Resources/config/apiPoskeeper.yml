@@ -189,9 +189,8 @@ api_poskeeper_customer_create:
 api_poskeeper_customer_update:
     path:     /poskeeper-customer-update
     defaults: { _controller: BinduBundle:ApiPoskeeper:updateCustomer }
-    methods:  POST|GET
-    options:
-        expose: true
+    methods:  POST
+
 
 
 api_poskeeper_online_purchase:
@@ -279,9 +278,8 @@ api_poskeeper_vendor_create:
 api_poskeeper_vendor_update:
     path:     /poskeeper-vendor-update
     defaults: { _controller: BinduBundle:ApiPoskeeper:updateVendor }
-    methods:  POST|GET
-    options:
-        expose: true
+    methods:  POST
+
 
 
 api_poskeeper_vendor_payment:

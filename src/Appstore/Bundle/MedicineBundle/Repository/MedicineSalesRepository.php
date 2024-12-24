@@ -44,6 +44,7 @@ class MedicineSalesRepository extends EntityRepository
         $invoice = isset($data['invoice'])? $data['invoice'] :'';
         $transactionMethod = isset($data['transactionMethod'])? $data['transactionMethod'] :'';
         $salesBy = isset($data['salesBy'])? $data['salesBy'] :'';
+        $userId = isset($data['userId'])? $data['userId'] :'';
         $paymentStatus = isset($data['paymentStatus'])? $data['paymentStatus'] :'';
         $bank = isset($data['bank'])? $data['bank'] :'';
         $mobileBank = isset($data['mobileBank'])? $data['mobileBank'] :'';
@@ -108,6 +109,11 @@ class MedicineSalesRepository extends EntityRepository
             $qb->andWhere("un.username = :username");
             $qb->setParameter('username', $salesBy);
         }
+
+        if(!empty($userId)){
+            $qb->andWhere("s.salesBy = :salesBy")->setParameter('salesBy', $userId);
+        }
+
 	    if(!empty($paymentStatus)){
             $qb->andWhere("s.paymentStatus = :status");
             $qb->setParameter('status', $paymentStatus);

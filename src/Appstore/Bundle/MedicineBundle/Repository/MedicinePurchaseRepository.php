@@ -35,6 +35,7 @@ class MedicinePurchaseRepository extends EntityRepository
         $vendorId = isset($data['vendorId'])? $data['vendorId'] :'';
         $startDate = isset($data['startDate'])? $data['startDate'] :'';
         $endDate = isset($data['endDate'])? $data['endDate'] :'';
+        $userId = isset($data['userId'])? $data['userId'] :'';
 
         if (!empty($grn)) {
             $qb->andWhere($qb->expr()->like("e.grn", "'%$grn%'"  ));
@@ -59,6 +60,10 @@ class MedicinePurchaseRepository extends EntityRepository
         if(!empty($vendorId)){
             $qb->join('e.medicineVendor','v');
             $qb->andWhere("v.id = :vendorId")->setParameter('vendorId', $vendorId);
+        }
+
+        if($userId){
+            $qb->andWhere("e.createdBy = :createdBy")->setParameter('createdBy', $userId);
         }
 
         if (!empty($startDate) ) {

@@ -30,6 +30,7 @@ class ExpenditureRepository extends EntityRepository
         $endDate        = isset($data['endDate']) and $data['endDate'] != '' ? $data['endDate']:'';
         $toUser         = isset($data['toUser'])? $data['toUser'] :'';
         $user =    isset($data['user'])? $data['user'] :'';
+        $userId =    isset($data['userId'])? $data['userId'] :'';
         $invoice =    isset($data['invoice'])? $data['invoice'] :'';
         $remark =    isset($data['remark'])? $data['remark'] :'';
         $accountHead    = isset($data['accountHead'])? $data['accountHead'] :'';
@@ -55,6 +56,10 @@ class ExpenditureRepository extends EntityRepository
         if (!empty($user)) {
             $qb->join('e.createdBy','u');
             $qb->andWhere("u.id = :user")->setParameter('user', $user);
+        }
+
+        if (!empty($userId)) {
+            $qb->andWhere("e.createdBy = :createdBy")->setParameter('createdBy', $userId);
         }
 
         if (!empty($device)) {
@@ -162,7 +167,7 @@ class ExpenditureRepository extends EntityRepository
         $qb->setParameter('process', 'approved');
         $qb->andWhere('e.globalOption = :globalOption');
         $qb->setParameter('globalOption', $option->getId());
-        $qb->andWhere('e.androidDevice = :device')->setParameter('device', $data['device']);
+  //      $qb->andWhere('e.androidDevice = :device')->setParameter('device', $data['device']);
         $this->handleSearchBetween($qb,$data);
         $amount = $qb->getQuery()->getOneOrNullResult();
         return  $amount['amount'] ;
