@@ -327,7 +327,7 @@ class MedicineStockRepository extends EntityRepository
         $qb = $this->createQueryBuilder('e');
         $qb->select('e.id as id ,e.brandName as brandName , e.name as name','e.purchasePrice as purchasePrice , e.salesPrice as salesPrice','e.remainingQuantity as quantity , e.pack as pack');
         $qb->addSelect('u.name as unit');
-        $qb->join("e.unit",'u');
+        $qb->leftJoin("e.unit",'u');
         $qb->where("e.medicineConfig = :config");
         $qb->setParameter('config', $config);
         if (!empty($brand)) {
