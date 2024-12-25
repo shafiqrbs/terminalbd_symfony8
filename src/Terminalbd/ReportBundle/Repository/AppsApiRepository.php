@@ -1740,9 +1740,9 @@ class AppsApiRepository extends EntityRepository
                 $salesBy = (isset($item['sales_by_id']) and $item['sales_by_id']) ?  $item['sales_by_id'] : '';
                 $sales_item = (isset($item['items']) and $item['items']) ?  $item['items'] : '';
                 $created = (isset($item['created_at']) and $item['created_at']) ?  $item['created_at'] : new \DateTime();
-                //$created = new \DateTime($created);
+                $created = new \DateTime($created);
 
-                $created = $process->getCreated();
+              //  $created = $process->getCreated();
                 $sales = new MedicineSales();
                 $sales->setMedicineConfig($config);
                 $sales->setCreated($created);
