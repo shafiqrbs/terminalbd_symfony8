@@ -1174,7 +1174,7 @@ class AppsApiRepository extends EntityRepository
             $data['discount_calculation'] = round(floatval($entity->getDiscountCalculation()),2);
             $data['vat'] = round(floatval($entity->getVat()),2);
             $data['sd'] = 0;
-            $data['net_total'] = round(floatval($entity->getPurchasePrice()),2);
+            $data['net_total'] = round(floatval($entity->getNetTotal()),2);
             $data['purchase_price'] = round(floatval($entity->getPurchasePrice()),2);
             $data['received'] = round(floatval($entity->getPayment()),2);
             $data['due'] = round(floatval($entity->getDue()),2);
