@@ -413,6 +413,83 @@ class GlobalOptionRepository extends EntityRepository
         return $micro;
     }
 
+    public function appGlobalOption($mobile,$data)
+    {
+
+        $em = $this->_em;
+        $mainApp = $data['app_id'];
+        $name = $data['shop_name'];
+        $mainApp = $em->getRepository(AppModule::class)->find($mainApp);
+        $globalOption = new GlobalOption();
+        $globalOption->setStatus(1);
+        $globalOption->setName($name);
+        $globalOption->setOrganizationName($name);
+        $globalOption->setMobileName($name);
+        $globalOption->setName($name);
+        $globalOption->setSlug($this->urlSlug($name));
+        $globalOption->setSubDomain($this->urlSlug($name));
+        $globalOption->setMobile($mobile);
+        $globalOption->setHotline($mobile);
+        $globalOption->setMainApp($mainApp);
+        $globalOption->setUniqueCode($this->getUniqueId());
+        $em->persist($globalOption);
+        $em->flush();
+
+
+        $name = $data['name'];
+        $username = $data['user_name'];
+        $email = "{$username}@gmail.com";
+        $user = new User();
+        $user->setUsername($username);
+        $user->setEmail($email);
+        $user->setPlainPassword('@123456');
+        $user->setAppPassword('@123456');
+        $user->setEnabled(1);
+        $user->setGlobalOption($globalOption);
+        $user->setUserGroup("user");
+        $user->setRoles("user");
+        $user->setAppRoles($this->mobileAppRoles());
+        $em->persist($user);
+        $em->flush();
+
+        $profile = new Profile();
+        $profile->setUser($user);
+        $profile->setName($name);
+        $profile->setMobile($mobile);
+        $designation = $em->getRepository(Designation::class)->find(1);
+        $profile->setDesignation($designation);
+        $em->persist($profile);
+        $em->flush();
+        return $globalOption;
+
+    }
+
+    public function mobileAppRoles()
+    {
+        $array =array('ROLE_MANAGER', 'ROLE_PURCHASE','ROLE_SALES','ROLE_STOCK','ROLE_ACCOUNT_RECEIVE','ROLE_ACCOUNT_PAYMENT','ROLE_EXPENSE','ROLE_SETTING');
+        return $array;
+    }
+    public function medicineRoles()
+    {
+        $array =array('ROLE_MEDICINE', 'ROLE_MEDICINE_SALES','ROLE_MEDICINE_PURCHASE','ROLE_MEDICINE_STOCK','ROLE_MEDICINE_MANAGER','ROLE_MEDICINE_REVERSE','ROLE_MEDICINE_REPORT','ROLE_MEDICINE_ADMIN',
+        'ROLE_ACCOUNTING','ROLE_DOMAIN_ACCOUNTING_EXPENDITURE','ROLE_DOMAIN_ACCOUNTING_PURCHASE','ROLE_DOMAIN_ACCOUNTING_SALES','ROLE_DOMAIN_ACCOUNTING_EXPENDITURE_PURCHASE','ROLE_DOMAIN_ACCOUNTING_CASH','ROLE_DOMAIN_FINANCE_APPROVAL','ROLE_DOMAIN_ACCOUNTING_REPORT','ROLE_DOMAIN_ACCOUNTING_SALES_REPORT','ROLE_DOMAIN_ACCOUNTING_PURCHASE_REPORT','ROLE_DOMAIN_ACCOUNTING_TRANSACTION','ROLE_DOMAIN_ACCOUNTING_JOURNAL','ROLE_DOMAIN_ACCOUNTING_BANK','ROLE_DOMAIN_ACCOUNTING_CONFIG');
+        return $array;
+    }
+    public function invoiceRoles()
+    {
+        $array =array('ROLE_BUSINESS', 'ROLE_BUSINESS_INVOICE','ROLE_BUSINESS_PURCHASE','ROLE_BUSINESS_STOCK','ROLE_BUSINESS_REPORT','ROLE_BUSINESS_MANAGER','ROLE_BUSINESS_APPROVE',
+            'ROLE_ACCOUNTING','ROLE_DOMAIN_ACCOUNTING_EXPENDITURE','ROLE_DOMAIN_ACCOUNTING_PURCHASE','ROLE_DOMAIN_ACCOUNTING_SALES','ROLE_DOMAIN_ACCOUNTING_EXPENDITURE_PURCHASE','ROLE_DOMAIN_ACCOUNTING_CASH','ROLE_DOMAIN_FINANCE_APPROVAL','ROLE_DOMAIN_ACCOUNTING_REPORT','ROLE_DOMAIN_ACCOUNTING_SALES_REPORT','ROLE_DOMAIN_ACCOUNTING_PURCHASE_REPORT','ROLE_DOMAIN_ACCOUNTING_TRANSACTION','ROLE_DOMAIN_ACCOUNTING_JOURNAL','ROLE_DOMAIN_ACCOUNTING_BANK','ROLE_DOMAIN_ACCOUNTING_CONFIG');
+        return $array;
+    }
+
+    public function restaurantRoles()
+    {
+        $array =array('ROLE_RESTAURANT','ROLE_DOMAIN_RESTAURANT','ROLE_DOMAIN_RESTAURANT_MANAGER','ROLE_RESTAURANT_REVERSE','ROLE_DOMAIN_RESTAURANT_ADMIN',
+            'ROLE_ACCOUNTING','ROLE_DOMAIN_ACCOUNTING_EXPENDITURE','ROLE_DOMAIN_ACCOUNTING_PURCHASE','ROLE_DOMAIN_ACCOUNTING_SALES','ROLE_DOMAIN_ACCOUNTING_EXPENDITURE_PURCHASE','ROLE_DOMAIN_ACCOUNTING_CASH','ROLE_DOMAIN_FINANCE_APPROVAL','ROLE_DOMAIN_ACCOUNTING_REPORT','ROLE_DOMAIN_ACCOUNTING_SALES_REPORT','ROLE_DOMAIN_ACCOUNTING_PURCHASE_REPORT','ROLE_DOMAIN_ACCOUNTING_TRANSACTION','ROLE_DOMAIN_ACCOUNTING_JOURNAL','ROLE_DOMAIN_ACCOUNTING_BANK','ROLE_DOMAIN_ACCOUNTING_CONFIG'
+        );
+        return $array;
+    }
+
 
     public function createGlobalOption($mobile,$data,$user ='')
     {

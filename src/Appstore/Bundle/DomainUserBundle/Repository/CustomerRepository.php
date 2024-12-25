@@ -1095,11 +1095,13 @@ class CustomerRepository extends EntityRepository
         $email = $data['email'];
         /* @var $customer Customer */
         $customer = $this->find($customerId);
-        $customer->setName($name);
-        $customer->setAddress($address);
-        $customer->setEmail($email);
-        $em->persist($customer);
-        $em->flush();
+        if($customer->getName() != 'Default' || $customer->getMobile() != $customer->getGlobalOption()->getMobile()){
+            $customer->setName($name);
+            $customer->setAddress($address);
+            $customer->setEmail($email);
+            $em->persist($customer);
+            $em->flush();
+        }
         return $em->getRepository(AppsApi::class)->apiCustomerMedicineOutstanding($customer->getGlobalOption()->getId(),$customer->getId());
     }
 

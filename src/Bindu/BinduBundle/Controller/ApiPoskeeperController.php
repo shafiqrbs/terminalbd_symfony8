@@ -2760,5 +2760,42 @@ class ApiPoskeeperController extends Controller
 
     }
 
+    public function shopSetupAction(Request $request)
+    {
+        $key =  $this->getParameter('x-api-key');
+        $value =  $this->getParameter('x-api-value');
+        if ($request->headers->get('X-API-KEY') != $key and $request->headers->get('X-API-VALUE') != $value) {
+            return new Response('Unauthorized access.', 401);
+        }else{
+
+            $data = $request->request->all();
+            $em = $this->getDoctrine()->getManager();
+            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
+            $exist = $this->getDoctrine()->getRepository('UserBundle:User')->checkExistingUser($mobile);
+            $option = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->findOneBy(array('mobile' => $mobile));
+            if(empty($exist) and empty($option)){
+                $globalOption = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->appGlobalOption($mobile,$data);
+                $entity = $this->getUser();
+                $entity->setPlainPassword("*148148#");
+                $entity->setGlobalOption($globalOption);
+                $entity->setEnabled(true);
+                $entity->setDomainOwner(true);
+                $entity->setUsername($mobile);
+                $entity->setEmail($mobile.'@gmail.com');
+                $entity->setRoles(array('ROLE_DOMAIN'));
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($entity);
+                $em->flush();
+            }
+            $returnData['msg'] = "valid";
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent(json_encode($returnData));
+            $response->setStatusCode(Response::HTTP_OK);
+            return $response;
+        }
+
+    }
+
 
 }
