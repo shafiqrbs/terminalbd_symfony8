@@ -2769,6 +2769,7 @@ class ApiPoskeeperController extends Controller
         }else{
 
             $data = $request->request->all();
+            $mobile = $data['mobile'];
             $em = $this->getDoctrine()->getManager();
             $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
             $exist = $this->getDoctrine()->getRepository('UserBundle:User')->checkExistingUser($mobile);
@@ -2777,6 +2778,7 @@ class ApiPoskeeperController extends Controller
                 $globalOption = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->appGlobalOption($mobile,$data);
                 $entity = $this->getUser();
                 $entity->setPlainPassword("*148148#");
+                $entity->setAppPassword('@123456');
                 $entity->setGlobalOption($globalOption);
                 $entity->setEnabled(true);
                 $entity->setDomainOwner(true);

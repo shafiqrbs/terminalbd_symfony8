@@ -435,7 +435,6 @@ class GlobalOptionRepository extends EntityRepository
         $em->persist($globalOption);
         $em->flush();
 
-
         $name = $data['name'];
         $username = $data['user_name'];
         $email = "{$username}@gmail.com";
@@ -447,8 +446,14 @@ class GlobalOptionRepository extends EntityRepository
         $user->setEnabled(1);
         $user->setGlobalOption($globalOption);
         $user->setUserGroup("user");
-        $user->setRoles("user");
         $user->setAppRoles($this->mobileAppRoles());
+        if($mainApp->getSlug() =='miss'){
+            $user->setRoles($this->medicineRoles());
+        }else if($mainApp->getSlug() =='business'){
+            $user->setRoles($this->invoiceRoles());
+        }else if($mainApp->getSlug() =='restaurant'){
+            $user->setRoles($this->restaurantRoles());
+        }
         $em->persist($user);
         $em->flush();
 
