@@ -88,6 +88,7 @@
                                 <th class="numeric" >Barcode</th>
                                 <th class="numeric" >Medicine Name</th>
                                 <th class="numeric" >Rack</th>
+                                <th class="numeric" >Created</th>
                                 <th class="numeric" >Grn</th>
                                 <th class="numeric" >Vendor</th>
                                 <th class="numeric" >PP</th>
@@ -107,7 +108,8 @@
                                     <td class="numeric" >{{ entity.barcode }}</td>
                                     <td class="numeric" >{{ entity.medicineStock.name }}</td>
                                     <td class="numeric" >{% if entity.medicineStock.rackNo is not empty %}{{ entity.medicineStock.rackNo.name }}{% endif %}</td>
-                                    <td class="numeric" >{{ entity.medicinePurchase.grn }}</td>
+                                    <td class="numeric" >{{ entity.medicinePurchase.created|date('d-m-y') }}</td>
+                                    <td class="numeric" ><a href="{{ path('medicine_purchase_show', { 'id': entity.medicinePurchase.id }) }}" target="_blank" >{{ entity.medicinePurchase.grn }}</a></td>
                                     <td class="numeric" >{% if entity.medicinePurchase.medicineVendor is defined and entity.medicinePurchase.medicineVendor is not empty %}{{ entity.medicinePurchase.medicineVendor.companyName }}{% endif %}</td>
                                     <td class="numeric" >
                                         {% if ( app.user.granted("ROLE_MEDICINE_MANAGER") or app.user.granted("ROLE_DOMAIN"))  %}

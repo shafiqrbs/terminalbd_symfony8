@@ -127,7 +127,6 @@ class MedicinePurchaseItemRepository extends EntityRepository
         $qb->andWhere('e.process = :process')->setParameter('process', 'Approved');
        // $qb->andWhere('mpi.remainingQuantity > 0');
         $this->handleSearchBetween($qb,$data);
-
         if (!empty($startExpiryDate) ) {
 		    $datetime = new \DateTime($startExpiryDate);
 		    $start = $datetime->format('Y-m-d 00:00:00');
