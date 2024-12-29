@@ -451,6 +451,14 @@ class GlobalOption
      */
     private $vatEnable;
 
+     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="isStock", type="boolean", nullable=true )
+     */
+    private $isStock;
+
+
     /**
      * @var string
      *
@@ -2414,5 +2422,23 @@ class GlobalOption
     {
         $this->linkDomain = $linkDomain;
     }
+
+    /**
+     * @return bool
+     */
+    public function isStock()
+    {
+        return $this->isStock;
+    }
+
+    /**
+     * @param bool $isStock
+     */
+    public function setIsStock($isStock)
+    {
+        $this->isStock = $isStock;
+    }
+
+
 
 }

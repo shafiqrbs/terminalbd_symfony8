@@ -26,7 +26,7 @@ class UserSignup extends Event
     }
 
     /**
-     * @return ContactMessage
+     * @return User
      */
     public function getUser()
     {

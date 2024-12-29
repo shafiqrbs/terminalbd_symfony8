@@ -104,11 +104,9 @@ class DefaultController extends Controller
 	  {
           set_time_limit(0);
           ignore_user_abort(true);
-
           $option = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->find($_REQUEST['option']);
           $config = $option->getMedicineConfig();
           if($option and !empty($option->getMedicineConfig())){
-
               $em = $this->getDoctrine()->getManager();
               $existConfig = $this->getUser()->getGlobalOption()->getMedicineConfig();
               $entities = $this->getDoctrine()->getRepository('MedicineBundle:MedicineParticular')->findBy(array('medicineConfig'=> $config));
@@ -116,7 +114,6 @@ class DefaultController extends Controller
               /* @var $entity MedicineParticular */
 
               foreach ($entities as $entity){
-
                   $newEntity = new MedicineParticular();
                   $newEntity->setMedicineConfig($existConfig);
                   $newEntity->setName($entity->getName());

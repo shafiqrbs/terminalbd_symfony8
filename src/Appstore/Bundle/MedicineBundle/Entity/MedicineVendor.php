@@ -146,10 +146,6 @@ class MedicineVendor
      */
     private $openingBalance = 0;
 
-
-
-
-
     /**
      * Get id
      *

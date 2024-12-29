@@ -32,7 +32,7 @@ class  GlobalOptionModifyType extends AbstractType
     {
         $userID = (!empty($options['data'])) ? $options['data']->getId():0;
         $optionID = (!empty($options['data'])) ? $options['data']->getId():0;
-        $syndicateId = (!empty($options['data'])) ? $options['data']->getSyndicate()->getParent()->getId():0;
+        $syndicateId = (!empty($options['data']) and $options['data']->getSyndicate()) ? $options['data']->getSyndicate()->getParent()->getId():'';
 
         if($userID > 0){
 

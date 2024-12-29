@@ -2,6 +2,17 @@ api_poskeeper_login:
     path:     /poskeeper-otp-login
     defaults: { _controller: BinduBundle:ApiPoskeeper:login }
 
+api_portal_app:
+    path:     /poskeeper-apps
+    defaults: { _controller: BinduBundle:ApiPortal:apps }
+
+api_poskeeper_shop_create:
+    path:     /poskeeper-shop-setup
+    defaults: { _controller: BinduBundle:ApiPoskeeper:shopSetup }
+    methods:  POST
+    options:
+        expose: true
+
 api_poskeeper_setup:
     path:     /poskeeper-setup
     defaults: { _controller: BinduBundle:ApiPoskeeper:setup }

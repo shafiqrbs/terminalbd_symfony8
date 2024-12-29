@@ -1025,12 +1025,14 @@ class MedicineStockRepository extends EntityRepository
     {
 
         $em = $this->_em;
+        $created = new \DateTime();
+        $data = $created->format('Y-m-d H:m:s');
         $stock = $em->createQuery("DELETE MedicineBundle:MedicineStock e WHERE e.medicineConfig={$to}");
         if($stock){
             $stock->execute();
         }
-        $elem = "INSERT INTO medicine_stock(`unit_id`,`name`,`slug`,`minQuantity`,`remainingQuantity`,`salesPrice`, `purchasePrice`,`averagePurchasePrice`, `medicineBrand_id`,`brandName`,`pack`,`isAndroid`,`printHide`,mode,status,`medicineConfig_id`)
-  SELECT `unit_id`, trim(name),trim(slug),0,0, `salesPrice`, `purchasePrice`, `purchasePrice`,`medicineBrand_id`, `brandName`, `pack`, `isAndroid`, `printHide`,mode,1,$to
+        $elem = "INSERT INTO medicine_stock(`unit_id`,`name`,`slug`,`minQuantity`,`remainingQuantity`,`salesPrice`, `purchasePrice`,`averagePurchasePrice`, `medicineBrand_id`,`brandName`,`pack`,`isAndroid`,`printHide`,mode,status,isDelete,created,updated,`medicineConfig_id`)
+  SELECT `unit_id`, trim(name),trim(slug),0,0, `salesPrice`, `purchasePrice`, `purchasePrice`,`medicineBrand_id`, `brandName`, `pack`, `isAndroid`, `printHide`,mode,1,0,'{$data}','{$data}',$to
   FROM medicine_stock
   WHERE medicineConfig_id =:config AND status=1";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);

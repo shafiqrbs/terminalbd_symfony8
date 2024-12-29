@@ -6,6 +6,7 @@ use Appstore\Bundle\AccountingBundle\Entity\AccountBank;
 use Appstore\Bundle\AccountingBundle\Entity\AccountCash;
 use Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank;
 use Appstore\Bundle\AccountingBundle\Entity\AccountSales;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineConfig;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineParticular;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineParticularType;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineSales;
@@ -18,6 +19,7 @@ use Gregwar\Image\Image;
 use Setting\Bundle\AppearanceBundle\Entity\TemplateCustomize;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Setting\Bundle\ToolBundle\Entity\TransactionMethod;
+use Setting\Bundle\ToolBundle\Event\UserSignup;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -2762,6 +2764,8 @@ class ApiPoskeeperController extends Controller
 
     public function shopSetupAction(Request $request)
     {
+        set_time_limit(0);
+        ignore_user_abort(true);
         $key =  $this->getParameter('x-api-key');
         $value =  $this->getParameter('x-api-value');
         if ($request->headers->get('X-API-KEY') != $key and $request->headers->get('X-API-VALUE') != $value) {
@@ -2774,9 +2778,17 @@ class ApiPoskeeperController extends Controller
             $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
             $exist = $this->getDoctrine()->getRepository('UserBundle:User')->checkExistingUser($mobile);
             $option = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->findOneBy(array('mobile' => $mobile));
+         //   $this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($option);
             if(empty($exist) and empty($option)){
-                $globalOption = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->appGlobalOption($mobile,$data);
-                $entity = $this->getUser();
+
+                /** @var $user User */
+                $user = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->appGlobalOption($mobile,$data);
+                /* @var $globalOption GlobalOption */
+                $globalOption = $user->getGlobalOption();
+
+                $this->get('settong.toolManageRepo')->createDirectory($globalOption->getId());
+                $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->initialSetup($globalOption);
+                $entity = new User();
                 $entity->setPlainPassword("*148148#");
                 $entity->setAppPassword('@123456');
                 $entity->setGlobalOption($globalOption);
@@ -2788,8 +2800,20 @@ class ApiPoskeeperController extends Controller
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($entity);
                 $em->flush();
+                if($globalOption->isStock() == 1 and $globalOption->getMainApp()->getSlug() == 'miss'){
+                    $this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
+                }elseif($globalOption->isStock() == 1 and $globalOption->getMainApp()->getSlug() == 'restaurant'){
+                    //$this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
+                }elseif($globalOption->isStock() == 1 and $globalOption->getMainApp()->getSlug() == 'invoice'){
+                    //$this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
+                }
             }
-            $returnData['msg'] = "valid";
+            $dispatcher = $this->container->get('event_dispatcher');
+            $dispatcher->dispatch('setting_tool.post.user_signup_msg', new UserSignup($user));
+
+            $returnData['name'] = $globalOption->getName();
+            $returnData['license_no'] = $globalOption->getMobile();
+            $returnData['active_key'] = $globalOption->getUniqueCode();
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($returnData));

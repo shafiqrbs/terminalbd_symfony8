@@ -418,7 +418,8 @@ class GlobalOptionRepository extends EntityRepository
 
         $em = $this->_em;
         $mainApp = $data['app_id'];
-        $name = $data['shop_name'];
+        $name = $data['store_name'];
+        $isStock = $data['is_stock'];
         $mainApp = $em->getRepository(AppModule::class)->find($mainApp);
         $globalOption = new GlobalOption();
         $globalOption->setStatus(1);
@@ -431,6 +432,9 @@ class GlobalOptionRepository extends EntityRepository
         $globalOption->setMobile($mobile);
         $globalOption->setHotline($mobile);
         $globalOption->setMainApp($mainApp);
+        if($isStock == 1){
+            $globalOption->setIsStock($isStock);
+        }
         $globalOption->setUniqueCode($this->getUniqueId());
         $em->persist($globalOption);
         $em->flush();
@@ -457,6 +461,7 @@ class GlobalOptionRepository extends EntityRepository
         $em->persist($user);
         $em->flush();
 
+
         $profile = new Profile();
         $profile->setUser($user);
         $profile->setName($name);
@@ -465,7 +470,8 @@ class GlobalOptionRepository extends EntityRepository
         $profile->setDesignation($designation);
         $em->persist($profile);
         $em->flush();
-        return $globalOption;
+        $this->systemConfigUpdate($globalOption);
+        return $user;
 
     }
 
@@ -568,15 +574,12 @@ class GlobalOptionRepository extends EntityRepository
             $this->_em->persist($config);
         }
 
-
-
         $hospital = $this->_em->getRepository('HospitalBundle:HospitalConfig')->findOneBy(array('globalOption'=>$globalOption));
         if(empty($hospital)){
             $config = new HospitalConfig();
             $config->setGlobalOption($globalOption);
             $this->_em->persist($config);
         }
-
 
         $restaurantConfig = $this->_em->getRepository('RestaurantBundle:RestaurantConfig')->findOneBy(array('globalOption'=>$globalOption));
         if(empty($restaurantConfig)){
@@ -611,103 +614,36 @@ class GlobalOptionRepository extends EntityRepository
     /**
      * @param GlobalOption $entity
      */
-    public function initialSetup(User $entity)
+    public function initialSetup(GlobalOption $globalOption)
     {
         $em = $this->_em;
 
-        /**
-        @var GlobalOption $globalOption;
-         */
+        /** @var GlobalOption $globalOption; */
 
-        $globalOption = $entity->getGlobalOption();
-
-        $theme       =  $em->getRepository('SettingToolBundle:Theme')->find(1);
         $settingEntity = new SiteSetting();
         $settingEntity->setGlobalOption($globalOption);
-        $settingEntity->setUser($entity);
-        $settingEntity->setTheme($theme);
-        $modules[] = $em->getRepository('SettingToolBundle:Module')->findOneBy(array('slug' => 'page'));
-        $modules[] = $em->getRepository('SettingToolBundle:Module')->findOneBy(array('slug' => 'contact'));
-        $settingEntity->setModules($modules);
+        if($globalOption->getMainApp()->getSlug() == 'miss'){
+            $modules[] = $em->getRepository(AppModule::class)->find(16);
+        }elseif($globalOption->getMainApp()->getSlug() == 'restaurant'){
+            $modules[] = $em->getRepository(AppModule::class)->find(11);
+        }elseif($globalOption->getMainApp()->getSlug() == 'business'){
+            $modules[] = $em->getRepository(AppModule::class)->find(16);
+        }
+        $modules[] = $em->getRepository(AppModule::class)->find(4);
+        $modules[] = $em->getRepository(AppModule::class)->find(7);
+        $settingEntity->setAppModules($modules);
         $em->persist($settingEntity);
-
 
         $templateEntity = new TemplateCustomize();
         $templateEntity->setGlobalOption($globalOption);
         $em->persist($templateEntity);
-
-
-        $homePageEntity = new HomePage();
-        $homePageEntity->setGlobalOption($globalOption);
-        $homePageEntity->setUser($entity);
-        $homePageEntity->setName('Home');
-        $em->persist($homePageEntity);
-
-        $iconEntity = new MobileIcon();
-        $iconEntity->setGlobalOption($globalOption);
-        $em->persist($iconEntity);
-
-
-        $contactEntity = new ContactPage();
-        $contactEntity->setGlobalOption($globalOption);
-        $contactEntity->setUser($entity);
-        $em->persist($contactEntity);
-
-        $footerEntity = new FooterSetting();
-        $footerEntity->setGlobalOption($globalOption);
-        $em->persist($footerEntity);
-
-        $adsEntity = new AdsTool();
-        $adsEntity->setGlobalOption($globalOption);
-        $em->persist($adsEntity);
-
 
         $customer = new Customer();
         $customer->setGlobalOption($globalOption);
         $customer->setMobile($globalOption->getMobile());
         $customer->setName('Default');
         $em->persist($customer);
-
-        $inventory = new InventoryConfig();
-        $inventory->setGlobalOption($globalOption);
-        $em->persist($inventory);
-
-
-        $ecommerce = new EcommerceConfig();
-        $ecommerce->setGlobalOption($globalOption);
-        $em->persist($ecommerce);
-
-        $config = new AssetsConfig();
-        $config->setGlobalOption($globalOption);
-        $this->_em->persist($config);
-
-
-        $module = $this->_em->getRepository('SettingToolBundle:Module')->findOneBy(array('slug' => 'page'));
-        $about = new Page();
-        $about->setGlobalOption($globalOption);
-        $about->setUser($entity);
-        $about->setModule($module);
-        $about->setName('About us');
-        $about->setMenu('About us');
-        $em->persist($about);
-
-
-        $menu = new Menu();
-        $menu->setGlobalOption($globalOption);
-        $menu->setPage($about);
-        $menu->setMenu($about->getName());
-        $menu->setSlug($about->getSlug());
-        $em->persist($menu);
-
-        $menu = new Menu();
-        $menu->setGlobalOption($globalOption);
-        $menu->setMenu('Contact us');
-        $menu->setSlug('contact');
-        $em->persist($menu);
-
         $em->flush();
-        $this->defaultMenuSetup($globalOption);
-        $this->initialMenuSetup($globalOption);
 
     }
 

@@ -9,7 +9,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Setting\Bundle\Tool\Service\RequestManager;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
 use Setting\Bundle\ToolBundle\Form\GlobalOptionType;
 use Symfony\Component\HttpFoundation\Response;
@@ -462,9 +461,11 @@ class GlobalOptionController extends Controller
     public function getSubSyndicateUnderVendor($entity)
     {
         $em = $this->getDoctrine()->getManager();
-        $parentId       = $entity->getSyndicate()->getId();
-        $syndicates     = $em->getRepository('SettingToolBundle:Syndicate')->findBy(array('status' => 1,'parent' => $parentId),array('name' => 'asc'));
-        return $subSyndicates  = $this->getDoctrine()->getRepository('SettingToolBundle:Syndicate')->getSelectedSubSyndicates($syndicates,$entity);
+        if($entity->getSyndicate()){
+            $parentId       = $entity->getSyndicate()->getId();
+            $syndicates     = $em->getRepository('SettingToolBundle:Syndicate')->findBy(array('status' => 1,'parent' => $parentId),array('name' => 'asc'));
+            return $subSyndicates  = $this->getDoctrine()->getRepository('SettingToolBundle:Syndicate')->getSelectedSubSyndicates($syndicates,$entity);
+        }
 
     }
 

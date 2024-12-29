@@ -1,8 +1,11 @@
 <?php
 
 namespace Appstore\Bundle\MedicineBundle\Repository;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineConfig;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineParticular;
 use Doctrine\ORM\EntityRepository;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
+use Symfony\Component\HttpFoundation\Response;
 
 
 /**
@@ -157,9 +160,34 @@ class MedicineConfigRepository extends EntityRepository
             29=>29,
             30=>30
         );
-
         return $array;
+    }
 
-
+    public function GenerateStock(GlobalOption $option)
+    {
+        $em = $this->_em;
+        $fromOption = $em->getRepository(GlobalOption::class)->find(126);
+        $config = $fromOption->getMedicineConfig();
+        if($option and $config){
+            $existConfig = $option->getMedicineConfig();
+            $entities = $em->getRepository('MedicineBundle:MedicineParticular')->findBy(array('medicineConfig'=> $config));
+            /* @var $entity MedicineParticular */
+            if($entities){
+                foreach ($entities as $entity){
+                    $newEntity = new MedicineParticular();
+                    $newEntity->setMedicineConfig($existConfig);
+                    $newEntity->setName($entity->getName());
+                    $newEntity->setStatus(1);
+                    $newEntity->setParticularType($entity->getParticularType());
+                    $newEntity->setSlug($entity->getSlug());
+                    $em->persist($newEntity);
+                    $em->flush();
+                }
+            }
+            $fromConfig = $config->getId();
+            $toConfig = $em->getRepository(MedicineConfig::class)->findOneBy(array('globalOption' => $option));
+            $em->getRepository('MedicineBundle:MedicineStock')->processStockMigration($fromConfig,$toConfig->getId());
+            $em->getRepository('MedicineBundle:MedicineVendor')->copyToMedicineVendor($fromConfig,$toConfig->getId());
+        }
     }
 }

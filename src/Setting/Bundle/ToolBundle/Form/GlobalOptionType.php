@@ -30,9 +30,9 @@ class GlobalOptionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $userID = (!empty($options['data'])) ? $options['data']->getId():0;
-        $syndicateId = (!empty($options['data'])) ? $options['data']->getSyndicate()->getId():0;
-        $optionID = (!empty($options['data'])) ? $options['data']->getId():0;
+        $userID = (!empty($options['data'])) ? $options['data']->getId():'';
+        $syndicateId = (!empty($options['data']) and $options['data']->getSyndicate()) ? $options['data']->getSyndicate()->getParent()->getId():'';
+        $optionID = (!empty($options['data'])) ? $options['data']->getId():'';
         if($userID > 0){
             parent::buildForm($builder, $options);
             $builder
