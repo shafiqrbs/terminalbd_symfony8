@@ -89,8 +89,9 @@ class ApiPortalController extends Controller
     }
 
     public function getAppModules(){
-        $array =array(array(
-            "medicine"=> "Medicine",
+        $appList = array();
+        $array = array(
+            "medicine" => "Medicine",
             "restaurant"=> "Restaurant",
             "fast-food"=> "Fast-Food",
             "trading"=> "Trading",
@@ -104,7 +105,10 @@ class ApiPortalController extends Controller
             "parlour"=> "Parlour",
             "fuel-station"=> "Fuel-station",
             "Others"=> "Others",
-        ));
+        );
+        $array = array(
+            array( 'app_slug' => 'medicine', 'name' => "Medicine"),
+        );
         return $array;
     }
 
