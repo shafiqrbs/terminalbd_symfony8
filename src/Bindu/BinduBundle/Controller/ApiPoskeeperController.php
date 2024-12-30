@@ -379,7 +379,7 @@ class ApiPoskeeperController extends Controller
                 'purchase'             => number_format($purchaseCashOverview['total'],2) ,
                 'payment'              => number_format($purchaseCashOverview['payment'],2) ,
                 'receive_amount'       => number_format($purchaseCashOverview['salesReceive'],2) ,
-                'payment_amount'       => number_format($purchaseCashOverview['payment'],2) ,
+                'payment_amount'       => number_format(($purchaseCashOverview['payment']+$expenditureOverview),2) ,
                 'balance_amount'       => number_format($purchaseCashOverview['salesReceive'] - ($purchaseCashOverview['payment']+$expenditureOverview),2) ,
                 'transaction_overview' => $transactionCashOverview,
                 'version'   => (int) $versionNo,
