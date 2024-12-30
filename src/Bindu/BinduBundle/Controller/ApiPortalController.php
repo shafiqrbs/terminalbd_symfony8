@@ -75,10 +75,10 @@ class ApiPortalController extends Controller
         $key =  $this->getParameter('x-api-key');
         $value =  $this->getParameter('x-api-value');
         if ($request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
-            $data =$this->getDoctrine()->getRepository('SettingToolBundle:AppModule')->getAppModules();
+          //  $data =$this->getDoctrine()->getRepository('SettingToolBundle:AppModule')->getAppModules();
+            $data = $this->getAppModules();
         }else{
             return new Response('Unauthorized access.', 401);
-
         }
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
@@ -87,6 +87,27 @@ class ApiPortalController extends Controller
         return $response;
 
     }
+
+    public function getAppModules(){
+        $array = array(
+            "medicine"=> "Medicine",
+            "restaurant"=> "Restaurant",
+            "fast-food"=> "Fast-Food",
+            "trading"=> "Trading",
+            "aggro-feed"=> "Aggro Feed",
+            "poultry"=> "Poultry",
+            "electronic"=> "Electronic",
+            "mobile-shop"=> "Mobile Shop",
+            "invoicing"=> "Invoicing",
+            "inventory"=> "Inventory",
+            "digital-sign"=> "Digital-Sign",
+            "parlour"=> "Parlour",
+            "fuel-station"=> "Fuel-station",
+            "Others"=> "Others",
+        );
+        return $array;
+    }
+
 
     public function appDetailsAction(Request $request)
     {

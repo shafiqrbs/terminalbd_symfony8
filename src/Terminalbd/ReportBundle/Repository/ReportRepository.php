@@ -497,10 +497,4 @@ class ReportRepository extends EntityRepository
         return $result;
     }
 
-
-
-
-
-
-
 }

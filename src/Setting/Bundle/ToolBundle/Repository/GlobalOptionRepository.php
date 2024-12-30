@@ -417,10 +417,10 @@ class GlobalOptionRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $mainApp = $data['app_id'];
+        $mainApp = $data['app_slug'];
         $name = $data['store_name'];
+        $password = $data['password'];
         $isStock = $data['is_stock'];
-        $mainApp = $em->getRepository(AppModule::class)->find($mainApp);
         $globalOption = new GlobalOption();
         $globalOption->setStatus(1);
         $globalOption->setName($name);
@@ -431,7 +431,17 @@ class GlobalOptionRepository extends EntityRepository
         $globalOption->setSubDomain($this->urlSlug($name));
         $globalOption->setMobile($mobile);
         $globalOption->setHotline($mobile);
-        $globalOption->setMainApp($mainApp);
+        $globalOption->setShopModel($mainApp);
+        if(in_array($mainApp,array('medicine'))){
+            $mainApp = $em->getRepository(AppModule::class)->findOneBy(array('slug'=>'miss'));
+            $globalOption->setMainApp($mainApp);
+        }elseif(in_array($mainApp,array('restaurant','fast-food'))){
+            $mainApp = $em->getRepository(AppModule::class)->findOneBy(array('slug'=>'restaurant'));
+            $globalOption->setMainApp($mainApp);
+        }else{
+            $mainApp = $em->getRepository(AppModule::class)->findOneBy(array('slug'=>'business'));
+            $globalOption->setMainApp($mainApp);
+        }
         if($isStock == 1){
             $globalOption->setIsStock($isStock);
         }
@@ -445,12 +455,13 @@ class GlobalOptionRepository extends EntityRepository
         $user = new User();
         $user->setUsername($username);
         $user->setEmail($email);
-        $user->setPlainPassword('@123456');
-        $user->setAppPassword('@123456');
+        $user->setPlainPassword($password);
+        $user->setAppPassword($password);
         $user->setEnabled(1);
         $user->setGlobalOption($globalOption);
         $user->setUserGroup("user");
         $user->setAppRoles($this->mobileAppRoles());
+
         if($mainApp->getSlug() =='miss'){
             $user->setRoles($this->medicineRoles());
         }else if($mainApp->getSlug() =='business'){

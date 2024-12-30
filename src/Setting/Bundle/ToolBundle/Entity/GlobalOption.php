@@ -433,6 +433,13 @@ class GlobalOption
     /**
      * @var string
      *
+     * @ORM\Column(name="shopModel", type="text", length=255  , nullable=true )
+     */
+    private $shopModel;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="binNo", type="text", length=255  , nullable=true )
      */
     private $binNo;
@@ -2439,6 +2446,21 @@ class GlobalOption
         $this->isStock = $isStock;
     }
 
+    /**
+     * @return string
+     */
+    public function getShopModel()
+    {
+        return $this->shopModel;
+    }
+
+    /**
+     * @param string $shopModel
+     */
+    public function setShopModel($shopModel)
+    {
+        $this->shopModel = $shopModel;
+    }
 
 
 }
