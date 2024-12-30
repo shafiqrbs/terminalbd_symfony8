@@ -2811,8 +2811,8 @@ class ApiPoskeeperController extends Controller
                     //$this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
                 }
             }
-            $dispatcher = $this->container->get('event_dispatcher');
-            $dispatcher->dispatch('setting_tool.post.user_signup_msg', new UserSignup($user));
+         //   $dispatcher = $this->container->get('event_dispatcher');
+         //   $dispatcher->dispatch('setting_tool.post.user_signup_msg', new UserSignup($user));
 
             $returnData['name'] = $globalOption->getName();
             $returnData['license_no'] = $globalOption->getMobile();
