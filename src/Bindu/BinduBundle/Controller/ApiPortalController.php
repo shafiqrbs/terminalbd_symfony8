@@ -108,6 +108,8 @@ class ApiPortalController extends Controller
         );
         $array = array(
             array( 'app_slug' => 'medicine', 'name' => "Medicine"),
+            array( 'app_slug' => 'restaurant', 'name' => "Restaurant"),
+            array( 'app_slug' => 'inventory', 'name' => "Inventory"),
         );
         return $array;
     }
