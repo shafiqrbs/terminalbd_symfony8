@@ -1697,6 +1697,8 @@ class AppsApiRepository extends EntityRepository
         $content = (isset($data['content']) and $data['content']) ? $data['content'] : '';
         $isApprove = (isset($data['is_approve']) and $data['is_approve']) ? 1 : 0;
         $user = (isset($data['approved_by']) and $data['approved_by']) ? $data['approved_by'] : '';
+        $total = (isset($data['total']) and $data['total']) ? $data['total'] : '';
+        $amount = (isset($data['amount']) and $data['amount']) ? $data['amount'] : '';
 
         $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
         $entity = new MedicineAndroidProcess();

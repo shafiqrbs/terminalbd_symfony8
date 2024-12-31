@@ -110,6 +110,20 @@ class MedicineAndroidProcess
     private $isApprove = false;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="total", type="float", nullable=true)
+     */
+    private $total = 0;
+
+      /**
+     * @var float
+     *
+     * @ORM\Column(name="amount", type="float", nullable=true)
+     */
+    private $amount = 0;
+
+     /**
      * @var integer
      *
      * @ORM\Column(name="itemCount", type="integer", nullable=true)
@@ -404,6 +418,40 @@ class MedicineAndroidProcess
     {
         $this->isApprove = $isApprove;
     }
+
+    /**
+     * @return float
+     */
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    /**
+     * @param float $total
+     */
+    public function setTotal($total)
+    {
+        $this->total = $total;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @param float $amount
+     */
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
+    }
+
+
 
 
 
