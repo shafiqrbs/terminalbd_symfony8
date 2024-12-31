@@ -1706,6 +1706,8 @@ class AppsApiRepository extends EntityRepository
         $entity->setAndroidDevice($device);
         $entity->setProcess($process);
         $entity->setMode($mode);
+        $entity->setTotal($total);
+        $entity->setAmount($amount);
         $entity->setJsonItem($content);
         $entity->setCreatedBy($em->getRepository(User::class)->find($user));
         $entity->setIsApprove($isApprove);
