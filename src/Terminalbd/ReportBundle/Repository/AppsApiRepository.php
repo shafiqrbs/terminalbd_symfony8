@@ -139,15 +139,22 @@ class AppsApiRepository extends EntityRepository
             $config = $entity->getRestaurantConfig();
             $servicePercent = $config->getServicePercentage();
             $sdPercent = $config->getSdPercentage();
+            $vatPercentage = $config->getVatPercentage();
+            $vatRegNo = $config->getVatRegNo();
+            $vatEnable = ($config->isVatEnable() == true) ? 1 : 0;
         }elseif($entity->getMainApp()->getSlug() == 'business'){
             $config = $entity->getBusinessConfig();
+            $vatPercentage = $config->getVatPercentage();
+            $vatRegNo = $config->getVatRegNo();
+            $vatEnable = ($config->getVatEnable() == true) ? 1 : 0;
         }else{
             $config = $entity->getMedicineConfig();
+            $vatPercentage = $config->getVatPercentage();
+            $vatRegNo = $config->getVatRegNo();
+            $vatEnable = ($config->isVatEnable() == true) ? 1 : 0;
         }
         $address = $config->getAddress();
-        $vatPercentage = $config->getVatPercentage();
-        $vatRegNo = $config->getVatRegNo();
-        $vatEnable = ($config->isVatEnable() == true) ? 1 : 0;
+
         $footerMessage = $config->getPrintFooterText();
         if ($footerMessage) {
             $printFooter = $footerMessage;
