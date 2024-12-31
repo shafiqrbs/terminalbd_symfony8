@@ -1,6 +1,11 @@
 <?php
 ini_set('date.timezone', 'Asia/Dhaka');
 
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Methods: *");
+header("Allow: *");
+
 /** @var \Composer\Autoload\ClassLoader $loader */
 $loader = require __DIR__.'/../app/autoload.php';
 
@@ -10,6 +15,8 @@ EzMaintenance\Worker::watch('file', array(
     /* 'template' => 'under_construction.php',*/
     'msg' => 'Site is currently undergoing maintenance!'
 ));
+
+
 
 defined('APPLICATION_ENV')
 || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'prod'));
