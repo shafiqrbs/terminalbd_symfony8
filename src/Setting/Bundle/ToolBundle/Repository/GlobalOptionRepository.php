@@ -458,6 +458,7 @@ class GlobalOptionRepository extends EntityRepository
         $user->setPlainPassword($password);
         $user->setAppPassword($password);
         $user->setEnabled(1);
+        $user->setDomainOwner(2);
         $user->setGlobalOption($globalOption);
         $user->setUserGroup("user");
         $user->setAppRoles($this->mobileAppRoles());
