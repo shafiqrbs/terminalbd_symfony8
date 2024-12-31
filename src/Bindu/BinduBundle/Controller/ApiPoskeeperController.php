@@ -2815,8 +2815,8 @@ class ApiPoskeeperController extends Controller
          //   $dispatcher->dispatch('setting_tool.post.user_signup_msg', new UserSignup($user));
 
             $returnData['name'] = $globalOption->getName();
-            $returnData['license_no'] = $globalOption->getMobile();
-            $returnData['active_key'] = $globalOption->getUniqueCode();
+            $returnData['license_no'] = (string) $globalOption->getMobile();
+            $returnData['active_key'] = (string) $globalOption->getUniqueCode();
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($returnData));
