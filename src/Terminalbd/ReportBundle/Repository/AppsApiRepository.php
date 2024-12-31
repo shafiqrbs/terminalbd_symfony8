@@ -206,7 +206,7 @@ class AppsApiRepository extends EntityRepository
             'messenger' => $this->stringNullChecker($messenger),
             'analytic' => $this->stringNullChecker($analytic),
             'email' => $this->stringNullChecker($entity->getEmail()),
-            'locationId' => $entity->getLocation() ? $entity->getLocation()->getId():'',
+            'locationId' => (integer) $entity->getLocation() ? $entity->getLocation()->getId():0,
             'address' => $this->stringNullChecker($address),
             'locationName' => $entity->getLocation() ? $this->stringNullChecker($entity->getLocation()->getName()):'',
             'symbol' => $config->getCurrency() ? $config->getCurrency()->getSymbol() : '',
