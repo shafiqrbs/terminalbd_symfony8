@@ -104,6 +104,12 @@ class BusinessConfig
     private $businessPurchasesReturns;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Currency")
+     * @ORM\OrderBy({"name" = "ASC"})
+     **/
+    private $currency;
+
+    /**
      * @var array
      *
      * @ORM\Column(name="stockFormat", type="array", length=50,nullable = true)
@@ -1789,6 +1795,24 @@ class BusinessConfig
     {
         $this->isArea = $isArea;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * @param mixed $currency
+     */
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
+    }
+
+
 
 
 
