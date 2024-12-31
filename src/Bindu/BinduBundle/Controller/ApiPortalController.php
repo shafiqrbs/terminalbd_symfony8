@@ -115,8 +115,7 @@ class ApiPortalController extends Controller
                 'active_key' => "1671288227",
                 'username' => "Pharmacy",
                 'password' => "@123456",
-                'content' => "<h1>Pharmacy POS Features</h1>
-                    <ul>
+                'content' => "<ul>
                         <li><strong>Inventory Tracking:</strong> Real-time monitoring of stock levels, expiry dates, and batch numbers for medicines.</li>
                         <li><strong>Barcode Scanning:</strong> Easy identification and billing of products using barcode scanning.</li>
                         <li><strong>Prescription Management:</strong> Integration to store, process, and validate prescriptions.</li>
@@ -134,8 +133,7 @@ class ApiPortalController extends Controller
                 'active_key' => "1551378444",
                 'username' => "jp_rubel",
                 'password' => "@123456",
-                'content' => " <h1>Restaurant POS Features</h1>
-        <ul>
+                'content' => "<ul>
             <li><strong>Table Management:</strong> Visual table layouts for reservations and order tracking.</li>
             <li><strong>Order Management:</strong> Integrated order tracking for dine-in, takeaway, and delivery.</li>
             <li><strong>Kitchen Display System (KDS):</strong> Instant order communication between waitstaff and the kitchen.</li>
@@ -147,13 +145,12 @@ class ApiPortalController extends Controller
              array(
                 'app_slug' => 'invoice',
                 'name' => "Business Invoice",
-                'title' => "Business Invoice Management System",
+                'title' => "Trading Business POS System",
                 'license_no' => "01706250725",
                 'active_key' => "1577633987",
                 'username' => "rpf_kajol",
                 'password' => "@123456",
-                'content' => "<h1>Trading Business POS Features</h1>
-        <ul>
+                'content' => "<ul>
             <li><strong>Multi-Warehouse Management:</strong> Track stock across multiple warehouses and locations.</li>
             <li><strong>Dynamic Pricing:</strong> Flexible pricing strategies based on market trends and demand.</li>
             <li><strong>Purchase Order Management:</strong> Automate purchase orders and vendor coordination.</li>
