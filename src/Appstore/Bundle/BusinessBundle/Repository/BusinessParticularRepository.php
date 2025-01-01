@@ -251,7 +251,9 @@ class BusinessParticularRepository extends EntityRepository
             $data[$key]['global_id']            = (int) $option->getId();
             $data[$key]['item_id']              = (int) $row['stockId'];
             $data[$key]['category_id']          = $row['categoryId'];
-            $data[$key]['categoryName']         = $row['categoryName'];
+            $data[$key]['category_name']         = $row['categoryName'];
+            $data[$key]['brand_name']           = '';
+            $data[$key]['barcode']              = '';
             if ($row['unitId']){
                 $data[$key]['unit_id']          = $row['unitId'];
                 $data[$key]['unit']             = $row['unitName'];
@@ -260,12 +262,12 @@ class BusinessParticularRepository extends EntityRepository
                 $data[$key]['unit']             = '';
             }
             $data[$key]['name']                 = $row['name'];
-            $data[$key]['printName']            = $row['name'];
+            $data[$key]['print_name']            = $row['name'];
             $data[$key]['quantity']             = $row['quantity'];
-            $data[$key]['salesPrice']           = $row['salesPrice'];
-            $data[$key]['purchasePrice']        = $row['purchasePrice'];
-            $data[$key]['printHidden']          = "";
-            $data[$key]['imagePath']            = "";
+            $data[$key]['sales_price']           = $row['salesPrice'];
+            $data[$key]['purchase_price']        = $row['purchasePrice'];
+            $data[$key]['print_hidden']          = "";
+            $data[$key]['image_path']            = "";
 
         }
         return $data;
