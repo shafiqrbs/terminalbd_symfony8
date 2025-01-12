@@ -69,7 +69,7 @@ class ApiPortalController extends Controller
 
     }
 
-    public function appsAction(Request $request)
+    public function onboardAction(Request $request)
     {
 
         $key =  $this->getParameter('x-api-key');
@@ -107,7 +107,8 @@ class ApiPortalController extends Controller
             "Others"=> "Others",
         );
         $array = array(
-            array(
+
+             array(
                 'app_slug' => 'medicine',
                 'name' => "Medicine",
                 'title' => "Medicine Management System",
@@ -159,7 +160,51 @@ class ApiPortalController extends Controller
         </ul>",
             )
         );
-        return $array;
+        $intro = array(
+
+            'video_url' => "https://youtu.be/CPclGyYCGtY?si=12eJJnM7yUQvh7RU",
+            'terms_condition'=> '<p>1. Acceptance of Terms
+    By using this Point of Sale (POS) application, you agree to abide by these Terms and Conditions. If you do not agree, please refrain from using the application.
+2. User Responsibilities
+    Ensure that all transactions are legally compliant and accurately recorded.
+    Maintain the confidentiality of login credentials and sensitive business data.
+    Use the software only for its intended purpose—business transactions and sales management.
+3. Licensing & Access
+    This POS software is licensed, not sold. You are granted a non-transferable, non-exclusive right to use it.
+    Unauthorized copying, distribution, or modification of the software is strictly prohibited.
+4. Data Privacy & Security
+    The application may collect and store transaction data for business analytics and operational purposes.
+    Users are responsible for securing their device and preventing unauthorized access.
+    The app provider is not liable for any data loss due to user negligence.
+5. Payment & Subscriptions
+    If applicable, subscription plans must be paid on time to maintain uninterrupted service.
+    Failure to renew may result in restricted access to certain features.
+6. Software Updates & Maintenance
+    The provider reserves the right to update the software periodically to improve performance and security.
+    Users must keep their software up to date to ensure compatibility and security.
+7. Prohibited Activities
+    Users must not:
+    Engage in fraudulent transactions or manipulate sales records.
+    Reverse-engineer, modify, or attempt to hack the application.
+    Use the POS app for illegal activities.
+8. Limitation of Liability
+    The app provider is not responsible for financial losses, transaction errors, or business disruptions caused by misuse or external factors.
+    The software is provided "as is," without warranties of any kind.
+9. Termination of Access
+    The provider reserves the right to suspend or terminate access if users violate these terms.
+    In case of termination, users must cease all use of the software immediately.
+10. Governing Law
+    These terms are governed by applicable local and international laws. Any disputes shall be resolved in accordance with the jurisdiction specified by the provider.
+By using this POS software, you acknowledge and agree to these terms. If you have any questions, contact customer support.</p>',
+            'aboutus'=> '<p>Founded in 2018, POSKeeper Global IT began its journey with a mission to revolutionize the pharmaceutical retail sector by offering dedicated and reliable Point of Sale (POS) solutions for medicine and healthcare businesses.
+We specialize in providing tailored POS systems designed specifically to address the unique needs of pharmacies and medical retailers. Our solutions streamline inventory management, enable precise billing, and ensure compliance with regulatory requirements, making it easier for businesses to focus on what truly matters—serving their customers and patients.
+Since our inception, we have expanded to serve a broader range of industries, while maintaining our roots in the healthcare sector. With a strong emphasis on innovation, security, and ease of use, we continue to empower businesses with tools that simplify operations, improve customer experiences, and drive growth.
+Today, we are proud to support a diverse portfolio of businesses, from independent pharmacies to large-scale medical chains, with state-of-the-art hardware, intuitive software, and 24/7 customer support.
+Your growth is our priority, and every feature we create is designed to make your business thrive.<p/>',
+            'onboard'=> 1,
+            'demo' => $array,
+        );
+        return $intro;
     }
 
 

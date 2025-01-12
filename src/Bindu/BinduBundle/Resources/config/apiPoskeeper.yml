@@ -3,8 +3,8 @@ api_poskeeper_login:
     defaults: { _controller: BinduBundle:ApiPoskeeper:login }
 
 api_portal_app:
-    path:     /poskeeper-apps
-    defaults: { _controller: BinduBundle:ApiPortal:apps }
+    path:     /poskeeper-onboard
+    defaults: { _controller: BinduBundle:ApiPortal:onboard }
 
 api_poskeeper_shop_create:
     path:     /poskeeper-shop-setup
