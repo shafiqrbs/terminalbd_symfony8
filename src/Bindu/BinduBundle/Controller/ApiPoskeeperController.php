@@ -251,7 +251,6 @@ class ApiPoskeeperController extends Controller
             'users'                 => $users,
             'units'                 => $units,
             'vendors'               => $vendors,
-           // 'color_plate'           => [$color_plate],
         );
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
@@ -2777,12 +2776,14 @@ class ApiPoskeeperController extends Controller
 
             $data = $request->request->all();
             $mobile = $data['mobile'];
+            $username = $data['user_name'];
             $em = $this->getDoctrine()->getManager();
             $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
             $exist = $this->getDoctrine()->getRepository('UserBundle:User')->checkExistingUser($mobile);
+            $user = $this->getDoctrine()->getRepository('UserBundle:User')->checkExistingUser($username);
             $option = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->findOneBy(array('mobile' => $mobile));
          //   $this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($option);
-            if(empty($exist) and empty($option)){
+            if(empty($exist)and empty($user) and empty($option)){
 
                 /** @var $user User */
                 $user = $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->appGlobalOption($mobile,$data);
@@ -2810,13 +2811,24 @@ class ApiPoskeeperController extends Controller
                 }elseif($globalOption->isStock() == 1 and $globalOption->getMainApp()->getSlug() == 'invoice'){
                     //$this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
                 }
+                $returnData['name'] = $globalOption->getName();
+                $returnData['license_no'] = (string) $globalOption->getMobile();
+                $returnData['active_key'] = (string) $globalOption->getUniqueCode();
+                $returnData['status'] = 'success';
+                $returnData['message'] = 'Your store create has been successfully';
+            }else{
+                $returnData['name'] = '';
+                $returnData['license_no'] = '';
+                $returnData['active_key'] = '';
+                $returnData['status'] = 'failed';
+                $returnData['message'] = 'Your mobile,username,email is not valid.';
+
             }
+
          //   $dispatcher = $this->container->get('event_dispatcher');
          //   $dispatcher->dispatch('setting_tool.post.user_signup_msg', new UserSignup($user));
 
-            $returnData['name'] = $globalOption->getName();
-            $returnData['license_no'] = (string) $globalOption->getMobile();
-            $returnData['active_key'] = (string) $globalOption->getUniqueCode();
+
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($returnData));

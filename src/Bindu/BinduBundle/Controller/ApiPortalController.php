@@ -107,7 +107,6 @@ class ApiPortalController extends Controller
             "Others"=> "Others",
         );
         $array = array(
-
              array(
                 'app_slug' => 'medicine',
                 'name' => "Medicine",
@@ -161,7 +160,6 @@ class ApiPortalController extends Controller
             )
         );
         $intro = array(
-
             'video_url' => "https://youtu.be/CPclGyYCGtY?si=12eJJnM7yUQvh7RU",
             'terms_condition'=> '<p>1. Acceptance of Terms
     By using this Point of Sale (POS) application, you agree to abide by these Terms and Conditions. If you do not agree, please refrain from using the application.
