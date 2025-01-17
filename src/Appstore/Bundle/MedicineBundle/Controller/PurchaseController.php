@@ -1167,6 +1167,11 @@ class PurchaseController extends Controller
             $em->flush();
         }
 
+        if($data['name'] == 'batchno'){
+            $entity->setBatchNo($data['value']);
+            $em->flush();
+        }
+
         if($data['name'] == 'PurchasePrice' and 0 < (float)$data['value']){
             $entity->setPurchasePrice((float)$data['value']);
             $entity->setActualPurchasePrice((float)$data['value']);

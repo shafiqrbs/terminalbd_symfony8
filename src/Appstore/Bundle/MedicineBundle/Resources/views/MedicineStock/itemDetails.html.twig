@@ -121,8 +121,8 @@
                                         <tr {% if item.expirationEndDate is not empty and "now"|date('Y-m-d') >= item.expirationEndDate|date('Y-m-d') %} class="red-alert" {% endif %} >
                                             <th class="numeric" >{% if item.expirationStartDate is not empty and item.expirationEndDate is not empty %}{{ item.expirationStartDate|date('d-m-y') }} To {{ item.expirationEndDate|date('d-m-y') }}{% endif %}</th>
                                             <td class="numeric" >{{ item.barcode }}</td>
-                                            <td class="numeric" >{{ item.medicinePurchase.grn }}</td>
-                                            <td class="numeric" >{{ item.medicinePurchase.receiveDate|date('d-m-Y') }}</td>
+                                            <td class="numeric" ><a target="_blank" href="{{ path('medicine_purchase_show', { 'id': item.medicinePurchase.id }) }}">{{ item.medicinePurchase.grn }}</a></td>
+                                            <td class="numeric" >{{ item.medicinePurchase.created|date('d-m-Y') }}</td>
                                             <td class="numeric" >{{ item.medicinePurchase.createdBy }}</td>
                                             <td class="numeric" >{% if item.medicinePurchase.medicineVendor is defined and item.medicinePurchase.medicineVendor is not empty %}{{ item.medicinePurchase.medicineVendor.companyName }}{% endif %}</td>
                                             <td class="numeric" >{{ item.purchasePrice }}</td>
@@ -201,7 +201,7 @@
                                         <tr>
                                             <td class="numeric" >{{ item.medicineSales.created|date('d-m-Y') }}</td>
                                             <td class="numeric" >{{ item.medicineSales.createdBy }}</td>
-                                            <td class="numeric" >{{ item.medicineSales.invoice }}</td>
+                                            <td class="numeric" ><a target="_blank" href="{{ path('medicine_sales_show', { 'id': item.medicineSales.id }) }}">{{ item.medicineSales.invoice }}</a></td>
                                             <td class="numeric" >{{ item.purchasePrice }}</td>
                                             <td class="numeric" >{{ item.salesPrice }}</td>
                                             <td class="numeric" >{{ item.quantity }}</td>
