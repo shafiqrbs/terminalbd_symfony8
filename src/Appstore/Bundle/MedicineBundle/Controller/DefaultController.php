@@ -5,6 +5,7 @@ namespace Appstore\Bundle\MedicineBundle\Controller;
 use Appstore\Bundle\MedicineBundle\Entity\MedicineParticular;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchase;
 use Appstore\Bundle\MedicineBundle\Entity\MedicinePurchaseItem;
+use Appstore\Bundle\MedicineBundle\Entity\MedicineStock;
 use Dompdf\Dompdf;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
