@@ -199,7 +199,7 @@ We specialize in providing tailored POS systems designed specifically to address
 Since our inception, we have expanded to serve a broader range of industries, while maintaining our roots in the healthcare sector. With a strong emphasis on innovation, security, and ease of use, we continue to empower businesses with tools that simplify operations, improve customer experiences, and drive growth.
 Today, we are proud to support a diverse portfolio of businesses, from independent pharmacies to large-scale medical chains, with state-of-the-art hardware, intuitive software, and 24/7 customer support.
 Your growth is our priority, and every feature we create is designed to make your business thrive.<p/>',
-            'onboard'=> 1,
+            'onboard'=> 0,
             'demo' => $array,
         );
         return $intro;
