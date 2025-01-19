@@ -267,7 +267,7 @@ class PurchaseController extends Controller
           $this->getDoctrine()->getRepository('MedicineBundle:MedicinePurchase')->updateInvoiceMode($entity);
         }
         $stockItemForm = $this->createStockItemForm(new MedicineStock(), $entity);
-        $purchaseBarcodeItemForm = $this->createPurchaseBarcodeItemForm(new MedicinePurchaseItem() , $entity);
+      //  $purchaseBarcodeItemForm = $this->createPurchaseBarcodeItemForm(new MedicinePurchaseItem() , $entity);
         $brands = $this->getDoctrine()->getRepository('MedicineBundle:MedicineStock')->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
         $vendors = $this->getDoctrine()->getRepository('MedicineBundle:MedicineVendor')->getVendorLists($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
         if($entity->getInvoiceMode() == "invoice"){
@@ -285,7 +285,7 @@ class PurchaseController extends Controller
             'vendors' => $vendors,
             'purchaseItem' => $purchaseItemForm->createView(),
             'stockItemForm' => $stockItemForm->createView(),
-            'purchaseBarcodeItemForm' => $purchaseBarcodeItemForm->createView(),
+          //  'purchaseBarcodeItemForm' => $purchaseBarcodeItemForm->createView(),
             'form' => $editForm->createView(),
         ));
     }
