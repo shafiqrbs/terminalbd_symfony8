@@ -153,27 +153,11 @@ $('form#purchaseItemForm').on('keypress', '.input', function (e) {
             case 'purchaseItem_stockName':
                 $('#purchaseItem_quantity').focus();
                 break;
-
             case 'purchaseItem_quantity':
                 $('#purchaseItem_quantity').focus();
                 $('#addPurchaseItem').click();
                 $('#purchaseItem_stockName').select2('open');
                 break;
-
-           /* case 'purchaseItem_quantity':
-                var qnt = $('#purchaseItem_quantity').val();
-                if(qnt == "NaN" || qnt =="" ){
-                    $('#purchaseItem_quantity').focus();
-                }else{
-                    $('#addPurchaseItem').click();
-                    $('#purchaseItem_stockName').select2('open');
-                }
-                break;    */
-
-            /*case 'purchaseItem_purchasePrice':
-                $('#purchaseItem_expirationEndDate').focus();
-                break;*/
-
             case 'purchaseItem_purchasePrice':
                 $('#addPurchaseItem').click();
                 $('#purchaseItem_stockName').select2('open');
@@ -545,6 +529,8 @@ function brandMedicineSearch(purchase){
         formatSelection: function (item) { return item.text }, // omitted for brevity, see the source of this page
         initSelection: function (element, callback) {
             var id = $(element).val();
+            $('#purchaseItem_quantity').focus();
+            alert('ok');
             $.ajax(Routing.generate('medicine_stock_name', { stock : id}), {
                 dataType: "json"
             }).done(function (data) {
@@ -560,6 +546,7 @@ function brandMedicineSearch(purchase){
 
         var medicine = $('#purchaseItem_stockName').val();
         if(medicine === ""){ return false }
+        $('#purchaseItem_quantity').focus();
         $.ajax({
             url: Routing.generate('medicine_purchase_particular_search',{'id':medicine,'purchase':purchase}),
             type: 'GET',

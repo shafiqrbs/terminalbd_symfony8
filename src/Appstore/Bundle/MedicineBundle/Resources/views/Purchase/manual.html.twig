@@ -35,9 +35,8 @@
                         <div class="actions">
                             <div class="btn-group">
                                 <a href="javascript:" id="stockShow"  data-trigger="hover" data-original-title="Add stock medicine" class=" btn red tooltips"><i class="fa fa-angle-double-down"></i> Add Stock</a>
-                               <a href="javascript:" id="barcodePurchase"  data-trigger="hover" data-original-title="Barcode base Purchase" class=" btn purple tooltips"><i class="fa fa-angle-double-down"></i> Barcode Purchase</a>
-                                {#<a href="https://medex.com.bd/" target="_blank"  class="btn purple"><i class="fa fa-anchor"></i> Check Price</a>
-                                <a class="btn yellow" target="_blank" href="{{ path('medicine') }}"><i class="icon-plus"></i> New Medicine </a>#}
+                                <a href="https://medex.com.bd/" target="_blank"  class="btn purple"><i class="fa fa-anchor"></i> Check Price</a>
+                                {# <a class="btn yellow" target="_blank" href="{{ path('medicine') }}"><i class="icon-plus"></i> New Medicine </a>#}
                                 <a class="btn black" href="{{ path('medicine_purchase') }}"><i class="icon-th-list"></i> Purchase </a>
                             </div>
                         </div>
@@ -105,65 +104,7 @@
                                 </div>
                                 {{ form_end(stockItemForm) }}
                             </div>
-                            <div class="purchaseToggle" id="barcodePurchaseItemBox" style="display: none">
-                            {{ form_start(purchaseBarcodeItemForm) }}
-                            {{ form_row(purchaseBarcodeItemForm._token) }}
-                            <div class="row-fluid" >
-                                <div class="span2" style="padding-left: 15px!important;">
-                                    <div class="control-group">
-                                        <label class="control-label" for="firstName">Barcode</label>
-                                        <div class="controls">
-                                            {{ form_widget(purchaseBarcodeItemForm.barcode) }}
-                                            {{ form_errors(purchaseBarcodeItemForm.barcode) }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="span4">
-                                    <div class="control-group">
-                                        <label class="control-label" for="firstName">Item Name</label>
-                                        <div class="controls">
-                                            {{ form_widget(purchaseBarcodeItemForm.name) }}
-                                            {{ form_errors(purchaseBarcodeItemForm.name) }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="span2">
-                                    <div class="control-group">
-                                        <label class="control-label" for="firstName">Quantity</label>
-                                        <div class="controls">
-                                            {{ form_widget(purchaseBarcodeItemForm.quantity) }}
-                                            {{ form_errors(purchaseBarcodeItemForm.quantity) }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="span2">
-                                    <div class="control-group">
-                                        <label class="control-label" for="firstName">Bonus Quantity</label>
-                                        <div class="controls">
-                                            <div class="input-append">
-                                                {{ form_widget(purchaseBarcodeItemForm.bonusQuantity) }}
-                                                <button class="btn green" id="barcodeUnit">Unit</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="span2">
-                                    <div class="control-group">
-                                        <label class="control-label" for="firstName">Total MRP</label>
-                                        <div class="controls">
-                                            <div class="input-append">
-                                                {{ form_widget(purchaseBarcodeItemForm.salesPrice) }}
-                                                <button type="submit" class="btn red" id="addPurchaseBarcodeItemForm"> <span class="fa fa-save"></span> Add</button>
-                                                <input type="hidden" id="barcodeId" name="barcodeId" value="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{ form_end(purchaseBarcodeItemForm) }}
-                            </div>
                             <div class="purchaseToggle" id="purchaseItemBox">
-
                                 <div class="row-fluid" id="brand-box">
                                     <div class="span4" style="margin-bottom:1px">
                                         <div class="control-group select-error-tooltip">

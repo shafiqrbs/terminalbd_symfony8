@@ -36,9 +36,9 @@
                         <div class="actions">
                             <div class="btn-group">
                                 <a href="javascript:" id="stockShow"  data-trigger="hover" data-original-title="Add stock medicine" class=" btn red tooltips"><i class="fa fa-angle-double-down"></i> Add Stock</a>
-                               <a href="javascript:" id="barcodePurchase"  data-trigger="hover" data-original-title="Barcode base Purchase" class=" btn purple tooltips"><i class="fa fa-angle-double-down"></i> Barcode Purchase</a>
-                                {#<a href="https://medex.com.bd/" target="_blank"  class="btn purple"><i class="fa fa-anchor"></i> Check Price</a>
-                                <a class="btn yellow" target="_blank" href="{{ path('medicine') }}"><i class="icon-plus"></i> New Medicine </a>#}
+                               {#<a href="javascript:" id="barcodePurchase"  data-trigger="hover" data-original-title="Barcode base Purchase" class=" btn purple tooltips"><i class="fa fa-angle-double-down"></i> Barcode Purchase</a>#}
+                                <a href="https://medex.com.bd/" target="_blank"  class="btn purple"><i class="fa fa-anchor"></i> Check Price</a>
+                                {#<a class="btn yellow" target="_blank" href="{{ path('medicine') }}"><i class="icon-plus"></i> New Medicine </a>#}
                                 <a class="btn black" href="{{ path('medicine_purchase') }}"><i class="icon-th-list"></i> Purchase </a>
                             </div>
                         </div>
@@ -116,7 +116,7 @@
                                 </div>
                                 {{ form_end(stockItemForm) }}
                             </div>
-                            <div class="purchaseToggle" id="barcodePurchaseItemBox" style="display: none">
+                           {# <div class="purchaseToggle" id="barcodePurchaseItemBox" style="display: none">
                             {{ form_start(purchaseBarcodeItemForm) }}
                             {{ form_row(purchaseBarcodeItemForm._token) }}
                             <div class="row-fluid" >
@@ -172,7 +172,7 @@
                                 </div>
                             </div>
                             {{ form_end(purchaseBarcodeItemForm) }}
-                            </div>
+                            </div>#}
                             <div class="purchaseToggle" id="purchaseItemBox">
 
                                 <div class="row-fluid" id="brand-box">
@@ -679,7 +679,5 @@
         placement: 'right',
     });
     $('#purchaseItem_stockName').focus();
-
-
 {% endblock %}
 

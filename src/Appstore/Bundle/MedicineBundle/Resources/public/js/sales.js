@@ -44,13 +44,14 @@ $(document).on('change', '#salesitem_stockName', function() {
 
     var medicine = $('#salesitem_stockName').val();
     if(medicine === ""){ return false }
+    $('#salesitem_quantity').focus();
     $.ajax({
         url: Routing.generate('medicine_sales_stock_search',{'id':medicine}),
         type: 'GET',
         success: function (response) {
             obj = JSON.parse(response);
-            $('#salesitem_salesPrice').val(obj['salesPrice']);
             $('#salesitem_quantity').focus();
+            $('#salesitem_salesPrice').val(obj['salesPrice']);
             $("#addParticular").attr("disabled", false);
         }
     })
