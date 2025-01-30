@@ -1699,6 +1699,7 @@ class AppsApiRepository extends EntityRepository
         $user = (isset($data['user_id']) and $data['user_id']) ? $data['user_id'] : '';
         $total = (isset($data['total']) and $data['total']) ? $data['total'] : '';
         $amount = (isset($data['amount']) and $data['amount']) ? $data['amount'] : '';
+        $totalInvoice = (isset($data['total_invoice']) and $data['total_invoice']) ? $data['total_invoice'] : '';
 
         $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(array('globalOption'=> $option,'id' => $device));
         $entity = new MedicineAndroidProcess();
@@ -1711,6 +1712,7 @@ class AppsApiRepository extends EntityRepository
         $entity->setJsonItem($content);
         $entity->setCreatedBy($em->getRepository(User::class)->find($user));
         $entity->setIsApprove($isApprove);
+        $entity->setItemCount($totalInvoice);
         $entity->setStatus(false);
         $em->persist($entity);
         $em->flush();
