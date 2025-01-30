@@ -1696,7 +1696,7 @@ class AppsApiRepository extends EntityRepository
         $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : 'offline';
         $content = (isset($data['content']) and $data['content']) ? $data['content'] : '';
         $isApprove = (isset($data['is_approve']) and $data['is_approve']) ? 1 : 0;
-        $user = (isset($data['approved_by']) and $data['approved_by']) ? $data['approved_by'] : '';
+        $user = (isset($data['user_id']) and $data['user_id']) ? $data['user_id'] : '';
         $total = (isset($data['total']) and $data['total']) ? $data['total'] : '';
         $amount = (isset($data['amount']) and $data['amount']) ? $data['amount'] : '';
 
