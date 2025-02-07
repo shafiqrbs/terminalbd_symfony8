@@ -27,10 +27,9 @@ class StockItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="stockItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected  $inventoryConfig;
-
-
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\PurchaseItem", inversedBy="stockItem")
@@ -65,17 +64,20 @@ class StockItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\SalesItem", inversedBy="stockItem")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $salesItem;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\SalesReturnItem", inversedBy="stockReturnItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $salesReturnItem;
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\SalesReturnItem", inversedBy="stockReplaceItems")
-     */
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      */
     protected $salesItemReplace;
 
 
@@ -86,26 +88,31 @@ class StockItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Vendor", inversedBy="stockItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $vendor;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemBrand", inversedBy="stockItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $brand;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemSize", inversedBy="stockItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $size;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemColor", inversedBy="stockItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $color;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Product", inversedBy="stockItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $product;
 
@@ -116,6 +123,7 @@ class StockItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Product\Bundle\ProductBundle\Entity\Category", inversedBy="stockItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $category;
 

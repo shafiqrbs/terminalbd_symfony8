@@ -28,14 +28,11 @@ class AccountJournal
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="accountJournal")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $globalOption;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Branches", inversedBy="accountJournal" )
-     **/
-    private  $branches;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\TransactionMethod", inversedBy="accountJournals" )
@@ -59,11 +56,13 @@ class AccountJournal
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead", inversedBy="accountJournalDebits" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountHeadDebit;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead", inversedBy="accountJournalCredits" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountHeadCredit;
 
@@ -75,22 +74,26 @@ class AccountJournal
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="accountJournal" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="accountJournalToUser" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $toUser;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="accountJournals" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="accountJournals" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 

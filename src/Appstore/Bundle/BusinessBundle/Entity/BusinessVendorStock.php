@@ -33,7 +33,8 @@ class BusinessVendorStock
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountVendor", inversedBy="businessVendorStocks")
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private $vendor;
 
 

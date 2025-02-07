@@ -49,17 +49,20 @@ class ModuleCategory
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Module", inversedBy="moduleCategory" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $module;
 
     /**
      * @ORM\ManyToMany(targetEntity="Setting\Bundle\AppearanceBundle\Entity\FeatureWidget", mappedBy="moduleCategory" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $featureWidgets;
 
      /**
      * @ORM\ManyToMany(targetEntity="Setting\Bundle\ContentBundle\Entity\Page", mappedBy="moduleCategory" )
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     protected $pages;
 
     /**
@@ -74,6 +77,7 @@ class ModuleCategory
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="moduleCategories" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $globalOption;
 

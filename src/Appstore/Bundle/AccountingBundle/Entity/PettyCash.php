@@ -39,6 +39,7 @@ class PettyCash
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="pettyCash")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $globalOption;

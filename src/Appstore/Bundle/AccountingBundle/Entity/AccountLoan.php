@@ -42,6 +42,7 @@ class AccountLoan
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
@@ -54,6 +55,7 @@ class AccountLoan
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $customer;
 
@@ -65,11 +67,13 @@ class AccountLoan
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 

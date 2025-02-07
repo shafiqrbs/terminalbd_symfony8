@@ -23,6 +23,7 @@ class MobileIcon
 
     /**
      * @ORM\OneToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="mobileIcon")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $globalOption;

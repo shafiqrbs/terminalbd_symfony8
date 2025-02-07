@@ -29,6 +29,7 @@ class MedicineSalesTemporary
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="medicineSalesTemporary" , cascade={"detach","merge"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $medicineConfig;
 
@@ -47,6 +48,7 @@ class MedicineSalesTemporary
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="medicineSalesTemporary")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $user;
 

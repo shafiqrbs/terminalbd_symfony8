@@ -42,6 +42,7 @@ class Particular
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Category", inversedBy="particulars" )
      * @ORM\OrderBy({"sorting" = "ASC"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $category;
 
@@ -88,6 +89,7 @@ class Particular
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $assignOperator;
 

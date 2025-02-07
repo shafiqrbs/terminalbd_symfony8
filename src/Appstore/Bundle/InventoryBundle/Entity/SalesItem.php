@@ -24,12 +24,14 @@ class SalesItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Item", inversedBy="salesItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $item;
 
 
     /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\InventoryBundle\Entity\StockItem", mappedBy="salesItem" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $stockItem;
 

@@ -27,6 +27,7 @@ class PaymentSalary
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="paymentSalary")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $globalOption;

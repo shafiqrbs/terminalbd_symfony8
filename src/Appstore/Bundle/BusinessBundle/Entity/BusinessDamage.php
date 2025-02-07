@@ -46,12 +46,14 @@ class BusinessDamage
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="damage" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse")
      * @ORM\OrderBy({"sorting" = "ASC"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $wearHouse;
 

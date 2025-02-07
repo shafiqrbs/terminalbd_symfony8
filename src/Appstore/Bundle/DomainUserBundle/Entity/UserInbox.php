@@ -9,7 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * UserInbox
  *
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="Appstore\Bundle\DomainUserBundle\Repository\UserInboxRepository")
+ * @ORM\Entity(repositoryClass="")
  */
 class UserInbox
 {

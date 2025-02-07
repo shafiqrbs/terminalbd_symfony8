@@ -29,6 +29,7 @@ class AccountHead
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="accountHeads", cascade={"detach","merge"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $globalOption;
 

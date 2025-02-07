@@ -27,6 +27,7 @@ class MedicineMinimumStock
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="medicineMinimumStock")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $medicineConfig;
 

@@ -25,16 +25,19 @@ class ItemMetaAttribute
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\PurchaseVendorItem", inversedBy="itemMetaAttributes" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $purchaseVendorItem;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Product", inversedBy="itemMetaAttributes" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $product;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemAttribute", inversedBy="itemMetaAttributes" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $itemAttribute;
 

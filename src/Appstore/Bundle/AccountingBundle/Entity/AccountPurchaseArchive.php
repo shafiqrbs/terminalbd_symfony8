@@ -27,6 +27,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
          * @var integer
          *
          * @ORM\Column(name="globalOption", type="integer",nullable=true)
+         * @ORM\JoinColumn(onDelete="CASCADE")
          */
         protected $globalOption;
 

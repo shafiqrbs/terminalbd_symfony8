@@ -31,11 +31,13 @@ class RestaurantTemporary
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular", inversedBy="restaurantTemp")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $particular;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="restaurantTemps")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $user;
 

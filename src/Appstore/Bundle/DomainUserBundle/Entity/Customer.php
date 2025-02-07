@@ -47,6 +47,7 @@ class Customer
 
     /**
      * @ORM\OneToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead", mappedBy="customer" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountHead;
 

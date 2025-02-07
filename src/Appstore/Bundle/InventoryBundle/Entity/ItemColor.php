@@ -25,6 +25,7 @@ class ItemColor
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="color" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $inventoryConfig;
 

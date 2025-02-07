@@ -34,6 +34,7 @@ class AndroidDeviceSetup
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="androids")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     private $globalOption;

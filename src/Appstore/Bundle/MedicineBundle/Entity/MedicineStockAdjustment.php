@@ -25,6 +25,7 @@ class MedicineStockAdjustment
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="stockAdjustment")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $medicineConfig;
 
@@ -44,6 +45,7 @@ class MedicineStockAdjustment
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="damage" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

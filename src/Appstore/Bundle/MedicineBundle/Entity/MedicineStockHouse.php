@@ -26,11 +26,13 @@ class MedicineStockHouse
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="stockHouses")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $medicineConfig;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineStock", inversedBy="stockHouses", cascade={"persist"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $medicineStock;
 
@@ -41,12 +43,14 @@ class MedicineStockHouse
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineParticular", inversedBy="stockHouses")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $wearHouse;
 
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="stockHouses" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

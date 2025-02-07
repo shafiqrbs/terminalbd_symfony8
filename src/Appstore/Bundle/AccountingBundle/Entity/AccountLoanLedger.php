@@ -29,6 +29,7 @@ class AccountLoanLedger
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $globalOption;

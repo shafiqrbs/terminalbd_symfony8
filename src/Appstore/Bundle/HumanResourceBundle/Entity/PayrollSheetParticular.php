@@ -27,17 +27,20 @@ class PayrollSheetParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HumanResourceBundle\Entity\PayrollSheet", inversedBy="payrollSheetParticulars")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $payrollSheet;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HumanResourceBundle\Entity\EmployeePayroll", inversedBy="payrollSheetParticulars" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $employee;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HumanResourceBundle\Entity\PayrollSetting", inversedBy="payrollSheetParticular" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $particular;
 

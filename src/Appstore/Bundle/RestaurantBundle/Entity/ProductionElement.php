@@ -24,6 +24,7 @@ class ProductionElement
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular", inversedBy="productionElements" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $material;
 

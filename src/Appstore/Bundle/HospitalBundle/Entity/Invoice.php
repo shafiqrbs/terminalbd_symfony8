@@ -57,12 +57,14 @@ class Invoice
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Service", inversedBy="hmsInvoices")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $service;
 
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\HmsServiceGroup")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $diseasesProfile;
 
@@ -87,6 +89,7 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="hmsInvoices", cascade={"persist"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $customer;
 
@@ -107,26 +110,31 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $marketingExecutive;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular", inversedBy="hmsInvoice", cascade={"persist"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $referredDoctor;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular", inversedBy="assignDoctorInvoices", cascade={"persist"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $assignDoctor;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular",cascade={"persist"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $anesthesiaDoctor;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular",cascade={"persist"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $assistantDoctor;
 
@@ -147,6 +155,7 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\HmsCategory", inversedBy="hmsInvoices", cascade={"persist"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $department;
 
@@ -154,23 +163,27 @@ class Invoice
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="hmsInvoiceCreatedBy")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="hmsInvoiceApprovedBy")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $approvedBy;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User",inversedBy="hmsInvoiceDeliveredBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $deliveredBy;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="hmsDischargeBy")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $dischargeBy;
 
@@ -226,12 +239,14 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="hmsInvoices" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="hmsInvoices" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 

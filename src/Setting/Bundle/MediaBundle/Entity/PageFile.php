@@ -28,6 +28,7 @@ class PageFile
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="pageFiles" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $globalOption;
 

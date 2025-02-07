@@ -10,7 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * CustomerConfig
  *
  * @ORM\Table("customer_config")
- * @ORM\Entity(repositoryClass="Appstore\Bundle\DomainUserBundle\Repository\CustomerConfigRepository")
+ * @ORM\Entity(repositoryClass="")
  */
 class CustomerConfig
 {

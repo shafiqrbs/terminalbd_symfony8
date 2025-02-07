@@ -39,11 +39,13 @@ class BusinessBatchParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $wearhouse;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $salesBy;
 

@@ -25,6 +25,7 @@ class DailyAttendance
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="dailyAttendance")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $globalOption;
 

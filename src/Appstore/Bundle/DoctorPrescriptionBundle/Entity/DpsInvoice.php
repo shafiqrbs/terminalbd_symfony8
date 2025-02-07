@@ -35,6 +35,7 @@ class DpsInvoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DoctorPrescriptionBundle\Entity\DpsConfig", inversedBy="dpsInvoices")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $dpsConfig;
 
@@ -83,17 +84,20 @@ class DpsInvoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="dpsInvoices" ,cascade={"persist"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $customer;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DoctorPrescriptionBundle\Entity\DpsParticular", inversedBy="assignDoctorInvoices", cascade={"persist"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $assignDoctor;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $hmsAssignDoctor;
 
@@ -110,6 +114,7 @@ class DpsInvoice
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="dpsInvoiceCreatedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
@@ -121,17 +126,20 @@ class DpsInvoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Bank", inversedBy="dpsInvoices" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $bank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="dpsInvoices" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="dpsInvoices" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 

@@ -31,11 +31,13 @@ class BranchInvoice
 
         /**
          * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="branchInvoices" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $inventoryConfig;
 
         /**
          * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Branches", inversedBy="branchInvoice" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
 
         private  $branches;
@@ -54,11 +56,13 @@ class BranchInvoice
         /**
          * @Gedmo\Blameable(on="create")
          * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="branchInvoice" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $createdBy;
 
         /**
          * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="branchInvoiceApprovedBy" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $approvedBy;
 

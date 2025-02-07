@@ -36,6 +36,7 @@ class ItemImport
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

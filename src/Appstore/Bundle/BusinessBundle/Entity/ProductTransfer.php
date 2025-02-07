@@ -31,18 +31,21 @@ class ProductTransfer
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $businessParticular;
 
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse")
-	 **/
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
 	private $fromWearHouse;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $toWearHouse;
 
@@ -50,11 +53,13 @@ class ProductTransfer
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $approvedBy;
 

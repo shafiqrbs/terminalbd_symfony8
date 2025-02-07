@@ -46,6 +46,7 @@ class Branches
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="branches" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $globalOption;
 

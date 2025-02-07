@@ -33,6 +33,7 @@ class Expenditure
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="expenditure")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $globalOption;
 
@@ -43,26 +44,31 @@ class Expenditure
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead", inversedBy="expendituries" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountHead;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\ExpenseAndroidProcess", inversedBy="expendituries" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $androidProcess;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\ExpenseCategory", inversedBy="expendituries" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $expenseCategory;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="expendituries" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="expendituries" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 
@@ -89,6 +95,7 @@ class Expenditure
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\AndroidDeviceSetup", inversedBy="expenditure" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $androidDevice;
 

@@ -32,6 +32,7 @@ class SalesReturn implements CodeAwareEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Branches", inversedBy="salesReturns" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $branches;
 
@@ -88,6 +89,7 @@ class SalesReturn implements CodeAwareEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="salesReturn" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

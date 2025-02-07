@@ -30,6 +30,7 @@ class AccountSalesReturn
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="accountSalesReturn")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $globalOption;
@@ -46,16 +47,19 @@ class AccountSalesReturn
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\SalesReturn", inversedBy="accountSalesReturn" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $salesReturn;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="accountSalesReturn" , cascade={"detach","merge"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $customer;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Branches", inversedBy="accountSalesReturn" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $branches;
 

@@ -27,12 +27,14 @@ class ExpenseCategory
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="expenseCategory")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $globalOption;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead", inversedBy="expenseCategory" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountHead;
 

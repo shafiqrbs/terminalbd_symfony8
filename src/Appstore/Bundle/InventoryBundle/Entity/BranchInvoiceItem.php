@@ -23,16 +23,19 @@ class BranchInvoiceItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Item", inversedBy="branchInvoiceItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $item;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\PurchaseItem", inversedBy="branchInvoiceItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $purchaseItem;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\BranchInvoice", inversedBy="branchInvoiceItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $branchInvoice;
 

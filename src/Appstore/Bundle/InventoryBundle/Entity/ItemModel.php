@@ -27,6 +27,7 @@ class ItemModel
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="model" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $inventoryConfig;
 

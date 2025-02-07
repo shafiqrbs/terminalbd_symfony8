@@ -23,11 +23,13 @@ class DeliveryItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Item", inversedBy="deliveryItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $item;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\PurchaseItem", inversedBy="deliveryItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $purchaseItem;
 

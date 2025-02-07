@@ -27,6 +27,7 @@ class ExpenditureArchive
      * @var integer
      *
      * @ORM\Column(name="globalOption", type="integer",nullable=true)
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $globalOption;
 

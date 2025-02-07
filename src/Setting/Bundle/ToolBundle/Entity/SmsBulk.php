@@ -24,6 +24,7 @@ class SmsBulk
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="smsmBulk")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $globalOption;
 

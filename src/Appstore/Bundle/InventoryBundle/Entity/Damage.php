@@ -24,12 +24,14 @@ class Damage
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="damages" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $inventoryConfig;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Item", inversedBy="damages" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $item;
 
@@ -41,6 +43,7 @@ class Damage
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\PurchaseItem", inversedBy="damages" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $purchaseItem;
 
@@ -53,6 +56,7 @@ class Damage
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="damageApprovedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $approvedBy;
 

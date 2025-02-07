@@ -32,6 +32,7 @@ class Feature
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="features" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $globalOption;
 

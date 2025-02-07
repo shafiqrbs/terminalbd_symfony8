@@ -29,6 +29,7 @@ class InvoiceSmsEmail
 
      /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="invoiceSmsEmails")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $globalOption = null;
 

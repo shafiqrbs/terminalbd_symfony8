@@ -32,11 +32,13 @@ class RestaurantTableInvoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular", inversedBy="restaurantTemps")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $table;
 
@@ -52,6 +54,7 @@ class RestaurantTableInvoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $salesBy;
 

@@ -27,6 +27,7 @@ class MedicineVendor
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="medicineVendors")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $medicineConfig;
 

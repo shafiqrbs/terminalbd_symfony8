@@ -31,22 +31,26 @@ class PageModule
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Module", inversedBy="pageModules" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $module;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ContentBundle\Entity\Page", inversedBy="pageModules" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $page;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\AppearanceBundle\Entity\Menu", inversedBy="pageModules")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected  $menu;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ContentBundle\Entity\HomePage", inversedBy="pageModules" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $homePage;
 

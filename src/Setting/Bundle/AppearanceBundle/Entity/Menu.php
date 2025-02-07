@@ -76,11 +76,13 @@ class Menu
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Module", inversedBy="nav")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $module;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\AppearanceBundle\Entity\MenuCustom", inversedBy="nav")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $menuCustom;
 
@@ -96,6 +98,7 @@ class Menu
 
     /**
      * @ORM\OneToOne(targetEntity="Setting\Bundle\ContentBundle\Entity\ModuleCategory", inversedBy="nav")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $category;
 
@@ -108,6 +111,7 @@ class Menu
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\SiteSetting", inversedBy="nav")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $siteSetting;
 

@@ -32,12 +32,14 @@ class RestaurantAndroidProcess
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\AndroidDeviceSetup", inversedBy="restaurantAndroidProcess" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $androidDevice;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="restaurantAndroidProcess" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
@@ -45,6 +47,7 @@ class RestaurantAndroidProcess
 
     /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Invoice", mappedBy="androidProcess" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $sales;
 
@@ -52,6 +55,7 @@ class RestaurantAndroidProcess
 
     /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Purchase", mappedBy="androidProcess" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $purchase;
 

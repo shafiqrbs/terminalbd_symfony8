@@ -27,6 +27,7 @@ class BusinessStockHistory
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessConfig" , cascade={"detach","merge"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $businessConfig;
 
@@ -95,6 +96,7 @@ class BusinessStockHistory
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\ProductTransfer")
      * @ORM\OrderBy({"sorting" = "ASC"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $itemTransfer;
 
@@ -102,6 +104,7 @@ class BusinessStockHistory
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

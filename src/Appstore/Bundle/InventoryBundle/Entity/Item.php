@@ -32,23 +32,27 @@ class Item
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="items" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $inventoryConfig;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Vendor", inversedBy="items" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $vendor;
 
     /**
      * @ORM\ManyToOne(targetEntity="Product\Bundle\ProductBundle\Entity\ItemGroup")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $itemGroup;
 
      /**
      * @ORM\ManyToOne(targetEntity="Product\Bundle\ProductBundle\Entity\Category",inversedBy="items")
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private  $category;
 
      /**

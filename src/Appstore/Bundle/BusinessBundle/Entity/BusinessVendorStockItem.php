@@ -32,6 +32,7 @@ class BusinessVendorStockItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular", inversedBy="businessVendorStockItems", cascade={"persist"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $particular;
 

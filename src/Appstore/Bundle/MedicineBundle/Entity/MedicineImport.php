@@ -26,6 +26,7 @@ class MedicineImport
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $medicineConfig;
 

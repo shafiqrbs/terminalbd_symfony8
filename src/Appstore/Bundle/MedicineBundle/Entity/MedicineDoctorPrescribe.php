@@ -35,6 +35,7 @@ class MedicineDoctorPrescribe
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineBrand", inversedBy="invoiceMedicine")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $medicine;
 

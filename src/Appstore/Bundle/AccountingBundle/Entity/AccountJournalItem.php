@@ -33,11 +33,13 @@ class AccountJournalItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $accountHead;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $accountSubHead;
 

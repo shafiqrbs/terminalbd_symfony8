@@ -28,6 +28,7 @@ class AccountCash
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="accountCashes")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $globalOption;
 

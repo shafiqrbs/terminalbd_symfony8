@@ -36,11 +36,13 @@ class MedicineSales
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="medicineSales")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $medicineConfig;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Branches", inversedBy="medicineSales")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $branch;
 
@@ -64,22 +66,26 @@ class MedicineSales
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="medicineSales" ,cascade={"persist"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $customer;
 
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="medicineSalesCreatedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="medicineSalesApprovedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $approvedBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="medicineSalesBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $salesBy;
 
@@ -91,17 +97,20 @@ class MedicineSales
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Bank", inversedBy="medicineSales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $bank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="medicineSales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="medicineSales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 
@@ -113,12 +122,14 @@ class MedicineSales
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\AndroidDeviceSetup", inversedBy="medicineSales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $androidDevice;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineAndroidProcess", inversedBy="medicineSales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $androidProcess;
 

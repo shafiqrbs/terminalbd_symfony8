@@ -30,12 +30,14 @@ class MedicinePrepurchase
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="medicinePrepurchase" , cascade={"detach","merge"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $medicineConfig;
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineVendor", inversedBy="medicinePrepurchase" , cascade={"detach","merge"} )
-	 **/
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
 	private  $medicineVendor;
 
 

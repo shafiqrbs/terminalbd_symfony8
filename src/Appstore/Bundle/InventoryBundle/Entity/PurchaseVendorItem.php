@@ -29,6 +29,7 @@ class PurchaseVendorItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="purchaseVendorItems" , cascade={"detach","merge"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $inventoryConfig;
 
@@ -56,6 +57,7 @@ class PurchaseVendorItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Product", inversedBy="purchaseVendorItem" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $masterItem;
 
@@ -82,17 +84,20 @@ class PurchaseVendorItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemBrand", inversedBy="purchaseVendorItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $brand;
 
     /**
      * @ORM\ManyToMany(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemColor", inversedBy="purchaseVendorItems" )
      * @ORM\OrderBy({"id" = "ASC"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $itemColors;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemSize", inversedBy="purchaseVendorItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $size;
 

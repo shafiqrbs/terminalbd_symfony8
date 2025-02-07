@@ -51,6 +51,7 @@ class BusinessPurchaseItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $wearhouse;
 

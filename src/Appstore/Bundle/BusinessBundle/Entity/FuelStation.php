@@ -31,27 +31,32 @@ class FuelStation
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $waerhouse;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $particular;
 
      /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private $salesBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $verifiedBy;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $approvedBy;
 

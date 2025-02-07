@@ -56,16 +56,19 @@ class BusinessInvoiceParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessVendorStockItem", inversedBy="businessInvoiceParticulars", cascade={"persist"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $vendorStockItem;
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessBatchParticular")
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private $batchItem;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $wearhouse;
 

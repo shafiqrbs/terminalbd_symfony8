@@ -27,12 +27,14 @@ class ItemSize
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="size" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $inventoryConfig;
 
 
     /**
      * @ORM\ManyToMany(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemSizeGroup", mappedBy="sizes")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $sizeGroup;
 
@@ -65,6 +67,7 @@ class ItemSize
 
     /**
      * @ORM\ManyToMany(targetEntity="Product\Bundle\ProductBundle\Entity\Category", inversedBy="size" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $category;
 

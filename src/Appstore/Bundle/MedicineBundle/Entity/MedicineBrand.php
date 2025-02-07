@@ -27,16 +27,19 @@ class MedicineBrand
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="medicineBrands")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $globalOption;
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineGeneric", inversedBy="medicineBrands")
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private $medicineGeneric;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineCompany", inversedBy="medicineBrands")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $medicineCompany;
 

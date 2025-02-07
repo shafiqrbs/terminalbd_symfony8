@@ -25,12 +25,14 @@ class ItemKeyValue
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\PurchaseVendorItem", inversedBy="itemKeyValues" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $purchaseVendorItem;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Product", inversedBy="itemKeyValues" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $product;
 

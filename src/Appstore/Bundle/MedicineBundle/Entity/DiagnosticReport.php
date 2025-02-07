@@ -44,11 +44,13 @@ class DiagnosticReport
 
    /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\HmsCategory", inversedBy="diagnosticReportCategories")
-     **/
+    * @ORM\JoinColumn(onDelete="CASCADE")
+    **/
     private $category;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\HmsCategory", inversedBy="diagnosticReportDepartments")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $department;
 

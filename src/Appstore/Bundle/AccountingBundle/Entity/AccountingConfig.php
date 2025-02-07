@@ -24,12 +24,13 @@ class AccountingConfig
 
      /**
      * @ORM\OneToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="accountingConfig" , cascade={"persist", "remove"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
-
     private $globalOption;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $capitalInvestor;
 

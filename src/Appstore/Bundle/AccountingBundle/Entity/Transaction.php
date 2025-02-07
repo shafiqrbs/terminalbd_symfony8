@@ -39,6 +39,7 @@ class Transaction
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead", inversedBy="transactions" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
      private $accountHead;
 
@@ -56,17 +57,14 @@ class Transaction
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead", inversedBy="subTransactions" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
      private $subAccountHead;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Branches", inversedBy="transactions" )
-     **/
-    private  $branches;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="transactions")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $globalOption;
 

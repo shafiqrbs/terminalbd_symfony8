@@ -41,7 +41,8 @@ class BusinessStoreLedger
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessStore", inversedBy="storeLedgers")
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     protected $store;
 
     /**
@@ -57,11 +58,13 @@ class BusinessStoreLedger
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 

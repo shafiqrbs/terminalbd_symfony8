@@ -32,11 +32,13 @@ class GoodsItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemSize", inversedBy="goodsItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $size;
 
     /**
      * @ORM\ManyToMany(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemColor", inversedBy="goodsItem")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $colors;
 

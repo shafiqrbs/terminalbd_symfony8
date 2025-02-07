@@ -26,6 +26,7 @@ class SiteSetting
 
     /**
      * @ORM\OneToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="siteSetting")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $user;

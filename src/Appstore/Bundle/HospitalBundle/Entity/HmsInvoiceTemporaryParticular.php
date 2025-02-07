@@ -26,17 +26,20 @@ class HmsInvoiceTemporaryParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\HospitalConfig", inversedBy="hmsInvoiceTemporaryParticular" , cascade={"detach","merge"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $hospitalConfig;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular", inversedBy="hmsInvoiceTemporaryParticular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $particular;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="hmsInvoiceTemporaryParticulars")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $user;
 

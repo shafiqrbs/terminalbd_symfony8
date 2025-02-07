@@ -24,6 +24,7 @@ class Reverse
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="reverses")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $inventoryConfig;
 
@@ -43,6 +44,7 @@ class Reverse
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="reverse" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

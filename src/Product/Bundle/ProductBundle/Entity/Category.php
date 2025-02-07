@@ -45,6 +45,7 @@ class Category
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="categories")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $inventoryConfig;
 
@@ -66,6 +67,7 @@ class Category
 
     /**
      * @ORM\ManyToOne(targetEntity="Product\Bundle\ProductBundle\Entity\ItemGroup")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $itemGroup;
 

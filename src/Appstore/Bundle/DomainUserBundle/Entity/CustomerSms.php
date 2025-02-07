@@ -27,7 +27,8 @@ class CustomerSms
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="sms" , cascade={"detach","merge"} )
-	 **/
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
 	private  $globalOption;
 
 

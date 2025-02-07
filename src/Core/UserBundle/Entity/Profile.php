@@ -67,11 +67,13 @@ class Profile
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Branches", inversedBy="employeeProfiles" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $employeeBranch;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HumanResourceBundle\Entity\HrDepartment")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $department;
 

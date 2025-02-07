@@ -23,16 +23,19 @@ class InvoiceModuleItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\InvoiceModule", inversedBy="invoiceModuleItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $invoiceModule = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\AppModule", inversedBy="invoiceModuleItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $appModule = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\SyndicateModule", inversedBy="invoiceModuleItems")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     protected $syndicateModule = null;
 

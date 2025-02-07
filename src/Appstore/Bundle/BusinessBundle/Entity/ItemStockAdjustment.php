@@ -25,6 +25,7 @@ class ItemStockAdjustment
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessConfig")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $config;
 
@@ -38,6 +39,7 @@ class ItemStockAdjustment
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="damage" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

@@ -26,11 +26,13 @@ class ExpenseAndroidProcess
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $globalOption;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\AndroidDeviceSetup", inversedBy="expenseAndroidProcess")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $androidDevice;
 

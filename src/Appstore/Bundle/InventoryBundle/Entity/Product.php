@@ -85,20 +85,22 @@ class Product implements CodeAwareEntity
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemBrand", inversedBy="products")
-	 */
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     */
 	protected $brand;
 
 	/**
 	 * @ORM\ManyToMany(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemColor", inversedBy="products" )
 	 * @ORM\OrderBy({"id" = "ASC"})
-	 **/
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
 	private  $colors;
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemSize", inversedBy="products" )
-	 **/
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
 	private  $size;
-
 
 
 	/**

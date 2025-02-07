@@ -33,11 +33,13 @@ class FeatureWidget
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="featureWidgets" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $globalOption;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Module", inversedBy="featureWidgets" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $module;
 
@@ -49,6 +51,7 @@ class FeatureWidget
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\AppearanceBundle\Entity\JsFeature", inversedBy="featureWidgets" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $jsFeature;
 
@@ -69,11 +72,13 @@ class FeatureWidget
 
      /**
      * @ORM\ManyToMany(targetEntity="Setting\Bundle\ContentBundle\Entity\ModuleCategory", inversedBy="featureWidgets" )
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private  $moduleCategory;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\AppearanceBundle\Entity\Menu", inversedBy="featureWidgets")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $menu;
 

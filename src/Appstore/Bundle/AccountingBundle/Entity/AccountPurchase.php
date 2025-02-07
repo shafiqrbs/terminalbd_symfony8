@@ -33,11 +33,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 
         /**
          * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="accountPurchase")
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         protected $globalOption;
 
         /**
          * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountHead", inversedBy="accountPurchases" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $accountHead;
 
@@ -50,11 +52,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 
         /**
          * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Vendor", inversedBy="accountPurchases" , cascade={"detach","merge"} )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $vendor;
 
         /**
          * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountVendor", inversedBy="accountPurchases" , cascade={"detach","merge"} )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $accountVendor;
 
@@ -74,6 +78,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
         /**
          * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\HmsVendor", inversedBy="accountPurchase" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $hmsVendor;
 
@@ -92,6 +97,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
         /**
          * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineVendor", inversedBy="accountPurchases" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $medicineVendor;
 
@@ -104,11 +110,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 
         /**
          * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="accountPurchases" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $accountBank;
 
         /**
          * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="accountPurchases" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $accountMobileBank;
 
@@ -125,12 +133,14 @@ use Symfony\Component\Validator\Constraints as Assert;
         /**
          * @Gedmo\Blameable(on="create")
          * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="accountPurchases" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $createdBy;
 
 
         /**
          * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="purchasesToUser" )
+         * @ORM\JoinColumn(onDelete="CASCADE")
          **/
         private  $toUser;
 

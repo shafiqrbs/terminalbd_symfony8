@@ -286,12 +286,6 @@ class Page
 
 
     /**
-     * @Gedmo\Blameable(on="create")
-     * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="pages" )
-     **/
-    protected $user;
-
-    /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\Module", inversedBy="pages")
      **/
     protected $module;

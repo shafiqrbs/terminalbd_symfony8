@@ -32,6 +32,7 @@ class InvoiceParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular", inversedBy="invoiceParticulars")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $particular;
 

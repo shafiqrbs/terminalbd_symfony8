@@ -26,6 +26,7 @@ class ProductionExpense
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular", inversedBy="productionExpense" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $productionItem;
 

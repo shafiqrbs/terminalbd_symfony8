@@ -29,6 +29,7 @@ class MedicineParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineParticularType", inversedBy="particulars")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $particularType;
 

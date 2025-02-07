@@ -26,11 +26,13 @@ class Pos
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $terminal;
 
     /**
      * @ORM\ManyToOne(targetEntity="Terminalbd\PosBundle\Entity\PosConfig")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $config;
 
@@ -43,17 +45,20 @@ class Pos
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="sales"  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $customer;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="salesUser" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $salesBy;
 
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="sales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $createdBy;
 
@@ -70,12 +75,14 @@ class Pos
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="sales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $accountBank;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="sales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $accountMobileBank;
 

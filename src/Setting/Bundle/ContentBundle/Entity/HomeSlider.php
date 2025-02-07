@@ -81,6 +81,7 @@ class HomeSlider
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="homeSliders")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $globalOption;
@@ -91,11 +92,6 @@ class HomeSlider
 
     protected $page;
 
-    /**
-     * @Gedmo\Blameable(on="create")
-     * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="homeSliders" )
-     **/
-    protected $user;
 
     /**
      * Get id

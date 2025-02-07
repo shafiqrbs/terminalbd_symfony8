@@ -24,6 +24,7 @@ class MedicineReverse
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="medicineReverses")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $medicineConfig;
 
@@ -44,6 +45,7 @@ class MedicineReverse
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="medicineReverse" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

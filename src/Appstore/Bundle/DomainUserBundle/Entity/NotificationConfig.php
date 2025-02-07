@@ -34,6 +34,7 @@ class NotificationConfig
 
     /**
      * @ORM\OneToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="notificationConfig" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $globalOption;
 

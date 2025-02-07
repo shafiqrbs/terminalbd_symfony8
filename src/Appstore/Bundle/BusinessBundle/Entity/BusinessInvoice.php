@@ -70,27 +70,32 @@ class BusinessInvoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="businessInvoices" ,cascade={"persist"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $customer;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountVendor",cascade={"persist"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $vendor;
 
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="businessInvoiceCreatedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="salesUser" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $salesBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="businessInvoiceApprovedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $approvedBy;
 
@@ -116,21 +121,25 @@ class BusinessInvoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="businessInvoice" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="businessInvoice" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\Marketing", inversedBy="invoices" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $marketing;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountCondition")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $condition;
 
@@ -146,6 +155,7 @@ class BusinessInvoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessArea", inversedBy="invoices" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $area;
 

@@ -45,6 +45,7 @@ class Department
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="departments" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $globalOption;
 

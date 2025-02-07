@@ -26,14 +26,11 @@ class AccountBalanceTransfer
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="balanceTransfer")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $globalOption;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Branches", inversedBy="balanceTransfer" )
-     **/
-    private  $branches;
 
     /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountCash", mappedBy="balanceTransfer" , cascade={"detach","merge"} )
@@ -43,6 +40,7 @@ class AccountBalanceTransfer
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="balanceTransfer" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
@@ -53,26 +51,31 @@ class AccountBalanceTransfer
 
 	/**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="fromBalanceTransfer" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $fromAccountBank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="fromBalanceTransfer" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $fromAccountMobileBank;
 
     /**
 	 * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\TransactionMethod", inversedBy="toBalanceTransfer" )
-	 **/
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
 	private  $toTransactionMethod;
 
 	/**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="toBalanceTransfer" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $toAccountBank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="toBalanceTransfer" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $toAccountMobileBank;
 

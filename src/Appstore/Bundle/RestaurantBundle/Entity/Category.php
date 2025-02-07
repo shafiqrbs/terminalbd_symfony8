@@ -42,6 +42,7 @@ class Category
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular")
      * @ORM\OrderBy({"name" = "ASC"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $productGroup;
 

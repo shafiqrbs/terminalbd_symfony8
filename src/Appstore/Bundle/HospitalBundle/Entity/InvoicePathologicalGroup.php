@@ -25,37 +25,44 @@ class InvoicePathologicalGroup
 
     /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\HospitalBundle\Entity\InvoiceParticular", mappedBy="invoicePathologicalGroup",cascade={"persist", "remove"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $invoiceParticulars;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Invoice")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $hmsInvoice;
 
      /**
-     * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular", inversedBy="invoiceParticularDoctor")
-     **/
+      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular", inversedBy="invoiceParticularDoctor")
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private $assignDoctor;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $assignLabuser;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\HmsCategory")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $category;
 
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $particularDeliveredBy;
 

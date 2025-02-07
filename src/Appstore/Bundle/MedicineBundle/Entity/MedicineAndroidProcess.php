@@ -25,11 +25,13 @@ class MedicineAndroidProcess
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="androidProcesses")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $medicineConfig;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\AndroidDeviceSetup", inversedBy="medicineAndroidProcess" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $androidDevice;
 
@@ -53,8 +55,9 @@ class MedicineAndroidProcess
 
 
      /**
-     * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
-     **/
+      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User")
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private  $createdBy;
 
 

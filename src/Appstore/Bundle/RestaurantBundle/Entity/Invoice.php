@@ -40,6 +40,7 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\RestaurantAndroidProcess", inversedBy="sales")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $androidProcess;
 
@@ -65,39 +66,46 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="restaurantInvoice" ,cascade={"persist","remove"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $customer;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular", inversedBy="invoiceTokenNo", cascade={"persist","remove"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $tokenNo;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular", cascade={"persist","remove"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $table;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular",cascade={"persist","remove"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $invoiceMode;
 
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="invoiceCreatedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="invoiceApprovedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $approvedBy;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="invoiceSalesBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $salesBy;
 
@@ -121,12 +129,14 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="restaurantInvoices" , cascade={"persist","remove"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="restaurantInvoices", cascade={"persist","remove"}  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 

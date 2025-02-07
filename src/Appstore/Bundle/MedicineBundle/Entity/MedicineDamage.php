@@ -25,12 +25,14 @@ class MedicineDamage
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig", inversedBy="medicineDamages")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $medicineConfig;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineStock", inversedBy="medicineDamages", cascade={"persist"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $medicineStock;
@@ -45,6 +47,7 @@ class MedicineDamage
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="damage" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

@@ -29,11 +29,13 @@ class Sales
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="sales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $inventoryConfig;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryAndroidProcess", inversedBy="sales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $androidProcess;
 
@@ -45,6 +47,7 @@ class Sales
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Branches", inversedBy="sales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $branches;
 
@@ -77,23 +80,27 @@ class Sales
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="sales"  )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $customer;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="salesUser" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $salesBy;
 
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="sales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $createdBy;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="salesApprovedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $approvedBy;
 
@@ -123,12 +130,14 @@ class Sales
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="sales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $accountBank;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="sales" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $accountMobileBank;
 

@@ -30,6 +30,7 @@ class EmployeePayrollParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HumanResourceBundle\Entity\PayrollSetting", inversedBy="employeePayrollParticulars" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $particular;
 

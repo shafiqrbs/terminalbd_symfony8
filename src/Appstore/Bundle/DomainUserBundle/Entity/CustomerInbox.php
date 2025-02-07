@@ -10,7 +10,7 @@ use Setting\Bundle\ToolBundle\Entity\GlobalOption;
  * CustomerInbox
  *
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="Appstore\Bundle\DomainUserBundle\Repository\CustomerInboxRepository")
+ * @ORM\Entity(repositoryClass="")
  */
 class CustomerInbox
 {
@@ -23,16 +23,16 @@ class CustomerInbox
      */
     private $id;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="customerInbox")
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
+    protected $globalOption;
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer", inversedBy="customerInbox")
      **/
     protected $customer;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="customerInbox")
-     **/
-    protected $globalOption;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="customerInbox")

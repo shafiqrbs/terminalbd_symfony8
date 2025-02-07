@@ -31,6 +31,7 @@ class ProductionValueAdded
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\RestaurantBundle\Entity\Particular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $valueAdded;
 

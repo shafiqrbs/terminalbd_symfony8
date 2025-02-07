@@ -33,6 +33,7 @@ class MedicineSalesReturnInvoice
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineConfig")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $medicineConfig;
 
@@ -45,7 +46,8 @@ class MedicineSalesReturnInvoice
 
       /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineSales")
-     **/
+       * @ORM\JoinColumn(onDelete="CASCADE")
+       **/
     private $medicineSales;
 
 

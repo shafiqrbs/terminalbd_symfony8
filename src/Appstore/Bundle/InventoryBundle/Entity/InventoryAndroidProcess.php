@@ -26,27 +26,28 @@ class InventoryAndroidProcess
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="androidProcesses")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $inventoryConfig;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\AndroidDeviceSetup", inversedBy="inventoryAndroidProcess" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $androidDevice;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="inventoryAndroidProcess" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
-
 
 
     /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Sales", mappedBy="androidProcess" )
      **/
     private  $sales;
-
 
 
     /**

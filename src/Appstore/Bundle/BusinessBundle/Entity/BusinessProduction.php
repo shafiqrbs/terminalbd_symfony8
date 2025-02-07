@@ -30,7 +30,8 @@ class BusinessProduction
     private  $businessParticular;
 
 	 /**
-     * @ORM\OneToMany(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessProductionExpense", mappedBy="businessProduction" )
+      * @ORM\OneToMany(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessProductionExpense", mappedBy="businessProduction" )
+      * @ORM\JoinColumn(onDelete="CASCADE")
       **/
     private  $businessProductionExpense;
 

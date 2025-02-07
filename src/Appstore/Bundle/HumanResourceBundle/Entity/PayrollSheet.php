@@ -34,6 +34,7 @@ class PayrollSheet
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HumanResourceBundle\Entity\EmployeePayroll", inversedBy="payrollSheets" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $employee;
 

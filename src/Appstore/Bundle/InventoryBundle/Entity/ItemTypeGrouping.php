@@ -25,6 +25,7 @@ class ItemTypeGrouping
     /**
      * @ORM\ManyToMany(targetEntity="Product\Bundle\ProductBundle\Entity\Category", inversedBy="categoryGrouping" , cascade={"detach","merge"})
      * @ORM\OrderBy({"name" = "ASC"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
 
     protected $categories;
@@ -32,7 +33,7 @@ class ItemTypeGrouping
 
     /**
      * @ORM\OneToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig", inversedBy="itemTypeGrouping")
-     * @ORM\OrderBy({"id" = "DESC"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $inventoryConfig;
 

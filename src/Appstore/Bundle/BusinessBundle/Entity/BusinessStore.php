@@ -30,11 +30,13 @@ class BusinessStore
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\DomainUserBundle\Entity\Customer")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $customer;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\Marketing")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $marketing;
 

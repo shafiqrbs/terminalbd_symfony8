@@ -27,6 +27,7 @@ class ItemInventory
      * @var \DateTime
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(name="created", type="datetime")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $created;
 
@@ -39,6 +40,7 @@ class ItemInventory
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Item", inversedBy="itemInventory" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $item;
 

@@ -26,29 +26,34 @@ class BusinessParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessConfig", inversedBy="businessParticulars" , cascade={"detach","merge"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $businessConfig;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\Category", inversedBy="businessParticulars" )
      * @ORM\OrderBy({"sorting" = "ASC"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $category;
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessBrand")
      * @ORM\OrderBy({"sorting" = "ASC"})
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private $brand;
 
      /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\WearHouse", inversedBy="businessParticulars" )
      * @ORM\OrderBy({"sorting" = "ASC"})
-     **/
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private $wearHouse;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessParticularType", inversedBy="businessParticulars" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $businessParticularType;
 
@@ -105,6 +110,7 @@ class BusinessParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\ProductUnit", inversedBy="businessParticulars" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $unit;
 

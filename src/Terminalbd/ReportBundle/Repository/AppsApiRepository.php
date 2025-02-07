@@ -1843,17 +1843,18 @@ class AppsApiRepository extends EntityRepository
                 if ($stockId) {
                     $salesItem->setMedicineStock($stockId);
                     $salesItem->setMrpPrice(floatval($stockId->getSalesPrice()));
+                    if($purchase->getMedicineConfig()->isProfitLastpp() == 1 || !$stockId || empty($stockId->getAveragePurchasePrice())){
+                        $salesItem->setPurchasePrice(floatval($stockId->getPurchasePrice()));
+                        $totalPurchasePrice += (floatval($stockId->getPurchasePrice()) * $salesItem->getQuantity());
+                    }else{
+                        $salesItem->setPurchasePrice(floatval($stockId->getAveragePurchasePrice()));
+                        $totalPurchasePrice += (floatval($stockId->getAveragePurchasePrice()) * $salesItem->getQuantity());
+                    }
                 }
                 if (isset($sub->quantity) and $sub->quantity) {
                     $salesItem->setQuantity($sub->quantity);
                 }
-                if($purchase->getMedicineConfig()->isProfitLastpp() == 1){
-                    $salesItem->setPurchasePrice(floatval($stockId->getPurchasePrice()));
-                    $totalPurchasePrice += (floatval($stockId->getPurchasePrice()) * $salesItem->getQuantity());
-                }else{
-                    $salesItem->setPurchasePrice(floatval($stockId->getAveragePurchasePrice()));
-                    $totalPurchasePrice += (floatval($stockId->getAveragePurchasePrice()) * $salesItem->getQuantity());
-                }
+
                 if (isset($sub->item_percent) and $sub->item_percent) {
                     $salesItem->setItemPercent(floatval($sub['item_percent']));
                 }

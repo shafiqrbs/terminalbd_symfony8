@@ -27,18 +27,21 @@ class PurchaseItem
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\InventoryConfig")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $inventoryConfig;
 
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Item", inversedBy="purchaseItems" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $item;
 
 
     /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\InventoryBundle\Entity\StockItem", mappedBy="purchaseItem" , cascade={"remove"} )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $stockItem;
 

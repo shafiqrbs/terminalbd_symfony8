@@ -26,6 +26,12 @@ class InventoryConfig
     private $id;
 
     /**
+     * @ORM\OneToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="inventoryConfig" , cascade={"persist", "remove"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
+    private $globalOption;
+
+    /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Reverse", mappedBy="inventoryConfig" , cascade={"persist", "remove"})
      */
     protected $reverses;
@@ -147,11 +153,7 @@ class InventoryConfig
     protected $purchaseReturn;
 
 
-    /**
-     * @ORM\OneToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="inventoryConfig" , cascade={"persist", "remove"})
-     **/
 
-    private $globalOption;
 
     /**
      * @ORM\OneToMany(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ExcelImporter", mappedBy="inventoryConfig" , cascade={"persist", "remove"})

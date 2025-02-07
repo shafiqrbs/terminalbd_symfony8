@@ -31,34 +31,40 @@ class InvoiceModule
     protected $invoiceModuleItems = null;
 
      /**
-     * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="invoiceModules")
-     **/
+      * @ORM\ManyToOne(targetEntity="Setting\Bundle\ToolBundle\Entity\GlobalOption", inversedBy="invoiceModules")
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     protected $globalOption = null;
 
 
     /**
      * @Gedmo\Blameable(on="create")
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="invoiceModule" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="invoiceModulePaymentBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $paymentBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="invoiceModuleReceivedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $receivedBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountBank", inversedBy="invoiceModules" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountBank;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountMobileBank", inversedBy="invoiceModules" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountMobileBank;
 
