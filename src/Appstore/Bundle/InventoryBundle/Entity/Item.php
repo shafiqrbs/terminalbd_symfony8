@@ -308,6 +308,7 @@ class Item
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\ItemSize", inversedBy="item" )
+
      **/
     private  $size;
 

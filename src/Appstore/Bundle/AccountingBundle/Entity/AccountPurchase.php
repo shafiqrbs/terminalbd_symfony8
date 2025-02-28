@@ -91,8 +91,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
          /**
-         * @ORM\OneToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessPurchase", inversedBy="accountPurchase" )
-         **/
+          * @ORM\OneToOne(targetEntity="Appstore\Bundle\BusinessBundle\Entity\BusinessPurchase", inversedBy="accountPurchase" )
+          * @ORM\JoinColumn(onDelete="CASCADE")
+          **/
         private  $businessPurchase;
 
         /**
