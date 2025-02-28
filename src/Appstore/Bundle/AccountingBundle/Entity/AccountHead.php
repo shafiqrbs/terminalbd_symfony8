@@ -68,12 +68,14 @@ class AccountHead
 
     /**
      * @ORM\OneToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountVendor", inversedBy="accountHead" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountVendor;
 
 
      /**
      * @ORM\OneToOne(targetEntity="Appstore\Bundle\AccountingBundle\Entity\AccountCondition")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $accountCondition;
 
@@ -84,13 +86,15 @@ class AccountHead
 
 
      /**
-     * @ORM\OneToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineVendor", inversedBy="accountHead" )
-     **/
+      * @ORM\OneToOne(targetEntity="Appstore\Bundle\MedicineBundle\Entity\MedicineVendor", inversedBy="accountHead" )
+      * @ORM\JoinColumn(onDelete="CASCADE")
+      **/
     private  $medicineVendor;
 
 
     /**
      * @ORM\OneToOne(targetEntity="Appstore\Bundle\InventoryBundle\Entity\Vendor", inversedBy="accountHead" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $inventoryVendor;
 
