@@ -47,16 +47,20 @@ class InvoiceParticular
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular", inversedBy="invoiceParticular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $particular;
 
+
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular", inversedBy="invoiceParticularDoctor")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $assignDoctor;
 
     /**
      * @ORM\ManyToOne(targetEntity="Appstore\Bundle\HospitalBundle\Entity\Particular")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $assignLabuser;
 

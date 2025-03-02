@@ -65,8 +65,6 @@ class InvoicePathologicalReport
     private $remark;
 
 
-
-
     /**
      * Get id
      *

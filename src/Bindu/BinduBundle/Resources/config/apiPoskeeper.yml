@@ -1,4 +1,4 @@
-api_poskeeper_login:
+xapi_poskeeper_login:
     path:     /poskeeper-otp-login
     defaults: { _controller: BinduBundle:ApiPoskeeper:login }
 

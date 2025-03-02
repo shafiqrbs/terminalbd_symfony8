@@ -81,6 +81,7 @@ class AccountBalanceTransfer
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="balanceTransferApprove" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $approvedBy;
 

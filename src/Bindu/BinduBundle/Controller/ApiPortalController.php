@@ -125,7 +125,7 @@ class ApiPortalController extends Controller
                         <li><strong>Customer Management:</strong> Maintain customer records for loyalty programs and purchase history.</li>
                     </ul>",
             ),
-            /* array(
+             array(
                 'app_slug' => 'restaurant',
                 'name' => "Restaurant",
                 'title' => "Restaurant Management System",
@@ -157,7 +157,7 @@ class ApiPortalController extends Controller
             <li><strong>Customer Relationship Management (CRM):</strong> Maintain a database for repeat clients and bulk orders.</li>
             <li><strong>Sales Analytics:</strong> Generate detailed sales reports to identify high-performing products.</li>
         </ul>",
-            )*/
+            )
         );
         $intro = array(
             'video_url' => "https://youtu.be/CPclGyYCGtY?si=12eJJnM7yUQvh7RU",

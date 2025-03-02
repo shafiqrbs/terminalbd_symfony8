@@ -145,11 +145,13 @@ class AccountCash
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="accountCashes" )
-	 **/
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     **/
 	private  $toUser;
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="accountPurchases" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $createdBy;
 

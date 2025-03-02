@@ -51,6 +51,7 @@ class InvoiceTransaction
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="hmsInvoiceApprovedBy" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $approvedBy;
 

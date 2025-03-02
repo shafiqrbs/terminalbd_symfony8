@@ -96,6 +96,7 @@ class AccountSales
 
     /**
      * @ORM\ManyToOne(targetEntity="Core\UserBundle\Entity\User", inversedBy="salesApprove" )
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private  $approvedBy;
 
