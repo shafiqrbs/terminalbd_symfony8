@@ -1761,6 +1761,7 @@ class AppsApiRepository extends EntityRepository
                 $sales->setCreated($created);
                 $sales->setUpdated($created);
                 $sales->setInvoice($invoice);
+                $sales->setDeviceSalesId($invoice);
                 $sales->setAndroidProcess($process);
                 if($createdBy){
                     $sales->setSalesBy($em->getRepository(User::class)->find($salesBy));

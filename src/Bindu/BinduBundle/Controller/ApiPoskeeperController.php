@@ -1540,6 +1540,7 @@ class ApiPoskeeperController extends Controller
         }else{
 
             /* @var $entity GlobalOption */
+
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $request->request->all();
