@@ -158,6 +158,7 @@
                                 </thead>
                                 <tbody>
                                 {% set modes = ['Due','Advance','Credit','Discount'] %}
+                                {% set ignoreDelete = ['Sales-Return'] %}
                                 {% for entity in entities %}
                                     <tr id="remove-{{ entity.id }}">
                                         <td><span class="badge badge-success toggle badge-custom" id="{{ entity.id  }}" ><span>[+]</span></span></td>
@@ -194,7 +195,7 @@
                                         </td>
                                         <td class="numeric" >{{ entity.balance|number_format }}</td>
                                         <td class="numeric" >
-                                            {% if entity.process != 'approved' or app.user.granted("ROLE_DOMAIN") %}
+                                            {% if entity.process != 'approved' or app.user.granted("ROLE_DOMAIN") and  entity.processHead not in ignoreDelete  %}
                                                 <a href="javascript:" id="" data-id="{{ entity.id }}" class="btn red mini delete"  data-url="{{ path('account_sales_delete',{'id':entity.id}) }}"><i class="icon-trash"></i></a>
                                             {% endif %}
                                             {% if entity.process != 'approved' %}

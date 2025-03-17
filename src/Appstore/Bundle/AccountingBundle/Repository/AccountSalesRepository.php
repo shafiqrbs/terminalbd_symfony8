@@ -1750,12 +1750,29 @@ LEFT JOIN business_invoice as invoice ON invoice.id = sales.businessInvoice_id
 JOIN Customer as customer ON sales.customer_id = customer.id
 JOIN fos_user as user ON customer.marketing_id = user.id
 JOIN user_profiles as profile ON user.id = profile.user_id
-WHERE sales.globalOption_id = {$global} AND sales.process = 'approved' AND sales.created >= '{$startDate}' AND sales.created <= '{$endDate}'
+WHERE sales.globalOption_id = {$global} AND sales.processHead != 'Sales-Return' AND sales.process = 'approved' AND sales.created >= '{$startDate}' AND sales.created <= '{$endDate}'
 GROUP BY user.id ORDER BY sales.amount DESC";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->execute();
         $result =  $qb->fetchAll();
-        return $result;
+
+        $sql2 = "SELECT user.id as id,SUM(sales.amount) as amount
+FROM account_sales as sales
+JOIN Customer as customer ON sales.customer_id = customer.id
+JOIN fos_user as user ON customer.marketing_id = user.id
+JOIN user_profiles as profile ON user.id = profile.user_id
+WHERE sales.globalOption_id = {$global} AND sales.processHead = 'Sales-Return' AND sales.process = 'approved' AND sales.created >= '{$startDate}' AND sales.created <= '{$endDate}'
+GROUP BY user.id ORDER BY sales.amount DESC";
+        $qb2 = $this->getEntityManager()->getConnection()->prepare($sql2);
+        $qb2->execute();
+        $result2 =  $qb2->fetchAll();
+        $salesReturns = array();
+        foreach ($result2 as $r){
+            $salesReturns[$r['id']] = $r;
+        }
+        $array = array('result' => $result,'salesReturns' => $salesReturns);
+        return $array;
+
 
     }
 

@@ -2,17 +2,21 @@
 {% set totalSales = 0 %}
 {% set totalDiscount = 0 %}
 {% set totalPayment = 0 %}
+{% set totalReturn = 0 %}
 {% for entity in entities %}
     {% set subTotalSales = (subTotalSales + entity.subTotal) %}
     {% set totalSales = (totalSales + entity.total) %}
     {% set totalDiscount = (totalDiscount + entity.discount) %}
     {% set totalPayment = (totalPayment + entity.amount) %}
+    {% set salesRe = (salesReturns[entity.id] is defined and  salesReturns[entity.id] is not empty ) ? salesReturns[entity.id].amount|default(0):0 %}
+    {% set totalReturn = (totalReturn + salesRe) %}
     <tr>
         <td class="numeric">{{ loop.index }}</td>
         <td class="numeric">{{ entity.name }}</td>
         <td class="text-right" >{{ entity.subTotal|number_format  }}</td>
         <td class="text-right" >{{ entity.discount|number_format  }}</td>
         <td class="text-right" >{{ entity.total|number_format  }}</td>
+        <td class="text-right" >{{ (salesReturns[entity.id] is defined and  salesReturns[entity.id] is not empty ) ? salesReturns[entity.id].amount|number_format:'' }}</td>
         <td class="text-right" >{{ entity.amount|number_format }}</td>
         <td class="text-right" >{{ (entity.total - entity.amount)|number_format }}</td>
         <td>
@@ -26,6 +30,7 @@
     <th class="text-right"><strong>{{ subTotalSales|number_format(2) }}</strong></th>
     <th class="text-right"><strong>{{ totalDiscount|number_format(2) }}</strong></th>
     <th class="text-right"><strong>{{ totalSales|number_format(2) }}</strong></th>
+    <th class="text-right"><strong>{{ totalReturn|number_format(2) }}</strong></th>
     <th class="text-right"><strong>{{ totalPayment|number_format(2) }}</strong></th>
     <th class="text-right"><strong>{{ (totalSales-totalPayment)|number_format(2) }}</strong></th>
     <th></th>

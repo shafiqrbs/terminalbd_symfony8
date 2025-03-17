@@ -1815,7 +1815,8 @@ class ReportController extends Controller
         $pagination = $this->getDoctrine()->getRepository('AccountingBundle:AccountSales')->insertBusinessExecutive($global,$data);
         $htmlProcess = $this->renderView(
             'ReportBundle:Business/MarketingExecutive:ajax-data.html.twig', array(
-                'entities' => $pagination,
+                'entities' => $pagination['result'],
+                'salesReturns' => $pagination['salesReturns'],
                 'data' => $data,
             )
         );
