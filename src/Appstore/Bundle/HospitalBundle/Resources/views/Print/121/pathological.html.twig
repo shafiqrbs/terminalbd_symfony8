@@ -1,16 +1,10 @@
 {% extends '::hms-print.html.twig' %}
 {% block body %}
     <div style="margin-top:{{  entity.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ entity.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
-        {%  if entity.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
-            <table class="table">
-                <tr>
-                    <td>
-                        <div class="span4 title-center text-center">
-                            {{ entity.hospitalConfig.address|raw }}
-                        </div>
-                    </td>
-                </tr>
-            </table>
+        {% if entity.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
+            {% if entity.hmsInvoice.hospitalConfig.webHeaderPath('headerFile') is not empty %}
+                <img style="max-height:100px; width:100%!important;" src="/{{ entity.hmsInvoice.hospitalConfig.webHeaderPath('headerFile') }}">
+            {% endif %}
         {% endif %}
         <table class="table table-border" style="border: 5px solid #c0c5c9!important" >
             <tr class="print-header">
@@ -21,16 +15,16 @@
                 </th>
             </tr>
             <tr>
-                <td style="width: 45%!important;">
+                <td style="width: 35%!important;">
                     <ul class="unstyled">
                         <li><label>Invoice No:</label> {{ entity.hmsInvoice.invoice }}</li>
-                        <li><label>Patient Name:</label> {{ entity.hmsInvoice.customer.name }}</li>
-                        <li><label>Investigation:</label> {{ entity.particular.name }}</li>
+                        <li><label>Patient ID:</label> {{ entity.hmsInvoice.customer.customerId }}</li>
+                        <li><label>Name:</label> {{ entity.hmsInvoice.customer.name }}</li>
                         <li><label>Sample:</label> {{ entity.particular.sepcimen }}</li>
-                        <li><label>Ref. By:</label> {% if entity.hmsInvoice.assignDoctor is not empty %}<strong>{{ entity.assignDoctor.name }}</strong>{% endif %}</li>
+                        <li><label>Ref. By:</label> {% if entity.hmsInvoice.assignDoctor is not empty %}<strong>{{ entity.hmsInvoice.assignDoctor.name }}</strong>{% endif %}</li>
                     </ul>
                 </td>
-                <td class="" style="width:20%!important;">
+                <td class="" style="width:30%!important;">
                     <ul class="unstyled" >
                         <li><label>Age:</label> {{ entity.hmsInvoice.customer.age }} {{ entity.hmsInvoice.customer.ageType }}</li>
                         <li><label>Gender:</label> {{ entity.hmsInvoice.customer.gender }} </li>
@@ -42,13 +36,12 @@
                 <td class="" style="width: 35%!important;">
                     <ul class="unstyled">
                         <li><label>Report No:</label> {{ entity.particular.particularCode }}-{{ entity.reportCode }}</li>
-                        <li><label>Invoice Date:</label> {{ entity.hmsInvoice.updated|date('d-m-Y') }}</li>
+                        <li><label>Invoice Date:</label> {{ entity.hmsInvoice.updated|date('d-m-y') }}</li>
                         <li><label>Delivery Date:</label> {{ entity.hmsInvoice.deliveryDateTime }}</li>
-                        <li><label>Coll. Time:</label> {{ entity.collectionDate|date('d-m-Y h:i:s A') }}</li>
+                        <li><label>Coll. Time:</label> {{ entity.collectionDate|date('d-m-y h:i A') }}</li>
                         <li><label>Coll. By:</label> {{ entity.sampleCollectedBy }}</li>
                     </ul>
                 </td>
-
             </tr>
         </table>
         {% if entity.particular.reportFormat == 1 %}
@@ -133,34 +126,24 @@
                 </tbody>
             </table>
         {% endif %}
-        <table class="table print-footer" style="position: fixed; bottom: 40px"  >
+        <table class="table print-footer">
             <tr>
-                <td class="left span4">
-                    <ul class="unstyled">
-                        <li>Prepared By</li>
-                        <li><strong>{{ entity.particularPreparedBy.profile.name }}</strong></li>
-                        <li>{% if entity.particularPreparedBy.profile.designation is not empty %}{{ entity.particularPreparedBy.profile.designation.name }}{% endif %}</li>
-                    </ul>
-                </td>
-                <td class="center span4">
+                <td class="center span6">
                     <ul class="unstyled">
                         <li>Printed By</li>
-                        <li><strong>{{ printUser.profile.name }}</strong></li>
-                        <li>{% if entity.particularPreparedBy.profile.designation is not empty %}{{ printUser.profile.designation.name }}{% endif %}</li>
+                        <li><strong>{{ (printUser.profile) ? printUser.profile.name :'' }}</strong></li>
+                        <li>{{ "now"|date('d-m-Y h:i A') }}</li>
                     </ul>
                 </td>
-                <td class="span4">
-                    {% if entity.assignDoctor is not empty %}
-                        <ul class="unstyled">
-                            <li><strong>{{ entity.assignDoctor.name }}</strong></li>
-                            <li>{{ entity.assignDoctor.educationalDegree|raw }}</li>
-                            <li>{{ entity.assignDoctor.specialist|raw }}</li>
-                            {% if entity.assignDoctor.category is not empty or entity.assignDoctor.department is not empty %}<li> {% if entity.assignDoctor.category is not empty %}{{ entity.assignDoctor.category.name }}{% endif %} {% if entity.assignDoctor.department is not empty %} ,{{ entity.assignDoctor.department.name }}{% endif %}</li>{% endif %}
-                            <li>{{ entity.assignDoctor.designation }}</li>
-                            <li>{{ entity.assignDoctor.currentJob }}</li>
-                        </ul>
-                    {% endif %}
+                <td class="center span6">
+                    <ul class="unstyled">
+                        <li>Prepared By</li>
+                        <li><br/><br/></li>
+                        <li><strong>{{ (entity.assignLabuser) ? entity.assignLabuser.name :'' }}</strong></li>
+                        <li><strong>{{ (entity.assignLabuser) ? entity.assignLabuser.doctorSignature|raw :'' }}</strong></li>
+                    </ul>
                 </td>
+
             </tr>
         </table>
     </div>
