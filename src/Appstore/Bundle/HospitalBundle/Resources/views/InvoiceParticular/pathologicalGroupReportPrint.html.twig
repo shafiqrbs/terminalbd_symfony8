@@ -22,10 +22,10 @@
 </head>
 <body>
 <div style="position: relative; height:{{ reportGroup.hmsInvoice.hospitalConfig.reportHeight~'px' ? reportGroup.hmsInvoice.hospitalConfig.reportHeight:'auto' }};  margin-top:{{  reportGroup.hmsInvoice.hospitalConfig.printMarginReportTop }}px;margin-left:{{ reportGroup.hmsInvoice.hospitalConfig.printMarginReportLeft }}px;">
-    {%  if reportGroup.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
-        <div style="margin-bottom:20px; text-align:center">
-            <img style="max-height:100px" src="/{{ global.webPath('file') }}">
-        </div>
+    {% if entity.hmsInvoice.hospitalConfig.isPrintReportHeader == 1 %}
+        {% if entity.hmsInvoice.hospitalConfig.webHeaderPath('headerFile') is not empty %}
+            <img style="max-height:100px; width:100%!important;" src="/{{ entity.hmsInvoice.hospitalConfig.webHeaderPath('headerFile') }}">
+        {% endif %}
     {% endif %}
     <table class="table table-border reportTable" style="border: 3px solid #383939!important" >
         <tr>
