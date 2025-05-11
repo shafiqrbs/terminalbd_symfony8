@@ -127,7 +127,7 @@ class SalesReturnController extends Controller
         $items = $data['item'];
         $globalOption = $this->getUser()->getGlobalOption();
         $returnInvoice = $this->getDoctrine()->getRepository(MedicineSalesReturnInvoice::class)->insertMedicineSalesReturn($globalOption,$data);
-        if($returnInvoice){
+        if($returnInvoice and $returnInvoice != 'invalid'){
             foreach ($items as $item){
                 if($data['quantity'][$item] > 0){
                     $qnt = $data['quantity'][$item];

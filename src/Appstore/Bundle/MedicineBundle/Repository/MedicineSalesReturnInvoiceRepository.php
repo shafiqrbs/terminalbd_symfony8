@@ -124,22 +124,26 @@ class MedicineSalesReturnInvoiceRepository extends EntityRepository
     {
         $config = $option->getMedicineConfig();
         $em = $this->_em;
-        $customerId = $data['customer'];
+        $customerId = (isset($data['customer']) and $data['customer']) ? $data['customer']:'';
         $total = (isset($data['total']) and $data['total']) ? round($data['total']):0;
         $payment = (isset($data['payment']) and $data['payment']) ? round($data['payment']):0;
         $remark = (isset($data['comment']) and $data['comment']) ? $data['comment']:'';
         $adjustment = round($total - $payment);
-        $customer = $em->getRepository(Customer::class)->findOneBy(array('globalOption' => $option,'id'=>$customerId));
-        $entity = new MedicineSalesReturnInvoice();
-        $entity->setMedicineConfig($config);
-        $entity->setCustomer($customer);
-        $entity->setSubTotal($total);
-        $entity->setPayment($payment);
-        $entity->setComment($remark);
-        $entity->setAdjustment($adjustment);
-        $em->persist($entity);
-        $em->flush();
-        return $entity;
+        $customer = $em->getRepository(Customer::class)->findOneBy(array('globalOption' => $option,'id'=> $customerId));
+        if($customer){
+            $entity = new MedicineSalesReturnInvoice();
+            $entity->setMedicineConfig($config);
+            $entity->setCustomer($customer);
+            $entity->setSubTotal($total);
+            $entity->setPayment($payment);
+            $entity->setComment($remark);
+            $entity->setAdjustment($adjustment);
+            $em->persist($entity);
+            $em->flush();
+            return $entity;
+        }
+        return 'invalid';
+
     }
 
     public function updateTotalAmountMismatch()
