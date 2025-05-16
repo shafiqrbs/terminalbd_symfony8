@@ -3,6 +3,7 @@
 namespace Setting\Bundle\ToolBundle\Controller;
 
 use Setting\Bundle\ToolBundle\Entity\GlobalOption;
+use Setting\Bundle\ToolBundle\Entity\SmsSender;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -210,6 +211,7 @@ class DomainController extends Controller
     {
 
         set_time_limit(0);
+
         if($option->getAccountingConfig()){
             $this->getDoctrine()->getRepository('AccountingBundle:AccountingConfig')->accountingReset($option);
         }
@@ -288,6 +290,16 @@ class DomainController extends Controller
         return $this->redirect($this->generateUrl('tools_domain'));
     }
 
+    public function domainDeletePurchaseSalesAction(GlobalOption $option)
+    {
+        set_time_limit(0);
+        $this->getDoctrine()->getRepository(GlobalOption::class)->domainDeletePurchaseSales($option);
+        $this->get('session')->getFlashBag()->add(
+            'success',"Successfully reset data"
+        );
+        return $this->redirect($this->generateUrl('tools_domain'));
+    }
+
     public function statusDeleteAction()
     {
         $em = $this->getDoctrine()->getManager();
@@ -343,7 +355,9 @@ class DomainController extends Controller
 
     public function androidDataCleanAction()
     {
+        $em = $this->getDoctrine()->getManager();
         $this->getDoctrine()->getRepository('SettingToolBundle:GlobalOption')->androidDataClean();
+        $this->getDoctrine()->getRepository(SmsSender::class)->smsHistoryDelete();
         $this->get('session')->getFlashBag()->add(
             'success',"Successfully reset data"
         );

@@ -126,6 +126,23 @@ $(document).on( "click", ".androidProcess", function( e ) {
 
     });
 
+$(document).on("click", ".confirm", function() {
+
+    $(this).removeClass('approve');
+    var id = $(this).attr("data-id");
+    var url = $(this).attr("data-url");
+    $('#confirm-content').confirmModal({
+        topOffset: 0,
+        top: '25%',
+        onOkBut: function(event, el) {
+            $.get(url, function( data ) {
+                alert(data);
+            });
+        }
+    });
+
+});
+
 
     $(".select2User").select2({
         ajax: {

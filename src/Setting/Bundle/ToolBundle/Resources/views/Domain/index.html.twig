@@ -140,7 +140,14 @@
                                                 <tr>
                                                     <th class="numeric" >Reset Operational Data</th>
                                                     <td class="numeric" >
-                                                        <a href="javascript:" data-url="{{ path('tools_option_reset',{id: entity.id}) }}" class="btn purple mini reset" ><i class="icon-refresh"></i>&nbsp;Reset Data</a>
+                                                        <a href="javascript:" data-url="{{ path('tools_option_reset',{id: entity.id}) }}" class="btn red mini reset" ><i class="icon-refresh"></i>&nbsp;Reset Data</a>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th class="numeric" >Reset Purchase/Sales</th>
+                                                    <td class="numeric" >
+                                                        <a href="javascript:" data-url="{{ path('tools_option_reset_purchase_sales',{id: entity.id}) }}" class="btn purple mini reset" ><i class="icon-refresh"></i>&nbsp;Reset Data</a>
                                                     </td>
                                                 </tr>
 

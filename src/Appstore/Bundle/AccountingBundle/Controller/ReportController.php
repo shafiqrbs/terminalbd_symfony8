@@ -412,11 +412,11 @@ class ReportController extends Controller
         if($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
             $this->send($msg,$mobile);
             $this->getDoctrine()->getRepository('SettingToolBundle:SmsSender')->insertCustomerOutstandingSms($invoice,$msg,'success');
-            $this->get('session')->getFlashBag()->add(
-                'success'," $name SMS has benn sent successfully"
-            );
+            $msg = "{$name} SMS has benn sent successfully";
+            return new Response($msg);
         }
-        return new Response('success');
+        return new Response("We apologize, but bulk SMS is currently unavailable for confirmation.");
+
 	}
     function send($msg, $phone, $sender = ""){
 

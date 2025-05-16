@@ -338,4 +338,14 @@ class SmsSenderRepository extends EntityRepository {
         }
 
     }
+
+    public function smsHistoryDelete(){
+
+        $em = $this->_em;
+        $accountCash = $em->createQuery("DELETE SettingToolBundle:SmsSender e WHERE e.status='success'");
+        if(!empty($accountCash)){
+            $accountCash->execute();
+        }
+
+    }
 } 

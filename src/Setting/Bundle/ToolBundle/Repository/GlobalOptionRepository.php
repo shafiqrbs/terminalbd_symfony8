@@ -1233,4 +1233,30 @@ class GlobalOptionRepository extends EntityRepository
 
     }
 
+
+    public function domainDeletePurchaseSales(GlobalOption $option)
+    {
+        $configId = $option->getMedicineConfig()->getId();
+        $lastMonth = date("Y-12-31 23:59:59", strtotime("last year"));
+
+        $sales = "DELETE medicine_sales_item FROM medicine_sales_item
+          JOIN medicine_sales ON medicine_sales_item.medicineSales_id = medicine_sales.id
+          WHERE medicine_sales.medicineConfig_id = :configId AND medicine_sales.created <= :endDate";
+        $qb1 = $this->getEntityManager()->getConnection()->prepare($sales);
+        $qb1->bindValue('configId', $configId);
+        $qb1->bindValue('endDate', $lastMonth);
+        $qb1->execute();
+
+        $purchase = "DELETE medicine_sales_item FROM medicine_sales_item
+        JOIN medicine_sales ON medicine_sales_item.medicineSales_id = medicine_sales.id
+        WHERE medicine_sales.medicineConfig_id = :configId AND medicine_sales.created <= :endDate";
+        $qb1 = $this->getEntityManager()->getConnection()->prepare($purchase);
+        $qb1->bindValue('configId', $configId);
+        $qb1->bindValue('endDate', $lastMonth);
+        $qb1->execute();
+        return "success";
+
+
+    }
+
 }

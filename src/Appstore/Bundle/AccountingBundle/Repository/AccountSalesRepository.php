@@ -1887,8 +1887,7 @@ GROUP BY user.id ORDER BY sales.amount DESC";
             $qb->setParameter('endDate',$end);
         }
         $result = $qb->getQuery()->getArrayResult();
-    //    var_dump($result);
-     //   exit;
+        $result = $qb->getQuery()->getArrayResult();
         return array('current' => $result,'previous' => $previous);
 
     }

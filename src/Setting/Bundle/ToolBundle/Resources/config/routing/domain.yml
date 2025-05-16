@@ -31,6 +31,10 @@ tools_option_reset:
     path:     /{id}/option-reset
     defaults: { _controller: "SettingToolBundle:Domain:resetSystemData" }
 
+tools_option_reset_purchase_sales:
+    path:     /{id}/option-reset-purchase-sales
+    defaults: { _controller: "SettingToolBundle:Domain:domainDeletePurchaseSales" }
+
 
 
 tools_option_delete:
