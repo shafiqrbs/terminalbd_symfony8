@@ -19,6 +19,12 @@ domain_edit:
     path:     /{id}/edit
     defaults: { _controller: "DomainUserBundle:DomainUser:edit" }
 
+domain_update_inline:
+    path:     /{id}/inline-update
+    defaults: { _controller: "DomainUserBundle:DomainUser:inlineUpdate" }
+    options:
+        expose: true
+
 domain_update:
     path:     /{id}/update
     defaults: { _controller: "DomainUserBundle:DomainUser:update" }

@@ -63,7 +63,13 @@
                                             <td><span class="badge badge-warning toggle badge-custom" id="{{ entity.id  }}" ><span>[+]</span></span></td>
                                             <td>{% if entity.profile is not empty %}{{ entity.profile.name }}{% endif %}</td>
                                             <td>{% if entity.profile.designation is defined and entity.profile.designation is not empty %}{{ entity.profile.designation.name }}{% endif %}</td>
-                                            <td>{{ entity.username }}</td>
+                                            <td>
+                                            {% if (app.user.granted("ROLE_DOMAIN")) %}
+                                                <a  class="editable" data-name="username" href="#"  data-url="{{ path('domain_update_inline',{id:entity.id}) }}" data-type="text" data-pk="{{ entity.id }}" data-original-title="Change username">{{ entity.username }}</a>
+                                            {% else %}
+                                                {{ entity.username }}
+                                            {% endif %}
+                                            </td>
                                             <td class="numeric"><a href="tel:+88 {{ entity.profile ? entity.profile.mobile :'' }}"> {{ entity.profile ? entity.profile.mobile :''}}</a></td>
                                             <td>{% if entity.enabled == 1 %}<span class="btn mini blue"><i class="icon-ok"></i></span>{% else %}<span class="btn mini red"><i class="icon-remove"></i></span>{% endif %}</td>
                                             <td>{% if entity.isDelete == 1 %}<span class="btn mini red"><i class="icon-trash"></i></span>{% endif %}</td>
@@ -120,6 +126,17 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block javascriptBlock %}
+    {{ parent() }}
+    {% javascripts
+        '@MedicineBundle/Resources/public/js/editable.js'
+    %}<script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock  %}
+{% block documentready %}
+    {{ parent() }}
+    EditableInit()
 {% endblock %}
 
 

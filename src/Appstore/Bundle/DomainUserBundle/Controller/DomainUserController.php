@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Appstore\Bundle\DomainUserBundle\Entity\DomainUser;
-
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * DomainUser controller.
@@ -148,6 +148,28 @@ class DomainUserController extends Controller
             'entity'      => $user,
             'form'   => $editForm->createView(),
         ));
+    }
+
+    public function inlineUpdateAction(Request $request)
+    {
+        $data = $request->request->all();
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $entity User */
+
+        $entity = $em->getRepository(User::class)->find($data['pk']);
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find particular entity.');
+        }
+        $exist = $em->getRepository(User::class)->findOneBy(array('username' => $data['value']));
+        if(empty($exist)){
+            $entity->setUsername(strtolower($data['value']));
+            $em->flush();
+            return new Response('success');
+        }
+        return new Response('invalid');
+
+
     }
 
     /**
