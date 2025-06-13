@@ -165,26 +165,44 @@
             <tr><td>Comment: {{ entity.comment|raw }}</td></tr>
         </table>
     {% endif %}
-    <table class="table print-footer">
-        <tr>
-            <td class="center span6">
-                <ul class="unstyled">
-                    <li>Printed By</li>
-                    <li><strong>{{ (printUser.profile) ? printUser.profile.name :'' }}</strong></li>
-                    <li>{{ "now"|date('d-m-Y h:i A') }}</li>
-                </ul>
-            </td>
-            <td class="center span6">
+    <div style="position: fixed; bottom:50px; width: 100%">
+        <div class="grid-print">
+            <div class="grid-print-item">
                 <ul class="unstyled">
                     <li>Prepared By</li>
-                    <li><br/><br/></li>
-                    <li><strong>{{ (entity.assignLabuser) ? entity.assignLabuser.name :'' }}</strong></li>
-                    <li><strong>{{ (entity.assignLabuser) ? entity.assignLabuser.doctorSignature|raw :'' }}</strong></li>
+                    {% if entity.assignLabuser is not empty %}
+                        <li>
+                            {% if(entity.assignLabuser and entity.assignLabuser.webSignaturePath) %}
+                                <img class="fileupload-preview fileupload-exists" alt="" src="{{ image(entity.assignLabuser.webSignaturePath).resize(180,100) }}">
+                            {% endif %}
+                        </li>
+                        <li><strong>{{ entity.assignLabuser.name }}</strong></li>
+                        <li>{% if entity.assignLabuser.doctorSignature is not empty %}{{ entity.assignLabuser.doctorSignature|raw }}{% endif %}</li>
+                    {% endif %}
                 </ul>
-            </td>
-
-        </tr>
-    </table>
+            </div>
+            <div class="grid-print-item">
+                <ul class="unstyled">
+                    <li>Printed By</li>
+                    <li><strong>{{ printUser.profile.name }}</strong></li>
+                    <li>{% if printUser.profile and printUser.profile.designation is not empty %}{{ printUser.profile.designation.name }}{% endif %}</li>
+                    <li>{{ "now"|date('d-m-Y h:i A') }}</li>
+                </ul>
+            </div>
+            <div class="grid-print-item">
+                {% if entity.assignDoctor is not empty %}
+                    <ul class="unstyled">
+                        <li> {% if(entity.assignDoctor.webSignaturePath) %}
+                                <img class="fileupload-preview fileupload-exists" alt="" src="{{ image(entity.assignDoctor.webSignaturePath).resize(180,100) }}">
+                            {% endif %}
+                        </li>
+                        <li><strong>{{ entity.assignDoctor.name }}</strong></li>
+                        <li>{{ entity.assignDoctor.doctorSignature|raw }}</li>
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <style>
