@@ -165,7 +165,7 @@
             <tr><td>Comment: {{ entity.comment|raw }}</td></tr>
         </table>
     {% endif %}
-    <div style="position: fixed; bottom:50px; width: 100%">
+    <div style="position: fixed; bottom:{{ entity.hmsInvoice.hospitalConfig.printMarginReportBottom ? entity.hmsInvoice.hospitalConfig.printMarginReportBottom : 50  }}px; width: 100%">
         <div class="grid-print">
             <div class="grid-print-item">
                 <ul class="unstyled">

@@ -50,6 +50,10 @@ hms_report_monthly_commission_pdf:
     path:     /monthly-commission-pdf
     defaults: { _controller: "HospitalBundle:Report:monthlyCommissionPdf" }
 
+hms_report_daily_referred_commission:
+    path:     /daily-commission-details
+    defaults: { _controller: "HospitalBundle:Report:dailyCommissionDetails" }
+
 hms_report_monthly_referred_commission:
     path:     /monthly-commission-details
     defaults: { _controller: "HospitalBundle:Report:monthlyCommissionDetails" }

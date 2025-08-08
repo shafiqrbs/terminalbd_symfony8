@@ -1038,6 +1038,7 @@ class Builder extends ContainerAware
                     ;
                 $menu['Hospital & Diagnostic']['Reports']->addChild('Monthly Commission', array('route' => 'hms_report_monthly_commission'))
                     ;
+                $menu['Hospital & Diagnostic']['Reports']->addChild('Daily Commission', array('route' => 'hms_report_daily_referred_commission'));
                 $menu['Hospital & Diagnostic']['Reports']->addChild('Referred Commission', array('route' => 'hms_report_monthly_referred_commission'))
                     ;
                 $menu['Hospital & Diagnostic']['Reports']->addChild('Commission Summary', array('route' => 'hms_report_commission_group'))

@@ -358,6 +358,44 @@ class DoctorInvoiceRepository extends EntityRepository
 
     }
 
+    public function dailyGroupBaseCommissionSummary(User $user , $data)
+    {
+        $config = $user->getGlobalOption()->getHospitalConfig()->getId();
+        $compare = new \DateTime();
+        $startDate = isset($data['startDate'])? $data['startDate'] : '';
+        $endDate = isset($data['endDate'])? $data['endDate'] : '';
+        if(empty($startDate) and empty($endDate)){
+            $datetime = new \DateTime("now");
+            $startDate = $datetime->format('Y-m-d 00:00:00');
+            $endDate = $datetime->format('Y-m-d 23:59:59');
+        }else{
+            $startDate = date('Y-m-d 00:00:00',strtotime($startDate));
+            $endDate = date('Y-m-d 23:59:59',strtotime($endDate));
+        }
+        $referred = isset($data['referred'])? $data['referred'] :'';
+        $referredSql = "";
+        if(!empty($referred)){
+            $referredSql = "AND transaction.assignDoctor_id = :referred";
+        }
+        $sql = "SELECT SUM(transaction.payment) as payment, commission.name as commissionName, commission.id as commissionId
+                FROM hms_doctor_invoice as transaction
+                INNER JOIN hms_commission as commission ON transaction.hmsCommission_id = commission.id
+                WHERE transaction.hospitalConfig_id = :hmsConfig AND transaction.process = :process AND DATE(transaction.updated) BETWEEN :startDate AND :endDate
+                {$referredSql} GROUP BY commissionName ";
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt->bindValue('hmsConfig', $config);
+        $stmt->bindValue('process', 'Paid');
+        $stmt->bindValue('startDate', $startDate);
+        $stmt->bindValue('endDate', $endDate);
+        if(!empty($referred)) {
+            $stmt->bindValue('referred',$referred);
+        }
+        $stmt->execute();
+        $results =  $stmt->fetchAll();
+        return $results;
+
+    }
+
     public function monthlyCommissionGroup(User $user , $data =array())
     {
         $config = $user->getGlobalOption()->getHospitalConfig()->getId();
@@ -426,6 +464,38 @@ class DoctorInvoiceRepository extends EntityRepository
         return $result;
     }
 
+    public function dailyReferredCommissionInvoice(User $user , $data =array()){
+        $this->_em;
+        $config = $user->getGlobalOption()->getHospitalConfig()->getId();
+
+        $startDate = isset($data['startDate'])? $data['startDate'] : '';
+        $endDate = isset($data['endDate'])? $data['endDate'] : '';
+        $referred = isset($data['referred'])? $data['referred'] :'';
+        if(empty($startDate) and empty($endDate)){
+            $datetime = new \DateTime("now");
+            $startDate = $datetime->format('Y-m-d 00:00:00');
+            $endDate = $datetime->format('Y-m-d 23:59:59');
+        }else{
+            $startDate = date('Y-m-d 00:00:00',strtotime($startDate));
+            $endDate = date('Y-m-d 23:59:59',strtotime($endDate));
+        }
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('e.updated as created,i.id as invoiceId,i.invoice as invoice,i.created as invoiceDate,c.name as customerName ');
+        $qb->addSelect('referred.name as referredName');
+        $qb->innerJoin('e.hmsInvoice','i');
+        $qb->innerJoin('i.customer','c');
+        $qb->innerJoin('e.assignDoctor','referred');
+        $qb->where('e.hospitalConfig = :config')->setParameter('config',$config);
+        $qb->andWhere("e.updated >= :startDate")->setParameter('startDate',$startDate);
+        $qb->andWhere("e.updated <= :endDate")->setParameter('endDate',$endDate);
+        $qb->andWhere("e.process = :process")->setParameter('process','Paid');
+        $qb->andWhere('referred.id = :assign');
+        $qb->setParameter('assign',$referred);
+        $qb->groupBy('i.id');
+        $result = $qb->getQuery()->getArrayResult();
+        return $result;
+    }
+
     public function monthlyCommissionDetails($user,$data)
     {
         $this->_em;
@@ -456,6 +526,46 @@ class DoctorInvoiceRepository extends EntityRepository
         $qb->andWhere('referred.id = :assign')->setParameter('assign',$referred);
         $qb->groupBy('particular.id,i.id');
         $result = $qb->getQuery()->getArrayResult();
+        $resDatas = array();
+        foreach ($result as $row){
+            $uniqueId = $row['invoiceId'].'-'.$row['commissionId'];
+            $resDatas[$uniqueId]= $row;
+        }
+        return $resDatas;
+
+    }
+
+    public function dailyCommissionDetails($user,$data)
+    {
+        $this->_em;
+        $config = $user->getGlobalOption()->getHospitalConfig()->getId();
+        $startDate = (isset($data['startDate']) and $data['startDate'])? $data['startDate'] : '';
+        $endDate = (isset($data['endDate']) and $data['endDate'])? $data['endDate'] : '';
+        $referred = isset($data['referred'])? $data['referred'] :'';
+        if(empty($startDate) and empty($endDate)){
+            $datetime = new \DateTime("now");
+            $startDate = $datetime->format('Y-m-d 00:00:00');
+            $endDate = $datetime->format('Y-m-d 23:59:59');
+        }else{
+            $startDate = date('Y-m-d 00:00:00',strtotime($startDate));
+            $endDate = date('Y-m-d 23:59:59',strtotime($endDate));
+        }
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('e.updated as created , i.id as invoiceId , referred.name as referredName,  particular.id as commissionId');
+        $qb->addSelect('SUM(e.payment) as payment');
+        $qb->innerJoin('e.hmsInvoice','i');
+        $qb->innerJoin('e.hmsCommission','particular');
+        $qb->innerJoin('e.assignDoctor','referred');
+        $qb->where('e.hospitalConfig = :config')->setParameter('config',$config);
+        $qb->andWhere("e.updated >= :startDate")->setParameter('startDate',$startDate);
+        $qb->andWhere("e.updated <= :endDate")->setParameter('endDate',$endDate);
+        $qb->andWhere("e.process = :process")->setParameter('process','Paid');
+        if($referred){
+            $qb->andWhere('referred.id = :assign')->setParameter('assign',$referred);
+        }
+        $qb->groupBy('particular.id,i.id');
+        $result = $qb->getQuery()->getArrayResult();
+
         $resDatas = array();
         foreach ($result as $row){
             $uniqueId = $row['invoiceId'].'-'.$row['commissionId'];

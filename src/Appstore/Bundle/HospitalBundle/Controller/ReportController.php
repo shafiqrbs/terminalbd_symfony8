@@ -2,6 +2,7 @@
 
 namespace Appstore\Bundle\HospitalBundle\Controller;
 
+use Appstore\Bundle\HospitalBundle\Entity\Particular;
 use Knp\Snappy\Pdf;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -452,6 +453,47 @@ class ReportController extends Controller
         return new Response('');
     }
 
+    public function dailyCommissionDetailsAction()
+    {
+        $user = $this->getUser();
+        $data = $_REQUEST;
+        $em = $this->getDoctrine()->getManager();
+        $commissions = $this->getDoctrine()->getRepository('HospitalBundle:DoctorInvoice')->dailyCommissionDetails($user, $data);
+        $monthlyReferredCommissionInvoice = $this->getDoctrine()->getRepository('HospitalBundle:DoctorInvoice')->dailyReferredCommissionInvoice($user, $data);
+        $commissionSummary = $this->getDoctrine()->getRepository('HospitalBundle:DoctorInvoice')->dailyGroupBaseCommissionSummary($user, $data);
+        $referredDoctors = $this->getDoctrine()->getRepository('HospitalBundle:Particular')->getFindWithParticular($user->getGlobalOption()->getHospitalConfig(), array(5, 6));
+        $mode =(isset($data['mode']) and !empty($data['mode'] )) ? $data['mode'] :'';
+        if($mode == "pdf"){
+            $referred = $this->getDoctrine()->getRepository(Particular::class)->find($data['referred']);
+            echo $html = $this->renderView(
+                'HospitalBundle:Report:dailyCommissionDetailsPdf.html.twig', array(
+                    'globalOption' => $user->getGlobalOption(),
+                    'referredInvoice' => $monthlyReferredCommissionInvoice,
+                    'referred' => $referred->getName(),
+                    'commissions' => $commissions,
+                    'commissionSummary' => $commissionSummary,
+                    'searchForm' => $data
+            ));
+            $datetime = new \DateTime("now");
+            $date = "daily-commission-report-{$datetime}";
+            $date = "{$date}.pdf";
+            $wkhtmltopdfPath = 'xvfb-run --server-args="-screen 0, 1280x1024x24" /usr/bin/wkhtmltopdf --use-xserver';
+            $snappy = new Pdf($wkhtmltopdfPath);
+            $pdf = $snappy->getOutputFromHtml($html);
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="' . $date . '"');
+            echo $pdf;
+            return new Response('');
+        }
+        return $this->render('HospitalBundle:Report:dailyCommissionDetails.html.twig', array(
+            'referredInvoice' => $monthlyReferredCommissionInvoice,
+            'referredDoctors' => $referredDoctors,
+            'commissions' => $commissions,
+            'commissionSummary' => $commissionSummary,
+            'searchForm' => $data
+        ));
+    }
+
     public function monthlyCommissionDetailsAction()
     {
         $user = $this->getUser();
@@ -461,6 +503,7 @@ class ReportController extends Controller
         $monthlyReferredCommissionInvoice = $this->getDoctrine()->getRepository('HospitalBundle:DoctorInvoice')->monthlyReferredCommissionInvoice($user, $data);
         $commissionSummary = $this->getDoctrine()->getRepository('HospitalBundle:DoctorInvoice')->monthlyGroupBaseCommissionSummary($user, $data);
         $referredDoctors = $this->getDoctrine()->getRepository('HospitalBundle:Particular')->getFindWithParticular($user->getGlobalOption()->getHospitalConfig(), array(5, 6));
+
         return $this->render('HospitalBundle:Report:monthlyCommissionDetails.html.twig', array(
             'referredInvoice' => $monthlyReferredCommissionInvoice,
             'referredDoctors' => $referredDoctors,

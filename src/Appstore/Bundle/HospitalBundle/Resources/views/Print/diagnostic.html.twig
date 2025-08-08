@@ -34,8 +34,8 @@
                 <td>
                     <ul class="unstyled" style="height:110px">
                         {% if entity.customer is not empty %}<li><strong>Pt. ID:</strong>&nbsp;{{ entity.customer.customerId }}</li>{% endif %}
-                        {% if entity.customer is not empty %}<li><strong>Name:</strong>&nbsp;{{ entity.customer.name }}</li>{% endif %}
-                        {% if entity.customer is not empty %}<li><strong>Mobile No:</strong>&nbsp;{{ entity.customer.mobile }}</li>{% endif %}
+                        {% if entity.customer is not empty %}<li><strong>Name:</strong>&nbsp;<strong style="font-size: 16px!important;">{{ entity.customer.name }}</strong></li>{% endif %}
+                        {% if entity.customer is not empty %}<li><strong>Mobile No:</strong>&nbsp;<strong style="font-size: 16px!important;">{{ entity.customer.mobile }}</strong></li>{% endif %}
                         {% if entity.customer is not empty %}<li><strong>Gender:</strong>&nbsp;{{ entity.customer.gender }}, &nbsp;{{ entity.customer.age }}&nbsp;{{ entity.customer.ageType }}</li>{% endif %}
                         {% if entity.customer is not empty and entity.customer.location is not empty   %}<li><strong>Location:</strong>&nbsp;{{ entity.customer.location.name }}, {{ entity.customer.location.parent.name }}</li>{% endif %}
 
@@ -50,7 +50,7 @@
                         {% if entity.cardNo is not empty %}<li><strong><i class="icon-money"></i>&nbsp;</strong>&nbsp;{{ entity.bank.name  }}/{{ entity.cardNo }}</li>{% endif %}
                         <li><hr></li>
                         <li><strong>Report status:</strong>&nbsp;{{  entity.process|capitalize }}</li>
-                        {% if entity.referredDoctor is not empty %}<li><strong>Referred By:</strong>&nbsp;{{ entity.referredDoctor.particularCode }}-{{ entity.referredDoctor.name }}</li>{% endif %}
+                        {% if entity.referredDoctor is not empty %}<li><strong>Referred By:</strong>&nbsp;<strong style="font-size: 16px!important;">{{ entity.referredDoctor.particularCode }}-{{ entity.referredDoctor.name }}</strong></li>{% endif %}
                     </ul>
                 </td>
             </tr>
