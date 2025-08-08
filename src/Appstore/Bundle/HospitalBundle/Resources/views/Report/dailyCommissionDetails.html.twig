@@ -74,6 +74,7 @@
                                     <th class="numeric" >Invoice Date</th>
                                     <th class="numeric" >Customer</th>
                                     <th class="numeric" >Referred</th>
+                                    <th class="numeric" >Invoice Amount</th>
                                     {% for com in commissionSummary %}
                                         <th class="numeric">{{ com.commissionName }}</th>
                                     {% endfor %}
@@ -87,7 +88,7 @@
                                         <td class="numeric" >{{ entity.invoice }}</td>
                                         <td class="numeric" >{{ entity.invoiceDate|date('d-m-y') }}</td>
                                         <td class="numeric" >{{ entity.customerName }}</td>
-                                        <td class="numeric" >{{ entity.referredName }}</td>
+                                        <td class="numeric" >{{ entity.total }}</td>
                                         {% set commission = 0 %}
                                         {% set subCommission = 0 %}
                                         {% for com in commissionSummary %}

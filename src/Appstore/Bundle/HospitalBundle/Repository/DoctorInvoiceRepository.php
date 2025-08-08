@@ -480,7 +480,7 @@ class DoctorInvoiceRepository extends EntityRepository
             $endDate = date('Y-m-d 23:59:59',strtotime($endDate));
         }
         $qb = $this->createQueryBuilder('e');
-        $qb->select('e.updated as created,i.id as invoiceId,i.invoice as invoice,i.created as invoiceDate,c.name as customerName ');
+        $qb->select('e.updated as created,i.id as invoiceId,i.invoice as invoice,i.created as invoiceDate,i.total as total,c.name as customerName ');
         $qb->addSelect('referred.name as referredName');
         $qb->innerJoin('e.hmsInvoice','i');
         $qb->innerJoin('i.customer','c');
