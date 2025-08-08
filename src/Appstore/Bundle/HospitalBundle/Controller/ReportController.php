@@ -465,7 +465,7 @@ class ReportController extends Controller
         $mode =(isset($data['mode']) and !empty($data['mode'] )) ? $data['mode'] :'';
         if($mode == "pdf"){
             $referred = $this->getDoctrine()->getRepository(Particular::class)->find($data['referred']);
-            echo $html = $this->renderView(
+            $html = $this->renderView(
                 'HospitalBundle:Report:dailyCommissionDetailsPdf.html.twig', array(
                     'globalOption' => $user->getGlobalOption(),
                     'referredInvoice' => $monthlyReferredCommissionInvoice,
