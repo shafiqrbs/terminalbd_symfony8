@@ -474,7 +474,8 @@ class ReportController extends Controller
                     'commissionSummary' => $commissionSummary,
                     'searchForm' => $data
             ));
-            $datetime = new \DateTime("now");
+            $time = new \DateTime("now");
+            $datetime = $time->format('d-m-Y');
             $date = "daily-commission-report-{$datetime}";
             $date = "{$date}.pdf";
             $wkhtmltopdfPath = 'xvfb-run --server-args="-screen 0, 1280x1024x24" /usr/bin/wkhtmltopdf --use-xserver';
