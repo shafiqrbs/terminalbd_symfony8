@@ -992,10 +992,11 @@ class MedicineSalesRepository extends EntityRepository
         $items = json_decode($process->getJsonItem(),true);
         $subItems = json_decode($process->getJsonSubItem(),true);
 
+
         $numItems = count($items);
         $numSubItems = count($subItems);
         $em = $this->_em;
-        if($numItems > 0 and $numSubItems > 0 ){
+        if($numItems > 0 ){
         $rows = '';
         $config = $option->getMedicineConfig()->getId();
         $androidProcess_id = $process->getId();
@@ -1040,7 +1041,6 @@ class MedicineSalesRepository extends EntityRepository
                     $method = 3;
                     $mobile = $em->getRepository(AccountMobileBank::class)->find($mobileBankAccount);
                     if($mobile and $mobile->getServiceCharge() > 0) {
-
                         $serviceCharge = $this->getCalculationBankServiceChargeManual($item,$mobile->getServiceCharge());
                         $discount = ($serviceCharge['discount']);
                         $total = ($serviceCharge['total']);
@@ -1096,11 +1096,9 @@ class MedicineSalesRepository extends EntityRepository
                     }
                 endforeach;
                 $em->flush();
-            }
 
-
-            $array = implode(",",$stockIds);
-            $sqlStockRemin = "UPDATE medicine_stock as stock
+                $array = implode(",",$stockIds);
+                $sqlStockRemin = "UPDATE medicine_stock as stock
             inner join (
               select ele.medicineStock_id, ROUND(COALESCE(SUM(ele.quantity),0),2) as salesQuantity
               from medicine_sales_item as ele
@@ -1110,8 +1108,9 @@ class MedicineSalesRepository extends EntityRepository
             ) as pa on stock.id = pa.medicineStock_id
   SET stock.remainingQuantity = ((COALESCE(stock.openingQuantity,0) + COALESCE(stock.purchaseQuantity,0) + COALESCE(stock.salesReturnQuantity,0)+ COALESCE(stock.bonusQuantity,0)+ COALESCE(stock.bonusAdjustment,0)+ COALESCE(stock.adjustmentQuantity,0)) - (COALESCE(pa.salesQuantity,0) + COALESCE(stock.purchaseReturnQuantity,0) + COALESCE(stock.damageQuantity,0)))
  , stock.salesQuantity = pa.salesQuantity";
-            $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
-            $qb5->execute();
+                $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
+                $qb5->execute();
+            }
 
             $sqlPurchasePrice = "Update medicine_sales as sales
             inner join (
