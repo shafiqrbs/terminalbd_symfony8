@@ -47,8 +47,8 @@
                                         <div class="span3"></div>
                                         <div class="span3">
                                             {%  set modes = ['diagnostic','admission','visit'] %}
-                                            <option value="">- Select Invoice Mode -</option>
                                             <select class="span12 m-wrap" name="mode" id='mode'>
+                                                <option value="">- Select Invoice Mode -</option>
                                                 {% for modeId in modes %}
                                                     <option value='{{ modeId }}' {% if (searchForm.modeId is defined and searchForm.mode == modeId) %} selected="selected" {% endif %} >{{ modeId|capitalize }}</option>
                                                 {% endfor %}
@@ -66,7 +66,7 @@
                                         </div>
                                         <div class="span3">
                                             <div class="controls">
-                                                {% set years = [2018,2019,2020,2021,2022,2023,2024,2025] %}
+                                                {% set years = [2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030] %}
                                                 <div class="input-append span11">
                                                     <select class="span11 m-wrap" name="year" id='year'>
                                                         {% for year in years %}
