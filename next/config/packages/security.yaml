@@ -1,39 +1,61 @@
+# Firewalls and hashers. Role hierarchy and access control are generated into
+# security_roles.yaml by migration/bin/port-security.php - edit the legacy
+# app/config/security.yml and re-run that script, not the generated file.
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        # Existing hashes are salted sha512 written by Symfony 2 via FOSUserBundle.
+        # `auto` hashes new passwords with a modern algorithm; `migrate_from`
+        # verifies the legacy format and hands the rehash to UserProvider's
+        # upgradePassword(), so a user is upgraded on their next login and
+        # nobody is forced to reset a password.
+        App\User\Entity\User:
+            algorithm: auto
+            migrate_from: [legacy_sha512]
 
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+        # sha512 / base64 / 5000 iterations are Symfony 2's defaults for the
+        # `sha512` encoder shorthand used in app/config/security.yml, and match
+        # Symfony 8's MessageDigestPasswordHasher defaults exactly.
+        legacy_sha512:
+            algorithm: message_digest
+            hash_algorithm: sha512
+            encode_as_base64: true
+            iterations: 5000
+
     providers:
-        users_in_memory: { memory: null }
+        app_users:
+            id: App\Security\UserProvider
 
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
-            pattern: ^/(_profiler|_wdt|assets|build)/
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
         main:
+            pattern: ^/
+            provider: app_users
             lazy: true
-            provider: users_in_memory
-
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Note: Only the *first* matching rule is applied
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+            form_login:
+                login_path: login
+                check_path: login
+                enable_csrf: true
+                default_target_path: landing_page
+                always_use_default_target_path: true
+            logout:
+                path: logout
+                target: login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 31536000
+                path: /home
 
 when@test:
     security:
         password_hashers:
-            # Password hashers are resource-intensive by design to ensure security.
-            # In tests, it's safe to reduce their cost to improve performance.
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            # Keep tests fast, but do not weaken the legacy hasher - the whole
+            # point of the migration tests is to exercise the real algorithm.
+            App\User\Entity\User:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                cost: 4
+                time_cost: 3
+                memory_cost: 10
+                migrate_from: [legacy_sha512]
