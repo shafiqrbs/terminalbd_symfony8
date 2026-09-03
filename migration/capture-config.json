@@ -1,0 +1,14 @@
+{
+  "_comment": "Per-endpoint request recipe. Fill in auth + params, then run capture.php against the LIVE SF2.8 app.",
+  "base_url": "https://CHANGE-ME.terminalbd.com",
+  "headers": {
+    "X-API-KEY": "",
+    "X-API-VALUE": "",
+    "Authorization": ""
+  },
+  "defaults": { "query": {}, "body": {} },
+  "per_endpoint": {
+    "flutter-api/poskeeper-otp-login": { "body": { "mobile": "", "otp": "" } }
+  },
+  "skip": []
+}

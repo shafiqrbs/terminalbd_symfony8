@@ -1,0 +1,320 @@
+<?php
+
+namespace App\DomainUser\Entity;
+
+use App\DomainUser\Repository\NotepadRepository;
+use DateTime;
+use Doctrine\ORM\Mapping as ORM;
+use App\User\Entity\User;
+use Gedmo\Mapping\Annotation as Gedmo;
+use App\Tool\Entity\GlobalOption;
+
+/**
+ * CustomerInbox
+ */
+#[ORM\Table('domain_notepad')]
+#[ORM\Entity(repositoryClass: NotepadRepository::class)]
+class Notepad
+{
+    /**
+     * @var integer
+     */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private $id;
+
+	#[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(targetEntity: GlobalOption::class, inversedBy: 'notepads')]
+    protected $globalOption;
+
+	#[ORM\ManyToOne(targetEntity: \App\User\Entity\User::class, inversedBy: 'notepad')]
+    protected $user;
+
+
+    /**
+     * @var DateTime
+     */
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'created', type: 'datetime')]
+    private $created;
+
+    /**
+     * @var DateTime
+     */
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'updated', type: 'datetime')]
+    private $updated;
+
+    /**
+     * @var string
+     *
+     *
+     */
+    #[ORM\Column(name: 'content', type: 'text', nullable: true)]
+    private $content;
+
+	/**
+     * @var string
+     *
+     *
+     */
+    #[ORM\Column(name: 'name', type: 'string', nullable: true)]
+    private $name;
+
+
+    /**
+     * @var string
+     *
+     *
+     */
+    #[ORM\Column(name: 'trip', type: 'text', nullable: true)]
+    private $trip;
+
+
+     /**
+     * @var string
+     *
+     *
+     */
+    #[ORM\Column(name: 'tripUrl', type: 'text', nullable: true)]
+    private $tripUrl;
+
+
+    /**
+     * @var string
+     *
+     *
+     */
+    #[ORM\Column(name: 'trainRoute', type: 'text', nullable: true)]
+    private $trainRoute;
+
+
+    /**
+     * @var string
+     *
+     *
+     */
+    #[ORM\Column(name: 'model', type: 'string', length: 255, nullable: true)]
+    private $model;
+
+    /**
+     * @var string
+     *
+     *
+     */
+    #[ORM\Column(name: 'days', type: 'string', length: 100, nullable: true)]
+    private $days;
+
+
+
+    /**
+     * @var boolean
+     */
+    #[ORM\Column(name: 'archive', type: 'boolean')]
+    private $archive = 0;
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    /**
+     * @param DateTime $created
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param string $content
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+
+
+    /**
+     * @return boolean
+     */
+    public function getArchive()
+    {
+        return $this->archive;
+    }
+
+    /**
+     * @param boolean $archive
+     */
+    public function setArchive($archive)
+    {
+        $this->archive = $archive;
+    }
+
+
+    /**
+     * @return DateTime
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * @param DateTime $updated
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+    }
+
+	/**
+	 * @return string
+	 */
+	public function getName(){
+		return $this->name;
+	}
+
+	/**
+	 * @param string $name
+	 */
+	public function setName( string $name ) {
+		$this->name = $name;
+	}
+
+	/**
+	 * @return GlobalOption
+	 */
+	public function getGlobalOption() {
+		return $this->globalOption;
+	}
+
+	/**
+	 * @param GlobalOption $globalOption
+	 */
+	public function setGlobalOption( $globalOption ) {
+		$this->globalOption = $globalOption;
+	}
+
+    /**
+     * @return string
+     */
+    public function getTrip()
+    {
+        return $this->trip;
+    }
+
+    /**
+     * @param string $trip
+     */
+    public function setTrip($trip)
+    {
+        $this->trip = $trip;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTripUrl()
+    {
+        return $this->tripUrl;
+    }
+
+    /**
+     * @param string $tripUrl
+     */
+    public function setTripUrl($tripUrl)
+    {
+        $this->tripUrl = $tripUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTrainRoute()
+    {
+        return $this->trainRoute;
+    }
+
+    /**
+     * @param string $trainRoute
+     */
+    public function setTrainRoute($trainRoute)
+    {
+        $this->trainRoute = $trainRoute;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModel()
+    {
+        return $this->model;
+    }
+
+    /**
+     * @param string $model
+     */
+    public function setModel($model)
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDays()
+    {
+        return $this->days;
+    }
+
+    /**
+     * @param string $days
+     */
+    public function setDays($days)
+    {
+        $this->days = $days;
+    }
+
+
+
+
+}

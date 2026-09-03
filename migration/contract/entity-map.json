@@ -1,0 +1,3017 @@
+[
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountBalanceTransfer",
+        "table": "account_balance_transfer",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountBalanceTransferRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountBalanceTransfer.php",
+        "assoc": 10,
+        "fields": 8
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountBank",
+        "table": "account_bank",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountBankRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountBank.php",
+        "assoc": 29,
+        "fields": 12
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountBkash",
+        "table": "account_bkash",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountBkashRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountBkash.php",
+        "assoc": 0,
+        "fields": 9
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountCashArchive",
+        "table": "account_cash_archive",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountCashRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountCashArchive.php",
+        "assoc": 0,
+        "fields": 30
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\CashReconciliation",
+        "table": "account_cash_reconciliation",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\CashReconciliationRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/CashReconciliation.php",
+        "assoc": 2,
+        "fields": 11
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\CashReconciliationMeta",
+        "table": "account_cash_reconciliation_meta",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\CashReconciliationRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/CashReconciliationMeta.php",
+        "assoc": 1,
+        "fields": 8
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountCondition",
+        "table": "account_condition",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountConditionRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountCondition.php",
+        "assoc": 2,
+        "fields": 5
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountConditionLedger",
+        "table": "account_condition_ledger",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountConditionLedgerRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountConditionLedger.php",
+        "assoc": 9,
+        "fields": 12
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\ExpenditureArchive",
+        "table": "account_expenditure_archive",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\ExpenditureRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/ExpenditureArchive.php",
+        "assoc": 0,
+        "fields": 21
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountHead",
+        "table": "account_head",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountHeadRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountHead.php",
+        "assoc": 22,
+        "fields": 9
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountJournal",
+        "table": "account_journal",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountJournalRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountJournal.php",
+        "assoc": 13,
+        "fields": 13
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountJournalItem",
+        "table": "account_journal_item",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountJournalItemRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountJournalItem.php",
+        "assoc": 3,
+        "fields": 5
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountLoan",
+        "table": "account_loan",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountLoanRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountLoan.php",
+        "assoc": 9,
+        "fields": 15
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountLoanLedger",
+        "table": "account_loan_ledger",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountLoanLedgerRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountLoanLedger.php",
+        "assoc": 9,
+        "fields": 12
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountLoanUser",
+        "table": "account_loan_user",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountLoanRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountLoanUser.php",
+        "assoc": 9,
+        "fields": 15
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountMobileBank",
+        "table": "account_mobile_bank",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountMobileBankRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountMobileBank.php",
+        "assoc": 27,
+        "fields": 9
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountProfit",
+        "table": "account_profit",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountProfitRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountProfit.php",
+        "assoc": 3,
+        "fields": 13
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountPurchase",
+        "table": "account_purchase",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountPurchaseRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountPurchase.php",
+        "assoc": 19,
+        "fields": 21
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountPurchaseArchive",
+        "table": "account_purchase_archive",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountPurchaseRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountPurchaseArchive.php",
+        "assoc": 0,
+        "fields": 31
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountPurchaseCommission",
+        "table": "account_purchase_commission",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountPurchaseCommissionRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountPurchaseCommission.php",
+        "assoc": 10,
+        "fields": 9
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountPurchaseReturn",
+        "table": "account_purchase_return",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountPurchaseReturnRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountPurchaseReturn.php",
+        "assoc": 5,
+        "fields": 11
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountSales",
+        "table": "account_sales",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountSalesRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountSales.php",
+        "assoc": 16,
+        "fields": 19
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountSalesAdjustment",
+        "table": "account_sales_adjustment",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountSalesAdjustmentRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountSalesAdjustment.php",
+        "assoc": 8,
+        "fields": 11
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountSalesArchive",
+        "table": "account_sales_archive",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountSalesRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountSalesArchive.php",
+        "assoc": 0,
+        "fields": 30
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountSalesReturn",
+        "table": "account_sales_return",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountSalesReturnRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountSalesReturn.php",
+        "assoc": 6,
+        "fields": 11
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\StockOpening",
+        "table": "account_stock_opening",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountLoanRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/StockOpening.php",
+        "assoc": 5,
+        "fields": 6
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountVendor",
+        "table": "account_vendor",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountVendorRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountVendor.php",
+        "assoc": 12,
+        "fields": 12
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\VoucherType",
+        "table": "account_voucher_type",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\VoucherTypeRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/VoucherType.php",
+        "assoc": 0,
+        "fields": 6
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountCash",
+        "table": "accountcash",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountCashRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountCash.php",
+        "assoc": 22,
+        "fields": 9
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\AccountingConfig",
+        "table": "accountingconfig",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\AccountingConfigRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/AccountingConfig.php",
+        "assoc": 2,
+        "fields": 18
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\EmployeeTransaction",
+        "table": "employeetransaction",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\EmployeeTransactionRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/EmployeeTransaction.php",
+        "assoc": 10,
+        "fields": 11
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\Expenditure",
+        "table": "expenditure",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\ExpenditureRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/Expenditure.php",
+        "assoc": 15,
+        "fields": 12
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\ExpenditureItem",
+        "table": "expenditureitem",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\ExpenditureItemRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/ExpenditureItem.php",
+        "assoc": 2,
+        "fields": 5
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\ExpenseCategory",
+        "table": "expenseCategory",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\ExpenseCategoryRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/ExpenseCategory.php",
+        "assoc": 5,
+        "fields": 9
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\ExpenseAndroidProcess",
+        "table": "expense_android_process",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\ExpenseAndroidProcessRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/ExpenseAndroidProcess.php",
+        "assoc": 3,
+        "fields": 10
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\PaymentSalary",
+        "table": "payment_salary",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\PaymentSalaryRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/PaymentSalary.php",
+        "assoc": 11,
+        "fields": 15
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\PettyCash",
+        "table": "pettycash",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\PettyCashRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/PettyCash.php",
+        "assoc": 10,
+        "fields": 13
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\ProcessHead",
+        "table": "process_head",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\ProcessHeadRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/ProcessHead.php",
+        "assoc": 0,
+        "fields": 4
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\SalarySetting",
+        "table": "salarysetting",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\SalarySettingRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/SalarySetting.php",
+        "assoc": 5,
+        "fields": 16
+    },
+    {
+        "module": "AccountingBundle",
+        "class": "Appstore\\Bundle\\AccountingBundle\\Entity\\Transaction",
+        "table": "transaction",
+        "repository": "Appstore\\Bundle\\AccountingBundle\\Repository\\TransactionRepository",
+        "file": "src/Appstore/Bundle/AccountingBundle/Entity/Transaction.php",
+        "assoc": 5,
+        "fields": 12
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\AndroidTemplateCustomization",
+        "table": "androidtemplatecustomization",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Repository\\AndroidTemplateCustomizationRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/AndroidTemplateCustomization.php",
+        "assoc": 1,
+        "fields": 108
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\Feature",
+        "table": "feature",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Repository\\FeatureRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/Feature.php",
+        "assoc": 6,
+        "fields": 19
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\FeatureWidget",
+        "table": "featurewidget",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Repository\\FeatureWidgetRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/FeatureWidget.php",
+        "assoc": 8,
+        "fields": 34
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\FeatureWidgetItem",
+        "table": "featurewidgetitem",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Repository\\FeatureWidgetItemRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/FeatureWidgetItem.php",
+        "assoc": 2,
+        "fields": 4
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\JsFeature",
+        "table": "jsfeature",
+        "repository": null,
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/JsFeature.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\Menu",
+        "table": "menu",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Entity\\MenuRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/Menu.php",
+        "assoc": 13,
+        "fields": 7
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\MenuCustom",
+        "table": "menucustom",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Entity\\MenuCustomRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/MenuCustom.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\MenuGroup",
+        "table": "menugroup",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Entity\\MenuGroupRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/MenuGroup.php",
+        "assoc": 2,
+        "fields": 5
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\MenuGrouping",
+        "table": "menugrouping",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Entity\\MenuGroupingRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/MenuGrouping.php",
+        "assoc": 5,
+        "fields": 2
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\SidebarWidget",
+        "table": "sidebarwidget",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Repository\\SidebarWidgetRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/SidebarWidget.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\SidebarWidgetPanel",
+        "table": "sidebarwidgetpanel",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Repository\\SidebarWidgetPanelRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/SidebarWidgetPanel.php",
+        "assoc": 5,
+        "fields": 1
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\SocialIcon",
+        "table": "socialicon",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Repository\\SidebarWidgetRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/SocialIcon.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "AppearanceBundle",
+        "class": "Setting\\Bundle\\AppearanceBundle\\Entity\\TemplateCustomize",
+        "table": "templatecustomize",
+        "repository": "Setting\\Bundle\\AppearanceBundle\\Repository\\TemplateCustomizeRepository",
+        "file": "src/Setting/Bundle/AppearanceBundle/Entity/TemplateCustomize.php",
+        "assoc": 2,
+        "fields": 171
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessAndroidProcess",
+        "table": "business_android_process",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessAndroidProcessRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessAndroidProcess.php",
+        "assoc": 5,
+        "fields": 15
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessArea",
+        "table": "business_area",
+        "repository": null,
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessArea.php",
+        "assoc": 4,
+        "fields": 3
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessBatch",
+        "table": "business_batch",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessBatchRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessBatch.php",
+        "assoc": 3,
+        "fields": 8
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessBatchParticular",
+        "table": "business_batch_particular",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessBatchParticularRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessBatchParticular.php",
+        "assoc": 4,
+        "fields": 11
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessBrand",
+        "table": "business_brand",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessBrandRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessBrand.php",
+        "assoc": 1,
+        "fields": 3
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\Category",
+        "table": "business_category",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\CategoryRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/Category.php",
+        "assoc": 2,
+        "fields": 7
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessConfig",
+        "table": "business_config",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessConfigRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessConfig.php",
+        "assoc": 16,
+        "fields": 65
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\Courier",
+        "table": "business_courier",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\CourierRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/Courier.php",
+        "assoc": 2,
+        "fields": 7
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessDistributionReturnItem",
+        "table": "business_distribution_return_item",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessDistributionReturnItemRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessDistributionReturnItem.php",
+        "assoc": 4,
+        "fields": 12
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\FuelStation",
+        "table": "business_fuelstation",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\FuelStationRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/FuelStation.php",
+        "assoc": 6,
+        "fields": 12
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessInvoice",
+        "table": "business_invoice",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessInvoiceRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessInvoice.php",
+        "assoc": 22,
+        "fields": 35
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessInvoiceParticular",
+        "table": "business_invoice_particular",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessInvoiceParticularRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessInvoiceParticular.php",
+        "assoc": 8,
+        "fields": 23
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessInvoiceReturn",
+        "table": "business_invoice_return",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessInvoiceReturnRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessInvoiceReturn.php",
+        "assoc": 5,
+        "fields": 10
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessInvoiceReturnItem",
+        "table": "business_invoice_return_item",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessInvoiceReturnItemRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessInvoiceReturnItem.php",
+        "assoc": 6,
+        "fields": 7
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\ItemImport",
+        "table": "business_itemimport",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\ItemImportRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/ItemImport.php",
+        "assoc": 2,
+        "fields": 8
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\Marketing",
+        "table": "business_marketing",
+        "repository": null,
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/Marketing.php",
+        "assoc": 2,
+        "fields": 10
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessParticular",
+        "table": "business_particular",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessParticularRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessParticular.php",
+        "assoc": 15,
+        "fields": 39
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessParticularType",
+        "table": "business_particular_type",
+        "repository": null,
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessParticularType.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\ProductTransfer",
+        "table": "business_product_transfer",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\ProductTransferRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/ProductTransfer.php",
+        "assoc": 6,
+        "fields": 7
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessProduction",
+        "table": "business_production",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessProductionRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessProduction.php",
+        "assoc": 2,
+        "fields": 9
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessProductionElement",
+        "table": "business_production_element",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessProductionElementRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessProductionElement.php",
+        "assoc": 2,
+        "fields": 4
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessProductionExpense",
+        "table": "business_production_expense",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessProductionExpenseRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessProductionExpense.php",
+        "assoc": 4,
+        "fields": 4
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessPurchase",
+        "table": "business_purchase",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessPurchaseRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessPurchase.php",
+        "assoc": 11,
+        "fields": 23
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessPurchaseItem",
+        "table": "business_purchase_item",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessPurchaseItemRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessPurchaseItem.php",
+        "assoc": 5,
+        "fields": 22
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessPurchaseReturn",
+        "table": "business_purchase_return",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessPurchaseReturnRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessPurchaseReturn.php",
+        "assoc": 4,
+        "fields": 13
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessPurchaseReturnItem",
+        "table": "business_purchase_return_item",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessPurchaseReturnItemRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessPurchaseReturnItem.php",
+        "assoc": 3,
+        "fields": 9
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessReverse",
+        "table": "business_reverse",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessReverseRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessReverse.php",
+        "assoc": 4,
+        "fields": 6
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessStockHistory",
+        "table": "business_stock_history",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessStockHistoryRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessStockHistory.php",
+        "assoc": 11,
+        "fields": 18
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessStore",
+        "table": "business_store",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessStoreRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessStore.php",
+        "assoc": 5,
+        "fields": 7
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessStoreLedger",
+        "table": "business_store_ledger",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessStoreLedgerRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessStoreLedger.php",
+        "assoc": 9,
+        "fields": 13
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessVendorStock",
+        "table": "business_vendor_stock",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessVendorStockRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessVendorStock.php",
+        "assoc": 3,
+        "fields": 11
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessVendorStockItem",
+        "table": "business_vendor_stock_item",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessVendorStockItemRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessVendorStockItem.php",
+        "assoc": 3,
+        "fields": 5
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\WearHouse",
+        "table": "business_wearhouse",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\WearHouseRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/WearHouse.php",
+        "assoc": 2,
+        "fields": 8
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\BusinessDamage",
+        "table": "businessdamage",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\BusinessDamageRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/BusinessDamage.php",
+        "assoc": 5,
+        "fields": 8
+    },
+    {
+        "module": "BusinessBundle",
+        "class": "Appstore\\Bundle\\BusinessBundle\\Entity\\ItemStockAdjustment",
+        "table": "itemstockadjustment",
+        "repository": "Appstore\\Bundle\\BusinessBundle\\Repository\\ItemStockAdjustmentRepository",
+        "file": "src/Appstore/Bundle/BusinessBundle/Entity/ItemStockAdjustment.php",
+        "assoc": 3,
+        "fields": 8
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\PageMeta",
+        "table": "PageMeta",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\PageMetaRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/PageMeta.php",
+        "assoc": 1,
+        "fields": 3
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\PageModule",
+        "table": "PageModule",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\PageModuleRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/PageModule.php",
+        "assoc": 4,
+        "fields": 7
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\Comment",
+        "table": "comment",
+        "repository": null,
+        "file": "src/Setting/Bundle/ContentBundle/Entity/Comment.php",
+        "assoc": 2,
+        "fields": 1
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\ContactMessage",
+        "table": "contactmessage",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\ContactMessageRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/ContactMessage.php",
+        "assoc": 2,
+        "fields": 10
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\ContactPage",
+        "table": "contactpage",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\ContactPageRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/ContactPage.php",
+        "assoc": 5,
+        "fields": 28
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\EmailBox",
+        "table": "emailbox",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\EmailBoxRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/EmailBox.php",
+        "assoc": 1,
+        "fields": 7
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\HomeBlock",
+        "table": "homeblock",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\HomeBlockRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/HomeBlock.php",
+        "assoc": 3,
+        "fields": 3
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\HomePage",
+        "table": "homepage",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\HomePageRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/HomePage.php",
+        "assoc": 8,
+        "fields": 7
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\HomeSlider",
+        "table": "homeslider",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\HomeSliderRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/HomeSlider.php",
+        "assoc": 2,
+        "fields": 8
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\ModuleCategory",
+        "table": "modulecategory",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\ModuleCategoryRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/ModuleCategory.php",
+        "assoc": 6,
+        "fields": 4
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\Page",
+        "table": "page",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\PageRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/Page.php",
+        "assoc": 18,
+        "fields": 41
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\SiteContent",
+        "table": "sitecontent",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\SiteContentRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/SiteContent.php",
+        "assoc": 3,
+        "fields": 11
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\SiteSlider",
+        "table": "siteslider",
+        "repository": null,
+        "file": "src/Setting/Bundle/ContentBundle/Entity/SiteSlider.php",
+        "assoc": 0,
+        "fields": 7
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\SiteTeam",
+        "table": "siteteam",
+        "repository": null,
+        "file": "src/Setting/Bundle/ContentBundle/Entity/SiteTeam.php",
+        "assoc": 0,
+        "fields": 10
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\SyndicateContent",
+        "table": "syndicatecontent",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\SyndicateContentRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/SyndicateContent.php",
+        "assoc": 3,
+        "fields": 6
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\Testimonial",
+        "table": "testimonial",
+        "repository": null,
+        "file": "src/Setting/Bundle/ContentBundle/Entity/Testimonial.php",
+        "assoc": 0,
+        "fields": 11
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\Thread",
+        "table": "thread",
+        "repository": null,
+        "file": "src/Setting/Bundle/ContentBundle/Entity/Thread.php",
+        "assoc": 0,
+        "fields": 1
+    },
+    {
+        "module": "ContentBundle",
+        "class": "Setting\\Bundle\\ContentBundle\\Entity\\Timeline",
+        "table": "timeline",
+        "repository": "Setting\\Bundle\\ContentBundle\\Repository\\TimelineRepository",
+        "file": "src/Setting/Bundle/ContentBundle/Entity/Timeline.php",
+        "assoc": 0,
+        "fields": 4
+    },
+    {
+        "module": "DoctorPrescriptionBundle",
+        "class": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Entity\\DpsConfig",
+        "table": "dps_config",
+        "repository": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Repository\\DpsConfigRepository",
+        "file": "src/Appstore/Bundle/DoctorPrescriptionBundle/Entity/DpsConfig.php",
+        "assoc": 4,
+        "fields": 48
+    },
+    {
+        "module": "DoctorPrescriptionBundle",
+        "class": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Entity\\DoctorService",
+        "table": "dps_doctor_service",
+        "repository": null,
+        "file": "src/Appstore/Bundle/DoctorPrescriptionBundle/Entity/DoctorService.php",
+        "assoc": 3,
+        "fields": 6
+    },
+    {
+        "module": "DoctorPrescriptionBundle",
+        "class": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Entity\\DpsInvoice",
+        "table": "dps_invoice",
+        "repository": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Repository\\DpsInvoiceRepository",
+        "file": "src/Appstore/Bundle/DoctorPrescriptionBundle/Entity/DpsInvoice.php",
+        "assoc": 19,
+        "fields": 24
+    },
+    {
+        "module": "DoctorPrescriptionBundle",
+        "class": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Entity\\DpsInvoiceParticular",
+        "table": "dps_invoice_particular",
+        "repository": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Repository\\DpsInvoiceParticularRepository",
+        "file": "src/Appstore/Bundle/DoctorPrescriptionBundle/Entity/DpsInvoiceParticular.php",
+        "assoc": 3,
+        "fields": 11
+    },
+    {
+        "module": "DoctorPrescriptionBundle",
+        "class": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Entity\\DpsParticular",
+        "table": "dps_particular",
+        "repository": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Repository\\DpsParticularRepository",
+        "file": "src/Appstore/Bundle/DoctorPrescriptionBundle/Entity/DpsParticular.php",
+        "assoc": 9,
+        "fields": 32
+    },
+    {
+        "module": "DoctorPrescriptionBundle",
+        "class": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Entity\\DpsService",
+        "table": "dps_service",
+        "repository": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Repository\\DpsServiceRepository",
+        "file": "src/Appstore/Bundle/DoctorPrescriptionBundle/Entity/DpsService.php",
+        "assoc": 5,
+        "fields": 12
+    },
+    {
+        "module": "DoctorPrescriptionBundle",
+        "class": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Entity\\DpsTreatmentPlan",
+        "table": "dps_treatment_plan",
+        "repository": "Appstore\\Bundle\\DoctorPrescriptionBundle\\Repository\\DpsTreatmentPlanRepository",
+        "file": "src/Appstore/Bundle/DoctorPrescriptionBundle/Entity/DpsTreatmentPlan.php",
+        "assoc": 7,
+        "fields": 17
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\Branches",
+        "table": "branches",
+        "repository": "Appstore\\Bundle\\DomainUserBundle\\Repository\\BranchesRepository",
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/Branches.php",
+        "assoc": 21,
+        "fields": 7
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\Customer",
+        "table": "customer",
+        "repository": "Appstore\\Bundle\\DomainUserBundle\\Repository\\CustomerRepository",
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/Customer.php",
+        "assoc": 21,
+        "fields": 65
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\CustomerSms",
+        "table": "customer_sms",
+        "repository": "Appstore\\Bundle\\DomainUserBundle\\Repository\\CustomerSmsRepository",
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/CustomerSms.php",
+        "assoc": 1,
+        "fields": 11
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\CustomerAddress",
+        "table": "customeraddress",
+        "repository": "Appstore\\Bundle\\DomainUserBundle\\Repository\\CustomerAddressRepository",
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/CustomerAddress.php",
+        "assoc": 2,
+        "fields": 6
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\CustomerConfig",
+        "table": "customerconfig",
+        "repository": null,
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/CustomerConfig.php",
+        "assoc": 0,
+        "fields": 5
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\CustomerInbox",
+        "table": "customerinbox",
+        "repository": null,
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/CustomerInbox.php",
+        "assoc": 3,
+        "fields": 7
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\Department",
+        "table": "department",
+        "repository": "Appstore\\Bundle\\DomainUserBundle\\Repository\\BranchesRepository",
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/Department.php",
+        "assoc": 1,
+        "fields": 7
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\DomainUser",
+        "table": "domainuser",
+        "repository": "Appstore\\Bundle\\DomainUserBundle\\Repository\\DomainUserRepository",
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/DomainUser.php",
+        "assoc": 2,
+        "fields": 7
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\Notepad",
+        "table": "notepad",
+        "repository": "Appstore\\Bundle\\DomainUserBundle\\Repository\\NotepadRepository",
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/Notepad.php",
+        "assoc": 2,
+        "fields": 11
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\NotificationConfig",
+        "table": "notificationconfig",
+        "repository": "Appstore\\Bundle\\DomainUserBundle\\Repository\\NotificationConfigRepository",
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/NotificationConfig.php",
+        "assoc": 1,
+        "fields": 6
+    },
+    {
+        "module": "DomainUserBundle",
+        "class": "Appstore\\Bundle\\DomainUserBundle\\Entity\\UserInbox",
+        "table": "userinbox",
+        "repository": null,
+        "file": "src/Appstore/Bundle/DomainUserBundle/Entity/UserInbox.php",
+        "assoc": 2,
+        "fields": 9
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\AdmissionPatientParticular",
+        "table": "hms_admission_patient_particular",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\AdmissionPatientParticularRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/AdmissionPatientParticular.php",
+        "assoc": 4,
+        "fields": 9
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsAdmissionPatientRelease",
+        "table": "hms_admission_patient_release",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsAdmissionPatientReleaseRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsAdmissionPatientRelease.php",
+        "assoc": 4,
+        "fields": 6
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsAdmissionTodo",
+        "table": "hms_admission_todo",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsAdmissionTodoRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsAdmissionTodo.php",
+        "assoc": 4,
+        "fields": 6
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsAdmissionTodoParticular",
+        "table": "hms_admission_todo_particular",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsAdmissionTodoParticularRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsAdmissionTodoParticular.php",
+        "assoc": 5,
+        "fields": 14
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsCategory",
+        "table": "hms_category",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsCategoryRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsCategory.php",
+        "assoc": 7,
+        "fields": 9
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsCommission",
+        "table": "hms_commission",
+        "repository": null,
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsCommission.php",
+        "assoc": 2,
+        "fields": 3
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HospitalConfig",
+        "table": "hms_config",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HospitalConfigRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HospitalConfig.php",
+        "assoc": 14,
+        "fields": 43
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\DoctorInvoice",
+        "table": "hms_doctor_invoice",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\DoctorInvoiceRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/DoctorInvoice.php",
+        "assoc": 11,
+        "fields": 13
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\DoctorInvoiceParticular",
+        "table": "hms_doctor_invoice_particular",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\DoctorInvoiceParticularRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/DoctorInvoiceParticular.php",
+        "assoc": 2,
+        "fields": 6
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsDoctorVisitMode",
+        "table": "hms_doctor_visitmode",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsDoctorVisitModeRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsDoctorVisitMode.php",
+        "assoc": 2,
+        "fields": 3
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\Invoice",
+        "table": "hms_invoice",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\InvoiceRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/Invoice.php",
+        "assoc": 31,
+        "fields": 51
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\InvoiceParticular",
+        "table": "hms_invoice_particular",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\InvoiceParticularRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/InvoiceParticular.php",
+        "assoc": 10,
+        "fields": 17
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\InvoicePathologicalGroup",
+        "table": "hms_invoice_pathological_group",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\InvoicePathologicalGroupRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/InvoicePathologicalGroup.php",
+        "assoc": 7,
+        "fields": 3
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\InvoicePathologicalReport",
+        "table": "hms_invoice_pathological_report",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\InvoicePathologicalReportRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/InvoicePathologicalReport.php",
+        "assoc": 2,
+        "fields": 5
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsInvoiceReturn",
+        "table": "hms_invoice_return",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsInvoiceReturnRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsInvoiceReturn.php",
+        "assoc": 4,
+        "fields": 7
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsInvoiceTemporaryParticular",
+        "table": "hms_invoice_temporary_particular",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsInvoiceTemporaryParticularRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsInvoiceTemporaryParticular.php",
+        "assoc": 3,
+        "fields": 6
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\InvoiceTransaction",
+        "table": "hms_invoice_transaction",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\InvoiceTransactionRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/InvoiceTransaction.php",
+        "assoc": 9,
+        "fields": 20
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\Message",
+        "table": "hms_message",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\MessageRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/Message.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\Particular",
+        "table": "hms_particular",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\ParticularRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/Particular.php",
+        "assoc": 26,
+        "fields": 57
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\PathologicalReport",
+        "table": "hms_pathological_report",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\PathologicalReportRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/PathologicalReport.php",
+        "assoc": 5,
+        "fields": 9
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsPurchase",
+        "table": "hms_purchase",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsPurchaseRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsPurchase.php",
+        "assoc": 9,
+        "fields": 18
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsPurchaseItem",
+        "table": "hms_purchase_item",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsPurchaseItemRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsPurchaseItem.php",
+        "assoc": 2,
+        "fields": 7
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsReverse",
+        "table": "hms_reverse",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsReverseRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsReverse.php",
+        "assoc": 3,
+        "fields": 6
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\Service",
+        "table": "hms_service",
+        "repository": null,
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/Service.php",
+        "assoc": 4,
+        "fields": 7
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsServiceGroup",
+        "table": "hms_service_group",
+        "repository": null,
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsServiceGroup.php",
+        "assoc": 3,
+        "fields": 4
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsStock",
+        "table": "hms_stock",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsStockOutRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsStock.php",
+        "assoc": 1,
+        "fields": 23
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsStockOut",
+        "table": "hms_stock_out",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsStockOutRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsStockOut.php",
+        "assoc": 6,
+        "fields": 16
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsStockOutItem",
+        "table": "hms_stock_out_item",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsStockOutItemRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsStockOutItem.php",
+        "assoc": 2,
+        "fields": 6
+    },
+    {
+        "module": "HospitalBundle",
+        "class": "Appstore\\Bundle\\HospitalBundle\\Entity\\HmsVendor",
+        "table": "hms_vendor",
+        "repository": "Appstore\\Bundle\\HospitalBundle\\Repository\\HmsVendorRepository",
+        "file": "src/Appstore/Bundle/HospitalBundle/Entity/HmsVendor.php",
+        "assoc": 4,
+        "fields": 10
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\EmployeePayroll",
+        "table": "employeepayroll",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\EmployeePayrollRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/EmployeePayroll.php",
+        "assoc": 7,
+        "fields": 29
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\EmployeePayrollParticular",
+        "table": "employeepayrollparticular",
+        "repository": null,
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/EmployeePayrollParticular.php",
+        "assoc": 2,
+        "fields": 6
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\Attendance",
+        "table": "hr_attendance",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\AttendanceRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/Attendance.php",
+        "assoc": 3,
+        "fields": 7
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\DailyAttendance",
+        "table": "hr_attendance_daily",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\DailyAttendanceRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/DailyAttendance.php",
+        "assoc": 4,
+        "fields": 9
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\EmployeeLeave",
+        "table": "hr_employee_leave",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\EmployeeLeaveRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/EmployeeLeave.php",
+        "assoc": 5,
+        "fields": 8
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\LeavePolicy",
+        "table": "hr_leave_policy",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\LeavePolicyRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/LeavePolicy.php",
+        "assoc": 1,
+        "fields": 5
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\LeaveSetup",
+        "table": "hr_leave_setup",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\LeaveSetupRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/LeaveSetup.php",
+        "assoc": 3,
+        "fields": 4
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\PayrollSetting",
+        "table": "hr_payroll_setting",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\PayrollSettingRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/PayrollSetting.php",
+        "assoc": 2,
+        "fields": 4
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\Weekend",
+        "table": "hr_weekend",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\WeekendRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/Weekend.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\HrDepartment",
+        "table": "hrdepartment",
+        "repository": null,
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/HrDepartment.php",
+        "assoc": 1,
+        "fields": 3
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\Payroll",
+        "table": "payroll",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\PayrollRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/Payroll.php",
+        "assoc": 3,
+        "fields": 20
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\PayrollSheet",
+        "table": "payrollsheet",
+        "repository": "Appstore\\Bundle\\HumanResourceBundle\\Repository\\PayrollSheetRepository",
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/PayrollSheet.php",
+        "assoc": 2,
+        "fields": 23
+    },
+    {
+        "module": "HumanResourceBundle",
+        "class": "Appstore\\Bundle\\HumanResourceBundle\\Entity\\PayrollSheetParticular",
+        "table": "payrollsheetparticular",
+        "repository": null,
+        "file": "src/Appstore/Bundle/HumanResourceBundle/Entity/PayrollSheetParticular.php",
+        "assoc": 3,
+        "fields": 5
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\BranchInvoice",
+        "table": "branchinvoice",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\BranchInvoiceRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/BranchInvoice.php",
+        "assoc": 6,
+        "fields": 10
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\BranchInvoiceItem",
+        "table": "branchinvoiceitem",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\BranchInvoiceItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/BranchInvoiceItem.php",
+        "assoc": 3,
+        "fields": 5
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ColorSize",
+        "table": "colorsize",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ColorSizeRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ColorSize.php",
+        "assoc": 3,
+        "fields": 5
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\Damage",
+        "table": "damage",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\DamageRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/Damage.php",
+        "assoc": 6,
+        "fields": 7
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\Delivery",
+        "table": "delivery",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\DeliveryRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/Delivery.php",
+        "assoc": 5,
+        "fields": 10
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\DeliveryItem",
+        "table": "deliveryitem",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\DeliveryItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/DeliveryItem.php",
+        "assoc": 3,
+        "fields": 4
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\DeliveryReturn",
+        "table": "deliveryreturn",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\DeliveryReturnRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/DeliveryReturn.php",
+        "assoc": 6,
+        "fields": 4
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ExcelImporter",
+        "table": "excel_importer",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ExcelImporterRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ExcelImporter.php",
+        "assoc": 3,
+        "fields": 9
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\GoodsItem",
+        "table": "goodsitem",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\GoodsItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/GoodsItem.php",
+        "assoc": 4,
+        "fields": 8
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\PurchaseItemSerial",
+        "table": "inv_purchase_item_serial",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\PurchaseItemSerialRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/PurchaseItemSerial.php",
+        "assoc": 3,
+        "fields": 6
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\InventoryAndroidProcess",
+        "table": "inventory_android_process",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\InventoryAndroidProcessRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/InventoryAndroidProcess.php",
+        "assoc": 5,
+        "fields": 14
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\Reverse",
+        "table": "inventory_reverse",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ReverseRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/Reverse.php",
+        "assoc": 4,
+        "fields": 6
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\InventoryConfig",
+        "table": "inventoryconfig",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\InventoryConfigRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/InventoryConfig.php",
+        "assoc": 27,
+        "fields": 63
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\Item",
+        "table": "item",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/Item.php",
+        "assoc": 17,
+        "fields": 36
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\Product",
+        "table": "item_master",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ProductRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/Product.php",
+        "assoc": 14,
+        "fields": 21
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\PrePurchaseItem",
+        "table": "item_pre_purchase",
+        "repository": null,
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/PrePurchaseItem.php",
+        "assoc": 2,
+        "fields": 8
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemAttribute",
+        "table": "itemattribute",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemAttributeRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemAttribute.php",
+        "assoc": 2,
+        "fields": 6
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemBrand",
+        "table": "itembrand",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemBrandRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemBrand.php",
+        "assoc": 5,
+        "fields": 5
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemColor",
+        "table": "itemcolor",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemColorRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemColor.php",
+        "assoc": 6,
+        "fields": 6
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemGallery",
+        "table": "itemgallery",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemGalleryRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemGallery.php",
+        "assoc": 2,
+        "fields": 2
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemInventory",
+        "table": "iteminventory",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemInventoryRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemInventory.php",
+        "assoc": 1,
+        "fields": 3
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemKeyValue",
+        "table": "itemkeyvalue",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemKeyValueRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemKeyValue.php",
+        "assoc": 2,
+        "fields": 4
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemMetaAttribute",
+        "table": "itemmetaattribute",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemMeatAttributeRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemMetaAttribute.php",
+        "assoc": 3,
+        "fields": 3
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemModel",
+        "table": "itemmodel",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemModelRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemModel.php",
+        "assoc": 4,
+        "fields": 4
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemSize",
+        "table": "itemsize",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemSizeRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemSize.php",
+        "assoc": 8,
+        "fields": 5
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemSizeGroup",
+        "table": "itemsizegroup",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemTypeGroupingRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemSizeGroup.php",
+        "assoc": 2,
+        "fields": 1
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemStockAdjustment",
+        "table": "itemstockadjustment",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemStockAdjustmentRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemStockAdjustment.php",
+        "assoc": 3,
+        "fields": 8
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ItemTypeGrouping",
+        "table": "itemtypegrouping",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ItemTypeGroupingRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ItemTypeGrouping.php",
+        "assoc": 2,
+        "fields": 1
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\ProductImport",
+        "table": "product_import",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\ProductImportRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/ProductImport.php",
+        "assoc": 0,
+        "fields": 15
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\Purchase",
+        "table": "purchase",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\PurchaseRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/Purchase.php",
+        "assoc": 14,
+        "fields": 28
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\PurchaseItem",
+        "table": "purchaseitem",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\PurchaseItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/PurchaseItem.php",
+        "assoc": 12,
+        "fields": 19
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\PurchaseOrder",
+        "table": "purchaseorder",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\PurchaseOrderRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/PurchaseOrder.php",
+        "assoc": 0,
+        "fields": 19
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\PurchaseReturn",
+        "table": "purchasereturn",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\PurchaseReturnRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/PurchaseReturn.php",
+        "assoc": 7,
+        "fields": 9
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\PurchaseReturnItem",
+        "table": "purchasereturnitem",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\PurchaseReturnItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/PurchaseReturnItem.php",
+        "assoc": 4,
+        "fields": 6
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\PurchaseVendorItem",
+        "table": "purchasevendoritem",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\PurchaseVendorItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/PurchaseVendorItem.php",
+        "assoc": 13,
+        "fields": 28
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\Sales",
+        "table": "sales",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\SalesRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/Sales.php",
+        "assoc": 18,
+        "fields": 37
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\SalesImport",
+        "table": "salesImport",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\SalesImportRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/SalesImport.php",
+        "assoc": 4,
+        "fields": 6
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\SalesReturnItem",
+        "table": "sales_return_item",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\SalesReturnItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/SalesReturnItem.php",
+        "assoc": 4,
+        "fields": 4
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\SalesTemporary",
+        "table": "sales_temporary",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineSalesTemporaryRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/SalesTemporary.php",
+        "assoc": 3,
+        "fields": 7
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\SalesItem",
+        "table": "salesitem",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\SalesItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/SalesItem.php",
+        "assoc": 6,
+        "fields": 15
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\SalesItemSerial",
+        "table": "salesitemserial",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\SalesItemSerialRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/SalesItemSerial.php",
+        "assoc": 2,
+        "fields": 2
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\SalesReturn",
+        "table": "salesreturn",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\SalesReturnRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/SalesReturn.php",
+        "assoc": 7,
+        "fields": 12
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\StockItem",
+        "table": "stockitem",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\StockItemRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/StockItem.php",
+        "assoc": 18,
+        "fields": 12
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\Vendor",
+        "table": "supplier",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\VendorRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/Vendor.php",
+        "assoc": 10,
+        "fields": 9
+    },
+    {
+        "module": "InventoryBundle",
+        "class": "Appstore\\Bundle\\InventoryBundle\\Entity\\WareHouse",
+        "table": "warehouse",
+        "repository": "Appstore\\Bundle\\InventoryBundle\\Repository\\WareHouseRepository",
+        "file": "src/Appstore/Bundle/InventoryBundle/Entity/WareHouse.php",
+        "assoc": 3,
+        "fields": 6
+    },
+    {
+        "module": "LocationBundle",
+        "class": "Setting\\Bundle\\LocationBundle\\Entity\\Country",
+        "table": "country",
+        "repository": "Setting\\Bundle\\LocationBundle\\Repository\\CountryRepository",
+        "file": "src/Setting/Bundle/LocationBundle/Entity/Country.php",
+        "assoc": 5,
+        "fields": 11
+    },
+    {
+        "module": "LocationBundle",
+        "class": "Setting\\Bundle\\LocationBundle\\Entity\\GpLocation",
+        "table": "location_gp",
+        "repository": null,
+        "file": "src/Setting/Bundle/LocationBundle/Entity/GpLocation.php",
+        "assoc": 6,
+        "fields": 10
+    },
+    {
+        "module": "LocationBundle",
+        "class": "Setting\\Bundle\\LocationBundle\\Entity\\Location",
+        "table": "locations",
+        "repository": "Setting\\Bundle\\LocationBundle\\Repository\\LocationRepository",
+        "file": "src/Setting/Bundle/LocationBundle/Entity/Location.php",
+        "assoc": 13,
+        "fields": 4
+    },
+    {
+        "module": "MediaBundle",
+        "class": "Setting\\Bundle\\MediaBundle\\Entity\\GalleryImage",
+        "table": "galleryimage",
+        "repository": "Setting\\Bundle\\MediaBundle\\Entity\\GalleryImageRepository",
+        "file": "src/Setting/Bundle/MediaBundle/Entity/GalleryImage.php",
+        "assoc": 1,
+        "fields": 6
+    },
+    {
+        "module": "MediaBundle",
+        "class": "Setting\\Bundle\\MediaBundle\\Entity\\PageFile",
+        "table": "pagefile",
+        "repository": "Setting\\Bundle\\MediaBundle\\Entity\\PageFileRepository",
+        "file": "src/Setting/Bundle/MediaBundle/Entity/PageFile.php",
+        "assoc": 2,
+        "fields": 6
+    },
+    {
+        "module": "MediaBundle",
+        "class": "Setting\\Bundle\\MediaBundle\\Entity\\PhotoGallery",
+        "table": "photo_gallery",
+        "repository": "Setting\\Bundle\\MediaBundle\\Entity\\PhotoGalleryRepository",
+        "file": "src/Setting/Bundle/MediaBundle/Entity/PhotoGallery.php",
+        "assoc": 8,
+        "fields": 6
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\DiagnosticReport",
+        "table": "hms_master_diagnostic_report",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\DiagnosticReportRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/DiagnosticReport.php",
+        "assoc": 5,
+        "fields": 12
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\DiagnosticReportFormat",
+        "table": "hms_master_diagnostic_report_format",
+        "repository": null,
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/DiagnosticReportFormat.php",
+        "assoc": 3,
+        "fields": 7
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineAndroidProcess",
+        "table": "medicine_android_process",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineAndroidProcessRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineAndroidProcess.php",
+        "assoc": 6,
+        "fields": 14
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineConfig",
+        "table": "medicine_config",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineConfigRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineConfig.php",
+        "assoc": 15,
+        "fields": 43
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineDoctorPrescribe",
+        "table": "medicine_doctor_prescribe",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineDoctorPrescribeRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineDoctorPrescribe.php",
+        "assoc": 2,
+        "fields": 11
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineParticular",
+        "table": "medicine_particular",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineParticularRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineParticular.php",
+        "assoc": 5,
+        "fields": 5
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineParticularType",
+        "table": "medicine_particular_type",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineParticularTypeRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineParticularType.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicinePrepurchase",
+        "table": "medicine_prepurchase",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicinePrepurchaseRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicinePrepurchase.php",
+        "assoc": 3,
+        "fields": 16
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicinePrepurchaseItem",
+        "table": "medicine_prepurchase_item",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicinePrepurchaseItemRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicinePrepurchaseItem.php",
+        "assoc": 3,
+        "fields": 7
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\PrescriptionAttribute",
+        "table": "medicine_prescription_attribute",
+        "repository": null,
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/PrescriptionAttribute.php",
+        "assoc": 0,
+        "fields": 5
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicinePurchase",
+        "table": "medicine_purchase",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicinePurchaseRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicinePurchase.php",
+        "assoc": 15,
+        "fields": 26
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicinePurchaseItem",
+        "table": "medicine_purchase_item",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicinePurchaseItemRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicinePurchaseItem.php",
+        "assoc": 8,
+        "fields": 26
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicinePurchaseReturn",
+        "table": "medicine_purchase_return",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicinePurchaseReturnRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicinePurchaseReturn.php",
+        "assoc": 6,
+        "fields": 12
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicinePurchaseReturnItem",
+        "table": "medicine_purchase_return_item",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicinePurchaseReturnItemRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicinePurchaseReturnItem.php",
+        "assoc": 3,
+        "fields": 4
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineReverse",
+        "table": "medicine_reverse",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineReverseRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineReverse.php",
+        "assoc": 4,
+        "fields": 6
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineSales",
+        "table": "medicine_sales",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineSalesRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineSales.php",
+        "assoc": 16,
+        "fields": 36
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineSalesItem",
+        "table": "medicine_sales_item",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineSalesItemRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineSalesItem.php",
+        "assoc": 5,
+        "fields": 16
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineSalesReturnInvoice",
+        "table": "medicine_sales_return_invoice",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineSalesReturnInvoiceRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineSalesReturnInvoice.php",
+        "assoc": 12,
+        "fields": 15
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineSalesTemporary",
+        "table": "medicine_sales_temporary",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineSalesTemporaryRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineSalesTemporary.php",
+        "assoc": 4,
+        "fields": 9
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineStockHouse",
+        "table": "medicine_stock_house",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineStockHouseRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineStockHouse.php",
+        "assoc": 5,
+        "fields": 7
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineTransfer",
+        "table": "medicine_transfer",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineTransferRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineTransfer.php",
+        "assoc": 5,
+        "fields": 14
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineTransferItem",
+        "table": "medicine_transfer_item",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineTransferItemRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineTransferItem.php",
+        "assoc": 2,
+        "fields": 4
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineVendor",
+        "table": "medicine_vendor",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineVendorRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineVendor.php",
+        "assoc": 7,
+        "fields": 12
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineBrand",
+        "table": "medicinebrand",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineBrandRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineBrand.php",
+        "assoc": 4,
+        "fields": 13
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineCompany",
+        "table": "medicinecompany",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineCompanyRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineCompany.php",
+        "assoc": 1,
+        "fields": 3
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineDamage",
+        "table": "medicinedamage",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineDamageRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineDamage.php",
+        "assoc": 4,
+        "fields": 8
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineGeneric",
+        "table": "medicinegeneric",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineGenericRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineGeneric.php",
+        "assoc": 1,
+        "fields": 10
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineImport",
+        "table": "medicineimport",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineImportRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineImport.php",
+        "assoc": 1,
+        "fields": 6
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineMinimumStock",
+        "table": "medicineminimumstock",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineMinimumStockRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineMinimumStock.php",
+        "assoc": 2,
+        "fields": 5
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineSalesReturn",
+        "table": "medicinesalesreturn",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineSalesReturnRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineSalesReturn.php",
+        "assoc": 6,
+        "fields": 12
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineStock",
+        "table": "medicinestock",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineStockRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineStock.php",
+        "assoc": 14,
+        "fields": 39
+    },
+    {
+        "module": "MedicineBundle",
+        "class": "Appstore\\Bundle\\MedicineBundle\\Entity\\MedicineStockAdjustment",
+        "table": "medicinestockadjustment",
+        "repository": "Appstore\\Bundle\\MedicineBundle\\Repository\\MedicineStockAdjustmentRepository",
+        "file": "src/Appstore/Bundle/MedicineBundle/Entity/MedicineStockAdjustment.php",
+        "assoc": 4,
+        "fields": 8
+    },
+    {
+        "module": "PosBundle",
+        "class": "Terminalbd\\PosBundle\\Entity\\Pos",
+        "table": "pos",
+        "repository": "Terminalbd\\PosBundle\\Repository\\PosRepository",
+        "file": "src/Terminalbd/PosBundle/Entity/Pos.php",
+        "assoc": 11,
+        "fields": 32
+    },
+    {
+        "module": "PosBundle",
+        "class": "Terminalbd\\PosBundle\\Entity\\PosConfig",
+        "table": "pos_config",
+        "repository": "Terminalbd\\PosBundle\\Repository\\PosRepository",
+        "file": "src/Terminalbd/PosBundle/Entity/PosConfig.php",
+        "assoc": 1,
+        "fields": 6
+    },
+    {
+        "module": "PosBundle",
+        "class": "Terminalbd\\PosBundle\\Entity\\PosItem",
+        "table": "pos_item",
+        "repository": "Terminalbd\\PosBundle\\Repository\\PosItemRepository",
+        "file": "src/Terminalbd/PosBundle/Entity/PosItem.php",
+        "assoc": 1,
+        "fields": 8
+    },
+    {
+        "module": "ProductBundle",
+        "class": "Product\\Bundle\\ProductBundle\\Entity\\Category",
+        "table": "categories",
+        "repository": "Product\\Bundle\\ProductBundle\\Entity\\CategoryRepository",
+        "file": "src/Product/Bundle/ProductBundle/Entity/Category.php",
+        "assoc": 17,
+        "fields": 14
+    },
+    {
+        "module": "ProductBundle",
+        "class": "Product\\Bundle\\ProductBundle\\Entity\\CategoryGrouping",
+        "table": "categorygrouping",
+        "repository": "Product\\Bundle\\ProductBundle\\Entity\\CategoryGroupingRepository",
+        "file": "src/Product/Bundle/ProductBundle/Entity/CategoryGrouping.php",
+        "assoc": 2,
+        "fields": 1
+    },
+    {
+        "module": "ProductBundle",
+        "class": "Product\\Bundle\\ProductBundle\\Entity\\Collection",
+        "table": "collection",
+        "repository": "Product\\Bundle\\ProductBundle\\Entity\\CollectionRepository",
+        "file": "src/Product/Bundle/ProductBundle/Entity/Collection.php",
+        "assoc": 3,
+        "fields": 8
+    },
+    {
+        "module": "ProductBundle",
+        "class": "Product\\Bundle\\ProductBundle\\Entity\\ItemGroup",
+        "table": "item_group",
+        "repository": "Product\\Bundle\\ProductBundle\\Entity\\ItemGroupRepository",
+        "file": "src/Product/Bundle/ProductBundle/Entity/ItemGroup.php",
+        "assoc": 3,
+        "fields": 7
+    },
+    {
+        "module": "ProductBundle",
+        "class": "Product\\Bundle\\ProductBundle\\Entity\\Product",
+        "table": "product",
+        "repository": "Product\\Bundle\\ProductBundle\\Entity\\ProductRepository",
+        "file": "src/Product/Bundle/ProductBundle/Entity/Product.php",
+        "assoc": 8,
+        "fields": 24
+    },
+    {
+        "module": "ProductBundle",
+        "class": "Product\\Bundle\\ProductBundle\\Entity\\ProductCustomAttribute",
+        "table": "productcustomattribute",
+        "repository": "Product\\Bundle\\ProductBundle\\Entity\\ProductCustomAttributeRepository",
+        "file": "src/Product/Bundle/ProductBundle/Entity/ProductCustomAttribute.php",
+        "assoc": 1,
+        "fields": 3
+    },
+    {
+        "module": "ProductBundle",
+        "class": "Product\\Bundle\\ProductBundle\\Entity\\ProductGallery",
+        "table": "productgallery",
+        "repository": "Product\\Bundle\\ProductBundle\\Entity\\ProductGalleryRepository",
+        "file": "src/Product/Bundle/ProductBundle/Entity/ProductGallery.php",
+        "assoc": 1,
+        "fields": 2
+    },
+    {
+        "module": "ProductBundle",
+        "class": "Product\\Bundle\\ProductBundle\\Entity\\ProductReview",
+        "table": "productreview",
+        "repository": "Product\\Bundle\\ProductBundle\\Entity\\ProductReviewRepository",
+        "file": "src/Product/Bundle/ProductBundle/Entity/ProductReview.php",
+        "assoc": 1,
+        "fields": 8
+    },
+    {
+        "module": "ReportBundle",
+        "class": "Terminalbd\\ReportBundle\\Entity\\AppsApi",
+        "table": "mis_api_report",
+        "repository": "Terminalbd\\ReportBundle\\Repository\\AppsApiRepository",
+        "file": "src/Terminalbd/ReportBundle/Entity/AppsApi.php",
+        "assoc": 2,
+        "fields": 6
+    },
+    {
+        "module": "ReportBundle",
+        "class": "Terminalbd\\ReportBundle\\Entity\\Report",
+        "table": "mis_report",
+        "repository": "Terminalbd\\ReportBundle\\Repository\\ReportRepository",
+        "file": "src/Terminalbd/ReportBundle/Entity/Report.php",
+        "assoc": 0,
+        "fields": 1
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\Coupon",
+        "table": "coupon",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\CouponRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/Coupon.php",
+        "assoc": 1,
+        "fields": 14
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\ProductionBatch",
+        "table": "res_production_batch",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\ProductionBatchRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/ProductionBatch.php",
+        "assoc": 4,
+        "fields": 7
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\ProductionExpense",
+        "table": "res_production_expense",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\ProductionExpenseRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/ProductionExpense.php",
+        "assoc": 6,
+        "fields": 3
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\RestaurantAndroidProcess",
+        "table": "restaurant_android_process",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\RestaurantAndroidProcessRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/RestaurantAndroidProcess.php",
+        "assoc": 5,
+        "fields": 14
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\RestaurantConfig",
+        "table": "restaurant_config",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\RestaurantConfigRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/RestaurantConfig.php",
+        "assoc": 10,
+        "fields": 60
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\Invoice",
+        "table": "restaurant_invoice",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\InvoiceRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/Invoice.php",
+        "assoc": 17,
+        "fields": 34
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\InvoiceParticular",
+        "table": "restaurant_invoice_particular",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\InvoiceParticularRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/InvoiceParticular.php",
+        "assoc": 2,
+        "fields": 12
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\Particular",
+        "table": "restaurant_particular",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\ParticularRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/Particular.php",
+        "assoc": 12,
+        "fields": 33
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\Category",
+        "table": "restaurant_product_category",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\CategoryRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/Category.php",
+        "assoc": 4,
+        "fields": 6
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\ProductionElement",
+        "table": "restaurant_production_element",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\ProductionElementRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/ProductionElement.php",
+        "assoc": 2,
+        "fields": 4
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\Purchase",
+        "table": "restaurant_purchase",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\PurchaseRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/Purchase.php",
+        "assoc": 10,
+        "fields": 18
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\PurchaseItem",
+        "table": "restaurant_purchase_item",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\PurchaseItemRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/PurchaseItem.php",
+        "assoc": 2,
+        "fields": 7
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\Reverse",
+        "table": "restaurant_reverse",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\ReverseRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/Reverse.php",
+        "assoc": 3,
+        "fields": 6
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\Service",
+        "table": "restaurant_service",
+        "repository": null,
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/Service.php",
+        "assoc": 1,
+        "fields": 7
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\RestaurantStockHistory",
+        "table": "restaurant_stock_history",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\RestaurantStockHistoryRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/RestaurantStockHistory.php",
+        "assoc": 6,
+        "fields": 14
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\RestaurantTableInvoice",
+        "table": "restaurant_table_invoice",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\RestaurantTableInvoiceRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/RestaurantTableInvoice.php",
+        "assoc": 11,
+        "fields": 22
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\RestaurantTableInvoiceItem",
+        "table": "restaurant_table_invoice_item",
+        "repository": null,
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/RestaurantTableInvoiceItem.php",
+        "assoc": 2,
+        "fields": 7
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\RestaurantTemporary",
+        "table": "restaurant_temporary",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\RestaurantTemporaryRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/RestaurantTemporary.php",
+        "assoc": 3,
+        "fields": 6
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\ProductionValueAdded",
+        "table": "restaurant_value_added",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\ProductionValueAddedRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/ProductionValueAdded.php",
+        "assoc": 2,
+        "fields": 2
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\RestaurantDamage",
+        "table": "restaurantdamage",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\RestaurantDamageRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/RestaurantDamage.php",
+        "assoc": 3,
+        "fields": 8
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\RestaurantStockAdjustment",
+        "table": "restaurantstockadjustment",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\RestaurantStockAdjustmentRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/RestaurantStockAdjustment.php",
+        "assoc": 3,
+        "fields": 7
+    },
+    {
+        "module": "RestaurantBundle",
+        "class": "Appstore\\Bundle\\RestaurantBundle\\Entity\\ItemImport",
+        "table": "resturant_itemimport",
+        "repository": "Appstore\\Bundle\\RestaurantBundle\\Repository\\ItemImporterRepository",
+        "file": "src/Appstore/Bundle/RestaurantBundle/Entity/ItemImport.php",
+        "assoc": 2,
+        "fields": 7
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\AdsTool",
+        "table": "adstool",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\AdsToolRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/AdsTool.php",
+        "assoc": 1,
+        "fields": 13
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\AndroidDeviceSetup",
+        "table": "androiddevicesetup",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\AndroidDeviceSetupRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/AndroidDeviceSetup.php",
+        "assoc": 9,
+        "fields": 3
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\ApplicationPricing",
+        "table": "applicationpricing",
+        "repository": "Setting\\Bundle\\ToolBundle\\Entity\\ApplicationPricingRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/ApplicationPricing.php",
+        "assoc": 2,
+        "fields": 3
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\ApplicationTestimonial",
+        "table": "applicationtestimonial",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\ApplicationTestimonialRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/ApplicationTestimonial.php",
+        "assoc": 1,
+        "fields": 7
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\AppModule",
+        "table": "appmodule",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\AppModuleRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/AppModule.php",
+        "assoc": 7,
+        "fields": 11
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Bank",
+        "table": "banks",
+        "repository": null,
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Bank.php",
+        "assoc": 13,
+        "fields": 2
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Branding",
+        "table": "branding",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\BrandingRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Branding.php",
+        "assoc": 2,
+        "fields": 7
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\ColorPlate",
+        "table": "color_plate",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\ColorPlateRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/ColorPlate.php",
+        "assoc": 1,
+        "fields": 5
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\ColorPlateKeyValue",
+        "table": "color_plate_key_value",
+        "repository": null,
+        "file": "src/Setting/Bundle/ToolBundle/Entity/ColorPlateKeyValue.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Configuration",
+        "table": "configuration",
+        "repository": null,
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Configuration.php",
+        "assoc": 0,
+        "fields": 3
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Currency",
+        "table": "currency",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\CurrencyRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Currency.php",
+        "assoc": 0,
+        "fields": 4
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Designation",
+        "table": "designation",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\DesignationRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Designation.php",
+        "assoc": 3,
+        "fields": 9
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\FooterSetting",
+        "table": "footersetting",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\FooterSettingRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/FooterSetting.php",
+        "assoc": 1,
+        "fields": 11
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\GlobalOption",
+        "table": "globaloption",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\GlobalOptionRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/GlobalOption.php",
+        "assoc": 75,
+        "fields": 55
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Icon",
+        "table": "icon",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\IconRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Icon.php",
+        "assoc": 2,
+        "fields": 5
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\InvoiceModule",
+        "table": "invoicemodule",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\InvoiceModuleRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/InvoiceModule.php",
+        "assoc": 9,
+        "fields": 17
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\InvoiceModuleItem",
+        "table": "invoicemoduleitem",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\InvoiceModuleItemRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/InvoiceModuleItem.php",
+        "assoc": 3,
+        "fields": 3
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\InvoiceSmsEmail",
+        "table": "invoicesmsemail",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\InvoiceSmsEmailRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/InvoiceSmsEmail.php",
+        "assoc": 7,
+        "fields": 14
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\InvoiceSmsEmailItem",
+        "table": "invoicesmsemailitem",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\InvoiceSmsEmailItemRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/InvoiceSmsEmailItem.php",
+        "assoc": 2,
+        "fields": 2
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\ItemAssurance",
+        "table": "itemassurance",
+        "repository": null,
+        "file": "src/Setting/Bundle/ToolBundle/Entity/ItemAssurance.php",
+        "assoc": 0,
+        "fields": 4
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\MedicineImport",
+        "table": "medicineimport",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\MedicineImportRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/MedicineImport.php",
+        "assoc": 0,
+        "fields": 6
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\MobileIcon",
+        "table": "mobileicon",
+        "repository": null,
+        "file": "src/Setting/Bundle/ToolBundle/Entity/MobileIcon.php",
+        "assoc": 1,
+        "fields": 2
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\MobileTheme",
+        "table": "mobiletheme",
+        "repository": "Setting\\Bundle\\ToolBundle\\Entity\\MobileThemeRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/MobileTheme.php",
+        "assoc": 2,
+        "fields": 5
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Module",
+        "table": "module",
+        "repository": "Setting\\Bundle\\ToolBundle\\Entity\\ModuleRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Module.php",
+        "assoc": 9,
+        "fields": 11
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\PaymentCard",
+        "table": "paymentcard",
+        "repository": null,
+        "file": "src/Setting/Bundle/ToolBundle/Entity/PaymentCard.php",
+        "assoc": 7,
+        "fields": 3
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\PortalBankAccount",
+        "table": "portal_bank_account",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\PortalBankAccountRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/PortalBankAccount.php",
+        "assoc": 1,
+        "fields": 7
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\PortalBkashAccount",
+        "table": "portalbkashaccount",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\PortalBkashAccountRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/PortalBkashAccount.php",
+        "assoc": 0,
+        "fields": 5
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\PortalMobileBankAccount",
+        "table": "portalmobilebankaccount",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\PortalMobileBankAccountRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/PortalMobileBankAccount.php",
+        "assoc": 1,
+        "fields": 8
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\PricePrefix",
+        "table": "priceprefix",
+        "repository": null,
+        "file": "src/Setting/Bundle/ToolBundle/Entity/PricePrefix.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\ProductColor",
+        "table": "productcolor",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\ProductColorRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/ProductColor.php",
+        "assoc": 0,
+        "fields": 6
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\ProductSize",
+        "table": "productsize",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\ProductSizeRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/ProductSize.php",
+        "assoc": 0,
+        "fields": 5
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\ProductUnit",
+        "table": "productunit",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\ProductUnitRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/ProductUnit.php",
+        "assoc": 13,
+        "fields": 4
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\SettingAccountHead",
+        "table": "settingaccounthead",
+        "repository": " Setting\\Bundle\\ToolBundle\\Repository\\SettingAccountHeadRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/SettingAccountHead.php",
+        "assoc": 2,
+        "fields": 6
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\SiteSetting",
+        "table": "sitesetting",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\SiteSettingRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/SiteSetting.php",
+        "assoc": 10,
+        "fields": 2
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\SmsBulk",
+        "table": "smsbulk",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\SmsBulkRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/SmsBulk.php",
+        "assoc": 3,
+        "fields": 11
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\SmsEmailPricing",
+        "table": "smsemailpricing",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\SmsEmailPricingRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/SmsEmailPricing.php",
+        "assoc": 1,
+        "fields": 9
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\SmsSender",
+        "table": "smssender",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\SmsSenderRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/SmsSender.php",
+        "assoc": 1,
+        "fields": 7
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\SmsSenderTotal",
+        "table": "smssendertotal",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\SmsSenderTotalRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/SmsSenderTotal.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\SubscribeEmail",
+        "table": "subscribeemail",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\SubscribeEmailRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/SubscribeEmail.php",
+        "assoc": 0,
+        "fields": 3
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Syndicate",
+        "table": "syndicate",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\SyndicateRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Syndicate.php",
+        "assoc": 12,
+        "fields": 8
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\SyndicateModule",
+        "table": "syndicatemodule",
+        "repository": "Setting\\Bundle\\ToolBundle\\Entity\\SyndicateModuleRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/SyndicateModule.php",
+        "assoc": 5,
+        "fields": 11
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Templating",
+        "table": "templating",
+        "repository": null,
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Templating.php",
+        "assoc": 0,
+        "fields": 12
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\Theme",
+        "table": "theme",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\ThemeRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/Theme.php",
+        "assoc": 3,
+        "fields": 5
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\ItemWarning",
+        "table": "tool_warning",
+        "repository": null,
+        "file": "src/Setting/Bundle/ToolBundle/Entity/ItemWarning.php",
+        "assoc": 0,
+        "fields": 4
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\TransactionMethod",
+        "table": "transactionmethod",
+        "repository": "Setting\\Bundle\\ToolBundle\\Repository\\TransactionMethodRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/TransactionMethod.php",
+        "assoc": 28,
+        "fields": 5
+    },
+    {
+        "module": "ToolBundle",
+        "class": "Setting\\Bundle\\ToolBundle\\Entity\\WebTheme",
+        "table": "webtheme",
+        "repository": "Setting\\Bundle\\ToolBundle\\Entity\\WebThemeRepository",
+        "file": "src/Setting/Bundle/ToolBundle/Entity/WebTheme.php",
+        "assoc": 2,
+        "fields": 5
+    },
+    {
+        "module": "UserBundle",
+        "class": "Core\\UserBundle\\Entity\\AccessRole",
+        "table": "accessrole",
+        "repository": "Core\\UserBundle\\Repository\\AccessRoleRepository",
+        "file": "src/Core/UserBundle/Entity/AccessRole.php",
+        "assoc": 1,
+        "fields": 4
+    },
+    {
+        "module": "UserBundle",
+        "class": "Core\\UserBundle\\Entity\\User",
+        "table": "fos_user",
+        "repository": "Core\\UserBundle\\Entity\\Repository\\UserRepository",
+        "file": "src/Core/UserBundle/Entity/User.php",
+        "assoc": 113,
+        "fields": 8
+    },
+    {
+        "module": "UserBundle",
+        "class": "Core\\UserBundle\\Entity\\GlobalApi",
+        "table": "global_api",
+        "repository": "Core\\UserBundle\\Repository\\GlobalApiRepository",
+        "file": "src/Core/UserBundle/Entity/GlobalApi.php",
+        "assoc": 0,
+        "fields": 1
+    },
+    {
+        "module": "UserBundle",
+        "class": "Core\\UserBundle\\Entity\\Group",
+        "table": "user_group",
+        "repository": null,
+        "file": "src/Core/UserBundle/Entity/Group.php",
+        "assoc": 1,
+        "fields": 2
+    },
+    {
+        "module": "UserBundle",
+        "class": "Core\\UserBundle\\Entity\\Profile",
+        "table": "user_profiles",
+        "repository": "Core\\UserBundle\\Repository\\ProfileRepository",
+        "file": "src/Core/UserBundle/Entity/Profile.php",
+        "assoc": 8,
+        "fields": 31
+    }
+]

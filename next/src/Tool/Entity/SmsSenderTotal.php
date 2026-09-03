@@ -1,0 +1,122 @@
+<?php
+
+namespace App\Tool\Entity;
+use App\Tool\Repository\SmsSenderTotalRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+
+/**
+ * SmsSenderTotal
+ */
+#[ORM\Table]
+#[ORM\Entity(repositoryClass: SmsSenderTotalRepository::class)]
+class SmsSenderTotal
+{
+    /**
+     * @var integer
+     */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private $id;
+
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\OneToOne(targetEntity: GlobalOption::class, inversedBy: 'smsSenderTotal')]
+    protected $globalOption;
+
+    /**
+     * @var integer
+     */
+    #[ORM\Column(name: 'purchase', type: 'integer', nullable: true)]
+    private $purchase;
+
+    /**
+     * @var integer
+     */
+    #[ORM\Column(name: 'sending', type: 'integer', nullable: true)]
+    private $sending;
+
+    /**
+     * @var integer
+     */
+    #[ORM\Column(name: 'remaining', type: 'integer', nullable: true)]
+    private $remaining;
+
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return GlobalOption
+     */
+    public function getGlobalOption()
+    {
+        return $this->globalOption;
+    }
+
+    /**
+     * @param GlobalOption $globalOption
+     */
+    public function setGlobalOption($globalOption)
+    {
+        $this->globalOption = $globalOption;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPurchase()
+    {
+        return $this->purchase;
+    }
+
+    /**
+     * @param int $purchase
+     */
+    public function setPurchase($purchase)
+    {
+        $this->purchase = $purchase;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSending()
+    {
+        return $this->sending;
+    }
+
+    /**
+     * @param int $sending
+     */
+    public function setSending($sending)
+    {
+        $this->sending = $sending;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRemaining()
+    {
+        return $this->remaining;
+    }
+
+    /**
+     * @param int $remaining
+     */
+    public function setRemaining($remaining)
+    {
+        $this->remaining = $remaining;
+    }
+
+
+}
+

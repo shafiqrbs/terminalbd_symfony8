@@ -35,3 +35,9 @@ composer.phar
 # OS
 .DS_Store
 Thumbs.db
+# Database dumps - this is a multi-tenant medical/pharmacy SaaS, dumps carry
+# patient and customer data and must never reach the repository.
+*.sql
+*.sql.gz
+*.sql.bz2
+*.dump

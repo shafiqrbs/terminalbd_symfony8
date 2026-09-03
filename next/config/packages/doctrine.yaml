@@ -1,0 +1,27 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+        types:
+            # DBAL 4 dropped these; 24 live columns still hold data written in
+            # their formats. See App\Doctrine\Type for why they must stay.
+            array: App\Doctrine\Type\LegacyArrayType
+            json_array: App\Doctrine\Type\LegacyJsonArrayType
+    orm:
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: false
+        mappings:
+            # One mapping over the whole tree: the ported entity graph is a single
+            # unit (48% of associations cross a former bundle boundary), so there
+            # is no useful per-module split.
+            App:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src'
+                prefix: 'App'
+                alias: App
+
+when@test:
+    doctrine:
+        dbal:
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'

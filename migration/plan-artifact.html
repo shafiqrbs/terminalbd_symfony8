@@ -1,0 +1,785 @@
+<title>Terminalbd on Symfony 8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --paper:      #F4F5F3;
+    --surface:    #FFFFFF;
+    --surface-2:  #EDEFEC;
+    --ink:        #16191C;
+    --muted:      #5C646E;
+    --rule:       #D8DDD9;
+    --rule-soft:  #E6EAE6;
+    --accent:     #0F6E5C;
+    --accent-bg:  #E2EFEA;
+    --warn:       #B4541A;
+    --warn-bg:    #F6E9DF;
+    --crit:       #A32222;
+    --crit-bg:    #F7E4E2;
+
+    --display: "IBM Plex Sans Condensed", "Helvetica Neue", Arial, sans-serif;
+    --body:    "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --measure: 74ch;
+    --pad: clamp(1.25rem, 4vw, 3.5rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:     #121513;
+      --surface:   #191D1B;
+      --surface-2: #202523;
+      --ink:       #E7ECE8;
+      --muted:     #98A29B;
+      --rule:      #2C332F;
+      --rule-soft: #232926;
+      --accent:    #52C0A5;
+      --accent-bg: #16302A;
+      --warn:      #E0904F;
+      --warn-bg:   #33241A;
+      --crit:      #E27A76;
+      --crit-bg:   #351E1D;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:     #121513;
+    --surface:   #191D1B;
+    --surface-2: #202523;
+    --ink:       #E7ECE8;
+    --muted:     #98A29B;
+    --rule:      #2C332F;
+    --rule-soft: #232926;
+    --accent:    #52C0A5;
+    --accent-bg: #16302A;
+    --warn:      #E0904F;
+    --warn-bg:   #33241A;
+    --crit:      #E27A76;
+    --crit-bg:   #351E1D;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: var(--pad);
+    display: flex;
+    flex-direction: column;
+    gap: 3.25rem;
+  }
+
+  .prose { max-width: var(--measure); }
+
+  h1, h2, h3 {
+    font-family: var(--display);
+    text-wrap: balance;
+    margin: 0;
+    line-height: 1.14;
+    letter-spacing: -0.012em;
+  }
+  h1 { font-size: clamp(2.1rem, 5.5vw, 3.1rem); font-weight: 700; }
+  h2 { font-size: clamp(1.45rem, 3vw, 1.9rem); font-weight: 650; }
+  h3 { font-size: 1.08rem; font-weight: 600; }
+
+  p { margin: 0; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  code, .mono { font-family: var(--mono); font-size: 0.88em; }
+  code { background: var(--surface-2); padding: 0.08em 0.34em; border-radius: 3px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .lede { font-size: 1.12rem; color: var(--muted); max-width: var(--measure); }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+  }
+  .jump a { color: var(--muted); text-decoration: none; }
+  .jump a:hover { color: var(--accent); }
+
+  /* version transition strip */
+  .shift {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    border: 1px solid var(--rule);
+    background: var(--surface);
+  }
+  .shift div {
+    padding: 0.9rem 1.05rem;
+    border-right: 1px solid var(--rule-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .shift div:last-child { border-right: 0; }
+  .shift dt {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .shift dd {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .shift .was { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .shift .now { color: var(--accent); }
+
+  /* ---------- sections ---------- */
+
+  section { display: flex; flex-direction: column; gap: 1.15rem; scroll-margin-top: 1.5rem; }
+  .section-head { display: flex; flex-direction: column; gap: 0.35rem; }
+
+  /* ---------- tables ---------- */
+
+  .scroll { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.87rem; }
+  caption {
+    caption-side: bottom;
+    text-align: left;
+    padding: 0.7rem 1rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    border-top: 1px solid var(--rule-soft);
+  }
+  th, td { padding: 0.5rem 1rem; text-align: left; vertical-align: top; }
+  thead th {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  tbody tr + tr td { border-top: 1px solid var(--rule-soft); }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  td.pkg { font-family: var(--mono); font-size: 0.82rem; white-space: nowrap; }
+
+  /* ---------- status pills ---------- */
+
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.14em 0.5em;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .pill.done { background: var(--accent-bg); color: var(--accent); }
+  .pill.rewrite { background: var(--warn-bg); color: var(--warn); }
+  .pill.gone { background: var(--crit-bg); color: var(--crit); }
+
+  /* ---------- verified results ---------- */
+
+  .checks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+  }
+  .checks div {
+    padding: 1rem 1.1rem;
+    border-right: 1px solid var(--rule-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .checks div:last-child { border-right: 0; }
+  .checks b {
+    font-family: var(--display);
+    font-size: 1.65rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .checks span { font-size: 0.82rem; color: var(--muted); }
+
+  /* ---------- bug findings ---------- */
+
+  .finds { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--rule); }
+  .find {
+    display: grid;
+    grid-template-columns: 3.2rem 1fr;
+    gap: 0 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .find .count {
+    font-family: var(--mono);
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--warn);
+    text-align: right;
+    padding-top: 0.1rem;
+  }
+  .find .count.sev { color: var(--crit); }
+  .find h3 { margin-bottom: 0.25rem; }
+  .find p { font-size: 0.9rem; color: var(--muted); max-width: 64ch; }
+  .find code { background: var(--surface-2); }
+
+  /* ---------- phases ---------- */
+
+  .phases { display: flex; flex-direction: column; gap: 0; }
+  .phase {
+    display: grid;
+    grid-template-columns: 2.6rem 1fr;
+    gap: 0 1.1rem;
+    padding: 1.15rem 0;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .phase:first-child { border-top: 1px solid var(--rule); }
+  .phase .n {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    padding-top: 0.22rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .phase.shipped .n { color: var(--accent); }
+  .phase .hd { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 0.3rem; }
+  .phase p { font-size: 0.92rem; color: var(--muted); max-width: 66ch; }
+  .phase ul { margin: 0.5rem 0 0; padding-left: 1.05rem; font-size: 0.88rem; color: var(--muted); }
+  .phase li { margin-bottom: 0.2rem; }
+
+  /* ---------- callout ---------- */
+
+  .callout {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--crit);
+    background: var(--surface);
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .callout .eyebrow { color: var(--crit); }
+  .callout p { font-size: 0.93rem; max-width: 68ch; }
+
+  .note {
+    font-size: 0.86rem;
+    color: var(--muted);
+    max-width: var(--measure);
+  }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.25rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: var(--mono);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Migration plan &middot; drafted 3 September 2026</p>
+    <h1>Terminalbd on Symfony&nbsp;8</h1>
+    <p class="lede">
+      A ten-module multi-tenant SaaS — hospital, pharmacy, restaurant, inventory, accounting —
+      running on a framework that reached end of life in November 2018. This is the route off it:
+      a strangler migration onto a parallel Symfony&nbsp;8.1 application sharing the same MySQL database,
+      with modules moved one at a time behind the reverse proxy. <strong>Phase&nbsp;1 is built and verified.</strong>
+    </p>
+
+    <dl class="shift">
+      <div><dt>PHP</dt><dd><span class="was">7.4.33</span> <span class="now">8.5.6</span></dd></div>
+      <div><dt>Framework</dt><dd><span class="was">SF 2.8</span> <span class="now">SF 8.1.6</span></dd></div>
+      <div><dt>Doctrine ORM</dt><dd><span class="was">2.5.4</span> <span class="now">3.6.8</span></dd></div>
+      <div><dt>Twig</dt><dd><span class="was">1.23.3</span> <span class="now">3.28.0</span></dd></div>
+    </dl>
+
+    <nav class="jump">
+      <a href="#shipped">01 Shipped</a>
+      <a href="#terrain">02 Terrain</a>
+      <a href="#wall">03 Dead deps</a>
+      <a href="#bugs">04 Bugs found</a>
+      <a href="#roadmap">05 Roadmap</a>
+      <a href="#order">06 Port order</a>
+      <a href="#risks">07 Open risks</a>
+    </nav>
+  </header>
+
+  <!-- ============================================================ -->
+  <section id="shipped">
+    <div class="section-head">
+      <p class="eyebrow">01 &middot; Shipped and verified</p>
+      <h2>The entity graph is ported</h2>
+    </div>
+    <p class="prose">
+      The whole Doctrine model moved in one pass, because it had to. Measured across the tree,
+      <strong>48% of <code>targetEntity</code> references cross a bundle boundary</strong> and every module
+      depends on between two and fifteen others. There is no clean per-module seam in the data model,
+      so a partial copy would leave Doctrine unable to resolve its own metadata. The model is the shared
+      foundation; the HTTP layer is what moves module by module on top of it.
+    </p>
+
+    <div class="checks">
+      <div><b>686</b><span>files ported to <code>App\</code></span></div>
+      <div><b>8,388</b><span>ORM attributes generated</span></div>
+      <div><b>432</b><span>Gedmo attributes converted</span></div>
+      <div><b>339</b><span>metadata definitions loaded</span></div>
+      <div><b>309</b><span>entities validating clean</span></div>
+      <div><b>0</b><span>syntax errors on PHP 8.5</span></div>
+    </div>
+
+    <p class="note">
+      Reproduced by <code>migration/bin/port.sh</code>, which is idempotent — it rebuilds
+      <code>next/src/</code> from the untouched SF&nbsp;2.8 tree in seven steps and re-runs safely after any
+      change to the legacy code. Acceptance is <code>next/bin/validate-mapping.php</code>, which boots the
+      kernel and loads every Doctrine metadata definition without touching a database.
+      The 30 entities still reporting errors are pre-existing defects, covered in section&nbsp;04.
+    </p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="terrain">
+    <div class="section-head">
+      <p class="eyebrow">02 &middot; Terrain</p>
+      <h2>What is actually here</h2>
+    </div>
+    <p class="prose">
+      Roughly 700,000 lines across two languages, accumulated over 3,734 commits since August 2016.
+      The number that shapes every decision below is the last one.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Layer</th><th class="num">Files</th><th class="num">Lines</th><th>Migration character</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>PHP</td><td class="num">1,830</td><td class="num">401,452</td><td>Rector handles ~60–70%; the rest is dead-bundle rewriting</td></tr>
+          <tr><td>Twig templates</td><td class="num">1,822</td><td class="num">296,814</td><td>1,854 <code>Bundle:Dir:file.twig</code> refs, 428 Assetic blocks</td></tr>
+          <tr><td>YAML config</td><td class="num">477</td><td class="num">&mdash;</td><td>SF2 layout → Flex <code>config/</code></td></tr>
+          <tr><td>Doctrine entities</td><td class="num">335</td><td class="num">4,064 cols</td><td class="pill done" style="display:inline-block">ported</td></tr>
+          <tr><td>Controllers</td><td class="num">457</td><td class="num">&mdash;</td><td>337 extend the SF2 <code>Controller</code> base</td></tr>
+          <tr><td>Form types</td><td class="num">360</td><td class="num">&mdash;</td><td>873 <code>setDefaultOptions()</code>/<code>getName()</code> methods</td></tr>
+          <tr><td>Repositories</td><td class="num">327</td><td class="num">&mdash;</td><td>Copied; query bodies still need per-module work</td></tr>
+          <tr><td>Real tests</td><td class="num">~0</td><td class="num">&mdash;</td><td>119 <code>*Test.php</code> files, all generator scaffolding</td></tr>
+        </tbody>
+        <caption>The 119 test files are <code>sensio/generator-bundle</code> stubs — the first one asserts that <code>GET /hello/Fabien</code> returns “Hello Fabien”. There is no regression safety net, which is the single strongest argument for the strangler approach over in-place version hops.</caption>
+      </table>
+    </div>
+
+    <p class="prose">
+      Mechanical rewrite volume in the HTTP layer, for sizing:
+      <code>$this-&gt;getDoctrine()</code> appears <strong>5,845</strong> times,
+      <code>$this-&gt;get()</code> service-locator calls <strong>1,434</strong> times
+      (790 of them just fetching <code>session</code>), and legacy Twig form helpers <strong>8,426</strong> times.
+    </p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="wall">
+    <div class="section-head">
+      <p class="eyebrow">03 &middot; The dependency wall</p>
+      <h2>Fifteen packages with no future version</h2>
+    </div>
+    <p class="prose">
+      These have no Symfony 5, 6, 7 or 8 release and never will. Each is a rewrite, not an upgrade —
+      and each dies at the Symfony 3/4 boundary, which is why paying the cost once on a fresh skeleton
+      beats paying it and then dragging 700k lines through four more major versions without tests.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Package</th><th class="num">Locked</th><th>Blast radius</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="pkg">friendsofsymfony/user-bundle</td><td class="num">dev-master</td><td>Entire auth stack; <code>sha512</code> hashes on every tenant</td><td><span class="pill done">replaced</span></td></tr>
+          <tr><td class="pkg">friendsofsymfony/comment-bundle</td><td class="num">2.0.8</td><td>Thread + Comment superclasses</td><td><span class="pill done">replaced</span></td></tr>
+          <tr><td class="pkg">jms/security-extra-bundle</td><td class="num">1.6.1</td><td>112 files using <code>@Secure</code> / <code>@PreAuthorize</code></td><td><span class="pill rewrite">→ #[IsGranted]</span></td></tr>
+          <tr><td class="pkg">jms/di-extra-bundle</td><td class="num">1.6.0</td><td>Annotation-driven service wiring</td><td><span class="pill rewrite">→ autowiring</span></td></tr>
+          <tr><td class="pkg">jms/aop-bundle</td><td class="num">1.2.0</td><td>Dead since ~2015</td><td><span class="pill gone">drop</span></td></tr>
+          <tr><td class="pkg">symfony/assetic-bundle</td><td class="num">2.7.1</td><td>428 <code>{% stylesheets %}</code> / <code>{% javascripts %}</code> blocks</td><td><span class="pill rewrite">→ AssetMapper</span></td></tr>
+          <tr><td class="pkg">sensio/distribution-bundle</td><td class="num">5.0.21</td><td><code>app/</code> + <code>web/</code> layout</td><td><span class="pill done">→ Flex</span></td></tr>
+          <tr><td class="pkg">sensio/generator-bundle</td><td class="num">2.5.3</td><td>Scaffolding only</td><td><span class="pill done">→ MakerBundle</span></td></tr>
+          <tr><td class="pkg">friendsofsymfony/rest-bundle</td><td class="num">1.5.3</td><td><strong>96 mobile endpoints</strong> with live Android + Flutter clients</td><td><span class="pill rewrite">→ native + Serializer</span></td></tr>
+          <tr><td class="pkg">phpoffice/phpexcel</td><td class="num">1.8.1</td><td>Excel export</td><td><span class="pill rewrite">→ PhpSpreadsheet</span></td></tr>
+          <tr><td class="pkg">liuggio/excelbundle</td><td class="num">2.x</td><td>Wrapper around the above</td><td><span class="pill gone">drop</span></td></tr>
+          <tr><td class="pkg">h4cc/wkhtmltopdf-amd64</td><td class="num">0.12.2.1</td><td>All PDF invoices and reports; wkhtmltopdf itself is EOL</td><td><span class="pill rewrite">re-plumb</span></td></tr>
+          <tr><td class="pkg">symfony/security-acl</td><td class="num">3.0.1</td><td>9 files touching ACL</td><td><span class="pill rewrite">→ voters</span></td></tr>
+          <tr><td class="pkg">divi/ajax-login-bundle</td><td class="num">dev-master</td><td>Login modal</td><td><span class="pill gone">drop</span></td></tr>
+          <tr><td class="pkg">xiidea/ez-maintenance</td><td class="num">1.0.0</td><td>Maintenance mode</td><td><span class="pill gone">drop</span></td></tr>
+        </tbody>
+        <caption>Four packages depend on unpinned <code>dev-master</code> or <code>@stable</code> constraints, so the legacy build is not currently reproducible from <code>composer.json</code> alone — only from <code>composer.lock</code>.</caption>
+      </table>
+    </div>
+
+    <p class="prose">
+      The good news is where this pain <em>is not</em>. Only <strong>18 of the 686</strong> ported model files
+      referenced any dead vendor at all. The domain model is ~97% portable; the wall is almost entirely in the
+      controller, form and template layer.
+    </p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="bugs">
+    <div class="section-head">
+      <p class="eyebrow">04 &middot; Findings</p>
+      <h2>Latent bugs the port surfaced</h2>
+    </div>
+    <p class="prose">
+      Doctrine 2 and PHP 7 tolerated a lot silently. Moving to strict attribute parsing turned each of these
+      into a hard error, which is how they were found. All of them are pre-existing — the same text is in the
+      SF&nbsp;2.8 tree today.
+    </p>
+
+    <div class="callout">
+      <p class="eyebrow">Highest severity &middot; would have silently destroyed authorization</p>
+      <p>
+        <strong>DBAL 4 removed the <code>array</code> and <code>object</code> column types outright.</strong>
+        24 live columns hold PHP-serialized payloads — including <code>fos_user.roles</code>, which carries every
+        user's role set. Read through a naive <code>json</code> replacement, every user on every tenant silently
+        loses their roles. Fixed with a compatibility type
+        (<code>App\Doctrine\Type\LegacyArrayType</code>) that reproduces DBAL&nbsp;3 semantics exactly, so
+        production rows are read unchanged and no data migration is required.
+      </p>
+    </div>
+
+    <div class="finds">
+      <div class="find">
+        <div class="count sev">1</div>
+        <div>
+          <h3>Composite foreign key introduced by automated conversion</h3>
+          <p>
+            A stray <code>*</code> in a <code>User</code> docblock left <code>@ORM\JoinColumns</code> malformed. Rector
+            faithfully emitted <em>both</em> join columns as separate attributes on <code>User::$globalOption</code>,
+            which ORM&nbsp;3 reads as a composite FK against a table that has one column. Merged back to the single
+            column Doctrine&nbsp;2 actually used. Found by scanning all 686 files for the pattern &mdash; it produces no
+            error message of its own, just a wrong schema.
+          </p>
+        </div>
+      </div>
+      <div class="find">
+        <div class="count">30</div>
+        <div>
+          <h3><code>JoinColumn</code> on illegal association sides</h3>
+          <p>
+            Placed on <code>OneToMany</code> relations, on inverse (<code>mappedBy</code>) sides, and in three cases on
+            plain scalar columns. Inert under ORM&nbsp;2, a hard mapping error under ORM&nbsp;3. Removed by rule, preserving
+            the legitimate owning-side <code>ManyToMany</code> pairs.
+          </p>
+        </div>
+      </div>
+      <div class="find">
+        <div class="count">98</div>
+        <div>
+          <h3><code>cascade={"merge"}</code> after <code>merge()</code> was removed</h3>
+          <p>
+            ORM&nbsp;3 deleted <code>EntityManager::merge()</code> and its cascade. The app calls <code>merge()</code>
+            exactly once, in a development command, so the cascade was already inert — dropped and the option lists deduped.
+          </p>
+        </div>
+      </div>
+      <div class="find">
+        <div class="count">5</div>
+        <div>
+          <h3>Duplicated non-repeatable annotations</h3>
+          <p>
+            Four classes declare <code>@ORM\Entity</code> twice, and one property declares <code>@ORM\OrderBy</code> twice
+            with conflicting sort directions. Doctrine&nbsp;2 re-keyed annotations by class name so the <em>last</em> won;
+            PHP&nbsp;8 rejects the repeat outright. Collapsed keeping the last occurrence, which reproduces the ORM&nbsp;2 outcome.
+          </p>
+        </div>
+      </div>
+      <div class="find">
+        <div class="count">3</div>
+        <div>
+          <h3><code>parent::__construct()</code> in parentless classes</h3>
+          <p>
+            The method is named <code>_constructor()</code> — a typo for <code>__construct()</code> — so it was never called
+            and the invalid parent call never executed. PHP&nbsp;8 rejects it at <em>compile</em> time. Removing the unreachable
+            line preserves behaviour byte-for-byte. The typo itself is left in place: fixing it would activate three
+            constructors that have never run.
+          </p>
+        </div>
+      </div>
+      <div class="find">
+        <div class="count">48</div>
+        <div>
+          <h3>Broken bidirectional associations</h3>
+          <p>
+            Across 30 entities, <code>inversedBy</code> / <code>mappedBy</code> point at fields that do not exist on the other
+            side. Doctrine only resolves the inverse side lazily, so these never surfaced at runtime. Catalogued in
+            <code>migration/contract/broken-associations.md</code> — fix each as its module is ported, by adding the missing
+            field or making the relation unidirectional.
+          </p>
+        </div>
+      </div>
+      <div class="find">
+        <div class="count">2</div>
+        <div>
+          <h3>Namespace and registration inconsistencies</h3>
+          <p>
+            <code>appstore\Bundle\DomainUserBundle</code> is declared with a lowercase leading character, which only works
+            because nothing resolves it case-sensitively; and <code>Appstore\Bundle\DmsBundle</code> exists on disk but is
+            never registered in <code>AppKernel</code>. Both normalised during the namespace rewrite.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="roadmap">
+    <div class="section-head">
+      <p class="eyebrow">05 &middot; Roadmap</p>
+      <h2>Phases, in dependency order</h2>
+    </div>
+    <p class="prose">
+      These are genuinely sequential — each phase unblocks the next. Phases 3 onward ship module by module,
+      each independently deployable, with rollback being a single route flipped back at the proxy.
+    </p>
+
+    <div class="phases">
+
+      <div class="phase shipped">
+        <div class="n">01</div>
+        <div>
+          <div class="hd"><h3>Skeleton and entity graph</h3><span class="pill done">shipped</span></div>
+          <p>
+            Symfony 8.1.6 on PHP 8.5 in <code>next/</code>, sharing the production MySQL database. All 335 entities and
+            327 repositories lifted into <code>App\</code>, annotations converted to attributes, mappings validated.
+            FOSUser and FOSComment superclasses reproduced column-for-column from their locked revisions so they map onto
+            <code>fos_user</code>, <code>user_group</code> and the comment tables untouched.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="n">02</div>
+        <div>
+          <div class="hd"><h3>Authentication and tenancy</h3></div>
+          <p>
+            The gate for everything else — no module can move until a request can be authenticated in the new app.
+          </p>
+          <ul>
+            <li>Native Symfony security replacing FOSUserBundle's 12 route names and its user manager</li>
+            <li>Migrating password hasher: verify existing salted <code>sha512</code>, transparently rehash to a modern algorithm on next successful login — no forced reset for any tenant</li>
+            <li>Port the subdomain tenancy listener that resolves each tenant from its host</li>
+            <li>Shared session store so a user stays logged in across the proxy boundary while both apps serve traffic</li>
+            <li>Convert the 112 files of <code>@Secure</code> annotations and the ~200-entry role hierarchy</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="n">03</div>
+        <div>
+          <div class="hd"><h3>Mobile APIs</h3><span class="pill rewrite">wire-locked</span></div>
+          <p>
+            96 endpoints across <code>/flutter-api</code> (66), <code>/android-api</code> (24) and
+            <code>/android-api-portal</code> (6), with shipped clients that cannot be updated in lockstep.
+            The contract is already extracted to <code>migration/contract/api-endpoints.json</code>; the capture and
+            shape-diff harness is written and waiting on credentials.
+          </p>
+          <ul>
+            <li>Record golden responses from production: <code>php migration/bin/capture.php legacy</code></li>
+            <li>Port controllers off FOSRestBundle onto native controllers plus the Serializer</li>
+            <li>Gate every deploy on <code>compare.php</code>, which diffs response <em>shape</em> and status — keys and value types, not volatile ids or timestamps</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="n">04</div>
+        <div>
+          <div class="hd"><h3>Shared presentation layer</h3></div>
+          <p>
+            Built once, consumed by every module port that follows: base layouts on Twig 3, the
+            <code>Bundle:Dir:file.twig</code> → <code>@Dir/file.html.twig</code> rename across 1,854 references,
+            Assetic replaced by AssetMapper, and the PDF and ESC/POS thermal-receipt pipelines re-plumbed
+            off the abandoned wkhtmltopdf shims.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="n">05</div>
+        <div>
+          <div class="hd"><h3>Module ports</h3></div>
+          <p>
+            Ten modules in the order set out in section 06, smallest first to prove the pipeline before the
+            large modules commit to it. Each port converts its controllers to autowired services, its form types to the
+            SF8 API, and its templates to Twig 3 — and fixes that module's share of the 48 broken associations.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="n">06</div>
+        <div>
+          <div class="hd"><h3>Decommission</h3></div>
+          <p>
+            Retire the PHP 7.4 pool once the last route is served by the new app, collapse the proxy rules, and
+            drop the compatibility shims that are no longer reachable. The <code>LegacyArrayType</code> stays
+            until its 24 columns are migrated deliberately, with a backfill — not as a side effect of a port.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="order">
+    <div class="section-head">
+      <p class="eyebrow">06 &middot; Sequencing</p>
+      <h2>Module port order</h2>
+    </div>
+    <p class="prose">
+      Ordered by risk-adjusted size: the small modules go first to shake out the pipeline while a mistake is
+      cheap, and the four largest go last when the patterns are settled. Template line count is the best available
+      proxy for effort, since it tracks the Twig&nbsp;1 → 3 work that dominates each port.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="num">#</th><th>Module</th><th class="num">Ctrls</th><th class="num">Forms</th>
+            <th class="num">Tmpl LOC</th><th class="num">$this-&gt;get</th><th class="num">@Secure</th><th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Location</td><td class="num">7</td><td class="num">1</td><td class="num">250</td><td class="num">2</td><td class="num">0</td><td>Reference data; pipeline warm-up</td></tr>
+          <tr><td class="num">2</td><td>Media</td><td class="num">7</td><td class="num">2</td><td class="num">595</td><td class="num">10</td><td class="num">0</td><td>Exercises file handling early</td></tr>
+          <tr><td class="num">3</td><td>Pos</td><td class="num">4</td><td class="num">1</td><td class="num">1,500</td><td class="num">25</td><td class="num">2</td><td>Thermal receipt printing path</td></tr>
+          <tr><td class="num">4</td><td>Product</td><td class="num">13</td><td class="num">6</td><td class="num">2,835</td><td class="num">19</td><td class="num">0</td><td>&mdash;</td></tr>
+          <tr><td class="num">5</td><td>HumanResource</td><td class="num">12</td><td class="num">10</td><td class="num">4,474</td><td class="num">28</td><td class="num">0</td><td>No security annotations to convert</td></tr>
+          <tr><td class="num">6</td><td>Report</td><td class="num">2</td><td class="num">0</td><td class="num">7,352</td><td class="num">2</td><td class="num">1</td><td>83 templates, almost no PHP</td></tr>
+          <tr><td class="num">7</td><td>DomainUser</td><td class="num">18</td><td class="num">17</td><td class="num">7,785</td><td class="num">59</td><td class="num">6</td><td>Customer records; tenancy-adjacent</td></tr>
+          <tr><td class="num">8</td><td>Appearance</td><td class="num">19</td><td class="num">10</td><td class="num">9,192</td><td class="num">15</td><td class="num">1</td><td>Theming; heavy on <code>array</code> columns</td></tr>
+          <tr><td class="num">9</td><td>Restaurant</td><td class="num">16</td><td class="num">18</td><td class="num">11,098</td><td class="num">72</td><td class="num">7</td><td>&mdash;</td></tr>
+          <tr><td class="num">10</td><td>Content</td><td class="num">69</td><td class="num">36</td><td class="num">13,011</td><td class="num">96</td><td class="num">0</td><td>CMS; carries the comment entities</td></tr>
+          <tr><td class="num">11</td><td>DoctorPrescription</td><td class="num">12</td><td class="num">9</td><td class="num">14,252</td><td class="num">56</td><td class="num">2</td><td>&mdash;</td></tr>
+          <tr><td class="num">12</td><td>Tool</td><td class="num">58</td><td class="num">43</td><td class="num">14,958</td><td class="num">134</td><td class="num">5</td><td>Settings; holds <code>GlobalOption</code></td></tr>
+          <tr><td class="num">13</td><td>Medicine</td><td class="num">26</td><td class="num">34</td><td class="num">24,765</td><td class="num">127</td><td class="num">5</td><td>Pharmacy</td></tr>
+          <tr><td class="num">14</td><td>Accounting</td><td class="num">45</td><td class="num">41</td><td class="num">38,295</td><td class="num">170</td><td class="num">25</td><td>Most <code>@Secure</code> annotations in the app</td></tr>
+          <tr><td class="num">15</td><td>Inventory</td><td class="num">56</td><td class="num">42</td><td class="num">39,483</td><td class="num">177</td><td class="num">13</td><td>&mdash;</td></tr>
+          <tr><td class="num">16</td><td>Business</td><td class="num">32</td><td class="num">29</td><td class="num">39,636</td><td class="num">138</td><td class="num">18</td><td>&mdash;</td></tr>
+          <tr><td class="num">17</td><td>Hospital</td><td class="num">35</td><td class="num">38</td><td class="num">41,925</td><td class="num">201</td><td class="num">12</td><td>Largest template surface; most recent active work</td></tr>
+        </tbody>
+        <caption>Customer (9 controllers, 5,730 template lines) folds into DomainUser. Bindu is the mobile API layer and ships in phase 03.</caption>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="risks">
+    <div class="section-head">
+      <p class="eyebrow">07 &middot; Open risks</p>
+      <h2>What could still go wrong</h2>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Risk</th><th>Why it matters</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>No test suite</strong></td>
+            <td>Nothing catches a regression in 700k lines of untested code</td>
+            <td>The golden-response harness covers the 96 mobile endpoints. Extend the same record-and-diff approach to the highest-traffic HTML routes before porting each module — it is cheaper than retrofitting unit tests</td>
+          </tr>
+          <tr>
+            <td><strong>Symfony 8.1 reaches EOL Jan 2027</strong></td>
+            <td>The migration will outlive the target release</td>
+            <td>Minor Symfony upgrades are backward compatible. Plan to ride 8.2 → 8.3 → 8.4, which is the next LTS (Nov 2027). Budget a day per bump, not a project</td>
+          </tr>
+          <tr>
+            <td><strong>Shared database, two writers</strong></td>
+            <td>Both apps write the same tables during the transition</td>
+            <td>Schema changes are additive-only until decommission. Never let a port alter a column the legacy app still reads</td>
+          </tr>
+          <tr>
+            <td><strong>Serialized <code>array</code> columns</strong></td>
+            <td>24 columns readable only through the compatibility type</td>
+            <td>Keep <code>LegacyArrayType</code> registered for the full migration. Convert to <code>json</code> later as a deliberate backfill with its own rollback</td>
+          </tr>
+          <tr>
+            <td><strong>Mobile clients cannot be updated in lockstep</strong></td>
+            <td>A shape change breaks apps already in users' hands</td>
+            <td><code>compare.php</code> gates every API deploy; treat a drift report as a release blocker, not a warning</td>
+          </tr>
+          <tr>
+            <td><strong>Password rehashing is one-way</strong></td>
+            <td>Users who never log in during the transition keep <code>sha512</code> hashes</td>
+            <td>Expected and safe — the migrating hasher verifies both formats indefinitely. Do not remove the legacy hasher on a schedule; remove it when telemetry shows zero legacy hashes remain</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note">
+      Not yet possible in this environment: the legacy app has no <code>vendor/</code>, no
+      <code>app/config/parameters.yml</code> and no reachable database, so nothing has been run against real data.
+      Golden-response capture and any schema comparison need a pointer at a staging environment.
+    </p>
+  </section>
+
+  <footer>
+    <span>next/ — Symfony 8.1.6 · PHP 8.5.6 · Doctrine ORM 3.6.8</span>
+    <span>migration/bin/port.sh — 7 steps, idempotent</span>
+    <span>Phase 1 verified 3 Sep 2026</span>
+  </footer>
+
+</div>
