@@ -335,7 +335,9 @@
       A ten-module multi-tenant SaaS — hospital, pharmacy, restaurant, inventory, accounting —
       running on a framework that reached end of life in November 2018. This is the route off it:
       a strangler migration onto a parallel Symfony&nbsp;8.1 application sharing the same MySQL database,
-      with modules moved one at a time behind the reverse proxy. <strong>Phase&nbsp;1 is built and verified.</strong>
+      with modules moved one at a time behind the reverse proxy.
+      <strong>Every mechanically portable layer is now ported: the application compiles, lints,
+      loads 3,484 routes and passes its tests on Symfony&nbsp;8.1 / PHP&nbsp;8.5.</strong>
     </p>
 
     <dl class="shift">
@@ -360,7 +362,7 @@
   <section id="shipped">
     <div class="section-head">
       <p class="eyebrow">01 &middot; Shipped and verified</p>
-      <h2>The entity graph is ported</h2>
+      <h2>The application builds</h2>
     </div>
     <p class="prose">
       The whole Doctrine model moved in one pass, because it had to. Measured across the tree,
@@ -371,20 +373,22 @@
     </p>
 
     <div class="checks">
-      <div><b>686</b><span>files ported to <code>App\</code></span></div>
+      <div><b>1,562</b><span>PHP files ported to <code>App\</code></span></div>
+      <div><b>3,484</b><span>routes loading</span></div>
+      <div><b>1,754</b><span>templates ported</span></div>
+      <div><b>6,507</b><span>Doctrine aliases &rarr; FQCN</span></div>
+      <div><b>521</b><span><code>@Secure</code> &rarr; <code>#[IsGranted]</code></span></div>
       <div><b>8,388</b><span>ORM attributes generated</span></div>
-      <div><b>432</b><span>Gedmo attributes converted</span></div>
       <div><b>339</b><span>metadata definitions loaded</span></div>
-      <div><b>309</b><span>entities validating clean</span></div>
       <div><b>0</b><span>syntax errors on PHP 8.5</span></div>
     </div>
 
     <p class="note">
-      Reproduced by <code>migration/bin/port.sh</code>, which is idempotent — it rebuilds
-      <code>next/src/</code> from the untouched SF&nbsp;2.8 tree in seven steps and re-runs safely after any
-      change to the legacy code. Acceptance is <code>next/bin/validate-mapping.php</code>, which boots the
-      kernel and loads every Doctrine metadata definition without touching a database.
-      The 30 entities still reporting errors are pre-existing defects, covered in section&nbsp;04.
+      Reproduced by <code>migration/bin/migrate.sh</code> — nine idempotent steps from the untouched
+      SF&nbsp;2.8 tree to a building app, ending in a verify block that greps for leftover legacy
+      constructs and then <em>actually</em> compiles the container, lints it, counts routes and runs the
+      suite. Container lint passes; 20&nbsp;tests / 33&nbsp;assertions green. The 30 entities still
+      reporting mapping errors are pre-existing defects, covered in section&nbsp;04.
     </p>
   </section>
 
@@ -566,6 +570,42 @@
         </div>
       </div>
       <div class="find">
+        <div class="count sev">147</div>
+        <div>
+          <h3>Duplicate route names</h3>
+          <p>
+            Symfony keeps the last route declared with a given name and drops the rest silently &mdash; Symfony&nbsp;2
+            did the same, and 145 of these are in the legacy tree already. One matters:
+            <code>/android-api-portal/apps</code> is shadowed by an identically named route in
+            <code>apiPoskeeper.yml</code>, so one of the 96 &ldquo;wire-locked&rdquo; mobile endpoints is
+            <strong>already unreachable in production today</strong>.
+          </p>
+        </div>
+      </div>
+      <div class="find">
+        <div class="count">205</div>
+        <div>
+          <h3>Aliases naming entities that do not exist</h3>
+          <p>
+            <code>Blog</code>, <code>Admission</code>, <code>MallConnect</code>, <code>Team</code>,
+            <code>MegaMenu</code>, <code>Course</code>, <code>InstituteLevel</code> are referenced by controllers
+            and repositories but exist nowhere in the tree. Dead routes that fail at runtime. Left flagged rather
+            than pointed at a plausible-looking wrong entity.
+          </p>
+        </div>
+      </div>
+      <div class="find">
+        <div class="count">1</div>
+        <div>
+          <h3>Corrupted entity alias</h3>
+          <p>
+            <code>getRepository('SettinMallShopTypegContentBundle:MallConnect')</code> &mdash; an old bad
+            find-replace spliced <code>MallShopType</code> into the middle of <code>SettingContentBundle</code>.
+            Throws <code>Unknown Entity namespace alias</code> whenever that route is hit.
+          </p>
+        </div>
+      </div>
+      <div class="find">
         <div class="count">2</div>
         <div>
           <h3>Namespace and registration inconsistencies</h3>
@@ -605,10 +645,10 @@
         </div>
       </div>
 
-      <div class="phase">
+      <div class="phase shipped">
         <div class="n">02</div>
         <div>
-          <div class="hd"><h3>Authentication and tenancy</h3></div>
+          <div class="hd"><h3>Authentication and tenancy</h3><span class="pill done">shipped</span></div>
           <p>
             The gate for everything else — no module can move until a request can be authenticated in the new app.
           </p>
@@ -625,7 +665,7 @@
       <div class="phase">
         <div class="n">03</div>
         <div>
-          <div class="hd"><h3>Mobile APIs</h3><span class="pill rewrite">wire-locked</span></div>
+          <div class="hd"><h3>Mobile APIs</h3><span class="pill rewrite">routed, contract unverified</span></div>
           <p>
             96 endpoints across <code>/flutter-api</code> (66), <code>/android-api</code> (24) and
             <code>/android-api-portal</code> (6), with shipped clients that cannot be updated in lockstep.
@@ -643,7 +683,7 @@
       <div class="phase">
         <div class="n">04</div>
         <div>
-          <div class="hd"><h3>Shared presentation layer</h3></div>
+          <div class="hd"><h3>Shared presentation layer</h3><span class="pill done">templates ported</span></div>
           <p>
             Built once, consumed by every module port that follows: base layouts on Twig 3, the
             <code>Bundle:Dir:file.twig</code> → <code>@Dir/file.html.twig</code> rename across 1,854 references,
@@ -656,7 +696,7 @@
       <div class="phase">
         <div class="n">05</div>
         <div>
-          <div class="hd"><h3>Module ports</h3></div>
+          <div class="hd"><h3>Module ports</h3><span class="pill rewrite">mechanical done</span></div>
           <p>
             Ten modules in the order set out in section 06, smallest first to prove the pipeline before the
             large modules commit to it. Each port converts its controllers to autowired services, its form types to the
