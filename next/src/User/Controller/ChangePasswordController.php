@@ -11,6 +11,8 @@
 
 namespace App\User\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Event\FormEvent;
@@ -29,6 +31,12 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class ChangePasswordController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly EventDispatcherInterface $eventDispatcher,
+    ) {
+    }
+
 
 
     /**
@@ -45,7 +53,7 @@ class ChangePasswordController extends AbstractController
         }
 
         /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher = $this->eventDispatcher;
 
         $event = new GetResponseUserEvent($user, $request);
         $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_INITIALIZE, $event);
@@ -55,6 +63,7 @@ class ChangePasswordController extends AbstractController
         }
 
         /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $formFactory = $this->get('fos_user.change_password.form.factory');
 
         $form = $formFactory->createForm();
@@ -63,11 +72,12 @@ class ChangePasswordController extends AbstractController
         $form->handleRequest($request);
         if ($form->isValid()) {
             /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $userManager = $this->get('fos_user.user_manager');
             $event = new FormEvent($form, $request);
             $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_SUCCESS, $event);
             $userManager->updateUser($user);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $data = $request->request->all();
             $password = $data['fos_user_change_password_form']['plainPassword']['first'];
             $user->setAppPassword($password);
@@ -103,7 +113,7 @@ class ChangePasswordController extends AbstractController
         }
 
         /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher = $this->eventDispatcher;
 
         $event = new GetResponseUserEvent($user, $request);
         $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_INITIALIZE, $event);
@@ -113,6 +123,7 @@ class ChangePasswordController extends AbstractController
         }
 
         /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $formFactory = $this->get('fos_user.change_password.form.factory');
 
         $form = $formFactory->createForm();
@@ -122,6 +133,7 @@ class ChangePasswordController extends AbstractController
 
         if ($form->isValid()) {
             /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $userManager = $this->get('fos_user.user_manager');
 
             $event = new FormEvent($form, $request);

@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -11,6 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ApplicationPricingController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all ApplicationPricing entities.
@@ -18,6 +24,7 @@ class ApplicationPricingController extends AbstractController
      */
     public function indexAction()
     {
+        // TODO(migration): AbstractController::getDoctrine() was removed; inject ManagerRegistry.
         $em = $this->getDoctrine();
 
         $apps = $em->getRepository(\App\Tool\Entity\AppModule::class)->findBy(['status'=>1],['name'=>'ASC']);
@@ -34,7 +41,7 @@ class ApplicationPricingController extends AbstractController
     public function inlineAppAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\AppModule::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Item entity.');
@@ -47,7 +54,7 @@ class ApplicationPricingController extends AbstractController
     public function inlineSyndicateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\SyndicateModule::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Item entity.');
@@ -60,7 +67,7 @@ class ApplicationPricingController extends AbstractController
     public function inlineModuleAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\Module::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Item entity.');

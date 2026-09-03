@@ -2,6 +2,8 @@
 
 namespace App\Appearance\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Appearance\Entity\Menu;
@@ -17,6 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class MenuController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all GlobalOption entities.
@@ -24,7 +32,7 @@ class MenuController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findAll();
 
@@ -39,7 +47,7 @@ class MenuController extends AbstractController
      */
     public function menuManageAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $id = $this->getUser()->getGlobalOption()->getId();
         $entities = $em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['globalOption'=>$id]);
         $form = $this->createEditForm($id);
@@ -60,7 +68,7 @@ class MenuController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $option = $this->getUser()->getGlobalOption();
             $entity->setGlobalOption($option);
             $entity->setMode("custom");
@@ -116,7 +124,7 @@ class MenuController extends AbstractController
      */
     public function modifyAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['globalOption'=>$globalOption],['sorting'=>'asc']);
         $form = $this->createEditForm($globalOption->getMenu());
@@ -155,8 +163,8 @@ class MenuController extends AbstractController
     public function updateAction(Request $request, $id)
     {
         $data = $request->request->all();
-        $this->getDoctrine()->getRepository(\App\Appearance\Entity\Menu::class)->updateMenu($data);
-        $this->get('session')->getFlashBag()->add(
+        $this->em->getRepository(\App\Appearance\Entity\Menu::class)->updateMenu($data);
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         $referer = $request->headers->get('referer');
@@ -172,7 +180,7 @@ class MenuController extends AbstractController
     {
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($id);
 
         if (!$entity) {
@@ -186,7 +194,7 @@ class MenuController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('menu'));
@@ -199,7 +207,7 @@ class MenuController extends AbstractController
     public function statusAction( $globalOption, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['globalOption'=>$globalOption,'id'=>$id]);
 
         if (!$entity) {
@@ -213,7 +221,7 @@ class MenuController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('menu_manage'));
@@ -221,7 +229,7 @@ class MenuController extends AbstractController
 
     public function resetMenuAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $globalOption->getId();
         $entities = $em->getRepository(\App\Appearance\Entity\MenuCustom::class)->findAll();
@@ -241,7 +249,7 @@ class MenuController extends AbstractController
                 $em->flush($menu);
             }
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Reset menu has been updated successfully"
         );
         return $this->redirect($this->generateUrl('menu_manage'));

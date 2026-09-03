@@ -10,6 +10,9 @@
 
 namespace App\User\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\User\Entity\User;
 use App\User\Form\Type\UserNotificationFormType;
@@ -23,6 +26,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ManageUserController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
     public function indexAction(Request $request, $page)
     {
         $request->query->set('page', $page);
@@ -36,11 +46,11 @@ class ManageUserController extends AbstractController
     {
         $query = $this->getUserManager()->getUserQuery();
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
 
         return $paginator->paginate(
             $query,
-            $this->get('request')->query->get('page', 1),
+            $this->requestStack->getCurrentRequest()->query->get('page', 1),
             10,
             ['distinct'=>false]
         );
@@ -52,6 +62,7 @@ class ManageUserController extends AbstractController
 
         $user = new User();//$userManager->createUser();
 
+	    // TODO(migration): AbstractController::get() was removed; inject this service.
 	    $service = $this->get('Core_user.registration.form.type');
 
         $form = $this->createForm($service, $user);
@@ -63,7 +74,7 @@ class ManageUserController extends AbstractController
                 $user->setEnabled(true);
                 $userManager->updateUser($user);
 
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'user-success',
                     'User Created Successfully!'
                 );
@@ -81,6 +92,7 @@ class ManageUserController extends AbstractController
     {
         $userManager = $this->getUserManager();
 
+	    // TODO(migration): AbstractController::get() was removed; inject this service.
 	    $service = $this->get('Core_user.registration.form.type');
 	    $form = $this->createForm($service, $user);
 
@@ -92,7 +104,7 @@ class ManageUserController extends AbstractController
                 $user->isEnabled();
                 $userManager->updateUser($user);
 
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'user-success',
                     'User Updated Successfully!'
                 );
@@ -128,12 +140,12 @@ class ManageUserController extends AbstractController
                 $this->deleteAvatar($user);
                 $userManager->deleteUser($user);
 
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'user-success',
                     'User Deleted Successfully!'
                 );
             } else {
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'user-error',
                     'Delete failed! Please Resubmit your form'
                 );
@@ -181,7 +193,7 @@ class ManageUserController extends AbstractController
 
     public function findUserByMobile($mobile)
     {
-       $profile = $this->getDoctrine()->getRepository(\App\User\Entity\Profile::class)->findBy(['mobile'=>$mobile]);
+       $profile = $this->em->getRepository(\App\User\Entity\Profile::class)->findBy(['mobile'=>$mobile]);
         if(!empty($profile)){
             return $profile->getId();
         }
@@ -200,7 +212,7 @@ class ManageUserController extends AbstractController
 
                 if ($this->uploadAvatar($request->files->get('avatar'), $user)) {
 
-                    $this->get('session')->getFlashBag()->add(
+                    $this->requestStack->getSession()->getFlashBag()->add(
                         'user-success',
                         'New Avatar saved Successfully!'
                     );
@@ -230,7 +242,7 @@ class ManageUserController extends AbstractController
 
                 $this->getEventDispatcher()->dispatch(DocudexUserEvent::USER_NOTIFICATION_SETTINGS_UPDATED, new UserEvent($user, $request));
 
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'user-success',
                     'Settings Updated Successfully!'
                 );
@@ -266,12 +278,12 @@ class ManageUserController extends AbstractController
                 new FilterUserResponseEvent($user, $request, $response)
             );
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'user-success',
                 'Password updated successfully!!'
             );
         } else {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'user-error',
                 'Password updated failed! Please Resubmit your form'
             );
@@ -310,6 +322,7 @@ class ManageUserController extends AbstractController
            return false;
         }
 
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $uploader = $this->get('docudex.core.service.uploader');
 
         $uploadedFileInfo = $uploader
@@ -339,6 +352,7 @@ class ManageUserController extends AbstractController
     private function getAvatarBaseDirectory($baseDire = null)
     {
         if($baseDire == null) {
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $pathConfigurator = $this->get('docudex.core.service.path.configurator');
             $baseDire = $pathConfigurator->getPathFromKey('user.profile.image', true);
         }
@@ -352,6 +366,7 @@ class ManageUserController extends AbstractController
 
 	private function getUserManager()
 	{
+		// TODO(migration): AbstractController::get() was removed; inject this service.
 		return $this->get('Core.user_manager');
 	}
 }

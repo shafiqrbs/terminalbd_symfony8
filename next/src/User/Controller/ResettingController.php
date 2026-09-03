@@ -11,6 +11,10 @@
 
 namespace App\User\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use App\Tool\Service\ToolManager;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\Tool\Event\PasswordChangeSmsEvent;
@@ -32,6 +36,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ResettingController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly ToolManager $toolManager,
+        private readonly EventDispatcherInterface $eventDispatcher,
+    ) {
+    }
+
     /**
      * Request reset user password: show form
      */
@@ -54,6 +66,7 @@ class ResettingController extends AbstractController
         $username = $request->request->get('username');
 
 
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $user = $this->get('fos_user.user_manager')->findUserByUsernameOrEmail($username);
 
         if (null === $user) {
@@ -68,12 +81,15 @@ class ResettingController extends AbstractController
 
         if (null === $user->getConfirmationToken()) {
             /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $tokenGenerator = $this->get('fos_user.util.token_generator');
             $user->setConfirmationToken($tokenGenerator->generateToken());
         }
 
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $this->get('fos_user.mailer')->sendResettingEmailMessage($user);
         $user->setPasswordRequestedAt(new DateTime());
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $this->get('fos_user.user_manager')->updateUser($user);
 
         return new RedirectResponse($this->generateUrl('fos_user_resetting_check_email',
@@ -105,11 +121,13 @@ class ResettingController extends AbstractController
     {
 
         /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $formFactory = $this->get('fos_user.resetting.form.factory');
         /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $userManager = $this->get('fos_user.user_manager');
         /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher = $this->eventDispatcher;
 
         $user = $userManager->findUserByConfirmationToken($token);
 
@@ -174,8 +192,8 @@ class ResettingController extends AbstractController
     {
 
         $intlMobile = $request->request->get('username');
-        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($intlMobile);
-        $profile = $this->getDoctrine()->getRepository(\App\User\Entity\Profile::class)->findOneBy(['mobile' => $mobile]);
+        $mobile = $this->toolManager->specialExpClean($intlMobile);
+        $profile = $this->em->getRepository(\App\User\Entity\Profile::class)->findOneBy(['mobile' => $mobile]);
         if(empty($profile)){
 
             $detect = new \Frontend\FrontentBundle\Service\MobileDetect();
@@ -193,8 +211,9 @@ class ResettingController extends AbstractController
             $entity = $profile->getUser();
             $a = mt_rand(1000,9999);
             $entity->setPlainPassword($a);
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $this->get('fos_user.user_manager')->updateUser($entity);
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Send sms on your mobile"
             );
             $dispatcher = $this->container->get('event_dispatcher');

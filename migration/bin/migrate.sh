@@ -33,25 +33,29 @@ rector_rc=0
 [ "$rector_rc" -eq 0 ] || echo "!! rector exited $rector_rc - see errors above"
 
 echo
-echo "############ 5. return types required by SF8 / Doctrine 3 base classes ############"
+echo "############ 5. controllers: AbstractController + constructor injection ############"
+$PHP migration/bin/port-controllers.php next/src
+
+echo
+echo "############ 6. return types required by SF8 / Doctrine 3 base classes ############"
 $PHP migration/bin/fix-signatures.php next/src
 
 echo
-echo "############ 6. JMS @Secure -> #[IsGranted] ############"
+echo "############ 7. JMS @Secure -> #[IsGranted] ############"
 $PHP migration/bin/secure-to-isgranted.php next/src
 
 echo
-echo "############ 7. Doctrine short-name aliases -> FQCN ############"
+echo "############ 8. Doctrine short-name aliases -> FQCN ############"
 $PHP migration/bin/fix-dql-aliases.php next/src 2>&1 | head -4 || true
 
 echo
-echo "############ 8. routing ############"
+echo "############ 9. routing ############"
 rm -rf next/config/routes/legacy
 $PHP migration/bin/port-routing.php
 $PHP migration/bin/port-auth-routes.php 2>&1 | head -1 || true
 
 echo
-echo "############ 9. container config ############"
+echo "############ 10. container config ############"
 $PHP migration/bin/port-parameters.php
 $PHP migration/bin/gen-service-excludes.php
 
@@ -76,4 +80,14 @@ echo "-- does it actually build? --"
 (cd next && $PHP bin/console lint:container 2>&1 | tail -2 | head -1)
 routes=$( (cd next && $PHP bin/console debug:router --format=json 2>/dev/null) | $PHP -r '$d=json_decode(stream_get_contents(STDIN),true); echo $d?count($d):0;')
 echo "routes loaded: $routes"
+loadable=$( (cd next && $PHP -r '
+require "vendor/autoload.php";
+$ok=0;$bad=0;
+foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator("src", FilesystemIterator::SKIP_DOTS)) as $f) {
+  if ($f->getExtension()!=="php" || !str_contains($f->getPathname(),"/Controller/")) continue;
+  $cls="App\\".str_replace("/","\\",substr($f->getPathname(),4,-4));
+  try { class_exists($cls) ? $ok++ : $bad++; } catch (\Throwable $e) { $bad++; }
+}
+echo "$ok/".($ok+$bad);') )
+echo "controllers loadable: $loadable"
 (cd next && $PHP vendor/bin/phpunit 2>&1 | tail -1)

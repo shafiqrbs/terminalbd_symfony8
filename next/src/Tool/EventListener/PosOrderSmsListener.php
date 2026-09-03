@@ -7,7 +7,7 @@
  */
 
 namespace App\Tool\EventListener;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use App\Tool\Event\PosOrderSmsEvent;
 use App\Tool\Service\SmsGateWay;
@@ -22,7 +22,7 @@ class PosOrderSmsListener extends BaseSmsAwareListener
 
     protected $gateway;
 
-    public function  __construct(private readonly Registry $doctrine, SmsGateWay $gateway)
+    public function  __construct(private readonly ManagerRegistry $doctrine, SmsGateWay $gateway)
     {
         $this->gateway = $gateway;
         $this->em = $this->doctrine->getManager();

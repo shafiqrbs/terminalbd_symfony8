@@ -4,6 +4,8 @@ namespace App\Pos\Controller;
 
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Inventory\Entity\InventoryConfig;
 use App\Inventory\Entity\Item;
 use App\Inventory\Entity\PurchaseItem;
@@ -11,7 +13,7 @@ use App\Inventory\Entity\PurchaseItemSerial;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Mike42\Escpos\Printer;
 use App\Tool\Entity\GlobalOption;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,8 +28,14 @@ use App\Pos\Service\PosItemManager;
  * InvoiceController controller.
  *
  */
-class PosController extends Controller
+class PosController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function invoiceModeAction($mode){
 
@@ -44,10 +52,10 @@ class PosController extends Controller
     public function indexAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $terminal = $user->getGlobalOption();
-        $entity = $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->insert($user);
+        $entity = $this->em->getRepository(\App\Pos\Entity\Pos::class)->insert($user);
         $form = $this->createTemporaryForm($entity);
         $categories = $em->getRepository(\App\Inventory\Entity\Item::class)->getApiCategory($terminal);
         $cart = new Cart($request->getSession());
@@ -85,18 +93,18 @@ class PosController extends Controller
         $data = "";
         $terminal = $user->getGlobalOption();
         $mainApp = !empty($terminal->getMainApp()) ? $terminal->getMainApp()->getSlug() : "";
-        if ($this->get('security.authorization_checker')->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
+        if ($this->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
             $config = $terminal->getInventoryConfig();
-            $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($terminal);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
+            $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($terminal);
+        }elseif ($this->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
             $config = $terminal->getRestaurantConfig();
-            $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($terminal);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
+            $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($terminal);
+        }elseif ($this->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
             $config = $terminal->getMedicineConfig();
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($terminal);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($terminal);
+        }elseif ($this->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
             $config = $terminal->getBusinessConfig();
-            $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($terminal);
+            $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($terminal);
         }
         $response->headers->set('invoiceMode', 'list', false);
         $invoiceMode = $request->cookies->get('invoiceMode');
@@ -126,18 +134,18 @@ class PosController extends Controller
         $arrs = array('category'=>$id);
         $terminal = $user->getGlobalOption();
         $mainApp = !empty($terminal->getMainApp()) ? $terminal->getMainApp()->getSlug() : "";
-        if ($this->get('security.authorization_checker')->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
+        if ($this->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
             $config = $terminal->getInventoryConfig();
-            $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($terminal,$arrs);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
+            $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($terminal,$arrs);
+        }elseif ($this->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
             $config = $terminal->getRestaurantConfig();
-            $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($terminal);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
+            $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($terminal);
+        }elseif ($this->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
             $config = $terminal->getMedicineConfig();
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($terminal);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($terminal);
+        }elseif ($this->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
             $config = $terminal->getBusinessConfig();
-            $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($terminal);
+            $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($terminal);
         }
         $response->headers->set('invoiceMode', 'list', false);
         $invoiceMode = $request->cookies->get('invoiceMode');
@@ -164,7 +172,7 @@ class PosController extends Controller
         $user = $this->getUser();
         $barcode = $_REQUEST['batch'];
         $config = $user->getGlobalOptoion()->getInventoryConfig();
-        $purchaseItem = $this->getDoctrine()->getRepository(PurchaseItem::class)->find($barcode);
+        $purchaseItem = $this->em->getRepository(PurchaseItem::class)->find($barcode);
         $terminal = $user->getGlobalOption();
         $html = $this->renderView(
             'Pos/Pos/serialNo.html.twig', array(
@@ -200,7 +208,7 @@ class PosController extends Controller
             'serial' => $serial,
         );
         $cart->insert($data);
-        $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
         $array = $this->returnCartSummaryAjaxData($cart);
         return new Response(json_encode($array));
 
@@ -216,8 +224,8 @@ class PosController extends Controller
         $barcode = trim($request->request->get('barcode'));
         $purchaseItem = "";
         if($barcode){
-            $serial = $this->getDoctrine()->getRepository(PurchaseItemSerial::class)->returnPurchaseItemSerialDetails($config,$barcode);
-            $purchaseItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->returnPurchaseItemDetails($config, $barcode);
+            $serial = $this->em->getRepository(PurchaseItemSerial::class)->returnPurchaseItemSerialDetails($config,$barcode);
+            $purchaseItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->returnPurchaseItemDetails($config, $barcode);
             if($serial){
                 $data = $this->getBracodeStockPurchaseItemSerial($cart, $serial);
                 return new Response(json_encode($data));
@@ -227,7 +235,7 @@ class PosController extends Controller
                     return new Response(json_encode($data));
                 }
             }else{
-                $product = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig' => $config, 'barcode' => $barcode));
+                $product = $this->em->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig' => $config, 'barcode' => $barcode));
                 if ($product) {
                     $data = $this->getBracodeStockItem($cart,$product);
                     return new Response(json_encode($data));
@@ -265,7 +273,7 @@ class PosController extends Controller
                 );
             }
             $cart->insert($data);
-            $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
+            $this->em->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
             $array = $this->returnCartSummaryAjaxData($cart);
             return $array;
         }
@@ -276,12 +284,12 @@ class PosController extends Controller
 
 
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $purchaseItemQuantity = $this->getDoctrine()->getRepository(PurchaseItem::class)->getPurchaseItemRemaining($purchaseItem->getId());
+        $purchaseItemQuantity = $this->em->getRepository(PurchaseItem::class)->getPurchaseItemRemaining($purchaseItem->getId());
 
         if($purchaseItem and $purchaseItemQuantity > 0){
 
             /* @var $product Item */
-            $purchaseItem = $this->getDoctrine()->getRepository(PurchaseItem::class)->find($existBarcode);
+            $purchaseItem = $this->em->getRepository(PurchaseItem::class)->find($existBarcode);
             $product = $purchaseItem->getItem();
             $salesPrice = $product->getDiscountPrice() > 0 ? $product->getDiscountPrice() : $product->getSalesPrice();
             $productUnit = ($product->getMasterItem()) ? $product->getMasterItem()->getUnit() : '';
@@ -295,7 +303,7 @@ class PosController extends Controller
                 'serial' => '',
             );
             $cart->insert($data);
-            $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
+            $this->em->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
             $array = $this->returnCartSummaryAjaxData($cart);
             return $array;
         }
@@ -336,7 +344,7 @@ class PosController extends Controller
                 );
             }
             $cart->insert($data);
-            $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
+            $this->em->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
             $array = $this->returnCartSummaryAjaxData($cart);
             return $array;
         }
@@ -355,12 +363,12 @@ class PosController extends Controller
         $option = "";
 
         if($item > 0){
-            $product = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->find($item);
+            $product = $this->em->getRepository(\App\Inventory\Entity\Item::class)->find($item);
         }else{
-            $product = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig' => $config, 'barcode' => $barcode));
+            $product = $this->em->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig' => $config, 'barcode' => $barcode));
         }
         if($product and $product->getPurchaseItems()){
-            $purchaseItems = $this->getDoctrine()->getRepository(PurchaseItem::class)->getPurchaseItemRemainingProduct($product);
+            $purchaseItems = $this->em->getRepository(PurchaseItem::class)->getPurchaseItemRemainingProduct($product);
             $purchaseItemOption .="<option>--Select Barcode--</option>";
             foreach ($purchaseItems as $option){
                 $remain = ($option['quantity'] - $option['salesQuantity']);
@@ -370,7 +378,7 @@ class PosController extends Controller
 
         if($product and $product->getItemSerials()){
 
-            $purchaseItems = $this->getDoctrine()->getRepository(PurchaseItemSerial::class)->getSerialProducts($product);
+            $purchaseItems = $this->em->getRepository(PurchaseItemSerial::class)->getSerialProducts($product);
             $serialOption .="<option>--Select Serial No--</option>";
             foreach ($purchaseItems as $option){
                 $serialOption .="<option value='{$option['id']}'>{$option['barcode']}</option>";
@@ -397,17 +405,17 @@ class PosController extends Controller
         $price = isset($data['price']) ? $data['price']:'';
         $item = $data['item'];
         $quantity = $data['quantity'];
-        $product = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig' => $config,'id' => $item));
+        $product = $this->em->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig' => $config,'id' => $item));
 
         if($serialNo){
-            $serial = $this->getDoctrine()->getRepository(PurchaseItemSerial::class)->find($serialNo);
+            $serial = $this->em->getRepository(PurchaseItemSerial::class)->find($serialNo);
             if($serial) {
                 $result = $this->getBracodeStockPurchaseItemSerial($cart, $serial);
                 return new Response(json_encode($result));
             }
         }elseif($pItem){
-            $purchaseItem = $this->getDoctrine()->getRepository(PurchaseItem::class)->find($pItem);
-            $purchaseItemQuantity = $this->getDoctrine()->getRepository(PurchaseItem::class)->getPurchaseItemRemaining($pItem);
+            $purchaseItem = $this->em->getRepository(PurchaseItem::class)->find($pItem);
+            $purchaseItemQuantity = $this->em->getRepository(PurchaseItem::class)->getPurchaseItemRemaining($pItem);
             if ($purchaseItem and $purchaseItemQuantity > 0) {
                 $result = $this->getBracodeStockPurchaseItem($cart, $purchaseItem,$quantity);
                 return new Response(json_encode($result));
@@ -426,18 +434,18 @@ class PosController extends Controller
         /* @var $terminal GlobalOption */
         $terminal = $user->getGlobalOption();
         $mainApp = !empty($terminal->getMainApp()) ? $terminal->getMainApp()->getSlug() : "";
-        if ($this->get('security.authorization_checker')->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
+        if ($this->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
             $config = $terminal->getInventoryConfig();
-            $items = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->searchAutoCompleteAllItem($item,$config);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
+            $items = $this->em->getRepository(\App\Inventory\Entity\Item::class)->searchAutoCompleteAllItem($item,$config);
+        }elseif ($this->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
             $config = $terminal->getRestaurantConfig();
-            $items = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->searchAutoComplete($item,$config);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
+            $items = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->searchAutoComplete($item,$config);
+        }elseif ($this->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
             $config = $terminal->getMedicineConfig();
-            $items = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoComplete($item,$config);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
+            $items = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoComplete($item,$config);
+        }elseif ($this->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
             $config = $terminal->getBusinessConfig();
-            $items = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->searchAutoComplete($item,$config);
+            $items = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->searchAutoComplete($item,$config);
         }
         return new JsonResponse($items);
     }
@@ -447,17 +455,17 @@ class PosController extends Controller
     {
 
         $cart = new Cart($request->getSession());
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $mode = $_REQUEST['mode'];
         $user = $this->getUser();
         $terminal = $user->getGlobalOption();
-        $setup = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->getMasterSetup($terminal);
+        $setup = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->getMasterSetup($terminal);
         $mainApp = empty($terminal->getMainApp()) ? '' : $terminal->getMainApp()->getSlug();
         $sales = '';
         /* @var $entity Pos */
 
-        $entity = $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
+        $entity = $this->em->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
         $editForm = $this->createTemporaryForm($entity);
         $editForm->handleRequest($request);
         if ($editForm->isValid()) {
@@ -468,12 +476,12 @@ class PosController extends Controller
                 $entity->setSalesBy($this->getUser());
             }
             if (isset($data['customerMobile']) and !empty($data['customerMobile'])) {
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($user->getGlobalOption(), $mobile, $data);
+                $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($user->getGlobalOption(), $mobile, $data);
                 $entity->setCustomer($customer);
             } elseif (isset($data['mobile']) and !empty($data['mobile'])) {
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['mobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(), 'mobile' => $mobile));
+                $mobile = $this->toolManager->specialExpClean($data['mobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(), 'mobile' => $mobile));
                 $entity->setCustomer($customer);
             }else{
                 $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->defaultCustomer($user->getGlobalOption());
@@ -497,34 +505,34 @@ class PosController extends Controller
             $em->flush();
             if(in_array($mode,array('save','print','pos'))){
                 $cart = new Cart($request->getSession());
-                $pos = $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
+                $pos = $this->em->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
                 if($pos->getTotal() > 0){
-                    if ($this->get('security.authorization_checker')->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
-                        $sales =  $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->insertPosSales($terminal,$pos,$cart);
-                    }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
-                        $sales = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($terminal);
-                    }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
-                        $sales = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($terminal);
-                    }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
-                        $sales = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($terminal);
+                    if ($this->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
+                        $sales =  $this->em->getRepository(\App\Inventory\Entity\Sales::class)->insertPosSales($terminal,$pos,$cart);
+                    }elseif ($this->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
+                        $sales = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($terminal);
+                    }elseif ($this->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
+                        $sales = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($terminal);
+                    }elseif ($this->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
+                        $sales = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($terminal);
                     }
                 }
             }elseif ($mode == "save-hold"){
-                $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->insertHold($entity,$cart);
+                $this->em->getRepository(\App\Pos\Entity\Pos::class)->insertHold($entity,$cart);
             }
 
         }
         if(in_array($mainApp,array('inventory','miss','business')) and $entity->getMode() == "pos"){
             $pos = $this->posInventory($entity,$cart);
-            $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->reset($this->getUser());
+            $this->em->getRepository(\App\Pos\Entity\Pos::class)->reset($this->getUser());
             $cart->destroy();
             return new Response($pos);
         }elseif($entity->getMode() == "print" and $sales){
-            $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->reset($this->getUser());
+            $this->em->getRepository(\App\Pos\Entity\Pos::class)->reset($this->getUser());
             $cart->destroy();
             return new Response($sales);
         }else{
-            $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->reset($this->getUser());
+            $this->em->getRepository(\App\Pos\Entity\Pos::class)->reset($this->getUser());
             $cart->destroy();
             return new Response('success');
         }
@@ -536,20 +544,20 @@ class PosController extends Controller
         $user = $this->getUser();
         $terminal = $user->getGlobalOption();
         $mainApp = empty($terminal->getMainApp()) ? '' : $terminal->getMainApp()->getSlug();
-        if ($this->get('security.authorization_checker')->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
+        if ($this->isGranted('ROLE_INVENTORY') and $mainApp == 'inventory') {
             $config = $terminal->getInventoryConfig();
-            $sales =  $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->find($id);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
+            $sales =  $this->em->getRepository(\App\Inventory\Entity\Sales::class)->find($id);
+        }elseif ($this->isGranted('ROLE_RESTAURANT' and $mainApp == 'restaurant')) {
             $config = $terminal->getRestaurantConfig();
-            $sales = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantTableInvoice::class)->find($id);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
+            $sales = $this->em->getRepository(\App\Restaurant\Entity\RestaurantTableInvoice::class)->find($id);
+        }elseif ($this->isGranted('ROLE_MEDICINE') and $mainApp == 'miss') {
             $config = $terminal->getMedicineConfig();
-            $sales = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->find($id);
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
+            $sales = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->find($id);
+        }elseif ($this->isGranted('ROLE_BUSINESS') and $mainApp == 'business') {
             $config = $terminal->getBusinessConfig();
-            $sales = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->find($id);
+            $sales = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->find($id);
         }
-        $inWard = $this->get('settong.toolManageRepo')->intToWords($sales->getPayment());
+        $inWard = $this->toolManager->intToWords($sales->getPayment());
         return $this->render('Pos/Pos/print.html.twig', array(
             'config'                => $config,
             'entity'                => $sales,
@@ -572,7 +580,7 @@ class PosController extends Controller
             'quantity' => $quantity,
         );
         $cart->update($data);
-        $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
         $array = $this->returnCartSummaryAjaxData($cart);
         return new Response(json_encode($array));
 
@@ -581,7 +589,7 @@ class PosController extends Controller
     public function cartCancelAction(Request $request)
     {
         $cart = new Cart($request->getSession());
-        $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->reset($this->getUser());
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->reset($this->getUser());
         $cart->destroy();
         return new Response('success');
 
@@ -589,7 +597,7 @@ class PosController extends Controller
 
     public function deleteAction(Pos $pos)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->remove($pos);
         $em->flush();
         return new Response(json_encode(array('success'=>'delete')));
@@ -601,13 +609,13 @@ class PosController extends Controller
         $terminal = $this->getUser()->getGlobalOption();
         $mainApp = !empty($terminal->getMainApp()) ? $terminal->getMainApp()->getSlug() : "";
         if ($mainApp == 'inventory') {
-            $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->getApiSales($terminal);
+            $entities = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->getApiSales($terminal);
         }elseif ($mainApp == 'restaurant') {
-            $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->getApiSales($terminal);
+            $entities = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->getApiSales($terminal);
         }elseif ($mainApp == 'miss') {
-            $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->getApiSales($terminal);
+            $entities = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->getApiSales($terminal);
         }elseif ($mainApp == 'business') {
-            $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->getApiSales($terminal);
+            $entities = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->getApiSales($terminal);
         }
         $htmlProcess = $this->renderView(
             'Pos/Pos/order.html.twig', array(
@@ -621,7 +629,7 @@ class PosController extends Controller
     public function holdAction(Request $request)
     {
         $terminal = $this->getUser()->getGlobalOption();
-        $holds = $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->findBy(array('terminal'=>$terminal,'mode'=>'save-hold'));
+        $holds = $this->em->getRepository(\App\Pos\Entity\Pos::class)->findBy(array('terminal'=>$terminal,'mode'=>'save-hold'));
         $htmlProcess = $this->renderView(
             'Pos/Pos/hold.html.twig', array(
                 'entities' => $holds,
@@ -634,7 +642,7 @@ class PosController extends Controller
     public function holdReorderAction(Request $request,Pos $pos)
     {
         $cart = new Cart($request->getSession());
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         /* @var $product PosItem */
 
@@ -650,7 +658,7 @@ class PosController extends Controller
         endforeach;
 
         $array = $this->returnCartSummaryAjaxData($cart);
-        $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
         $em->remove($pos);
         $em->flush();
         return new Response(json_encode($array));
@@ -662,17 +670,17 @@ class PosController extends Controller
         $cart = new Cart($request->getSession());
         $cart->remove($product);
         $array = $this->returnCartSummaryAjaxData($cart);
-        $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
         return new Response(json_encode($array));
     }
 
     public function updateTransactionMethodAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $id = $_REQUEST['method'];
-        $method = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(array('name'=>$id));
+        $method = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(array('name'=>$id));
         /* @var $entity Pos */
-        $entity = $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
+        $entity = $this->em->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
         $entity->setTransactionMethod($method);
         $em->persist($entity);
         $em->flush();
@@ -682,11 +690,11 @@ class PosController extends Controller
     public function updateAction(Request $request)
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $cart = new Cart($request->getSession());
         /* @var $entity Pos */
-        $entity = $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
+        $entity = $this->em->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
         $form = $this->createTemporaryForm($entity);
         $form->handleRequest($request);
         $form = $data['pos'];
@@ -701,7 +709,7 @@ class PosController extends Controller
         $entity->setReceive($payment);
         $em->persist($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->update($this->getUser(),$cart);
         $array = $this->returnCartSummaryAjaxData($cart);
         return new Response(json_encode($array));
 
@@ -711,7 +719,7 @@ class PosController extends Controller
     {
         /* @var $entity Pos */
 
-        $entity = $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
+        $entity = $this->em->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
         $subTotal = number_format($cart->total(), 2, '.', '');
         $discount = number_format($entity->getDiscount(), 2, '.', '');
         $percent = number_format($entity->getDiscountCalculation(), 2, '.', '');
@@ -756,7 +764,7 @@ class PosController extends Controller
     public function invoiceLoadAction(Pos $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getinventoryConfig();
         $form = $this->createTemporaryForm($entity);
@@ -789,7 +797,7 @@ class PosController extends Controller
 
     public function returnResultData(Pos $invoice){
 
-        $entity = $this->getDoctrine()->getRepository('InventoryBundle:Pos')->updateInvoiceTotalPrice($invoice);
+        $entity = $this->em->getRepository('InventoryBundle:Pos')->updateInvoiceTotalPrice($invoice);
         $process = empty($entity->getProcess()) ? "Free" : $entity->getProcess();
         $htmlProcess = $this->renderView(
             'Pos/TableInvoice/ajaxTableItem.html.twig', array(
@@ -813,10 +821,10 @@ class PosController extends Controller
 
     public function invoiceProcessAction(Pos $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $process = $_REQUEST['process'];
         if($process == "Free"){
-            $this->getDoctrine()->getRepository('InventoryBundle:Pos')->resetData($invoice);
+            $this->em->getRepository('InventoryBundle:Pos')->resetData($invoice);
             $result = $this->returnResultData($invoice);
             return new Response(json_encode($result));
         }else{
@@ -838,10 +846,10 @@ class PosController extends Controller
     public function addProductAction($product)
     {
         $id = $_REQUEST['invoice'];
-        $invoice = $this->getDoctrine()->getRepository('InventoryBundle:Pos')->find($id);
-        $entity = $this->getDoctrine()->getRepository('InventoryBundle:Particular')->find($product);
+        $invoice = $this->em->getRepository('InventoryBundle:Pos')->find($id);
+        $entity = $this->em->getRepository('InventoryBundle:Particular')->find($product);
         $invoiceItems = array('particularId' => $product , 'quantity' => 1,'price' => $entity->getPrice(),'process'=>'create');
-    //    $this->getDoctrine()->getRepository('InventoryBundle:Pos')->insertInvoiceItems($invoice, $invoiceItems);
+    //    $this->em->getRepository('InventoryBundle:Pos')->insertInvoiceItems($invoice, $invoiceItems);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
     }
@@ -849,19 +857,19 @@ class PosController extends Controller
     public function updateProductAction(Request $request , $product)
     {
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $quantity = $_REQUEST['quantity'];
         /* @var $entity PosItem */
-        $entity = $this->getDoctrine()->getRepository('InventoryBundle:PosItem')->find($product);
+        $entity = $this->em->getRepository('InventoryBundle:PosItem')->find($product);
         $invoiceItems = array('particularId' => $entity->getParticular()->getId() , 'quantity' => $quantity,'price' => $entity->getSalesPrice(),'process' => 'update');
-        $this->getDoctrine()->getRepository('InventoryBundle:Pos')->insertInvoiceItems($entity->getTableInvoice(), $invoiceItems);
+        $this->em->getRepository('InventoryBundle:Pos')->insertInvoiceItems($entity->getTableInvoice(), $invoiceItems);
         $result = $this->returnResultData($entity->getTableInvoice());
         return new Response(json_encode($result));
     }
 
     public function invoiceParticularDeleteAction(Pos $invoice,PosItem $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
@@ -879,9 +887,9 @@ class PosController extends Controller
         $printer = new Printer($connector);
         $printer -> initialize();
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
-        $setup = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->getMasterSetup($option);
+        $setup = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->getMasterSetup($option);
 
         $mainApp        = $setup['main_app_name'];
         $address        = $setup['address'];
@@ -1001,12 +1009,12 @@ class PosController extends Controller
     {
 
         $isPrints = $_REQUEST['isPrint'];
-        $this->getDoctrine()->getRepository('InventoryBundle:Pos')->updateKitchenPrint($entity,$isPrints);
+        $this->em->getRepository('InventoryBundle:Pos')->updateKitchenPrint($entity,$isPrints);
         $connector = new \Mike42\Escpos\PrintConnectors\DummyPrintConnector();
         $printer = new Printer($connector);
         $printer -> initialize();
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $config = $entity->getinventoryConfig();
 
@@ -1050,7 +1058,7 @@ class PosController extends Controller
         $printer -> text(new PosItemManager('Item Name', 'Qnt', 'Amount'));
         $printer -> text("------------------------------------------------------------\n");
         $i = 1;
-        $invoiceItems = $this->getDoctrine()->getRepository(\App\Pos\Entity\PosItem::class)->findBy(array('tableInvoice'=>$entity,'isPrint' => 1));
+        $invoiceItems = $this->em->getRepository(\App\Pos\Entity\PosItem::class)->findBy(array('tableInvoice'=>$entity,'isPrint' => 1));
         /* @var $row PosItem */
 
         foreach ( $invoiceItems as $row){
@@ -1071,12 +1079,12 @@ class PosController extends Controller
     private function posRestaurent(Pos $entity)
     {
         $cart = new Cart($request->getSession());
-        $invoiceParticulars = $this->getDoctrine()->getRepository('InventoryBundle:InvoiceParticular')->findBy(array('invoice' => $entity->getId()));
+        $invoiceParticulars = $this->em->getRepository('InventoryBundle:InvoiceParticular')->findBy(array('invoice' => $entity->getId()));
         $connector = new \Mike42\Escpos\PrintConnectors\DummyPrintConnector();
         $printer = new Printer($connector);
         $printer -> initialize();
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $config = $entity->getinventoryConfig();
 
@@ -1136,7 +1144,7 @@ class PosController extends Controller
             $printer -> text("BIN No - ".$vatRegNo." Mushak - 6.3\n\n");
         }
         if($entity->getinventoryConfig()->isPrintToken() == 1){
-            $token = $this->getDoctrine()->getRepository('InventoryBundle:Invoice')->getLastCode($entity);
+            $token = $this->em->getRepository('InventoryBundle:Invoice')->getLastCode($entity);
             $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
             $printer -> setJustification(Printer::JUSTIFY_CENTER);
             $printer -> text("Token No-{$token}\n\n");
@@ -1205,7 +1213,7 @@ class PosController extends Controller
             $printer -> text("DELIVERY PRINT");
             $printer -> text("\n");
             if($entity->getinventoryConfig()->isPrintToken() == 1){
-                $token = $this->getDoctrine()->getRepository('InventoryBundle:Invoice')->getLastCode($entity);
+                $token = $this->em->getRepository('InventoryBundle:Invoice')->getLastCode($entity);
                 $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
                 $printer -> setJustification(Printer::JUSTIFY_CENTER);
                 $printer -> text("Token No-{$token}\n\n");

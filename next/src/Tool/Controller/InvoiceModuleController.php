@@ -2,12 +2,15 @@
 
 namespace App\Tool\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Tool\Entity\GlobalOption;
 use App\Tool\Entity\InvoiceModuleItem;
 use App\Tool\Form\InvoicePaymentReceiveType;
 use App\Tool\Form\InvoiceType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Tool\Entity\InvoiceModule;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,16 +20,23 @@ use Symfony\Component\HttpFoundation\Response;
  * InvoiceModule controller.
  *
  */
-class InvoiceModuleController extends Controller
+class InvoiceModuleController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -39,7 +49,7 @@ class InvoiceModuleController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\InvoiceModule::class)->findBy(array(),array('updated'=>'DESC'));
         $entities = $this->paginate($entities);
@@ -53,7 +63,7 @@ class InvoiceModuleController extends Controller
      */
     public function domainAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Tool\Entity\InvoiceModule::class)->domainInvoice($globalOption);
         $entities = $this->paginate($entities);
@@ -67,12 +77,12 @@ class InvoiceModuleController extends Controller
     {
 
         $entity = new InvoiceModule();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setProcess('In-progress');
         $entity->setCustomInvoice(1);
         $em->persist($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Invoice  has been generated successfully"
         );
         return $this->redirect($this->generateUrl('invoicemodule_modify', array('id' => $entity->getId())));
@@ -91,7 +101,7 @@ class InvoiceModuleController extends Controller
 
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\InvoiceModule::class)->find($id);
         $data = $request->request->all();
@@ -112,11 +122,11 @@ class InvoiceModuleController extends Controller
             }
             $entity->setProcess('Pending');
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceModule::class)->insertInvoiceModuleItem($entity,$data);
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceModule::class)->updateInvoice($entity);
+            $this->em->getRepository(\App\Tool\Entity\InvoiceModule::class)->insertInvoiceModuleItem($entity,$data);
+            $this->em->getRepository(\App\Tool\Entity\InvoiceModule::class)->updateInvoice($entity);
             return $this->redirect($this->generateUrl('invoicemodule'));
         }
 
@@ -128,17 +138,17 @@ class InvoiceModuleController extends Controller
 
     public function deleteItemAction(InvoiceModule $invoice, InvoiceModuleItem $item)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$item) {
             throw $this->createNotFoundException('Unable to find InvoiceModule entity.');
         }
 
         $em->remove($item);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Invoice  has been deleted successfully"
         );
-        $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceModule::class)->updateInvoice($invoice);
+        $this->em->getRepository(\App\Tool\Entity\InvoiceModule::class)->updateInvoice($invoice);
         return $this->redirect($this->generateUrl('invoicemodule'));
     }
 
@@ -169,24 +179,24 @@ class InvoiceModuleController extends Controller
     public function newAction(GlobalOption $option)
     {
         $billMonth = date('F,Y');
-        $exits = $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceModule::class)->findBy(array('billMonth'=>$billMonth,'globalOption'=>$option));
+        $exits = $this->em->getRepository(\App\Tool\Entity\InvoiceModule::class)->findBy(array('billMonth'=>$billMonth,'globalOption'=>$option));
         if(empty($exits)){
 
             $entity = new InvoiceModule();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($option);
             $entity->setBillMonth($billMonth);
             $entity->setProcess('Created');
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceModule::class)->insertInvoiceItem($entity);
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Tool\Entity\InvoiceModule::class)->insertInvoiceItem($entity);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Invoice  has been generated successfully"
             );
             return $this->redirect($this->generateUrl('invoicemodule_edit', array('invoice' => $entity->getInvoice())));
 
         }else{
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Invoice  has been already created"
             );
             return $this->redirect($this->generateUrl('tools_domain'));
@@ -201,7 +211,7 @@ class InvoiceModuleController extends Controller
      */
     public function editAction(InvoiceModule $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceModule entity.');
         }
@@ -218,14 +228,14 @@ class InvoiceModuleController extends Controller
      */
     public function generateInvoiceAction(InvoiceModule $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceModule entity.');
         }
         $entity->setProcess('Pending');
         $em->persist($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceModule::class)->updateInvoice($entity);
+        $this->em->getRepository(\App\Tool\Entity\InvoiceModule::class)->updateInvoice($entity);
         return $this->redirect($this->generateUrl('invoicemodule_show', array('id' => $entity->getId())));
     }
 
@@ -235,7 +245,7 @@ class InvoiceModuleController extends Controller
      */
     public function showAction(InvoiceModule $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceModule entity.');
         }
@@ -275,14 +285,14 @@ class InvoiceModuleController extends Controller
 
     public function deleteAction(InvoiceModule $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceModule entity.');
         }
 
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Invoice  has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('invoicemodule'));
@@ -296,7 +306,7 @@ class InvoiceModuleController extends Controller
      */
     public function paymentAction(Request $request,InvoiceModule $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceModule entity.');
         }
@@ -314,7 +324,7 @@ class InvoiceModuleController extends Controller
      */
     public function approveAction(InvoiceModule $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceModule entity.');
         }
@@ -331,7 +341,7 @@ class InvoiceModuleController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\InvoiceModuleItem::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Item entity.');

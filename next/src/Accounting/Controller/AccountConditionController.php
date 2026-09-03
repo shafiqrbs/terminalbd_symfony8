@@ -3,6 +3,10 @@
 namespace App\Accounting\Controller;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountCondition;
 use App\Accounting\Entity\AccountConditionLedger;
 use App\Accounting\Form\AccountConditionLedgerType;
@@ -10,7 +14,7 @@ use App\Accounting\Form\AccountConditionType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\DomainUser\Entity\Customer;
@@ -21,16 +25,24 @@ use Symfony\Component\HttpFoundation\Response;
  * Customer controller.
  *
  */
-class AccountConditionController extends Controller
+class AccountConditionController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -40,7 +52,7 @@ class AccountConditionController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\AccountCondition::class)->findBy(array('globalOption'=>$globalOption),array('name'=>'ASC'));
@@ -54,7 +66,7 @@ class AccountConditionController extends Controller
 
     public function ledgerAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $pagination = $em->getRepository(\App\Accounting\Entity\AccountConditionLedger::class)->getLedgerLists($globalOption->getId(),$data);
@@ -76,13 +88,13 @@ class AccountConditionController extends Controller
         $form->handleRequest($request);
         $option = $this->getUser()->getGlobalOption();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+            $em = $this->em;
+            $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setGlobalOption($option);
 	        $entity->setMobile($mobile);
 	        $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertConditionAccount($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertConditionAccount($entity);
             return $this->redirect($this->generateUrl('account_condition'));
         }
         return $this->render('Accounting/AccountCondition/new.html.twig', array(
@@ -125,9 +137,9 @@ class AccountConditionController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_CRM') or is_granted('ROLE_DOMAIN')"))]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
-        $entity = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCondition::class)->findOneBy(array('globalOption'=>$option,'id'=>$id));
+        $entity = $this->em->getRepository(\App\Accounting\Entity\AccountCondition::class)->findOneBy(array('globalOption'=>$option,'id'=>$id));
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Customer entity.');
         }
@@ -164,19 +176,19 @@ class AccountConditionController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
-        $entity = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCondition::class)->findOneBy(array('globalOption'=>$option,'id'=>$id));
+        $entity = $this->em->getRepository(\App\Accounting\Entity\AccountCondition::class)->findOneBy(array('globalOption'=>$option,'id'=>$id));
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Customer entity.');
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         if ($editForm->isValid()) {
-	        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertConditionAccount($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertConditionAccount($entity);
             return $this->redirect($this->generateUrl('account_condition'));
         }
         return $this->render('Accounting/AccountCondition/new.html.twig', array(
@@ -188,9 +200,9 @@ class AccountConditionController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_CRM') or is_granted('ROLE_DOMAIN')"))]
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
-        $entity = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCondition::class)->findOneBy(array('globalOption'=>$option,'id'=>$id));
+        $entity = $this->em->getRepository(\App\Accounting\Entity\AccountCondition::class)->findOneBy(array('globalOption'=>$option,'id'=>$id));
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Customer entity.');
         }
@@ -198,12 +210,12 @@ class AccountConditionController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }
@@ -255,7 +267,7 @@ class AccountConditionController extends Controller
         $form = $this->createLedgerForm($entity);
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         if($form->isValid() && empty($method)){
             $entity->setGlobalOption($option);
@@ -278,7 +290,7 @@ class AccountConditionController extends Controller
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_condition_ledger'));
@@ -307,13 +319,13 @@ class AccountConditionController extends Controller
 
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_condition_ledger'));
         }
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         return $this->render('Accounting/AccountCondition/new-ledger.html.twig', array(
@@ -329,7 +341,7 @@ class AccountConditionController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountConditionLedger::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountConditionLedger entity.');
@@ -354,7 +366,7 @@ class AccountConditionController extends Controller
     {
 
         $option = $this->getUser()->getGlobalOption();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountConditionLedger::class)->findOneBy(array('globalOption'=>$option,'id'=>$id));
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountConditionLedger entity.');
@@ -369,11 +381,11 @@ class AccountConditionController extends Controller
     public function approveAction(AccountConditionLedger $entity)
     {
         if (!empty($entity) and $entity->getProcess() != 'approved') {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             if(empty($entity->getTransactionMethod()) and in_array($entity->getMode(),array( 'Due','Advance'))){
-                $method = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+                $method = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
                 $entity->setTransactionMethod($method);
             }
             $accountConfig = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -385,7 +397,7 @@ class AccountConditionController extends Controller
             $em->flush();
             $em->getRepository(\App\Accounting\Entity\AccountConditionLedger::class)->updateConditionBalance($entity);
             if($entity->getAmount() > 0 and in_array($entity->getMode(),array( 'Due','Advance')) ){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountConditionCash($entity);
+                $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountConditionCash($entity);
             }
             return new Response('success');
 

@@ -37,6 +37,34 @@ $CONTEXTS = [
     'DataTransformerInterface' => [],
 ];
 
+/**
+ * Type-hints that are no longer autowirable services.
+ * DoctrineBundle 3 registers Doctrine\Persistence\ManagerRegistry, not its own
+ * Registry subclass, so a constructor asking for the latter cannot be built.
+ */
+$TYPE_RENAMES = [
+    'Doctrine\\Bundle\\DoctrineBundle\\Registry' => 'Doctrine\\Persistence\\ManagerRegistry',
+];
+
+$renamed = 0;
+foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)) as $f) {
+    if ($f->getExtension() !== 'php') continue;
+    $src = (string) file_get_contents($f->getPathname());
+    $out = $src;
+    foreach ($TYPE_RENAMES as $from => $to) {
+        $out = str_replace($from, $to, $out);
+        $shortFrom = substr($from, strrpos($from, '\\') + 1);
+        $shortTo   = substr($to, strrpos($to, '\\') + 1);
+        if ($out !== $src) {
+            $out = preg_replace('/\b' . preg_quote($shortFrom, '/') . '\s+(\$\w+)/', $shortTo . ' $1', $out);
+        }
+    }
+    if ($out === $src) continue;
+    $renamed++;
+    if (!$dryRun) file_put_contents($f->getPathname(), $out);
+}
+printf("%s %d files with non-autowirable type hints\n", $dryRun ? 'would rename in' : 'renamed in', $renamed);
+
 $fixed = 0; $files = 0; $byMethod = [];
 
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)) as $f) {

@@ -3,10 +3,12 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Inventory\Entity\PrePurchaseItem;
@@ -16,8 +18,14 @@ use App\Inventory\Form\PrePurchaseItemType;
  * PrePurchaseItem controller.
  *
  */
-class PrePurchaseItemController extends Controller
+class PrePurchaseItemController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all PrePurchaseItem entities.
@@ -25,7 +33,7 @@ class PrePurchaseItemController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Inventory\Entity\PrePurchaseItem::class)->findBy(array(),array('updated'=>'asc'));
         return $this->render('Inventory/PrePurchaseItem/index.html.twig', array(
             'entities' => $entities,
@@ -43,13 +51,13 @@ class PrePurchaseItemController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
             $entity->setStatus(false);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('prepurchaseitem'));
@@ -104,7 +112,7 @@ class PrePurchaseItemController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PrePurchaseItem::class)->find($id);
 
@@ -123,7 +131,7 @@ class PrePurchaseItemController extends Controller
     #[IsGranted('ROLE_DOMAIN_INVENTORY_SALES')]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PrePurchaseItem::class)->find($id);
 
@@ -167,7 +175,7 @@ class PrePurchaseItemController extends Controller
     #[IsGranted('ROLE_DOMAIN_INVENTORY_SALES')]
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PrePurchaseItem::class)->find($id);
 
@@ -179,7 +187,7 @@ class PrePurchaseItemController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('prepurchaseitem_edit', array('id' => $id)));
@@ -194,7 +202,7 @@ class PrePurchaseItemController extends Controller
 
     public function statusAction(PrePurchaseItem $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $status = $entity->isStatus();
         if($status == 1){
             $entity->setStatus(0);
@@ -202,7 +210,7 @@ class PrePurchaseItemController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('prepurchaseitem'));
@@ -215,7 +223,7 @@ class PrePurchaseItemController extends Controller
     #[IsGranted('ROLE_DOMAIN_INVENTORY_SALES')]
     public function deleteAction(PrePurchaseItem $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Product entity.');
         }
@@ -224,16 +232,16 @@ class PrePurchaseItemController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -244,7 +252,7 @@ class PrePurchaseItemController extends Controller
     {
         $item = $_REQUEST['q'];
         if ($item) {
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PrePurchaseItem::class)->searchAutoComplete($item);
+            $item = $this->em->getRepository(\App\Inventory\Entity\PrePurchaseItem::class)->searchAutoComplete($item);
         }
         return new JsonResponse($item);
     }

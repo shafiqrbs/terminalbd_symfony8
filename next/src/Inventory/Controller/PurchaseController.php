@@ -2,13 +2,16 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountPurchase;
 use App\Inventory\Entity\PurchaseItem;
 use App\Inventory\Entity\PurchaseVendorItem;
 use App\Inventory\Form\PurchaseApproveType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Inventory\Entity\Purchase;
 use App\Inventory\Form\PurchaseType;
@@ -18,16 +21,23 @@ use Symfony\Component\HttpFoundation\Response;
  * PurchaseOrder controller.
  *
  */
-class PurchaseController extends Controller
+class PurchaseController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -39,11 +49,11 @@ class PurchaseController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\Purchase::class)->findWithSearch($inventory,$data);
-        $purchaseOverview = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseOverview($inventory,$data);
+        $purchaseOverview = $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseOverview($inventory,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Inventory/Purchase/index.html.twig', array(
             'entities' => $pagination,
@@ -62,12 +72,12 @@ class PurchaseController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $purchase = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Purchase::class)->findOneBy(array('inventoryConfig' => $inventory,'vendor' => $entity->getVendor(),'memo' => $entity->getMemo()));
+            $purchase = $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->findOneBy(array('inventoryConfig' => $inventory,'vendor' => $entity->getVendor(),'memo' => $entity->getMemo()));
             if($purchase){
 
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'notice', "Purchase memo no duplicate for this vendor/supplier"
                 );
                 return $this->render('Inventory/Purchase/new.html.twig', array(
@@ -174,7 +184,7 @@ class PurchaseController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
 
@@ -192,7 +202,7 @@ class PurchaseController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
 
@@ -237,7 +247,7 @@ class PurchaseController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
         $editForm = $this->createEditForm($entity);
@@ -259,7 +269,7 @@ class PurchaseController extends Controller
     {
 
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $purchase->setApprovedBy($this->getUser());
         $purchase->setProcess('approved');
         $em->persist($purchase);
@@ -269,8 +279,8 @@ class PurchaseController extends Controller
         $em->getRepository(\App\Inventory\Entity\StockItem::class)->insertPurchaseStockItem($purchase);
         if($purchase->getAsInvestment() == 1){
             $journal = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->insertAccountPurchaseJournal($purchase);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($journal);
+            $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
+            $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($journal);
         }
         $accountPurchase = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertAccountPurchase($purchase);
         $em->getRepository(\App\Accounting\Entity\Transaction::class)->purchaseTransaction($purchase,$accountPurchase);
@@ -285,7 +295,7 @@ class PurchaseController extends Controller
     public function deleteAction(Purchase $purchase)
     {
         if($purchase){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->remove($purchase);
             $em->flush();
             return new Response('success');
@@ -305,7 +315,7 @@ class PurchaseController extends Controller
 
         if($vendorItem){
             $this->updatePurchaseStatus($vendorItem->getPurchase(),'created');
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->remove($vendorItem);
             $em->flush();
             return new Response('success');
@@ -326,7 +336,7 @@ class PurchaseController extends Controller
 
         if($purchaseItem){
             $this->updatePurchaseStatus($purchaseItem->getPurchase(),'wfs');
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->remove($purchaseItem);
             $em->flush();
             return new Response('success');
@@ -338,7 +348,7 @@ class PurchaseController extends Controller
 
     public function  updatePurchaseStatus(Purchase $entity,$process){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setProcess($process);
         $em->persist($entity);
         $em->flush();
@@ -349,7 +359,7 @@ class PurchaseController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Purchase::class)->searchAutoComplete($inventory,$item);
+            $item = $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->searchAutoComplete($inventory,$item);
         }
         return new JsonResponse($item);
     }
@@ -369,7 +379,7 @@ class PurchaseController extends Controller
      */
     public function editApproveAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
 
@@ -418,7 +428,7 @@ class PurchaseController extends Controller
     public function updateApproveAction(Request $request, $id)
     {
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
         $editForm = $this->createEditApproveForm($entity);
@@ -432,12 +442,12 @@ class PurchaseController extends Controller
             $em->getRepository(\App\Inventory\Entity\Item::class)->getItemUpdatePriceQnt($entity);
             if($entity->getAsInvestment() == 1){
                 $journal = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->insertAccountPurchaseJournal($entity);
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($journal);
+                $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
+                $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($journal);
             }
             $accountPurchase = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertAccountPurchase($entity);
             $em->getRepository(\App\Accounting\Entity\Transaction::class)->purchaseTransaction($entity,$accountPurchase);
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Purchase invoice approved successfully"
             );
             return $this->redirect($this->generateUrl('purchase'));
@@ -454,7 +464,7 @@ class PurchaseController extends Controller
     public function inlinePurchaseVendorItemUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
@@ -475,11 +485,11 @@ class PurchaseController extends Controller
 
     public function purchaseVendorItemDeleteAction(Purchase $purchase , PurchaseVendorItem $purchaseVendorItem)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->remove($purchaseVendorItem);
         $em->flush();
         $em->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseModifyUpdate($purchase);
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success', "Purchase invoice approved successfully"
         );
         return $this->redirect($this->generateUrl('purchase_edit_approve',array('id' => $purchase->getId())));
@@ -490,7 +500,7 @@ class PurchaseController extends Controller
     public function inlinePurchaseItemUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
@@ -515,7 +525,7 @@ class PurchaseController extends Controller
 
     public function purchaseItemDeleteAction(Purchase $purchase, PurchaseItem $purchaseItem)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $sumPurchaseItem = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->getPurchaseItemQuantity($purchaseItem->getPurchase(), $purchaseItem->getPurchaseVendorItem()->getId());
 
@@ -530,7 +540,7 @@ class PurchaseController extends Controller
         }
         $em->flush();
         $em->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseModifyUpdate($purchase);
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success', "Purchase invoice approved successfully"
         );
         return $this->redirect($this->generateUrl('purchase_edit_approve',array('id' => $purchase->getId())));
@@ -541,11 +551,11 @@ class PurchaseController extends Controller
     {
 
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->purchaseItemReverseUpdateQnt($purchase);
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->purchaseItemStockRemoveQnt($purchase);
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedPurchaseJournal($purchase);
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->removeApprovedAccountPurchase($purchase);
+        $em = $this->em;
+        $this->em->getRepository(\App\Inventory\Entity\Item::class)->purchaseItemReverseUpdateQnt($purchase);
+        $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->purchaseItemStockRemoveQnt($purchase);
+        $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedPurchaseJournal($purchase);
+        $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->removeApprovedAccountPurchase($purchase);
         $em->remove($purchase);
         $em->flush();
         return $this->redirect($this->generateUrl('purchase'));
@@ -569,7 +579,7 @@ class PurchaseController extends Controller
     public function updateSerialNo()
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $this->getDoctrine()->getRepository(PurchaseItem::class)->processSerialNo($config);
+        $this->em->getRepository(PurchaseItem::class)->processSerialNo($config);
         exit;
     }
 

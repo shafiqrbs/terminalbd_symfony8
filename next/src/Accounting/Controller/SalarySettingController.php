@@ -2,9 +2,12 @@
 
 namespace App\Accounting\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Accounting\Entity\Payroll;
 use App\Accounting\Form\SalarySettingType;
@@ -13,17 +16,24 @@ use App\Accounting\Form\SalarySettingType;
  * SalarySetting controller.
  *
  */
-class SalarySettingController extends Controller
+class SalarySettingController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -37,7 +47,7 @@ class SalarySettingController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\SalarySetting::class)->findWithSearch($globalOption,$data);
@@ -58,7 +68,7 @@ class SalarySettingController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $globalOption = $this->getUser()->getGlobalOption();
             $entity->setGlobalOption($globalOption);
             $totalAmount = ($entity->getBasicAmount() + $entity->getBonusAmount() + $entity->getOtherAmount() + $entity->getAdvanceAmount());
@@ -69,7 +79,7 @@ class SalarySettingController extends Controller
             //$entity->setSalaryInfo($salaryInfo);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('account_salarysetting'));
@@ -125,7 +135,7 @@ class SalarySettingController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\SalarySetting::class)->find($id);
 
@@ -144,7 +154,7 @@ class SalarySettingController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\SalarySetting::class)->find($id);
 
@@ -188,7 +198,7 @@ class SalarySettingController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\SalarySetting::class)->find($id);
 
@@ -225,7 +235,7 @@ class SalarySettingController extends Controller
     public function deleteAction(Payroll $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
               $em->remove($entity);
             $em->flush();
@@ -240,7 +250,7 @@ class SalarySettingController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\SalarySetting::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
@@ -254,7 +264,7 @@ class SalarySettingController extends Controller
     public function approveAction(Payroll $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $em->flush();
@@ -268,7 +278,7 @@ class SalarySettingController extends Controller
     public function statusAction(Payroll $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $status = $entity->getStatus();
             if($status == 1){
                 $entity->setStatus(0);
@@ -288,7 +298,7 @@ class SalarySettingController extends Controller
     {
         $data = $request->request->all();
         $id = $data['id'];
-        $entity = $this->getDoctrine()->getRepository(\App\Accounting\Entity\SalarySetting::class)->find($id);
+        $entity = $this->em->getRepository(\App\Accounting\Entity\SalarySetting::class)->find($id);
         $totalAmount = $entity->getTotalAmount();
         return new \Symfony\Component\HttpFoundation\Response($totalAmount);
         exit;

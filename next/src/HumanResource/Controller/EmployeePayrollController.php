@@ -4,6 +4,8 @@ namespace App\HumanResource\Controller;
 
 
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\HumanResource\Entity\EmployeePayroll;
 use App\HumanResource\Entity\EmployeePayrollParticular;
 use App\HumanResource\Form\EditUserType;
@@ -14,7 +16,7 @@ use App\User\Entity\User;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use App\Tool\Entity\Designation;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -22,13 +24,19 @@ use Symfony\Component\HttpFoundation\Response;
  * Customer controller.
  *
  */
-class EmployeePayrollController extends Controller
+class EmployeePayrollController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         return $this->render('HumanResource/EmployeePayroll/index.html.twig', array(
@@ -39,10 +47,10 @@ class EmployeePayrollController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new User();
         $form = $this->createCreateForm($entity);
-        $particulars = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$entity->getGlobalOption()));
+        $particulars = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$entity->getGlobalOption()));
         return $this->render('HumanResource/EmployeePayroll/new.html.twig', array(
             'entity'  => $entity,
             'particulars' => $particulars,
@@ -58,7 +66,7 @@ class EmployeePayrollController extends Controller
         $form->handleRequest($request);
         $globalOption = $this->getUser()->getGlobalOption();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($globalOption);
             $entity->setPassword($globalOption);
             $entity->getProfile()->upload();
@@ -70,7 +78,7 @@ class EmployeePayrollController extends Controller
             $entity->getEmployeePayroll()->setGlobalOption($globalOption);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('employee_payroll_edit',array('user' => $entity->getId())));
@@ -92,8 +100,8 @@ class EmployeePayrollController extends Controller
     private function createCreateForm(User $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $user = $this->em->getRepository(\App\User\Entity\User::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into UserType::configureOptions() and pass them as form options: $user,$option,$location), $entity, array(
         $form = $this->createForm(new UserType($user,$option,$location), $entity, array(
@@ -109,9 +117,9 @@ class EmployeePayrollController extends Controller
 
     public function editAction(User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $form = $this->editCreateForm($user);
-        $particulars = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$user->getGlobalOption()));
+        $particulars = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$user->getGlobalOption()));
         return $this->render('HumanResource/EmployeePayroll/edit.html.twig', array(
             'user'  => $user,
             'entity'  => $user->getEmployeePayroll(),
@@ -134,9 +142,9 @@ class EmployeePayrollController extends Controller
     private function editCreateForm(User $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class);
-        $designationRepository = $this->getDoctrine()->getRepository(Designation::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $user = $this->em->getRepository(\App\User\Entity\User::class);
+        $designationRepository = $this->em->getRepository(Designation::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into EditUserType::configureOptions() and pass them as form options: $user,$option,$location,$designationRepository), $entity, array(
         $form = $this->createForm(new EditUserType($user,$option,$location,$designationRepository), $entity, array(
@@ -161,16 +169,16 @@ class EmployeePayrollController extends Controller
         $form->handleRequest($request);
         $data = $request->request->all();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->getProfile()->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('employee_payroll_edit',array('user' => $entity->getId())));
         }
-        $particulars = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$entity->getGlobalOption()));
+        $particulars = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$entity->getGlobalOption()));
         return $this->render('HumanResource/EmployeePayroll/edit.html.twig', array(
             'user'  => $entity,
             'entity' => $entity->getEmployeePayroll(),
@@ -190,8 +198,8 @@ class EmployeePayrollController extends Controller
     private function settingCreateForm(EmployeePayroll $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $user = $this->em->getRepository(\App\User\Entity\User::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into EmployeePayrollType::configureOptions() and pass them as form options: $user,$option,$location), $entity, array(
         $form = $this->createForm(new EmployeePayrollType($user,$option,$location), $entity, array(
@@ -207,9 +215,9 @@ class EmployeePayrollController extends Controller
 
     public function payrollSettingAction(User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $form = $this->settingCreateForm($user->getEmployeePayroll());
-        $particulars = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$user->getGlobalOption()));
+        $particulars = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$user->getGlobalOption()));
         return $this->render('HumanResource/EmployeePayroll/payroll.html.twig', array(
             'user'  => $user,
             'entity'  => $user->getEmployeePayroll(),
@@ -227,17 +235,17 @@ class EmployeePayrollController extends Controller
         $form->handleRequest($request);
         $data = $request->request->all();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
-            $this->getDoctrine()->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->insertUpdateParticular($entity,$data);
-            $this->getDoctrine()->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->insertUpdate($entity);
+            $this->em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->insertUpdateParticular($entity,$data);
+            $this->em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->insertUpdate($entity);
             return $this->redirect($this->generateUrl('employee_payroll_setting',array('user' => $entity->getEmployee()->getId())));
         }
-        $particulars = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$entity->getGlobalOption()));
+        $particulars = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$entity->getGlobalOption()));
         return $this->render('HumanResource/EmployeePayroll/payroll.html.twig', array(
             'user'  => $entity->getEmployee(),
             'entity' => $entity,
@@ -249,7 +257,7 @@ class EmployeePayrollController extends Controller
     public function approveAction(User $user)
     {
         $entity = $user->getEmployeePayroll();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $approve = $this->getUser();
         $entity->setApprovedBy($approve);
         $em->persist($entity);
@@ -263,7 +271,7 @@ class EmployeePayrollController extends Controller
 
     public function particularDeleteAction(EmployeePayrollParticular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -274,11 +282,11 @@ class EmployeePayrollController extends Controller
             return new Response('success');
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }

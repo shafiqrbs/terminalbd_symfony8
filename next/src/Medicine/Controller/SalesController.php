@@ -5,6 +5,11 @@ namespace App\Medicine\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Medicine\Entity\MedicineAndroidProcess;
 use App\Medicine\Entity\MedicineConfig;
 use App\Medicine\Entity\MedicinePurchaseItem;
@@ -16,22 +21,31 @@ use App\Medicine\Form\SalesType;
 use App\Medicine\Service\PosItemManager;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Mike42\Escpos\Printer;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Report\Entity\AppsApi;
 
 
-class SalesController extends Controller
+class SalesController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -42,14 +56,14 @@ class SalesController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->invoiceLists($this->getUser(),$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->invoiceLists($this->getUser(),$data);
         $pagination = $this->paginate($entities);
         $transactionMethods = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status' => 1), array('name' => 'ASC'));
-        $banks = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(array('globalOption' => $user->getGlobalOption(),'status' => 1), array('name' => 'ASC'));
-        $mobiles =  $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(array('globalOption' => $user->getGlobalOption() , 'status' => 1), array('name' => 'ASC'));
+        $banks = $this->em->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(array('globalOption' => $user->getGlobalOption(),'status' => 1), array('name' => 'ASC'));
+        $mobiles =  $this->em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(array('globalOption' => $user->getGlobalOption() , 'status' => 1), array('name' => 'ASC'));
         return $this->render('Medicine/Sales/index.html.twig', array(
             'entities' => $pagination,
             'banks' => $banks,
@@ -63,14 +77,14 @@ class SalesController extends Controller
 
     public function holdAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->invoiceLists($this->getUser(),$data,"Hold");
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->invoiceLists($this->getUser(),$data,"Hold");
         $pagination = $this->paginate($entities);
         $transactionMethods = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status' => 1), array('name' => 'ASC'));
-        $banks = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(array('globalOption' => $user->getGlobalOption(),'status' => 1), array('name' => 'ASC'));
-        $mobiles =  $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(array('globalOption' => $user->getGlobalOption() , 'status' => 1), array('name' => 'ASC'));
+        $banks = $this->em->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(array('globalOption' => $user->getGlobalOption(),'status' => 1), array('name' => 'ASC'));
+        $mobiles =  $this->em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(array('globalOption' => $user->getGlobalOption() , 'status' => 1), array('name' => 'ASC'));
         return $this->render('Medicine/Sales/hold.html.twig', array(
             'entities' => $pagination,
             'banks' => $banks,
@@ -86,10 +100,10 @@ class SalesController extends Controller
      */
     public function salesItemAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $pagination = '';
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesItemLists($this->getUser(),$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesItemLists($this->getUser(),$data);
         if($entities){
             $pagination = $this->paginate($entities);
         }
@@ -107,7 +121,7 @@ class SalesController extends Controller
     {
 
         return $this->redirect($this->generateUrl('medicine_sales'));
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new MedicineSales();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity->setMedicineConfig($config);
@@ -127,9 +141,9 @@ class SalesController extends Controller
     public function copyAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $sales = $this->getDoctrine()->getRepository(MedicineSales::class)->findOneBy(array('medicineConfig'=>$config,'id'=>$id));
+        $sales = $this->em->getRepository(MedicineSales::class)->findOneBy(array('medicineConfig'=>$config,'id'=>$id));
         if (!$sales) {
             throw $this->createNotFoundException('Unable to find MedicineSales entity.');
         }
@@ -145,7 +159,7 @@ class SalesController extends Controller
         $entity->setTransactionMethod($transactionMethod);
         $em->persist($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(MedicineSalesItem::class)->insertCopyItems($entity,$sales);
+        $this->em->getRepository(MedicineSalesItem::class)->insertCopyItems($entity,$sales);
         return $this->redirect($this->generateUrl('medicine_sales_edit', array('id' => $entity->getId())));
 
     }
@@ -154,7 +168,7 @@ class SalesController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineSales::class)->findOneBy(array('medicineConfig' => $config , 'id' => $id));
         if (!$entity) {
@@ -162,7 +176,7 @@ class SalesController extends Controller
         }
         $salesItemForm = $this->createMedicineSalesItemForm(new MedicineSalesItem() , $entity);
         $editForm = $this->createEditForm($entity);
-        $customers = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->getCustomers($this->getUser()->getGlobalOption()->getId());
+        $customers = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->getCustomers($this->getUser()->getGlobalOption()->getId());
         return $this->render('Medicine/Sales/new.html.twig', array(
             'entity' => $entity,
             'customers' => $customers,
@@ -182,7 +196,7 @@ class SalesController extends Controller
     private function createEditForm(MedicineSales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SalesType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new SalesType($globalOption,$location), $entity, array(
@@ -230,8 +244,8 @@ class SalesController extends Controller
                 $purchaseItems .= '<option value="' . $item->getId() . '">' . $item->getMedicinePurchase()->getGrn() . ' - ' . $expiration . '[' . $item->getRemainingQuantity() . '] - PP Tk.'.$item->getPurchasePrice().'</option>';
             }
         }
-        $discountPercentList = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->discountPercentList();
-        $genericItems = $this->getDoctrine()->getRepository(MedicineStock::class)->getGenericStockMedicine($stock);
+        $discountPercentList = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->discountPercentList();
+        $genericItems = $this->em->getRepository(MedicineStock::class)->getGenericStockMedicine($stock);
         $html = $this->renderView('Medicine/Sales/stockGenericItem.html.twig', array(
            'stock'        => $stock,
            'genericItems'        => $genericItems,
@@ -242,7 +256,7 @@ class SalesController extends Controller
 
    public function returnResultData(MedicineSales $entity,$msg=''){
 
-      // $salesItems = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->getSalesItems($entity);
+      // $salesItems = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->getSalesItems($entity);
        $salesItems = $this->renderView('Medicine/Sales/sales-invoice-data.html.twig', array(
            'entity'        => $entity,
        ));
@@ -273,11 +287,11 @@ class SalesController extends Controller
        $entity = new MedicineSalesItem();
        $form = $this->createMedicineSalesItemForm($entity,$invoice);
        $form->handleRequest($request);
-       $em = $this->getDoctrine()->getManager();
+       $em = $this->em;
        $entity->setMedicineSales($invoice);
        /* @var $stock MedicineStock */
        $stockItem = (isset($data['salesitem']) and $data['salesitem']['stockName']) ? $data['salesitem']['stockName'] :'';
-       $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($stockItem);
+       $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($stockItem);
        if(isset($data['salesitem']) and $data['salesitem'] and $stock){
 
            $itemPercent = ($data['salesitem']['itemPercent']);
@@ -297,8 +311,8 @@ class SalesController extends Controller
            $entity->setPurchasePrice($stock->getAveragePurchasePrice());
            $em->persist($entity);
            $em->flush();
-           $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'sales');
-           $invoice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateMedicineSalesTotalPrice($invoice);
+           $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'sales');
+           $invoice = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateMedicineSalesTotalPrice($invoice);
            $msg = 'Medicine added successfully';
            $result = $this->returnResultData($invoice,$msg);
            return new Response(json_encode($result));
@@ -312,10 +326,10 @@ class SalesController extends Controller
 
    public function salesItemUpdateAction(){
 
-       $em = $this->getDoctrine()->getManager();
+       $em = $this->em;
        $data = $_REQUEST;
        $id =isset($data['id']) ?  $data['id']: 0;
-       $salesItem = $this->getDoctrine()->getRepository(MedicineSalesItem::class)->find($id);
+       $salesItem = $this->em->getRepository(MedicineSalesItem::class)->find($id);
        if($salesItem){
            $quantity =isset($data['quantity']) ?  $data['quantity']: 1;
            $price =isset( $data['salesPrice']) ?  $data['salesPrice']:  $salesItem->getMedicineStock()->getSalesPrice();
@@ -333,8 +347,8 @@ class SalesController extends Controller
            $salesItem->setQuantity($quantity);
            $salesItem->setSubTotal($salesItem->getSalesPrice() * $quantity);
            $em->flush();
-           $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($salesItem->getMedicineStock(),'sales');
-           $invoice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateMedicineSalesTotalPrice($salesItem->getMedicineSales());
+           $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($salesItem->getMedicineStock(),'sales');
+           $invoice = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateMedicineSalesTotalPrice($salesItem->getMedicineSales());
            $result = $this->returnResultData($invoice,$msg='');
            return new Response(json_encode($result));
        }
@@ -346,10 +360,10 @@ class SalesController extends Controller
 
    public function instantPurchaseSalesAction(MedicineSales $sales , MedicinePurchaseItem $item)
    {
-       $em = $this->getDoctrine()->getManager();
+       $em = $this->em;
        $quantity = $_REQUEST['quantity'];
        if(empty($item->getSalesQuantity())) {
-           $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item->getMedicineStock());
+           $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item->getMedicineStock());
        }
        $salesItem = new MedicineSalesItem();
        $salesItem->setMedicineSales($sales);
@@ -361,9 +375,9 @@ class SalesController extends Controller
        $salesItem->setPurchasePrice($item->getMedicineStock()->getAveragePurchasePrice());
        $em->persist($salesItem);
        $em->flush();
-       $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($item,'sales');
-       $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item->getMedicineStock(),'sales');
-       $invoice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateMedicineSalesTotalPrice($sales);
+       $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($item,'sales');
+       $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item->getMedicineStock(),'sales');
+       $invoice = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateMedicineSalesTotalPrice($sales);
        $msg = 'Medicine added successfully';
        $result = $this->returnResultData($invoice,$msg);
        return new Response(json_encode($result));
@@ -373,18 +387,18 @@ class SalesController extends Controller
 
    public function salesItemDeleteAction(MedicineSales $invoice, MedicineSalesItem $particular){
 
-       $em = $this->getDoctrine()->getManager();
+       $em = $this->em;
        $stock = $particular->getMedicineStock();
-       $this->get('session')->set('stock', $stock);
+       $this->requestStack->getSession()->set('stock', $stock);
        $particular->setQuantity(0);
        $em->flush();
-       $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'sales');
+       $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'sales');
        if (!$particular) {
            throw $this->createNotFoundException('Unable to find SalesItem entity.');
        }
        $em->remove($particular);
        $em->flush();
-       $invoice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateMedicineSalesTotalPrice($invoice);
+       $invoice = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateMedicineSalesTotalPrice($invoice);
        $msg = 'Medicine added successfully';
        $result = $this->returnResultData($invoice,$msg);
        return new Response(json_encode($result));
@@ -395,7 +409,7 @@ class SalesController extends Controller
 
    public function invoiceDiscountUpdateAction(Request $request)
    {
-       $em = $this->getDoctrine()->getManager();
+       $em = $this->em;
        $discountType = $request->request->get('discountType');
        $discountCal = (float)$request->request->get('discount');
        $invoice = $request->request->get('invoice');
@@ -431,7 +445,7 @@ class SalesController extends Controller
 
    public function updateAction(Request $request, MedicineSales $entity)
    {
-       $em = $this->getDoctrine()->getManager();
+       $em = $this->em;
        $globalOption = $this->getUser()->getGlobalOption();
        if (!$entity) {
            throw $this->createNotFoundException('Unable to find MedicineSales entity.');
@@ -442,12 +456,12 @@ class SalesController extends Controller
        $data = $request->request->all();
        if ($editForm->isValid()) {
            if (!empty($data['customerMobile'])) {
-               $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-               $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($globalOption,$mobile,$data);
+               $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+               $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($globalOption,$mobile,$data);
                $entity->setCustomer($customer);
 
            } elseif(!empty($data['customer'])) {
-               $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->find($data['customer']);
+               $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->find($data['customer']);
                $entity->setCustomer($customer);
            }
            if($data['process'] == 'hold'){
@@ -473,7 +487,7 @@ class SalesController extends Controller
            }
            $em->flush();
            if($entity->getProcess() == 'Done'){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($entity);
+                $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($entity);
            }
            if($data['process'] == 'save' or $data['process'] == 'hold' ){
                return $this->redirect($this->generateUrl('medicine_sales'));
@@ -481,7 +495,7 @@ class SalesController extends Controller
                return $this->redirect($this->generateUrl('medicine_sales_print_invoice', array('id' => $entity->getId())));
            }
        }
-       $customers = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->getCustomers($this->getUser()->getGlobalOption()->getId());
+       $customers = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->getCustomers($this->getUser()->getGlobalOption()->getId());
        return $this->render('Medicine/Sales/new.html.twig', array(
            'entity' => $entity,
            'customers' => $customers,
@@ -497,7 +511,7 @@ class SalesController extends Controller
     */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineSales::class)->find($id);
 
@@ -516,7 +530,7 @@ class SalesController extends Controller
      */
     public function posPrintAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineSales::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
@@ -524,7 +538,7 @@ class SalesController extends Controller
         $option = $this->getUser()->getGlobalOption();
         $previousDue = 0;
         if($entity->getCustomer()->getName() != "Default"){
-            $previousDue = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($option,$entity->getCustomer());
+            $previousDue = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($option,$entity->getCustomer());
         }
         if($entity->getMedicineConfig()->isCustomPrint() == 1){
             $subDomain = $entity->getMedicineConfig()->getGlobalOption()->getSubDomain();
@@ -550,7 +564,7 @@ class SalesController extends Controller
     public function posPrintUltraAction($id,$mode)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineSales::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
@@ -558,7 +572,7 @@ class SalesController extends Controller
         $option = $this->getUser()->getGlobalOption();
         $previousDue = 0;
         if($entity->getCustomer()->getName() != "Default"){
-            $previousDue = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($option,$entity->getCustomer());
+            $previousDue = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($option,$entity->getCustomer());
         }
         if($mode == "pos"){
             $plaintext = $this->posMikePrint($entity);
@@ -586,13 +600,13 @@ class SalesController extends Controller
 
     public function approvedAction(MedicineSales $sales)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!empty($sales)) {
             $sales->setProcess('Approved');
             $sales->setApprovedBy($this->getUser());
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getSalesUpdateQnt($sales);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($sales);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getSalesUpdateQnt($sales);
+            $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($sales);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -604,7 +618,7 @@ class SalesController extends Controller
     public function deleteAction(MedicineSales $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -617,7 +631,7 @@ class SalesController extends Controller
 
 	public function allSalesItemDelete(MedicineSales $invoice){
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 
 		/* @var $particular MedicineSalesItem */
         if($invoice->getMedicineSalesItems()){
@@ -625,17 +639,17 @@ class SalesController extends Controller
 
                 $item = $particular->getMedicinePurchaseItem();
                 $stock = $particular->getMedicineStock();
-                $this->get('session')->set('item', $item);
-                $this->get('session')->set('stock', $stock);
+                $this->requestStack->getSession()->set('item', $item);
+                $this->requestStack->getSession()->set('stock', $stock);
                 $em->remove($particular);
                 $em->flush();
-                $item = $this->get('session')->get('item');
-                $stock = $this->get('session')->get('stock');
+                $item = $this->requestStack->getSession()->get('item');
+                $stock = $this->requestStack->getSession()->get('stock');
                 if($item){
-                    $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($item,'sales');
+                    $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($item,'sales');
                 }
                 if($stock){
-                    $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'sales');
+                    $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'sales');
                 }
 
             }
@@ -648,7 +662,7 @@ class SalesController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -682,12 +696,12 @@ class SalesController extends Controller
          */
 
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->accountMedicineSalesReverse($sales);
+        $em = $this->em;
+        $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountMedicineSalesReverse($sales);
         $sales->setRevised(true);
         $sales->setProcess('Created');
         $em->flush();
-        $template = $this->get('twig')->render('Medicine/Sales/salesReverse.html.twig', array(
+        $template = $this->twig->render('Medicine/Sales/salesReverse.html.twig', array(
             'entity' => $sales,
             'config' => $sales->getMedicineConfig(),
         ));
@@ -698,7 +712,7 @@ class SalesController extends Controller
     public function reverseShowAction($id)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineReverse::class)->findOneBy(array('medicineConfig' => $config, 'medicineSales' => $id));
+        $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineReverse::class)->findOneBy(array('medicineConfig' => $config, 'medicineSales' => $id));
         return $this->render('Medicine/MedicineReverse/sales.html.twig', array(
             'entity' => $entity,
         ));
@@ -713,9 +727,9 @@ class SalesController extends Controller
     public function androidSalesAction()
     {
         $conf = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineAndroidProcess::class)->getAndroidSalesList($conf,"sales");
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineAndroidProcess::class)->getAndroidSalesList($conf,"sales");
         $pagination = $this->paginate($entities);
-        $sales = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->findAndroidDeviceSales($pagination);
+        $sales = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->findAndroidDeviceSales($pagination);
         return $this->render('Medicine/Sales/salesAndroid.html.twig', array(
             'entities' => $pagination,
             'sales' => $sales,
@@ -731,7 +745,7 @@ class SalesController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->androidDeviceSalesProcess($device);
+        $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->androidDeviceSalesProcess($device);
         exit;
     }
 
@@ -746,7 +760,7 @@ class SalesController extends Controller
         $msg = "invalid";
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
 
         $removeSalesItem = $em->createQuery("DELETE MedicineBundle:MedicineSalesItem e WHERE e.androidProcess= {$android->getId()}");
@@ -759,7 +773,7 @@ class SalesController extends Controller
         }
       //  $this->androidProcessSymfony($android);
         if($android->getMode() == 'offline'){
-            $this->getDoctrine()->getRepository(AppsApi::class)->apiSyncProcess($android->getId());
+            $this->em->getRepository(AppsApi::class)->apiSyncProcess($android->getId());
             $status = 'success';
         }else{
             $status = $this->androidProcessMysql($android);
@@ -772,17 +786,17 @@ class SalesController extends Controller
 
 
     public function androidProcessSymfony($android){
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
-         $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->insertApiSales($config->getGlobalOption(),$android);
-         $salses = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->findBy(array('androidProcess' => $android));
+         $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->insertApiSales($config->getGlobalOption(),$android);
+         $salses = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->findBy(array('androidProcess' => $android));
           foreach ($salses as $sales){
             if($sales->getProcess() == "Device"){
                 $sales->setProcess('Done');
                 $sales->setUpdated($sales->getCreated());
                 $sales->setApprovedBy($this->getUser());
                 $em->flush();
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($sales);
+                $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($sales);
                 $msg = "valid";
             }
         }
@@ -791,8 +805,8 @@ class SalesController extends Controller
 
     public function androidProcessMysql($android){
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $em = $this->getDoctrine()->getManager();
-        $status = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->insertApiSalesManual($config->getGlobalOption(),$android);
+        $em = $this->em;
+        $status = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->insertApiSalesManual($config->getGlobalOption(),$android);
         if($status > 0 ){
             $android->setStatus(true);
             $em->persist($android);
@@ -810,13 +824,13 @@ public function groupReverseAction()
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $data = array('startDate' => '2019-07-04','endateDate' => '2019-07-04');
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->salesReverseMigration($config->getId(),$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->salesReverseMigration($config->getId(),$data);
         /* @var $sales MedicineSales */
         foreach ( $entities as $sales):
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->accountMedicineSalesReverse($sales);
+            $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountMedicineSalesReverse($sales);
             $sales->setRevised(true);
             $sales->setProcess('Complete');
             $em->flush();
@@ -829,10 +843,10 @@ public function groupReverseAction()
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $data = array('startDate' => '2019-07-04','endateDate' => '2019-07-04');
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->salesReverseMigration($config,$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->salesReverseMigration($config,$data);
         /* @var $sales MedicineSales */
         foreach ( $entities as $sales):
             if (!empty($sales) and $sales->getProcess() == "Complete" ) {
@@ -840,7 +854,7 @@ public function groupReverseAction()
                 $sales->setUpdated($sales->getCreated());
                 $sales->setApprovedBy($this->getUser());
                 $em->flush();
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($sales);
+                $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($sales);
             }
         endforeach;
         exit;
@@ -851,14 +865,14 @@ public function groupReverseAction()
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         if($android->getMedicineConfig()->getId() == $config->getId()) {
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->androidDuplicateSalesDelete($config, $android);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->androidDuplicateSalesDelete($config, $android);
         }
         return $this->redirect($this->generateUrl('medicine_sales_android'));
     }
 
     public function androidDeleteAction(MedicineAndroidProcess $android)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         if($android->getMedicineConfig()->getId() == $config->getId()){
             $em->remove($android);
@@ -875,7 +889,7 @@ public function groupReverseAction()
         $printer = new Printer($connector);
         $printer -> initialize();
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         /* @var $config MedicineConfig */
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
@@ -936,7 +950,7 @@ public function groupReverseAction()
             $discount       = new PosItemManager('Discount: ','Tk.',number_format($discount));
         }
         $grandTotal     = new PosItemManager('Net Payable: ','Tk.',number_format($total));
-        $previousDue = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($option,$entity->getCustomer());
+        $previousDue = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($option,$entity->getCustomer());
         if($prevDue == 1 and $entity->getCustomer()->getName() != "Default"){
             $previous = ($previousDue - $entity->getDue());
             $previousBalance       = new PosItemManager('Previous Due: ','Tk.',number_format($previous));
@@ -1034,7 +1048,7 @@ public function groupReverseAction()
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new MedicineSales();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity->setMedicineConfig($config);
@@ -1046,7 +1060,7 @@ public function groupReverseAction()
         $entity->setTransactionMethod($transactionMethod);
         $em->persist($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(MedicineSales::class)->androidMissingSalesImport($config,$entity,$process);
+        $this->em->getRepository(MedicineSales::class)->androidMissingSalesImport($config,$entity,$process);
         return $this->redirect($this->generateUrl('medicine_sales_edit', array('id' => $entity->getId())));
 
     }
@@ -1054,7 +1068,7 @@ public function groupReverseAction()
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $pk = isset($data['pk']) ? $data['pk']:0;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineSales::class)->find($pk);
         if (!$entity) {

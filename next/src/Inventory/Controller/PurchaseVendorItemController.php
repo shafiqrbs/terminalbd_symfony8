@@ -2,11 +2,14 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Inventory\Entity\ItemGallery;
 use App\Inventory\Entity\Purchase;
 use App\Inventory\Form\PurchaseVendorItemDetailsType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Inventory\Entity\PurchaseVendorItem;
 use App\Inventory\Form\PurchaseVendorItemType;
@@ -16,17 +19,24 @@ use Symfony\Component\HttpFoundation\Response;
  * PurchaseVendorItem controller.
  *
  */
-class PurchaseVendorItemController extends Controller
+class PurchaseVendorItemController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -38,7 +48,7 @@ class PurchaseVendorItemController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->findWithSearch($inventory,$data);
@@ -62,9 +72,9 @@ class PurchaseVendorItemController extends Controller
         $form->handleRequest($request);
         if( $this->checkItemQuantity($purchase, $vendorQnt) == true ){
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->em;
 
-                $masterItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Product::class)->findOneBy(array('inventoryConfig' => $purchase->getInventoryConfig(),'name' => $entity->getName()));
+                $masterItem = $this->em->getRepository(\App\Inventory\Entity\Product::class)->findOneBy(array('inventoryConfig' => $purchase->getInventoryConfig(),'name' => $entity->getName()));
 
                 $entity->setInventoryConfig($purchase->getInventoryConfig());
                 $entity->setPurchase($purchase);
@@ -77,7 +87,7 @@ class PurchaseVendorItemController extends Controller
                 $em->flush();
                 $item = $purchase->getTotalItem();
                 $quantity = $purchase->getTotalQnt();
-                $vendorItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->getPurchaseVendorItemQuantity($purchase);
+                $vendorItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->getPurchaseVendorItemQuantity($purchase);
                 if( $vendorItem['totalQnt']  ==  $quantity or $vendorItem['totalItem'] == $item ){
                     $success = 'complete';
                     $em->getRepository(\App\Inventory\Entity\Purchase::class)->updateProcess($purchase,'wfs');
@@ -89,12 +99,12 @@ class PurchaseVendorItemController extends Controller
 
         }
 
-        $vendorItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->getPurchaseVendorItemQuantity($purchase);
+        $vendorItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->getPurchaseVendorItemQuantity($purchase);
         if( $vendorItem['totalQnt']  ==  $purchase->getTotalQnt() or $vendorItem['totalItem'] == $purchase->getTotalItem() ) {
             $success = 'complete';
         }
 
-        $vendorItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->getVendorItemList($purchase);
+        $vendorItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->getVendorItemList($purchase);
         return new Response(json_encode(array('success'=> $success ,'vendorItem' => $vendorItem)));
         exit;
        /* return $this->render('Inventory/PurchaseVendorItem/new.html.twig', array(
@@ -107,7 +117,7 @@ class PurchaseVendorItemController extends Controller
     {
         $item = $purchase->getTotalItem();
         $quantity = $purchase->getTotalQnt();
-        $vendorItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->getPurchaseVendorItemQuantity($purchase);
+        $vendorItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->getPurchaseVendorItemQuantity($purchase);
         $totalQnt = ($vendorItem['totalQnt'] + $vendorQnt);
         $totalItem = ($vendorItem['totalItem'] + 1);
         if($totalQnt > $quantity or $totalItem > $item ){
@@ -165,7 +175,7 @@ class PurchaseVendorItemController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->find($id);
 
@@ -187,7 +197,7 @@ class PurchaseVendorItemController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->find($id);
 
@@ -230,7 +240,7 @@ class PurchaseVendorItemController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->find($id);
 
@@ -247,8 +257,8 @@ class PurchaseVendorItemController extends Controller
             }
             $entity->upload();
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemMetaAttribute::class)->insertProductAttribute($entity,$data);
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemGallery::class)->insertProductGallery($entity,$data);
+            $this->em->getRepository(\App\Inventory\Entity\ItemMetaAttribute::class)->insertProductAttribute($entity,$data);
+            $this->em->getRepository(\App\Inventory\Entity\ItemGallery::class)->insertProductGallery($entity,$data);
             return $this->redirect($this->generateUrl('inventory_purchasevendoritem_edit', array('id' => $id)));
         }
 
@@ -265,8 +275,8 @@ class PurchaseVendorItemController extends Controller
     {
 
         if($vendorItem){
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\Purchase::class)->updateProcess($vendorItem->getPurchase(),'created');
-            $em = $this->getDoctrine()->getManager();
+            $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->updateProcess($vendorItem->getPurchase(),'created');
+            $em = $this->em;
             $vendorItem->deleteImageDirectory();
             $em->remove($vendorItem);
             $em->flush();
@@ -300,7 +310,7 @@ class PurchaseVendorItemController extends Controller
     public function webStatusAction(Request $request , $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         /* @var $entity PurchaseVendorItem  **/
 
@@ -314,13 +324,13 @@ class PurchaseVendorItemController extends Controller
         if($status == 1){
             $entity->setIsWeb(0);
         } else{
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\GoodsItem::class)->insertInventorySubProduct($entity);
+            $this->em->getRepository(\App\Inventory\Entity\GoodsItem::class)->insertInventorySubProduct($entity);
             $entity->setWebName($entity->getName());
             $entity->setSubProduct(true);
             $entity->setIsWeb(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been changed successfully"
         );
         return $this->redirect($request->headers->get('referer'));
@@ -331,7 +341,7 @@ class PurchaseVendorItemController extends Controller
     public function inlineItemUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');

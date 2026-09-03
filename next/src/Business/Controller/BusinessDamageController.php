@@ -2,25 +2,35 @@
 
 namespace App\Business\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\BusinessDamage;
 use App\Business\Form\BusinessDamageType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Damage controller.
  *
  */
-class BusinessDamageController extends Controller
+class BusinessDamageController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 	public function paginate($entities)
 	{
-		$paginator = $this->get('knp_paginator');
+		$paginator = $this->paginator;
 		$pagination = $paginator->paginate(
 			$entities,
-			$this->get('request')->query->get('page', 1)/*page number*/,
+			$this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
 			25  /*limit per page*/
 		);
 		$pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -34,9 +44,9 @@ class BusinessDamageController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessDamage::class)->findBy(array('businessConfig' => $config),array('created'=>'ASC'));
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessDamage::class)->findBy(array('businessConfig' => $config),array('created'=>'ASC'));
 	    $pagination = $this->paginate($entities);
         return $this->render('Business/Damage/index.html.twig', array(
             'entities' => $pagination,
@@ -63,14 +73,14 @@ class BusinessDamageController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
             $entity->setBusinessConfig($config);
             $entity->setSubTotal($entity->getBusinessParticular()->getPurchasePrice() * $entity->getQuantity());
             $em->persist($entity);
             $em->flush();
-	        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($entity->getBusinessParticular(),'damage');
-            $this->get('session')->getFlashBag()->add(
+	        $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($entity->getBusinessParticular(),'damage');
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('business_damage', array('id' => $entity->getId())));
@@ -111,9 +121,9 @@ class BusinessDamageController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessDamage::class)->findBy(array('medicineConfig' => $config),array('companyName'=>'ASC'));
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessDamage::class)->findBy(array('medicineConfig' => $config),array('companyName'=>'ASC'));
 
         $entity = $em->getRepository(\App\Business\Entity\BusinessDamage::class)->find($id);
 
@@ -159,9 +169,9 @@ class BusinessDamageController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessDamage::class)->findBy(array('medicineConfig' => $config),array('companyName'=>'ASC'));
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessDamage::class)->findBy(array('medicineConfig' => $config),array('companyName'=>'ASC'));
 
         $entity = $em->getRepository(\App\Business\Entity\BusinessDamage::class)->find($id);
 
@@ -174,7 +184,7 @@ class BusinessDamageController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             return $this->redirect($this->generateUrl('business_damage'));
@@ -191,13 +201,13 @@ class BusinessDamageController extends Controller
      */
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Business\Entity\BusinessDamage::class)->find($id);
         $stock = $entity->getBusinessParticular();
         $em->remove($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($stock,'damage');
-        $this->get('session')->getFlashBag()->add(
+        $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($stock,'damage');
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('business_damage'));
@@ -205,11 +215,11 @@ class BusinessDamageController extends Controller
 
 	public function approvedAction($id)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
 		$damage = $em->getRepository(\App\Business\Entity\BusinessDamage::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 		if (!empty($damage) and ($damage->getProcess() == 'Created')) {
-			$em = $this->getDoctrine()->getManager();
+			$em = $this->em;
 			$damage->setProcess('Approved');
 			$em->flush();
 			$em->getRepository(\App\Accounting\Entity\Transaction::class)->insertGlobalDamageTransaction($this->getUser()->getGlobalOption(),$damage);

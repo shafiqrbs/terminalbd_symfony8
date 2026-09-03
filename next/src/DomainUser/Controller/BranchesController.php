@@ -1,9 +1,11 @@
 <?php
 
 namespace App\DomainUser\Controller;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\DomainUser\Entity\Branches;
 use App\DomainUser\Form\BranchesType;
 
@@ -11,8 +13,14 @@ use App\DomainUser\Form\BranchesType;
  * Branches controller.
  *
  */
-class BranchesController extends Controller
+class BranchesController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     /**
@@ -22,7 +30,7 @@ class BranchesController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\DomainUser\Entity\Branches::class)->findBy(array('globalOption' => $globalOption),array('name'=>'asc'));
         return $this->render('DomainUser/Branches/index.html.twig', array(
@@ -37,7 +45,7 @@ class BranchesController extends Controller
 
     public function branchesEmployeeAction(Branches $branches)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         return $this->render('DomainUser/Branches/employee.html.twig', array(
             'branches' => $branches,
         ));
@@ -55,12 +63,12 @@ class BranchesController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $globalOption = $this->getUser()->getGlobalOption();
             $entity->setGlobalOption($globalOption);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('domain_branches'));
@@ -82,7 +90,7 @@ class BranchesController extends Controller
     private function createCreateForm(Branches $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into BranchesType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new BranchesType($globalOption,$location), $entity, array(
@@ -119,7 +127,7 @@ class BranchesController extends Controller
 
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Branches::class)->find($id);
 
@@ -138,7 +146,7 @@ class BranchesController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Branches::class)->find($id);
 
@@ -163,7 +171,7 @@ class BranchesController extends Controller
     private function createEditForm(Branches $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into BranchesType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new BranchesType($globalOption,$location), $entity, array(
@@ -182,7 +190,7 @@ class BranchesController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Branches::class)->find($id);
 
@@ -194,7 +202,7 @@ class BranchesController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('domain_branches_edit', array('id' => $id)));
@@ -213,7 +221,7 @@ class BranchesController extends Controller
 
     public function deleteAction(Branches $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->remove($entity);
         $em->flush();
         return $this->redirect($this->generateUrl('domain_branches'));
@@ -226,7 +234,7 @@ class BranchesController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $globalOption = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Branches::class)->searchAutoComplete($item,$globalOption);
+            $item = $this->em->getRepository(\App\DomainUser\Entity\Branches::class)->searchAutoComplete($item,$globalOption);
         }
         return new JsonResponse($item);
     }

@@ -4,6 +4,9 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Accounting\Entity\AccountHead;
@@ -20,14 +23,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AccountHeadController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
            100  /*limit per page*/
         );
         return $pagination;
@@ -39,11 +49,11 @@ class AccountHeadController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 	    $data = $_REQUEST;
 	    $global = $this->getUser()->getGlobalOption();
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1,'status' => 1],['name'=>'ASC']);
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount($global->getId());
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1,'status' => 1],['name'=>'ASC']);
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount($global->getId());
         return $this->render('Accounting/AccountHead/index.html.twig', [
             'accountHead' => $accountHead,
             'heads' => $heads,
@@ -63,12 +73,12 @@ class AccountHeadController extends AbstractController
         $form->handleRequest($request);
         $global = $this->getUser()->getGlobalOption();
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($global);
             $entity->setCode($entity->getCode());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('accounthead_new', ['id' => $entity->getId()]));
@@ -120,7 +130,7 @@ class AccountHeadController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->find($id);
 
@@ -142,7 +152,7 @@ class AccountHeadController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_ACCOUNTING_JOURNAL') or is_granted('ROLE_DOMAIN_ACCOUNTING')"))]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->find($id);
 
@@ -182,7 +192,7 @@ class AccountHeadController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->find($id);
 
@@ -196,7 +206,7 @@ class AccountHeadController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setSlug($entity->getName());
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('accounthead'));
@@ -217,7 +227,7 @@ class AccountHeadController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->find($id);
 
             if (!$entity) {
@@ -251,7 +261,7 @@ class AccountHeadController extends AbstractController
 	public function parentSelectAction()
 	{
 
-		$accountHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent'=>1],['name'=>'ASC']);
+		$accountHeads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent'=>1],['name'=>'ASC']);
 		$items      = [];
 		$items[]    = ['value' => '','text'=> '---Select Parent Head---'];
 		foreach ($accountHeads as $entity):
@@ -264,7 +274,7 @@ class AccountHeadController extends AbstractController
     public function subAccountSelectAction($id)
     {
         $global = $this->getUser()->getGlobalOption();
-        $accountHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['parent' => $id , 'globalOption'=> $global , 'status'=>1],['name'=>'ASC']);
+        $accountHeads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['parent' => $id , 'globalOption'=> $global , 'status'=>1],['name'=>'ASC']);
         $items      = '';
         $items    .="<option value=''>--Choose Sub-account Head--</option>";
         foreach ($accountHeads as $entity):
@@ -277,7 +287,7 @@ class AccountHeadController extends AbstractController
     public function inlineUpdateAction(Request $request)
 	{
 		$data = $request->request->all();
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$entity = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->find($data['pk']);
 		if (!$entity) {
 			throw $this->createNotFoundException('Unable to find AccountHead entity.');
@@ -289,7 +299,7 @@ class AccountHeadController extends AbstractController
 			$entity->setName($data['value']);
 		}
 		if($data['name'] == 'parent'){
-			$parent = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->find($data['value']);
+			$parent = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->find($data['value']);
 			$entity->setParent($parent);
 		}
 		$em->flush();

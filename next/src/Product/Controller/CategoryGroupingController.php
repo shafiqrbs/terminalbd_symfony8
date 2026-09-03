@@ -2,6 +2,7 @@
 
 namespace App\Product\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,11 @@ use App\Product\Form\CategoryGroupingType;
  */
 class CategoryGroupingController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all CategoryGrouping entities.
@@ -22,8 +28,8 @@ class CategoryGroupingController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $em = $this->em;
+        $user = $this->getUser();
         $grouping = $em->getRepository(\App\Product\Entity\CategoryGrouping::class)->findOneBy(['user'=>$user]);
         $array = [];
         if($grouping){
@@ -37,7 +43,7 @@ class CategoryGroupingController extends AbstractController
         $categories = $em->getRepository(\App\Product\Entity\Category::class)->findBy(['status'=>1,'parent'=>NULL],['name'=>'asc']);
         if($categories)
 
-            $entities = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class)->getGroupCategories($categories,$array);
+            $entities = $this->em->getRepository(\App\Product\Entity\Category::class)->getGroupCategories($categories,$array);
             $entity = new CategoryGrouping();
             $form   = $this->createCreateForm($entity);
 
@@ -55,8 +61,8 @@ class CategoryGroupingController extends AbstractController
 
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $em = $this->em;
+        $user = $this->getUser();
 
         $entity = $em->getRepository(\App\Product\Entity\CategoryGrouping::class)->findOneBy(['user'=>$user]);
         if($entity){
@@ -135,7 +141,7 @@ class CategoryGroupingController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Product\Entity\CategoryGrouping::class)->find($id);
 
@@ -157,7 +163,7 @@ class CategoryGroupingController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Product\Entity\CategoryGrouping::class)->find($id);
 
@@ -199,7 +205,7 @@ class CategoryGroupingController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Product\Entity\CategoryGrouping::class)->find($id);
 
@@ -233,7 +239,7 @@ class CategoryGroupingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Product\Entity\CategoryGrouping::class)->find($id);
 
             if (!$entity) {

@@ -4,7 +4,7 @@ namespace App\Restaurant\Importer;
 
 use App\Restaurant\Entity\Particular;
 use App\Restaurant\Entity\Category;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Restaurant\Repository\CategoryRepository;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 

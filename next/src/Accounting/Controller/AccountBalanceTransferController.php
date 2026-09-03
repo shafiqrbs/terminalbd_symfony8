@@ -4,8 +4,11 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Accounting\Entity\AccountBalanceTransfer;
@@ -16,16 +19,23 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountBalanceTransfer controller.
  *
  */
-class AccountBalanceTransferController extends Controller
+class AccountBalanceTransferController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,13 +45,13 @@ class AccountBalanceTransferController extends Controller
 
 	public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Accounting\Entity\AccountBalanceTransfer::class)->findWithSearch( $this->getUser(),$data);
         $pagination = $this->paginate($entities);
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(array('isParent'=>1),array('name'=>'ASC'));
-        $debit = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountBalanceTransfer::class)->accountCashOverview($this->getUser(),'Debit',$data);
-        $credit = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountBalanceTransfer::class)->accountCashOverview($this->getUser(),'Credit',$data);
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(array('isParent'=>1),array('name'=>'ASC'));
+        $debit = $this->em->getRepository(\App\Accounting\Entity\AccountBalanceTransfer::class)->accountCashOverview($this->getUser(),'Debit',$data);
+        $credit = $this->em->getRepository(\App\Accounting\Entity\AccountBalanceTransfer::class)->accountCashOverview($this->getUser(),'Credit',$data);
         $overview = array('debit' => $debit,'credit' => $credit);
         return $this->render('Accounting/AccountBalanceTransfer/index.html.twig', array(
             'entities' => $pagination,
@@ -64,19 +74,19 @@ class AccountBalanceTransferController extends Controller
             ($form->isValid() && $method == 'bank' && $entity->getFromAccountBank()) ||
             ($form->isValid() && $method == 'mobile' && $entity->getFromAccountMobileBank())
         ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             if(!empty($this->getUser()->getProfile()->getBranches())){
                 $entity->setBranches($this->getUser()->getProfile()->getBranches());
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_balancetransfer'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         return $this->render('Accounting/AccountBalanceTransfer/new.html.twig', array(
@@ -112,7 +122,7 @@ class AccountBalanceTransferController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountBalanceTransfer();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
@@ -132,7 +142,7 @@ class AccountBalanceTransferController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountBalanceTransfer::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountBalanceTransfer entity.');
@@ -145,7 +155,7 @@ class AccountBalanceTransferController extends Controller
     public function approveAction(AccountBalanceTransfer $entity)
     {
         if (!empty($entity) and $entity->getProcess() != 'approved') {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $accountConfig = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -155,7 +165,7 @@ class AccountBalanceTransferController extends Controller
                 $entity->setUpdated($datetime);
             }
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->balanceTransferAccountCash($entity,'BalanceTransfer');
+            $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->balanceTransferAccountCash($entity,'BalanceTransfer');
             return new Response('success');
         } else {
             return new Response('failed');
@@ -166,7 +176,7 @@ class AccountBalanceTransferController extends Controller
 
     public function deleteAction(AccountBalanceTransfer $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountBalanceTransfer entity.');
         }
@@ -183,7 +193,7 @@ class AccountBalanceTransferController extends Controller
      */
     public function approveDeleteAction(AccountBalanceTransfer $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountBalanceTransfer entity.');
         }
@@ -197,8 +207,8 @@ class AccountBalanceTransferController extends Controller
 
 	public function journalReverseAction(AccountBalanceTransfer $entity){
 
-		$em = $this->getDoctrine()->getManager();
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->accountCashReverse($entity,'BalanceTransfer');
+		$em = $this->em;
+		$this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->accountCashReverse($entity,'BalanceTransfer');
 		$entity->setProcess(null);
 		$entity->setApprovedBy(null);
 		$em->flush();

@@ -3,12 +3,15 @@
 namespace App\Business\Controller;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\BusinessBatch;
 use App\Business\Entity\BusinessBatchParticular;
 use App\Business\Entity\BusinessInvoice;
 use App\Business\Form\BusinessBatchParticularType;
 use JMS\SecurityExtraBundle\Annotation\Secure;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,16 +19,23 @@ use Symfony\Component\HttpFoundation\Response;
  * BusinessInvoiceController controller.
  *
  */
-class InvoiceFuelPumpController extends Controller
+class InvoiceFuelPumpController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -42,7 +52,7 @@ class InvoiceFuelPumpController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository( \App\Business\Entity\BusinessBatch::class )->invoiceLists( $config->getId(),$data);
@@ -55,7 +65,7 @@ class InvoiceFuelPumpController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new BusinessBatch();
         $option = $this->getUser()->getGlobalOption();
         $config = $option->getBusinessConfig();
@@ -74,7 +84,7 @@ class InvoiceFuelPumpController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $global = $this->getUser()->getGlobalOption();
         $config = $global->getBusinessConfig();
 
@@ -86,7 +96,7 @@ class InvoiceFuelPumpController extends Controller
         }
         $purchaseItem = new BusinessBatchParticular();
         $editForm = $this->createEditForm($purchaseItem,$entity);
-        $customerSales = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getBatchItemSales($entity);
+        $customerSales = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getBatchItemSales($entity);
         return $this->render("Business/FuelPump/new.html.twig", array(
             'config' => $config,
             'entity' => $entity,
@@ -123,11 +133,11 @@ class InvoiceFuelPumpController extends Controller
 
     public function addParticularAction(Request $request, BusinessBatch $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $purchaseItem = new BusinessBatchParticular();
         $editForm = $this->createEditForm($purchaseItem,$invoice);
         $editForm->handleRequest($request);
-        $exist = $this->getDoctrine()->getRepository(BusinessBatchParticular::class)->findOneBy(array('businessBatch'=>$invoice,'businessParticular'=> $purchaseItem->getBusinessParticular(),'wearhouse'=>$purchaseItem->getWearhouse(),'salesBy'=>$purchaseItem->getSalesBy()));
+        $exist = $this->em->getRepository(BusinessBatchParticular::class)->findOneBy(array('businessBatch'=>$invoice,'businessParticular'=> $purchaseItem->getBusinessParticular(),'wearhouse'=>$purchaseItem->getWearhouse(),'salesBy'=>$purchaseItem->getSalesBy()));
         if ($editForm->isValid() and empty($exist)) {
             $purchaseItem->setBusinessBatch($invoice);
             $purchaseItem->setPrice($purchaseItem->getBusinessParticular()->getSalesPrice());
@@ -141,12 +151,12 @@ class InvoiceFuelPumpController extends Controller
 
     public function batchItemUpdateAction(Request $request,$id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $endReading = $_REQUEST['endReading'];
         /* @var $item BusinessBatchParticular */
-        $item = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessBatchParticular::class)->find($id);
+        $item = $this->em->getRepository(\App\Business\Entity\BusinessBatchParticular::class)->find($id);
         if($item){
-            $customerSales = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getBatchSingleItemSales($id);
+            $customerSales = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getBatchSingleItemSales($id);
             if($customerSales){
                 $item->setCustomerSalesQuantity($customerSales['quantity']);
                 $item->setCustomerSalesAmount($customerSales['amount']);
@@ -164,7 +174,7 @@ class InvoiceFuelPumpController extends Controller
 
     public function returnResultData(BusinessBatch $invoice){
 
-        $customerSales = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getBatchItemSales($invoice);
+        $customerSales = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getBatchItemSales($invoice);
         $html = $this->renderView(
             "Business/FuelPump/item.html.twig", array('entity' => $invoice)
         );
@@ -178,7 +188,7 @@ class InvoiceFuelPumpController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_INVOICE') or is_granted('ROLE_DOMAIN')"))]
     public function itemDeleteAction(BusinessBatchParticular $particular)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -193,7 +203,7 @@ class InvoiceFuelPumpController extends Controller
      #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_INVOICE') or is_granted('ROLE_DOMAIN')"))]
     public function deleteAction(BusinessBatch $particular)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -208,11 +218,11 @@ class InvoiceFuelPumpController extends Controller
      #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_INVOICE') or is_granted('ROLE_DOMAIN')"))]
     public function showAction(BusinessBatch $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
-        $customerSales = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getBatchItemSales($entity);
+        $customerSales = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getBatchItemSales($entity);
 
         return $this->render("Business/FuelPump/show.html.twig", array(
             'entity' => $entity,
@@ -228,11 +238,11 @@ class InvoiceFuelPumpController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_INVOICE') or is_granted('ROLE_DOMAIN')"))]
     public function itemApproveAction(BusinessBatchParticular $particular)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if($particular->getEndMeterReading() > $particular->getStartMeterReading()){
             $particular->setProcess("Approved");
             $em->flush();
-            $this->getDoctrine()->getRepository(BusinessInvoice::class)->insertFuelSales($particular);
+            $this->em->getRepository(BusinessInvoice::class)->insertFuelSales($particular);
             return new Response("success");
         }
         return new Response("invalid");

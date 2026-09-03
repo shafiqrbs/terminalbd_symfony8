@@ -3,9 +3,11 @@
 namespace App\Appearance\Controller;
 
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Appearance\Form\SidebarWidgetPanelType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Appearance\Entity\SidebarWidget;
 use App\Appearance\Form\SidebarWidgetType;
@@ -14,8 +16,14 @@ use App\Appearance\Form\SidebarWidgetType;
  * SidebarWidget controller.
  *
  */
-class SidebarWidgetController extends Controller
+class SidebarWidgetController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all SidebarWidget entities.
@@ -23,7 +31,7 @@ class SidebarWidgetController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Appearance\Entity\SidebarWidget::class)->findBy(array());
         return $this->render('Appearance/SidebarWidget/index.html.twig', array(
@@ -43,10 +51,10 @@ class SidebarWidgetController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('sidebarwidget_edit', array('id' => $entity->getId())));
@@ -68,7 +76,7 @@ class SidebarWidgetController extends Controller
     private function createCreateForm(SidebarWidget $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SidebarWidgetType::configureOptions() and pass them as form options: $globalOption,$em), $entity, array(
         $form = $this->createForm(new SidebarWidgetType($globalOption,$em), $entity, array(
@@ -103,7 +111,7 @@ class SidebarWidgetController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\SidebarWidget::class)->find($id);
         $option = $this->getUser()->getGlobalOption();
@@ -158,7 +166,7 @@ class SidebarWidgetController extends Controller
      */
     public function updateAction(Request $request, SidebarWidgetPanel $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
 
 
@@ -168,7 +176,7 @@ class SidebarWidgetController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('sidebarwidget_edit', array('id' => $entity->getSidebarWidget()->getId())));
@@ -187,7 +195,7 @@ class SidebarWidgetController extends Controller
     public function deleteAction(SidebarWidget $megamenu )
     {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             if (!$megamenu) {
                 throw $this->createNotFoundException('Unable to find SidebarWidget entity.');
             }
@@ -220,7 +228,7 @@ class SidebarWidgetController extends Controller
     public function sortedAction(Request $request){
 
         $data = $request->request->get('menuItem');
-        $this->getDoctrine()->getRepository(\App\Appearance\Entity\SidebarWidget::class)->setOrdering($data);
+        $this->em->getRepository(\App\Appearance\Entity\SidebarWidget::class)->setOrdering($data);
         exit;
 
     }
@@ -234,7 +242,7 @@ class SidebarWidgetController extends Controller
         $form = $this->createDeleteForm($entity->getId());
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $status = $entity->getStatus();
         if($status == 1){
             $entity->setStatus(0);
@@ -242,7 +250,7 @@ class SidebarWidgetController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('megamenu'));

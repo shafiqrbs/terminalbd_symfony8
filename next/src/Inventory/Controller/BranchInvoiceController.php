@@ -3,6 +3,9 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Inventory\Form\BranchInvoiceItemType;
@@ -19,14 +22,21 @@ use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
  */
 class BranchInvoiceController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -39,7 +49,7 @@ class BranchInvoiceController extends AbstractController
 
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\BranchInvoice::class)->invoiceLists($inventory,$data);
@@ -56,23 +66,23 @@ class BranchInvoiceController extends AbstractController
 
     public function searchAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $sales = $request->request->get('sales');
         $barcode = $request->request->get('barcode');
         $sales = $em->getRepository(\App\Inventory\Entity\BranchInvoice::class)->find($sales);
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $purchaseItem = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->returnPurchaseItemDetails($inventory,$barcode);
-        $checkQuantity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\BranchInvoiceItem::class)->checkPurchaseQuantity($purchaseItem);
+        $checkQuantity = $this->em->getRepository(\App\Inventory\Entity\BranchInvoiceItem::class)->checkPurchaseQuantity($purchaseItem);
         $itemDetails= '';
         $salesItems = '';
         $salesTotal = '';
         if($purchaseItem && $checkQuantity == true ){
             //$itemDetails = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findBarcode($purchaseItem);
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\BranchInvoiceItem::class)->insertBranchInvoiceItems($sales,$purchaseItem);
-            $salesTotal = $this->getDoctrine()->getRepository(\App\Inventory\Entity\BranchInvoice::class)->updateBranchInvoiceTotalPrice($sales);
+            $this->em->getRepository(\App\Inventory\Entity\BranchInvoiceItem::class)->insertBranchInvoiceItems($sales,$purchaseItem);
+            $salesTotal = $this->em->getRepository(\App\Inventory\Entity\BranchInvoice::class)->updateBranchInvoiceTotalPrice($sales);
             $salesItems = $em->getRepository(\App\Inventory\Entity\BranchInvoiceItem::class)->getBranchInvoiceItems($sales);
         }else{
-            $salesTotal = $this->getDoctrine()->getRepository(\App\Inventory\Entity\BranchInvoice::class)->updateBranchInvoiceTotalPrice($sales);
+            $salesTotal = $this->em->getRepository(\App\Inventory\Entity\BranchInvoice::class)->updateBranchInvoiceTotalPrice($sales);
             $salesItems = $em->getRepository(\App\Inventory\Entity\BranchInvoiceItem::class)->getBranchInvoiceItems($sales);
         }
 
@@ -85,7 +95,7 @@ class BranchInvoiceController extends AbstractController
 
     public function salesItemUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $salesItemId = $request->request->get('salesItemId');
         $quantity = $request->request->get('quantity');
         $salesPrice = $request->request->get('salesPrice');
@@ -100,7 +110,7 @@ class BranchInvoiceController extends AbstractController
         $salesItem->setSubTotal($quantity * $salesPrice);
         $em->persist($salesItem);
         $em->flush();
-        $salesTotal = $this->getDoctrine()->getRepository(\App\Inventory\Entity\BranchInvoice::class)->updateBranchInvoiceTotalPrice($salesItem->getBranchInvoice());
+        $salesTotal = $this->em->getRepository(\App\Inventory\Entity\BranchInvoice::class)->updateBranchInvoiceTotalPrice($salesItem->getBranchInvoice());
         return new Response(json_encode(['salesTotal'=>$salesTotal]));
         exit;
     }
@@ -111,7 +121,7 @@ class BranchInvoiceController extends AbstractController
     {
         $branch = $_REQUEST['branch'];
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $branches = $em->getRepository(\App\DomainUser\Entity\Branches::class)->find($branch);
         if(!empty($branches)){
             $entity = new BranchInvoice();
@@ -121,12 +131,12 @@ class BranchInvoiceController extends AbstractController
             $entity->setBranches($branches);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Invoice has been generated successfully, add your item"
             );
             return $this->redirect($this->generateUrl('inventory_branchinvoice_edit', ['code' => $entity->getInvoice()]));
         }else{
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error', "Invoice has not been generated, please select branch "
             );
             return $this->redirect($this->generateUrl('inventory_branch'));
@@ -142,7 +152,7 @@ class BranchInvoiceController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\BranchInvoice::class)->find($id);
 
@@ -158,7 +168,7 @@ class BranchInvoiceController extends AbstractController
 
     public function editAction($code)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\BranchInvoice::class)->findOneBy(['invoice'=>$code]);
 
         if (!$entity) {
@@ -197,7 +207,7 @@ class BranchInvoiceController extends AbstractController
     public function updateAction(Request $request, BranchInvoice $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $branchItem = new BranchInvoiceItem();
         $form = $this->createEditForm($entity,$branchItem);
         $form->handleRequest($request);
@@ -215,7 +225,7 @@ class BranchInvoiceController extends AbstractController
                 $branchItem->setSubTotal($purchaseItem->getSalesPrice() * $branchItem->getQuantity());
                 $em->persist($branchItem);
                 $em->flush();
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'success', "Data has been added successfully"
                 );
                 $em->getRepository(\App\Inventory\Entity\BranchInvoice::class)->updateBranchInvoiceTotalPrice($entity);
@@ -223,7 +233,7 @@ class BranchInvoiceController extends AbstractController
             }
         }
 
-        $this->get('session')->getFlashBag()->add('error', "Invalid barcode,please add correct barcode");
+        $this->requestStack->getSession()->getFlashBag()->add('error', "Invalid barcode,please add correct barcode");
         return $this->render('Inventory/BranchInvoice/new.html.twig', [
             'entity' => $entity,
             'form'   => $form->createView(),
@@ -236,11 +246,11 @@ class BranchInvoiceController extends AbstractController
     public function approveAction(BranchInvoice $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Invoice has been approved successfully"
             );
         }
@@ -254,7 +264,7 @@ class BranchInvoiceController extends AbstractController
 
     public function deleteAction(BranchInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find BranchInvoice entity.');
         }
@@ -271,7 +281,7 @@ class BranchInvoiceController extends AbstractController
     public function itemDeleteAction(BranchInvoiceItem $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find BranchInvoiceItem entity.');
         }
@@ -286,7 +296,7 @@ class BranchInvoiceController extends AbstractController
     {
         $item = $request->request->get('item');
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->itemPurchaseDetails($inventory,$item);
+        $data = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->itemPurchaseDetails($inventory,$item);
         return new Response($data);
     }
 

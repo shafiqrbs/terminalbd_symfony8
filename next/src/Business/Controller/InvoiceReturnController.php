@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Business\Controller;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\BusinessInvoiceReturn;
 use App\Business\Entity\BusinessInvoiceReturnItem;
 use App\Business\Entity\WearHouse;
@@ -10,22 +13,29 @@ use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Knp\Snappy\Pdf;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Vendor controller.
  *
  */
-class InvoiceReturnController extends Controller
+class InvoiceReturnController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -39,10 +49,10 @@ class InvoiceReturnController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $data = $_REQUEST;
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceReturn::class)->findWithSearch($config->getId(),$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceReturn::class)->findWithSearch($config->getId(),$data);
         $pagination = $this->paginate($entities);
         return $this->render('Business/InvoiceReturn/index.html.twig', array(
             'entities' => $pagination,
@@ -57,10 +67,10 @@ class InvoiceReturnController extends Controller
      */
     public function salesReturnAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $data = $_REQUEST;
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->findWithSearch($config->getId(),$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->findWithSearch($config->getId(),$data);
         $pagination = $this->paginate($entities);
         return $this->render('Business/InvoiceReturn/sales-item.html.twig', array(
             'entities' => $pagination,
@@ -98,7 +108,7 @@ class InvoiceReturnController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new BusinessInvoiceReturn();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
@@ -113,7 +123,7 @@ class InvoiceReturnController extends Controller
             $entity->setPayment(0);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('business_invoice_return_edit', array('id' => $entity->getId())));
@@ -151,7 +161,7 @@ class InvoiceReturnController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $em->getRepository(\App\Business\Entity\BusinessInvoiceReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
         if (!$entity) {
@@ -160,9 +170,9 @@ class InvoiceReturnController extends Controller
         $particulars = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getCustomerItem($config,$entity->getCustomer());
         $returnItems = $em->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->getCustomerItem($config,$entity->getCustomer());
         $globalOption = $this->getUser()->getGlobalOption();
-        $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($globalOption,$entity->getCustomer());
+        $result = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($globalOption,$entity->getCustomer());
         $balance = empty($result) ? 0 : $result;
-        $wearhouses = $this->getDoctrine()->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
+        $wearhouses = $this->em->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
 
         return $this->render("Business/InvoiceReturn/edit.html.twig", array(
             'entity' => $entity,
@@ -178,7 +188,7 @@ class InvoiceReturnController extends Controller
 
     public function updateAction(Request $request, BusinessInvoiceReturn $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -194,7 +204,7 @@ class InvoiceReturnController extends Controller
         $entity->setPayment($data['payment']);
         $entity->setSubTotal($data['payment']+$data['adjustment']);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->insertInvoiceReturnItem($entity,$data);
+        $this->em->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->insertInvoiceReturnItem($entity,$data);
         return $this->redirect($this->generateUrl('business_invoice_return_show',array('id' => $entity->getId())));
 
     }
@@ -206,7 +216,7 @@ class InvoiceReturnController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $em->getRepository(\App\Business\Entity\BusinessInvoiceReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
         if (!$entity) {
@@ -219,12 +229,12 @@ class InvoiceReturnController extends Controller
 
     public function approvedAction(BusinessInvoiceReturn $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setProcess('Approved');
         $em->flush();
         $vendor = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->insertSalesReturnVendor($entity->getBusinessConfig()->getGlobalOption());
         if($vendor and $entity->getPayment() > 0){
-            $purchase = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->insertPurchaseReturn($entity);
+            $purchase = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->insertPurchaseReturn($entity);
             $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertBusinessAccountPurchase($purchase);
         }
         if($entity->getAdjustment() > 0){
@@ -233,11 +243,11 @@ class InvoiceReturnController extends Controller
         if($entity->getInvoiceReturnItems()){
             /* @var $row BusinessInvoiceReturnItem */
             foreach ($entity->getInvoiceReturnItems() as $row){
-                $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->approveSalesReturnItem($row);
+                $this->em->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->approveSalesReturnItem($row);
             }
         }
         if($entity->getBusinessConfig()->isStockHistory() == 1 ){
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processInsertSalesReturnItem($entity);
+            $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processInsertSalesReturnItem($entity);
         }
         return new Response('success');
 
@@ -251,9 +261,9 @@ class InvoiceReturnController extends Controller
     {
 
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
+        $entity = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }

@@ -2,6 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Inventory\Entity\InventoryConfig;
 use App\Inventory\Entity\Item;
 use App\Inventory\Entity\ItemGallery;
@@ -11,7 +14,7 @@ use App\Inventory\Form\ItemSearchType;
 use App\Inventory\Form\ItemType;
 use App\Inventory\Form\ItemWebType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,17 +24,24 @@ use Symfony\Component\HttpFoundation\Response;
  * Item controller.
  *
  */
-class ItemController extends Controller
+class ItemController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-	    $paginator = $this->get('knp_paginator');
+	    $paginator = $this->paginator;
 	    $pagination = $paginator->paginate(
 		    $entities,
-		    $this->get('request')->query->get('page', 1)/*page number*/,
+		    $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
 		    25  /*limit per page*/
 	    );
 	    $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -44,7 +54,7 @@ class ItemController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\Item::class)->findWithSearch($inventory,$data);
@@ -68,7 +78,7 @@ class ItemController extends Controller
      */
     private function searchCreateForm(Item $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemTypeGrouping::class);
+        $em = $this->em->getRepository(\App\Inventory\Entity\ItemTypeGrouping::class);
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ItemSearchType::configureOptions() and pass them as form options: $inventoryConfig,$em), $entity, array(
@@ -88,7 +98,7 @@ class ItemController extends Controller
         /* @var $inventory InventoryConfig  */
 
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Item();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
@@ -98,34 +108,34 @@ class ItemController extends Controller
         $brandName = (isset($data['item']['brand']) and $data['item']['brand']) ? $data['item']['brand'] :'';
         $vendorName = (isset($data['item']['vendor']) and $data['item']['vendor']) ? $data['item']['vendor'] :'';
         if ($form->isValid()) {
-            $checkData = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->checkDuplicateSKU($inventory,$data);
+            $checkData = $this->em->getRepository(\App\Inventory\Entity\Item::class)->checkDuplicateSKU($inventory,$data);
             $barcode = (isset($data['item']['barcode']) and $data['item']['barcode']) ? $data['item']['barcode']:'';
-            $barcodeCount = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getExistBarcode($inventory->getId(),$barcode);
+            $barcodeCount = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getExistBarcode($inventory->getId(),$barcode);
             if($checkData['count'] != 0 ) {
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'notice',"Item already exist, Please change add another item name"
                 );
             }elseif($entity->getBarcode() and $barcodeCount > 0){
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'notice',"This barcode already exist, Please change add another item name"
                 );
             }else{
                 $entity->setInventoryConfig($inventory);
                 $entity->setMasterItem($checkData['masterItem']);
                 if($inventory->getIsVendor() == 1){
-                    $vendor = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getExistVendor($inventory,$vendorName);
+                    $vendor = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getExistVendor($inventory,$vendorName);
                     $entity->setVendor($vendor);
                 }
                 if($inventory->getIsBrand() == 1){
-                    $brand = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getExistBrand($inventory,$brandName);
+                    $brand = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getExistBrand($inventory,$brandName);
                     $entity->setBrand($brand);
                 }
-                $category = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getExistCategory($inventory,$categoryName);
+                $category = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getExistCategory($inventory,$categoryName);
                 $entity->setCategory($category);
-                $masterItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getExistMasterItem($inventory,$category,$name);
+                $masterItem = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getExistMasterItem($inventory,$category,$name);
                 $entity->setMasterItem($masterItem);
                 if(empty($entity->getItemUnit())){
-                    $unit = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
+                    $unit = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
                     $entity->setItemUnit($unit);
                     $entity->getMasterItem()->setProductUnit($unit);
                 }
@@ -139,16 +149,16 @@ class ItemController extends Controller
                 // $entity->upload();
                 $em->persist($entity);
                 $em->flush();
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'success', "Item has been added successfully"
                 );
                 return $this->redirect($this->generateUrl('item_new', array('id' => $entity->getId())));
             }
         }
-        $items = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Product::class)->getMasterItems($inventory);
-        $brands = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Product::class)->getMasterItems($inventory);
-        $vendors = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Product::class)->getMasterItems($inventory);
-        $categories = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class)->categoryInventoryTree($inventory);
+        $items = $this->em->getRepository(\App\Inventory\Entity\Product::class)->getMasterItems($inventory);
+        $brands = $this->em->getRepository(\App\Inventory\Entity\Product::class)->getMasterItems($inventory);
+        $vendors = $this->em->getRepository(\App\Inventory\Entity\Product::class)->getMasterItems($inventory);
+        $categories = $this->em->getRepository(\App\Product\Entity\Category::class)->categoryInventoryTree($inventory);
         return $this->render('Inventory/Item/new.html.twig', array(
             'entity' => $entity,
             'items' => $items,
@@ -170,8 +180,8 @@ class ItemController extends Controller
      */
     private function createCreateForm(Item $entity)
     {
-        $groupRep = $this->getDoctrine()->getRepository(\App\Product\Entity\ItemGroup::class);
-        $catRep = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $groupRep = $this->em->getRepository(\App\Product\Entity\ItemGroup::class);
+        $catRep = $this->em->getRepository(\App\Product\Entity\Category::class);
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ItemType::configureOptions() and pass them as form options: $inventoryConfig,$groupRep,$catRep), $entity, array(
@@ -195,13 +205,13 @@ class ItemController extends Controller
     public function newAction()
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Item();
         $form   = $this->createCreateForm($entity);
-        $items = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Product::class)->getMasterItems($inventory);
-        $categories = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class)->categoryInventoryTree($inventory);
-        $brands = $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemBrand::class)->brandInventoryTree($inventory);
-        $vendors = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Vendor::class)->vendorInventoryTree($inventory);
+        $items = $this->em->getRepository(\App\Inventory\Entity\Product::class)->getMasterItems($inventory);
+        $categories = $this->em->getRepository(\App\Product\Entity\Category::class)->categoryInventoryTree($inventory);
+        $brands = $this->em->getRepository(\App\Inventory\Entity\ItemBrand::class)->brandInventoryTree($inventory);
+        $vendors = $this->em->getRepository(\App\Inventory\Entity\Vendor::class)->vendorInventoryTree($inventory);
         return $this->render('Inventory/Item/new.html.twig', array(
             'entity' => $entity,
             'items' => $items,
@@ -219,7 +229,7 @@ class ItemController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Item::class)->find($id);
 
@@ -238,7 +248,7 @@ class ItemController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entity = $em->getRepository(\App\Inventory\Entity\Item::class)->find($id);
         if (!$entity) {
@@ -263,8 +273,8 @@ class ItemController extends Controller
      */
     private function createEditForm(Item $entity)
     {
-        $groupRep = $this->getDoctrine()->getRepository(\App\Product\Entity\ItemGroup::class);
-        $catRep = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $groupRep = $this->em->getRepository(\App\Product\Entity\ItemGroup::class);
+        $catRep = $this->em->getRepository(\App\Product\Entity\Category::class);
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into EditItemType::configureOptions() and pass them as form options: $inventoryConfig,$groupRep,$catRep), $entity, array(
@@ -286,7 +296,7 @@ class ItemController extends Controller
      */
     public function editWebAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Item::class)->find($id);
         if (!$entity) {
@@ -329,7 +339,7 @@ class ItemController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $entity = $em->getRepository(\App\Inventory\Entity\Item::class)->find($id);
 
@@ -342,7 +352,7 @@ class ItemController extends Controller
         $erors = $editForm->getErrors();
         if ($editForm->isValid()) {
             if(empty($entity->getItemUnit())){
-                $unit = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
+                $unit = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
                 $entity->setItemUnit($unit);
                 $entity->getMasterItem()->setProductUnit($unit);
             }
@@ -351,10 +361,10 @@ class ItemController extends Controller
             }
             $entity->upload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemGallery::class)->insertProductGallery($entity,$data);
+            $this->em->getRepository(\App\Inventory\Entity\ItemGallery::class)->insertProductGallery($entity,$data);
             return $this->redirect($this->generateUrl('item'));
         }
         return $this->render('Inventory/Item/edit.html.twig', array(
@@ -370,7 +380,7 @@ class ItemController extends Controller
      */
     public function updateWebAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $entity = $em->getRepository(\App\Inventory\Entity\Item::class)->find($id);
 
@@ -383,10 +393,10 @@ class ItemController extends Controller
         if ($editForm->isValid()) {
 
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemGallery::class)->insertProductGallery($entity,$data);
+            $this->em->getRepository(\App\Inventory\Entity\ItemGallery::class)->insertProductGallery($entity,$data);
             return $this->redirect($this->generateUrl('item_edit_web', array('id' => $entity->getId())));
         }
 
@@ -402,7 +412,7 @@ class ItemController extends Controller
      */
     public function deleteAction(Item $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find item entity.');
         }
@@ -411,12 +421,12 @@ class ItemController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }
@@ -431,7 +441,7 @@ class ItemController extends Controller
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\Item::class)->find($id);
 
         if (!$entity) {
@@ -444,7 +454,7 @@ class ItemController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('item'));
@@ -453,7 +463,7 @@ class ItemController extends Controller
     public function barcodeAction(Request $request)
     {
         $data = $request->request->get('check');
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($data)) {
             foreach ($data as $row) {
                 $entities[] = $em->getRepository(\App\Inventory\Entity\Item::class)->find($row);
@@ -475,7 +485,7 @@ class ItemController extends Controller
     public function skuUpdateAction(Item $item)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->skuUpdate($inventory,$item);
+        $this->em->getRepository(\App\Inventory\Entity\Item::class)->skuUpdate($inventory,$item);
         return new JsonResponse($item->getName());
     }
 
@@ -484,7 +494,7 @@ class ItemController extends Controller
         $item = trim($_REQUEST['q']);
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\Item::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -494,7 +504,7 @@ class ItemController extends Controller
         $item = trim($_REQUEST['q']);
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->searchBarcodeItem($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\Item::class)->searchBarcodeItem($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -504,7 +514,7 @@ class ItemController extends Controller
         $item = trim($_REQUEST['q']);
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->searchAutoCompleteAllItem($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\Item::class)->searchAutoCompleteAllItem($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -512,7 +522,7 @@ class ItemController extends Controller
     public function priceAction(Request $request)
     {
         $item = $request->request->get('item');
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->find($item);
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Item::class)->find($item);
         return new JsonResponse(array('salesPrice' => $entity->getSalesPrice(),'webPrice'=>$entity->getWebPrice()));
     }
 
@@ -520,7 +530,7 @@ class ItemController extends Controller
     {
 	    $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
     	$data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\Item::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Item entity.');
@@ -528,18 +538,18 @@ class ItemController extends Controller
 
 	    if($data['name'] == 'Barcode') {
             $barcode = trim($data['value']);
-		    $existBarcode = $this->getDoctrine()->getRepository( \App\Inventory\Entity\Item::class )->findBy( array('inventoryConfig'=>$config, 'barcode' => $barcode) );
+		    $existBarcode = $this->em->getRepository( \App\Inventory\Entity\Item::class )->findBy( array('inventoryConfig'=>$config, 'barcode' => $barcode) );
 		    if ( empty( $existBarcode ) ) {
 			    $entity->setBarcode($barcode);
 			    $em->flush();
 		    }else{
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'notice'," $barcode This barcode already used another item"
                 );
             }
 
 	    }elseif($data['name'] == 'Sku'){
-		    $existSku = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->findBy(array('inventoryConfig'=>$config,'sku' => $data['value']));
+		    $existSku = $this->em->getRepository(\App\Inventory\Entity\Item::class)->findBy(array('inventoryConfig'=>$config,'sku' => $data['value']));
 		    if(empty($existSku)){
 			    $entity->setSku($data['value']);
 			    $em->flush();
@@ -559,8 +569,8 @@ class ItemController extends Controller
     public function webStatusAction(Request $request,Item $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig'=> $config,'id' => $entity->getId()));
-        $em = $this->getDoctrine()->getManager();
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig'=> $config,'id' => $entity->getId()));
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -571,7 +581,7 @@ class ItemController extends Controller
             $entity->setIsWeb(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         $referer = $request->headers->get('referer');
@@ -582,7 +592,7 @@ class ItemController extends Controller
     public function vendorItemAction($vendor)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->findBy(
+        $entities = $this->em->getRepository(\App\Inventory\Entity\Item::class)->findBy(
             array(
                 'inventoryConfig'=>$inventory,
                 'vendor'=>$vendor)
@@ -600,11 +610,11 @@ class ItemController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $items = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findItemWithPurchaseQuantity($inventory);
+        $items = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findItemWithPurchaseQuantity($inventory);
         foreach ($items as $row){
-           $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->find($row['itemId']);
+           $item = $this->em->getRepository(\App\Inventory\Entity\Item::class)->find($row['itemId']);
            $item->setPurchaseQuantity($row['quantity']);
            $em->flush();
         }
@@ -615,15 +625,15 @@ class ItemController extends Controller
 	{
 		set_time_limit(0);
 		ignore_user_abort(true);
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-		$items = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findItemWithPurchaseQuantity($inventory);
+		$items = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findItemWithPurchaseQuantity($inventory);
 		foreach ($items as $row){
-			$item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->find($row['itemId']);
-			$salesQnt = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($row['itemId'],'sales');
-			$salesReturnQnt = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($row['itemId'],'salesReturn');
-			$purchaseReturnQnt = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($row['itemId'],'purchaseReturn');
-			$damageQnt = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($row['itemId'],'damage');
+			$item = $this->em->getRepository(\App\Inventory\Entity\Item::class)->find($row['itemId']);
+			$salesQnt = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($row['itemId'],'sales');
+			$salesReturnQnt = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($row['itemId'],'salesReturn');
+			$purchaseReturnQnt = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($row['itemId'],'purchaseReturn');
+			$damageQnt = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($row['itemId'],'damage');
 			$item->setPurchaseQuantity($row['quantity']);
 			$item->setSalesQuantity($salesQnt);
 			$item->setSalesQuantityReturn($salesReturnQnt);
@@ -640,7 +650,7 @@ class ItemController extends Controller
 	{
 		$data = $request->request->all();
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$entity = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($data['pk']);
 		if (!$entity) {
 			throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
@@ -659,7 +669,7 @@ class ItemController extends Controller
 			$em->flush();
 			$em->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseSimpleUpdate($entity->getPurchase());
 		}
-		$salesQnt = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemQuantity($entity,array('sales','damage','purchaseReturn'));
+		$salesQnt = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemQuantity($entity,array('sales','damage','purchaseReturn'));
 		if($data['name'] == 'Quantity' and $salesQnt <= (int)$data['value']){
 			$entity->setQuantity((int)$data['value']);
 			$entity->setPurchaseSubTotal((int)$data['value'] * $entity->getPurchasePrice());
@@ -669,7 +679,7 @@ class ItemController extends Controller
 		}
 
 		if($data['name'] == 'Barcode'){
-			$existBarcode = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(array('inventoryConfig'=>$config,'barcode' => $data['value']));
+			$existBarcode = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(array('inventoryConfig'=>$config,'barcode' => $data['value']));
 			if(empty($existBarcode)){
 				$process = 'set'.$data['name'];
 				$entity->$process($data['value']);
@@ -685,7 +695,7 @@ class ItemController extends Controller
 
 		set_time_limit(0);
 		ignore_user_abort(true);
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$global = $this->getUser()->getGlobalOption();
 		$data = $_REQUEST;
 		$array = array();
@@ -739,10 +749,11 @@ class ItemController extends Controller
 
 		set_time_limit(0);
 		ignore_user_abort(true);
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$global = $this->getUser()->getGlobalOption();
 		$data = $_REQUEST;
-		$entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->gpProductWiseSales($global,$data);
+		$entities = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->gpProductWiseSales($global,$data);
+		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
 
 		$phpExcelObject->setActiveSheetIndex(0)
@@ -791,8 +802,10 @@ class ItemController extends Controller
 		$phpExcelObject->setActiveSheetIndex(0);
 
 		// create the writer
+		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
 		// create the response
+		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$response = $this->get('phpexcel')->createStreamedResponse($writer);
 		// adding headers
 		$dispositionHeader = $response->headers->makeDisposition(

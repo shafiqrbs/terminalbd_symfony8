@@ -2,9 +2,12 @@
 
 namespace App\Content\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Content\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Content\Entity\Blog;
 use App\Content\Form\BlogType;
@@ -13,16 +16,23 @@ use App\Content\Form\BlogType;
  * Blog controller.
  *
  */
-class BlogController extends Controller
+class BlogController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -35,7 +45,7 @@ class BlogController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Content\Entity\Page::class)->getPagesFor($globalOption,'blog');
@@ -57,16 +67,16 @@ class BlogController extends Controller
 
         $user = $this->getUser();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
 
-            $entity ->setModule($this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'blog')));
+            $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'blog')));
             $entity->setUser($user);
             $entity->setGlobalOption($user->getGlobalOption());
             $entity->upload();
             $em->persist($entity);
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('blog'));
@@ -88,7 +98,7 @@ class BlogController extends Controller
     {
 
         $globalOption = $this->getUser()->getGlobalOption();
-        $module = $this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'blog'));
+        $module = $this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'blog'));
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into BlogType::configureOptions() and pass them as form options: $globalOption,$module), $entity, array(
         $form = $this->createForm(new BlogType($globalOption,$module), $entity, array(
@@ -124,7 +134,7 @@ class BlogController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:Blog')->find($id);
 
@@ -146,7 +156,7 @@ class BlogController extends Controller
      */
     public function editAction(Page $entity )
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $editForm = $this->createEditForm($entity);
 
         return $this->render('Content/Blog/new.html.twig', array(
@@ -166,7 +176,7 @@ class BlogController extends Controller
     private function createEditForm(Page $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $module = $this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'blog'));
+        $module = $this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'blog'));
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into BlogType::configureOptions() and pass them as form options: $globalOption,$module), $entity, array(
         $form = $this->createForm(new BlogType($globalOption,$module), $entity, array(
@@ -186,7 +196,7 @@ class BlogController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -206,7 +216,7 @@ class BlogController extends Controller
             $entity->upload();
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('blog_edit', array('id' => $id)));
@@ -224,13 +234,13 @@ class BlogController extends Controller
      */
     public function deleteAction(Page $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($entity->getFile())){
             $entity->removeUpload();
         }
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add('success',"Data has been updated successfully");
+        $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been updated successfully");
         return $this->redirect($this->generateUrl('blog'));
     }
 
@@ -257,7 +267,7 @@ class BlogController extends Controller
     public function statusAction(Request $request, Page $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $status = $entity->getStatus();
         if($status == 1){
             $entity->setStatus(0);
@@ -265,7 +275,7 @@ class BlogController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('blog'));

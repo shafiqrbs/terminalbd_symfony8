@@ -4,6 +4,9 @@ namespace App\Hospital\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Hospital\Entity\HmsInvoiceReturn;
 use App\Hospital\Entity\Invoice;
@@ -18,6 +21,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class InvoiceReturnController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     /**
      * Lists all Vendor entities.
@@ -27,10 +37,10 @@ class InvoiceReturnController extends AbstractController
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -44,14 +54,14 @@ class InvoiceReturnController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $entities = $em->getRepository(\App\Hospital\Entity\HmsInvoiceReturn::class)->invoiceLists( $user, $data);
         $pagination = $this->paginate($entities);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,[5]);
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,[5,6]);
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,[5]);
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,[5,6]);
         return $this->render('Hospital/InvoiceReturn/index.html.twig', [
             'entities' => $pagination,
             'assignDoctors' => $assignDoctors,
@@ -69,7 +79,7 @@ class InvoiceReturnController extends AbstractController
     public function createAction($id)
     {
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(['hospitalConfig' => $hospital, 'id' => $id]);
+        $entity = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(['hospitalConfig' => $hospital, 'id' => $id]);
         if(!empty($entity->getHmsInvoiceReturn())){
             return $this->redirect($this->generateUrl('hms_invoicereturn'));
         }
@@ -81,12 +91,12 @@ class InvoiceReturnController extends AbstractController
 
     public function paymentAction(Invoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $request = $_REQUEST;
         $payment = $request['payment'];
         $remark = $request['remark'];
         if ( (!empty($invoice)  and empty($invoice->HmsInvoiceReturn) and !empty($payment)) and $invoice->getTotal() >= $payment ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = new HmsInvoiceReturn();
             $entity->setHospitalConfig($invoice->getHospitalConfig());
             $entity->setHmsInvoice($invoice);
@@ -104,7 +114,7 @@ class InvoiceReturnController extends AbstractController
 
     public function canceledAction(InvoiceParticular $particular)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particular->setProcess('Canceled');
         $particular->setParticularDeliveredBy(null);
         $em->flush();
@@ -113,10 +123,10 @@ class InvoiceReturnController extends AbstractController
 
     public function approveAction(HmsInvoiceReturn $invoice )
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($invoice) and $invoice->getProcess() != 'Approved'){
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->hmsReturnInvoice($invoice);
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updateProcess($invoice);
+            $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->hmsReturnInvoice($invoice);
+            $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updateProcess($invoice);
             $invoice->setProcess('Approved');
             $em->persist($invoice);
             $em->flush($invoice);
@@ -131,7 +141,7 @@ class InvoiceReturnController extends AbstractController
 
     public function deleteAction(HmsInvoiceReturn $return )
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$return) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
@@ -148,7 +158,7 @@ class InvoiceReturnController extends AbstractController
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Hospital\Entity\HmsInvoiceReturn::class)->find($id);
 
         if (!$entity) {
@@ -162,7 +172,7 @@ class InvoiceReturnController extends AbstractController
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_InvoiceReturn'));

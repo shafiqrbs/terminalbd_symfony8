@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,11 @@ use App\Content\Form\SiteSliderType;
  */
 class SiteSliderController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all SiteSlider entities.
@@ -23,7 +29,7 @@ class SiteSliderController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Content\Entity\SiteSlider::class)->findAll();
 
@@ -42,9 +48,10 @@ class SiteSliderController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
 
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $uploadableManager = $this->get('stof_doctrine_extensions.uploadable.manager');
 
             // Here, "getMyFile" returns the "UploadedFile" instance that the form bound in your $myFile property
@@ -120,7 +127,7 @@ class SiteSliderController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\SiteSlider::class)->find($id);
 
@@ -166,7 +173,7 @@ class SiteSliderController extends AbstractController
      */
     public function updateAction(Request $request, SiteSlider $entity )
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $deleteForm = $this->createDeleteForm($entity->getId());
         $editForm = $this->createEditForm($entity);
@@ -174,6 +181,7 @@ class SiteSliderController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
 	        $entity->upload();
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             //$uploadableManager = $this->get('stof_doctrine_extensions.uploadable.manager');
             // Here, "getMyFile" returns the "UploadedFile" instance that the form bound in your $myFile property
             //$uploadableManager->markEntityToUpload($entity, $entity->getFile());
@@ -197,7 +205,7 @@ class SiteSliderController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Content\Entity\SiteSlider::class)->find($id);
 
             if (!$entity) {

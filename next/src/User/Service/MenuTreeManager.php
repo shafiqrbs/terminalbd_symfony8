@@ -3,7 +3,7 @@
 namespace App\User\Service;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Tool\Entity\GlobalOption;
 
 /**
@@ -22,7 +22,7 @@ class MenuTreeManager
      */
     protected  $em;
 
-    public function  __construct(private readonly Registry $doctrine)
+    public function  __construct(private readonly ManagerRegistry $doctrine)
     {
         $this->em = $this->doctrine->getManager();
     }

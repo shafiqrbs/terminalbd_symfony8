@@ -2,6 +2,8 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,6 +18,12 @@ use App\Tool\Form\BrandingType;
  */
 class BrandingController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Branding entities.
@@ -23,7 +31,7 @@ class BrandingController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\Branding::class)->findAll();
 
@@ -42,7 +50,7 @@ class BrandingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->upload();
             $em->persist($entity);
             $em->flush();
@@ -98,7 +106,7 @@ class BrandingController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Branding::class)->find($id);
 
@@ -120,7 +128,7 @@ class BrandingController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Branding::class)->find($id);
 
@@ -163,7 +171,7 @@ class BrandingController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Branding::class)->find($id);
 
@@ -199,7 +207,7 @@ class BrandingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Tool\Entity\Branding::class)->find($id);
 
             if (!$entity) {
@@ -239,7 +247,7 @@ class BrandingController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\Branding::class)->find($id);
 
         if (!$entity) {
@@ -253,7 +261,7 @@ class BrandingController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('branding'));
@@ -263,7 +271,7 @@ class BrandingController extends AbstractController
     {
         $item = $_REQUEST['q'];
         if ($item) {
-            $item = $this->getDoctrine()->getRepository(\App\Tool\Entity\Branding::class)->searchAutoComplete($item);
+            $item = $this->em->getRepository(\App\Tool\Entity\Branding::class)->searchAutoComplete($item);
         }
         return new JsonResponse($item);
     }

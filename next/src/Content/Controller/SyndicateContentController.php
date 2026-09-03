@@ -2,8 +2,11 @@
 
 namespace App\Content\Controller;
 
+use App\Appearance\Service\MenuManager;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Content\Entity\SyndicateContent;
 use App\Content\Form\SyndicateContentType;
@@ -12,8 +15,15 @@ use App\Content\Form\SyndicateContentType;
  * SyndicateContent controller.
  *
  */
-class SyndicateContentController extends Controller
+class SyndicateContentController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly MenuManager $menuManager,
+    ) {
+    }
+
 
     /**
      * Lists all SyndicateContent entities.
@@ -21,10 +31,10 @@ class SyndicateContentController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Content\Entity\SyndicateContent::class)->findAll();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
         return $this->render('Content/SyndicateContent/index.html.twig', array(
             'user' => $user,
         ));
@@ -40,8 +50,8 @@ class SyndicateContentController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $entity->setSlug($this->get('setting.menuSettingRepo')->urlSlug($entity->getName()));
+            $em = $this->em;
+            $entity->setSlug($this->menuManager->urlSlug($entity->getName()));
             $em->persist($entity);
             $em->flush();
 
@@ -107,7 +117,7 @@ class SyndicateContentController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\SyndicateContent::class)->find($id);
 
@@ -129,13 +139,13 @@ class SyndicateContentController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\SyndicateContent::class)->findOneBy(array('syndicate'=>$id));
 
         if (!$entity) {
-            $user = $this->get('security.context')->getToken()->getUser();
-            $this->getDoctrine()->getRepository(\App\Content\Entity\SyndicateContent::class)->insertContent($id,$user);
+            $user = $this->getUser();
+            $this->em->getRepository(\App\Content\Entity\SyndicateContent::class)->insertContent($id,$user);
             $entity = $em->getRepository(\App\Content\Entity\SyndicateContent::class)->findOneBy(array('syndicate'=>$id));
 
         }
@@ -181,7 +191,7 @@ class SyndicateContentController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\SyndicateContent::class)->find($id);
 
@@ -194,12 +204,12 @@ class SyndicateContentController extends Controller
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
-            $entity->setSlug($this->get('setting.menuSettingRepo')->urlSlug($entity->getName()));
+            $entity->setSlug($this->menuManager->urlSlug($entity->getName()));
             $entity->upload();
             $em->flush();
             $syndicateId = $entity->getSyndicate()->getId();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
 
@@ -222,7 +232,7 @@ class SyndicateContentController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Content\Entity\SyndicateContent::class)->find($id);
 
             if (!$entity) {

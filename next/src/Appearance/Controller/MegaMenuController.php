@@ -2,8 +2,10 @@
 
 namespace App\Appearance\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Appearance\Entity\MegaMenu;
 use App\Appearance\Form\MegaMenuType;
@@ -12,8 +14,14 @@ use App\Appearance\Form\MegaMenuType;
  * MegaMenu controller.
  *
  */
-class MegaMenuController extends Controller
+class MegaMenuController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all MegaMenu entities.
@@ -21,7 +29,7 @@ class MegaMenuController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository('SettingAppearanceBundle:MegaMenu')->findBy(array(),array('sorting' => 'asc'));
         return $this->render('Appearance/MegaMenu/index.html.twig', array(
             'entities' => $entities,
@@ -40,11 +48,11 @@ class MegaMenuController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
 
@@ -67,10 +75,10 @@ class MegaMenuController extends Controller
     private function createCreateForm(MegaMenu $entity)
     {
 
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
-        $cr = $this->getDoctrine()->getRepository(\App\Product\Entity\Collection::class);
-        $sr = $this->getDoctrine()->getRepository(\App\Tool\Entity\Syndicate::class);
-        $go = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
+        $cr = $this->em->getRepository(\App\Product\Entity\Collection::class);
+        $sr = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
+        $go = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class);
 
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into MegaMenuType::configureOptions() and pass them as form options: $em, $cr , $sr, $go), $entity, array(
@@ -121,7 +129,7 @@ class MegaMenuController extends Controller
 
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingAppearanceBundle:MegaMenu')->find($id);
 
@@ -143,7 +151,7 @@ class MegaMenuController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingAppearanceBundle:MegaMenu')->find($id);
 
@@ -168,9 +176,9 @@ class MegaMenuController extends Controller
      */
     private function createEditForm(MegaMenu $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
-        $cr = $this->getDoctrine()->getRepository(\App\Product\Entity\Collection::class);
-        $sr = $this->getDoctrine()->getRepository(\App\Tool\Entity\Syndicate::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
+        $cr = $this->em->getRepository(\App\Product\Entity\Collection::class);
+        $sr = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into MegaMenuType::configureOptions() and pass them as form options: $em, $cr,$sr), $entity, array(
         $form = $this->createForm(new MegaMenuType($em, $cr,$sr), $entity, array(
@@ -191,7 +199,7 @@ class MegaMenuController extends Controller
      */
     public function updateAction(Request $request, MegaMenu $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
 
 
@@ -202,7 +210,7 @@ class MegaMenuController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
 
@@ -223,7 +231,7 @@ class MegaMenuController extends Controller
     public function deleteAction(MegaMenu $megamenu )
     {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             if (!$megamenu) {
                 throw $this->createNotFoundException('Unable to find MegaMenu entity.');
             }
@@ -256,7 +264,7 @@ class MegaMenuController extends Controller
     public function sortedAction(Request $request){
 
         $data = $request->request->get('menuItem');
-        $this->getDoctrine()->getRepository('SettingAppearanceBundle:MegaMenu')->setOrdering($data);
+        $this->em->getRepository('SettingAppearanceBundle:MegaMenu')->setOrdering($data);
         exit;
 
     }
@@ -270,7 +278,7 @@ class MegaMenuController extends Controller
         $form = $this->createDeleteForm($entity->getId());
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $status = $entity->getStatus();
         if($status == 1){
             $entity->setStatus(0);
@@ -278,7 +286,7 @@ class MegaMenuController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('megamenu'));

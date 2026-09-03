@@ -2,6 +2,8 @@
 
 namespace App\DoctorPrescription\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -17,6 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ServiceController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     /**
@@ -27,7 +35,7 @@ class ServiceController extends AbstractController
     {
         $entity = new DpsService();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
         $pagination = $em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->getServiceLists($config);
         $editForm = $this->createCreateForm($entity);
@@ -46,18 +54,18 @@ class ServiceController extends AbstractController
     public function createAction(Request $request)
     {
         $entity = new DpsService();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
         $pagination = $em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->getServiceLists($config);
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setDpsConfig($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('dps_service'));
@@ -98,7 +106,7 @@ class ServiceController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
         $pagination = $em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->getServiceLists($config);
         //$pagination = $this->paginate($pagination);
@@ -142,7 +150,7 @@ class ServiceController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
         $pagination = $em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->getServiceLists($config);
         //$pagination = $this->paginate($pagination);
@@ -157,7 +165,7 @@ class ServiceController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setSlug($entity->getName());
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('dps_service'));
@@ -175,7 +183,7 @@ class ServiceController extends AbstractController
      */
     public function deleteAction(DpsService $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -183,16 +191,16 @@ class ServiceController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -207,7 +215,7 @@ class ServiceController extends AbstractController
     public function statusAction(DpsService $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -219,7 +227,7 @@ class ServiceController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('dps_service:'));
@@ -232,7 +240,7 @@ class ServiceController extends AbstractController
     public function sortedAction(Request $request,$fieldName)
     {
         $data = $request ->request->get('item');
-        $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->setListOrdering($fieldName,$data);
+        $this->em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->setListOrdering($fieldName,$data);
         exit;
     }
 

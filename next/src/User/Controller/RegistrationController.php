@@ -11,6 +11,7 @@
 
 namespace App\User\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use FOS\UserBundle\Controller\RegistrationController as Controller;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
@@ -25,16 +26,20 @@ use Symfony\Component\HttpFoundation\Request;
  * @author Thibault Duplessis <thibault.duplessis@gmail.com>
  * @author Christophe Coevoet <stof@notk.org>
  */
+// TODO(migration): extends an aliased FOSUserBundle controller that no longer exists.
+// Reimplement the inherited behaviour on AbstractController.
 class RegistrationController extends Controller
 {
     public function registerAction(Request $request)
     {
         /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $formFactory = $this->get('fos_user.registration.form.factory');
         /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $userManager = $this->get('fos_user.user_manager');
         /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher = $this->eventDispatcher;
 
         $user = $userManager->createUser();
         $user->setEnabled(true);

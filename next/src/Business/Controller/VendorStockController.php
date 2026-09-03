@@ -2,6 +2,10 @@
 
 namespace App\Business\Controller;
 
+use Twig\Environment;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountVendor;
 use App\Business\Entity\BusinessParticular;
 use App\Business\Entity\BusinessVendorStock;
@@ -10,22 +14,30 @@ use App\Business\Form\VendorStockType;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Vendor controller.
  *
  */
-class VendorStockController extends Controller
+class VendorStockController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -39,10 +51,10 @@ class VendorStockController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $data = $_REQUEST;
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findWithSearch($this->getUser(),$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findWithSearch($this->getUser(),$data);
         $pagination = $this->paginate($entities);
         return $this->render('Business/VendorStock/index.html.twig', array(
             'entities' => $pagination,
@@ -57,14 +69,14 @@ class VendorStockController extends Controller
      */
     public function vendorStockItemAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->findWithSearch($this->getUser(),$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->findWithSearch($this->getUser(),$data);
         $pagination = $this->paginate($entities);
-        $salesItems = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getSalesStockItem($pagination,$data);
-        $purchaseItems = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->getPurchaseStockItem($pagination,$data);
-        $vendors = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $this->getUser()->getGlobalOption()],['companyName'=>'ASC']);
+        $salesItems = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getSalesStockItem($pagination,$data);
+        $purchaseItems = $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->getPurchaseStockItem($pagination,$data);
+        $vendors = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $this->getUser()->getGlobalOption()],['companyName'=>'ASC']);
         return $this->render("Business/VendorStock/vendor-stock.html.twig", array(
             'pagination' => $pagination,
             'salesItems' => $salesItems,
@@ -91,7 +103,7 @@ class VendorStockController extends Controller
     public function newAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new BusinessVendorStock();
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity->setBusinessConfig($config);
@@ -106,7 +118,7 @@ class VendorStockController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
@@ -149,7 +161,7 @@ class VendorStockController extends Controller
 
     public function returnResultData(BusinessVendorStock $invoice,$msg=''){
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->getVendorStockItems($invoice);
+        $invoiceParticulars = $this->em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->getVendorStockItems($invoice);
         $subTotal = $invoice->getSubTotal() > 0 ? $invoice->getSubTotal() : 0;
          $data = array(
             'subTotal' => $subTotal,
@@ -170,13 +182,13 @@ class VendorStockController extends Controller
 
     public function addParticularAction(Request $request, BusinessVendorStock $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price);
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->insertVendorStockItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStock::class)->updateVendorStockTotalPrice($invoice);
+        $this->em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->insertVendorStockItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->updateVendorStockTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -184,13 +196,13 @@ class VendorStockController extends Controller
 
     public function invoiceParticularDeleteAction(BusinessVendorStock $invoice, BusinessVendorStockItem $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStock::class)->updateVendorStockTotalPrice($invoice);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->updateVendorStockTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -199,7 +211,7 @@ class VendorStockController extends Controller
     public function selectGrnAction(AccountVendor $vendor)
     {
         $particular = $_REQUEST['particular'];
-        $purchaseItems = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->getDropdownList($vendor,$particular);
+        $purchaseItems = $this->em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->getDropdownList($vendor,$particular);
         return new Response($purchaseItems);
 
     }
@@ -212,7 +224,7 @@ class VendorStockController extends Controller
 
     public function updateAction(Request $request, BusinessVendorStock $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -240,7 +252,7 @@ class VendorStockController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
@@ -254,15 +266,15 @@ class VendorStockController extends Controller
 
     public function approvedAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $vendorStock = $em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
         if (!empty($vendorStock) and $vendorStock->getprocess() != 'Approved') {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $vendorStock->setProcess('Approved');
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->vendorStockItemUpdate($vendorStock);
+            $this->em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->vendorStockItemUpdate($vendorStock);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -272,14 +284,14 @@ class VendorStockController extends Controller
 
     public function purchaseProcessAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $vendorStock = $em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
         if (!empty($vendorStock)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $vendorStock->setProcess('Purchase');
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->insertVendorStockLotPurchase($vendorStock);
+            $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->insertVendorStockLotPurchase($vendorStock);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -295,9 +307,9 @@ class VendorStockController extends Controller
     {
 
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
+        $entity = $this->em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -310,8 +322,8 @@ class VendorStockController extends Controller
     {
 
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->findOneBy(array('id' => $id));
-        $em = $this->getDoctrine()->getManager();
+        $entity = $this->em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->findOneBy(array('id' => $id));
+        $em = $this->em;
         if ($entity->getBusinessVendorStock()->getBusinessConfig()->getId() == $config ) {
             $entity->setStatus(true);
             $em->flush();
@@ -334,26 +346,26 @@ class VendorStockController extends Controller
          * Delete Journal & Account VendorStock
          */
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $VendorStock = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
+        $VendorStock = $this->em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if($VendorStock->getAsInvestment() == 1 ) {
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedBusinessVendorStockJournal($VendorStock);
+            $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedBusinessVendorStockJournal($VendorStock);
         }
-        $this->getDoctrine()->getRepository('AccountingBundle:AccountVendorStock')->accountBusinessVendorStockReverse($VendorStock);
+        $this->em->getRepository('AccountingBundle:AccountVendorStock')->accountBusinessVendorStockReverse($VendorStock);
         $VendorStock->setIsReversed(true);
         $VendorStock->setProcess('created');
         $VendorStock->setApprovedBy(NULL);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getVendorStockUpdateQnt($VendorStock);
-        $template = $this->get('twig')->render('Business/VendorStock/VendorStockReverse.html.twig', array(
+        $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getVendorStockUpdateQnt($VendorStock);
+        $template = $this->twig->render('Business/VendorStock/VendorStockReverse.html.twig', array(
             'entity' => $VendorStock,
             'config' => $VendorStock->getBusinessConfig(),
         ));
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessReverse::class)->VendorStockReverse($VendorStock, $template);
+        $this->em->getRepository(\App\Business\Entity\BusinessReverse::class)->VendorStockReverse($VendorStock, $template);
         return $this->redirect($this->generateUrl('business_vendor_stock_edit',array('id' => $VendorStock->getId())));
     }
 
@@ -380,7 +392,7 @@ class VendorStockController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var $entity BusinessVendorStockItem */
         $entity = $em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->find($data['pk']);
         if (!$entity) {
@@ -390,7 +402,7 @@ class VendorStockController extends Controller
         $entity->setQuantity($quantity);
         $entity->setSubTotal($quantity * $entity->getPrice());
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessVendorStock::class)->updateVendorStockTotalPrice($entity->getBusinessVendorStock());
+        $this->em->getRepository(\App\Business\Entity\BusinessVendorStock::class)->updateVendorStockTotalPrice($entity->getBusinessVendorStock());
         return new Response('success');
 
     }

@@ -2,6 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Inventory\Entity\ItemStockAdjustment;
@@ -15,13 +18,20 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class StockAdjustmentController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 	public function paginate($entities)
 	{
-		$paginator = $this->get('knp_paginator');
+		$paginator = $this->paginator;
 		$pagination = $paginator->paginate(
 			$entities,
-			$this->get('request')->query->get('page', 1)/*page number*/,
+			$this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
 			25  /*limit per page*/
 		);
 		$pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -35,10 +45,10 @@ class StockAdjustmentController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig()->getId();
-        $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemStockAdjustment::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\ItemStockAdjustment::class)->findWithSearch($config,$data);
 	    $pagination = $this->paginate($entities);
 	    return $this->render('Inventory/StockAdjustment/index.html.twig', [
             'entities' => $pagination
@@ -64,11 +74,11 @@ class StockAdjustmentController extends AbstractController
         $entity = new ItemStockAdjustment();
         $data = $request->request->all();
         /* @var $stock Item */
-        $stock = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->find($data['adjustment']['item']);
+        $stock = $this->em->getRepository(\App\Inventory\Entity\Item::class)->find($data['adjustment']['item']);
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setConfig($config);
             $entity->setItem($stock);
@@ -78,7 +88,7 @@ class StockAdjustmentController extends AbstractController
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('inv_stock_adjustment', ['id' => $entity->getId()]));
@@ -117,11 +127,11 @@ class StockAdjustmentController extends AbstractController
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\ItemStockAdjustment::class)->find($id);
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('inv_stock_adjustment'));
@@ -129,16 +139,16 @@ class StockAdjustmentController extends AbstractController
 
 	public function approvedAction($id)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $damage = $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemStockAdjustment::class)->findOneBy(['config'=>$config,'id'=>$id]);
+        $damage = $this->em->getRepository(\App\Inventory\Entity\ItemStockAdjustment::class)->findOneBy(['config'=>$config,'id'=>$id]);
         /* @var $damage ItemStockAdjustment */
 
         if (!empty($damage) and ($damage->getProcess() == 'Created')) {
-			$em = $this->getDoctrine()->getManager();
+			$em = $this->em;
 			$damage->setProcess('Approved');
 			$em->flush();
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->stockAdjustment($damage->getItem());
+            $this->em->getRepository(\App\Inventory\Entity\Item::class)->stockAdjustment($damage->getItem());
             return new Response('success');
 		} else {
 			return new Response('failed');

@@ -2,11 +2,14 @@
 
 namespace App\Content\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Snappy\Pdf;
 use App\Content\Entity\PageMeta;
 use App\Content\Entity\PageModule;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Content\Entity\Page;
 use App\Content\Form\PageType;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,16 +18,23 @@ use Symfony\Component\HttpFoundation\Response;
  * Page controller.
  *
  */
-class PageController extends Controller
+class PageController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -37,7 +47,7 @@ class PageController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Content\Entity\Page::class)->getPagesFor($this->getUser()->getGlobalOption(),'page');
         $entities = $this->paginate($entities);
@@ -62,17 +72,17 @@ class PageController extends Controller
         $data = $request->request->all();
         if ($form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setUser($this->getUser());
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
-            $entity ->setModule($this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'page')));
+            $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'page')));
             $entity ->upload();
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Content\Entity\PageMeta::class)->pageMeta($entity,$data);
-            $this->getDoctrine()->getRepository(\App\Appearance\Entity\Menu::class)->createMenuForPage($entity);
+            $this->em->getRepository(\App\Content\Entity\PageMeta::class)->pageMeta($entity,$data);
+            $this->em->getRepository(\App\Appearance\Entity\Menu::class)->createMenuForPage($entity);
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('page'));
@@ -190,7 +200,7 @@ class PageController extends Controller
      */
     public function updateAction(Request $request, Page $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         $data = $request->request->all();
@@ -202,12 +212,12 @@ class PageController extends Controller
                 $entity->upload();
             }
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Content\Entity\PageMeta::class)->pageMeta($entity,$data);
-            $this->getDoctrine()->getRepository(\App\Content\Entity\PageModule::class)->createFeatureModule($entity,$data);
-            $this->getDoctrine()->getRepository(\App\Content\Entity\Page::class)->updatePageMenu($entity);
+            $this->em->getRepository(\App\Content\Entity\PageMeta::class)->pageMeta($entity,$data);
+            $this->em->getRepository(\App\Content\Entity\PageModule::class)->createFeatureModule($entity,$data);
+            $this->em->getRepository(\App\Content\Entity\Page::class)->updatePageMenu($entity);
 
             return $this->redirect($this->generateUrl('page_edit', array('id' => $entity->getId())));
         }
@@ -224,13 +234,13 @@ class PageController extends Controller
      */
     public function deleteAction(Page $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($entity->getFile())){
             $entity->removeUpload();
         }
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add('success',"Data has been updated successfully");
+        $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been updated successfully");
         return $this->redirect($this->generateUrl('page'));
 }
 
@@ -241,7 +251,7 @@ class PageController extends Controller
     public function statusAction(Request $request, Page $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $status = $entity->getStatus();
         if($status == 1){
             $entity->setStatus(0);
@@ -249,7 +259,7 @@ class PageController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('page'));
@@ -289,7 +299,7 @@ class PageController extends Controller
 
     public function metaDeleteAction(PageMeta $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->remove($entity);
         $em->flush();
         return new Response('success');

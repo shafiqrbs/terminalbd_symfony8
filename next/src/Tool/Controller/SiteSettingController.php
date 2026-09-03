@@ -2,9 +2,12 @@
 
 namespace App\Tool\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Tool\Entity\SiteSetting;
 use App\Tool\Entity\GlobalOption;
@@ -14,8 +17,15 @@ use App\Tool\Form\SiteSettingType;
  * SiteSetting controller.
  *
  */
-class SiteSettingController extends Controller
+class SiteSettingController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     /**
      * Lists all SiteSetting entities.
@@ -23,7 +33,7 @@ class SiteSettingController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\SiteSetting::class)->findAll();
         $paginate = $this->paginate($entities);
@@ -36,10 +46,10 @@ class SiteSettingController extends Controller
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             30  /*limit per page*/
         );
         return $pagination;
@@ -63,8 +73,8 @@ class SiteSettingController extends Controller
      */
     private function createCreateForm(SiteSetting $entity)
     {
-        $user = $this->get('security.context')->getToken()->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(array('user' => $user));
         if($entities){
             $syndicateId = $entities->getSyndicate()->getId();
@@ -107,7 +117,7 @@ class SiteSettingController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\SiteSetting::class)->find($id);
 
@@ -128,7 +138,7 @@ class SiteSettingController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\SiteSetting::class)->find($id);
 
@@ -150,7 +160,7 @@ class SiteSettingController extends Controller
     private function createEditForm(SiteSetting $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(array('user' => $entity->getUser()));
         if($entities){
             $syndicateId = $entities->getSyndicate()->getId();
@@ -175,7 +185,7 @@ class SiteSettingController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\SiteSetting::class)->find($id);
 
@@ -189,11 +199,11 @@ class SiteSettingController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
         }
-        $this->getDoctrine()->getRepository(\App\Tool\Entity\SiteSetting::class)->updateSettingMenu($entity);
+        $this->em->getRepository(\App\Tool\Entity\SiteSetting::class)->updateSettingMenu($entity);
 
         $referer = $request->headers->get('referer');
         return new RedirectResponse($referer);
@@ -208,7 +218,7 @@ class SiteSettingController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Tool\Entity\SiteSetting::class)->find($id);
 
             if (!$entity) {
@@ -245,9 +255,9 @@ class SiteSettingController extends Controller
      */
     public function modifyAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
 
         $entity = $em->getRepository(\App\Tool\Entity\SiteSetting::class)->findOneBy(array('user'=>$user));
 

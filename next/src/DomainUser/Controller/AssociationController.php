@@ -4,6 +4,10 @@ namespace App\DomainUser\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\BusinessInvoice;
 use App\Business\Form\AssociationInvoiceType;
 use App\DomainUser\Event\AssociationSmsEvent;
@@ -12,7 +16,7 @@ use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use App\Tool\Entity\GlobalOption;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\DomainUser\Entity\Customer;
@@ -23,15 +27,23 @@ use Symfony\Component\HttpFoundation\Response;
  * Customer controller.
  *
  */
-class AssociationController extends Controller
+class AssociationController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -42,14 +54,14 @@ class AssociationController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $data['type'] = "member";
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findWithSearch($globalOption,$data);
         $pagination = $this->paginate($entities);
-        $batches = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->studentBatchChoiceList();
-        $bloods = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->bloodsChoiceList();
+        $batches = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->studentBatchChoiceList();
+        $bloods = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->bloodsChoiceList();
         return $this->render('DomainUser/Association/index.html.twig', array(
             'entities' => $pagination,
             'batches' => $batches,
@@ -69,12 +81,12 @@ class AssociationController extends Controller
         $entity = new Customer();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
-        $entity = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'mobile'=>$mobile));
+        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
+        $entity = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'mobile'=>$mobile));
         if ($form->isValid() and empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($globalOption);
-	        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
             $em->persist($entity);
             $em->flush();
@@ -96,7 +108,7 @@ class AssociationController extends Controller
      */
     private function createCreateForm(Customer $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class);
+        $em = $this->em->getRepository(\App\DomainUser\Entity\Customer::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into MemberEditProfileType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new MemberEditProfileType($em), $entity, array(
@@ -127,7 +139,7 @@ class AssociationController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $config,'id'=> $id));
         if (!$entity) {
@@ -145,7 +157,7 @@ class AssociationController extends Controller
      */
     public function processAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $config, 'id' => $id ));
         if (!$entity) {
@@ -179,7 +191,7 @@ class AssociationController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findBy(array('globalOption' => $config));
         /* @var $global GlobalOption */
@@ -201,7 +213,7 @@ class AssociationController extends Controller
 
     public function memberShowAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->find($id);
         if (!$entity) {
@@ -215,7 +227,7 @@ class AssociationController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_CRM') or is_granted('ROLE_DOMAIN') or is_granted('ROLE_MEMBER_ASSOCIATION')"))]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->find($id);
 
@@ -239,7 +251,7 @@ class AssociationController extends Controller
     */
     private function createEditForm(Customer $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class);
+        $em = $this->em->getRepository(\App\DomainUser\Entity\Customer::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into MemberEditProfileType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new MemberEditProfileType($em), $entity, array(
@@ -258,7 +270,7 @@ class AssociationController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->find($id);
 
@@ -270,7 +282,7 @@ class AssociationController extends Controller
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
-	        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
             $em->flush();
             return $this->redirect($this->generateUrl('domain_association'));
@@ -284,7 +296,7 @@ class AssociationController extends Controller
 
     public function batchSelectAction()
     {
-        $entities = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->studentBatchChoiceList();
+        $entities = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->studentBatchChoiceList();
         $items = array();
         $items[] = array('value' => '','text'=> '-Select Batch-');
         foreach ($entities as $entity):
@@ -312,8 +324,8 @@ class AssociationController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
-        $entity = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->find($data['pk']);
+        $em = $this->em;
+        $entity = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
         }
@@ -330,13 +342,13 @@ class AssociationController extends Controller
 
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$globalOption,'id' => $id));
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Customer entity.');
         }
-        $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->find($entity->getUser());
+        $user = $this->em->getRepository(\App\User\Entity\User::class)->find($entity->getUser());
         if($user){
             $user->setEnabled(false);
             $user->setIsDelete(true);
@@ -345,10 +357,10 @@ class AssociationController extends Controller
         $entity->setGlobalOption(NULL);
         $entity->setStatus(false);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been deleted successfully"
         );
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->deleteAssociationInvoice($entity);
+        $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->deleteAssociationInvoice($entity);
         return new Response('Success');
     }
 
@@ -357,7 +369,7 @@ class AssociationController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoComplete($go,$item);
+            $item = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoComplete($go,$item);
         }
         return new JsonResponse($item);
     }
@@ -375,7 +387,7 @@ class AssociationController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteName($go,$item);
+            $item = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteName($go,$item);
         }
         return new JsonResponse($item);
     }
@@ -393,7 +405,7 @@ class AssociationController extends Controller
 
         $q = $_REQUEST['term'];
         $option = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteCode($option,$q);
+        $entities = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteCode($option,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('id' => $entity['customer'],'value' => $entity['text']);
@@ -415,7 +427,7 @@ class AssociationController extends Controller
     {
         $item = $_REQUEST['q'];
         if ($item) {
-            $item = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class)->searchAutoComplete($item);
+            $item = $this->em->getRepository(\App\Location\Entity\Location::class)->searchAutoComplete($item);
         }
         return new JsonResponse($item);
 
@@ -433,7 +445,7 @@ class AssociationController extends Controller
     {
         $q = $_REQUEST['q'];
         $option = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteName($option,$q);
+        $entities = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteName($option,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('id' => $entity['id'],'value' => $entity['id']);
@@ -446,7 +458,7 @@ class AssociationController extends Controller
     {
         $q = $_REQUEST['term'];
         $option = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoComplete($option,$q);
+        $entities = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoComplete($option,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('id' => $entity['customer'],'value' => $entity['id']);
@@ -460,11 +472,11 @@ class AssociationController extends Controller
     public function invoiceNewAction($customer)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option =  $this->getUser()->getGlobalOption();
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array("globalOption" => $option,"customerId" => $customer));
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array("globalOption" => $option,"customerId" => $customer));
 
-        $lastInvoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoiceParticular($customer);
+        $lastInvoice = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoiceParticular($customer);
 
         $entity = new BusinessInvoice();
         $editForm = $this->createInvoiceCreateForm($entity,$customer);
@@ -518,8 +530,8 @@ class AssociationController extends Controller
         $config = $user->getGlobalOption()->getBusinessConfig();
 
         $option =  $this->getUser()->getGlobalOption();
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array("globalOption" => $option,"customerId" => $customer));
-        $lastInvoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoiceParticular($customer);
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array("globalOption" => $option,"customerId" => $customer));
+        $lastInvoice = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoiceParticular($customer);
 
         $entity = new BusinessInvoice();
         $form = $this->createInvoiceCreateForm($entity,$customer);
@@ -529,7 +541,7 @@ class AssociationController extends Controller
             ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setBusinessConfig($config);
             $entity->setCustomer($customer);
             $entity->setMobile($customer->getMobile());
@@ -538,13 +550,13 @@ class AssociationController extends Controller
             $entity->setEndDate($lastInvoice->getEndDate());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Data has been inserted successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertStudentMonthlyParticular($entity,$lastInvoice, $data);
-            $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
+            $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertStudentMonthlyParticular($entity,$lastInvoice, $data);
+            $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
             if($entity->getProcess() == "Done"){
-                $accountSales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountInvoice($entity);
+                $accountSales = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountInvoice($entity);
                 $em->getRepository(\App\Accounting\Entity\Transaction::class)->serviceTransaction($accountSales);
                 /* @var $global GlobalOption */
                 $global = $this->getUser()->getGlobalOption();
@@ -555,7 +567,7 @@ class AssociationController extends Controller
             }
             return $this->redirect($this->generateUrl('domain_association_invoice'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'warning', "Payment information does not valid"
         );
         return $this->render("DomainUserBundle:Association/Invoice:new.html.twig", array(
@@ -571,7 +583,7 @@ class AssociationController extends Controller
     public function invoiceAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->invoiceLists( $config->getId(),$data);
@@ -587,7 +599,7 @@ class AssociationController extends Controller
     public function invoiceShowAction($id)
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
+        $entity = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
         return $this->render("DomainUserBundle:Association/Invoice:show.html.twig", array(
             'entity' => $entity,
         ));
@@ -598,7 +610,7 @@ class AssociationController extends Controller
      public function invoiceEditAction($id)
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
+        $entity = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
         $form = $this->editInvoiceCreateForm($entity);
         return $this->render("DomainUserBundle:Association/Invoice:edit.html.twig", array(
             'entity' => $entity,
@@ -637,7 +649,7 @@ class AssociationController extends Controller
     public function invoiceUpdateAction(Request $request,$id)
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
+        $entity = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
         $form = $this->editInvoiceCreateForm($entity);
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
@@ -645,21 +657,21 @@ class AssociationController extends Controller
             ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setBusinessConfig($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Data has been inserted successfully"
             );
             if($entity->getProcess() == "Done"){
-            $accountSales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountInvoice($entity);
+            $accountSales = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountInvoice($entity);
             $em->getRepository(\App\Accounting\Entity\Transaction::class)->serviceTransaction($accountSales);
             }
-            $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
+            $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
             return $this->redirect($this->generateUrl('domain_association_invoice'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'warning', "Payment information does not valid"
         );
         return $this->render("DomainUserBundle:Association/Invoice:edit.html.twig", array(
@@ -672,9 +684,9 @@ class AssociationController extends Controller
     public function invoicePrintAction($id)
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
+        $entity = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         /* @var $config BusinessConfig */
 
@@ -690,9 +702,9 @@ class AssociationController extends Controller
             }
             $amountInWords = '';
             if($entity->getProcess() == "Quotation"){
-                $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+                $amountInWords = $this->toolManager->intToWords($entity->getTotal());
             }
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($this->getUser()->getGlobalOption(),$entity->getCustomer());
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($this->getUser()->getGlobalOption(),$entity->getCustomer());
             $balance = empty($result) ? 0 : $result;
             return  $this->render("Business/Print/{$template}.html.twig",
                 array(

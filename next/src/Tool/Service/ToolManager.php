@@ -2,7 +2,7 @@
 
 namespace App\Tool\Service;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 /**
@@ -21,7 +21,7 @@ class ToolManager
      */
     protected $em;
 
-    public function  __construct(private readonly Registry $doctrine)
+    public function  __construct(private readonly ManagerRegistry $doctrine)
     {
         $this->em = $this->doctrine->getManager();
     }

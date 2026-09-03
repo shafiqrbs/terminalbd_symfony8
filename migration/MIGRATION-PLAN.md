@@ -51,6 +51,10 @@ OK (20 tests, 33 assertions)
 | `#[ORM\]` / `#[Gedmo\]` attributes | 8,388 / 432 |
 | `@Secure` → `#[IsGranted]` | 521 (184 single-role, 337 OR-expressions) |
 | Doctrine short-name aliases → FQCN | 6,507 |
+| Controllers that load | **333 / 336** |
+| Routes resolving to a real controller + action | **3,054 / 3,473** (419 are pre-existing dead routes) |
+| `$this->getDoctrine()` call sites converted | 5,838 |
+| Service-locator calls converted | 1,374 |
 | Container lint | passes |
 | Test suite | 20 tests, 33 assertions, green |
 | PHP syntax errors | 0 |
@@ -242,6 +246,15 @@ Removing the unreachable line preserves behaviour byte-for-byte. **The typo is d
 left in place**: correcting it would activate three constructors that have never executed,
 which initialise collections and set `status = true`.
 
+### 5.12 Routes pointing at controllers and actions that do not exist — 419
+
+229 name a controller class that is absent from the legacy tree too
+(`HotelReportController`, `EcommerceMenuController`, `FeatureController`,
+`TemplateController`, ...). 190 name an action that its controller never had — verified by hand:
+`pos.yml:118` routes to `PosBundle:Pos:salesItem`, and `PosController` has no `salesItemAction`
+in either tree. All 419 are catalogued in `migration/contract/unresolvable-routes.md`; each is a
+500 in production today.
+
 ### 5.9 Corrupted entity alias — 1 case, runtime fatal today
 
 `src/Setting/Bundle/ContentBundle/Controller/MallShopController.php:122` reads
@@ -362,8 +375,18 @@ declares explicit paths, so the standard YAML loader handles them.
 
 ### Phase 5 — Module ports — mechanical layer done, semantic layer outstanding
 
-Every module's controllers, forms, services and listeners are ported and compile. What is left is
-per-module semantic work that automation would have gotten wrong:
+Every module's controllers, forms, services and listeners are ported, load and resolve.
+Controllers now extend `AbstractController` with constructor injection: Symfony 8 removed
+`getDoctrine()` and `get()`, so all 5,838 Doctrine calls and 1,374 service-locator calls were
+rewritten (`$this->get('session')` → `RequestStack`, `$this->get('request')` → the current
+request, `security.context->getToken()->getUser()` → `getUser()`, and so on).
+
+> Two controllers alias a FOSUserBundle controller as `Controller`
+> (`use FOS\UserBundle\Controller\GroupController as Controller`). Rewriting their
+> `extends Controller` would have silently changed which class they extend, so the transform
+> requires the FrameworkBundle import to be present and flags those two instead.
+
+What is left is per-module semantic work that automation would have gotten wrong:
 
 - [ ] **317 form-type instantiations across 172 files** (`createForm(new XType($deps))` and
       `$builder->add('f', new XType($deps))`). Symfony 3 removed instance-passing; each dependency
@@ -378,6 +401,12 @@ per-module semantic work that automation would have gotten wrong:
       decide per route whether to restore the entity or delete the controller.
 - [ ] **19 template references to bundles that never existed here** (`DocudexUserBundle`) —
       leftovers from another project; dead today.
+- [ ] **419 routes that cannot resolve** (`migration/contract/unresolvable-routes.md`) — dead in
+      the legacy tree too; delete the route or restore the controller
+- [ ] **3 controllers extending FOSUserBundle bases** (Group, Registration, Profile) — reimplement
+      the inherited behaviour on `AbstractController`
+- [ ] **25 files with `TODO(migration)` markers** for services with no mechanical equivalent
+      (`fos_user.user_manager`, `phpexcel`, custom importers)
 - [ ] 48 broken bidirectional associations (`migration/contract/broken-associations.md`)
 - [ ] Verify behaviour against real data, module by module, before flipping each proxy route
 

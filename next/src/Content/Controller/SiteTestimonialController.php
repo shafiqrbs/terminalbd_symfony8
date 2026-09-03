@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Content\Entity\Testimonial;
@@ -16,6 +17,11 @@ use App\Content\Entity\SiteContent;
  */
 class SiteTestimonialController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all SiteContent entities.
@@ -23,7 +29,7 @@ class SiteTestimonialController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Content\Entity\Testimonial::class)->findAll();
         return $this->render('Content/SiteTestimonial/index.html.twig', [
             'entities' => $entities,
@@ -39,7 +45,7 @@ class SiteTestimonialController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity ->upload();
             $em->persist($entity);
             $em->flush();
@@ -100,7 +106,7 @@ class SiteTestimonialController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Content\Entity\Testimonial::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find SiteContent entity.');
@@ -137,7 +143,7 @@ class SiteTestimonialController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Testimonial::class)->find($id);
 
@@ -165,7 +171,7 @@ class SiteTestimonialController extends AbstractController
      */
     public function deleteAction(Request $request, $id)
     {
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
     	$entity = $em->getRepository(\App\Content\Entity\Testimonial::class)->find($id);
 	    if (!$entity) {
 		    throw $this->createNotFoundException('Unable to find SiteContent entity.');

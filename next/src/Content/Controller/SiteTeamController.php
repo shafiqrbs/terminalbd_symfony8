@@ -2,6 +2,8 @@
 
 namespace App\Content\Controller;
 
+use App\Appearance\Service\MenuManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,12 @@ use App\Content\Form\SiteTeamType;
  */
 class SiteTeamController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly MenuManager $menuManager,
+    ) {
+    }
+
 
     /**
      * Lists all SiteTeam entities.
@@ -22,7 +30,7 @@ class SiteTeamController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Content\Entity\SiteTeam::class)->findAll();
 
@@ -41,8 +49,8 @@ class SiteTeamController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $slug = $this->get('setting.menuSettingRepo')-> urlSlug($entity->getName());
+            $em = $this->em;
+            $slug = $this->menuManager-> urlSlug($entity->getName());
             $entity ->setSlug($slug);
             $entity ->upload();
             $em->persist($entity);
@@ -106,7 +114,7 @@ class SiteTeamController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\SiteTeam::class)->find($id);
 
@@ -146,7 +154,7 @@ class SiteTeamController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\SiteTeam::class)->find($id);
 
@@ -160,7 +168,7 @@ class SiteTeamController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
 
-            $slug = $this->get('setting.menuSettingRepo')->urlSlug($entity->getName());
+            $slug = $this->menuManager->urlSlug($entity->getName());
             $entity ->setSlug($slug);
             $entity->upload();
             $em->flush();
@@ -184,7 +192,7 @@ class SiteTeamController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Content\Entity\SiteTeam::class)->find($id);
 
             if (!$entity) {

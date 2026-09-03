@@ -2,6 +2,8 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Inventory\Entity\InventoryConfig;
@@ -16,6 +18,12 @@ use App\Inventory\Form\ExcelImporterType;
  */
 class ExcelImporterController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all ExcelImporter entities.
@@ -23,7 +31,7 @@ class ExcelImporterController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\ExcelImporter::class)->findBy(['inventoryConfig'=>$inventory],['updated'=>'DESC']);
         return $this->render('Inventory/ExcelImporter/index.html.twig', [
@@ -41,13 +49,13 @@ class ExcelImporterController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('inventory_excelimproter'));
@@ -99,16 +107,20 @@ class ExcelImporterController extends AbstractController
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $excelImporter->getInventoryConfig();
 
         if($excelImporter->getMode() == 'purchase'){
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $importer = $this->get('appstore_inventory_importer_excel');
             $importer->setInventoryConfig($inventory->getId());
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $reader = $this->get('appstore_inventory.importer.excel_data_reader');
         }else{
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $importer = $this->get('appstore_inventory_product_import');
             $importer->setExcelImport($excelImporter);
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $reader = $this->get('appstore_inventory.importer.product_excel_data_reader');
         }
         $file =  realpath($excelImporter->getAbsolutePath());
@@ -116,13 +128,13 @@ class ExcelImporterController extends AbstractController
         if($importer->isValid($data)) {
             $importer->import($data);
             $excelImporter->setProgress('migrated');
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been migration successfully"
             );
             $em->flush();
             return $this->redirect($this->generateUrl('inventory_purchasesimple'));
         }else{
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Excel File memo no null or exist in your system"
             );
             $excelImporter->setProgress('invalid');
@@ -137,7 +149,7 @@ class ExcelImporterController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ExcelImporter::class)->find($id);
 
@@ -174,7 +186,7 @@ class ExcelImporterController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ExcelImporter::class)->find($id);
 
@@ -202,7 +214,7 @@ class ExcelImporterController extends AbstractController
      */
     public function deleteAction(ExcelImporter $excelImporter)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if ($excelImporter) {
             $excelImporter->removeUpload();
             $em->remove($excelImporter);
@@ -215,7 +227,7 @@ class ExcelImporterController extends AbstractController
     {
 
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
 
         /*  This function is written for sum total item base.  */
@@ -237,7 +249,7 @@ class ExcelImporterController extends AbstractController
 
         $em->persist($excelImporter);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been updated successfully"
         );
         return $this->redirect($this->generateUrl('inventory_excelimproter'));
@@ -245,10 +257,10 @@ class ExcelImporterController extends AbstractController
     }
     public function resetedAction(InventoryConfig $inventoryConfig)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->flush();
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been updated successfully"
         );
 
@@ -258,10 +270,10 @@ class ExcelImporterController extends AbstractController
 
     public function restoredAction(InventoryConfig $inventoryConfig)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->flush();
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been updated successfully"
         );
 

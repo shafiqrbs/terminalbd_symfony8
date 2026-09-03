@@ -2,7 +2,7 @@
 
 namespace App\Inventory\Importer;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Inventory\Entity\Sales;
 use App\Inventory\Entity\SalesItem;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;

@@ -2,6 +2,8 @@
 
 namespace App\Medicine\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Medicine\Entity\MedicinePurchase;
 use App\Medicine\Entity\MedicinePurchaseReturn;
 use App\Medicine\Entity\MedicinePurchaseItem;
@@ -10,15 +12,21 @@ use App\Medicine\Form\PurchaseReturnItemType;
 use App\Medicine\Form\PurchaseReturnType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * PurchaseReturn controller.
  *
  */
-class MedicinePurchaseReturnController extends Controller
+class MedicinePurchaseReturnController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all PurchaseReturn entities.
@@ -26,11 +34,11 @@ class MedicinePurchaseReturnController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new MedicinePurchaseReturn();
         $form = $this->createCreateForm($entity);
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->findBy(array('medicineConfig' => $config),array('created'=>'ASC'));
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->findBy(array('medicineConfig' => $config),array('created'=>'ASC'));
         return $this->render('Medicine/PurchaseReturn/index.html.twig', array(
             'entities' => $entities,
             'entity' => $entity,
@@ -51,7 +59,7 @@ class MedicinePurchaseReturnController extends Controller
 
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->find($id);
 
@@ -73,12 +81,12 @@ class MedicinePurchaseReturnController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('medicine_purchase_return_edit', array('id' => $entity->getId())));
@@ -119,7 +127,7 @@ class MedicinePurchaseReturnController extends Controller
      */
     public function editAction(MedicinePurchaseReturn $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $purchaseItem = new MedicinePurchaseReturnItem();
         $form = $this->createEditForm($entity,$purchaseItem);
         if (!$entity) {
@@ -156,7 +164,7 @@ class MedicinePurchaseReturnController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseReturn entity.');
@@ -169,18 +177,18 @@ class MedicinePurchaseReturnController extends Controller
 
             $purchaseReturnItem->setMedicinePurchaseReturn($entity);
 
-            $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['medicineStock']);
+            $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['medicineStock']);
             $purchaseReturnItem->setMedicineStock($stock);
-          //  $purchaseItem = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($data['medicinePurchaseItem']);
+          //  $purchaseItem = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($data['medicinePurchaseItem']);
            // $purchaseReturnItem->setMedicinePurchaseItem($purchaseItem);
             $purchaseReturnItem->setPurchasePrice($stock->getPurchasePrice());
             $purchaseReturnItem->setSubTotal($purchaseReturnItem->getPurchasePrice() * $purchaseReturnItem->getQuantity());
             $em->persist($purchaseReturnItem);
             $em->flush();
-           // $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($purchaseItem,'purchase-return');
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->updatePurchaseReturnTotalPrice($entity);
-            $this->get('session')->getFlashBag()->add(
+           // $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($purchaseItem,'purchase-return');
+            $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
+            $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->updatePurchaseReturnTotalPrice($entity);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('medicine_purchase_return_edit',array('id'=>$entity->getId())));
@@ -197,12 +205,12 @@ class MedicinePurchaseReturnController extends Controller
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->find($id);
         $this->allPurchaseReturnItemDelete($entity);
 	    $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('medicine_purchase_return'));
@@ -210,7 +218,7 @@ class MedicinePurchaseReturnController extends Controller
 
 	public function allPurchaseReturnItemDelete(MedicinePurchaseReturn $invoice){
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 
 		/* @var $particular MedicinePurchaseReturnItem */
 
@@ -220,14 +228,14 @@ class MedicinePurchaseReturnController extends Controller
 
 				//$item = $particular->getMedicinePurchaseItem();
 				$stock = $particular->getMedicineStock();
-				//$this->get('session')->set('item', $item);
-				$this->get('session')->set('stock', $stock);
+				//$this->requestStack->getSession()->set('item', $item);
+				$this->requestStack->getSession()->set('stock', $stock);
 				$em->remove($particular);
 				$em->flush();
-				//$item = $this->get('session')->get('item');
-				$stock = $this->get('session')->get('stock');
-				//$this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($item,'purchase_return');
-				$this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
+				//$item = $this->requestStack->getSession()->get('item');
+				$stock = $this->requestStack->getSession()->get('stock');
+				//$this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($item,'purchase_return');
+				$this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
 
 			}
 
@@ -245,23 +253,23 @@ class MedicinePurchaseReturnController extends Controller
     public function deleteItemAction(MedicinePurchaseReturn $purchase,$id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 	    $config = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
         if($config == $purchase->getMedicineConfig()->getId()){
 		    $entity = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturnItem::class)->find($id);
 		    $stock = $entity->getMedicineStock();
 		    $purchaseReturn = $entity->getMedicinePurchaseReturn()->getId();
-		    $this->get('session')->set('stock', $stock);
-		    $this->get('session')->set('purchaseReturn', $purchaseReturn);
+		    $this->requestStack->getSession()->set('stock', $stock);
+		    $this->requestStack->getSession()->set('purchaseReturn', $purchaseReturn);
 		    // $purchaseItem = $entity->getMedicinePurchaseItem();
 		    $em->remove($entity);
 		    $em->flush();
-		    $stock = $this->get('session')->get('stock');
-		    $purchaseReturn = $this->get('session')->get('purchaseReturn');
-		    // $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($purchaseItem,'purchase_return');
-		    $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
-	        $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->updatePurchaseReturnTotalPrice($purchase);
-	        $this->get('session')->getFlashBag()->add(
+		    $stock = $this->requestStack->getSession()->get('stock');
+		    $purchaseReturn = $this->requestStack->getSession()->get('purchaseReturn');
+		    // $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($purchaseItem,'purchase_return');
+		    $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
+	        $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->updatePurchaseReturnTotalPrice($purchase);
+	        $this->requestStack->getSession()->getFlashBag()->add(
 			    'error',"Data has been deleted successfully"
 		    );
         }
@@ -272,7 +280,7 @@ class MedicinePurchaseReturnController extends Controller
 	public function invoiceDiscountUpdateAction(Request $request)
 	{
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$discountType = $request->request->get('discountType');
 		$discountCal = (float)$request->request->get('discount');
 		$invoice = $request->request->get('purchase');
@@ -312,9 +320,9 @@ class MedicinePurchaseReturnController extends Controller
 
     public function approveAction(MedicinePurchaseReturn $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!empty($entity) and $entity->getProcess() != "approved") {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $em->flush();

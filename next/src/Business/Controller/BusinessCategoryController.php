@@ -4,6 +4,8 @@ namespace App\Business\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -19,6 +21,12 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
  */
 class BusinessCategoryController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all BusinessCategory entities.
@@ -30,7 +38,7 @@ class BusinessCategoryController extends AbstractController
     {
 
         $entity = new Category();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig' => $option],[ 'name' =>'asc' ]);
         $form   = $this->createCreateForm($entity);
@@ -50,7 +58,7 @@ class BusinessCategoryController extends AbstractController
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig' => $option],[ 'name' =>'asc' ]);
 
@@ -64,7 +72,7 @@ class BusinessCategoryController extends AbstractController
             $entity->setBusinessConfig($globalOption->getBusinessConfig());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('business_category', ['id' => $entity->getId()]));
@@ -108,7 +116,7 @@ class BusinessCategoryController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_STOCK') or is_granted('ROLE_DOMAIN')"))]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig' => $option],[ 'name' =>'asc' ]);
 
@@ -154,7 +162,7 @@ class BusinessCategoryController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig' => $option],[ 'name' =>'asc' ]);
         $entity = $em->getRepository(\App\Business\Entity\Category::class)->find($id);
@@ -167,7 +175,7 @@ class BusinessCategoryController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('business_category'));
@@ -187,21 +195,21 @@ class BusinessCategoryController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_STOCK') or is_granted('ROLE_DOMAIN')"))]
     public function deleteAction(Category $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         try {
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -211,7 +219,7 @@ class BusinessCategoryController extends AbstractController
     public function sortedAction(Request $request)
     {
         $data = $request ->request->get('item');
-        $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->setCategorySorting($data);
+        $this->em->getRepository(\App\Business\Entity\Category::class)->setCategorySorting($data);
         exit;
     }
 

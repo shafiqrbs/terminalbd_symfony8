@@ -2,6 +2,7 @@
 
 namespace App\Bindu\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,6 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ApiController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     public function checkApiValidation($request)
     {
@@ -17,7 +23,7 @@ class ApiController extends AbstractController
         $key =  $this->getParameter('x-api-key');
         $value =  $this->getParameter('x-api-value');
         $unique = $request->headers->get('X-API-SECRET');
-        $setup = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $unique,'status'=>1]);
+        $setup = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $unique,'status'=>1]);
         if (!empty($setup) and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
             return $setup;
         }
@@ -34,14 +40,14 @@ class ApiController extends AbstractController
         $mobile = $formData['mobile'];
         $deviceId = $formData['deviceId'];
         $data = [];
-        $entity = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1]);
+        $entity = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1]);
         if (empty($entity) and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
                 return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }else{
 
             /* @var $entity GlobalOption */
 
-            $device = $this->getDoctrine()->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity,$deviceId);
+            $device = $this->em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity,$deviceId);
             if($device) {
                 $address = '';
                 $vatRegNo = '';
@@ -162,12 +168,12 @@ class ApiController extends AbstractController
         $mobile = $formData['mobile'];
         $deviceId = $formData['deviceId'];
         $data = [];
-        $entity = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1]);
+        $entity = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1]);
         if (empty($entity) and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }else {
 
-            $device = $this->getDoctrine()->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity, $deviceId);
+            $device = $this->em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity, $deviceId);
             if ($device) {
                 /* @var $entity GlobalOption */
 
@@ -325,40 +331,40 @@ class ApiController extends AbstractController
 
             $slides = [];
             $introPages = [];
-            $users = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->getCustomers($entity);
-            $customers = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->customerOutstanding($entity);
+            $users = $this->em->getRepository(\App\User\Entity\User::class)->getCustomers($entity);
+            $customers = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->customerOutstanding($entity);
 
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiSpalshStock($entity);
+                $stocks = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiSpalshStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
+                $stocks = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
+                $stocks = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
+                $stocks = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
             }
 
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $categories = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->getApiCategory($entity);
+                $categories = $this->em->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->getApiCategory($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $categories = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Category::class)->getApiCategory($entity);
+                $categories = $this->em->getRepository(\App\Restaurant\Entity\Category::class)->getApiCategory($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $categories = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiCategory($entity);
+                $categories = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiCategory($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $categories = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->getApiCategory($entity);
+                $categories = $this->em->getRepository(\App\Business\Entity\Category::class)->getApiCategory($entity);
             }
 
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $vendors = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->getApiVendor($entity);
+                $vendors = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->getApiVendor($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $vendors = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
+                $vendors = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $vendors = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Vendor::class)->getApiVendor($entity);
+                $vendors = $this->em->getRepository(\App\Inventory\Entity\Vendor::class)->getApiVendor($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $vendors = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
+                $vendors = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
             }
 
-            $result = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findAll();
+            $result = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findAll();
             $methods = [];
 
             /* @var $row TransactionMethod */
@@ -368,7 +374,7 @@ class ApiController extends AbstractController
                 $methods[$key]['name']                 = $row->getName();
             }
 
-            $paymentCards = $this->getDoctrine()->getRepository(\App\Tool\Entity\PaymentCard::class)->findAll();
+            $paymentCards = $this->em->getRepository(\App\Tool\Entity\PaymentCard::class)->findAll();
 
             $cards = [];
 
@@ -379,7 +385,7 @@ class ApiController extends AbstractController
                 $cards[$key]['name']                 = $row->getName();
             }
 
-            $accountBanks = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption'=>$entity,'status'=>1]);
+            $accountBanks = $this->em->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption'=>$entity,'status'=>1]);
 
             $banks = [];
 
@@ -394,7 +400,7 @@ class ApiController extends AbstractController
                 }
             }
 
-            $accountMobileBanks = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption'=>$entity,'status'=>1]);
+            $accountMobileBanks = $this->em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption'=>$entity,'status'=>1]);
             $mobiles = [];
 
             /* @var $row AccountMobileBank */
@@ -440,7 +446,7 @@ class ApiController extends AbstractController
         }else{
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->getCustomers($entity);
+            $data = $this->em->getRepository(\App\User\Entity\User::class)->getCustomers($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -463,9 +469,9 @@ class ApiController extends AbstractController
             $data['startDate'] = $datetime->format('Y-m-d');
             $data['endDate'] = $datetime->format('Y-m-d');
             $data['device'] = $deviceId;
-            $purchaseCashOverview = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->androidDevicePurchaseOverview($entity,$data);
-            $salesCashOverview = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->androidDeviceSalesOverview($entity,$data);
-            $expenditureOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->androidDeviceExpenditureOverview($entity,$data);
+            $purchaseCashOverview = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->androidDevicePurchaseOverview($entity,$data);
+            $salesCashOverview = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->androidDeviceSalesOverview($entity,$data);
+            $expenditureOverview = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->androidDeviceExpenditureOverview($entity,$data);
             $data = [
                 'globalOption'              => $entity->getId(),
                 'expenditureOverview'       => $expenditureOverview ,
@@ -500,13 +506,13 @@ class ApiController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -531,7 +537,7 @@ class ApiController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->getApiCustomer($entity);
+            $data = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->getApiCustomer($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -553,7 +559,7 @@ class ApiController extends AbstractController
 
             /* @var $entity GlobalOption */
 
-            $data = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->getApiUnit();
+            $data = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->getApiUnit();
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -577,13 +583,13 @@ class ApiController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->getApiCategory($entity);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->getApiCategory($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Category::class)->getApiCategory($entity);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Category::class)->getApiCategory($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiCategory($entity);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiCategory($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->getApiCategory($entity);
+                $data = $this->em->getRepository(\App\Business\Entity\Category::class)->getApiCategory($entity);
             }
 
             $response = new Response();
@@ -607,13 +613,13 @@ class ApiController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->getApiVendor($entity);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->getApiVendor($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
+                $data = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Vendor::class)->getApiVendor($entity);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Vendor::class)->getApiVendor($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
+                $data = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
             }
 
             $response = new Response();
@@ -637,7 +643,7 @@ class ApiController extends AbstractController
 
             /* @var $entity GlobalOption */
 
-            $result = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findAll();
+            $result = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findAll();
             $data = [];
 
             /* @var $row TransactionMethod */
@@ -667,7 +673,7 @@ class ApiController extends AbstractController
 
             /* @var $entity GlobalOption */
 
-            $result = $this->getDoctrine()->getRepository(\App\Tool\Entity\PaymentCard::class)->findAll();
+            $result = $this->em->getRepository(\App\Tool\Entity\PaymentCard::class)->findAll();
             $data = [];
 
             /* @var $row TransactionMethod */
@@ -698,7 +704,7 @@ class ApiController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption'=>$entity,'status'=>1]);
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption'=>$entity,'status'=>1]);
 
             $data = [];
 
@@ -734,7 +740,7 @@ class ApiController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption'=>$entity,'status'=>1]);
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption'=>$entity,'status'=>1]);
             $data = [];
 
             /* @var $row AccountMobileBank */
@@ -769,7 +775,7 @@ class ApiController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->getApiCategory($entity);
+            $data = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->getApiCategory($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -834,7 +840,7 @@ class ApiController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $data = ['offset' => 0,'limit' => 2000];
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiDims($entity,$data);
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiDims($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -854,7 +860,7 @@ class ApiController extends AbstractController
         }else{
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Coupon::class)->getApiDiscountCoupon($entity);
+            $data = $this->em->getRepository(\App\Restaurant\Entity\Coupon::class)->getApiDiscountCoupon($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -873,7 +879,7 @@ class ApiController extends AbstractController
         }else{
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiRestaurantToken($entity);
+            $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiRestaurantToken($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -940,13 +946,13 @@ class ApiController extends AbstractController
 
 
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'sales',$data);
+                $this->em->getRepository(\App\Medicine\Entity\MedicineAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'sales',$data);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'sales',$data);
+                $this->em->getRepository(\App\Restaurant\Entity\RestaurantAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'sales',$data);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\InventoryAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'sales',$data);
+                $this->em->getRepository(\App\Inventory\Entity\InventoryAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'sales',$data);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'sales',$data);
+                $this->em->getRepository(\App\Business\Entity\BusinessAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'sales',$data);
             }
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
@@ -992,13 +998,13 @@ class ApiController extends AbstractController
 
             $data = $request->request->all();
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'purchase',$data);
+                $this->em->getRepository(\App\Medicine\Entity\MedicineAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'purchase',$data);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'purchase',$data);
+                $this->em->getRepository(\App\Restaurant\Entity\RestaurantAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'purchase',$data);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\InventoryAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'purchase',$data);
+                $this->em->getRepository(\App\Inventory\Entity\InventoryAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'purchase',$data);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'purchase',$data);
+                $this->em->getRepository(\App\Business\Entity\BusinessAndroidProcess::class)->insertAndroidProcess($entity,$deviceId,'purchase',$data);
             }
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
@@ -1025,7 +1031,7 @@ class ApiController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseAndroidProcess::class)->insertAndroidProcess($entity,$ipAddress,$deviceId,'expenditure',$data);
+            $this->em->getRepository(\App\Accounting\Entity\ExpenseAndroidProcess::class)->insertAndroidProcess($entity,$ipAddress,$deviceId,'expenditure',$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['message'=>"success", 'ipAddress'=>$ipAddress]));
@@ -1049,7 +1055,7 @@ class ApiController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
-            $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->insertApiInvoiceToken($entity,$data);
+            $data = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->insertApiInvoiceToken($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode("success"));
@@ -1076,14 +1082,14 @@ class ApiController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->insertAndroidStock($entity,$formArray);
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($entity);
+                $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->insertAndroidStock($entity,$formArray);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1106,7 +1112,7 @@ class ApiController extends AbstractController
             /* @var $entity GlobalOption */
             $id = $_REQUEST['id'] ?? '';
             $entity = $this->checkApiValidation($request);
-            $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($id);
+            $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($id);
             $array  = [];
             if($stock){
                 /* @var $stock MedicineStock */
@@ -1143,15 +1149,15 @@ class ApiController extends AbstractController
             $data = $request->request->all();
             $entity = $this->checkApiValidation($request);
             $stockId = $_REQUEST['id'] ?? '';
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateAndroidStock($data);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateAndroidStock($data);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1177,13 +1183,13 @@ class ApiController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $stockId = $_REQUEST['id'] ?? '';
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStockDelete($entity,$stockId);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStockDelete($entity,$stockId);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStockDelete($entity,$stockId);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStockDelete($entity,$stockId);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStockDelete($entity,$stockId);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStockDelete($entity,$stockId);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStockDelete($entity,$stockId);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStockDelete($entity,$stockId);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1209,7 +1215,7 @@ class ApiController extends AbstractController
             $formArray = $request->request->all();
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $status = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->apiCreateCustomer($entity,$formArray);
+            $status = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->apiCreateCustomer($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status'=> $status]));
@@ -1233,7 +1239,7 @@ class ApiController extends AbstractController
             $formArray = $request->request->all();
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $status = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->apiUpdateCustomer($entity,$formArray);
+            $status = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->apiUpdateCustomer($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status'=> $status]));
@@ -1256,7 +1262,7 @@ class ApiController extends AbstractController
             $formArray = $request->request->all();
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->apiCustomerLedger($entity,$formArray);
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->apiCustomerLedger($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -1279,13 +1285,13 @@ class ApiController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->getApiSalesInvoice($entity,$invoice);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->getApiSalesInvoice($entity,$invoice);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiSalesInvoice($entity,$invoice);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiSalesInvoice($entity,$invoice);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiSalesInvoice($entity,$invoice);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiSalesInvoice($entity,$invoice);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiSalesInvoice($entity,$invoice);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiSalesInvoice($entity,$invoice);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1308,13 +1314,13 @@ class ApiController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->apiInvoiceMessage($entity);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->apiInvoiceMessage($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->apiInvoiceMessage($entity);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->apiInvoiceMessage($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->apiInvoiceMessage($entity);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->apiInvoiceMessage($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->apiInvoiceMessage($entity);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->apiInvoiceMessage($entity);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1338,7 +1344,7 @@ class ApiController extends AbstractController
             $data = $request->request->all();
             /* @var $option GlobalOption */
             $option = $this->checkApiValidation($request);
-            $status = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->apiInsertSalesReceive($option,$data);
+            $status = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->apiInsertSalesReceive($option,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status'=> $status]));

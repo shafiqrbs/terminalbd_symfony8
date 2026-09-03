@@ -4,6 +4,8 @@ namespace App\Medicine\Controller;
 
 
 
+use App\Tool\Service\ToolManager;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Medicine\Entity\MedicineConfig;
 use App\Medicine\Entity\MedicineSales;
 use App\Medicine\Entity\MedicineSalesItem;
@@ -16,7 +18,7 @@ use App\Medicine\Service\PosItemManager;
 use App\User\Entity\User;
 use Mike42\Escpos\Printer;
 use App\Tool\Entity\GlobalOption;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,8 +27,14 @@ use Symfony\Component\HttpFoundation\Response;
  * Invoice controller.
  *
  */
-class MedicineSalesTemporaryController extends Controller
+class MedicineSalesTemporaryController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function newAction()
     {
@@ -37,10 +45,10 @@ class MedicineSalesTemporaryController extends Controller
         $entity = new MedicineSales();
         $salesItemForm = $this->createMedicineSalesItemForm(new MedicineSalesItem());
         $editForm = $this->createCreateForm($entity);
-        $result = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
+        $result = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
         $stockItemForm = $this->createStockItemForm(new MedicineStock());
-        $discountPercentList = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->discountPercentList();
-        $brands = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
+        $discountPercentList = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->discountPercentList();
+        $brands = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
         return $this->render('Medicine/Sales/pos.html.twig', array(
             'entity'        => $entity,
             'salesItem'     => $salesItemForm->createView(),
@@ -64,7 +72,7 @@ class MedicineSalesTemporaryController extends Controller
     private function createCreateForm(MedicineSales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SalesTemporaryType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new SalesTemporaryType($globalOption,$location), $entity, array(
@@ -82,7 +90,7 @@ class MedicineSalesTemporaryController extends Controller
     private function createMedicineSalesItemForm(MedicineSalesItem $salesItem )
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $em = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class);
+        $em = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SalesTemporaryItemType::configureOptions() and pass them as form options: $globalOption,$em), $salesItem, array(
         $form = $this->createForm(new SalesTemporaryItemType($globalOption,$em), $salesItem, array(
@@ -119,17 +127,17 @@ class MedicineSalesTemporaryController extends Controller
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getMedicineConfig();
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $entity = new MedicineStock();
         $form = $this->createStockItemForm($entity);
         $form->handleRequest($request);
         $medicineName = trim($data['medicineStock']['name']);
         if(empty($data['medicineId'])) {
-            $checkStockMedicine = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config,$medicineName);
+            $checkStockMedicine = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config,$medicineName);
         }else{
-            $medicine = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
-            $checkStockMedicine = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
+            $medicine = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
+            $checkStockMedicine = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
         }
         if (empty($checkStockMedicine) and $medicineName){
             $entity->setMedicineConfig($config);
@@ -153,7 +161,7 @@ class MedicineSalesTemporaryController extends Controller
                 }
             }
             if(empty($entity->getUnit())){
-                $unit = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
+                $unit = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
                 $entity->setUnit($unit);
             }
             $avg = ($entity->getSalesPrice() - (($entity->getSalesPrice() * 12.5)/100));
@@ -163,11 +171,11 @@ class MedicineSalesTemporaryController extends Controller
             $entity->setRemainingQuantity($entity->getOpeningQuantity() - $entity->getSalesQuantity());
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertDirectInvoiceItems($user, $entity,$data);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertDirectInvoiceItems($user, $entity,$data);
             $result = $this->returnResultData($user,'success');
             return new Response(json_encode($result));
         }elseif($checkStockMedicine){
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertDirectInvoiceItems($user,$checkStockMedicine,$data);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertDirectInvoiceItems($user,$checkStockMedicine,$data);
             $result = $this->returnResultData($user,'success');
             return new Response(json_encode($result));
         }else{
@@ -180,7 +188,7 @@ class MedicineSalesTemporaryController extends Controller
     {
         set_time_limit(0);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         if( 0 == $data['salesSubTotal']){
 	        $data = array('sales' => '',
@@ -199,8 +207,8 @@ class MedicineSalesTemporaryController extends Controller
         $editForm = $this->createCreateForm($entity);
         $editForm->handleRequest($request);
         $invoice = $entity->getInvoice();
-        $tempTotal = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
-        $exist = $this->getDoctrine()->getRepository(MedicineSales::class)->findOneBy(array('medicineConfig' => $config, 'invoice' => $invoice));
+        $tempTotal = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
+        $exist = $this->em->getRepository(MedicineSales::class)->findOneBy(array('medicineConfig' => $config, 'invoice' => $invoice));
         $btn = $request->request->get('buttonType');
         if ($editForm->isValid() and empty($exist) and round($data['salesSubTotal']) > 0 and round($tempTotal['subTotal']) > 0 ) {
             $entity->setMedicineConfig($config);
@@ -208,12 +216,12 @@ class MedicineSalesTemporaryController extends Controller
             $entity->setCustomer($customer);
             $globalOption = $this->getUser()->getGlobalOption();
             if (!empty($data['customerMobile'])) {
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($globalOption, $mobile, $data);
+                $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($globalOption, $mobile, $data);
                 $entity->setCustomer($customer);
             } elseif (!empty($data['mobile'])) {
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['mobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'mobile' => $mobile));
+                $mobile = $this->toolManager->specialExpClean($data['mobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'mobile' => $mobile));
                 $entity->setCustomer($customer);
             }
             $purchaseTotal = floor($tempTotal['purchaseSubTotal']);
@@ -268,11 +276,11 @@ class MedicineSalesTemporaryController extends Controller
             }
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->temporarySalesInsert($user, $entity);
-          //  $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->temporarySalesInsertManual($user, $entity);
-           // $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->removeSalesTemporary($this->getUser());
+            $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->temporarySalesInsert($user, $entity);
+          //  $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->temporarySalesInsertManual($user, $entity);
+           // $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->removeSalesTemporary($this->getUser());
             if ($entity->getProcess() == 'Done') {
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($entity);
+                $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($entity);
             }
             if ($btn == "regularBtn" and $entity->getProcess() == 'Done') {
                 return new Response($entity->getId());
@@ -293,7 +301,7 @@ class MedicineSalesTemporaryController extends Controller
         $user = $this->getUser();
         $discount = (float)$request->request->get('discount');
         $discountType = $request->request->get('discountType');
-        $result = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
+        $result = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
 	    $subTotal = $result['subTotal'];
         if($discountType == 'flat' and $subTotal > $discount){
             $initialDiscount = round($discount);
@@ -318,12 +326,12 @@ class MedicineSalesTemporaryController extends Controller
 
     public function returnResultData(User $user,$msg=''){
 
-       // $salesItems = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSalesItems($user);
-        $salesTemporary = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findBy(array('user'=>$user),array('id'=>'ASC'));
-        $total = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
+       // $salesItems = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSalesItems($user);
+        $salesTemporary = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findBy(array('user'=>$user),array('id'=>'ASC'));
+        $total = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
 	    $subTotal = round($total['subTotal']);
 	    $purchaseSubTotal = round($total['purchaseSubTotal']);
-        $discountPercentLists = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->discountPercentList();
+        $discountPercentLists = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->discountPercentList();
         $salesItems = $this->renderView('Medicine/Sales/ajaxPosItem.html.twig', array(
             'config' => $this->getUser()->getGlobalOption()->getMedicineConfig(),
             'salesTemporary'        => $salesTemporary,
@@ -347,10 +355,10 @@ class MedicineSalesTemporaryController extends Controller
     public function addParticularAction(Request $request)
     {
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $form = $request->request->all();
         $data = $form['salesTemporaryItem'];
-        $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertInvoiceItems($user, $data);
+        $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertInvoiceItems($user, $data);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($user,$msg);
         return new Response(json_encode($result));
@@ -363,12 +371,12 @@ class MedicineSalesTemporaryController extends Controller
         $user = $this->getUser();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $barcode =trim($_REQUEST['barcode']);
-        $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=>$config,'barcode'=>$barcode));
+        $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=>$config,'barcode'=>$barcode));
         if($stock and $config->isRemainingQuantity() == 1 and $stock->getRemainingQuantity() >  0){
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertBarcodeInvoiceItems($user, $stock);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertBarcodeInvoiceItems($user, $stock);
         }
         if($stock and $config->isRemainingQuantity() != 1){
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertBarcodeInvoiceItems($user, $stock);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertBarcodeInvoiceItems($user, $stock);
         }
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($user,$msg);
@@ -380,9 +388,9 @@ class MedicineSalesTemporaryController extends Controller
         $user = $this->getUser();
         $data = $request->request->all();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=>$config,'id'=>$id));
+        $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=>$config,'id'=>$id));
         if($stock){
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertAjaxLiveItem($user, $stock,$data);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertAjaxLiveItem($user, $stock,$data);
         }
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($user,$msg);
@@ -395,8 +403,8 @@ class MedicineSalesTemporaryController extends Controller
         $item = !empty($_REQUEST['query']) ? trim($_REQUEST['query']): '';
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $items = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->liveSearchAutoComplete($item,$inventory);
-            $discountPercentLists = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->discountPercentList();
+            $items = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->liveSearchAutoComplete($item,$inventory);
+            $discountPercentLists = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->discountPercentList();
             $return = $this->renderView('Medicine/Sales/live-search-data.html.twig', array(
                 'items'  => $items,
                 'discountPercentLists'  => $discountPercentLists
@@ -413,9 +421,9 @@ class MedicineSalesTemporaryController extends Controller
     {
         $user = $this->getUser();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=>$config,'id'=>$id));
+        $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=>$config,'id'=>$id));
         if($stock){
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertBarcodeInvoiceItems($user, $stock);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertBarcodeInvoiceItems($user, $stock);
         }
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($user,$msg);
@@ -427,7 +435,7 @@ class MedicineSalesTemporaryController extends Controller
         $data = $request->request->all();
         $user = $this->getUser();
         if($stock){
-            $this->getDoctrine()->getRepository(MedicineSalesTemporary::class)->insertGenericInvoiceItems($user,$stock,$data);
+            $this->em->getRepository(MedicineSalesTemporary::class)->insertGenericInvoiceItems($user,$stock,$data);
         }
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($user,$msg);
@@ -440,7 +448,7 @@ class MedicineSalesTemporaryController extends Controller
     {
         $user = $this->getUser();
         $data = $request->request->all();
-        $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->updateInvoiceItems($user, $data);
+        $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->updateInvoiceItems($user, $data);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($user,$msg);
         return new Response(json_encode($result));
@@ -449,7 +457,7 @@ class MedicineSalesTemporaryController extends Controller
 
     public function invoiceParticularDeleteAction(MedicineSalesTemporary $particular){
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find Sales Item entity.');
         }
@@ -467,7 +475,7 @@ class MedicineSalesTemporaryController extends Controller
         $printer = new Printer($connector);
         $printer -> initialize();
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         /* @var $config MedicineConfig */
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
@@ -528,7 +536,7 @@ class MedicineSalesTemporaryController extends Controller
             $discount       = new PosItemManager('Discount: ','Tk.',number_format($discount));
         }
         $grandTotal     = new PosItemManager('Net Payable: ','Tk.',number_format($total));
-        $previousDue = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($option,$entity->getCustomer());
+        $previousDue = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($option,$entity->getCustomer());
         if($prevDue == 1 and $entity->getCustomer()->getName() != "Default"){
             $previous = ($previousDue - $entity->getDue());
             $previousBalance       = new PosItemManager('Previous Due: ','Tk.',number_format($previous));

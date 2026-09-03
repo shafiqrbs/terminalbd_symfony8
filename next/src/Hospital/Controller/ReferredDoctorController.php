@@ -2,6 +2,9 @@
 
 namespace App\Hospital\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\Particular;
 use App\Hospital\Form\DoctorType;
 use App\Hospital\Form\ReferredDoctorType;
@@ -9,22 +12,29 @@ use App\Hospital\Form\ParticularType;
 use App\Hospital\Form\PathologyType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 /**
  * ReferredDoctorController controller.
  *
  */
-class ReferredDoctorController extends Controller
+class ReferredDoctorController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -38,13 +48,13 @@ class ReferredDoctorController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entities = $em->getRepository(\App\Hospital\Entity\Particular::class)->findWithSearch($config , $service = 6, $data);
         $pagination = $this->paginate($entities);
-        $categories = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>2),array('name' =>'asc' ));
-        $departments = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>7),array('name' =>'asc' ));
+        $categories = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>2),array('name' =>'asc' ));
+        $departments = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>7),array('name' =>'asc' ));
         return $this->render('Hospital/ReferredDoctor/index.html.twig', array(
             'entities' => $pagination,
             'categories' => $categories,
@@ -66,16 +76,16 @@ class ReferredDoctorController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setHospitalConfig($globalOption -> getHospitalConfig());
-            $service = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Service::class)->find(6);
+            $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(6);
             $entity->setService($service);
             if($entity->getParticularCode()){
                 $entity->setParticularCode($entity->getParticularCode());
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_referreddoctor_new', array('id' => $entity->getId())));
@@ -97,8 +107,8 @@ class ReferredDoctorController extends Controller
     private function createCreateForm(Particular $entity, $globalOption)
     {
 
-        $em = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ReferredDoctorType::configureOptions() and pass them as form options: $em,$globalOption,$location), $entity, array(
         $form = $this->createForm(new ReferredDoctorType($em,$globalOption,$location), $entity, array(
@@ -143,7 +153,7 @@ class ReferredDoctorController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
 
@@ -168,8 +178,8 @@ class ReferredDoctorController extends Controller
      */
     private function createEditForm(Particular $entity,$globalOption)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ReferredDoctorType::configureOptions() and pass them as form options: $em,$globalOption,$location), $entity, array(
         $form = $this->createForm(new ReferredDoctorType($em,$globalOption,$location), $entity, array(
@@ -188,7 +198,7 @@ class ReferredDoctorController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
 
@@ -206,7 +216,7 @@ class ReferredDoctorController extends Controller
             }
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_referreddoctor'));
@@ -223,7 +233,7 @@ class ReferredDoctorController extends Controller
      */
     public function deleteAction(Particular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -231,16 +241,16 @@ class ReferredDoctorController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -255,7 +265,7 @@ class ReferredDoctorController extends Controller
     public function statusAction(Particular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -267,7 +277,7 @@ class ReferredDoctorController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_referreddoctor'));

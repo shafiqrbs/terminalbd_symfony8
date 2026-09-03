@@ -2,11 +2,17 @@
 
 namespace App\Accounting\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Accounting\Entity\AccountVendor;
 
 class DefaultController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
     public function indexAction($name)
     {
         return $this->render('Accounting/Default/index.html.twig', ['name' => $name]);
@@ -17,8 +23,8 @@ class DefaultController extends AbstractController
 		set_time_limit(0);
 		ignore_user_abort(true);
 
-		$em = $this->getDoctrine()->getManager();
-		$entities1 = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findAll();
+		$em = $this->em;
+		$entities1 = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findAll();
 		foreach ($entities1 as $vendor ){
 
 			$entity = new AccountVendor();
@@ -37,8 +43,8 @@ class DefaultController extends AbstractController
 		}
 
 
-		$em = $this->getDoctrine()->getManager();
-		$entities2 = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Vendor::class)->findAll();
+		$em = $this->em;
+		$entities2 = $this->em->getRepository(\App\Inventory\Entity\Vendor::class)->findAll();
 		foreach ($entities2 as $vendor ){
 
 			$entity = new AccountVendor();
@@ -56,8 +62,8 @@ class DefaultController extends AbstractController
 		}
 
 
-		$em = $this->getDoctrine()->getManager();
-		$entities3 = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsVendor::class)->findAll();
+		$em = $this->em;
+		$entities3 = $this->em->getRepository(\App\Hospital\Entity\HmsVendor::class)->findAll();
 		foreach ($entities3 as $vendor ){
 
 			$entity = new AccountVendor();
@@ -76,7 +82,7 @@ class DefaultController extends AbstractController
 		}
 
 
-		$entities5 = $this->getDoctrine()->getRepository('RestaurantBundle:Vendor')->findAll();
+		$entities5 = $this->em->getRepository('RestaurantBundle:Vendor')->findAll();
 		foreach ($entities5 as $vendor ){
 
 			$entity = new AccountVendor();
@@ -101,10 +107,10 @@ class DefaultController extends AbstractController
 	{
 		set_time_limit(0);
 		ignore_user_abort(true);
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$globalOption = $this->getUser()->getGlobalOption();
-		$entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findAll();
+		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findAll();
 		
 		/* @var $entity AccountPurchase */
 
@@ -112,21 +118,21 @@ class DefaultController extends AbstractController
 
 			if(!empty($entity->getVendor())){
 				$entity->setCompanyName($entity->getVendor()->getCompanyName());
-				$vendor  = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['globalOption' =>$entity->getGlobalOption(),'oldId'=>$entity->getVendor()->getId()]);
+				$vendor  = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['globalOption' =>$entity->getGlobalOption(),'oldId'=>$entity->getVendor()->getId()]);
 				$entity->setAccountVendor($vendor);
 				if(!empty($entity->getPurchase())){
 					$entity->setGrn($entity->getPurchase()->getGrn());
 				}
 			}elseif(!empty($entity->getHmsVendor())){
 				$entity->setCompanyName($entity->getHmsVendor()->getCompanyName());
-				$vendor  = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['globalOption' =>$entity->getGlobalOption(),'oldId'=>$entity->getHmsVendor()->getId()]);
+				$vendor  = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['globalOption' =>$entity->getGlobalOption(),'oldId'=>$entity->getHmsVendor()->getId()]);
 				$entity->setAccountVendor($vendor);
 				if(!empty($entity->getHmsPurchase())){
 					$entity->setGrn($entity->getMedicinePurchase()->getGrn());
 				}
 			}elseif(!empty($entity->getDmsVendor())){
 				$entity->setCompanyName($entity->getDmsVendor()->getCompanyName());
-				$vendor  = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['globalOption' =>$entity->getGlobalOption(),'oldId'=>$entity->getDmsVendor()->getId()]);
+				$vendor  = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['globalOption' =>$entity->getGlobalOption(),'oldId'=>$entity->getDmsVendor()->getId()]);
 				$entity->setAccountVendor($vendor);
 				if(!empty($entity->getHmsPurchase())){
 					$entity->setGrn($entity->getDmsPurchase()->getGrn());
@@ -138,7 +144,7 @@ class DefaultController extends AbstractController
 				}
 			}elseif(!empty($entity->getMedicineVendor())){
 				$entity->setCompanyName($entity->getMedicineVendor()->getCompanyName());
-				$vendor  = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['globalOption' =>$entity->getGlobalOption(),'oldId'=>$entity->getMedicineVendor()->getId()]);
+				$vendor  = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['globalOption' =>$entity->getGlobalOption(),'oldId'=>$entity->getMedicineVendor()->getId()]);
 				$entity->setAccountVendor($vendor);
 				if(!empty($entity->getMedicinePurchase())){
 					$entity->setGrn($entity->getMedicinePurchase()->getGrn());
@@ -163,10 +169,10 @@ class DefaultController extends AbstractController
 	{
 		set_time_limit(0);
 		ignore_user_abort(true);
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$globalOption = $this->getUser()->getGlobalOption();
-		$entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->findAll();
+		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->findAll();
 
 		/* @var $entity AccountSales */
 

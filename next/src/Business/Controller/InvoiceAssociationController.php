@@ -3,6 +3,11 @@
 namespace App\Business\Controller;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\BusinessConfig;
 use App\Business\Form\CustomerInvoiceType;
 use Knp\Snappy\Pdf;
@@ -15,22 +20,31 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * BusinessInvoiceController controller.
  *
  */
-class InvoiceAssociationController extends Controller
+class InvoiceAssociationController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -47,7 +61,7 @@ class InvoiceAssociationController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $data['createdBy'] = $user->getId();
@@ -66,10 +80,10 @@ class InvoiceAssociationController extends Controller
     public function newAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$this->getUser()->getId()));
+        $em = $this->em;
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$this->getUser()->getId()));
 
-        $lastInvoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoiceParticular($customer->getId());
+        $lastInvoice = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoiceParticular($customer->getId());
 
         $entity = new BusinessInvoice();
         $editForm = $this->createCreateForm($entity);
@@ -121,15 +135,15 @@ class InvoiceAssociationController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$user->getId()));
-        $lastInvoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoiceParticular($customer->getId());
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$user->getId()));
+        $lastInvoice = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoiceParticular($customer->getId());
 
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
         if (($form->isValid() && $method == 'cash') ||
             ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setBusinessConfig($config);
             $entity->setCustomer($customer);
             $entity->setMobile($customer->getMobile());
@@ -138,14 +152,14 @@ class InvoiceAssociationController extends Controller
             $entity->setEndDate(new \DateTime("now"));
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Data has been inserted successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertStudentMonthlyParticular($entity,$lastInvoice, $data);
-            $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
+            $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertStudentMonthlyParticular($entity,$lastInvoice, $data);
+            $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
             return $this->redirect($this->generateUrl('customerweb_invoice', array('shop' => $user->getGlobalOption()->getSlug())));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'warning', "Payment information does not valid"
         );
         return $this->render("Customer/Invoice/new.html.twig", array(
@@ -189,7 +203,7 @@ class InvoiceAssociationController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->findOneBy(array( 'businessConfig' => $config , 'id' => $id));
 
@@ -212,7 +226,7 @@ class InvoiceAssociationController extends Controller
     public function updateAction(Request $request, BusinessInvoice $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Business Ivoice entity.');
@@ -222,8 +236,8 @@ class InvoiceAssociationController extends Controller
         $data = $request->request->all();
         if ($editForm->isValid()) {
 	        $em->flush();
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertCustomerInvoiceParticular($entity, $data);
-            $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
+            $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertCustomerInvoiceParticular($entity, $data);
+            $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
             return $this->redirect($this->generateUrl('customerweb_invoice', array('shop' => $globalOption->getSlug())));
         }
         $config = $entity->getBusinessConfig();
@@ -242,7 +256,7 @@ class InvoiceAssociationController extends Controller
 
 	public function invoiceDiscountUpdateAction(Request $request)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$discountType = $request->request->get('discountType');
 		$discountCal = (float)$request->request->get('discount');
 		$invoice = $request->request->get('invoice');
@@ -292,7 +306,7 @@ class InvoiceAssociationController extends Controller
 
     public function showAction(BusinessInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         if ($config->getId() == $entity->getBusinessConfig()->getId()) {
             return $this->render('Business/Invoice/show.html.twig', array(
@@ -311,7 +325,7 @@ class InvoiceAssociationController extends Controller
 
     public function deleteAction(BusinessInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -328,7 +342,7 @@ class InvoiceAssociationController extends Controller
 
     public function returnResultData(BusinessInvoice $entity, $msg=''){
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getSalesItems($entity);
+        $invoiceParticulars = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getSalesItems($entity);
         $subTotal = $entity->getSubTotal() > 0 ? $entity->getSubTotal() : 0;
         $netTotal = $entity->getTotal() > 0 ? $entity->getTotal() : 0;
         $payment = $entity->getPayment() > 0 ? $entity->getPayment() : 0;
@@ -359,7 +373,7 @@ class InvoiceAssociationController extends Controller
     public function addEventAction(Request $request, BusinessInvoice $invoice)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $request->request->all();
         $invoice->setEventType($data['eventType']);
@@ -367,12 +381,12 @@ class InvoiceAssociationController extends Controller
         $invoice->setEndDate($data['endDate']);
         $invoice->setVenue($data['venue']);
         if(!empty($data['customerName']) and !empty($data['customerMobile'])){
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($globalOption, $mobile, $data);
+            $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($globalOption, $mobile, $data);
             $invoice->setCustomer($customer);
         }elseif (!empty($data['mobile'])){
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['mobile']);
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'mobile' => $mobile));
+            $mobile = $this->toolManager->specialExpClean($data['mobile']);
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'mobile' => $mobile));
             $invoice->setCustomer($customer);
         }
         $em->flush();
@@ -389,14 +403,14 @@ class InvoiceAssociationController extends Controller
     public function addParticularAction(Request $request, BusinessInvoice $invoice)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particular = $request->request->get('customParticular');
         $price = $request->request->get('price');
         $unit = $request->request->get('unit');
         $quantity = $request->request->get('quantity');
         $invoiceItems = array('particular' => $particular, 'quantity' => $quantity,'price' => $price,'unit' => $unit);
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertInvoiceParticular($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
+        $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertInvoiceParticular($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -411,13 +425,13 @@ class InvoiceAssociationController extends Controller
 
     public function invoiceParticularDeleteAction(BusinessInvoice $invoice, BusinessInvoiceParticular $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-	    $invoice = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
+	    $invoice = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
         $result = $this->returnResultData($invoice,$msg ='');
         return new Response(json_encode($result));
         exit;
@@ -443,17 +457,17 @@ class InvoiceAssociationController extends Controller
 		 * Delete Journal & Account Purchase
 		 */
 		set_time_limit(0);
-		$em = $this->getDoctrine()->getManager();
-		$this->getDoctrine()->getRepository(\App\Business\Entity\BusinessProductionExpense::class)->removeProductionExpense($sales);
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->accountBusinessSalesReverse($sales);
+		$em = $this->em;
+		$this->em->getRepository(\App\Business\Entity\BusinessProductionExpense::class)->removeProductionExpense($sales);
+		$this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountBusinessSalesReverse($sales);
 		$sales->setIsReversed(true);
 		$sales->setProcess('Created');
 		$em->flush();
-		$template = $this->get('twig')->render('Business/Invoice/reverse.html.twig', array(
+		$template = $this->twig->render('Business/Invoice/reverse.html.twig', array(
 			'entity' => $sales,
 			'config' => $sales->getBusinessConfig(),
 		));
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->insertInvoiceProductItem($sales);
+        $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->insertInvoiceProductItem($sales);
 		$em->getRepository(\App\Business\Entity\BusinessReverse::class)->salesReverse($sales, $template);
 		return $this->redirect($this->generateUrl('business_invoice_edit',array('id' => $sales->getId())));
 	}
@@ -461,7 +475,7 @@ class InvoiceAssociationController extends Controller
 	public function invoiceReverseShowAction($id)
 	{
 		$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-		$entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessReverse::class)->findOneBy(array('businessConfig' => $config, 'businessInvoice' => $id));
+		$entity = $this->em->getRepository(\App\Business\Entity\BusinessReverse::class)->findOneBy(array('businessConfig' => $config, 'businessInvoice' => $id));
 		return $this->render('Business/Reverse/sales.html.twig', array(
 			'entity' => $entity,
 		));
@@ -475,8 +489,8 @@ class InvoiceAssociationController extends Controller
     public function deleteEmptyInvoiceAction()
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->findBy(array( 'businessConfig' => $config, 'process' => 'Created'));
-        $em = $this->getDoctrine()->getManager();
+        $entities = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->findBy(array( 'businessConfig' => $config, 'process' => 'Created'));
+        $em = $this->em;
         foreach ($entities as $entity) {
             $em->remove($entity);
             $em->flush();
@@ -486,7 +500,7 @@ class InvoiceAssociationController extends Controller
 
     public function invoicePrintPdfAction(BusinessInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         if ($config->getId() == $entity->getBusinessConfig()->getId()) {
 
@@ -533,7 +547,7 @@ class InvoiceAssociationController extends Controller
     {
         $q = $_REQUEST['term'];
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->searchAutoComplete($config,$q);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->searchAutoComplete($config,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[] = ['value' => $entity['id']];
@@ -546,7 +560,7 @@ class InvoiceAssociationController extends Controller
     {
         $q = $_REQUEST['term'];
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->searchAutoComplete($config,$q);
+        $entities = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->searchAutoComplete($config,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('value' => $entity['id']);
@@ -558,14 +572,14 @@ class InvoiceAssociationController extends Controller
     public function addAccessoriesAction(Request $request, BusinessInvoice $invoice)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particular = $request->request->get('particular');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('salesPrice');
         if(!empty($particular)){
             $invoiceItems = array('accessories' => $particular ,'quantity' => $quantity,'price' => $price);
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertStockItem($invoice,$invoiceItems);
-            $invoice = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
+            $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertStockItem($invoice,$invoiceItems);
+            $invoice = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
             $msg = 'Particular added successfully';
             $result = $this->returnResultData($invoice,$msg);
             return new Response(json_encode($result));
@@ -581,15 +595,15 @@ class InvoiceAssociationController extends Controller
     public function addParticularCommissionAction(Request $request, BusinessInvoice $invoice)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particular = $request->request->get('particular');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('salesPrice');
         $vendor = $request->request->get('vendor');
         $stockGrn = $request->request->get('stockGrn');
         $invoiceItems = array('particular' => $particular, 'quantity' => $quantity,'price' => $price,'vendor' => $vendor,'stockGrn' => $stockGrn);
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertCommissionInvoiceParticular($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
+        $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertCommissionInvoiceParticular($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -600,7 +614,7 @@ class InvoiceAssociationController extends Controller
     public function bannerSignAction(Request $request, BusinessInvoice $invoice)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particular = $request->request->get('particular');
         $quantity = $request->request->get('quantity');
         $salesPrice = $request->request->get('salesPrice');
@@ -608,8 +622,8 @@ class InvoiceAssociationController extends Controller
         $height = $request->request->get('height');
         if(!empty($particular)){
             $invoiceItems = array('particular' => $particular ,'quantity' => $quantity,'salesPrice'=> $salesPrice, 'width'=> $width,'height'=> $height);
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertBannerSignItem($invoice,$invoiceItems);
-	        $invoice = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
+            $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertBannerSignItem($invoice,$invoiceItems);
+	        $invoice = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
             $msg = 'Particular added successfully';
             $result = $this->returnResultData($invoice,$msg);
             return new Response(json_encode($result));
@@ -622,8 +636,8 @@ class InvoiceAssociationController extends Controller
     {
 
         $data = $request->request->all();
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->updateInvoiceItems($data);
-        $invoice = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->updateInvoiceItems($data);
+        $invoice = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($invoice);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -647,7 +661,7 @@ class InvoiceAssociationController extends Controller
     public function invoicePrintAction(BusinessInvoice $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         /* @var $config BusinessConfig */
 
@@ -663,9 +677,9 @@ class InvoiceAssociationController extends Controller
             }
             $amountInWords = '';
             if($entity->getProcess() == "Quotation"){
-                $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+                $amountInWords = $this->toolManager->intToWords($entity->getTotal());
             }
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($this->getUser()->getGlobalOption(),$entity->getCustomer());
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($this->getUser()->getGlobalOption(),$entity->getCustomer());
             $balance = empty($result) ? 0 : $result;
             return  $this->render("Business/Print/{$template}.html.twig",
                 array(
@@ -682,7 +696,7 @@ class InvoiceAssociationController extends Controller
 
     public function invoiceChalanAction(BusinessInvoice $entity)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 
 		/* @var $config BusinessConfig */
 
@@ -693,7 +707,7 @@ class InvoiceAssociationController extends Controller
 			}else{
 				$template = !empty($config->getInvoiceType()) ? $config->getInvoiceType():'print';
 			}
-			$result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($config->getGlobalOption(), $data = array('mobile' => $entity->getCustomer()->getMobile()));
+			$result = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($config->getGlobalOption(), $data = array('mobile' => $entity->getCustomer()->getMobile()));
 			$balance = empty($result) ? 0 : $result[0]['customerBalance'];
 			return  $this->render("Business/Print/{$template}.html.twig",
 				[
@@ -709,14 +723,14 @@ class InvoiceAssociationController extends Controller
 	public function  commissionProcessAction()
     {
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $data = [];
         $entities = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->invoiceLists( $user,$data);
         $config = $user->getGlobalOption()->getBusinessConfig()->getId();
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->checkInstantPurchaseReverse($config);
+        $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->checkInstantPurchaseReverse($config);
         foreach ($entities->getQuery()->getResult() as $entity):
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->insertCommissionPurchase($entity);
+        $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->insertCommissionPurchase($entity);
         endforeach;
         return $this->redirect($this->generateUrl('business_invoice'));
     }
@@ -727,7 +741,7 @@ class InvoiceAssociationController extends Controller
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = ['startDate' => '2019-07-04','endateDate' => '2019-07-04','process'=>"Done"];
         $entities = $em->getRepository(\App\Business\Entity\BusinessInvoice::class)->invoiceLists( $this->getUser() , $data);
         $pagination = $entities->getQuery()->getResult();
@@ -735,8 +749,8 @@ class InvoiceAssociationController extends Controller
         /* @var $sales BusinessInvoice */
 
         foreach ($pagination as $sales):
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessProductionExpense::class)->removeProductionExpense($sales);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->accountBusinessSalesReverse($sales);
+            $this->em->getRepository(\App\Business\Entity\BusinessProductionExpense::class)->removeProductionExpense($sales);
+            $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountBusinessSalesReverse($sales);
             $sales->setIsReversed(true);
             $sales->setProcess('Revised');
             $em->flush();
@@ -750,13 +764,13 @@ class InvoiceAssociationController extends Controller
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = ['startDate' => '2019-07-04','endateDate' => '2019-07-04','process'=>"Revised"];
         $entities = $em->getRepository(\App\Business\Entity\BusinessInvoice::class)->invoiceLists( $this->getUser() , $data);
         $pagination = $entities->getQuery()->getResult();
         /* @var $entity BusinessInvoice */
         foreach ($pagination as $entity):
-            $accountSales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountInvoice($entity);
+            $accountSales = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountInvoice($entity);
             $em->getRepository(\App\Accounting\Entity\Transaction::class)->salesGlobalTransaction($accountSales);
         endforeach;
         exit;

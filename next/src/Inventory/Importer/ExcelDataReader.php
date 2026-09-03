@@ -10,7 +10,7 @@ namespace App\Inventory\Importer;
 
 use PHPExcel;
 use App\Inventory\Repository\PurchaseRepository;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Liuggio\ExcelBundle\Factory;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 

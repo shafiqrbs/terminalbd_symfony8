@@ -3,6 +3,8 @@
 namespace App\Hospital\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\HospitalConfig;
 use App\Hospital\Entity\Invoice;
 use App\Hospital\Entity\InvoiceParticular;
@@ -16,15 +18,21 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * HospitalConfigController.
  *
  */
-class HospitalConfigController extends Controller
+class HospitalConfigController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     /**
@@ -76,7 +84,7 @@ class HospitalConfigController extends Controller
     #[IsGranted('ROLE_DOMAIN')]
     public function updateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         /** @var  $entity HospitalConfig */
         $entity = $this->getUser()->getGlobalOption()->getHospitalConfig();
@@ -98,7 +106,7 @@ class HospitalConfigController extends Controller
             $entity->headerUpload();
             $entity->footerUpload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Report has been created successfully"
             );
 

@@ -2,12 +2,14 @@
 
 namespace App\Hospital\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\Particular;
 use App\Hospital\Entity\PathologicalReport;
 use App\Hospital\Form\PathologicalReportType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -15,8 +17,14 @@ use Symfony\Component\HttpFoundation\Response;
  * Pathology controller.
  *
  */
-class PathologicalReportController extends Controller
+class PathologicalReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
 
@@ -28,10 +36,10 @@ class PathologicalReportController extends Controller
     {
         $hmsc = $this->getUser()->getGlobalOption()->getHospitalConfig();
         if($hmsc->getId() == $pathology->getHospitalConfig()->getId()){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = New PathologicalReport();
             $form = $this->createCreateForm($entity,$pathology);
-            $reportFormats = $this->getDoctrine()->getRepository(\App\Hospital\Entity\PathologicalReport::class)->findBy(array('particular' => $pathology),array('sorting'=>'asc','parent'=>'asc'));
+            $reportFormats = $this->em->getRepository(\App\Hospital\Entity\PathologicalReport::class)->findBy(array('particular' => $pathology),array('sorting'=>'asc','parent'=>'asc'));
             return $this->render('Hospital/Pathology/pathologicalReport.html.twig', array(
                 'entity'        => $entity,
                 'pathology'     => $pathology,
@@ -56,11 +64,11 @@ class PathologicalReportController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setParticular($pathology);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_pathological_report', array('pathology' => $pathology->getId())));
@@ -102,7 +110,7 @@ class PathologicalReportController extends Controller
      */
     public function editAction(Particular $pathology,PathologicalReport $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $form = $this->createEditForm($entity,$pathology);
         return $this->render('Hospital/Pathology/pathologicalReport.html.twig', array(
             'entity'        => $entity,
@@ -142,7 +150,7 @@ class PathologicalReportController extends Controller
      */
     public function updateAction(Request $request, Particular $pathology, PathologicalReport $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -152,7 +160,7 @@ class PathologicalReportController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_pathological_report',array('pathology'=>$pathology->getId())));
@@ -173,7 +181,7 @@ class PathologicalReportController extends Controller
     public function deleteAction(Particular $pathology, PathologicalReport $pathologicalReport)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$pathologicalReport) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -181,16 +189,16 @@ class PathologicalReportController extends Controller
 
             $em->remove($pathologicalReport);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -205,7 +213,7 @@ class PathologicalReportController extends Controller
     public function statusAction(Particular $pathology , PathologicalReport $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -217,7 +225,7 @@ class PathologicalReportController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_pathological_report',array('pathology' => $pathology->getId())));
@@ -226,7 +234,7 @@ class PathologicalReportController extends Controller
     public function sortingAction(Request $request,Particular $pathology)
     {
         $data = $request ->request->get('item');
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\PathologicalReport::class)->updateSorting($data);
+        $this->em->getRepository(\App\Hospital\Entity\PathologicalReport::class)->updateSorting($data);
         exit;
     }
 
@@ -234,9 +242,9 @@ class PathologicalReportController extends Controller
     {
         $data = $request->request->all();
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var $entity PathologicalReport */
-        $entity = $this->getDoctrine()->getRepository(PathologicalReport::class)->find($data['pk']);
+        $entity = $this->em->getRepository(PathologicalReport::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PathologicalReport entity.');
         }

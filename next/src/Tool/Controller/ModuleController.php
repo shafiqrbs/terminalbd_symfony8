@@ -3,6 +3,9 @@
 namespace App\Tool\Controller;
 
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +20,13 @@ use App\Tool\Form\ModuleType;
  */
 class ModuleController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     /**
@@ -25,7 +35,7 @@ class ModuleController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\Module::class)->findBy([],['name'=>'asc']);
 
@@ -40,7 +50,7 @@ class ModuleController extends AbstractController
 
     public function moduleDeleteAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\Module::class)->findAll([],['name'=>'asc']);
 
@@ -57,10 +67,10 @@ class ModuleController extends AbstractController
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             30  /*limit per page*/
         );
         return $pagination;
@@ -77,11 +87,11 @@ class ModuleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $menu = $entity->getMenu();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('module'));
@@ -135,7 +145,7 @@ class ModuleController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Module::class)->find($id);
 
@@ -157,7 +167,7 @@ class ModuleController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Module::class)->find($id);
 
@@ -200,7 +210,7 @@ class ModuleController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Module::class)->find($id);
 
@@ -234,7 +244,7 @@ class ModuleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Tool\Entity\Module::class)->find($id);
 
             if (!$entity) {
@@ -274,7 +284,7 @@ class ModuleController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\Module::class)->find($id);
 
         if (!$entity) {
@@ -288,7 +298,7 @@ class ModuleController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('module'));

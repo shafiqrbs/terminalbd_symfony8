@@ -1,6 +1,9 @@
 <?php
 
 namespace App\DomainUser\Controller;
+use App\Tool\Service\ToolManager;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,6 +16,13 @@ use App\DomainUser\Form\NotificationConfigType;
  */
 class NotificationConfigController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
 
     /**
@@ -23,10 +33,10 @@ class NotificationConfigController extends AbstractController
     {
 
         $global = $this->getUser()->getGlobalOption();
-        $entity = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\NotificationConfig::class)->findOneBy(['globalOption'=>$global]);
+        $entity = $this->em->getRepository(\App\DomainUser\Entity\NotificationConfig::class)->findOneBy(['globalOption'=>$global]);
         if(empty($entity)){
             $entity = new NotificationConfig();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($global);
             $em->persist($entity);
             $em->flush();
@@ -63,7 +73,7 @@ class NotificationConfigController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\NotificationConfig::class)->find($id);
 
@@ -74,12 +84,12 @@ class NotificationConfigController extends AbstractController
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+            $mobile = $this->toolManager->specialExpClean($entity->getMobile());
             $entity->setMobile($mobile);
-            $notification = $this->get('settong.toolManageRepo')->specialExpClean($entity->getPaymentNotification());
+            $notification = $this->toolManager->specialExpClean($entity->getPaymentNotification());
             $entity->setPaymentNotification($notification);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('domain_notificationconfig'));

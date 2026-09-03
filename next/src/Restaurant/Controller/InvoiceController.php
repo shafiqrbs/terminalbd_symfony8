@@ -4,6 +4,11 @@ namespace App\Restaurant\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Restaurant\Entity\Invoice;
 use App\Restaurant\Entity\InvoiceParticular;
 use App\Restaurant\Entity\Particular;
@@ -20,23 +25,32 @@ use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\Printer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * InvoiceController controller.
  *
  */
-class InvoiceController extends Controller
+class InvoiceController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -51,7 +65,7 @@ class InvoiceController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getRestaurantConfig();
@@ -71,7 +85,7 @@ class InvoiceController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Invoice();
         $option = $this->getUser()->getGlobalOption();
         $config = $option->getRestaurantConfig();
@@ -96,7 +110,7 @@ class InvoiceController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->findOneBy(array('restaurantConfig' => $config , 'id' => $id));
 
@@ -129,7 +143,7 @@ class InvoiceController extends Controller
 
     public function returnResultData(Invoice $entity,$msg=''){
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->invoiceParticularLists($entity);
+        $invoiceParticulars = $this->em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->invoiceParticularLists($entity);
         $subTotal = $entity->getSubTotal() > 0 ? $entity->getSubTotal() : 0;
         $netTotal = $entity->getTotal() > 0 ? $entity->getTotal() : 0;
         $payment = $entity->getPayment() > 0 ? $entity->getPayment() : 0;
@@ -155,13 +169,13 @@ class InvoiceController extends Controller
 
     public function addParticularAction(Request $request, Invoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
         $process = $request->request->get('process');
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'process'=>$process);
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->insertInvoiceItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($invoice);
+        $this->em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->insertInvoiceItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($invoice);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -171,22 +185,22 @@ class InvoiceController extends Controller
 
     public function addProductAction(Request $request, Invoice $invoice, $product)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         // $particularId = $request->request->get('particularId');
         $invoiceItems = array('particularId' => $product , 'quantity' => 1,'process'=>'create');
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->insertInvoiceItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($invoice);
+        $this->em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->insertInvoiceItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
     }
 
     public function updateProductAction(Request $request, Invoice $invoice, $product)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $quantity = $_REQUEST['quantity'];
         $invoiceItems = array('particularId' => $product , 'quantity' => $quantity,'process'=>'update');
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->insertInvoiceItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($invoice);
+        $this->em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->insertInvoiceItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($invoice);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -196,14 +210,14 @@ class InvoiceController extends Controller
     public function invoiceParticularDeleteAction( $invoice, InvoiceParticular $particular){
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-        $entity =  $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->find($invoice);
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($entity);
+        $entity =  $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->find($invoice);
+        $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($entity);
         $msg = 'Product deleted successfully';
         $result = $this->returnResultData($entity,$msg);
         return new Response(json_encode($result));
@@ -211,7 +225,7 @@ class InvoiceController extends Controller
 
     public function updateAction(Request $request, Invoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -223,26 +237,26 @@ class InvoiceController extends Controller
         if($editForm->isValid()) {
 
             if (isset($data['customerMobile']) and !empty($data['customerMobile'])) {
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option, $mobile, $data);
+                $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option, $mobile, $data);
                 $entity->setCustomer($customer);
             } elseif (isset($data['mobile']) and !empty($data['mobile'])) {
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['mobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $option, 'mobile' => $mobile));
+                $mobile = $this->toolManager->specialExpClean($data['mobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $option, 'mobile' => $mobile));
                 $entity->setCustomer($customer);
             }else{
                 $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->defaultCustomer($option);
                 $entity->setCustomer($customer);
             }
-            $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+            $amountInWords = $this->toolManager->intToWords($entity->getTotal());
             $entity->setPaymentInWord($amountInWords);
             $due = $entity->getTotal() - $entity->getPayment();
             $entity->setDue($due);
             $em->flush();
             if(!empty($entity->getInvoiceParticulars()) and in_array($entity->getProcess(),array('Delivered','Done'))) {
-                $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->insertAccessories($entity);
+                $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->insertAccessories($entity);
                 if($entity->getRestaurantConfig()->isStockHistory() == 1 ) {
-                    $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertSalesItem($entity);
+                    $this->em->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertSalesItem($entity);
                 }
                 $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertRestaurantAccountInvoice($entity);
             }
@@ -258,7 +272,7 @@ class InvoiceController extends Controller
 
     public function invoiceDiscountUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $discountCalculation = (float)$request->request->get('discount');
         $invoice = $request->request->get('invoice');
         $discountType = $request->request->get('discountType');
@@ -283,7 +297,7 @@ class InvoiceController extends Controller
         }else{
             $msg = 'Discount is not use properly';
         }
-        $returnEntity =  $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($entity);
+        $returnEntity =  $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($entity);
         $result = $this->returnResultData($returnEntity,$msg);
         return new Response(json_encode($result));
 
@@ -294,14 +308,14 @@ class InvoiceController extends Controller
 
         /* @var $config RestaurantConfig */
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $invoice = $request->request->get('invoice');
         $discountCoupon = $request->request->get('discountCoupon');
         $entity = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->find($invoice);
         $subTotal = $entity->getSubTotal();
         /* @var $config RestaurantConfig */
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        // $coupon = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Coupon::class)->getValidCouponCode($this->getUser()->getGlobalOption(),$discountCoupon);
+        // $coupon = $this->em->getRepository(\App\Restaurant\Entity\Coupon::class)->getValidCouponCode($this->getUser()->getGlobalOption(),$discountCoupon);
         $total = 0;
         $discount = 0;
         if($config->getDiscountType() == 'flat' and !empty($discountCoupon)){
@@ -320,7 +334,7 @@ class InvoiceController extends Controller
         }else{
             $msg = 'Discount is not use properly';
         }
-        $returnEntity =  $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($entity);
+        $returnEntity =  $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->updateInvoiceTotalPrice($entity);
         $result = $this->returnResultData($returnEntity,$msg);
         return new Response(json_encode($result));
 
@@ -328,7 +342,7 @@ class InvoiceController extends Controller
 
     public function searchAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $sales = $request->request->get('sales');
         $barcode = $request->request->get('barcode');
         $sales = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->find($sales);
@@ -372,7 +386,7 @@ class InvoiceController extends Controller
     private function createInvoiceParticularForm(InvoiceParticular $entity , Invoice $invoice)
     {
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        $particular = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class);
+        $particular = $this->em->getRepository(\App\Restaurant\Entity\Particular::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into RestaurantParticularType::configureOptions() and pass them as form options: $config,$particular), $entity, array(
         $form = $this->createForm(new RestaurantParticularType($config,$particular), $entity, array(
@@ -390,7 +404,7 @@ class InvoiceController extends Controller
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $Invoice = $em->createQuery("DELETE RestaurantBundle:Invoice e WHERE e.id = {$id}");
         $Invoice->execute();
         return new Response(json_encode(array('success' => 'success')));
@@ -400,13 +414,13 @@ class InvoiceController extends Controller
     public function deleteEmptyInvoiceAction()
     {
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->invoiceDelete($config);
+        $this->em->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->invoiceDelete($config);
         return $this->redirect($this->generateUrl('restaurant_invoice'));
     }
 
     public function checkTokenBookingAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $tokenNo = $request->request->get('tokenNo');
         $invoice = $request->request->get('invoice');
         $status = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->checkTokenBooking($invoice,$tokenNo);
@@ -416,12 +430,12 @@ class InvoiceController extends Controller
 
     public function reverseAction($invoice){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->findOneBy(array('restaurantConfig' => $config, 'invoice' => $invoice));
+        $entity = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->findOneBy(array('restaurantConfig' => $config, 'invoice' => $invoice));
         $em->getRepository(\App\Restaurant\Entity\Invoice::class)->salesTransactionReverse($entity);
         $em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->reverseInvoiceParticularUpdate($entity);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setRevised(true);
         $entity->setProcess('Revised');
         $entity->setRevised(true);
@@ -430,11 +444,11 @@ class InvoiceController extends Controller
         $entity->setDue($entity->getTotal() - $entity->getPayment());
         $entity->setPaymentInWord(null);
         $em->flush();
-        $template = $this->get('twig')->render('Restaurant/Invoice/reverse-data.html.twig',array(
+        $template = $this->twig->render('Restaurant/Invoice/reverse-data.html.twig',array(
             'entity' => $entity,
         ));
         if($entity->getRestaurantConfig()->isStockHistory() == 1 ) {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processReverseSalesItem($entity);
+            $this->em->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processReverseSalesItem($entity);
         }
         $em->getRepository(\App\Restaurant\Entity\Reverse::class)->insertInvoice($entity,$template);
         return $this->redirect($this->generateUrl('restaurant_invoice_edit',array('id'=>$entity->getId())));
@@ -442,7 +456,7 @@ class InvoiceController extends Controller
 
     public function reverseShowAction($invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Reverse::class)->findOneBy(array('restaurantConfig'=>$config,'invoice' => $invoice));
         return $this->render('Restaurant/Invoice/reverse.html.twig', array(
@@ -452,10 +466,10 @@ class InvoiceController extends Controller
 
     public function PosPrintAction(Request $request,$invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->findOneBy(array('restaurantConfig'=>$config,'invoice'=>$invoice));
-        $response = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->posPrint($entity);
+        $response = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->posPrint($entity);
         return new Response($response);
     }
 
@@ -463,10 +477,10 @@ class InvoiceController extends Controller
 
      public function PosDeliveryPrintAction(Request $request,$id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->findOneBy(array('restaurantConfig'=>$config,'id'=>$id));
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->findBy(array('invoice' => $entity->getId()));
+        $invoiceParticulars = $this->em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->findBy(array('invoice' => $entity->getId()));
         $response = $this->renderView(
             'Restaurant/Invoice/posPrint.html.twig', array(
                 'entity'         => $entity,
@@ -482,7 +496,7 @@ class InvoiceController extends Controller
     public function approvedOrderAction(Invoice $entity)
     {
         $globalOption = $entity->getRestaurantConfig()->getGlobalOption();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $payment = !empty($data['payment']) ? $data['payment'] :0;
         if($entity->getPayment() >= $entity->getTotal()){
             $entity->setPayment($entity->getTotal());
@@ -499,11 +513,11 @@ class InvoiceController extends Controller
         }
         $entity->setApprovedBy($this->getUser());
         $entity->setProcess('Done');
-        $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+        $amountInWords = $this->toolManager->intToWords($entity->getTotal());
         $entity->setPaymentInWord($amountInWords);
         $em->flush();
         if ($entity->getTotal() > 0) {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->insertAccessories($entity);
+            $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->insertAccessories($entity);
             $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertRestaurantAccountInvoice($entity);
         }
         return $this->redirect($this->generateUrl('restaurant_invoice'));
@@ -512,26 +526,26 @@ class InvoiceController extends Controller
 
     public function PaymentPrintAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->findOneBy(array('restaurantConfig' => $config,'id' => $id));
-        $response = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->posPrint($entity);
+        $response = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->posPrint($entity);
         return new Response($response);
 
     }
 
     public function KitchenPrintAction($invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->findOneBy(array('restaurantConfig'=>$config,'invoice'=>$invoice));
-        $response = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->posPrint($entity);
+        $response = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->posPrint($entity);
         return new Response($response);
     }
 
     public function saveAction($invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->findOneBy(array('restaurantConfig'=>$config,'invoice'=>$invoice));
         if(!empty($entity)){
@@ -544,17 +558,17 @@ class InvoiceController extends Controller
 
     public function cashPayment(Invoice $entity){
 
-        $em =  $em = $this->getDoctrine()->getManager();
+        $em =  $em = $this->em;
         $entity->setPayment($entity->getTotal());
         $entity->setPaymentStatus('Paid');
         $entity->setApprovedBy($this->getUser());
         $entity->setProcess('Done');
         $entity->setDue(0);
-        $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+        $amountInWords = $this->toolManager->intToWords($entity->getTotal());
         $entity->setPaymentInWord($amountInWords);
         $em->flush();
         if ($entity->getTotal() > 0) {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->insertAccessories($entity);
+            $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->insertAccessories($entity);
             $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertRestaurantAccountInvoice($entity);
         }
 
@@ -562,7 +576,7 @@ class InvoiceController extends Controller
 
     public function productsAction(Invoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $pagination         = $em->getRepository(\App\Restaurant\Entity\Particular::class)->getServiceLists($invoice ,array('product','stockable'));
         return new Response($pagination);
@@ -571,12 +585,12 @@ class InvoiceController extends Controller
 
     public function todaySalesAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $salesOverview      = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->findWithSalesOverview($this->getUser());
+        $em = $this->em;
+        $salesOverview      = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->findWithSalesOverview($this->getUser());
         $created            = date('y-m-d');
         $sales              = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->invoiceLists( $this->getUser() , array('created' => $created));
         $salesLists         = $this->paginate($sales);
-        $template = $this->get('twig')->render('Restaurant/Invoice/product.html.twig',array(
+        $template = $this->twig->render('Restaurant/Invoice/product.html.twig',array(
             'salesLists' => $salesLists,
         ));
         $data = array('overview'=> $salesOverview ,'products' =>$template );
@@ -588,9 +602,9 @@ class InvoiceController extends Controller
     public function androidSalesAction()
     {
         $conf = $this->getUser()->getGlobalOption()->getRestaurantConfig()->getId();
-        $entities = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantAndroidProcess::class)->getAndroidSalesList($conf,"sales");
+        $entities = $this->em->getRepository(\App\Restaurant\Entity\RestaurantAndroidProcess::class)->getAndroidSalesList($conf,"sales");
         $pagination = $this->paginate($entities);
-        $sales = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->findAndroidDeviceSales($pagination);
+        $sales = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->findAndroidDeviceSales($pagination);
         return $this->render('Restaurant/Invoice/salesAndroid.html.twig', array(
             'entities'  => $pagination,
             'sales'     => $sales,
@@ -601,7 +615,7 @@ class InvoiceController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->androidDeviceSalesProcess($device);
+        $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->androidDeviceSalesProcess($device);
         exit;
     }
 
@@ -611,18 +625,18 @@ class InvoiceController extends Controller
         $msg = "invalid";
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
 
         $removeSales = $em->createQuery("DELETE RestaurantBundle:Invoice e WHERE e.androidProcess= {$android->getId()}");
         if(!empty($removeSales)){
             $removeSales->execute();
         }
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->insertApiSales($config->getGlobalOption(),$android);
+        $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->insertApiSales($config->getGlobalOption(),$android);
 
         /* @var $sales Invoice */
 
-        $salses = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->findBy(array('androidProcess' => $android));
+        $salses = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->findBy(array('androidProcess' => $android));
         foreach ($salses as $sales){
             if($sales->getProcess() == "Device"){
                 $sales->setProcess('Done');
@@ -630,11 +644,11 @@ class InvoiceController extends Controller
                 $sales->setUpdated($sales->getCreated());
                 $sales->setApprovedBy($this->getUser());
                 $em->flush();
-                $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->insertAccessories($sales);
+                $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->insertAccessories($sales);
                 if($sales->getRestaurantConfig()->isStockHistory() == 1 ) {
-                    $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertSalesItem($sales);
+                    $this->em->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertSalesItem($sales);
                 }
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertRestaurantAccountInvoice($sales);
+                $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertRestaurantAccountInvoice($sales);
                 $msg = "valid";
             }
         }
@@ -642,7 +656,7 @@ class InvoiceController extends Controller
             $android->setStatus(true);
             $em->persist($android);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->updateApiSalesPurchasePrice($android->getId());
+            $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->updateApiSalesPurchasePrice($android->getId());
         }
         if($msg == "valid"){
             return new Response('success');

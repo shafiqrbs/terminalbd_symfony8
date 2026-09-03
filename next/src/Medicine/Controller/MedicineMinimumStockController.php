@@ -2,19 +2,27 @@
 
 namespace App\Medicine\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Medicine\Entity\MedicineMinimumStock;
 use App\Medicine\Form\MedicineMinimumStockType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * MedicineMinimumStock controller.
  *
  */
-class MedicineMinimumStockController extends Controller
+class MedicineMinimumStockController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all MedicineMinimumStock entities.
@@ -22,11 +30,11 @@ class MedicineMinimumStockController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new MedicineMinimumStock();
         $form = $this->createCreateForm($entity);
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->findBy(array('medicineConfig' => $config));
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->findBy(array('medicineConfig' => $config));
         return $this->render('Medicine/MedicineMinimumStock/index.html.twig', array(
             'entities' => $entities,
             'entity' => $entity,
@@ -41,17 +49,17 @@ class MedicineMinimumStockController extends Controller
     {
         $entity = new MedicineMinimumStock();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->findBy(array('medicineConfig' => $config));
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->findBy(array('medicineConfig' => $config));
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('medicine_minimum', array('id' => $entity->getId())));
@@ -74,7 +82,7 @@ class MedicineMinimumStockController extends Controller
     private function createCreateForm(MedicineMinimumStock $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $em = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class);
+        $em = $this->em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into MedicineMinimumStockType::configureOptions() and pass them as form options: $em,$config), $entity, array(
         $form = $this->createForm(new MedicineMinimumStockType($em,$config), $entity, array(
@@ -94,9 +102,9 @@ class MedicineMinimumStockController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->findBy(array('medicineConfig' => $config));
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->findBy(array('medicineConfig' => $config));
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->find($id);
 
@@ -137,9 +145,9 @@ class MedicineMinimumStockController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->findBy(array('medicineConfig' => $config));
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->findBy(array('medicineConfig' => $config));
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->find($id);
 
@@ -152,7 +160,7 @@ class MedicineMinimumStockController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             return $this->redirect($this->generateUrl('medicine_minimum'));
@@ -171,7 +179,7 @@ class MedicineMinimumStockController extends Controller
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->find($id);
 
         if (!$entity) {
@@ -181,16 +189,16 @@ class MedicineMinimumStockController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -206,7 +214,7 @@ class MedicineMinimumStockController extends Controller
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class)->find($id);
 
         if (!$entity) {
@@ -220,7 +228,7 @@ class MedicineMinimumStockController extends Controller
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('medicine_minimum'));
@@ -231,9 +239,9 @@ class MedicineMinimumStockController extends Controller
 
 	    set_time_limit(0);
 	    ignore_user_abort(true);
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
 	    $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-	    $items = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findBy(array('medicineConfig'=>$config,'unit'=> $stock->getUnit()));
+	    $items = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findBy(array('medicineConfig'=>$config,'unit'=> $stock->getUnit()));
 		foreach ($items as $item){
 			$item->setMinQuantity($stock->getMinQuantity());
 			$em->flush();

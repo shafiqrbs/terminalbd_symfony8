@@ -1,6 +1,8 @@
 <?php
 
 namespace App\DomainUser\Controller;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\User\Form\DomainEditUserType;
 use FOS\UserBundle\Model\UserManager;
 use App\User\Entity\User;
@@ -9,7 +11,7 @@ use App\User\Form\DomainSignType;
 use App\Tool\Entity\Designation;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\DomainUser\Entity\DomainUser;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,8 +19,14 @@ use Symfony\Component\HttpFoundation\Response;
  * DomainUser controller.
  *
  */
-class DomainUserController extends Controller
+class DomainUserController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all DomainUser entities.
@@ -27,10 +35,10 @@ class DomainUserController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $option = $user->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->getEmployeeEntities($option);
+        $entities = $this->em->getRepository(\App\User\Entity\User::class)->getEmployeeEntities($option);
         return $this->render('DomainUser/DomainUser/index.html.twig', array(
             'entities' => $entities,
         ));
@@ -53,7 +61,7 @@ class DomainUserController extends Controller
        $password = $data['user']['plainPassword']['first'];
         if ($form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($globalOption);
             $entity->getProfile()->upload();
             $entity->setDomainOwner(2);
@@ -61,7 +69,7 @@ class DomainUserController extends Controller
             $entity->setAppPassword($password);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('domain_user'));
@@ -83,10 +91,10 @@ class DomainUserController extends Controller
      */
     private function createCreateForm(User $entity)
     {
-        $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class);
+        $user = $this->em->getRepository(\App\User\Entity\User::class);
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $designation = $this->getDoctrine()->getRepository(\App\Tool\Entity\Designation::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $designation = $this->em->getRepository(\App\Tool\Entity\Designation::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DomainSignType::configureOptions() and pass them as form options: $user,$globalOption,$location,$designation), $entity, array(
         $form = $this->createForm(new DomainSignType($user,$globalOption,$location,$designation), $entity, array(
@@ -123,7 +131,7 @@ class DomainUserController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\User\Entity\User::class)->find($id);
 
@@ -142,7 +150,7 @@ class DomainUserController extends Controller
     public function editAction(User $user)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $editForm = $this->createEditForm($user);
         $globalOption = $user->getGlobalOption();
         return $this->render('DomainUser/DomainUser/edit.html.twig', array(
@@ -155,7 +163,7 @@ class DomainUserController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         /* @var $entity User */
 
@@ -184,9 +192,9 @@ class DomainUserController extends Controller
     private function createEditForm(User $entity)
     {
 
-        $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class);
+        $user = $this->em->getRepository(\App\User\Entity\User::class);
         $globalOption = $this->getUser()->getGlobalOption();
-        $designation = $this->getDoctrine()->getRepository(\App\Tool\Entity\Designation::class);
+        $designation = $this->em->getRepository(\App\Tool\Entity\Designation::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DomainEditUserType::configureOptions() and pass them as form options: $user,$globalOption,$designation), $entity, array(
         $form = $this->createForm(new DomainEditUserType($user,$globalOption,$designation), $entity, array(
@@ -205,7 +213,7 @@ class DomainUserController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         /* @var $entity User */
         $entity = $em->getRepository(\App\User\Entity\User::class)->find($id);
@@ -241,11 +249,11 @@ class DomainUserController extends Controller
      */
     public function deleteAction(User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user->setIsDelete(true);
         $user->setEnabled(false);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"Data has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('domain_user'));
@@ -264,8 +272,8 @@ class DomainUserController extends Controller
     {
 
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $designation = $this->getDoctrine()->getRepository(\App\Tool\Entity\Designation::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $designation = $this->em->getRepository(\App\Tool\Entity\Designation::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DomainEditSignType::configureOptions() and pass them as form options: $globalOption,$location,$designation), $entity, array(
         $form = $this->createForm(new DomainEditSignType($globalOption,$location,$designation), $entity, array(
@@ -303,7 +311,7 @@ class DomainUserController extends Controller
      */
     public function updateProfileAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $this->getUser();
 
@@ -315,7 +323,7 @@ class DomainUserController extends Controller
         $editForm->handleRequest($request);
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('domain_edit_profile'));
@@ -334,7 +342,7 @@ class DomainUserController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
+            $item = $this->em->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
         }
         return new JsonResponse($item);
     }
@@ -344,7 +352,7 @@ class DomainUserController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->searchAutoCompleteProfile($item,$go);
+            $item = $this->em->getRepository(\App\User\Entity\User::class)->searchAutoCompleteProfile($item,$go);
         }
         return new JsonResponse($item);
     }
@@ -362,8 +370,9 @@ class DomainUserController extends Controller
         $password = '@123456';
         $user->setPlainPassword($password);
         $user->setAppPassword($password);
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $this->get('fos_user.user_manager')->updateUser($user);
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Password reset successfully"
         );
       //  $dispatcher = $this->container->get('event_dispatcher');

@@ -3,26 +3,36 @@
 namespace App\Customer\Controller;
 
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\User\Entity\User;
 use App\User\Form\CustomerEditProfileType;
 use Frontend\FrontentBundle\Service\Cart;
 use App\Tool\Entity\GlobalOption;
 use App\Tool\Form\DomainSearchType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DomainController extends Controller
+class DomainController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -31,7 +41,7 @@ class DomainController extends Controller
     public function indexAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new GlobalOption();
         $form   = $this->createCreateForm($entity);
         $form->handleRequest($request);
@@ -39,7 +49,7 @@ class DomainController extends Controller
         $pagination = $this->paginate($entities);
         $shop = $request->request->get('shop');
         if(!empty($globalOption)){
-            $globalOption = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(array('slug' => $shop));
+            $globalOption = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(array('slug' => $shop));
         }else{
             $globalOption ='';
         }
@@ -71,8 +81,8 @@ class DomainController extends Controller
 
     private function createCreateForm(GlobalOption $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Tool\Entity\Syndicate::class);
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DomainSearchType::configureOptions() and pass them as form options: $em,$location), $entity, array(
         $form = $this->createForm(new DomainSearchType($em,$location), $entity, array(

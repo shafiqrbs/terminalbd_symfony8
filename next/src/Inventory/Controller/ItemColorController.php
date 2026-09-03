@@ -3,6 +3,8 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -19,6 +21,12 @@ use App\Inventory\Form\ItemColorType;
  */
 class ItemColorController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all ItemColor entities.
@@ -26,7 +34,7 @@ class ItemColorController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Inventory\Entity\ItemColor::class)->findBy(['isValid'=> 1],['code'=>'asc']);
         return $this->render('Inventory/ItemColor/index.html.twig', [
             'entities' => $entities,
@@ -44,13 +52,13 @@ class ItemColorController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
             $entity->setStatus(false);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('itemcolor_show', ['id' => $entity->getId()]));
@@ -103,7 +111,7 @@ class ItemColorController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemColor::class)->find($id);
 
@@ -125,7 +133,7 @@ class ItemColorController extends AbstractController
     #[IsGranted('ROLE_ADMIN_OPERATION_USER')]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemColor::class)->find($id);
 
@@ -168,7 +176,7 @@ class ItemColorController extends AbstractController
     #[IsGranted('ROLE_ADMIN_OPERATION_USER')]
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemColor::class)->find($id);
 
@@ -182,7 +190,7 @@ class ItemColorController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('itemcolor_edit', ['id' => $id]));
@@ -200,7 +208,7 @@ class ItemColorController extends AbstractController
     #[IsGranted('ROLE_ADMIN_OPERATION_USER')]
     public function deleteAction(ItemColor $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Product entity.');
         }
@@ -209,16 +217,16 @@ class ItemColorController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -246,7 +254,7 @@ class ItemColorController extends AbstractController
     {
         $item = $_REQUEST['q'];
         if ($item) {
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemColor::class)->searchAutoComplete($item);
+            $item = $this->em->getRepository(\App\Inventory\Entity\ItemColor::class)->searchAutoComplete($item);
         }
         return new JsonResponse($item);
     }

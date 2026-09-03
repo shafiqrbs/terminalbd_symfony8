@@ -3,19 +3,27 @@
 namespace App\Accounting\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountBank;
 use App\Accounting\Form\AccountBankType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use JMS\SecurityExtraBundle\Annotation\Secure;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * AccountBank controller.
  *
  */
-class AccountBankController extends Controller
+class AccountBankController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     #[IsGranted('ROLE_DOMAIN_ACCOUNTING_CONFIG')]
@@ -23,12 +31,12 @@ class AccountBankController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->findWithSearch($globalOption,$data);
 
-       // $this->getDoctrine()->getRepository(AccountBank::class)->selectBankRecords();
+       // $this->em->getRepository(AccountBank::class)->selectBankRecords();
         return $this->render('Accounting/AccountBank/index.html.twig', array(
             'entities' => $entities,
             'searchForm' => $data,
@@ -48,7 +56,7 @@ class AccountBankController extends Controller
         $form->handleRequest($request);
         if ($form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $name = $entity->getServiceName();
             $entity->setName($name);
@@ -56,12 +64,12 @@ class AccountBankController extends Controller
             $em->persist($entity);
             $em->flush();
             if($entity->isDefault() == 1){
-                $this->getDoctrine()->getRepository(AccountBank::class)->setupDefault($entity);
+                $this->em->getRepository(AccountBank::class)->setupDefault($entity);
             }
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertBankAccount($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertBankAccount($entity);
             return $this->redirect($this->generateUrl('accountbank'));
         }
 
@@ -101,7 +109,7 @@ class AccountBankController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountBank();
         $form   = $this->createCreateForm($entity);
         return $this->render('Accounting/AccountBank/new.html.twig', array(
@@ -118,7 +126,7 @@ class AccountBankController extends Controller
     public function showAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($id);
         if (!$entity) {
@@ -137,7 +145,7 @@ class AccountBankController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($id);
 
@@ -185,7 +193,7 @@ class AccountBankController extends Controller
 
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($id);
 
@@ -205,9 +213,9 @@ class AccountBankController extends Controller
             $entity->upload();
             $em->flush();
             if($entity->isDefault() == 1){
-                $this->getDoctrine()->getRepository(AccountBank::class)->setupDefault($entity);
+                $this->em->getRepository(AccountBank::class)->setupDefault($entity);
             }
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertBankAccount($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertBankAccount($entity);
             return $this->redirect($this->generateUrl('accountbank'));
         }
 
@@ -225,7 +233,7 @@ class AccountBankController extends Controller
     public function deleteAction(AccountBank $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
         }
@@ -233,12 +241,12 @@ class AccountBankController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }

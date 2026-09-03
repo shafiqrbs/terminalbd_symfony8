@@ -2,12 +2,14 @@
 
 namespace App\Hospital\Controller;
 
+use App\Tool\Service\ToolManager;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\HmsInvoiceTemporaryParticular;
 use App\Hospital\Entity\Invoice;
 use App\Hospital\Entity\Particular;
 use App\Hospital\Form\InvoiceType;
 use App\User\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,19 +17,25 @@ use Symfony\Component\HttpFoundation\Response;
  * Invoice controller.
  *
  */
-class HmsInvoiceTemporaryParticularController extends Controller
+class HmsInvoiceTemporaryParticularController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function newAction()
     {
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $entity = new Invoice();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $form = $this->createInvoiceCustomerForm($entity);
         $services        = $em->getRepository(\App\Hospital\Entity\Particular::class)->getServices($hospital,array(1,8,7));
         $referredDoctors    = $em->getRepository(\App\Hospital\Entity\Particular::class)->getServiceWithParticular($hospital,array(5,6));;
-        $subTotal = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->getSubTotalAmount($user);
+        $subTotal = $this->em->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->getSubTotalAmount($user);
         $html = $this->renderView('Hospital/Invoice/diagnostic.html.twig', array(
             'temporarySubTotal'   => $subTotal,
             'hospital'   => $hospital,
@@ -45,8 +53,8 @@ class HmsInvoiceTemporaryParticularController extends Controller
     private function createInvoiceCustomerForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $category = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into InvoiceType::configureOptions() and pass them as form options: $globalOption,$category ,$location), $entity, array(
         $form = $this->createForm(new InvoiceType($globalOption,$category ,$location), $entity, array(
@@ -64,7 +72,7 @@ class HmsInvoiceTemporaryParticularController extends Controller
 
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = New Invoice();
         $user = $this->getUser();
         $option = $user->getGlobalOption();
@@ -79,13 +87,13 @@ class HmsInvoiceTemporaryParticularController extends Controller
         $referredId = $data['referredId'];
         $consultantId = $data['consultant'];
         $entity->setHospitalConfig($hospital);
-        $service = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Service::class)->find(1);
+        $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(1);
         $entity->setService($service);
-        $referredDoctor = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(array('hospitalConfig' => $hospital,'name'=>'Self','service' => 6));
+        $referredDoctor = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(array('hospitalConfig' => $hospital,'name'=>'Self','service' => 6));
         $entity->setReferredDoctor($referredDoctor);
         $transactionMethod = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         if($admissionId){
-            $admission = $this->getDoctrine()->getRepository(Invoice::class)->findOneBy(array('hospitalConfig' => $hospital,'invoice'=>$admissionId));
+            $admission = $this->em->getRepository(Invoice::class)->findOneBy(array('hospitalConfig' => $hospital,'invoice'=>$admissionId));
             $entity->setParent($admission);
             $entity->setMarketingExecutive($admission->getMarketingExecutive());
             $entity->setReferredDoctor($admission->getReferredDoctor());
@@ -96,25 +104,25 @@ class HmsInvoiceTemporaryParticularController extends Controller
         $entity->setPrintFor('diagnostic');
         $entity->setCreatedBy($this->getUser());
         if (!empty($data['customer']['name'])) {
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customer']['mobile']);
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findHmsExistingCustomerDiagnostic($this->getUser()->getGlobalOption(), $mobile,$patientId,$data);
+            $mobile = $this->toolManager->specialExpClean($data['customer']['mobile']);
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findHmsExistingCustomerDiagnostic($this->getUser()->getGlobalOption(), $mobile,$patientId,$data);
             $entity->setCustomer($customer);
             $entity->setMobile($mobile);
         }
         if(!empty($data['assignDoctor']['name']) && !empty($data['assignDoctor']['mobile'])) {
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['assignDoctor']['mobile']);
-            $doctor = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->findHmsExistingDoctor($hospital , $mobile,$data);
+            $mobile = $this->toolManager->specialExpClean($data['assignDoctor']['mobile']);
+            $doctor = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->findHmsExistingDoctor($hospital , $mobile,$data);
             $entity->setAssignDoctor($doctor);
         }elseif(!empty($consultantId)){
-            $consultant = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->find($consultantId);
+            $consultant = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->find($consultantId);
             $entity->setAssignDoctor($consultant);
         }
         if(!empty($data['referredDoctor']['name']) && !empty($data['referredDoctor']['mobile'])) {
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['referredDoctor']['mobile']);
-            $referred = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->findHmsExistingReferred($hospital , $mobile,$data);
+            $mobile = $this->toolManager->specialExpClean($data['referredDoctor']['mobile']);
+            $referred = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->findHmsExistingReferred($hospital , $mobile,$data);
             $entity->setReferredDoctor($referred);
         }elseif(!empty($referredId)){
-            $referred = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->find($referredId);
+            $referred = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->find($referredId);
             $entity->setReferredDoctor($referred);
         }
         $deliveryDateTime = $request->request->get('deliveryDateTime');
@@ -134,17 +142,17 @@ class HmsInvoiceTemporaryParticularController extends Controller
         }else{
             $entity->setProcess('In-progress');
         }
-        $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+        $amountInWords = $this->toolManager->intToWords($entity->getTotal());
         $entity->setPaymentInWord($amountInWords);
         $em->persist($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->insertMasterParticular($user,$entity);
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updateInvoiceTotalPrice($entity);
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->insertTransaction($entity);
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updatePaymentReceive($entity);
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->insertAccessories($entity);
+        $this->em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->insertMasterParticular($user,$entity);
+        $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updateInvoiceTotalPrice($entity);
+        $this->em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->insertTransaction($entity);
+        $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updatePaymentReceive($entity);
+        $this->em->getRepository(\App\Hospital\Entity\Particular::class)->insertAccessories($entity);
         if($hospital->getInitialDiagnosticShow() != 1){
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->removeInitialParticular($user);
+            $this->em->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->removeInitialParticular($user);
         }
         $data = array(
             'entity' => $entity->getId(),
@@ -162,7 +170,7 @@ class HmsInvoiceTemporaryParticularController extends Controller
         $user = $this->getUser();
         $discount = (float)$request->request->get('discount');
         $discountType = $request->request->get('discountType');
-        $subTotal = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->getSubTotalAmount($user);
+        $subTotal = $this->em->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->getSubTotalAmount($user);
         if($discountType == 'flat'){
             $initialGrandTotal = ($subTotal  - $discount);
         }else{
@@ -187,8 +195,8 @@ class HmsInvoiceTemporaryParticularController extends Controller
 
     public function returnResultData(User $user,$msg=''){
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->getSalesItems($user);
-        $subTotal = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->getSubTotalAmount($user);
+        $invoiceParticulars = $this->em->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->getSalesItems($user);
+        $subTotal = $this->em->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->getSubTotalAmount($user);
         $data = array(
            'subTotal' => $subTotal,
            'initialGrandTotal' => $subTotal,
@@ -203,12 +211,12 @@ class HmsInvoiceTemporaryParticularController extends Controller
     public function addParticularAction(Request $request)
     {
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price );
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->insertInvoiceItems($user, $invoiceItems);
+        $this->em->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->insertInvoiceItems($user, $invoiceItems);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($user,$msg);
         return new Response(json_encode($result));
@@ -219,13 +227,13 @@ class HmsInvoiceTemporaryParticularController extends Controller
      public function searchAddParticularAction(Particular $particular)
     {
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $particularId =$particular->getId();
         $quantity =1;
         $price = $particular->getPrice() ;
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price );
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->insertInvoiceItems($user, $invoiceItems);
+        $this->em->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->insertInvoiceItems($user, $invoiceItems);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($user,$msg);
         return new Response(json_encode($result));
@@ -237,7 +245,7 @@ class HmsInvoiceTemporaryParticularController extends Controller
 
 
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }

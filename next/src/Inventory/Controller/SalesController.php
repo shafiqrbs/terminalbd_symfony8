@@ -3,6 +3,11 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Inventory\Entity\Item;
 use App\Inventory\Entity\PurchaseItem;
 use App\Inventory\Entity\Sales;
@@ -13,7 +18,7 @@ use App\Inventory\Service\PosItemManager;
 use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Mike42\Escpos\Printer;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,16 +27,25 @@ use Symfony\Component\HttpFoundation\Response;
  * Sales controller.
  *
  */
-class SalesController extends Controller
+class SalesController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -42,7 +56,7 @@ class SalesController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -63,7 +77,7 @@ class SalesController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Sales();
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $globalOption = $this->getUser()->getGlobalOption();
@@ -90,7 +104,7 @@ class SalesController extends Controller
     public function editAction($code)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entity = $em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory, 'invoice' => $code));
         if (!$entity) {
@@ -114,7 +128,7 @@ class SalesController extends Controller
     public function salesItemAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\SalesItem::class)->salesItems($inventory, $data);
@@ -131,7 +145,7 @@ class SalesController extends Controller
     public function searchAction(Request $request)
     {
         $purchaseItem = "";
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $salesInvoice = $request->request->get('sales');
         $barcode = $request->request->get('barcode');
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
@@ -147,13 +161,13 @@ class SalesController extends Controller
         }
         if ($serialItem) {
            $pItem = $serialItem->getPurchaseItem();
-           $checkQuantity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItemSerial::class)->findOneBy(array('purchaseItemSerial' => $serialItem));
+           $checkQuantity = $this->em->getRepository(\App\Inventory\Entity\SalesItemSerial::class)->findOneBy(array('purchaseItemSerial' => $serialItem));
            if (empty($checkQuantity)) {
-                $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSerialSalesItems($sales, $pItem,$serialItem);
-                $salesEntity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $sales = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSerialSalesItems($sales, $pItem,$serialItem);
+                $salesEntity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = '<div class="alert alert-success"><strong>Success!</strong> Product added successfully.</div>';
             } else {
-                $salesEntity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $salesEntity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = '<div class="alert"><strong>Warning!</strong> There is no product in our inventory.</div>';
             }
             $data = $this->returnResultData($salesEntity, $msg);
@@ -161,28 +175,28 @@ class SalesController extends Controller
 
         }elseif($purchaseItem) {
             /* @var $purchaseItem PurchaseItem */
-            $checkQuantity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->checkPurchaseItemSalesQuantity($purchaseItem);
+            $checkQuantity = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->checkPurchaseItemSalesQuantity($purchaseItem);
             $itemStock = $purchaseItem->getQuantity();
             if(!empty($purchaseItem) and $itemStock > 0 and  $itemStock > $checkQuantity) {
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSalesPurchaseItems($sales, $purchaseItem);
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSalesPurchaseItems($sales, $purchaseItem);
+                $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = '<div class="alert alert-success"><strong>Success!</strong> Product added successfully.</div>';
             } else {
-                $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = '<div class="alert"><strong>Warning!</strong> There is no product in our inventory.</div>';
             }
             $data = $this->returnResultData($sales,$msg);
             return new Response(json_encode($data));
         }elseif($itemStock) {
             /* @var $itemStock Item */
-            $checkQuantity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesItemQuantity($itemStock);
+            $checkQuantity = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesItemQuantity($itemStock);
             if($itemStock->getRemainingQnt() > 0 and  $itemStock->getRemainingQnt() > $checkQuantity) {
                 $data = array('quantity'=>1,'salesPrice'=>$itemStock->getSalesPrice(),'purchasePrice'=>$itemStock->getPurchasePrice());
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSalesItems($sales, $itemStock,$data);
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSalesItems($sales, $itemStock,$data);
+                $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = '<div class="alert alert-success"><strong>Success!</strong> Product added successfully.</div>';
             } else {
-                $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = '<div class="alert"><strong>Warning!</strong> There is no product in our inventory.</div>';
             }
             $data = $this->returnResultData($sales,$msg);
@@ -196,24 +210,24 @@ class SalesController extends Controller
 
     public function searchPurchaseItemAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $sales = $request->request->get('sales');
         $barcode = $request->request->get('barcode');
         $sales = $em->getRepository(\App\Inventory\Entity\Sales::class)->find($sales);
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $purchaseItem = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->returnPurchaseItemDetails($inventory, $barcode);
-        $checkQuantity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesQuantity($purchaseItem);
+        $checkQuantity = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesQuantity($purchaseItem);
         $itemStock = $purchaseItem->getItemStock();
 
         if (!empty($purchaseItem) && $itemStock > $checkQuantity) {
 
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSalesItems($sales, $purchaseItem);
-            $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+            $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSalesItems($sales, $purchaseItem);
+            $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
             $msg = 'Product added successfully';
 
         } else {
 
-            $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+            $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
             $msg = '<div class="alert"><strong>Warning!</strong> There is no product in our inventory.</div>';
         }
         $data = $this->returnResultData($sales,$msg);
@@ -223,10 +237,10 @@ class SalesController extends Controller
 
     public function returnResultData($sales,$msg=''){
 
-        //$salesItems = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->getSalesItems($sales);
+        //$salesItems = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->getSalesItems($sales);
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $config,'id' => $sales));
+        $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $config,'id' => $sales));
         /*
          * $salesItems = $this->renderView('Inventory/Sales/item.html.twig', array(
             'entity' => $entity
@@ -258,10 +272,10 @@ class SalesController extends Controller
 
     public function returnSalesDataAction($msg=''){
 
-        //$salesItems = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->getSalesItems($sales);
+        //$salesItems = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->getSalesItems($sales);
         $sales = $_REQUEST['id'];
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $config,'id' => $sales));
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $config,'id' => $sales));
         $salesItems = $this->renderView('Inventory/Sales/sales-pos-item.html.twig', array(
             'entity' => $entity
         ));
@@ -291,7 +305,7 @@ class SalesController extends Controller
 
 	public function salesDiscountUpdateAction(Request $request)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$discountType = $request->request->get('discountType');
 		$discountCal = (float)$request->request->get('discount');
 		$sales = $request->request->get('sales');
@@ -341,7 +355,7 @@ class SalesController extends Controller
 
     public function salesItemUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $salesItemId = $request->request->get('salesItemId');
         $quantity = $request->request->get('quantity');
         $salesPrice = $request->request->get('salesPrice');
@@ -350,10 +364,10 @@ class SalesController extends Controller
         $salesItem = $em->getRepository(\App\Inventory\Entity\SalesItem::class)->find($salesItemId);
         /* @var $salesItem SalesItem */
         if($salesItem->getPurchaseItem()){
-            $checkOngoingSalesQuantity = $this->getDoctrine()->getRepository(SalesItem::class)->checkPurchaseItemSalesQuantity($salesItem->getPurchaseItem());
+            $checkOngoingSalesQuantity = $this->em->getRepository(SalesItem::class)->checkPurchaseItemSalesQuantity($salesItem->getPurchaseItem());
             $itemStock = $salesItem->getPurchaseItem()->getQuantity();
         }else{
-            $checkOngoingSalesQuantity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesItemQuantity($salesItem->getItem());
+            $checkOngoingSalesQuantity = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesItemQuantity($salesItem->getItem());
             $itemStock = $salesItem->getItem()->getRemainingQnt();
         }
         $currentRemainingQnt = ($itemStock - ($checkOngoingSalesQuantity + $quantity)) ;
@@ -365,7 +379,7 @@ class SalesController extends Controller
         if(!empty($salesItem) && $itemStock > 0 && $currentRemainingQnt >= 0 ){
             $salesItem->setQuantity($quantity);
             $salesItem->setSubTotal($salesItem->getQuantity() * $salesPrice);
-            $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($salesItem->getSales());
+            $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($salesItem->getSales());
             $msg = '<div class="alert alert-success"><strong>Success!</strong> Product added successfully.</div>';
         } else {
             $salesItem->setSubTotal($salesItem->getQuantity() * $salesPrice);
@@ -398,12 +412,12 @@ class SalesController extends Controller
 
     public function resetAction(Sales $sales)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         foreach ($sales->getSalesItems() as $salesItem ) {
             $em->remove($salesItem);
         }
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+        $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
         return $this->redirect($this->generateUrl('inventory_sales_edit', array('code' => $sales->getInvoice())));
 
     }
@@ -411,13 +425,13 @@ class SalesController extends Controller
     public function salesInlineMobileUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\Sales::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
         }
-        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['value']);
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findExistingCustomer($entity, $mobile);
+        $mobile = $this->toolManager->specialExpClean($data['value']);
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findExistingCustomer($entity, $mobile);
         $entity->setCustomer($customer);
         $entity->setMobile($mobile);
         $em->flush();
@@ -453,7 +467,7 @@ class SalesController extends Controller
 
     public function updateAction(Request $request, Sales $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sales entity.');
@@ -484,7 +498,7 @@ class SalesController extends Controller
             if ($entity->getTransactionMethod()->getId() != 4) {
                 $entity->setApprovedBy($this->getUser());
             }
-            $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+            $amountInWords = $this->toolManager->intToWords($entity->getTotal());
             $entity->setPaymentInWord($amountInWords);
             $em->flush();
 
@@ -526,7 +540,7 @@ class SalesController extends Controller
     public function approveAction(Sales $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setPaymentStatus('Paid');
             $entity->setApprovedBy($this->getUser());
             $em->flush();
@@ -546,20 +560,20 @@ class SalesController extends Controller
     public function deleteAction(Sales $sales)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
         if (!$sales and $config->getId() != $sales->getInventoryConfig()->getId()) {
             throw $this->createNotFoundException('Unable to find Sales entity.');
         }
         if($sales->getSalesItems()){
-            $template = $this->get('twig')->render('Inventory/Reverse/salesReverse.html.twig', array(
+            $template = $this->twig->render('Inventory/Reverse/salesReverse.html.twig', array(
                 'entity' => $sales,
                 'inventoryConfig' => $config,
             ));
             foreach ($sales->getSalesItems() as $item){
-                $this->getDoctrine()->getRepository(SalesItemSerial::class)->deleteSalesItemSerial($item);
+                $this->em->getRepository(SalesItemSerial::class)->deleteSalesItemSerial($item);
             }
-            $exist = $this->getDoctrine()->getRepository(SalesItem::class)->findBy(array('sales' => $sales->getId()));
+            $exist = $this->em->getRepository(SalesItem::class)->findBy(array('sales' => $sales->getId()));
             if($exist){
                 $em->remove($exist);
                 $em->flush();
@@ -581,7 +595,7 @@ class SalesController extends Controller
     public function itemSerialNoUpdateAction(SalesItem  $salesItem)
     {
         $serial = $_REQUEST['serial'];
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($serial)){
             $ser = implode(",",$serial);
 	        $salesItem->setSerialNo($ser);
@@ -609,15 +623,15 @@ class SalesController extends Controller
      */
     public function itemDeleteAction(Sales $sales, $salesItem)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\SalesItem::class)->find($salesItem);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
-       // $this->getDoctrine()->getRepository(SalesItemSerial::class)->deleteSalesItemSerial($entity);
+       // $this->em->getRepository(SalesItemSerial::class)->deleteSalesItemSerial($entity);
         $em->remove($entity);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+        $invoice = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
         $data = $this->returnResultData($invoice);
         return new Response(json_encode($data));
 
@@ -636,14 +650,14 @@ class SalesController extends Controller
         if( $detect->isMobile() || $detect->isTablet() ) {
             $device = 'mobile' ;
         }
-        $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->itemPurchaseDetails($securityContext,$inventory, $item, $customer, $device);
+        $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->itemPurchaseDetails($securityContext,$inventory, $item, $customer, $device);
         return new Response($data);
     }
 
     public function branchStockItemDetailsAction(Item $item)
     {
         $user = $this->getUser();
-        $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->itemDeliveryPurchaseDetails($user,$item);
+        $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->itemDeliveryPurchaseDetails($user,$item);
         return new Response($data);
     }
 
@@ -664,7 +678,7 @@ class SalesController extends Controller
     public function salesInlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\Sales::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
@@ -678,7 +692,7 @@ class SalesController extends Controller
     public function salesInlineProcessUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\Sales::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
@@ -715,14 +729,14 @@ class SalesController extends Controller
     {
         if (!empty($entity)) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
 
             $entity->setPaymentStatus('Paid');
             $entity->setProcess('Done');
             $entity->setPayment($entity->getTotal());
             $entity->setDue(0);
             $entity->setApprovedBy($this->getUser());
-            $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+            $amountInWords = $this->toolManager->intToWords($entity->getTotal());
             $entity->setPaymentInWord($amountInWords);
             $em->flush();
             $em->getRepository(\App\Inventory\Entity\StockItem::class)->insertSalesStockItem($entity);
@@ -740,7 +754,7 @@ class SalesController extends Controller
     public function returnCancelOrder(Sales $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setPaymentStatus('Cancel');
             $entity->setApprovedBy($this->getUser());
             $em->flush();
@@ -756,7 +770,7 @@ class SalesController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
         exit;
@@ -784,12 +798,12 @@ class SalesController extends Controller
 
     public function invoicePrintAction($invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entity = $em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory, 'invoice' => $invoice));
         $barcode = $this->getBarcode($entity->getInvoice());
         $totalAmount = ( $entity->getTotal() + $entity->getDeliveryCharge());
-        $inWard = $this->get('settong.toolManageRepo')->intToWords($totalAmount);
+        $inWard = $this->toolManager->intToWords($totalAmount);
         if($inventory->isCustomPrint() == 1){
             $print = $this->getUser()->getGlobalOption()->getSlug();
         }else{
@@ -807,10 +821,10 @@ class SalesController extends Controller
     {
 
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $config,'invoice' => $invoice));
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $config,'invoice' => $invoice));
         $barcode = $this->getBarcode($entity->getInvoice());
         $totalAmount = ( $entity->getTotal() + $entity->getDeliveryCharge());
-        $inWard = $this->get('settong.toolManageRepo')->intToWords($totalAmount);
+        $inWard = $this->toolManager->intToWords($totalAmount);
 
         return $this->render('Inventory/SalesPrint/chalan.html.twig', array(
             'entity'      => $entity,
@@ -828,7 +842,7 @@ class SalesController extends Controller
 
 
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory, 'invoice' => $code));
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory, 'invoice' => $code));
         $option = $entity->getInventoryConfig()->getGlobalOption();
         $this->approvedOrder($entity);
 

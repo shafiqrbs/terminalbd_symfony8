@@ -3,12 +3,14 @@
 namespace App\Accounting\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountMobileBank;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Accounting\Form\AccountMobileBankType;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,8 +18,14 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountMobileBankController controller.
  *
  */
-class AccountMobileBankController extends Controller
+class AccountMobileBankController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     #[IsGranted('ROLE_DOMAIN_ACCOUNTING_CONFIG')]
@@ -25,7 +33,7 @@ class AccountMobileBankController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findWithSearch($globalOption,$data);
@@ -48,16 +56,16 @@ class AccountMobileBankController extends Controller
         $form->handleRequest($request);
         if ($form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $name = $entity->getMobile().','.$entity->getServiceName();
             $entity->setName($name);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertMobileBankAccount($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertMobileBankAccount($entity);
             return $this->redirect($this->generateUrl('accountmobilebank'));
         }
 
@@ -97,7 +105,7 @@ class AccountMobileBankController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountMobileBank();
         $form   = $this->createCreateForm($entity);
         return $this->render('Accounting/MobileBankAccount/new.html.twig', array(
@@ -114,7 +122,7 @@ class AccountMobileBankController extends Controller
     public function showAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($id);
         if (!$entity) {
@@ -133,7 +141,7 @@ class AccountMobileBankController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($id);
 
@@ -179,7 +187,7 @@ class AccountMobileBankController extends Controller
 
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountMobileBank entity.');
@@ -190,10 +198,10 @@ class AccountMobileBankController extends Controller
             $name = $entity->getMobile().','.$entity->getServiceName();
             $entity->setName($name);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertMobileBankAccount($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertMobileBankAccount($entity);
             return $this->redirect($this->generateUrl('accountmobilebank_edit', array('id' => $id)));
         }
 
@@ -210,7 +218,7 @@ class AccountMobileBankController extends Controller
 
     public function deleteAction(AccountMobileBank $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
         }
@@ -218,12 +226,12 @@ class AccountMobileBankController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }

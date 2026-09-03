@@ -4,6 +4,10 @@ namespace App\Business\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountVendor;
 use App\Business\Entity\BusinessInvoiceParticular;
 use App\Business\Entity\BusinessParticular;
@@ -17,22 +21,30 @@ use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Knp\Snappy\Pdf;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Vendor controller.
  *
  */
-class PurchaseController extends Controller
+class PurchaseController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -46,10 +58,10 @@ class PurchaseController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
 	    $data = $_REQUEST;
-	    $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->findWithSearch($this->getUser(),$data);
+	    $entities = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->findWithSearch($this->getUser(),$data);
         $pagination = $this->paginate($entities);
         return $this->render('Business/Purchase/index.html.twig', array(
             'entities' => $pagination,
@@ -64,10 +76,10 @@ class PurchaseController extends Controller
      */
     public function purchaseItemAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 	    $data = $_REQUEST;
 	    $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->findWithSearch($this->getUser(),$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->findWithSearch($this->getUser(),$data);
         $pagination = $this->paginate($entities);
 	    $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'index';
         if(empty($data['pdf'])){
@@ -116,7 +128,7 @@ class PurchaseController extends Controller
     public function newAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new BusinessPurchase();
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity->setBusinessConfig($config);
@@ -135,7 +147,7 @@ class PurchaseController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
@@ -145,8 +157,8 @@ class PurchaseController extends Controller
         $editForm = $this->createEditForm($entity);
         $particulars = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->getFindWithParticular($config,$type = array('consumable','stock'));
 	    $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'new';
-        $vendors = $this->getDoctrine()->getRepository(AccountVendor::class)->findBy(array('globalOption'=>$this->getUser()->getGlobalOption()));
-        $wearhouses = $this->getDoctrine()->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
+        $vendors = $this->em->getRepository(AccountVendor::class)->findBy(array('globalOption'=>$this->getUser()->getGlobalOption()));
+        $wearhouses = $this->em->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
 	    return $this->render("Business/Purchase/{$view}.html.twig", array(
             'entity' => $entity,
             'config' => $config,
@@ -216,7 +228,7 @@ class PurchaseController extends Controller
 
     public function updateItemAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $item = $request->request->get('purchaseItem');
         $quantity = empty($request->request->get('quantity'))?0 :$request->request->get('quantity');
         $price = floatval(empty($request->request->get('price')) ? 0 : $request->request->get('price'));
@@ -224,14 +236,14 @@ class PurchaseController extends Controller
 
         /* @var $purchaseItem BusinessPurchaseItem */
 
-        $purchaseItem = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->find($item);
+        $purchaseItem = $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->find($item);
         $purchaseItem->setQuantity($quantity);
         $purchaseItem->setPurchasePrice($price);
         $purchaseItem->setPurchaseSubTotal($price * $quantity);
         $purchaseItem->setBonusQuantity($bonusQty);
         $em->persist($purchaseItem);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($purchaseItem->getBusinessPurchase());
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($purchaseItem->getBusinessPurchase());
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -244,19 +256,19 @@ class PurchaseController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_INVOICE') or is_granted('ROLE_DOMAIN')"))]
     public function addBarcodeProductAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $wearhouse = '';
         $data = $_REQUEST;
         $id = $data['invoice'];
         $barcode = $data['barcode'];
-        $invoice =  $this->getDoctrine()->getRepository(BusinessPurchase::class)->find($id);
-        $stock = $this->getDoctrine()->getRepository(BusinessParticular::class)->findOneBy(array('businessConfig' => $invoice->getBusinessConfig(),'particularCode'=>$barcode));
+        $invoice =  $this->em->getRepository(BusinessPurchase::class)->find($id);
+        $stock = $this->em->getRepository(BusinessParticular::class)->findOneBy(array('businessConfig' => $invoice->getBusinessConfig(),'particularCode'=>$barcode));
         $particularId = $stock->getId();
         $price = $stock->getPrice();
         $quantity = 1;
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price,'wearhouse' => $wearhouse);
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertPurchaseItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
+        $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertPurchaseItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -264,7 +276,7 @@ class PurchaseController extends Controller
 
     public function addParticularAction(Request $request, BusinessPurchase $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
@@ -275,8 +287,8 @@ class PurchaseController extends Controller
             $price = $request->request->get('purchasePrice');
         }
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price,'wearhouse' => $wearhouse);
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertPurchaseItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
+        $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertPurchaseItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -284,7 +296,7 @@ class PurchaseController extends Controller
 
     public function sawmillParticularAction(Request $request, BusinessPurchase $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $width = $request->request->get('width');
         $height = $request->request->get('height');
@@ -292,8 +304,8 @@ class PurchaseController extends Controller
         $particularType = $request->request->get('particularType');
         $price = $request->request->get('purchasePrice');
         $invoiceItems = array('particularId' => $particularId ,'particularType' => $particularType, 'width' => $width,'height' => $height,'length' => $length,'price' => $price);
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertSawmillPurchaseItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
+        $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertSawmillPurchaseItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -301,7 +313,7 @@ class PurchaseController extends Controller
 
     public function insertPurchaseDistributionItemsAction(Request $request, BusinessPurchase $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
         $bonusQuantity = $request->request->get('bonusQuantity');
@@ -311,18 +323,18 @@ class PurchaseController extends Controller
             $price = $request->request->get('purchasePrice');
         }
         $invoiceItems = array('particularId' => $particularId ,'quantity' => $quantity,'bonusQuantity' => $bonusQuantity,'price' => $price);
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertPurchaseDistributionItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
+        $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertPurchaseDistributionItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
     }
 
     public function signParticularAction(Request $request, BusinessPurchase $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 	    $invoiceItems = $request->request->all();
-	    $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertSignPurchaseItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
+	    $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertSignPurchaseItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -330,13 +342,13 @@ class PurchaseController extends Controller
 
     public function invoiceParticularDeleteAction(BusinessPurchase $invoice, BusinessPurchaseItem $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -345,7 +357,7 @@ class PurchaseController extends Controller
     #[IsGranted('ROLE_BUSINESS')]
     public function invoiceDiscountUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $discountType = $request->request->get('discountType');
         $discountCal = (float)$request->request->get('discount');
         $invoice = $request->request->get('invoice');
@@ -376,7 +388,7 @@ class PurchaseController extends Controller
 			$entity->setDue(round($entity->getNetTotal()));
 		}
 	    $em->flush();
-    //    $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($entity);
+    //    $entity = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($entity);
         $msg = 'Discount successfully';
         $result = $this->returnResultData($entity,$msg);
         return new Response(json_encode($result));
@@ -385,7 +397,7 @@ class PurchaseController extends Controller
 
     public function updateAction(Request $request, BusinessPurchase $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 	    $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -423,7 +435,7 @@ class PurchaseController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
 	    $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
 	    $entity = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
@@ -439,11 +451,11 @@ class PurchaseController extends Controller
 
     public function approvedAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 		$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
 	    $purchase = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 	    if (!empty($purchase) and empty($purchase->getApprovedBy())) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $purchase->setProcess('Approved');
             $purchase->setApprovedBy($this->getUser());
             if($purchase->getPayment() === 0 ){
@@ -451,14 +463,14 @@ class PurchaseController extends Controller
 	            $purchase->setAsInvestment(false);
             }
 		    $em->flush();
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->updatePurchaseItemPrice($purchase);
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getPurchaseUpdateQnt($purchase);
+            $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->updatePurchaseItemPrice($purchase);
+            $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getPurchaseUpdateQnt($purchase);
             if($config->isStockHistory() == 1 ){
-                $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processInsertPurchaseItem($purchase);
+                $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processInsertPurchaseItem($purchase);
             }
             if($purchase->getAsInvestment() == 1 and $purchase->getPayment() > 0 ){
-			    $journal =  $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->insertAccountBusinessPurchaseJournal($purchase);
-			    $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
+			    $journal =  $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->insertAccountBusinessPurchaseJournal($purchase);
+			    $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
 		    }
             $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertBusinessAccountPurchase($purchase);
             return new Response('success');
@@ -476,12 +488,12 @@ class PurchaseController extends Controller
     {
 
     	$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-	    $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
-        $em = $this->getDoctrine()->getManager();
+	    $entity = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
-        $this->getDoctrine()->getRepository(BusinessInvoiceParticular::class)->removePurchaseItem($entity);
+        $this->em->getRepository(BusinessInvoiceParticular::class)->removePurchaseItem($entity);
         $em->remove($entity);
         $em->flush();
         return $this->redirect($this->generateUrl('business_purchase'));
@@ -491,8 +503,8 @@ class PurchaseController extends Controller
     {
 
     	$config = $this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
-	    $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->findOneBy(array('id' => $id));
-        $em = $this->getDoctrine()->getManager();
+	    $entity = $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->findOneBy(array('id' => $id));
+        $em = $this->em;
         if ($entity->getBusinessPurchase()->getBusinessConfig()->getId() == $config ) {
 	        $entity->setStatus(true);
 	        $em->flush();
@@ -515,29 +527,29 @@ class PurchaseController extends Controller
 		 * Delete Journal & Account Purchase
 		 */
 		$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-		$purchase = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchase::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
+		$purchase = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
 		set_time_limit(0);
 		ignore_user_abort(true);
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		if($purchase->getAsInvestment() == 1 ) {
-			$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedBusinessPurchaseJournal($purchase);
+			$this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedBusinessPurchaseJournal($purchase);
 		}
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountBusinessPurchaseReverse($purchase);
+		$this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountBusinessPurchaseReverse($purchase);
 		$purchase->setIsReversed(true);
 		$purchase->setProcess('Created');
 		$purchase->setApprovedBy(NULL);
 		$em->flush();
-		$this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getPurchaseUpdateQnt($purchase);
+		$this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getPurchaseUpdateQnt($purchase);
         if($config->isStockHistory() == 1 ) {
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processReversePurchaseItem($purchase);
+            $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processReversePurchaseItem($purchase);
         }
-        $template = $this->get('twig')->render('Business/Purchase/purchaseReverse.html.twig', array(
+        $template = $this->twig->render('Business/Purchase/purchaseReverse.html.twig', array(
 			'entity' => $purchase,
 			'config' => $purchase->getBusinessConfig(),
 		));
-		$this->getDoctrine()->getRepository(\App\Business\Entity\BusinessReverse::class)->purchaseReverse($purchase, $template);
+		$this->em->getRepository(\App\Business\Entity\BusinessReverse::class)->purchaseReverse($purchase, $template);
 		return $this->redirect($this->generateUrl('business_purchase_edit',array('id' => $purchase->getId())));
 	}
 
@@ -563,7 +575,7 @@ class PurchaseController extends Controller
 
     public function printAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
@@ -589,7 +601,7 @@ class PurchaseController extends Controller
         }
         $amount = 0;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
-        $amount = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->sumOpeningQuantity($config);
+        $amount = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->sumOpeningQuantity($config);
         $entity = new BusinessPurchase();
         $editForm = $this->createOpeningForm($entity);
         return $this->render('Business/Purchase/opening.html.twig', array(
@@ -632,8 +644,8 @@ class PurchaseController extends Controller
             return new RedirectResponse($referer);
         }*/
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $amount = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->sumOpeningQuantity($config->getId());
-        $em = $this->getDoctrine()->getManager();
+        $amount = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->sumOpeningQuantity($config->getId());
+        $em = $this->em;
         $entity = new BusinessPurchase();
         $form = $this->createOpeningForm($entity);
         $form->handleRequest($request);
@@ -649,14 +661,14 @@ class PurchaseController extends Controller
             $entity->setApprovedBy($this->getUser());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertBusinessAccountPurchase($entity);
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateOpeningQuantity($config->getId());
+            $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateOpeningQuantity($config->getId());
             return $this->redirect($this->generateUrl('business_stock'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Required field does not input"
         );
         return $this->render('Business/Purchase/opening.html.twig', array(

@@ -4,6 +4,9 @@ namespace App\Hospital\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\Invoice;
 use App\Hospital\Entity\InvoiceParticular;
 use App\Hospital\Entity\InvoicePathologicalGroup;
@@ -15,7 +18,7 @@ use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
@@ -24,16 +27,23 @@ use Hackzilla\BarcodeBundle\Utility\Barcode;
  * InvoiceParticularcontroller.
  *
  */
-class InvoiceParticularController extends Controller
+class InvoiceParticularController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -50,16 +60,16 @@ class InvoiceParticularController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
 
         $entities = $em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->invoicePathologicalReportLists( $user, $data);
         $pagination = $this->paginate($entities);
-        $particularService = $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->processPathologicalReports($hospital->getId());
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(6));
+        $particularService = $this->em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->processPathologicalReports($hospital->getId());
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(6));
 
         return $this->render('Hospital/InvoiceParticular/index.html.twig', array(
             'entities' => $pagination,
@@ -76,15 +86,15 @@ class InvoiceParticularController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_HOSPITAL_LAB') or is_granted('ROLE_DOMAIN_HOSPITAL_MANAGER') or is_granted('ROLE_DOMAIN') or is_granted('ROLE_DOMAIN_HOSPITAL_DOCTOR')"))]
     public function reportProcessAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $entities = $em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->invoicePathologicalReportLists( $user,$data);
         $pagination = $this->paginate($entities);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(6));
-        $particularService = $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->processPathologicalReports($hospital->getId());
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(6));
+        $particularService = $this->em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->processPathologicalReports($hospital->getId());
         $selected = explode(',', $request->cookies->get('barcodes', ''));
         return $this->render('Hospital/InvoiceParticular/diagnostic.html.twig', array(
             'entities' => $pagination,
@@ -103,17 +113,17 @@ class InvoiceParticularController extends Controller
 
     public function patientTestAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $data[] = array('process'=>'In-progress');
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->invoiceLists( $user , $mode = 'diagnostic' , $data);
         $pagination = $this->paginate($entities);
-        $employees = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital->getId());
-        $processes = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'diagnostic',$data);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'assign-doctor');
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'referred-doctor');
+        $employees = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital->getId());
+        $processes = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'diagnostic',$data);
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'assign-doctor');
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'referred-doctor');
         return $this->render('Hospital/InvoiceParticular/patientTest.html.twig', array(
             'entities'                          => $pagination,
             'assignDoctors'                     => $assignDoctors,
@@ -132,14 +142,14 @@ class InvoiceParticularController extends Controller
 
     public function patientGroupTestAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $entities = $em->getRepository(\App\Hospital\Entity\InvoicePathologicalGroup::class)->invoicePathologicalGroupLists($user,$data);
         $pagination = $this->paginate($entities);
-        $employees = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital->getId());
-        $processes = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'diagnostic',$data);
+        $employees = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital->getId());
+        $processes = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'diagnostic',$data);
         return $this->render('Hospital/InvoiceParticular/patientGroupTest.html.twig', array(
             'entities'                          => $pagination,
             'processes'                         => $processes,
@@ -157,7 +167,7 @@ class InvoiceParticularController extends Controller
 
     public function groupPathologicalReportAction(Request $request, Invoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entity = new InvoicePathologicalGroup();
         $selected = explode(',', $request->cookies->get('barcodes', ''));
@@ -170,10 +180,10 @@ class InvoiceParticularController extends Controller
         $selected = (str_replace('on','',$selected));
         if(is_array($selected) and count($selected) > 0 and $selected[0] != "" ){
             foreach ($selected as $particular):
-                $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
+                $pathology = $this->em->getRepository(InvoiceParticular::class)->find($particular);
                 $pathology->getParticular()->getService()->getSlug();
                 if($pathology->getParticular()->getService()->getSlug() == 'diagnostic'){
-                    $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoicePathologicalReport::class)->insertGroup($pathology);
+                    $this->em->getRepository(\App\Hospital\Entity\InvoicePathologicalReport::class)->insertGroup($pathology);
                     $pathologies[] = $pathology;
                     if (!empty($pathology->getInvoicePathologicalReports())){
                         foreach ($pathology->getInvoicePathologicalReports() as $row):
@@ -204,7 +214,7 @@ class InvoiceParticularController extends Controller
     public function groupPathologicalReportUpdateAction(InvoicePathologicalReport $entity)
     {
         $result = $_REQUEST['result'];
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setResult($result);
         $em->flush();
         return new Response('success');
@@ -232,7 +242,7 @@ class InvoiceParticularController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_HOSPITAL_LAB') or is_granted('ROLE_DOMAIN_HOSPITAL_MANAGER') or is_granted('ROLE_DOMAIN') or is_granted('ROLE_DOMAIN_HOSPITAL_DOCTOR')"))]
     public function groupUpdateAction(Request $request, Invoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new InvoicePathologicalGroup();
         $selected = explode(',', $request->cookies->get('barcodes', ''));
         if (!$entity) {
@@ -245,13 +255,13 @@ class InvoiceParticularController extends Controller
             $entity->setCreatedBy($this->getUser());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Report has been created successfully"
             );
             /* @var $pathology InvoiceParticular */
 
             foreach ($selected as $particular){
-                $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
+                $pathology = $this->em->getRepository(InvoiceParticular::class)->find($particular);
                 if(empty($pathology->getInvoicePathologicalGroup())){
                     $pathology->setInvoicePathologicalGroup($entity);
                     $em->persist($pathology);
@@ -269,9 +279,9 @@ class InvoiceParticularController extends Controller
 
         $pathologies = [];
         foreach ($selected as $particular):
-            $pathology = $this->getDoctrine()->getRepository(InvoiceParticular::class)->find($particular);
+            $pathology = $this->em->getRepository(InvoiceParticular::class)->find($particular);
             if($pathology->getParticular()->getService()->getSlug() == 'diagnostic' and $pathology->getParticular()->getPathologicalReports()){
-                $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoicePathologicalReport::class)->insertGroup($pathology);
+                $this->em->getRepository(\App\Hospital\Entity\InvoicePathologicalReport::class)->insertGroup($pathology);
                 $pathologies[] = $pathology;
                 if (!empty($pathology->getInvoicePathologicalReports())){
                     foreach ($pathology->getInvoicePathologicalReports() as $row):
@@ -302,7 +312,7 @@ class InvoiceParticularController extends Controller
     private function createGroupReportForm(InvoicePathologicalGroup $entity,$invoice)
     {
         $hospitalConfig = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $em = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into InvoiceGroupParticularType::configureOptions() and pass them as form options: $hospitalConfig,$em), $entity, array(
         $form = $this->createForm(new InvoiceGroupParticularType($hospitalConfig,$em), $entity, array(
@@ -364,7 +374,7 @@ class InvoiceParticularController extends Controller
             throw $this->createNotFoundException('Unable to find Invoice Particular entity preparation.');
         }
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('Collected');
             $entity->setSampleCollectedBy($this->getUser());
             $entity->setCollectionDate(new \DateTime());
@@ -380,7 +390,7 @@ class InvoiceParticularController extends Controller
 
     public function machineFormatAction(InvoiceParticular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setParticularDeliveredBy($this->getUser());
         $entity->setParticularPreparedBy($this->getUser());
         $entity->setCollectionDate(new \DateTime());
@@ -409,7 +419,7 @@ class InvoiceParticularController extends Controller
         $reportArr = array();
 
         /** @var InvoicePathologicalReport $row */
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!empty($entity->getInvoicePathologicalReports())){
             foreach ($entity->getInvoicePathologicalReports() as $row):
                 if(!empty($row->getPathologicalReport())){
@@ -456,7 +466,7 @@ class InvoiceParticularController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->find($id);
 
@@ -471,8 +481,8 @@ class InvoiceParticularController extends Controller
             $entity->setParticularPreparedBy($this->getUser());
             $entity->upload();
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoicePathologicalReport::class)->insert($entity,$data);
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Hospital\Entity\InvoicePathologicalReport::class)->insert($entity,$data);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Report has been created successfully"
             );
             return $this->redirect($this->generateUrl('hms_invoice_particular_preparation',array('id'=> $entity->getId())));
@@ -488,17 +498,17 @@ class InvoiceParticularController extends Controller
     public function deliveryAction(InvoiceParticular $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setParticularDeliveredBy($this->getUser());
             $em->flush();
         }
         $invoice = $entity->getHmsInvoice();
         if($invoice->getPaymentStatus() == 'Paid' and $invoice->getReportCount() == $invoice->getDeliveryCount()){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $invoice->setProcess('Done');
             $em->flush();
-            $accountInvoice = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalFinalAccountInvoice($invoice);
-           // $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesFinal($invoice, $accountInvoice);
+            $accountInvoice = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalFinalAccountInvoice($invoice);
+           // $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesFinal($invoice, $accountInvoice);
         }
         return $this->redirect($this->generateUrl('hms_invoice_confirm', array('id' => $entity->getHmsInvoice()->getId())));
     }
@@ -511,7 +521,7 @@ class InvoiceParticularController extends Controller
     public function reportReverseAction(InvoiceParticular $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('In-progress');
             $em->flush();
         }
@@ -560,7 +570,7 @@ class InvoiceParticularController extends Controller
 
     public function pathologicalReportDeleteAction(InvoicePathologicalReport $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -587,7 +597,7 @@ class InvoiceParticularController extends Controller
 
         $invoice = $entity->getHmsInvoice();
         if($invoice->getPaymentStatus() == 'Paid'){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setParticularDeliveredBy($this->getUser());
             $entity->setProcess('Done');
             $em->flush();

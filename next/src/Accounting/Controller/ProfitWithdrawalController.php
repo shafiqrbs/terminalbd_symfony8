@@ -4,11 +4,14 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountHead;
 use App\Accounting\Form\ProfitWithdrawalType;
 use App\User\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Accounting\Entity\AccountJournal;
@@ -19,16 +22,23 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountJournal controller.
  *
  */
-class ProfitWithdrawalController extends Controller
+class ProfitWithdrawalController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -38,7 +48,7 @@ class ProfitWithdrawalController extends Controller
 
 	public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $data['mode'] = "withdrawal";
         $entities = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findWithSearch( $this->getUser(),$data);
@@ -66,30 +76,30 @@ class ProfitWithdrawalController extends Controller
             ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             if($entity->getTransactionMethod()->getSlug() == "cash"){
-                $cash = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findOneBy(array("slug" => "cash-in-hand"));
+                $cash = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findOneBy(array("slug" => "cash-in-hand"));
                 $entity->setAccountHeadCredit($cash);
             }elseif($entity->getTransactionMethod()->getSlug() == "bank"){
-                $bank = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findOneBy(array("slug" => "bank-account"));
+                $bank = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findOneBy(array("slug" => "bank-account"));
                 $entity->setAccountHeadCredit($bank);
             }elseif($entity->getTransactionMethod()->getSlug() == "mobile"){
-                $mobile = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findOneBy(array("slug" => "mobile-account"));
+                $mobile = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findOneBy(array("slug" => "mobile-account"));
                 $entity->setAccountHeadCredit($mobile);
             }
-            $profit = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findOneBy(array("slug" => "profit-loss"));
+            $profit = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findOneBy(array("slug" => "profit-loss"));
             $entity->setAccountHeadDebit($profit);
             $entity->setMode("withdrawal");
             $entity->setTransactionType("Credit");
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_profit_withdrawal'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         return $this->render('Accounting/ProfitWithdrawal/new.html.twig', array(
@@ -126,12 +136,12 @@ class ProfitWithdrawalController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountJournal();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(array('isParent' => 1),array('name'=>'ASC'));
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(array('isParent' => 1),array('name'=>'ASC'));
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
         return $this->render('Accounting/ProfitWithdrawal/new.html.twig', array(
             'entity' => $entity,
             'accountHead' => $accountHead,
@@ -147,7 +157,7 @@ class ProfitWithdrawalController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($id);
          if (!$entity) {
@@ -163,7 +173,7 @@ class ProfitWithdrawalController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($id);
 
@@ -206,7 +216,7 @@ class ProfitWithdrawalController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($id);
 
@@ -233,7 +243,7 @@ class ProfitWithdrawalController extends Controller
     {
         $data = $request->request->all();
         $entity = new AccountJournal();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setGlobalOption($this->getUser()->getGlobalOption());
         $parent = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($data['parent']);
         $entity->setToUser($parent->getCreatedBy());
@@ -251,7 +261,7 @@ class ProfitWithdrawalController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
@@ -264,7 +274,7 @@ class ProfitWithdrawalController extends Controller
     public function approveAction(AccountJournal $entity)
     {
         if (!empty($entity) and $entity->getProcess() != 'approved') {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $accountClose = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -275,9 +285,9 @@ class ProfitWithdrawalController extends Controller
             }
             $em->flush();
             if(!empty($entity->getTransactionMethod())){
-	            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($entity,'Journal');
+	            $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($entity,'Journal');
             }
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($entity);
+            $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($entity);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -290,7 +300,7 @@ class ProfitWithdrawalController extends Controller
 
     public function deleteAction(AccountJournal $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
@@ -306,11 +316,11 @@ class ProfitWithdrawalController extends Controller
      */
     public function stakeholderProfitAction(User $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
-        $amount = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->getStakeHolderProfitAccount($entity);
+        $amount = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->getStakeHolderProfitAccount($entity);
         return new Response(abs($amount));
     }
 
@@ -321,7 +331,7 @@ class ProfitWithdrawalController extends Controller
      */
     public function approveDeleteAction(AccountJournal $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
@@ -335,8 +345,8 @@ class ProfitWithdrawalController extends Controller
 
 	public function journalReverseAction(AccountJournal $entity){
 
-		$em = $this->getDoctrine()->getManager();
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountReverse($entity);
+		$em = $this->em;
+		$this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountReverse($entity);
 		$entity->setProcess(null);
 		$entity->setApprovedBy(null);
 		$entity->setAmount(0);
@@ -351,7 +361,7 @@ class ProfitWithdrawalController extends Controller
 		set_time_limit(0);
 		ignore_user_abort(true);
 		$array = array();
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$entities = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findWithSearch( $this->getUser(),$data);
 		$entities = $entities->getResult();

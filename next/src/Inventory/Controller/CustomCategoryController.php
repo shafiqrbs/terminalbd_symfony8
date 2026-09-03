@@ -2,11 +2,14 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Inventory\Form\CustomCategoryType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Product\Entity\Category;
 use App\Product\Form\CategoryType;
@@ -16,16 +19,23 @@ use App\Product\Form\CategoryType;
  * Category controller.
  *
  */
-class CustomCategoryController extends Controller
+class CustomCategoryController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -38,7 +48,7 @@ class CustomCategoryController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Product\Entity\Category::class)->findBy(array('inventoryConfig' => $inventoryConfig ),array( 'name' =>'asc' ));
         $pagination = $this->paginate($entities);
@@ -60,7 +70,7 @@ class CustomCategoryController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventoryConfig =  $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventoryConfig);
             $entity->setStatus(true);
@@ -88,7 +98,7 @@ class CustomCategoryController extends Controller
     {
 
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into CustomCategoryType::configureOptions() and pass them as form options: $inventory,$em), $entity, array(
         $form = $this->createForm(new CustomCategoryType($inventory,$em), $entity, array(
@@ -123,7 +133,7 @@ class CustomCategoryController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Product\Entity\Category::class)->find($id);
 
@@ -145,7 +155,7 @@ class CustomCategoryController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entity = $em->getRepository(\App\Product\Entity\Category::class)->findOneBy(array('inventoryConfig'=>$config,'id'=>$id));
         if (!$entity) {
@@ -168,7 +178,7 @@ class CustomCategoryController extends Controller
     private function createEditForm(Category $entity)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into CustomCategoryType::configureOptions() and pass them as form options: $inventory,$em), $entity, array(
         $form = $this->createForm(new CustomCategoryType($inventory,$em), $entity, array(
@@ -187,7 +197,7 @@ class CustomCategoryController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Product\Entity\Category::class)->find($id);
 
@@ -218,7 +228,7 @@ class CustomCategoryController extends Controller
      */
     public function deleteAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig()->getId();
         $entity = $em->getRepository(\App\Product\Entity\Category::class)->findOneBy(array('inventoryConfig'=>$config,'id'=>$id));
         if (!$entity) {
@@ -229,12 +239,12 @@ class CustomCategoryController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }

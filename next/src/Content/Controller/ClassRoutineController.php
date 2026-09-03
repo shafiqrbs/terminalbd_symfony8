@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,11 @@ use App\Content\Form\ClassRoutineType;
  */
 class ClassRoutineController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all ClassRoutine entities.
@@ -22,7 +28,7 @@ class ClassRoutineController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository('SettingContentBundle:ClassRoutine')->findAll();
 
@@ -41,7 +47,7 @@ class ClassRoutineController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
 
@@ -94,7 +100,7 @@ class ClassRoutineController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:ClassRoutine')->find($id);
 
@@ -116,7 +122,7 @@ class ClassRoutineController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:ClassRoutine')->find($id);
 
@@ -158,7 +164,7 @@ class ClassRoutineController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:ClassRoutine')->find($id);
 
@@ -192,7 +198,7 @@ class ClassRoutineController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository('SettingContentBundle:ClassRoutine')->find($id);
 
             if (!$entity) {

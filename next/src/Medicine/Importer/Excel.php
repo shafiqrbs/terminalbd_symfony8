@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Medicine\Importer;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Medicine\Entity\MedicineParticular;
 use App\Medicine\Entity\MedicineStock;
 use App\Medicine\Repository\MedicineParticularRepository;

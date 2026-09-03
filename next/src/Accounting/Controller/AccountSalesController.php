@@ -4,12 +4,16 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountSales;
 use App\Accounting\Form\AccountSalesInvoiceType;
 use App\Accounting\Form\AccountSalesType;
 use App\Inventory\Entity\Sales;
 use JMS\SecurityExtraBundle\Annotation\Secure;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,16 +21,24 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountSales controller.
  *
  */
-class AccountSalesController extends Controller
+class AccountSalesController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -37,15 +49,15 @@ class AccountSalesController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->findWithSearch($user,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->receiveModeOverview($user,$data);
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
-        $groups = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->getProcessModes($user->getGlobalOption()->getId());
-        $users = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->getCreatedUsers($user->getGlobalOption()->getId());
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->receiveModeOverview($user,$data);
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
+        $groups = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getProcessModes($user->getGlobalOption()->getId());
+        $users = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getCreatedUsers($user->getGlobalOption()->getId());
         return $this->render('Accounting/AccountSales/index.html.twig', array(
             'entities' => $pagination,
             'transactionMethods' => $transactionMethods,
@@ -59,10 +71,10 @@ class AccountSalesController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_ACCOUNTING_SALES_REPORT') or is_granted('ROLE_DOMAIN')"))]
     public function customerOutstandingAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Accounting/AccountSales/customerOutstanding.html.twig', array(
             'entities' => $pagination,
@@ -75,10 +87,10 @@ class AccountSalesController extends Controller
 
     public function customerSummaryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
         return $this->render('AccountingBundle:AccountSales/Report:customerReport.html.twig', array(
             'entities' => $entities,
             'option' => $globalOption,
@@ -91,10 +103,10 @@ class AccountSalesController extends Controller
 
     public function userSummaryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->userSummary($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->userSummary($globalOption,$data);
         if(isset($data['submit']) and $data['submit'] == 'print' and isset($data['employee']) and $data['employee']){
             return $this->render('AccountingBundle:AccountSales/Report:userSummary.html.twig', array(
                 'entities' => $entities,
@@ -117,11 +129,11 @@ class AccountSalesController extends Controller
      */
     public function salesReturnAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Accounting\Entity\AccountSalesReturn::class)->findWithSearch($this->getUser(),$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSalesReturn::class)->salesReturnOverview($this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSalesReturn::class)->salesReturnOverview($this->getUser(),$data);
         return $this->render('Accounting/AccountSales/salesReturn.html.twig', array(
             'entities' => $pagination,
             'searchForm' => $data,
@@ -139,20 +151,20 @@ class AccountSalesController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $data = $request->request->all();
         if($form->isValid() && empty($method)){
             $entity->setGlobalOption($option);
             $customer = $form["customer"]->getData();
             if (empty($customer) and !empty($data['customerMobile'])){
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option, $mobile, $data);
+                $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option, $mobile, $data);
                 $entity->setCustomer($customer);
 
             }elseif (!empty($customer)){
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($customer);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option, 'mobile' => $mobile));
+                $mobile = $this->toolManager->specialExpClean($customer);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option, 'mobile' => $mobile));
                 $entity->setCustomer($customer);
             }
 
@@ -183,7 +195,7 @@ class AccountSalesController extends Controller
 
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             if($this->getUser()->getCheckExistRole('ROLE_DOMAIN_ACCOUNTING_OPERATOR')){
@@ -198,13 +210,13 @@ class AccountSalesController extends Controller
             $entity->setGlobalOption($option);
             $customer = $form["customer"]->getData();
             if (empty($customer) and !empty($data['customerMobile'])){
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option, $mobile, $data);
+                $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option, $mobile, $data);
                 $entity->setCustomer($customer);
 
             }elseif (!empty($customer)){
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($customer);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option, 'mobile' => $mobile));
+                $mobile = $this->toolManager->specialExpClean($customer);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option, 'mobile' => $mobile));
                 $entity->setCustomer($customer);
             }
             if( in_array($entity->getProcessHead(),array("Debit"))){
@@ -233,7 +245,7 @@ class AccountSalesController extends Controller
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             if($this->getUser()->getCheckExistRole('ROLE_DOMAIN_ACCOUNTING_OPERATOR')){
@@ -243,7 +255,7 @@ class AccountSalesController extends Controller
             }
         }
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         return $this->render('Accounting/AccountSales/new.html.twig', array(
@@ -278,7 +290,7 @@ class AccountSalesController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_ACCOUNTING_SALES') or is_granted('ROLE_DOMAIN_ACCOUNTING_OPERATOR') or is_granted('ROLE_DOMAIN')"))]
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountSales();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
@@ -295,12 +307,12 @@ class AccountSalesController extends Controller
      */
     public function duePaymentAction(Sales $sales)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountSales();
         $entity->setGlobalOption( $this->getUser()->getGlobalOption());
         $entity->setSales($sales);
         $entity->setCustomer($sales->getCustomer());
-        $entity->setTransactionMethod($this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
+        $entity->setTransactionMethod($this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         $entity->setProcessHead('Due');
         $em->persist($entity);
         $em->flush();
@@ -317,14 +329,14 @@ class AccountSalesController extends Controller
      */
     public function printAction(AccountSales $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity and $entity->getGlobalOption()->getId() != $this->getUser()->getGlobalOption()->getId() ) {
             throw $this->createNotFoundException('Unable to find AccountSales entity.');
         }
         $template = ($entity->getGlobalOption()->getAccountingConfig()->isCustomPrint() == 1) ? $entity->getGlobalOption()->getSubDomain():'print';
-        $amountInWord = $this->get('settong.toolManageRepo')->intToWords($entity->getAmount());
-        $outstanding = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($entity->getGlobalOption(),$entity->getCustomer());
+        $amountInWord = $this->toolManager->intToWords($entity->getAmount());
+        $outstanding = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($entity->getGlobalOption(),$entity->getCustomer());
         return $this->render("Accounting/AccountSales/{$template}.html.twig", array(
             'entity'           => $entity,
             'config'           => $entity->getGlobalOption()->getAccountingConfig(),
@@ -339,7 +351,7 @@ class AccountSalesController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->find($id);
 
@@ -382,7 +394,7 @@ class AccountSalesController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountSales entity.');
@@ -392,7 +404,7 @@ class AccountSalesController extends Controller
         if ($editForm->isValid()) {
 
             if ($entity->getSales()->getDue() < $entity->getAmount() ){
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'notice',"Payment amount receive must be same or less as due amount"
                 );
                 return $this->redirect($this->generateUrl('account_sales_edit',array('id' => $entity->getId())));
@@ -415,7 +427,7 @@ class AccountSalesController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
@@ -435,11 +447,11 @@ class AccountSalesController extends Controller
     public function approveAction(AccountSales $entity)
     {
 	    if (!empty($entity) and $entity->getProcess() != 'approved') {
-		    $em = $this->getDoctrine()->getManager();
+		    $em = $this->em;
 		    $entity->setProcess('approved');
 		    $entity->setApprovedBy($this->getUser());
 		    if(empty($entity->getTransactionMethod()) and in_array($entity->getProcessHead(),array( 'Due','Advance'))){
-			    $method = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+			    $method = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
 			    $entity->setTransactionMethod($method);
 		    }
             $accountConfig = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -450,11 +462,11 @@ class AccountSalesController extends Controller
             }
 		    $em->flush();
 		    if(!empty($entity->getSales()) and $entity->getProcessHead() == 'Due'){
-		    	$this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesPaymentReceive($entity);
+		    	$this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesPaymentReceive($entity);
 		    }
 		    $em->getRepository(\App\Accounting\Entity\AccountSales::class)->updateCustomerBalance($entity);
 		    if($entity->getAmount() > 0 and in_array($entity->getProcessHead(),array( 'Due','Advance')) ){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($entity);
+                $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($entity);
 		    }
 
             $customer = $entity->getCustomer();
@@ -471,8 +483,8 @@ class AccountSalesController extends Controller
             $msg = nl2br("=={$orgName}==  Dear {$msg}");
             if($entity->isSmsAlert() == 1 and $entity->getGlobalOption()->getAccountingConfig()->isSalesReceiveSms() == 1 and $entity->getGlobalOption()->getSmsSenderTotal() and $entity->getGlobalOption()->getSmsSenderTotal()->getRemaining() > 0 and $entity->getGlobalOption()->getNotificationConfig()->getSmsActive() == 1) {
                 $this->send($msg,$mobile);
-                $this->getDoctrine()->getRepository(\App\Tool\Entity\SmsSender::class)->insertCustomerOutstandingSms($customer,$msg,'success');
-                $this->get('session')->getFlashBag()->add(
+                $this->em->getRepository(\App\Tool\Entity\SmsSender::class)->insertCustomerOutstandingSms($customer,$msg,'success');
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'success'," $name SMS has benn sent successfully"
                 );
             }
@@ -491,7 +503,7 @@ class AccountSalesController extends Controller
      */
     public function deleteAction(AccountSales $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
         }
@@ -505,8 +517,8 @@ class AccountSalesController extends Controller
 
     public function salesReverseAction(AccountSales $entity){
 
-        $em = $this->getDoctrine()->getManager();
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->accountReverse($entity);
+        $em = $this->em;
+        $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountReverse($entity);
         $entity->setProcess(null);
         $entity->setApprovedBy(null);
         $entity->setTotalAmount(0);
@@ -520,11 +532,11 @@ class AccountSalesController extends Controller
 
     public function salesPrint(AccountSales $sales)
     {
-    	$em = $this->getDoctrine()->getManager();
+    	$em = $this->em;
 	    $template = $sales->getGlobalOption()->getSlug();
-	    $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($sales->getGlobalOption(), $data = array('mobile'=> $sales->getCustomer()->getMobile()));
+	    $result = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($sales->getGlobalOption(), $data = array('mobile'=> $sales->getCustomer()->getMobile()));
 	    $balance = empty($result) ? 0 :$result[0]['customerBalance'];
-	    $amountInWords = $this->get('settong.toolManageRepo')->intToWords($sales->getAmount());
+	    $amountInWords = $this->toolManager->intToWords($sales->getAmount());
 	    return  $this->render("Business/Print/{$template}.html.twig",
 		    array(
 			    'amountInWords' => $amountInWords,
@@ -541,9 +553,9 @@ class AccountSalesController extends Controller
 	    $customerId = $_REQUEST['customer'];
 	    $globalOption = $this->getUser()->getGlobalOption();
 	    $balance = 0;
-	    $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'id'=> $customerId));
+	    $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'id'=> $customerId));
 	    if(!empty($customer)){
-		    $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($globalOption,$customer);
+		    $result = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($globalOption,$customer);
 		    $balance = empty($result) ? 0 : $result;
 	    }
         $taka = number_format($balance).' Taka';
@@ -557,9 +569,9 @@ class AccountSalesController extends Controller
         $customerId = $_REQUEST['customer'];
         $globalOption = $this->getUser()->getGlobalOption();
         $balance = 0;
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'mobile'=> $customerId));
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'mobile'=> $customerId));
         if(!empty($customer)){
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($globalOption,$customer);
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($globalOption,$customer);
             $balance = empty($result) ? 0 : $result;
         }
         $taka = number_format($balance).' Taka';

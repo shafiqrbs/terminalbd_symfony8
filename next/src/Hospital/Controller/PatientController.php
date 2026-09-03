@@ -2,6 +2,7 @@
 
 namespace App\Hospital\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Hospital\Entity\Invoice;
 use App\Hospital\Entity\InvoiceParticular;
@@ -16,6 +17,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PatientController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     public function patientAction(Invoice $entity)
     {
@@ -36,7 +42,7 @@ class PatientController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getHospitalConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -46,7 +52,7 @@ class PatientController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getHospitalConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->searchAdmissionAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->searchAdmissionAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -56,7 +62,7 @@ class PatientController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getHospitalConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->searchParticularAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->searchParticularAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -66,7 +72,7 @@ class PatientController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getHospitalConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->searchDoctorReferredAutoComplete($item,$inventory,[5]);
+            $item = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->searchDoctorReferredAutoComplete($item,$inventory,[5]);
         }
         return new JsonResponse($item);
     }
@@ -76,7 +82,7 @@ class PatientController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getHospitalConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->searchDoctorReferredAutoComplete($item,$inventory,[5,6]);
+            $item = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->searchDoctorReferredAutoComplete($item,$inventory,[5,6]);
         }
         return new JsonResponse($item);
     }
@@ -84,7 +90,7 @@ class PatientController extends AbstractController
     public function patientGlobalDetailsAction($invoice)
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig()->getId();
-        $entity = $this->getDoctrine()->getRepository(Invoice::class)->findOneBy(['hospitalConfig' => $config,'invoice' => trim($invoice)]);
+        $entity = $this->em->getRepository(Invoice::class)->findOneBy(['hospitalConfig' => $config,'invoice' => trim($invoice)]);
         if ($entity) {
             $view =  $this->renderView('Hospital/Patient/ajax-show.html.twig', [
                 'entity' => $entity,
@@ -98,7 +104,7 @@ class PatientController extends AbstractController
     public function patientInfoAction($invoice)
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig()->getId();
-        $entity = $this->getDoctrine()->getRepository(Invoice::class)->findOneBy(['hospitalConfig' => $config,'invoice' => trim($invoice)]);
+        $entity = $this->em->getRepository(Invoice::class)->findOneBy(['hospitalConfig' => $config,'invoice' => trim($invoice)]);
         if ($entity) {
             $customer = $entity->getCustomer();
             $data = [
@@ -122,7 +128,7 @@ class PatientController extends AbstractController
     public function assignDoctorSelectAction()
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getParticularIdName($config,[5]);
+        $entities = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getParticularIdName($config,[5]);
         $items = [];
             $items[] = ['value' => '','text'=> '-Change Doctor-'];
         foreach ($entities as $entity):
@@ -136,7 +142,7 @@ class PatientController extends AbstractController
     public function referredDoctorSelectAction()
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getParticularIdName($config,[5,6]);
+        $entities = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getParticularIdName($config,[5,6]);
         $items = [];
         $items[] = ['value' => '','text'=> '-Change Referred-'];
         foreach ($entities as $entity):
@@ -150,7 +156,7 @@ class PatientController extends AbstractController
     public function marketingExecutiveSelectAction()
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getMarketingExecutiveName($config,[14]);
+        $entities = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getMarketingExecutiveName($config,[14]);
         $items = [];
         $items[] = ['value' => '','text'=> '-Change Marketing Executive-'];
         foreach ($entities as $entity):
@@ -165,8 +171,8 @@ class PatientController extends AbstractController
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $cabin = ($invoice->getCabin()) ? $invoice->getCabin()->getId() : 0;
-        $cabins = $this->getDoctrine()->getRepository(Invoice::class)->getExistCabin($config,$cabin);
-        $entities = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getCurrentCabins($config,2,$cabins);
+        $cabins = $this->em->getRepository(Invoice::class)->getExistCabin($config,$cabin);
+        $entities = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getCurrentCabins($config,2,$cabins);
         $items = [];
         $items[] = ['value' => '','text'=> '-Change Patient Cabin-'];
         foreach ($entities as $entity):
@@ -180,7 +186,7 @@ class PatientController extends AbstractController
     public function inlinePatientUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(Invoice::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find entity.');
@@ -203,7 +209,7 @@ class PatientController extends AbstractController
     public function inlinePatientVisitDoctorUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(Invoice::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find entity.');
@@ -231,7 +237,7 @@ class PatientController extends AbstractController
     public function inlinePatientFinalBillUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(InvoiceParticular::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find entity.');

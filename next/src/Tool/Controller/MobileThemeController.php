@@ -2,6 +2,8 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,12 @@ use App\Tool\Form\MobileThemeType;
  */
 class MobileThemeController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all MobileTheme entities.
@@ -22,7 +30,7 @@ class MobileThemeController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\MobileTheme::class)->findAll();
 
@@ -41,12 +49,12 @@ class MobileThemeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity ->upload();
             $em->persist($entity);
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('mobiletheme_show', ['id' => $entity->getId()]));
@@ -101,7 +109,7 @@ class MobileThemeController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\MobileTheme::class)->find($id);
 
@@ -123,7 +131,7 @@ class MobileThemeController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\MobileTheme::class)->find($id);
 
@@ -168,7 +176,7 @@ class MobileThemeController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\MobileTheme::class)->find($id);
 
@@ -184,7 +192,7 @@ class MobileThemeController extends AbstractController
             $entity ->upload();
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('mobiletheme_edit', ['id' => $id]));
@@ -206,7 +214,7 @@ class MobileThemeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Tool\Entity\MobileTheme::class)->find($id);
 
             if (!$entity) {
@@ -249,7 +257,7 @@ class MobileThemeController extends AbstractController
         //$data = $request->request->all();
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\MobileTheme::class)->find($id);
 
         if (!$entity) {
@@ -263,7 +271,7 @@ class MobileThemeController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('mobiletheme'));

@@ -3,13 +3,15 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Inventory\Entity\ItemSizeGroup;
 use App\Inventory\Form\ItemSizeGroupingType;
 use App\Inventory\Form\ItemSizeGroupType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Inventory\Entity\ItemSize;
@@ -19,8 +21,14 @@ use App\Inventory\Form\ItemSizeType;
  * ItemSize controller.
  *
  */
-class ItemSizeController extends Controller
+class ItemSizeController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all ItemSize entities.
@@ -28,7 +36,7 @@ class ItemSizeController extends Controller
     #[IsGranted('ROLE_DOMAIN_INVENTORY_MANAGER')]
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Inventory\Entity\ItemSize::class)->findBy(array('isValid'=>1),array('code'=>'asc'));
         return $this->render('Inventory/ItemSize/index.html.twig', array(
             'entities' => $entities,
@@ -45,13 +53,13 @@ class ItemSizeController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
             $entity->setStatus(false);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('itemsize'));
@@ -73,7 +81,7 @@ class ItemSizeController extends Controller
     private function createCreateForm(ItemSize $entity)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ItemSizeType::configureOptions() and pass them as form options: $em,$inventory), $entity, array(
         $form = $this->createForm(new ItemSizeType($em,$inventory), $entity, array(
@@ -109,7 +117,7 @@ class ItemSizeController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemSize::class)->find($id);
 
@@ -128,7 +136,7 @@ class ItemSizeController extends Controller
     #[IsGranted('ROLE_ADMIN')]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemSize::class)->find($id);
 
@@ -153,7 +161,7 @@ class ItemSizeController extends Controller
     private function createEditForm(ItemSize $entity)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ItemSizeType::configureOptions() and pass them as form options: $em,$inventory), $entity, array(
         $form = $this->createForm(new ItemSizeType($em,$inventory), $entity, array(
@@ -172,7 +180,7 @@ class ItemSizeController extends Controller
     #[IsGranted('ROLE_ADMIN_OPERATION_USER')]
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemSize::class)->find($id);
 
@@ -184,7 +192,7 @@ class ItemSizeController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('itemsize_edit', array('id' => $id)));
@@ -202,7 +210,7 @@ class ItemSizeController extends Controller
     #[IsGranted('ROLE_ADMIN_OPERATION_USER')]
     public function deleteAction(ItemSize $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Product entity.');
         }
@@ -211,12 +219,12 @@ class ItemSizeController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }
@@ -228,7 +236,7 @@ class ItemSizeController extends Controller
     {
         $item = $_REQUEST['q'];
         if ($item) {
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemSize::class)->searchAutoComplete($item);
+            $item = $this->em->getRepository(\App\Inventory\Entity\ItemSize::class)->searchAutoComplete($item);
         }
         return new JsonResponse($item);
     }
@@ -244,7 +252,7 @@ class ItemSizeController extends Controller
     public function sizeGroupAction(){
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new ItemSizeGroup();
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $array = array();
@@ -262,7 +270,7 @@ class ItemSizeController extends Controller
 
         $sizes = $em->getRepository(\App\Inventory\Entity\ItemSize::class)->findBy(array('isValid'=>1),array('code'=>'asc'));
         if($sizes)
-        $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemSize::class)->getGroupSizes($sizes,$array);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\ItemSize::class)->getGroupSizes($sizes,$array);
         $form   = $this->createSizeGroupForm($entity);
 
         return $this->render('Inventory/ItemSize/group.html.twig', array(
@@ -285,7 +293,7 @@ class ItemSizeController extends Controller
     public function sizeGroupCreateAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         if($globalOption){
             $entity = $globalOption->getInventoryConfig()->getSizeGroup();
@@ -308,7 +316,7 @@ class ItemSizeController extends Controller
             $entity->setSizes($array);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('itemsize_group'));

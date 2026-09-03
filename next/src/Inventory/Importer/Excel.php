@@ -12,7 +12,7 @@ use App\Inventory\Repository\ItemSizeRepository;
 use App\Inventory\Repository\VendorRepository;
 use App\Tool\Repository\ProductUnitRepository;
 use App\Inventory\Repository\PurchaseRepository;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Inventory\Entity\Item;
 use App\Inventory\Entity\ItemBrand;
 use App\Inventory\Entity\ItemColor;

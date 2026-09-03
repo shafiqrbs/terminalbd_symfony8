@@ -4,6 +4,9 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\Accounting\Entity\AccountProfit;
@@ -18,14 +21,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AccountProfitController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,7 +45,7 @@ class AccountProfitController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Accounting\Entity\AccountProfit::class)->findWithSearch( $this->getUser()->getGlobalOption(),$data);
         $pagination = $this->paginate($entities);
@@ -51,7 +61,7 @@ class AccountProfitController extends AbstractController
     public function newAction()
     {
         $search = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $datetime = new DateTime("now");
         $today = $datetime->format('d-m-Y');
@@ -68,13 +78,13 @@ class AccountProfitController extends AbstractController
             $data =  $compare->format("Y-m-t 22:59:59");
         }
 
-        $entity = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountProfit::class)->findOneBy(['globalOption' => $option,'month' => $month ,'year' => $year]);
-      //  $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountProfit::class)->reportMonthlyProfitLoss($entity,$data);
-      //  $capital = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->getCapitalInvestment($option,$entity);
+        $entity = $this->em->getRepository(\App\Accounting\Entity\AccountProfit::class)->findOneBy(['globalOption' => $option,'month' => $month ,'year' => $year]);
+      //  $overview = $this->em->getRepository(\App\Accounting\Entity\AccountProfit::class)->reportMonthlyProfitLoss($entity,$data);
+      //  $capital = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->getCapitalInvestment($option,$entity);
 
         if(empty($entity)){
-            $entity = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountProfit::class)->insertAccountProfit($option,$month,$year,$data);
-            $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountProfit::class)->reportMonthlyProfitLoss($entity,$data);
+            $entity = $this->em->getRepository(\App\Accounting\Entity\AccountProfit::class)->insertAccountProfit($option,$month,$year,$data);
+            $overview = $this->em->getRepository(\App\Accounting\Entity\AccountProfit::class)->reportMonthlyProfitLoss($entity,$data);
             $sales = round($overview['sales'] + $overview['salesAdjustment']);
             $purchase = round($overview['purchase'] + $overview['purchaseAdjustment']);
             $expenditure = round ($overview['expenditure']);
@@ -96,13 +106,13 @@ class AccountProfitController extends AbstractController
             $em->persist($entity);
             $em->flush();
             if($entity->getLoss() > 0 or $entity->getProfit() > 0){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->getCapitalInvestment($option,$entity);
+                $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->getCapitalInvestment($option,$entity);
             }
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
         }else{
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Already generated this {$month},{$year}"
             );
         }
@@ -113,7 +123,7 @@ class AccountProfitController extends AbstractController
 
     public function deleteAction(AccountProfit $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
@@ -125,7 +135,7 @@ class AccountProfitController extends AbstractController
     public function downloadProfitAction()
     {
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Accounting\Entity\AccountProfit::class)->findWithSearch( $this->getUser()->getGlobalOption(),$data);
         $html = $this->renderView(
             'Accounting/AccountProfit/profitPdf.html.twig', [

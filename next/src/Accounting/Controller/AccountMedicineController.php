@@ -4,13 +4,16 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountPurchase;
 use App\Accounting\Form\AccountMedicinePurchaseType;
 use App\Accounting\Form\AccountSalesInvoiceType;
 use App\Accounting\Form\AccountSalesMedicineType;
 use App\Medicine\Entity\MedicineSales;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Accounting\Entity\AccountSales;
@@ -20,16 +23,23 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountSalesMedicine controller.
  *
  */
-class AccountMedicineController extends Controller
+class AccountMedicineController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -39,14 +49,14 @@ class AccountMedicineController extends Controller
 
     public function salesAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->findWithSearch($user,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(20,29));
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(20,29));
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
         return $this->render('Accounting/AccountMedicine/sales.html.twig', array(
             'entities' => $pagination,
             'accountHead' => $accountHead,
@@ -60,10 +70,10 @@ class AccountMedicineController extends Controller
 
 	public function customerOutstandingAction()
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data =$_REQUEST;
 		$globalOption = $this->getUser()->getGlobalOption();
-		$entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
+		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
 		$pagination = $this->paginate($entities);
 		return $this->render('Accounting/AccountMedicine/customerOutstanding.html.twig', array(
 			'entities' => $pagination,
@@ -77,14 +87,14 @@ class AccountMedicineController extends Controller
 
     public function purchaseAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($globalOption,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($globalOption,$data);
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(5));
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($globalOption,$data);
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(5));
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
         return $this->render('Accounting/AccountMedicine/purchase.html.twig', array(
             'entities' => $pagination,
             'accountHead' => $accountHead,
@@ -99,10 +109,10 @@ class AccountMedicineController extends Controller
 
     public function vendorOutstandingAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data =$_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorMedicineOutstanding($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorMedicineOutstanding($globalOption,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Accounting/AccountMedicine/purchaseOutstanding.html.twig', array(
             'entities' => $pagination,
@@ -115,7 +125,7 @@ class AccountMedicineController extends Controller
 
 	public function purchaseNewAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountPurchase();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
@@ -132,7 +142,7 @@ class AccountMedicineController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $entity->setProcessHead('medicine');
             $entity->setProcessType('Payment');
@@ -144,7 +154,7 @@ class AccountMedicineController extends Controller
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_purchase_medicine'));
@@ -184,7 +194,7 @@ class AccountMedicineController extends Controller
 
 	public function salesNewAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountSales();
         $form   = $this->salesCreateForm($entity);
         return $this->render('Accounting/AccountMedicine/new.html.twig', array(
@@ -199,14 +209,14 @@ class AccountMedicineController extends Controller
         $form = $this->salesCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption( $this->getUser()->getGlobalOption());
             if(!empty($this->getUser()->getProfile()->getBranches())){
                 $entity->setBranches($this->getUser()->getProfile()->getBranches());
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_sales_medicine'));
@@ -249,18 +259,18 @@ class AccountMedicineController extends Controller
      */
     public function duePaymentAction(MedicineSales $sales)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $global=$this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->findOneBy(array('globalOption'=>$global,'medicineSales'=>$sales->getId()));
         if (!$entity) {
             return $this->redirect($this->generateUrl('account_sales_medicine_new'));
         }
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountSales();
         $entity->setGlobalOption( $this->getUser()->getGlobalOption());
         $entity->setMedicineSales($sales);
         $entity->setCustomer($sales->getCustomer());
-        $entity->setTransactionMethod($this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
+        $entity->setTransactionMethod($this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         $entity->setProcessHead('Due');
         if(!empty($this->getUser()->getProfile()->getBranches())){
             $entity->setBranches($this->getUser()->getProfile()->getBranches());
@@ -281,7 +291,7 @@ class AccountMedicineController extends Controller
      */
     public function duePaymentUpdateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountSales entity.');
@@ -324,15 +334,15 @@ class AccountMedicineController extends Controller
     public function salesApproveAction(AccountSales $entity)
     {
         if (!empty($entity) and $entity->getProcess() != 'approved' ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $em->flush();
             $em->getRepository(\App\Accounting\Entity\AccountSales::class)->updateCustomerBalance($entity);
             if($entity->getMedicineSales()){
-                $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateSalesPaymentReceive($entity);
+                $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->updateSalesPaymentReceive($entity);
             }
-            // $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountSalesTransaction($entity);
+            // $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountSalesTransaction($entity);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -343,8 +353,8 @@ class AccountMedicineController extends Controller
 
     public function salesMedicineReverseAction(AccountSales $entity){
 
-	    $em = $this->getDoctrine()->getManager();
-    	$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->accountReverse($entity);
+	    $em = $this->em;
+    	$this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountReverse($entity);
 	    $entity->setProcess(null);
 	    $entity->setApprovedBy(null);
 	    $entity->setBalance(0);
@@ -354,8 +364,8 @@ class AccountMedicineController extends Controller
 
 	public function purchaseMedicineReverseAction(AccountPurchase $entity){
 
-		$em = $this->getDoctrine()->getManager();
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountReverse($entity);
+		$em = $this->em;
+		$this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountReverse($entity);
 		$entity->setProcess(null);
 		$entity->setApprovedBy(null);
 		$entity->setBalance(0);

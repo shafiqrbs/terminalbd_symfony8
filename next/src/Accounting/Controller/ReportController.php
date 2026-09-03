@@ -2,6 +2,9 @@
 
 namespace App\Accounting\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\Accounting\Entity\AccountPurchase;
@@ -12,13 +15,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -27,10 +37,10 @@ class ReportController extends AbstractController
 
     public function balanceAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
         return $this->render('Accounting/Report/incomePdf.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
@@ -39,9 +49,9 @@ class ReportController extends AbstractController
 
     public function incomeAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportSalesIncome($this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportSalesIncome($this->getUser(),$data);
         return $this->render('Accounting/Report/income.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
@@ -53,7 +63,7 @@ class ReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportSalesIncome($this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportSalesIncome($this->getUser(),$data);
         $html = $this->renderView(
             'Accounting/Report/incomePdf.html.twig', [
                 'overview' => $overview,
@@ -76,7 +86,7 @@ class ReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
         return $this->render('Accounting/Report/incomePdf.html.twig', [
             'overview' => $overview,
             'print' => '<script>window.print();</script>'
@@ -87,9 +97,9 @@ class ReportController extends AbstractController
     public function monthlyIncomeAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMonthlyIncome( $this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMonthlyIncome( $this->getUser(),$data);
         if(!empty($data['startMonth']) and !empty($data['endMonth'])){
             $sm = "01-{$data['startMonth']}-{$data['year']}";
             $compareTo = new DateTime($sm);
@@ -111,10 +121,10 @@ class ReportController extends AbstractController
 
     public function monthlyIncomePdfAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMonthlyIncome( $this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMonthlyIncome( $this->getUser(),$data);
         if(!empty($data['startMonth']) and !empty($data['endMonth'])){
             $sm = "01-{$data['startMonth']}-{$data['year']}";
             $compareTo = new DateTime($sm);
@@ -147,9 +157,9 @@ class ReportController extends AbstractController
 
     public function cashReceivePaymentAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->cashReceivePayment( $this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashReceivePayment( $this->getUser(),$data);
         return $this->render('Accounting/Report/accountCashDetails.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
@@ -158,9 +168,9 @@ class ReportController extends AbstractController
 
 	public function cashReceivePaymentDetailsAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMonthlyIncome( $this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMonthlyIncome( $this->getUser(),$data);
         return $this->render('Accounting/Report/monthlyIncome.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
@@ -169,10 +179,10 @@ class ReportController extends AbstractController
 
     public function expenditureSummaryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview($user,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview($user,$data);
         $parent = [23,37];
         $expenditureHead = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->parentsExpenseAccountHead($user->getGlobalOption(),$parent,$data);
         if(empty($data['pdf'])){
@@ -206,7 +216,7 @@ class ReportController extends AbstractController
 
     public function expenditureCategoryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $expenditureOverview = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportForExpenditure($user->getGlobalOption(),$data);
@@ -238,15 +248,15 @@ class ReportController extends AbstractController
 
     public function expenditureDetailsAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 	    $option = $this->getUser()->getGlobalOption();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview( $this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview( $this->getUser(),$data);
         $entities = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->findWithSearch( $this->getUser(),$data);
         $pagination = $this->paginate($entities);
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findByQuery();
-        $categories = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(['globalOption'=> $option, 'status'=>1],['name'=>'asc']);
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getExpenseAccountHead();
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findByQuery();
+        $categories = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(['globalOption'=> $option, 'status'=>1],['name'=>'asc']);
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getExpenseAccountHead();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($option);
 
         if(empty($data['pdf'])) {
@@ -286,10 +296,10 @@ class ReportController extends AbstractController
 
     public function expenditurePurchaseHeadAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview($user,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview($user,$data);
         $parent = [23,37];
         $expenditureHead = $em->getRepository(\App\Accounting\Entity\Transaction::class)->parentsAccountHead($user->getGlobalOption(),$parent,$data);
         if(empty($data['pdf'])){
@@ -323,15 +333,15 @@ class ReportController extends AbstractController
 
     public function expenditurePurchaseDetailsAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $option = $this->getUser()->getGlobalOption();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview( $this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview( $this->getUser(),$data);
         $entities = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->findWithSearch( $this->getUser(),$data);
         $pagination = $this->paginate($entities);
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(['status'=>1],['name'=>'asc']);
-        $categories = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(['globalOption'=> $option, 'status'=>1],['name'=>'asc']);
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getExpenseAccountHead();
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(['status'=>1],['name'=>'asc']);
+        $categories = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(['globalOption'=> $option, 'status'=>1],['name'=>'asc']);
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getExpenseAccountHead();
         if(empty($data['pdf'])) {
 
             return $this->render('AccountingBundle:Report/Expenditure:expenditure.html.twig', [
@@ -374,12 +384,12 @@ class ReportController extends AbstractController
 	{
         set_time_limit(0);
         ignore_user_abort(true);
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
 		$data =$_REQUEST;
 		$globalOption = $this->getUser()->getGlobalOption();
-		$entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
+		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
 		$pagination = $this->paginate($entities);
-		$summary = $this->getDoctrine()->getRepository(AccountSales::class)->customerOutstandingSummary($globalOption);
+		$summary = $this->em->getRepository(AccountSales::class)->customerOutstandingSummary($globalOption);
 		return $this->render('AccountingBundle:Report/Outstanding:customerOutstanding.html.twig', [
 			'global' => $globalOption,
 			'entities' => $pagination,
@@ -403,13 +413,13 @@ class ReportController extends AbstractController
 
        // $mobile = "+8801746406712"; //.$invoice->getCustomer()->getMobile();
         $date = date('d-m-Y');
-        $balance = $this->getDoctrine()->getRepository(AccountSales::class)->customerSingleOutstanding( $invoice->getGlobalOption(),$invoice->getId());
+        $balance = $this->em->getRepository(AccountSales::class)->customerSingleOutstanding( $invoice->getGlobalOption(),$invoice->getId());
         $outstanding = number_format($balance,2);
         $msg = "Sir , Your present Due Balance BDT {$outstanding} TK. Please Contact with us";
         $msg = nl2br("=={$orgName}==  Dear {$msg}");
         if($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
             $this->send($msg,$mobile);
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\SmsSender::class)->insertCustomerOutstandingSms($invoice,$msg,'success');
+            $this->em->getRepository(\App\Tool\Entity\SmsSender::class)->insertCustomerOutstandingSms($invoice,$msg,'success');
             $msg = "{$name} SMS has benn sent successfully";
             return new Response($msg);
         }
@@ -452,12 +462,12 @@ class ReportController extends AbstractController
 	{
         set_time_limit(0);
         ignore_user_abort(true);
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
 		$data =$_REQUEST;
 		$globalOption = $this->getUser()->getGlobalOption();
-		$entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
+		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
 		$pagination = $this->paginate($entities);
-        $summary = $this->getDoctrine()->getRepository(AccountSales::class)->customerOutstandingSummary($globalOption);
+        $summary = $this->em->getRepository(AccountSales::class)->customerOutstandingSummary($globalOption);
         return $this->render('AccountingBundle:Report/Outstanding:customerSummary.html.twig', [
 			'entities' => $pagination,
 			'summary' => $summary,
@@ -471,7 +481,7 @@ class ReportController extends AbstractController
         ignore_user_abort(true);
 	    $data =$_REQUEST;
 		$globalOption = $this->getUser()->getGlobalOption();
-		$entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
+		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
         $html = $this->renderView(
 		    'AccountingBundle:Report/Outstanding:customerOutstandingPdf.html.twig', [
 			'globalOption'  => $globalOption,
@@ -494,14 +504,14 @@ class ReportController extends AbstractController
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$customer ='';
 		$overview = '';
 		if(isset($data['mobile']) and !empty($data['mobile'])){
-			$customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $this->getUser()->getGlobalOption()->getId(),'mobile'=>$data['mobile']]);
-			$overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
+			$customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $this->getUser()->getGlobalOption()->getId(),'mobile'=>$data['mobile']]);
+			$overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
 		}
 		$entities = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerLedger($user,$data);
         if(empty($data['pdf'])) {
@@ -541,14 +551,14 @@ class ReportController extends AbstractController
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$customer ='';
 		$overview = '';
 		if(isset($data['mobile']) and !empty($data['mobile'])){
-			$customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['mobile'=>$data['mobile']]);
-			$overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
+			$customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['mobile'=>$data['mobile']]);
+			$overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
 		}
         $entities = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerLedger($user,$data);
         $print = $this->renderView('AccountingBundle:Report/Outstanding:customerOutstandingPrint.html.twig', [
@@ -572,13 +582,13 @@ class ReportController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         /* @var $globalOption GlobalOption */
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorLedgerOutstanding($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorLedgerOutstanding($globalOption,$data);
         $pagination = $this->paginate($entities);
-        $summary = $this->getDoctrine()->getRepository(AccountPurchase::class)->vendorOutstandingSummary($globalOption);
+        $summary = $this->em->getRepository(AccountPurchase::class)->vendorOutstandingSummary($globalOption);
         return $this->render('AccountingBundle:Report/Outstanding:vendorOutstanding.html.twig', [
             'option' => $globalOption,
             'entities' => $pagination,
@@ -591,13 +601,13 @@ class ReportController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         /* @var $globalOption GlobalOption */
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorSummary($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorSummary($globalOption,$data);
         $pagination = $this->paginate($entities);
-        $summary = $this->getDoctrine()->getRepository(AccountPurchase::class)->vendorOutstandingSummary($globalOption);
+        $summary = $this->em->getRepository(AccountPurchase::class)->vendorOutstandingSummary($globalOption);
 
         return $this->render('AccountingBundle:Report/Outstanding:vendorSummary.html.twig', [
             'option' => $globalOption,
@@ -611,11 +621,11 @@ class ReportController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         /* @var $globalOption GlobalOption */
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorLedgerOutstanding($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorLedgerOutstanding($globalOption,$data);
         $html = $this->renderView(
             'AccountingBundle:Report/Outstanding:vendorOutstandingPdf.html.twig', [
             'globalOption'  => $globalOption,
@@ -635,18 +645,18 @@ class ReportController extends AbstractController
 
 	public function vendorLedgerAction()
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
 		$overview = '';
         $vendor = '';
         $entities = '';
         if ($globalOption->getMainApp()->getSlug() == 'inventory' and !empty($data['vendor'])){
-            $vendor = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Vendor::class)->findOneBy(['companyName'=> $data['vendor']]);
+            $vendor = $this->em->getRepository(\App\Inventory\Entity\Vendor::class)->findOneBy(['companyName'=> $data['vendor']]);
         }else if ($globalOption->getMainApp()->getSlug() == 'miss' and !empty($data['vendor'])){
-            $vendor = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['companyName'=> $data['vendor']]);
+            $vendor = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['companyName'=> $data['vendor']]);
         }elseif(!empty($data['vendor'])){
-            $vendor = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['companyName'=> $data['vendor']]);
+            $vendor = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findOneBy(['companyName'=> $data['vendor']]);
         }
 		if(!empty($data) and !empty($data['vendor'])){
             $entities = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorLedger($globalOption,$data);
@@ -685,10 +695,10 @@ class ReportController extends AbstractController
      */
     public function customerSalesAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
         return $this->render('AccountingBundle:Report/Sales:customerSummary.html.twig', [
             'entities' => $entities,
             'option' => $globalOption,
@@ -702,10 +712,10 @@ class ReportController extends AbstractController
      */
     public function salesBoardAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
         return $this->render('AccountingBundle:Report/Sales:salesBoard.html.twig', [
             'entities' => $entities,
             'option' => $globalOption,
@@ -719,10 +729,10 @@ class ReportController extends AbstractController
      */
     public function userSummaryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->userSummary($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->userSummary($globalOption,$data);
         return $this->render('AccountingBundle:Report/Sales:userSummary.html.twig', [
             'entities' => $entities,
             'option' => $globalOption,

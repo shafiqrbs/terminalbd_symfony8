@@ -2,6 +2,10 @@
 
 namespace App\Inventory\Controller;
 
+use Twig\Environment;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Inventory\Entity\InventoryConfig;
 use App\Inventory\Entity\Item;
 use App\Inventory\Entity\Purchase;
@@ -9,7 +13,7 @@ use App\Inventory\Entity\PurchaseItem;
 use App\Inventory\Form\PurchaseApproveType;
 use App\Inventory\Form\PurchaseItemSimpleType;
 use App\Inventory\Form\PurchaseType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,16 +22,24 @@ use Symfony\Component\HttpFoundation\Response;
  * PurchaseOrder controller.
  *
  */
-class PurchaseSimpleController extends Controller
+class PurchaseSimpleController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -39,11 +51,11 @@ class PurchaseSimpleController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\Purchase::class)->findWithSearch($inventory,$data);
-        $purchaseOverview = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseOverview($inventory,$data);
+        $purchaseOverview = $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseOverview($inventory,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Inventory/PurchaseSimple/index.html.twig', array(
             'entities' => $pagination,
@@ -59,7 +71,7 @@ class PurchaseSimpleController extends Controller
      */
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Purchase();
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entity->setInventoryConfig($inventory);
@@ -77,9 +89,9 @@ class PurchaseSimpleController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
-        $processItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemSalesQuantity($entity,array('sales','damage','purchaseReturn'));
+        $processItem = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemSalesQuantity($entity,array('sales','damage','purchaseReturn'));
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Purchase entity.');
         }
@@ -95,10 +107,10 @@ class PurchaseSimpleController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $purchase = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
-        $processItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemSalesQuantity($purchase,array('sales','damage','purchaseReturn'));
+        $processItem = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemSalesQuantity($purchase,array('sales','damage','purchaseReturn'));
         if (!$purchase) {
             throw $this->createNotFoundException('Unable to find Purchase entity.');
         }
@@ -170,7 +182,7 @@ class PurchaseSimpleController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
         $editForm = $this->createEditForm($entity);
@@ -203,7 +215,7 @@ class PurchaseSimpleController extends Controller
     {
 
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $purchase->setApprovedBy($this->getUser());
         $purchase->setProcess('approved');
         $em->persist($purchase);
@@ -214,7 +226,7 @@ class PurchaseSimpleController extends Controller
         $em->getRepository(\App\Inventory\Entity\Item::class)->getItemUpdatePriceQnt($purchase);
         if($purchase->getAsInvestment() == 1){
             $journal = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->insertAccountPurchaseJournal($purchase);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
+            $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
         }
         $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertAccountPurchase($purchase);
         return new Response(json_encode(array('success'=>'success')));
@@ -228,13 +240,13 @@ class PurchaseSimpleController extends Controller
     public function deleteAction(Purchase $purchase)
     {
         if($purchase and $purchase->getInventoryConfig()->getId() == $this->getUser()->getGlobalOption()->getInventoryConfig()->getId()){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             if($purchase->getPurchaseItems()){
-                $template = $this->get('twig')->render('Inventory/Reverse/purchaseReverse.html.twig', array(
+                $template = $this->twig->render('Inventory/Reverse/purchaseReverse.html.twig', array(
                     'entity' => $purchase,
                     'inventoryConfig' => $purchase->getInventoryConfig(),
                 ));
-                $exist = $this->getDoctrine()->getRepository(PurchaseItem::class)->findBy(array('purchase' => $purchase->getId()));
+                $exist = $this->em->getRepository(PurchaseItem::class)->findBy(array('purchase' => $purchase->getId()));
                 if($exist){
                     $em->remove($exist);
                     $em->flush();
@@ -257,7 +269,7 @@ class PurchaseSimpleController extends Controller
 
     public function  updatePurchaseStatus(Purchase $entity,$process){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setProcess($process);
         $em->persist($entity);
         $em->flush();
@@ -268,7 +280,7 @@ class PurchaseSimpleController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Purchase::class)->searchAutoComplete($inventory,$item);
+            $item = $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->searchAutoComplete($inventory,$item);
         }
         return new JsonResponse($item);
     }
@@ -288,7 +300,7 @@ class PurchaseSimpleController extends Controller
      */
     public function editApproveAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
 
@@ -337,7 +349,7 @@ class PurchaseSimpleController extends Controller
     public function updateApproveAction(Request $request, $id)
     {
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
         $editForm = $this->createEditApproveForm($entity);
@@ -354,10 +366,10 @@ class PurchaseSimpleController extends Controller
             $em->getRepository(\App\Inventory\Entity\Item::class)->getItemUpdatePriceQnt($entity);
             if($entity->getAsInvestment() == 1){
                 $journal = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->insertAccountPurchaseJournal($entity);
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
+                $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($journal,'Journal');
             }
             $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertAccountPurchase($entity);
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Purchase invoice approved successfully"
             );
             return $this->redirect($this->generateUrl('inventory_purchasesimple'));
@@ -377,12 +389,12 @@ class PurchaseSimpleController extends Controller
     {
 
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->purchaseItemReverseUpdateQnt($purchase);
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->purchaseItemStockRemoveQnt($purchase);
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedPurchaseJournal($purchase);
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->removeApprovedAccountPurchase($purchase);
+        $this->em->getRepository(\App\Inventory\Entity\Item::class)->purchaseItemReverseUpdateQnt($purchase);
+        $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->purchaseItemStockRemoveQnt($purchase);
+        $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedPurchaseJournal($purchase);
+        $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->removeApprovedAccountPurchase($purchase);
         $em->remove($purchase);
         $em->flush();
         return $this->redirect($this->generateUrl('purchase'));
@@ -395,12 +407,12 @@ class PurchaseSimpleController extends Controller
      */
     public function createPurchaseItemAction(Request $request, Purchase $purchase)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all()['purchaseitem'];
         $item = $data['item'];
         $serialNo = isset($data['serialNo']) ? $data['serialNo'] : '';
-        $stock = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->find($item);
-        $exist = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(array('purchase'=>$purchase,'item'=>$item));
+        $stock = $this->em->getRepository(\App\Inventory\Entity\Item::class)->find($item);
+        $exist = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(array('purchase'=>$purchase,'item'=>$item));
 
         if(empty($exist)){
             $purchaseItem = new PurchaseItem();
@@ -425,7 +437,7 @@ class PurchaseSimpleController extends Controller
             $em->persist($exist);
             $em->flush();
         }
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->generatePurchaseVendorItem($purchase);
+        $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->generatePurchaseVendorItem($purchase);
         $entity = $em->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseSimpleUpdate($purchase);
         $html = $this->renderView(
             'Inventory/PurchaseSimple/purchase-item.html.twig', array(
@@ -447,14 +459,14 @@ class PurchaseSimpleController extends Controller
     public function barcodeItemInsertAction(Request $request,$id)
     {
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $b = trim($data['barcode']);
-        $purchase = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
+        $purchase = $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->find($id);
         $item = $em->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('barcode'=>$b));
         if (!$item) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
         }
-        $exist = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(array('purchase'=>$purchase,'item'=>$item));
+        $exist = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(array('purchase'=>$purchase,'item'=>$item));
         if($exist){
             $quantity = ($exist->getQuantity()+1);
             $exist->setQuantity($quantity);
@@ -493,7 +505,7 @@ class PurchaseSimpleController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data =$_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var $entity PurchaseItem */
         $item = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($data['id']);
         if (!$item) {
@@ -525,13 +537,13 @@ class PurchaseSimpleController extends Controller
 
     public function purchaseItemDeleteAction(Purchase $purchase, PurchaseItem $purchaseItem)
     {
-        $em = $this->getDoctrine()->getManager();
-        $salesQnt = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemQuantity($purchaseItem, array('sales','damage','purchaseReturn'));
+        $em = $this->em;
+        $salesQnt = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemQuantity($purchaseItem, array('sales','damage','purchaseReturn'));
         if($purchaseItem and $salesQnt == 0 ) {
             $em->remove($purchaseItem);
             $em->flush();
             $em->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseSimpleUpdate($purchase);
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->generatePurchaseVendorItem($purchase);
+            $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->generatePurchaseVendorItem($purchase);
         }
         return new Response(
             json_encode(
@@ -549,7 +561,7 @@ class PurchaseSimpleController extends Controller
     public function createStockItemAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
 
         /* @var InventoryConfig $inventory*/
@@ -562,7 +574,7 @@ class PurchaseSimpleController extends Controller
             if(empty($existMasterItem)){
                 $existMasterItem = $em->getRepository(\App\Inventory\Entity\Product::class)->createNewProduct($inventory,$data['masterItem']);
             }
-            $checkData = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->checkInstantDuplicateSKU($inventory,$data);
+            $checkData = $this->em->getRepository(\App\Inventory\Entity\Item::class)->checkInstantDuplicateSKU($inventory,$data);
             if($checkData == 0 ) {
                 $entity->setInventoryConfig($inventory);
                 $entity->setMasterItem($existMasterItem);
@@ -618,19 +630,19 @@ class PurchaseSimpleController extends Controller
          * */
 
         set_time_limit(0);
-        $em = $this->getDoctrine()->getManager();
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->purchaseItemStockRemoveQnt($purchase);
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->purchaseItemReverseUpdateQnt($purchase);
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItemSerial::class)->removeSerialNo($purchase);
+        $em = $this->em;
+        $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->purchaseItemStockRemoveQnt($purchase);
+        $this->em->getRepository(\App\Inventory\Entity\Item::class)->purchaseItemReverseUpdateQnt($purchase);
+        $this->em->getRepository(\App\Inventory\Entity\PurchaseItemSerial::class)->removeSerialNo($purchase);
         if($purchase->getAsInvestment() == 1 ) {
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedPurchaseJournal($purchase);
+            $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedPurchaseJournal($purchase);
         }
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseReverse($purchase);
+        $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseReverse($purchase);
       // $em->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseSimpleUpdate($purchase);
         $purchase->setRevised(true);
         $purchase->setProcess('created');
         $em->flush();
-        $template = $this->get('twig')->render('Inventory/Reverse/purchaseReverse.html.twig', array(
+        $template = $this->twig->render('Inventory/Reverse/purchaseReverse.html.twig', array(
             'entity' => $purchase,
             'inventoryConfig' => $purchase->getInventoryConfig(),
         ));
@@ -641,7 +653,7 @@ class PurchaseSimpleController extends Controller
     public function processSerialNoAction()
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $this->getDoctrine()->getRepository(PurchaseItem::class)->processSerialNo($config);
+        $this->em->getRepository(PurchaseItem::class)->processSerialNo($config);
         exit;
     }
 

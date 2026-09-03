@@ -2,6 +2,9 @@
 
 namespace App\Accounting\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountPurchase;
 use App\Accounting\Form\AccountBusinessPurchaseType;
 use App\Accounting\Form\AccountSalesBusinessType;
@@ -9,7 +12,7 @@ use App\Accounting\Form\AccountSalesInvoiceType;
 use App\Accounting\Form\AccountSalesMedicineType;
 use App\Medicine\Entity\MedicineSales;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Accounting\Entity\AccountSales;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,16 +20,23 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountSalesMedicine controller.
  *
  */
-class AccountBusinessController extends Controller
+class AccountBusinessController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -39,14 +49,14 @@ class AccountBusinessController extends Controller
      */
     public function salesAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->findWithSearch($user,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(20,29));
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(20,29));
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
         return $this->render('Accounting/AccountBusiness/sales.html.twig', array(
             'entities' => $pagination,
             'accountHead' => $accountHead,
@@ -62,14 +72,14 @@ class AccountBusinessController extends Controller
      */
     public function purchaseAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($globalOption,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($globalOption,$data);
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(5));
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($globalOption,$data);
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(5));
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
         return $this->render('Accounting/AccountBusiness/purchase.html.twig', array(
             'entities' => $pagination,
             'accountHead' => $accountHead,
@@ -85,10 +95,10 @@ class AccountBusinessController extends Controller
      */
     public function customerOutstandingAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data =$_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Accounting/AccountBusiness/customerOutstanding.html.twig', array(
             'entities' => $pagination,
@@ -102,10 +112,10 @@ class AccountBusinessController extends Controller
      */
     public function vendorOutstandingAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data =$_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorBusinessOutstanding($globalOption,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorBusinessOutstanding($globalOption,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Accounting/AccountBusiness/purchaseOutstanding.html.twig', array(
             'entities' => $pagination,
@@ -115,7 +125,7 @@ class AccountBusinessController extends Controller
 
     public function purchaseNewAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountPurchase();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
@@ -132,7 +142,7 @@ class AccountBusinessController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             if($entity->getPayment() < 0){
                 $entity->setPurchaseAmount(abs($entity->getPayment()));
@@ -141,7 +151,7 @@ class AccountBusinessController extends Controller
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_purchase_business'));
@@ -184,7 +194,7 @@ class AccountBusinessController extends Controller
      */
     public function salesNewAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountSales();
         $form   = $this->salesCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
@@ -201,7 +211,7 @@ class AccountBusinessController extends Controller
         $form = $this->salesCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption( $this->getUser()->getGlobalOption());
             if(!empty($this->getUser()->getProfile()->getBranches())){
                 $entity->setBranches($this->getUser()->getProfile()->getBranches());
@@ -213,7 +223,7 @@ class AccountBusinessController extends Controller
 	        }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_sales_business'));
@@ -255,18 +265,18 @@ class AccountBusinessController extends Controller
      */
     public function duePaymentAction(MedicineSales $sales)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $global=$this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->findOneBy(array('globalOption'=>$global,'businessSales'=>$sales->getId()));
         if (!$entity) {
             return $this->redirect($this->generateUrl('account_sales_business_new'));
         }
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountSales();
         $entity->setGlobalOption( $this->getUser()->getGlobalOption());
         $entity->setMedicineSales($sales);
         $entity->setCustomer($sales->getCustomer());
-        $entity->setTransactionMethod($this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
+        $entity->setTransactionMethod($this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         $entity->setProcessHead('Due');
         if(!empty($this->getUser()->getProfile()->getBranches())){
             $entity->setBranches($this->getUser()->getProfile()->getBranches());
@@ -287,7 +297,7 @@ class AccountBusinessController extends Controller
      */
     public function duePaymentUpdateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountSales entity.');
@@ -330,21 +340,21 @@ class AccountBusinessController extends Controller
     public function salesApproveAction(AccountSales $entity)
     {
 	    if (!empty($entity) and $entity->getProcess() != 'approved') {
-		    $em = $this->getDoctrine()->getManager();
+		    $em = $this->em;
 		    $entity->setProcess('approved');
 		    $entity->setApprovedBy($this->getUser());
 		    if(in_array($entity->getProcessHead(),array( 'Due','Advance'))){
-			    $method = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+			    $method = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
 			    $entity->setTransactionMethod($method);
 		    }
 		    $em->flush();
 		    $em->getRepository(\App\Accounting\Entity\AccountSales::class)->updateCustomerBalance($entity);
 		    if($entity->getProcessHead() == 'Outstanding'){
-			    $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)-> insertCustomerOutstandingTransaction($entity);
+			    $this->em->getRepository(\App\Accounting\Entity\Transaction::class)-> insertCustomerOutstandingTransaction($entity);
 		    }elseif($entity->getProcessHead() == 'Discount'){
-			    $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertCustomerDiscountTransaction($entity);
+			    $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertCustomerDiscountTransaction($entity);
 		    }elseif($entity->getAmount() > 0 ){
-			    $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountSalesTransaction($entity);
+			    $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountSalesTransaction($entity);
 		    }
 		    return new Response('success');
 
@@ -358,14 +368,14 @@ class AccountBusinessController extends Controller
 
     public function customerLedgerAction()
     {
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
     	$data = $_REQUEST;
 	    $user = $this->getUser();
 	    $customer ='';
 	    $overview = '';
 	    if(isset($data['mobile']) and !empty($data['mobile'])){
-		    $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('mobile'=>$data['mobile']));
-		    $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
+		    $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('mobile'=>$data['mobile']));
+		    $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
 
 	    }
 	    $entities = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerLedger($user,$data);
@@ -379,14 +389,14 @@ class AccountBusinessController extends Controller
 
 	public function vendorLedgerAction()
     {
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
     	$data = $_REQUEST;
 	    $user = $this->getUser();
 	    $customer ='';
 	    $overview = '';
 	    if(isset($data['mobile']) and !empty($data['mobile'])){
-		    $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('mobile'=>$data['mobile']));
-		    $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
+		    $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('mobile'=>$data['mobile']));
+		    $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
 
 	    }
 	    $entities = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerLedger($user,$data);

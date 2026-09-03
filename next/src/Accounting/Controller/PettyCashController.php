@@ -2,8 +2,11 @@
 
 namespace App\Accounting\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Accounting\Entity\PettyCash;
 use App\Accounting\Form\PettyCashType;
@@ -13,16 +16,23 @@ use Symfony\Component\HttpFoundation\Response;
  * PettyCash controller.
  *
  */
-class PettyCashController extends Controller
+class PettyCashController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,12 +45,12 @@ class PettyCashController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->findBy(array('globalOption' => $globalOption,'parent'=>NULL));
         $pagination = $this->paginate($entities);
-        //$overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\PettyCash::class)->salesOverview($inventory,$data);
+        //$overview = $this->em->getRepository(\App\Accounting\Entity\PettyCash::class)->salesOverview($inventory,$data);
         $accountHead = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(array('status'=>1),array('name'=>'asc'));
         $transactionMethods = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1));
         $accountBanks = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(array('globalOption'=>$globalOption,'status'=>1));
@@ -59,13 +69,13 @@ class PettyCashController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new PettyCash();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
             $lastBalance = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->lastInsertCash($entity);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setBalance($lastBalance + $entity->getAmount());
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $em->persist($entity);
@@ -107,7 +117,7 @@ class PettyCashController extends Controller
      */
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new PettyCash();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
@@ -124,7 +134,7 @@ class PettyCashController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->find($id);
          if (!$entity) {
@@ -143,7 +153,7 @@ class PettyCashController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $pettyCash = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->find($data['pk']);
         if (!$pettyCash) {
             throw $this->createNotFoundException('Unable to find PettyCash entity.');
@@ -159,7 +169,7 @@ class PettyCashController extends Controller
      */
     public function deleteAction(PettyCash $pettyCash)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$pettyCash) {
             throw $this->createNotFoundException('Unable to find PettyCash entity.');
         }
@@ -173,7 +183,7 @@ class PettyCashController extends Controller
     {
         $data = $request->request->all();
         $entity = new PettyCash();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setGlobalOption($this->getUser()->getGlobalOption());
         $parent = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->find($data['parent']);
         $returnAmount = ($parent->getReturnAmount() + $data['amount']);
@@ -193,7 +203,7 @@ class PettyCashController extends Controller
         }
         $em->persist($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->returnPettyCashTransaction($entity);
+        $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->returnPettyCashTransaction($entity);
         return new Response('success');
         exit;
 
@@ -202,12 +212,12 @@ class PettyCashController extends Controller
     public function approveAction(PettyCash $pettyCash)
     {
         if (!empty($pettyCash)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $pettyCash->setProcess('approved');
             $pettyCash->setApprovedBy($this->getUser());
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPettyCash($pettyCash);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertPettyCashTransaction($pettyCash);
+            $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPettyCash($pettyCash);
+            $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertPettyCashTransaction($pettyCash);
 
             return new Response('success');
         } else {

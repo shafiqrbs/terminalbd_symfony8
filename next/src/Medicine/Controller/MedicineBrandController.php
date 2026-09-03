@@ -2,6 +2,7 @@
 
 namespace App\Medicine\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,6 +18,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class MedicineBrandController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all MedicineBrand entities.
@@ -24,7 +30,7 @@ class MedicineBrandController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findAll();
 
@@ -42,7 +48,7 @@ class MedicineBrandController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
             return $this->redirect($this->generateUrl('medicine_show', ['id' => $entity->getId()]));
@@ -93,7 +99,7 @@ class MedicineBrandController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($id);
 
@@ -115,7 +121,7 @@ class MedicineBrandController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($id);
 
@@ -157,7 +163,7 @@ class MedicineBrandController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($id);
 
@@ -191,7 +197,7 @@ class MedicineBrandController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($id);
 
             if (!$entity) {
@@ -220,7 +226,7 @@ class MedicineBrandController extends AbstractController
     public function medicineDetailsAction(){
 
         $data = $_REQUEST['medicine'];
-        $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data);
+        $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data);
         $items = [];
         if($entity) {
             $items =[
@@ -241,7 +247,7 @@ class MedicineBrandController extends AbstractController
         $items = [];
 
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -254,7 +260,7 @@ class MedicineBrandController extends AbstractController
     {
         $item = trim($_REQUEST['q']);
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
         }
         return new JsonResponse($entities);
 
@@ -265,7 +271,7 @@ class MedicineBrandController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -287,7 +293,7 @@ class MedicineBrandController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchBrandNameAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchBrandNameAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -300,7 +306,7 @@ class MedicineBrandController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchCompanyNameAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchCompanyNameAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -313,7 +319,7 @@ class MedicineBrandController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchGenericNameAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchGenericNameAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -326,7 +332,7 @@ class MedicineBrandController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineGenericAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineGenericAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
 	         //   $items[] = array('value' => $entity['id'], 'label' => $entity['text'], 'desc' => $entity['text'], 'icon' => 'img/avatar.png');
@@ -341,7 +347,7 @@ class MedicineBrandController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchPackSizeAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchPackSizeAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -354,7 +360,7 @@ class MedicineBrandController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchStrengthAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchStrengthAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -367,7 +373,7 @@ class MedicineBrandController extends AbstractController
         $item = $_REQUEST['term'];
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineFormAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineFormAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;

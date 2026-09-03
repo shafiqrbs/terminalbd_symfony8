@@ -2,16 +2,22 @@
 
 namespace App\DoctorPrescription\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Knp\Snappy\Pdf;
 use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getDpsConfig();
@@ -26,7 +32,7 @@ class DefaultController extends AbstractController
 
     public function pdfTodaySalesAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getDpsConfig();

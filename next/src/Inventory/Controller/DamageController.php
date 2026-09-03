@@ -2,6 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,15 +20,22 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DamageController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -37,10 +47,10 @@ class DamageController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entities = $this->getDoctrine()->getManager()->getRepository(\App\Inventory\Entity\Damage::class)->findWithSearch($inventory,$data);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\Damage::class)->findWithSearch($inventory,$data);
         $paginate = $this->paginate($entities);
         return $this->render('Inventory/Damage/index.html.twig', [
             'entities' => $paginate,
@@ -51,7 +61,7 @@ class DamageController extends AbstractController
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $data = ['startDate'=> date('Y-m-d'),'endDate'=> date('Y-m-d')];
-        $entities = $this->getDoctrine()->getManager()->getRepository(\App\Inventory\Entity\Damage::class)->findWithSearch($inventory,$data);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\Damage::class)->findWithSearch($inventory,$data);
         return $entities;
     }
 
@@ -67,10 +77,10 @@ class DamageController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $data = $request->request->all();
             $barcode = $data['appstore_bundle_inventorybundle_Damage']['purchaseItem'];
-            $purchaseItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(['barcode'=>$barcode]);
+            $purchaseItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(['barcode'=>$barcode]);
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
             $entity->setItem($purchaseItem->getItem());
@@ -79,7 +89,7 @@ class DamageController extends AbstractController
             $entity->setTotal($purchaseItem->getPurchasePrice() * $entity->getQuantity());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('inventory_damage_new'));
@@ -123,7 +133,7 @@ class DamageController extends AbstractController
         $form   = $this->createCreateForm($entity);
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $data = ['startDate'=> date('Y-m-d'),'endDate'=> date('Y-m-d')];
-        $entities = $this->getDoctrine()->getManager()->getRepository(\App\Inventory\Entity\Damage::class)->findWithSearch($inventory,$data);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\Damage::class)->findWithSearch($inventory,$data);
 
         $paginate = $this->paginate($entities);
         return $this->render('Inventory/Damage/new.html.twig', [
@@ -139,7 +149,7 @@ class DamageController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Damage::class)->find($id);
 
@@ -161,7 +171,7 @@ class DamageController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Damage::class)->find($id);
 
@@ -205,7 +215,7 @@ class DamageController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Damage::class)->find($id);
 
@@ -219,7 +229,7 @@ class DamageController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('inventory_damage_edit', ['id' => $id]));
@@ -239,7 +249,7 @@ class DamageController extends AbstractController
     public function deleteAction($id)
     {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity = $em->getRepository(\App\Inventory\Entity\Damage::class)->findOneBy(['inventoryConfig'=>$inventory,'id' => $id]);
             if (!$entity) {
@@ -274,7 +284,7 @@ class DamageController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Damage::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\Damage::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -290,13 +300,13 @@ class DamageController extends AbstractController
     public function approveAction(Damage $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setApprovedBy($this->getUser());
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->insertDamageItem($entity);
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->itemDamageUpdate($entity);
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\GoodsItem::class)->insertInventoryDamageItem($entity);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertDamageTransaction($entity);
+            $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->insertDamageItem($entity);
+            $this->em->getRepository(\App\Inventory\Entity\Item::class)->itemDamageUpdate($entity);
+            $this->em->getRepository(\App\Inventory\Entity\GoodsItem::class)->insertInventoryDamageItem($entity);
+            $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertDamageTransaction($entity);
 
             return new Response('success');
         } else {

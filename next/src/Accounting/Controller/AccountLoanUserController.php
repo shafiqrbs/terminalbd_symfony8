@@ -2,27 +2,39 @@
 
 namespace App\Accounting\Controller;
 
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountLoanUser;
 use App\Accounting\Form\AccountLoanUserType;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * AccountLoan controller.
  *
  */
-class AccountLoanUserController extends Controller
+class AccountLoanUserController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -36,7 +48,7 @@ class AccountLoanUserController extends Controller
     public function indexAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $option = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\AccountLoanUser::class)->findBy(array('globalOption'=>$option),array('name'=>'ASC'));
@@ -58,13 +70,13 @@ class AccountLoanUserController extends Controller
         $form->handleRequest($request);
         $option = $this->getUser()->getGlobalOption();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+            $em = $this->em;
+            $mobile = $this->toolManager->specialExpClean($entity->getMobile());
             $entity->setGlobalOption($option);
             $entity->setMobile($mobile);
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertLoanAccount($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertLoanAccount($entity);
             return $this->redirect($this->generateUrl('account_loanuser'));
         }
         return $this->render('Accounting/AccountLoan/user.html.twig', array(
@@ -102,7 +114,7 @@ class AccountLoanUserController extends Controller
      */
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountLoanUser();
         $form   = $this->createCreateForm($entity);
         return $this->render('Accounting/AccountLoan/user.html.twig', array(
@@ -118,7 +130,7 @@ class AccountLoanUserController extends Controller
      */
     public function deleteAction(AccountLoanUser $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountLoanUser entity.');
         }
@@ -155,7 +167,7 @@ class AccountLoanUserController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountLoanUser::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Customer entity.');
@@ -163,10 +175,10 @@ class AccountLoanUserController extends Controller
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         if ($editForm->isValid()) {
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+            $mobile = $this->toolManager->specialExpClean($entity->getMobile());
             $entity->setMobile($mobile);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertLoanAccount($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertLoanAccount($entity);
             return $this->redirect($this->generateUrl('account_loanuser'));
         }
         return $this->render('Accounting/AccountLoan/index-user.html.twig', array(

@@ -3,6 +3,9 @@
 namespace App\Tool\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
@@ -17,14 +20,21 @@ use App\Tool\Form\SizeType;
  */
 class SizeController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -37,7 +47,7 @@ class SizeController extends AbstractController
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Inventory\Entity\ItemSize::class)->findBy(['isValid'=>1],['code'=>'asc']);
         $entities = $this->paginate($entities);
         return $this->render('Tool/Size/index.html.twig', [
@@ -55,11 +65,11 @@ class SizeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setStatus(false);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('size'));
@@ -113,7 +123,7 @@ class SizeController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('InventoryBundle:Size')->find($id);
 
@@ -132,7 +142,7 @@ class SizeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemSize::class)->find($id);
 
@@ -172,7 +182,7 @@ class SizeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemSize::class)->find($id);
 
@@ -184,7 +194,7 @@ class SizeController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('size_edit', ['id' => $id]));
@@ -202,7 +212,7 @@ class SizeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function deleteAction(ItemSize $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Product entity.');
         }
@@ -211,12 +221,12 @@ class SizeController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }
@@ -227,7 +237,7 @@ class SizeController extends AbstractController
     {
 
         $a = 0;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         for( $i = 0; $i < 200; $i++ ) {
             $a += 5;
             $entity = $em->getRepository(\App\Inventory\Entity\ItemSize::class)->findOneBy(['isValid'=>1,'name'=>$a]);

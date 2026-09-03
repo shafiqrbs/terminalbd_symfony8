@@ -2,7 +2,7 @@
 
 namespace App\Business\Importer;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Business\Entity\BusinessParticular;
 use App\Business\Entity\Category;
 use App\Business\Repository\CategoryRepository;

@@ -2,6 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,14 +19,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PurchaseReturnController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,7 +45,7 @@ class PurchaseReturnController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->findBy(['inventoryConfig'=>$inventory],['updated'=>'DESC']);
         $pagination = $this->paginate($entities);
@@ -55,7 +65,7 @@ class PurchaseReturnController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
 
@@ -91,7 +101,7 @@ class PurchaseReturnController extends AbstractController
     public function newAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new PurchaseReturn();
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entity->setInventoryConfig($inventory);
@@ -108,7 +118,7 @@ class PurchaseReturnController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->find($id);
 
@@ -126,7 +136,7 @@ class PurchaseReturnController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->find($id);
 
@@ -166,7 +176,7 @@ class PurchaseReturnController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->find($id);
         if (!$entity) {
@@ -193,7 +203,7 @@ class PurchaseReturnController extends AbstractController
      */
     public function deleteAction(PurchaseReturn $purchaseReturn)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$purchaseReturn) {
             throw $this->createNotFoundException('Unable to find Purchase Return entity.');
         }
@@ -209,15 +219,15 @@ class PurchaseReturnController extends AbstractController
      */
     public function deleteItemAction( PurchaseReturn $purchaseReturn , $purchaseReturnItem)
     {
-        $em = $this->getDoctrine()->getManager();
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseReturnItem::class)->find($purchaseReturnItem);
+        $em = $this->em;
+        $entity = $this->em->getRepository(\App\Inventory\Entity\PurchaseReturnItem::class)->find($purchaseReturnItem);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Purchase Return Item entity.');
         }
         $em->remove($entity);
         $em->flush();
 
-        $total = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->updatePurchaseReturnTotalPrice($purchaseReturn);
+        $total = $this->em->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->updatePurchaseReturnTotalPrice($purchaseReturn);
         $total = $total > 0 ? $total : 0;
         return new Response(json_encode(['total'=>$total,'success'=>'success']));
         exit;
@@ -228,7 +238,7 @@ class PurchaseReturnController extends AbstractController
     public function searchAction(Request $request)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $purchaseReturn = $request->request->get('purchaseReturn');
         $barcode = $request->request->get('barcode');
         $purchaseReturn = $em->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->find($purchaseReturn);
@@ -240,17 +250,17 @@ class PurchaseReturnController extends AbstractController
 
             $returnItems = $em->getRepository(\App\Inventory\Entity\PurchaseReturnItem::class)->findOneBy(['purchaseReturn'=>$purchaseReturn]);
             if(empty($returnItems)) {
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->insertPurchaseVendor($purchaseReturn, $purchaseItem->getPurchase());
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseReturnItem::class)->insertPurchaseReturnsItems($purchaseReturn,$purchaseItem);
+                $this->em->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->insertPurchaseVendor($purchaseReturn, $purchaseItem->getPurchase());
+                $this->em->getRepository(\App\Inventory\Entity\PurchaseReturnItem::class)->insertPurchaseReturnsItems($purchaseReturn,$purchaseItem);
                 $message ='Data has been inserted successfully';
             }elseif($purchaseReturn->getVendor()->getId() == $purchaseItem->getPurchase()->getVendor()->getId()){
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseReturnItem::class)->insertPurchaseReturnsItems($purchaseReturn,$purchaseItem);
+                $this->em->getRepository(\App\Inventory\Entity\PurchaseReturnItem::class)->insertPurchaseReturnsItems($purchaseReturn,$purchaseItem);
                 $message ='Data has been inserted successfully';
             }else{
                 $message ='Please ensure adding same vendor for return item';
             }
 
-            $total = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->updatePurchaseReturnTotalPrice($purchaseReturn);
+            $total = $this->em->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->updatePurchaseReturnTotalPrice($purchaseReturn);
             $purchaseReturnItems = $em->getRepository(\App\Inventory\Entity\PurchaseReturnItem::class)->getPurchaseReturnItems($purchaseReturn);
             return new Response(json_encode(['message' => $message, 'total'=> $total , 'purchaseReturnItem' => $purchaseReturnItems]));
         }else{
@@ -261,7 +271,7 @@ class PurchaseReturnController extends AbstractController
 
     public function purchaseReturnItemUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $itemId = $request->request->get('itemId');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
@@ -272,7 +282,7 @@ class PurchaseReturnController extends AbstractController
         $item->setSubTotal($quantity * $price);
         $em->persist($item);
         $em->flush();
-        $total = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->updatePurchaseReturnTotalPrice($item->getPurchaseReturn());
+        $total = $this->em->getRepository(\App\Inventory\Entity\PurchaseReturn::class)->updatePurchaseReturnTotalPrice($item->getPurchaseReturn());
         return new Response(json_encode(['total'=>$total]));
         exit;
 
@@ -282,7 +292,7 @@ class PurchaseReturnController extends AbstractController
     public function approveAction(Request $request,PurchaseReturn $purchaseReturn)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $adjustmentInvoice = $_REQUEST['adjustmentInvoice'];
         $purchase = $em->getRepository(\App\Inventory\Entity\Purchase::class)->findOneBy(['grn'=>$adjustmentInvoice]);
         if(!empty($purchase))

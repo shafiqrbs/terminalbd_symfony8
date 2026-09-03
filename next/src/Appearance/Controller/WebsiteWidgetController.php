@@ -4,11 +4,13 @@ namespace App\Appearance\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use App\Appearance\Entity\FeatureWidget;
 use App\Appearance\Form\FeatureWidgetType;
 use App\Appearance\Form\WebsiteWidgetType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
 
@@ -16,14 +18,20 @@ use Symfony\Component\HttpFoundation\Request;
  * WebsiteWidgetController controller.
  *
  */
-class WebsiteWidgetController extends Controller
+class WebsiteWidgetController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_WEBSITE_WEDGET') or is_granted('ROLE_DOMAIN')"))]
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->findBy(array('globalOption'=> $globalOption ,'widgetFor'=>'website'),array('updated'=>'DESC'));
         return $this->render('Appearance/WebsiteWidget/index.html.twig', array(
@@ -34,7 +42,7 @@ class WebsiteWidgetController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_WEBSITE_WEDGET') or is_granted('ROLE_DOMAIN')"))]
     public function sortingAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->findBy(array('globalOption'=> $globalOption ,'widgetFor'=>'website' ),array('sorting'=>'ASC'));
         return $this->render('Appearance/WebsiteWidget/sorting.html.twig', array(
@@ -46,7 +54,7 @@ class WebsiteWidgetController extends Controller
     public function sortedListAction(Request $request)
     {
         $data = $request ->request->get('item');
-        $this->getDoctrine()->getRepository(\App\Appearance\Entity\FeatureWidget::class)->setListOrdering($data);
+        $this->em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->setListOrdering($data);
         exit;
     }
 
@@ -59,7 +67,7 @@ class WebsiteWidgetController extends Controller
         $form->handleRequest($request);
         $data = $request->request->all();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $user = $this->getUser();
             $entity->setGlobalOption($user->getGlobalOption());
             $entity->setPageName($entity->getMenu()->getSlug());
@@ -69,7 +77,7 @@ class WebsiteWidgetController extends Controller
 
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Appearance\Entity\FeatureWidgetItem::class)->insert($entity,$data);
+            $this->em->getRepository(\App\Appearance\Entity\FeatureWidgetItem::class)->insert($entity,$data);
 
             if(!empty($entity->getJsFeature()) and $entity->getJsFeature()->getSlug() == 'feature'){
                 return $this->redirect($this->generateUrl('appearancewebsitewidget_feature',array('id'=>$entity->getId())));
@@ -79,7 +87,7 @@ class WebsiteWidgetController extends Controller
 
         }
         $global = $this->getUser()->getGlobalOption();
-        $features = $this->getDoctrine()->getRepository(\App\Appearance\Entity\Feature::class)->findBy(array('globalOption' => $global));
+        $features = $this->em->getRepository(\App\Appearance\Entity\Feature::class)->findBy(array('globalOption' => $global));
 
 
         return $this->render('Appearance/WebsiteWidget/new.html.twig', array(
@@ -120,7 +128,7 @@ class WebsiteWidgetController extends Controller
         $entity = new FeatureWidget();
         $form   = $this->createCreateForm($entity);
         $global = $this->getUser()->getGlobalOption();
-        $features = $this->getDoctrine()->getRepository(\App\Appearance\Entity\Feature::class)->findBy(array('globalOption' => $global));
+        $features = $this->em->getRepository(\App\Appearance\Entity\Feature::class)->findBy(array('globalOption' => $global));
         return $this->render('Appearance/WebsiteWidget/new.html.twig', array(
             'entity'    => $entity,
             'features'  => $features,
@@ -132,7 +140,7 @@ class WebsiteWidgetController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_WEBSITE_WEDGET') or is_granted('ROLE_DOMAIN')"))]
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->find($id);
 
@@ -151,7 +159,7 @@ class WebsiteWidgetController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_WEBSITE_WEDGET') or is_granted('ROLE_DOMAIN')"))]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->find($id);
 
@@ -160,7 +168,7 @@ class WebsiteWidgetController extends Controller
         }
         $global = $this->getUser()->getGlobalOption();
         $editForm = $this->createEditForm($entity);
-        $features = $this->getDoctrine()->getRepository(\App\Appearance\Entity\Feature::class)->findBy(array('globalOption' => $global));
+        $features = $this->em->getRepository(\App\Appearance\Entity\Feature::class)->findBy(array('globalOption' => $global));
         $featureIds = array();
         foreach ($entity->getFeatureWidgetItems() as $row ){
             $featureIds[] = $row->getFeature()->getId();;
@@ -184,7 +192,7 @@ class WebsiteWidgetController extends Controller
     private function createEditForm(FeatureWidget $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $category = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $category = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into WebsiteWidgetType::configureOptions() and pass them as form options: $globalOption,$category), $entity, array(
         $form = $this->createForm(new WebsiteWidgetType($globalOption,$category), $entity, array(
@@ -203,7 +211,7 @@ class WebsiteWidgetController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->find($id);
 
         if (!$entity) {
@@ -220,12 +228,12 @@ class WebsiteWidgetController extends Controller
             $name = $entity->getPageName().'-'.$entity->getPosition();
             $entity->setName($name);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Appearance\Entity\FeatureWidgetItem::class)->update($entity,$data);
+            $this->em->getRepository(\App\Appearance\Entity\FeatureWidgetItem::class)->update($entity,$data);
             return $this->redirect($this->generateUrl('appearancewebsitewidget_edit', array('id' => $id)));
 
         }
         $global = $this->getUser()->getGlobalOption();
-        $features = $this->getDoctrine()->getRepository(\App\Appearance\Entity\Feature::class)->findBy(array('globalOption' => $global));
+        $features = $this->em->getRepository(\App\Appearance\Entity\Feature::class)->findBy(array('globalOption' => $global));
 
 
         return $this->render('Appearance/WebsiteWidget/new.html.twig', array(
@@ -241,17 +249,17 @@ class WebsiteWidgetController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_WEBSITE_WEDGET') or is_granted('ROLE_DOMAIN')"))]
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->findOneBy(array('globalOption'=>$globalOption,'id'=>$id));
         if (!empty($entity)) {
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been deleted successfully"
             );
         }else{
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Sorry! Data not deleted"
             );
         }
@@ -281,7 +289,7 @@ class WebsiteWidgetController extends Controller
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->find($id);
 
         if (!$entity) {
@@ -295,7 +303,7 @@ class WebsiteWidgetController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('appearancewebsitewidget'));
@@ -314,7 +322,7 @@ class WebsiteWidgetController extends Controller
     public function sortedAction(Request $request)
     {
         $data = $request ->request->get('item');
-        $this->getDoctrine()->getRepository(\App\Appearance\Entity\FeatureWidget::class)->setDivOrdering($data);
+        $this->em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->setDivOrdering($data);
         exit;
 
     }
@@ -322,7 +330,7 @@ class WebsiteWidgetController extends Controller
     public function resizeAction(Request $request)
     {
         $data = $request ->request->all();
-        $this->getDoctrine()->getRepository(\App\Appearance\Entity\FeatureWidget::class)->setDivResize($data);
+        $this->em->getRepository(\App\Appearance\Entity\FeatureWidget::class)->setDivResize($data);
         exit;
     }
 }

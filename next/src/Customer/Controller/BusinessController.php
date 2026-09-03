@@ -2,24 +2,34 @@
 
 namespace App\Customer\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\BusinessInvoice;
 use App\Business\Form\CustomerInvoiceType;
 use Frontend\FrontentBundle\Service\Cart;
 use App\Tool\Entity\Module;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BusinessController extends Controller
+class BusinessController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -30,21 +40,21 @@ class BusinessController extends Controller
         
         $user = $this->getUser();
         if(!empty($shop)){
-            $globalOption = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(array('slug' => $shop));
+            $globalOption = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(array('slug' => $shop));
         }else{
             $globalOption ='';
         }
         $businessModel =  $globalOption->getBusinessConfig()->getBusinessModel();
         if($businessModel == "association"){
             $config = $globalOption->getBusinessConfig();
-            $particular = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(array('businessConfig'=> $config,'slug'=>'registration-fee'));
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user' => $this->getUser()->getId()));
+            $particular = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(array('businessConfig'=> $config,'slug'=>'registration-fee'));
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user' => $this->getUser()->getId()));
             $entity = new BusinessInvoice();
             $editForm = $this->createCreateForm($entity);
-            $Exinvoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoice($globalOption->getBusinessConfig(),$customer);
+            $Exinvoice = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoice($globalOption->getBusinessConfig(),$customer);
             $invoiceCheck = empty($Exinvoice) ? 'false' : "true";
             $template =  "Member";
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Data has been inserted successfully"
             );
             return $this->render("CustomerBundle:{$template}:dashboard.html.twig", array(
@@ -100,19 +110,19 @@ class BusinessController extends Controller
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getBusinessConfig();
 
-        $particular = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(array('businessConfig'=> $config,'slug'=>'registration-fee'));
+        $particular = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(array('businessConfig'=> $config,'slug'=>'registration-fee'));
 
         $entity = new BusinessInvoice();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$user->getId()));
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$user->getId()));
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
         if (($form->isValid() && $method == 'cash') ||
             ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setBusinessConfig($config);
             $entity->setCustomer($customer);
             $entity->setMobile($customer->getMobile());
@@ -122,14 +132,14 @@ class BusinessController extends Controller
             $entity->setEndDate(new \DateTime("now"));
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Data has been inserted successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertStudentInvoiceParticular($entity,$particular);
-            $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
+            $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertStudentInvoiceParticular($entity,$particular);
+            $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
             return $this->redirect($this->generateUrl('customer_business_dashboard', array('shop' => $user->getGlobalOption()->getSlug())));
         }else{
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'warning', "Payment information does not valid"
             );
             return $this->redirect($this->generateUrl('customer_business_dashboard', array('shop' => $user->getGlobalOption()->getSlug())));

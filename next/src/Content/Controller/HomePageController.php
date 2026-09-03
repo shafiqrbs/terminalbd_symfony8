@@ -2,11 +2,13 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Content\Entity\HomeBlock;
 use App\Content\Entity\PageModule;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Content\Entity\HomePage;
 use App\Content\Form\HomePageType;
@@ -16,8 +18,14 @@ use Symfony\Component\HttpFoundation\Response;
  * HomePage controller.
  *
  */
-class HomePageController extends Controller
+class HomePageController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all HomePage entities.
@@ -25,7 +33,7 @@ class HomePageController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         return $this->redirect($this->generateUrl('landing_page'));
 
     }
@@ -37,7 +45,7 @@ class HomePageController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\HomePage::class)->find($id);
 
@@ -57,7 +65,7 @@ class HomePageController extends Controller
 
         $editForm = $this->createEditForm($entity);
 
-        $menus = $this->getDoctrine()->getRepository(\App\Content\Entity\HomeBlock::class)->getMenuLists($entity->getUser());
+        $menus = $this->em->getRepository(\App\Content\Entity\HomeBlock::class)->getMenuLists($entity->getUser());
 
         return $this->render('Content/HomePage/edit.html.twig', array(
             'entity'      => $entity,
@@ -75,9 +83,9 @@ class HomePageController extends Controller
     public function modifyAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption()->getId();
-        $entity = $this->getDoctrine()->getManager()->getRepository(\App\Content\Entity\HomePage::class)->findOneBy(array('globalOption'=>$globalOption));
+        $entity = $this->em->getRepository(\App\Content\Entity\HomePage::class)->findOneBy(array('globalOption'=>$globalOption));
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find HomePage entity.');
@@ -93,9 +101,9 @@ class HomePageController extends Controller
 
 
         // exit(\Doctrine\Common\Util\Debug::dump($entity));
-        $icons = $this->getDoctrine()->getManager()->getRepository(\App\Tool\Entity\Icon::class)->findBy(array('status'=>1),array('name'=>'ASC'));
+        $icons = $this->em->getRepository(\App\Tool\Entity\Icon::class)->findBy(array('status'=>1),array('name'=>'ASC'));
         $editForm = $this->createEditForm($entity);
-        $menus = $this->getDoctrine()->getRepository(\App\Content\Entity\HomeBlock::class)->getMenuLists($globalOption);
+        $menus = $this->em->getRepository(\App\Content\Entity\HomeBlock::class)->getMenuLists($globalOption);
 
         return $this->render('Content/HomePage/edit.html.twig', array(
             'entity'      => $entity,
@@ -138,7 +146,7 @@ class HomePageController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $data = $request->request->all();
 
@@ -156,11 +164,11 @@ class HomePageController extends Controller
             $entity->upload();
             $em->flush();
 
-            $this->getDoctrine()->getRepository(\App\Content\Entity\HomeBlock::class)->insertHomeBlock($data,$entity);
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Content\Entity\HomeBlock::class)->insertHomeBlock($data,$entity);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Content\Entity\PageModule::class)->createHomeFeatureModule($entity,$data);
+            $this->em->getRepository(\App\Content\Entity\PageModule::class)->createHomeFeatureModule($entity,$data);
             $referer = $request->headers->get('referer');
             return new RedirectResponse($referer);
         }
@@ -174,7 +182,7 @@ class HomePageController extends Controller
 
     public function deleteAction(HomeBlock $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->remove($entity);
         $em->flush();
 

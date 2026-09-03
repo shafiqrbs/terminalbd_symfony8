@@ -11,6 +11,8 @@
 
 namespace App\User\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\User\Entity\User;
 use App\User\Form\MemberEditProfileType;
 use App\User\Form\DomainUserProfileType;
@@ -47,7 +49,7 @@ class ProfileController extends BaseProfileController
      */
     public function updateProfileAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $this->getUser();
 
@@ -59,7 +61,7 @@ class ProfileController extends BaseProfileController
         $editForm->handleRequest($request);
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('domain_edit_profile'));
@@ -83,7 +85,7 @@ class ProfileController extends BaseProfileController
     {
 
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DomainUserProfileType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new DomainUserProfileType($globalOption,$location), $entity, array(

@@ -2,6 +2,10 @@
 
 namespace App\DoctorPrescription\Controller;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DoctorPrescription\Form\InvoiceCustomerType;
 use App\DoctorPrescription\Form\InvoiceTransactionType;
 use App\DomainUser\Entity\Customer;
@@ -21,22 +25,30 @@ use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Tool\Entity\GlobalOption;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * DpsInvoiceController controller.
  *
  */
-class InvoiceController extends Controller
+class InvoiceController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -48,13 +60,13 @@ class InvoiceController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $dpsConfig = $user->getGlobalOption()->getDpsConfig();
         $entities = $em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->invoiceLists( $user,$data);
         $pagination = $this->paginate($entities);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getFindDentalServiceParticular($dpsConfig,array('doctor'));
+        $assignDoctors = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getFindDentalServiceParticular($dpsConfig,array('doctor'));
 
         return $this->render('DoctorPrescription/Invoice/index.html.twig', array(
             'dpsConfig' => $dpsConfig,
@@ -73,7 +85,7 @@ class InvoiceController extends Controller
         $user = $this->getUser();
         $form = $this->createInvoiceCustomerForm($entity);
         $dpsConfig = $user->getGlobalOption()->getDpsConfig();
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getFindDentalServiceParticular($dpsConfig,array('doctor'));
+        $assignDoctors = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getFindDentalServiceParticular($dpsConfig,array('doctor'));
         $html = $this->renderView('DoctorPrescription/Invoice/patient.html.twig', array(
             'form'   => $form->createView(),
             'assignDoctors'   => $assignDoctors,
@@ -83,7 +95,7 @@ class InvoiceController extends Controller
 
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new DpsInvoice();
         $dpsConfig = $this->getUser()->getGlobalOption()->getDpsConfig();
         $lastObject = $em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->getLastInvoice($dpsConfig);
@@ -98,11 +110,11 @@ class InvoiceController extends Controller
             $entity->setCreatedBy($this->getUser());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             if($dpsConfig->getIsDefaultMedicine() == 1 ){
-                $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineDoctorPrescribe::class)->defaultDpsBeforeMedicine($entity,$lastObject);
+                $this->em->getRepository(\App\Medicine\Entity\MedicineDoctorPrescribe::class)->defaultDpsBeforeMedicine($entity,$lastObject);
             }
             return new Response($entity->getId());
             //return $this->redirect($this->generateUrl('dps_invoice_edit', array('id' => $entity->getId())));
@@ -146,8 +158,8 @@ class InvoiceController extends Controller
     private function createTransactionForm(DpsInvoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $diagnostic = $this->getDoctrine()->getRepository(\App\Medicine\Entity\DiagnosticReport::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $diagnostic = $this->em->getRepository(\App\Medicine\Entity\DiagnosticReport::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into InvoiceTransactionType::configureOptions() and pass them as form options: $globalOption,$location,$diagnostic), $entity, array(
         $form = $this->createForm(new InvoiceTransactionType($globalOption,$location,$diagnostic), $entity, array(
@@ -166,8 +178,8 @@ class InvoiceController extends Controller
     private function createEditForm(DpsInvoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $diagnostic = $this->getDoctrine()->getRepository(\App\Medicine\Entity\DiagnosticReport::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $diagnostic = $this->em->getRepository(\App\Medicine\Entity\DiagnosticReport::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into InvoiceType::configureOptions() and pass them as form options: $globalOption,$location,$diagnostic), $entity, array(
         $form = $this->createForm(new InvoiceType($globalOption,$location,$diagnostic), $entity, array(
@@ -188,7 +200,7 @@ class InvoiceController extends Controller
     public function editAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $dpsConfig = $this->getUser()->getGlobalOption()->getDpsConfig();
         $entity = $em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->findOneBy(array('dpsConfig' => $dpsConfig , 'id' => $id));
 
@@ -213,7 +225,7 @@ class InvoiceController extends Controller
         }
 
         $services    = $em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->getServiceLists($dpsConfig);
-        $others        = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getAccessoriesParticular($entity->getDpsConfig(),array('other-service'));
+        $others        = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getAccessoriesParticular($entity->getDpsConfig(),array('other-service'));
 
         $prescriptionAttributes         = $em->getRepository(\App\Medicine\Entity\PrescriptionAttribute::class)->findAll();
         return $this->render('DoctorPrescription/Invoice/new.html.twig', array(
@@ -231,7 +243,7 @@ class InvoiceController extends Controller
     #[IsGranted('ROLE_DPS')]
     public function updateAction(Request $request, DpsInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -240,18 +252,18 @@ class InvoiceController extends Controller
         $editForm->handleRequest($request);
         $data = $request->request->all();
 
-        $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->insertInvoiceItems($entity,$data);
+        $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->insertInvoiceItems($entity,$data);
 
         if($editForm->isValid() and !empty($entity->getInvoiceParticulars())) {
 
             if (!empty($data['customer']['name'])) {
 
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customer']['mobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findHmsExistingCustomerDiagnostic($this->getUser()->getGlobalOption(), $mobile, $data);
+                $mobile = $this->toolManager->specialExpClean($data['customer']['mobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findHmsExistingCustomerDiagnostic($this->getUser()->getGlobalOption(), $mobile, $data);
                 $entity->setCustomer($customer);
                 $entity->setMobile($mobile);
             }
-            $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+            $amountInWords = $this->toolManager->intToWords($entity->getTotal());
             $entity->setPaymentInWord($amountInWords);
             if(!empty($entity->getCustomer()) and  $entity->getProcess() == 'Created'){
                 $entity->setProcess('Visit');
@@ -259,8 +271,8 @@ class InvoiceController extends Controller
             $em->flush();
             $file = $request->files->all();
             if(!empty($file) and !empty($data['investigation'])){
-                $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->fileUpload($entity,$data,$file);
-                $data = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->insertInvoiceInvestigationUpload($entity, $data);
+                $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->fileUpload($entity,$data,$file);
+                $data = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->insertInvoiceInvestigationUpload($entity, $data);
                 return new Response($data);
             }
         }
@@ -269,7 +281,7 @@ class InvoiceController extends Controller
     #[IsGranted('ROLE_DPS')]
     public function showAction(DpsInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $dpsConfig = $this->getUser()->getGlobalOption()->getDpsConfig();
         if ($dpsConfig->getId() == $entity->getDpsConfig()->getId()) {
             return $this->render('DoctorPrescription/Invoice/show.html.twig', array(
@@ -284,7 +296,7 @@ class InvoiceController extends Controller
     public function deleteAction(DpsInvoice $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $msg = 'invalid';
         $dpsConfig = $this->getUser()->getGlobalOption()->getDpsConfig();
         if (!$entity and $dpsConfig->getId() == $entity->getDpsConfig()->getId()) {
@@ -294,17 +306,17 @@ class InvoiceController extends Controller
             $em->remove($entity);
             $em->flush();
             $msg = "success";
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
             $msg = "invalid";
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
             $msg = "invalid";
@@ -316,10 +328,10 @@ class InvoiceController extends Controller
 
     public function returnResultData(DpsInvoice $entity,$msg=''){
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->getSalesItems($entity);
+        $invoiceParticulars = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->getSalesItems($entity);
         $completes ='';
         $completes .='<option value="">--Select the complete service--</option>';
-        $others        = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getAccessoriesParticular($entity->getDpsConfig(),array('other-service'));
+        $others        = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getAccessoriesParticular($entity->getDpsConfig(),array('other-service'));
         foreach ($others as $other){
             $completes .= '<option value="'.$other['id'].'-0">'.$other['name'].'</option>';
         }
@@ -350,12 +362,12 @@ class InvoiceController extends Controller
     public function particularProcedureAction(Request $request, DpsInvoice $invoice,$service)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $procedure = $request->request->get('procedure');
         $diseases = $request->request->get('diseases');
         $invoiceItems = array('service'=> $service, 'procedure' => $procedure ,'diseases' => $diseases);
-        $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->insertInvoiceParticularSingle($invoice, $invoiceItems);
-        $data = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->insertInvoiceParticularReturn($invoice, $invoiceItems);
+        $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->insertInvoiceParticularSingle($invoice, $invoiceItems);
+        $data = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->insertInvoiceParticularReturn($invoice, $invoiceItems);
         return new Response($data);
         exit;
 
@@ -364,7 +376,7 @@ class InvoiceController extends Controller
     public function invoiceParticularDeleteAction( $invoice, DpsInvoiceParticular $particular){
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
@@ -380,14 +392,14 @@ class InvoiceController extends Controller
     public function treatmentParticularAddAction(Request $request, DpsInvoice $invoice)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $price = $request->request->get('price');
         $appointmentDate = $request->request->get('appointmentDate');
         $appointmentTime = $request->request->get('appointmentTime');
         $invoiceItems = array('particularId' => $particularId , 'quantity' => 1,'price' => $price,'appointmentDate'=>$appointmentDate , 'appointmentTime'=> $appointmentTime );
-        $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->insertInvoiceItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->updateInvoiceTotalPrice($invoice);
+        $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->insertInvoiceItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->updateInvoiceTotalPrice($invoice);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -402,11 +414,11 @@ class InvoiceController extends Controller
 
     public function treatmentPaymentAction(Request $request, DpsInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         if ((!empty($entity)) ) {
-            $treatmentPlan = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->insertPaymentTransaction($entity,$data);
-            $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->updateInvoiceTotalPrice($entity);
+            $treatmentPlan = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->insertPaymentTransaction($entity,$data);
+            $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->updateInvoiceTotalPrice($entity);
             /*if($treatmentPlan->getPayment() > 0){
                 $em->getRepository(\App\Accounting\Entity\AccountCash::class)->dpsInsertSalesCash($treatmentPlan);
                 $em->getRepository(\App\Accounting\Entity\Transaction::class)->dpsTransaction($treatmentPlan);
@@ -423,16 +435,16 @@ class InvoiceController extends Controller
     public function treatmentApprovedAction(DpsTreatmentPlan $treatmentPlan){
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$treatmentPlan) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         if($treatmentPlan->getPayment() > 0){
             $treatmentPlan->setStatus(true);
-            $method = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+            $method = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
             $treatmentPlan->setTransactionMethod($method);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->updatePaymentReceive($treatmentPlan->getDpsInvoice());
+            $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->updatePaymentReceive($treatmentPlan->getDpsInvoice());
             $dps = $em->getRepository(\App\Accounting\Entity\AccountCash::class)->dpsInsertSalesCash($treatmentPlan);
             $em->getRepository(\App\Accounting\Entity\Transaction::class)->dpsTransaction($treatmentPlan);
             return new Response('success');
@@ -444,7 +456,7 @@ class InvoiceController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find particular entity.');
@@ -465,13 +477,13 @@ class InvoiceController extends Controller
 
     public function treatmentDeleteAction(DpsInvoice $invoice ,DpsTreatmentPlan $treatmentPlan){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$treatmentPlan) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($treatmentPlan);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->updateInvoiceTotalPrice($invoice);
+        $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->updateInvoiceTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
         exit;
@@ -479,11 +491,11 @@ class InvoiceController extends Controller
 
     public function treatmentAppointmentDatetimeAction(Request $request){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $appointmentDate = $data['appointmentDate'];
         $appointmentTime = $data['appointmentTime'];
-        $entity = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->findOneBy(array('status'=> 0 ,'appointmentTime'=>$appointmentTime,'appointmentDate'=> $appointmentDate ));
+        $entity = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->findOneBy(array('status'=> 0 ,'appointmentTime'=>$appointmentTime,'appointmentDate'=> $appointmentDate ));
         if($entity){
             $res = 'invalid';
         }
@@ -495,7 +507,7 @@ class InvoiceController extends Controller
     public function addMedicineAction(Request $request, DpsInvoice $invoice)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $medicine = $request->request->get('medicine');
         $medicineId = $request->request->get('medicineId');
         $generic = $request->request->get('generic');
@@ -506,8 +518,8 @@ class InvoiceController extends Controller
         $medicineDurationType = $request->request->get('medicineDurationType');
         if(!empty($medicine)  OR $medicineId > 0){
             $invoiceItems = array('medicine' => $medicine ,'medicineId' => $medicineId , 'generic' => $generic,'medicineQuantity' => $medicineQuantity,'medicineDose' => $medicineDose,'medicineDoseTime' => $medicineDoseTime ,'medicineDuration' => $medicineDuration,'medicineDurationType' => $medicineDurationType);
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineDoctorPrescribe::class)->insertDpsInvoiceMedicine($invoice, $invoiceItems);
-            $result = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineDoctorPrescribe::class)->getDpsInvoiceMedicines($invoice);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineDoctorPrescribe::class)->insertDpsInvoiceMedicine($invoice, $invoiceItems);
+            $result = $this->em->getRepository(\App\Medicine\Entity\MedicineDoctorPrescribe::class)->getDpsInvoiceMedicines($invoice);
             return new Response($result);
         }
         exit;
@@ -517,7 +529,7 @@ class InvoiceController extends Controller
     public function deleteMedicineAction(MedicineDoctorPrescribe $medicine){
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$medicine) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
@@ -528,7 +540,7 @@ class InvoiceController extends Controller
 
     public function patientLoadAction(DpsInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $dpsConfig = $this->getUser()->getGlobalOption()->getDpsConfig();
         if ($dpsConfig->getId() == $entity->getDpsConfig()->getId()) {
 
@@ -565,8 +577,8 @@ class InvoiceController extends Controller
     public function deleteEmptyInvoiceAction()
     {
         $dpsConfig = $this->getUser()->getGlobalOption()->getDpsConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->findBy(array('dpsConfig' => $dpsConfig, 'process' => 'Created'));
-        $em = $this->getDoctrine()->getManager();
+        $entities = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->findBy(array('dpsConfig' => $dpsConfig, 'process' => 'Created'));
+        $em = $this->em;
         foreach ($entities as $entity) {
             $em->remove($entity);
             $em->flush();
@@ -586,7 +598,7 @@ class InvoiceController extends Controller
     public function invoiceProcessUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -600,7 +612,7 @@ class InvoiceController extends Controller
     public function invoicePrintAction(DpsInvoice $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $dpsConfig = $this->getUser()->getGlobalOption()->getDpsConfig();
         if ($dpsConfig->getId() == $entity->getDpsConfig()->getId()) {
 
@@ -639,7 +651,7 @@ class InvoiceController extends Controller
     public function invoicePrintPreviewAction(DpsInvoice $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $dpsConfig = $this->getUser()->getGlobalOption()->getDpsConfig();
         if ($dpsConfig->getId() == $entity->getDpsConfig()->getId()) {
 
@@ -678,7 +690,7 @@ class InvoiceController extends Controller
 
     public function invoicePrintPdfAction(DpsInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $dpsConfig = $this->getUser()->getGlobalOption()->getDpsConfig();
         if ($dpsConfig->getId() == $entity->getDpsConfig()->getId()) {
 
@@ -729,7 +741,7 @@ class InvoiceController extends Controller
         $user = $this->getUser();
         $data = $_REQUEST;
         $dpsConfig = $user->getGlobalOption()->getDpsConfig();
-        $appointments = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->findFreeAppointmentTime($dpsConfig,$data);
+        $appointments = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->findFreeAppointmentTime($dpsConfig,$data);
         $arrays = ['12.00 PM','12.15 PM',
             '12.30 PM','12.45 PM','1.00 PM','1.15 PM','1.30 PM','1.45 PM','2.00 PM','2.15 PM',
             '2.30 PM','2.45 PM','3.00 PM','4.15 PM','4.30 PM','4.45 PM','5.00 PM','5.15 PM',
@@ -768,7 +780,7 @@ class InvoiceController extends Controller
     {
         $q = $_REQUEST['term'];
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->searchAutoComplete($config,$q);
+        $entities = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->searchAutoComplete($config,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('value' => $entity['id']);
@@ -781,7 +793,7 @@ class InvoiceController extends Controller
     {
         $q = $_REQUEST['term'];
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->searchProcedureDiseasesComplete($config,$q);
+        $entities = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->searchProcedureDiseasesComplete($config,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('value' => $entity['id']);
@@ -794,7 +806,7 @@ class InvoiceController extends Controller
     {
         $q = $_REQUEST['term'];
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->searchAutoComplete($config,$q);
+        $entities = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->searchAutoComplete($config,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('value' => $entity['id']);
@@ -807,7 +819,7 @@ class InvoiceController extends Controller
     {
         $q = $_REQUEST['term'];
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->searchAutoComplete($config,$q);
+        $entities = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->searchAutoComplete($config,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('value' => $entity['id']);
@@ -832,13 +844,13 @@ class InvoiceController extends Controller
     public function addAccessoriesAction(Request $request, DpsInvoice $invoice)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $accessories = $request->request->get('accessories');
         $quantity = $request->request->get('quantity');
         if(!empty($accessories)){
             $invoiceItems = array('accessories' => $accessories ,'quantity' => $quantity);
-            $this->getDoctrine()->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->insertInvoiceAccessories($invoice, $invoiceItems);
-            $result = $this->getDoctrine()->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->getInvoiceAccessories($invoice);
+            $this->em->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->insertInvoiceAccessories($invoice, $invoiceItems);
+            $result = $this->em->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->getInvoiceAccessories($invoice);
             return new Response($result);
         }
         exit;
@@ -847,7 +859,7 @@ class InvoiceController extends Controller
 
     public function deleteAccessoriesAction(DpsInvoiceAccessories $accessories){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$accessories) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
@@ -858,13 +870,13 @@ class InvoiceController extends Controller
 
     public function approvedAccessoriesAction(DpsInvoiceAccessories $accessories){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$accessories) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $accessories->setStatus(1);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getSalesUpdateQnt($accessories);
+        $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getSalesUpdateQnt($accessories);
         exit;
     }
 

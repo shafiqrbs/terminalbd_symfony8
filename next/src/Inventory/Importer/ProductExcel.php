@@ -3,7 +3,7 @@
 namespace App\Inventory\Importer;
 
 use App\Inventory\Entity\ItemBrand;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Inventory\Repository\ItemBrandRepository;
 use App\Inventory\Repository\ItemSizeRepository;
 use App\Inventory\Entity\Item;

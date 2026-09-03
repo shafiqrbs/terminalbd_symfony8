@@ -2,6 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,14 +19,21 @@ use App\Inventory\Form\ItemTypeGroupingType;
  */
 class ItemTypeGroupingController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -36,7 +46,7 @@ class ItemTypeGroupingController extends AbstractController
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Inventory\Entity\ItemTypeGrouping::class)->findAll();
         $entities = $this->paginate($entities);
         return $this->render('Inventory/ItemTypeGrouping/index.html.twig', [
@@ -50,7 +60,7 @@ class ItemTypeGroupingController extends AbstractController
     public function createAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         if($globalOption){
             $entity = $globalOption->getInventoryConfig()->getItemTypeGrouping();
@@ -103,7 +113,7 @@ class ItemTypeGroupingController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new ItemTypeGrouping();
         $inventoryConfig = $em->getRepository(\App\Inventory\Entity\InventoryConfig::class)->find($id);
         $array = [];
@@ -122,7 +132,7 @@ class ItemTypeGroupingController extends AbstractController
         $categories = $em->getRepository(\App\Product\Entity\Category::class)->findBy(['status' => 1,'inventoryConfig'=>NULL,'parent'=>NULL],['name'=>'asc']);
         if($categories)
 
-        $entities = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class)->getGroupCategories($categories,$array);
+        $entities = $this->em->getRepository(\App\Product\Entity\Category::class)->getGroupCategories($categories,$array);
         $form   = $this->createCreateForm($entity);
 
         return $this->render('Inventory/ItemTypeGrouping/edit.html.twig', [
@@ -156,7 +166,7 @@ class ItemTypeGroupingController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemTypeGrouping::class)->find($id);
 
@@ -190,7 +200,7 @@ class ItemTypeGroupingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Inventory\Entity\ItemTypeGrouping::class)->find($id);
 
             if (!$entity) {
@@ -226,7 +236,7 @@ class ItemTypeGroupingController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\ItemTypeGrouping::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\ItemTypeGrouping::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }

@@ -4,6 +4,10 @@ namespace App\Hospital\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\DoctorInvoice;
 use App\Hospital\Entity\Invoice;
 use App\Hospital\Entity\InvoiceParticular;
@@ -19,23 +23,31 @@ use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\Printer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Hackzilla\BarcodeBundle\Utility\Barcode;
 /**
  * DoctorInvoiceController controller.
  *
  */
-class DoctorInvoiceController extends Controller
+class DoctorInvoiceController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -50,7 +62,7 @@ class DoctorInvoiceController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
@@ -63,7 +75,7 @@ class DoctorInvoiceController extends Controller
         }
         $overview = $em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->findWithOverview($user,$data);
         $invoiceOverview = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findWithOverview($user,$data);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5,6));
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5,6));
         return $this->render('Hospital/DoctorInvoice/index.html.twig', array(
             'entities' => $pagination,
             'invoiceOverview' => $invoiceOverview,
@@ -77,7 +89,7 @@ class DoctorInvoiceController extends Controller
     public function doctorInvoiceAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -85,9 +97,9 @@ class DoctorInvoiceController extends Controller
         $overview = $em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->findWithOverview($user,$data);
         $entities = $em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->findWithList($user,$data);
         $pagination = $this->paginate($entities);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5,6));
-        $commissions =  $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCommission::class)->findBy(array('status' => 1), array('name' => 'ASC'));
-        $transactionMethods =  $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status' => 1), array('name' => 'ASC'));
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5,6));
+        $commissions =  $this->em->getRepository(\App\Hospital\Entity\HmsCommission::class)->findBy(array('status' => 1), array('name' => 'ASC'));
+        $transactionMethods =  $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status' => 1), array('name' => 'ASC'));
         return $this->render('Hospital/DoctorInvoice/doctor.html.twig', array(
             'entities' => $pagination,
             'overview' => $overview,
@@ -101,7 +113,7 @@ class DoctorInvoiceController extends Controller
 
     public function newAction(Invoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if($invoice->getCommissionApproved() == 'true'){
             return $this->redirect($this->generateUrl('hms_doctor_commission_invoice'));
         }
@@ -167,24 +179,24 @@ class DoctorInvoiceController extends Controller
         $entity = new DoctorInvoice();
         $form = $this->createCreateForm($entity,$invoice);
         $form->handleRequest($request);
-        $commission = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->updateCommissionInvoice($invoice);
+        $commission = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->updateCommissionInvoice($invoice);
         $totalCommission = ($entity->getPayment() + $commission);
-        $exits = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->findOneBy(array('hmsInvoice'=> $invoice ,'hmsCommission' => $entity->getHmsCommission()));
+        $exits = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->findOneBy(array('hmsInvoice'=> $invoice ,'hmsCommission' => $entity->getHmsCommission()));
         if (empty($exits) and $form->isValid() and $invoice->getPayment() >= $entity -> getPayment() and  $invoice->getPayment() >= $totalCommission) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
             $entity->setHospitalConfig($hospital);
             $entity->setHmsInvoice($invoice);
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('hms_doctor_invoice_new', array('id' => $invoice->getId())));
         }
         if (empty($exits) and $form->isValid() and $invoice->getPayment() >= $entity -> getPayment() and  $invoice->getPayment() >= $totalCommission) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Amount is not valid, amount must be less/equal receive amount"
             );
         }
@@ -233,9 +245,9 @@ class DoctorInvoiceController extends Controller
     public function confirmAction(Invoice $entity)
     {
 
-        $totalInvoiceAmount = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->updateCommissionInvoice($entity);
+        $totalInvoiceAmount = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->updateCommissionInvoice($entity);
         if (!empty($entity) and $totalInvoiceAmount == $entity->getCommission() and $entity->getCommissionApproved() == false ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setCommissionApproved(true);
             $em->flush();
             return new Response('success');
@@ -248,9 +260,9 @@ class DoctorInvoiceController extends Controller
 
     public function printAction(DoctorInvoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $inWords = $this->get('settong.toolManageRepo')->intToWords($invoice->getPayment());
+        $inWords = $this->toolManager->intToWords($invoice->getPayment());
         if($hospital->isCustomPrint() == 1){
             $template = "DoctorInvoice:print/{$hospital->getGlobalOption()->getSubDomain()}";
         }else{
@@ -272,12 +284,12 @@ class DoctorInvoiceController extends Controller
     {
 
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('Paid');
             $entity->setApprovedBy($this->getUser());
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updateCommissionPayment($entity->getHmsInvoice());
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->insertCommissionPayment($entity);
+            $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updateCommissionPayment($entity->getHmsInvoice());
+            $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->insertCommissionPayment($entity);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -289,7 +301,7 @@ class DoctorInvoiceController extends Controller
     public function deleteAction(DoctorInvoice $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -318,7 +330,7 @@ class DoctorInvoiceController extends Controller
     public function invoiceProcessUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -334,7 +346,7 @@ class DoctorInvoiceController extends Controller
     {
 
         $barcode = $this->getBarcode($entity->getInvoice());
-        $inWords = $this->get('settong.toolManageRepo')->intToWords($entity->getPayment());
+        $inWords = $this->toolManager->intToWords($entity->getPayment());
 
         return $this->render('HospitalBundle:Invoice:'.$entity->getPrintFor().'.html.twig', array(
             'entity'      => $entity,

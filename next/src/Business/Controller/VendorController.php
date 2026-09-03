@@ -2,6 +2,8 @@
 
 namespace App\Business\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -17,6 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class VendorController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Vendor entities.
@@ -24,11 +32,11 @@ class VendorController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountVendor();
         $form = $this->createCreateForm($entity);
         $global = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $global],['companyName'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $global],['companyName'=>'ASC']);
         return $this->render('Business/Vendor/index.html.twig', [
             'entities' => $entities,
             'entity' => $entity,
@@ -43,17 +51,17 @@ class VendorController extends AbstractController
     {
         $entity = new AccountVendor();
         $global = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $global],['companyName'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $global],['companyName'=>'ASC']);
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $global = $this->getUser()->getGlobalOption();
             $entity->setGlobalOption($global);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('business_vendor', ['id' => $entity->getId()]));
@@ -92,9 +100,9 @@ class VendorController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $global = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $global],['companyName'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $global],['companyName'=>'ASC']);
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
         if (!$entity) {
@@ -136,9 +144,9 @@ class VendorController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $global = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $global],['companyName'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $global],['companyName'=>'ASC']);
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
         if (!$entity) {
@@ -150,8 +158,8 @@ class VendorController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->updateVendorCompanyName($entity);
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->updateVendorCompanyName($entity);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             return $this->redirect($this->generateUrl('business_vendor'));
@@ -170,7 +178,7 @@ class VendorController extends AbstractController
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
         if (!$entity) {
@@ -180,16 +188,16 @@ class VendorController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -205,7 +213,7 @@ class VendorController extends AbstractController
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
         if (!$entity) {
@@ -219,7 +227,7 @@ class VendorController extends AbstractController
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('business_vendor'));
@@ -230,7 +238,7 @@ class VendorController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $global = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->searchAutoComplete($item,$global);
+            $item = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->searchAutoComplete($item,$global);
         }
         return new JsonResponse($item);
     }

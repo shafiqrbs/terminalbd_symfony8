@@ -11,6 +11,7 @@
 
 namespace App\User\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use App\User\Entity\Group;
 use FOS\UserBundle\Controller\GroupController as Controller;
@@ -23,6 +24,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+// TODO(migration): extends an aliased FOSUserBundle controller that no longer exists.
+// Reimplement the inherited behaviour on AbstractController.
 class GroupController extends Controller
 {
 
@@ -59,7 +62,7 @@ class GroupController extends Controller
 				$groupManager->updateGroup($group);
 
 				if (null === $response = $event->getResponse()) {
-					$this->get('session')->getFlashBag()->add(
+					$this->requestStack->getSession()->getFlashBag()->add(
 						'success-status',
 						'Group Created Successfully!'
 					);
@@ -116,7 +119,7 @@ class GroupController extends Controller
 				$groupManager->updateGroup($group);
 
 				if (null === $response = $event->getResponse()) {
-					$this->get('session')->getFlashBag()->add(
+					$this->requestStack->getSession()->getFlashBag()->add(
 						'success-status',
 						'Group Updated Successfully!'
 					);
@@ -151,7 +154,7 @@ class GroupController extends Controller
 		//$dispatcher = $this->container->get('event_dispatcher');
 		//$dispatcher->dispatch(FOSUserEvents::GROUP_DELETE_COMPLETED, new FilterGroupResponseEvent($group, $request, $response));
 
-		$this->get('session')->getFlashBag()->add(
+		$this->requestStack->getSession()->getFlashBag()->add(
 			'success-status',
 			'Group Deleted Successfully!'
 		);
@@ -172,7 +175,7 @@ class GroupController extends Controller
 
 		if ($request->getRealMethod() == 'POST') {
 
-			$this->get('session')->getFlashBag()->add(
+			$this->requestStack->getSession()->getFlashBag()->add(
 				'success-status',
 				'Group Category Updated Successfully!'
 			);
@@ -229,6 +232,7 @@ class GroupController extends Controller
 		//$dispatcher
 		//	->dispatch(DocudexUserEvents::USER_GROUP_CATEGORY_CHANGED, new DocudexGroupEvent($group, $changes));
 
+		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$this->get('fos_user.group_manager')->updateGroup($group);
 	}
 

@@ -2,10 +2,12 @@
 
 namespace App\Business\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\ItemImport;
 use App\Business\Form\ItemImporterType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 
@@ -13,8 +15,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  * ItemImporter controller.
  *
  */
-class ItemImporterController extends Controller
+class ItemImporterController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all ItemImporter entities.
@@ -22,7 +30,7 @@ class ItemImporterController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\ItemImport::class)->findBy(array('businessConfig'=>$config),array('updated'=>'DESC'));
         return $this->render('Business/ItemImporter/index.html.twig', array(
@@ -39,13 +47,13 @@ class ItemImporterController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
             $entity->setBusinessConfig($config);
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('business_itemimporter'));
@@ -100,15 +108,17 @@ class ItemImporterController extends Controller
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $importer = $this->get('appstore_business_item_import');
         $importer->setItemImport($ItemImporter);
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $reader = $this->get('appstore.business.item.import.event.listener');
         $file =  realpath($ItemImporter->getAbsolutePath());
         $data = $reader->getData($file);
         $importer->import($data);
         $ItemImporter->setProgress('migrated');
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been migration successfully"
         );
         $em->flush();
@@ -121,7 +131,7 @@ class ItemImporterController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Business\Entity\ItemImport::class)->find($id);
 
@@ -161,7 +171,7 @@ class ItemImporterController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Business\Entity\ItemImport::class)->find($id);
 
@@ -189,7 +199,7 @@ class ItemImporterController extends Controller
      */
     public function deleteAction(ItemImport $ItemImporter)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if ($ItemImporter) {
             $ItemImporter->removeUpload();
             $em->remove($ItemImporter);

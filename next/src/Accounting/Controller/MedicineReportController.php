@@ -2,12 +2,18 @@
 
 namespace App\Accounting\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use Knp\Snappy\Pdf;
 
 class MedicineReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
     public function balanceAction()
     {
 
@@ -15,10 +21,10 @@ class MedicineReportController extends AbstractController
 
     public function incomeAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineIncome($user,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineIncome($user,$data);
         if(empty($data['pdf'])){
             return $this->render('AccountingBundle:Report/Medicine:income.html.twig', [
                 'overview' => $overview,
@@ -51,7 +57,7 @@ class MedicineReportController extends AbstractController
     public function monthlyIncomeAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         if(!empty($data['startMonth']) and !empty($data['endMonth'])){
             $sm = "01-{$data['startMonth']}-{$data['year']}";
@@ -67,7 +73,7 @@ class MedicineReportController extends AbstractController
             $dateRange =  $compareTo->format('F,Y');
         }
 
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineMonthlyIncome($this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineMonthlyIncome($this->getUser(),$data);
 
         if(!empty($data['startMonth']) and !empty($data['endMonth'])){
             $sm = "01-{$data['startMonth']}-{$data['year']}";

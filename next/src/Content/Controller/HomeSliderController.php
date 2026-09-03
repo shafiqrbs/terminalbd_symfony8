@@ -2,8 +2,10 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Content\Entity\HomeSlider;
 use App\Content\Form\HomeSliderType;
@@ -12,8 +14,14 @@ use App\Content\Form\HomeSliderType;
  * HomeSlider controller.
  *
  */
-class HomeSliderController extends Controller
+class HomeSliderController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all HomeSlider entities.
@@ -21,7 +29,7 @@ class HomeSliderController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Content\Entity\HomeSlider::class)->findBy(array('globalOption'=>$globalOption));
 
@@ -40,7 +48,7 @@ class HomeSliderController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $user = $this->getUser();
             $entity->setGlobalOption($user->getGlobalOption());
             $entity->upload();
@@ -100,7 +108,7 @@ class HomeSliderController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\HomeSlider::class)->find($id);
 
@@ -122,7 +130,7 @@ class HomeSliderController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\HomeSlider::class)->find($id);
 
@@ -169,7 +177,7 @@ class HomeSliderController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Content\Entity\HomeSlider::class)->find($id);
 
         if (!$entity) {
@@ -205,7 +213,7 @@ class HomeSliderController extends Controller
      */
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Content\Entity\HomeSlider::class)->findOneBy(array('globalOption'=>$globalOption,'id'=>$id));
         if (!empty($entity)) {
@@ -213,11 +221,11 @@ class HomeSliderController extends Controller
             $entity->removeUpload();
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Status has been deleted successfully"
             );
         }else{
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Sorry! Data not deleted"
             );
         }
@@ -250,7 +258,7 @@ class HomeSliderController extends Controller
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Content\Entity\HomeSlider::class)->find($id);
 
         if (!$entity) {
@@ -264,7 +272,7 @@ class HomeSliderController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('homeslider'));
@@ -272,8 +280,8 @@ class HomeSliderController extends Controller
 
     public function sortingAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $em = $this->em;
+        $user = $this->getUser();
 
         $entities = $em->getRepository(\App\Content\Entity\HomeSlider::class)->findBy(array('user'=>$user),array('sorting'=>'asc'));
 
@@ -287,7 +295,7 @@ class HomeSliderController extends Controller
     public function sortedAction(Request $request)
     {
         $data = $request ->request->get('menuItem');
-        $this->getDoctrine()->getRepository(\App\Content\Entity\HomeSlider::class)->setMenuOrdering($data);
+        $this->em->getRepository(\App\Content\Entity\HomeSlider::class)->setMenuOrdering($data);
         exit;
 
     }

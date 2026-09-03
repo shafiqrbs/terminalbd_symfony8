@@ -4,10 +4,13 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\ExpenseAndroidProcess;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Accounting\Entity\Expenditure;
 use App\Accounting\Form\ExpenditureType;
@@ -17,16 +20,23 @@ use Symfony\Component\HttpFoundation\Response;
  * Expenditure controller.
  *
  */
-class ExpenditureController extends Controller
+class ExpenditureController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -39,16 +49,16 @@ class ExpenditureController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->findWithSearch( $this->getUser(),$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview($user,$data);
-     //   $flatExpenseCategoryTree = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->getCategoryOptions( $user->getGlobalOption());
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
-	    $categories = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(array('globalOption'=> $user->getGlobalOption(), 'status'=>1),array('name'=>'asc'));
-	    $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getExpenseAccountHead();
+        $overview = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview($user,$data);
+     //   $flatExpenseCategoryTree = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->getCategoryOptions( $user->getGlobalOption());
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
+	    $categories = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(array('globalOption'=> $user->getGlobalOption(), 'status'=>1),array('name'=>'asc'));
+	    $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getExpenseAccountHead();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($user->getGlobalOption());
         return $this->render('Accounting/Expenditure/index.html.twig', array(
             'entities' => $pagination,
@@ -71,7 +81,7 @@ class ExpenditureController extends Controller
         $entity = new Expenditure();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
         if (($form->isValid() && $method == 'cash') ||
@@ -79,7 +89,7 @@ class ExpenditureController extends Controller
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $lastBalance = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->lastInsertExpenditure($entity);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption( $this->getUser()->getGlobalOption());
             $entity->setBalance($lastBalance + $entity->getAmount());
             $entity->setAccountHead($entity->getExpenseCategory()->getAccountHead());
@@ -104,12 +114,12 @@ class ExpenditureController extends Controller
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_expenditure'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         return $this->render('Accounting/Expenditure/new.html.twig', array(
@@ -128,7 +138,7 @@ class ExpenditureController extends Controller
     private function createCreateForm(Expenditure $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $expenseCategory = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseCategory::class);
+        $expenseCategory = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ExpenditureType::configureOptions() and pass them as form options: $globalOption,$expenseCategory), $entity, array(
         $form = $this->createForm(new ExpenditureType($globalOption,$expenseCategory), $entity, array(
@@ -148,7 +158,7 @@ class ExpenditureController extends Controller
      */
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Expenditure();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
@@ -167,7 +177,7 @@ class ExpenditureController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $Expenditure = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->find($data['pk']);
         if (!$Expenditure) {
             throw $this->createNotFoundException('Unable to find Expenditure entity.');
@@ -180,7 +190,7 @@ class ExpenditureController extends Controller
     public function approveAction(Expenditure $expenditure)
     {
         if (!empty($expenditure) and $expenditure->getProcess() != "approved" ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $expenditure->setProcess('approved');
             $expenditure->setApprovedBy($this->getUser());
             $accountConfig = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -190,8 +200,8 @@ class ExpenditureController extends Controller
                 $expenditure->setUpdated($datetime);
             }
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertExpenditureCash($expenditure);
-           // $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertExpenditureTransaction($expenditure);
+            $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertExpenditureCash($expenditure);
+           // $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertExpenditureTransaction($expenditure);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -205,7 +215,7 @@ class ExpenditureController extends Controller
      */
     public function deleteAction(Expenditure $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Expenditure entity.');
         }
@@ -222,8 +232,8 @@ class ExpenditureController extends Controller
 
     public function expenditureReverseAction(Expenditure $entity){
 
-        $em = $this->getDoctrine()->getManager();
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->accountReverse($entity);
+        $em = $this->em;
+        $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->accountReverse($entity);
         $entity->setProcess(null);
         $entity->setApprovedBy(null);
         $entity->setAmount(0);
@@ -237,9 +247,9 @@ class ExpenditureController extends Controller
     public function androidExpenseAction()
     {
         $conf = $this->getUser()->getGlobalOption()->getId();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseAndroidProcess::class)->getAndroidSalesList($conf);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\ExpenseAndroidProcess::class)->getAndroidSalesList($conf);
         $pagination = $this->paginate($entities);
-        $sales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->findAndroidDeviceSales($pagination);
+        $sales = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->findAndroidDeviceSales($pagination);
         return $this->render('@Accounting/Expenditure/android.html.twig', array(
             'entities' => $pagination,
             'sales' => $sales,
@@ -251,14 +261,14 @@ class ExpenditureController extends Controller
         $msg = "invalid";
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
 
         $removeSales = $em->createQuery("DELETE AccountingBundle:Expenditure e WHERE e.androidProcess= {$android->getId()}");
         if(!empty($removeSales)){
             $removeSales->execute();
         }
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->insertApiExpense($config,$android);
+        $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->insertApiExpense($config,$android);
 
         /* @var $sales Expenditure */
 
@@ -269,7 +279,7 @@ class ExpenditureController extends Controller
                 $sales->setUpdated($sales->getCreated());
                 $sales->setApprovedBy($this->getUser());
                 $em->flush();
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertExpenditureCash($sales);
+                $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertExpenditureCash($sales);
                 $msg = "valid";
             }
         }

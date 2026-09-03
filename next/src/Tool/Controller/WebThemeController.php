@@ -2,6 +2,8 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,12 @@ use App\Tool\Form\WebThemeType;
  */
 class WebThemeController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all WebTheme entities.
@@ -22,7 +30,7 @@ class WebThemeController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\WebTheme::class)->findAll();
 
@@ -41,11 +49,11 @@ class WebThemeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity ->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('webtheme_show', ['id' => $entity->getId()]));
@@ -99,7 +107,7 @@ class WebThemeController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\WebTheme::class)->find($id);
 
@@ -121,7 +129,7 @@ class WebThemeController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\WebTheme::class)->find($id);
 
@@ -165,7 +173,7 @@ class WebThemeController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\WebTheme::class)->find($id);
 
@@ -180,7 +188,7 @@ class WebThemeController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity ->upload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('webtheme_edit', ['id' => $id]));
@@ -202,7 +210,7 @@ class WebThemeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Tool\Entity\WebTheme::class)->find($id);
 
             if (!$entity) {
@@ -245,7 +253,7 @@ class WebThemeController extends AbstractController
         //$data = $request->request->all();
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\WebTheme::class)->find($id);
 
         if (!$entity) {
@@ -259,7 +267,7 @@ class WebThemeController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('webtheme'));

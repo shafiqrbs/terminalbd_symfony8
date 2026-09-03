@@ -2,22 +2,28 @@
 
 namespace App\Accounting\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use Knp\Snappy\Pdf;
 
 class BusinessReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
 
 	public function balanceSheetAction()
 	{
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
-		$overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessMonthlyIncome($this->getUser(),$data);
-		$accountHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent'=>1],['sorting'=>'ASC']);
-		$accountHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->findBy(['isParent'=>1],['sorting'=>'ASC']);
+		$overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessMonthlyIncome($this->getUser(),$data);
+		$accountHeads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent'=>1],['sorting'=>'ASC']);
+		$accountHeads = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->findBy(['isParent'=>1],['sorting'=>'ASC']);
 		return $this->render('AccountingBundle:Report/Business:balanceSheet.html.twig', [
 			'overview' => $overview,
 			'accountHeads' => $accountHeads,
@@ -28,10 +34,10 @@ class BusinessReportController extends AbstractController
 
 	public function balanceAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
         return $this->render('Accounting/Report/incomePdf.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
@@ -40,10 +46,10 @@ class BusinessReportController extends AbstractController
 
     public function incomeAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessIncome($user,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessIncome($user,$data);
         return $this->render('AccountingBundle:Report/Business:income.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
@@ -54,7 +60,7 @@ class BusinessReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessIncome($globalOption,$data);
         $html = $this->renderView(
             'AccountingBundle:Report/Hms:incomePdf.html.twig', [
                 'overview' => $overview,
@@ -76,7 +82,7 @@ class BusinessReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessIncome($globalOption,$data);
         return $this->render('AccountingBundle:Report/Hms:incomePdf.html.twig', [
             'overview' => $overview,
             'print' => '<script>window.print();</script>'
@@ -87,7 +93,7 @@ class BusinessReportController extends AbstractController
     public function monthlyIncomeAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         if(!empty($data['startMonth']) and !empty($data['endMonth'])){
             $sm = "01-{$data['startMonth']}-{$data['year']}";
@@ -103,7 +109,7 @@ class BusinessReportController extends AbstractController
             $dateRange =  $compareTo->format('F,Y');
         }
 
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineMonthlyIncome($this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineMonthlyIncome($this->getUser(),$data);
 
         if(!empty($data['startMonth']) and !empty($data['endMonth'])){
             $sm = "01-{$data['startMonth']}-{$data['year']}";

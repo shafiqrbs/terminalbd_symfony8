@@ -4,6 +4,11 @@ namespace App\Hospital\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\Invoice;
 use App\Hospital\Entity\InvoiceParticular;
 use App\Hospital\Entity\InvoiceTransaction;
@@ -14,7 +19,7 @@ use App\Hospital\Form\NewPatientAdmissionType;
 use App\Hospital\Form\PatientAdmissionType;
 use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
 use JMS\SecurityExtraBundle\Annotation\Secure;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,15 +28,24 @@ use Symfony\Component\HttpFoundation\Response;
  * Invoice controller.
  *
  */
-class InvoiceAdmissionController extends Controller
+class InvoiceAdmissionController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -47,7 +61,7 @@ class InvoiceAdmissionController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
@@ -55,14 +69,14 @@ class InvoiceAdmissionController extends Controller
         $pagination = $this->paginate($entities);
      //   $salesTransactionOverview = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todaySalesOverview($user,$data,'true','admission');
      //   $previousSalesTransactionOverview = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todaySalesOverview($user,$data,'false','admission');
-        $employees = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital->getId());
-        $cabins = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(2));
-        $cabinGroups = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('hospitalConfig'=>$hospital,'service'=>2),array('name'=>'ASC'));
-        $departments = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getDepartments($hospital);
-        $processes = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'admission',$data);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'assign-doctor');
-        $anesthesiaDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'anesthesia-doctor');
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'referred-doctor');
+        $employees = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital->getId());
+        $cabins = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(2));
+        $cabinGroups = $this->em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('hospitalConfig'=>$hospital,'service'=>2),array('name'=>'ASC'));
+        $departments = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getDepartments($hospital);
+        $processes = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'admission',$data);
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'assign-doctor');
+        $anesthesiaDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'anesthesia-doctor');
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'referred-doctor');
 
         return $this->render('Hospital/InvoiceAdmission/index.html.twig', array(
             'entities' => $pagination,
@@ -90,10 +104,10 @@ class InvoiceAdmissionController extends Controller
     public function bookingCabinAction()
     {
         $entity = new Particular();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(array('hospitalConfig' => $config,'service'=> 2),array('name'=>'ASC'));
-        $cabins = $this->getDoctrine()->getRepository(Invoice::class)->getBookingCabinLists($config);
+        $cabins = $this->em->getRepository(Invoice::class)->getBookingCabinLists($config);
         return $this->render('Hospital/InvoiceAdmission/cabin.html.twig', array(
             'pagination' => $pagination,
             'cabins' => $cabins,
@@ -105,7 +119,7 @@ class InvoiceAdmissionController extends Controller
     public function downloadAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -116,9 +130,9 @@ class InvoiceAdmissionController extends Controller
         $salesTransactionOverview = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todaySalesOverview($user,$data,'true','admission');
         $previousSalesTransactionOverview = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todaySalesOverview($user,$data,'false','admission');
 
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
-        $cabins = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(2));
-        $cabinGroups = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('hospitalConfig'=>$hospital,'service'=>2),array('name'=>'ASC'));
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
+        $cabins = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(2));
+        $cabinGroups = $this->em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('hospitalConfig'=>$hospital,'service'=>2),array('name'=>'ASC'));
 
         return $this->render('Hospital/InvoiceAdmission/index.html.twig', array(
             'entities' => $pagination,
@@ -153,7 +167,7 @@ class InvoiceAdmissionController extends Controller
 
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $entity = new Invoice();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
@@ -170,10 +184,10 @@ class InvoiceAdmissionController extends Controller
             $entity->setInvoiceMode('admission');
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
-            $this->getDoctrine()->getRepository(InvoiceTransaction::class)->insertDefaultAdmissionParticular($entity);
+            $this->em->getRepository(InvoiceTransaction::class)->insertDefaultAdmissionParticular($entity);
             return $this->redirect($this->generateUrl('hms_invoice_admission_daily_invoice',array('invoice' => $entity->getInvoice())));
         }
         return $this->render('Hospital/InvoiceAdmission/new.html.twig', array(
@@ -210,9 +224,9 @@ class InvoiceAdmissionController extends Controller
     private function createCreateForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $category = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $cabins = $this->getDoctrine()->getRepository(Invoice::class)->getExistCabin($globalOption->getHospitalConfig());
+        $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $cabins = $this->em->getRepository(Invoice::class)->getExistCabin($globalOption->getHospitalConfig());
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into NewPatientAdmissionType::configureOptions() and pass them as form options: $globalOption,$category ,$location,$cabins), $entity, array(
         $form = $this->createForm(new NewPatientAdmissionType($globalOption,$category ,$location,$cabins), $entity, array(
@@ -231,11 +245,11 @@ class InvoiceAdmissionController extends Controller
 
     public function cabinAdmissionAction(Particular $cabin)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Invoice();
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity->setHospitalConfig($hospital);
-        $service = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Service::class)->find(1);
+        $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(1);
         $entity->setService($service);
         $entity->setCabin($cabin);
         $entity->setPaymentStatus('Pending');
@@ -256,11 +270,11 @@ class InvoiceAdmissionController extends Controller
         $invoiceId = $request->request->get('invoice');
         $patient = $request->request->get('patientId');
         $option = $this->getUser()->getGlobalOption();
-        $patientId = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'customerId'=>$patient));
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'mobile'=>$customerId));
-        $invoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'invoice' => $invoiceId));
+        $patientId = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'customerId'=>$patient));
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'mobile'=>$customerId));
+        $invoice = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'invoice' => $invoiceId));
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if($customer){
             $entity = new Invoice();
             $entity->setHospitalConfig($hospital);
@@ -302,7 +316,7 @@ class InvoiceAdmissionController extends Controller
     public function admittedPatientAction(Invoice $invoice)
     {
         $customer = $invoice->getCustomer();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Invoice();
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity->setHospitalConfig($hospital);
@@ -320,7 +334,7 @@ class InvoiceAdmissionController extends Controller
 
     public function admittedPatientUpdateAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital , 'id' => $id));
         if (!$entity) {
@@ -335,7 +349,7 @@ class InvoiceAdmissionController extends Controller
 
     public function updatePatientAction(Request $request, Invoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -360,7 +374,7 @@ class InvoiceAdmissionController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_HOSPITAL_MANAGER') or is_granted('ROLE_DOMAIN') or is_granted('ROLE_DOMAIN_HOSPITAL_OPERATOR') or is_granted('ROLE_DOMAIN_HOSPITAL_ADMISSION') or is_granted('ROLE_DOMAIN_HOSPITAL_VISIT')"))]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital , 'id' => $id));
         if (!$entity) {
@@ -384,7 +398,7 @@ class InvoiceAdmissionController extends Controller
 
     public function patientInvoiceAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital , 'id' => $id));
 
@@ -416,8 +430,8 @@ class InvoiceAdmissionController extends Controller
     private function createEditForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $category = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into InvoiceAdmissionType::configureOptions() and pass them as form options: $globalOption,$location,$category), $entity, array(
         $form = $this->createForm(new InvoiceAdmissionType($globalOption,$location,$category), $entity, array(
@@ -442,9 +456,9 @@ class InvoiceAdmissionController extends Controller
     private function createAdmissionForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $admission = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class);
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $category = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $admission = $this->em->getRepository(\App\Hospital\Entity\Invoice::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into PatientAdmissionType::configureOptions() and pass them as form options: $globalOption,$admission,$location,$category), $entity, array(
         $form = $this->createForm(new PatientAdmissionType($globalOption,$admission,$location,$category), $entity, array(
@@ -461,7 +475,7 @@ class InvoiceAdmissionController extends Controller
 
     public function updateOldAction(Request $request, Invoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -475,23 +489,23 @@ class InvoiceAdmissionController extends Controller
 
             if (!empty($data['customer']['name'])) {
 
-                 $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customer']['mobile']);
-                 $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findHmsExistingCustomer($this->getUser()->getGlobalOption(), $mobile,$data);
+                 $mobile = $this->toolManager->specialExpClean($data['customer']['mobile']);
+                 $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findHmsExistingCustomer($this->getUser()->getGlobalOption(), $mobile,$data);
                  $entity->setCustomer($customer);
                  $entity->setMobile($mobile);
 
             }
             if(!empty($data['referredDoctor']['name']) && !empty($data['referredDoctor']['mobile'])) {
 
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['referredDoctor']['mobile']);
-                $referred = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->findHmsExistingCustomer($entity->getHospitalConfig() , $mobile,$data);
+                $mobile = $this->toolManager->specialExpClean($data['referredDoctor']['mobile']);
+                $referred = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->findHmsExistingCustomer($entity->getHospitalConfig() , $mobile,$data);
                 $entity->setReferredDoctor($referred);
             }else{
-                $referred = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(array('hospitalConfig' => $entity->getHospitalConfig() , 'service' => 6, 'id' => $referredId ));
+                $referred = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(array('hospitalConfig' => $entity->getHospitalConfig() , 'service' => 6, 'id' => $referredId ));
                 $entity->setReferredDoctor($referred);
             }
             if($entity->getTotal() > 0 ) {
-                $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+                $amountInWords = $this->toolManager->intToWords($entity->getTotal());
                 $entity->setProcess('Admitted');
                 $entity->setPrintFor('admitted');
                 $entity->setPaymentInWord($amountInWords);
@@ -500,10 +514,10 @@ class InvoiceAdmissionController extends Controller
 
             if($entity->getTotal() > 0 ){
 
-                $transaction = $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->initialInsertInvoiceTransaction($entity);
-                $this->getDoctrine()->getRepository(\App\Hospital\Entity\AdmissionPatientParticular::class)->initialUpdateInvoiceParticulars($entity,$transaction);
-                $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->insertAccessories($entity);
-                $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updatePaymentReceive($entity);
+                $transaction = $this->em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->initialInsertInvoiceTransaction($entity);
+                $this->em->getRepository(\App\Hospital\Entity\AdmissionPatientParticular::class)->initialUpdateInvoiceParticulars($entity,$transaction);
+                $this->em->getRepository(\App\Hospital\Entity\Particular::class)->insertAccessories($entity);
+                $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updatePaymentReceive($entity);
             }
 
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
@@ -529,7 +543,7 @@ class InvoiceAdmissionController extends Controller
 
     public function updateAction(Request $request, Invoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -538,8 +552,8 @@ class InvoiceAdmissionController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
             if($entity->getReceive() > 0 ){
-               // $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->initialInsertAdmissionInvoiceTransaction($entity);
-                $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updatePaymentReceive($entity);
+               // $this->em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->initialInsertAdmissionInvoiceTransaction($entity);
+                $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updatePaymentReceive($entity);
             }
         }
         $invoiceTransaction = $this->renderView("Hospital/InvoiceAdmission/invoice-transaction.html.twig", array(
@@ -558,7 +572,7 @@ class InvoiceAdmissionController extends Controller
 
     public function invoiceDiscountUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $discountCalculation = (float)$request->request->get('discount');
         $invoice = $request->request->get('invoice');
         $discountType = $request->request->get('discountType');
@@ -593,7 +607,7 @@ class InvoiceAdmissionController extends Controller
     public function particularSearchAction()
     {
         $id = $_REQUEST['id'];
-        $particular = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
+        $particular = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
         $quantity = $particular->getQuantity() > 0 ? $particular->getQuantity() :1;
         return new Response(json_encode(array('particularId'=> $particular->getId() ,'price'=> $particular->getPrice() , 'quantity'=> $quantity, 'minimumPrice'=> $particular->getMinimumPrice(), 'instruction'=> $particular->getInstruction())));
     }
@@ -625,14 +639,14 @@ class InvoiceAdmissionController extends Controller
 
     public function addParticularAction(Request $request, Invoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price );
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->insertInvoiceItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updateInvoiceTotalPrice($invoice);
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updateAdmissionPaymentReceive($invoice);
+        $this->em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->insertInvoiceItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updateInvoiceTotalPrice($invoice);
+        $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updateAdmissionPaymentReceive($invoice);
         $msg = 'Particular added successfully';
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -649,11 +663,11 @@ class InvoiceAdmissionController extends Controller
 
     public function invoiceTransactionDeleteAction($invoice, InvoiceTransaction $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->remove($particular);
         $em->flush();
-        $entity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->find($invoice);
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updateAdmissionPaymentReceive($entity);
+        $entity = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->find($invoice);
+        $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updateAdmissionPaymentReceive($entity);
         $invoiceTransaction = $this->renderView("Hospital/InvoiceAdmission/invoice-transaction.html.twig", array(
             'entity' => $entity
         ));
@@ -667,12 +681,12 @@ class InvoiceAdmissionController extends Controller
 
     public function invoiceTransactionApproveAction($invoice ,InvoiceTransaction $particular)
     {
-        $em = $this->getDoctrine()->getManager();
-        $entity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->find($invoice);
+        $em = $this->em;
+        $entity = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->find($invoice);
         $particular->setApprovedBy($this->getUser());
         $particular->setProcess("Done");
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updateAdmissionPaymentReceive($entity);
+        $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updateAdmissionPaymentReceive($entity);
         $invoiceTransaction = $this->renderView("Hospital/InvoiceAdmission/invoice-transaction.html.twig", array(
             'entity' => $entity
         ));
@@ -693,7 +707,7 @@ class InvoiceAdmissionController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_HOSPITAL_MANAGER') or is_granted('ROLE_DOMAIN_HOSPITAL_ADMIN') or is_granted('ROLE_DOMAIN')"))]
     public function deleteAction(Invoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -782,7 +796,7 @@ class InvoiceAdmissionController extends Controller
 
     public function approveAction(Request $request , Invoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $payment = (float)$data['invoicePayment']['payment'];
         $discount = (float)$data['invoicePayment']['discount'];
@@ -792,8 +806,8 @@ class InvoiceAdmissionController extends Controller
         $transactionForm = $this->createInvoicePaymentForm($entity,$transaction);
         $transactionForm->handleRequest($request);
         if ($transactionForm->isValid() and (!empty($entity) and !empty($payment)) or (!empty($entity) and !empty($discount))) {
-            $em = $this->getDoctrine()->getManager();
-            $code = $this->getDoctrine()->getRepository(InvoiceTransaction::class)->getLastCode($entity);
+            $em = $this->em;
+            $code = $this->em->getRepository(InvoiceTransaction::class)->getLastCode($entity);
             $transaction->setHmsInvoice($entity);
             $transaction->setCode($code + 1);
             $transaction->setProcess("In-progress");
@@ -808,7 +822,7 @@ class InvoiceAdmissionController extends Controller
     public function dischargeAction($id)
     {
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getHospitalConfig()->getId();
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$inventory,'id'=>$id));
         /* @var $entity Invoice */
@@ -825,7 +839,7 @@ class InvoiceAdmissionController extends Controller
 
     public function releaseAction($invoice,$process)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getHospitalConfig()->getId();
         /* @var $entity Invoice */
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$inventory,'invoice'=>$invoice));
@@ -838,8 +852,8 @@ class InvoiceAdmissionController extends Controller
             $entity->setApprovedBy($this->getUser());
             $date = new \DateTime("now");
             $entity->setReleaseDate($date);
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->removePendingTransaction($entity);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalFinalAccountInvoice($entity);
+            $this->em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->removePendingTransaction($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalFinalAccountInvoice($entity);
         }elseif($process == 'cancel'){
             $entity->setProcess('Admitted');
         }
@@ -849,7 +863,7 @@ class InvoiceAdmissionController extends Controller
 
     public function admittedAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -859,8 +873,8 @@ class InvoiceAdmissionController extends Controller
         $overview = $em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->findWithOverview($user,$data);
         $invoiceOverview = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findWithOverview($user,$data);
 
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(6));
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(6));
 
         return $this->render('Hospital/InvoiceAdmission/admitted.html.twig', array(
             'entities' => $pagination,
@@ -896,8 +910,8 @@ class InvoiceAdmissionController extends Controller
     public function deleteEmptyInvoiceAction()
     {
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findBy(array('hospitalConfig' => $hospital, 'process' => 'Created','invoiceMode'=>'admission'));
-        $em = $this->getDoctrine()->getManager();
+        $entities = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findBy(array('hospitalConfig' => $hospital, 'process' => 'Created','invoiceMode'=>'admission'));
+        $em = $this->em;
         foreach ($entities as $entity) {
             $entity->setIsDelete(1);
             $entity->setInvoiceMode('delete');
@@ -913,7 +927,7 @@ class InvoiceAdmissionController extends Controller
 
         $barcode = $this->getBarcode($entity->getInvoice());
         $patientId = $this->getBarcode($entity->getCustomer()->getCustomerId());
-        $inWords = $this->get('settong.toolManageRepo')->intToWords($entity->getPayment());
+        $inWords = $this->toolManager->intToWords($entity->getPayment());
 
         $invoiceDetails = ['Pathology' => ['items' => [], 'total'=> 0, 'hasQuantity' => false ]];
 
@@ -968,7 +982,7 @@ class InvoiceAdmissionController extends Controller
 
         $barcode = $this->getBarcode($entity->getInvoice());
         $patientId = $this->getBarcode($entity->getCustomer()->getCustomerId());
-        $inWords = $this->get('settong.toolManageRepo')->intToWords($entity->getPayment());
+        $inWords = $this->toolManager->intToWords($entity->getPayment());
         $invoiceDetails = ['Pathology' => ['items' => [], 'total'=> 0, 'hasQuantity' => false ]];
 
         foreach ($entity->getInvoiceParticulars() as $item) {
@@ -1002,13 +1016,13 @@ class InvoiceAdmissionController extends Controller
 
     public function paymentReceiveInvoicePrintAction($invoice, InvoiceTransaction $transaction)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital,'invoice' => $invoice));
         $barcode = $this->getBarcode($entity->getInvoice());
         $patientId = $this->getBarcode($entity->getCustomer()->getCustomerId());
-        $inWords = $this->get('settong.toolManageRepo')->intToWords($entity->getPayment());
-        $inWordTransaction = $this->get('settong.toolManageRepo')->intToWords($transaction->getPayment());
+        $inWords = $this->toolManager->intToWords($entity->getPayment());
+        $inWordTransaction = $this->toolManager->intToWords($transaction->getPayment());
         return $this->render('Hospital/Print/receive.html.twig', array(
             'entity'                => $entity,
             'invoiceBarcode'        => $barcode,
@@ -1022,12 +1036,12 @@ class InvoiceAdmissionController extends Controller
 
      public function paymentTransactionInvoicePrintAction($invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital,'invoice' => $invoice));
         $barcode = $this->getBarcode($entity->getInvoice());
         $patientId = $this->getBarcode($entity->getCustomer()->getCustomerId());
-        $inWords = $this->get('settong.toolManageRepo')->intToWords($entity->getPayment());
+        $inWords = $this->toolManager->intToWords($entity->getPayment());
         return $this->render('Hospital/Print/transaction.html.twig', array(
             'entity'                => $entity,
             'invoiceBarcode'        => $barcode,
@@ -1039,7 +1053,7 @@ class InvoiceAdmissionController extends Controller
 
     public function invoicePrintForAction(Request $request, Invoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $print = $request->request->get('printFor');
         $invoice->setPrintFor($print);
         $em->persist($invoice);
@@ -1049,7 +1063,7 @@ class InvoiceAdmissionController extends Controller
 
     public function checkPatientCabinBookingAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $cabin = $request->request->get('cabin');
         $invoice = $request->request->get('invoice');
         $status = $em->getRepository(\App\Hospital\Entity\Invoice::class)->checkCabinBooking($invoice,$cabin);
@@ -1059,7 +1073,7 @@ class InvoiceAdmissionController extends Controller
 
     public function newCheckPatientCabinBookingAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig()->getId();
         $cabin = $request->request->get('cabin');
         $status = $em->getRepository(\App\Hospital\Entity\Invoice::class)->checkNewCabinBooking($config,$cabin);
@@ -1074,9 +1088,9 @@ class InvoiceAdmissionController extends Controller
 
     public function admissionInvoiceReverseAction($invoice){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital, 'invoice' => $invoice));
+        $entity = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital, 'invoice' => $invoice));
         $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->hmsAdmissionSalesTransactionReverse($entity);
         $em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->hmsInvoiceParticularReverse($entity);
         $entity->setRevised(true);
@@ -1087,7 +1101,7 @@ class InvoiceAdmissionController extends Controller
         $entity->setPaymentInWord(null);
         $entity->setPayment(null);
         $em->flush();
-        $template = $this->get('twig')->render('Hospital/Reverse/admission.html.twig',array(
+        $template = $this->twig->render('Hospital/Reverse/admission.html.twig',array(
             'entity' => $entity,
         ));
         $em->getRepository(\App\Hospital\Entity\HmsReverse::class)->insertAdmissionInvoice($entity,$template);
@@ -1099,8 +1113,8 @@ class InvoiceAdmissionController extends Controller
     public function admissionInvoiceReverseShowAction($invoice)
     {
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $admission = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital, 'invoice' => $invoice));
-        $entity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsReverse::class)->findOneBy(array('hospitalConfig' => $hospital, 'hmsInvoice' => $admission->getId()));
+        $admission = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital, 'invoice' => $invoice));
+        $entity = $this->em->getRepository(\App\Hospital\Entity\HmsReverse::class)->findOneBy(array('hospitalConfig' => $hospital, 'hmsInvoice' => $admission->getId()));
         return $this->render('Hospital/Reverse/admissionShow.html.twig', array(
             'entity' => $entity
         ));
@@ -1110,7 +1124,7 @@ class InvoiceAdmissionController extends Controller
     public function invoiceReverseShowAction(Invoice $invoice)
     {
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsReverse::class)->findOneBy(array('hospitalConfig' => $hospital, 'hmsInvoice' => $invoice));
+        $entity = $this->em->getRepository(\App\Hospital\Entity\HmsReverse::class)->findOneBy(array('hospitalConfig' => $hospital, 'hmsInvoice' => $invoice));
         return $this->render('Hospital/Reverse/show.html.twig', array(
             'entity' => $entity,
         ));
@@ -1120,8 +1134,8 @@ class InvoiceAdmissionController extends Controller
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $cabin = ($invoice->getCabin()) ? $invoice->getCabin()->getId() : 0;
-        $cabins = $this->getDoctrine()->getRepository(Invoice::class)->getExistCabin($config,$cabin);
-        $entities = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getCurrentCabins($config,2,$cabins);
+        $cabins = $this->em->getRepository(Invoice::class)->getExistCabin($config,$cabin);
+        $entities = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getCurrentCabins($config,2,$cabins);
         $items = array();
         $items[] = array('value' => '','text'=> '-Change Patient Cabin-');
         foreach ($entities as $entity):
@@ -1135,7 +1149,7 @@ class InvoiceAdmissionController extends Controller
     public function inlineCabinUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(Invoice::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');

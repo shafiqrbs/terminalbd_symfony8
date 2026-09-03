@@ -4,6 +4,10 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Accounting\Form\UserType;
@@ -21,15 +25,23 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class UserController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -40,7 +52,7 @@ class UserController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $data['userGroup'] = 'account';
         $globalOption = $this->getUser()->getGlobalOption();
@@ -54,13 +66,13 @@ class UserController extends AbstractController
 
     public function restoreCustomerAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         /* @var $entity User */
         foreach ($entities as $entity){
             $mobile = $entity->getProfile()->getMobile();
-            $exist = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$globalOption,'mobile'=>$mobile]);
+            $exist = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$globalOption,'mobile'=>$mobile]);
             if(empty($exist)){
                 $customer = new Customer();
                 $customer->setGlobalOption($globalOption);
@@ -89,16 +101,16 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         $data = $request->request->all();
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $globalOption = $this->getUser()->getGlobalOption();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+            $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
-	        $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->insertAccountUser($globalOption,$entity->getUserGroup());
+	        $user = $this->em->getRepository(\App\User\Entity\User::class)->insertAccountUser($globalOption,$entity->getUserGroup());
 	        $entity->setUser($user);
             $em->persist($entity);
             $em->flush();
             if($entity->getUserGroup() != 'other'){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertUserAccount($entity);
+                $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertUserAccount($entity);
             }
             return $this->redirect($this->generateUrl('account_user'));
         }
@@ -152,7 +164,7 @@ class UserController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_CRM') or is_granted('ROLE_DOMAIN')"))]
     public function editAction(User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $user->getProfile();
      //   $entity = $em->getRepository(\App\User\Entity\Profile::class)->find($id);
 
@@ -192,7 +204,7 @@ class UserController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         /* @var $entity Profile */
 
@@ -203,7 +215,7 @@ class UserController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-	        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
 	        if($entity->getUserGroup() =='marketing'){
                 $entity->getUser()->setUserGroup('marketing');
@@ -211,7 +223,7 @@ class UserController extends AbstractController
 	        $em->persist($entity);
             $em->flush();
             if($entity->getUserGroup() != 'other'){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertUserAccount($entity);
+                $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertUserAccount($entity);
             }
             return $this->redirect($this->generateUrl('account_user'));
         }
@@ -225,7 +237,7 @@ class UserController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_CRM') or is_granted('ROLE_DOMAIN')"))]
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\User\Entity\Profile::class)->findOneBy(['globalOption'=>$globalOption,'id' => $id]);
         if (!$entity) {
@@ -234,12 +246,12 @@ class UserController extends AbstractController
         try {
             $entity->setIsDelete(true);
             $entity->setEnabled(false);
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }
@@ -249,7 +261,7 @@ class UserController extends AbstractController
 
     public function changeUserModeAction(User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if($user->getUserGroup() == "account" ){
             $user->setUserGroup('user');
             $user->setEnabled(true);

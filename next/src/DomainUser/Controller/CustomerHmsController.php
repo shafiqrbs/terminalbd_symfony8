@@ -3,6 +3,10 @@
 namespace App\DomainUser\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DomainUser\Form\CustomerForDiagonesticType;
 use App\DomainUser\Form\CustomerForHospitalType;
 use App\Hospital\Entity\Invoice;
@@ -10,7 +14,7 @@ use App\Hospital\Form\InvoicePatientType;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\DomainUser\Entity\Customer;
 use App\DomainUser\Form\CustomerType;
@@ -20,16 +24,24 @@ use Symfony\Component\HttpFoundation\Response;
  * Customer controller.
  *
  */
-class CustomerHmsController extends Controller
+class CustomerHmsController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -40,7 +52,7 @@ class CustomerHmsController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
@@ -60,17 +72,17 @@ class CustomerHmsController extends Controller
         $entity = new Customer();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $invoice = $request->request->get('patientInvoice');
         if ($form->isValid()) {
             $globalOption  = $this->getUser()->getGlobalOption();
             $mobile = $entity->getMobile();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
+            $mobile = $this->toolManager->specialExpClean($mobile);
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $entity->setMobile($mobile);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Customer has been created successfully"
             );
             if($invoice){
@@ -96,7 +108,7 @@ class CustomerHmsController extends Controller
      */
     private function createCreateForm(Customer $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into CustomerForDiagonesticType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new CustomerForDiagonesticType($location), $entity, array(
@@ -128,7 +140,7 @@ class CustomerHmsController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->find($id);
 
@@ -145,7 +157,7 @@ class CustomerHmsController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->find($id);
 
@@ -169,7 +181,7 @@ class CustomerHmsController extends Controller
     */
     private function createEditForm(Customer $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into CustomerForDiagonesticType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new CustomerForDiagonesticType($location), $entity, array(
@@ -188,7 +200,7 @@ class CustomerHmsController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->find($id);
         if (!$entity) {
@@ -199,10 +211,10 @@ class CustomerHmsController extends Controller
 
         if ($editForm->isValid()) {
             $mobile = $entity->getMobile();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
+            $mobile = $this->toolManager->specialExpClean($mobile);
             $entity->setMobile($mobile);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Customer has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_customer'));
@@ -218,7 +230,7 @@ class CustomerHmsController extends Controller
 
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=> $option,'id'=>$id));
         if (!$entity) {
@@ -234,11 +246,11 @@ class CustomerHmsController extends Controller
     {
         $customer = $request->request->get('customer');
         $invoice = $request->request->get('invoice');
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=> $option,'id' => $customer));
         if (!empty($entity)) {
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->updatePatientInfo($invoice, $entity);
+            $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->updatePatientInfo($invoice, $entity);
             $data = array(
                 'status' => 'valid',
                 'patient' => $entity->getId(),

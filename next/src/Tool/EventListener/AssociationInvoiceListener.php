@@ -2,7 +2,7 @@
 
 namespace App\Tool\EventListener;
     use App\Business\Entity\BusinessInvoice;
-    use Doctrine\Bundle\DoctrineBundle\Registry;
+    use Doctrine\Persistence\ManagerRegistry;
     use Doctrine\ORM\EntityManager;
     use App\Tool\Event\AssociationInvoiceSmsEvent;
     use App\Tool\Service\SmsGateWay;
@@ -19,7 +19,7 @@ class AssociationInvoiceListener extends BaseSmsAwareListener
 
     protected $gateway;
 
-    public function  __construct(Registry $doctrine, SmsGateWay $gateway)
+    public function  __construct(ManagerRegistry $doctrine, SmsGateWay $gateway)
     {
         $this->doctrine = $doctrine;
         $this->gateway = $gateway;

@@ -2,8 +2,10 @@
 
 namespace App\Content\Controller;
 
+use App\Appearance\Service\MenuManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Content\Entity\SiteContent;
 use App\Content\Form\SiteContentType;
@@ -12,8 +14,14 @@ use App\Content\Form\SiteContentType;
  * SiteContent controller.
  *
  */
-class SiteContentController extends Controller
+class SiteContentController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly MenuManager $menuManager,
+    ) {
+    }
+
 
     /**
      * Lists all SiteContent entities.
@@ -21,7 +29,7 @@ class SiteContentController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Content\Entity\SiteContent::class)->findAll();
 
@@ -40,8 +48,8 @@ class SiteContentController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $slug = $this->get('setting.menuSettingRepo')-> urlSlug($entity->getName());
+            $em = $this->em;
+            $slug = $this->menuManager-> urlSlug($entity->getName());
             $entity ->setSlug($slug);
             $entity ->upload();
             $em->persist($entity);
@@ -99,7 +107,7 @@ class SiteContentController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\SiteContent::class)->find($id);
 
@@ -121,7 +129,7 @@ class SiteContentController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\SiteContent::class)->find($id);
 
@@ -166,7 +174,7 @@ class SiteContentController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\SiteContent::class)->find($id);
 
@@ -180,7 +188,7 @@ class SiteContentController extends Controller
 
         if ($editForm->isValid()) {
 
-            $slug = $this->get('setting.menuSettingRepo')->urlSlug($entity->getName());
+            $slug = $this->menuManager->urlSlug($entity->getName());
             $entity ->setSlug($slug);
             $entity->upload();
             $em->flush();
@@ -204,7 +212,7 @@ class SiteContentController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Content\Entity\SiteContent::class)->find($id);
 
             if (!$entity) {

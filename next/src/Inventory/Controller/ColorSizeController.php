@@ -2,6 +2,8 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,12 @@ use App\Inventory\Form\ColorSizeType;
  */
 class ColorSizeController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all ColorSize entities.
@@ -22,7 +30,7 @@ class ColorSizeController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Inventory\Entity\ColorSize::class)->findBy([],['type'=>'asc']);
 
@@ -41,7 +49,7 @@ class ColorSizeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $lastCode = $em->getRepository(\App\Inventory\Entity\ColorSize::class)->getLastId($inventory,$entity->getType());
             $code= str_pad($lastCode, 2 , "0", STR_PAD_LEFT);
@@ -49,7 +57,7 @@ class ColorSizeController extends AbstractController
             $entity->setInventoryConfig($inventory);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('colorsize_show', ['id' => $entity->getId()]));
@@ -102,7 +110,7 @@ class ColorSizeController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ColorSize::class)->find($id);
 
@@ -124,7 +132,7 @@ class ColorSizeController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ColorSize::class)->find($id);
 
@@ -167,7 +175,7 @@ class ColorSizeController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ColorSize::class)->find($id);
 
@@ -181,7 +189,7 @@ class ColorSizeController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('colorsize_edit', ['id' => $id]));
@@ -203,7 +211,7 @@ class ColorSizeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Inventory\Entity\ColorSize::class)->find($id);
 
             if (!$entity) {

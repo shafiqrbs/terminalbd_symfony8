@@ -4,6 +4,8 @@ namespace App\Restaurant\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Restaurant\Entity\RestaurantConfig;
 use App\Restaurant\Form\ConfigType;
 use Frontend\FrontentBundle\Service\MobileDetect;
@@ -11,15 +13,21 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * HospitalConfigController.
  *
  */
-class RestaurantConfigController extends Controller
+class RestaurantConfigController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Particular entities.
@@ -71,7 +79,7 @@ class RestaurantConfigController extends Controller
 
     public function updateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $this->getUser()->getGlobalOption()->getRestaurantConfig();
 
@@ -85,7 +93,7 @@ class RestaurantConfigController extends Controller
         if ($editForm->isValid()) {
 
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Report has been created successfully"
             );
 

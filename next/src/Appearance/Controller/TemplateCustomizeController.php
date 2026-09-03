@@ -2,6 +2,7 @@
 
 namespace App\Appearance\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Appearance\Form\TemplateEcommerceType;
@@ -16,6 +17,11 @@ use App\Appearance\Form\TemplateCustomizeType;
  */
 class TemplateCustomizeController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all TemplateCustomize entities.
@@ -23,7 +29,7 @@ class TemplateCustomizeController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->findAll();
 
@@ -91,7 +97,7 @@ class TemplateCustomizeController extends AbstractController
     {
 
         $option = $this->getUser()->getGlobalOption();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->findOneBy(['globalOption'=>$option]);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find TemplateCustomize entity.');
@@ -113,7 +119,7 @@ class TemplateCustomizeController extends AbstractController
     public function ecommerceEditAction()
     {
         $option = $this->getUser()->getGlobalOption();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->findOneBy(['globalOption' => $option]);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find TemplateCustomize entity.');
@@ -168,7 +174,7 @@ class TemplateCustomizeController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->findOneBy(['globalOption'=> $id]);
         $data = $request->request->all();
@@ -204,7 +210,7 @@ class TemplateCustomizeController extends AbstractController
             }
             $entity->upload();
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->fileUploader($entity,$file);
+            $this->em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->fileUploader($entity,$file);
             return $this->redirect($this->generateUrl('templatecustomize_edit', ['id' => $id]));
         }
 
@@ -216,7 +222,7 @@ class TemplateCustomizeController extends AbstractController
 
     public function ecommerceUpdateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->findOneBy(['globalOption'=> $id]);
         $data = $request->request->all();
@@ -248,7 +254,7 @@ class TemplateCustomizeController extends AbstractController
             }
             $entity->upload();
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->fileUploader($entity,$file);
+            $this->em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->fileUploader($entity,$file);
             return $this->redirect($this->generateUrl('templatecustomize_edit', ['id' => $id]));
         }
 
@@ -259,7 +265,7 @@ class TemplateCustomizeController extends AbstractController
     }
 
     public function resetAction(TemplateCustomize $entity){
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity->setAnchorColor(NULL);
         $entity->setAnchorHoverColor(NULL);

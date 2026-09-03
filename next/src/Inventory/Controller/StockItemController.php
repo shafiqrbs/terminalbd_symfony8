@@ -2,6 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Inventory\Entity\Item;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,14 +16,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class StockItemController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -29,7 +39,7 @@ class StockItemController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\Item::class)->findWithSearch($inventory,$data);
@@ -44,7 +54,7 @@ class StockItemController extends AbstractController
 
     public function itemShortListAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\Item::class)->findWithShortListSearch($inventory,$data);
@@ -58,7 +68,7 @@ class StockItemController extends AbstractController
     public function barcodeStockAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $data = $_REQUEST;
         $branchStocks ='';
@@ -76,9 +86,11 @@ class StockItemController extends AbstractController
 
     public function indexResultsAction()
     {
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $datatable = $this->get('app.datatable.stockitem');
         $datatable->buildDatatable();
 
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $query = $this->get('sg_datatables.query')->getQueryFrom($datatable);
 
         return $query->getResponse();
@@ -94,7 +106,7 @@ class StockItemController extends AbstractController
      */
     public function showAction(Item $item)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Item::class)->find($item);
 
@@ -109,7 +121,7 @@ class StockItemController extends AbstractController
     public function barcodeBranchStockAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $data = $_REQUEST;
         $branchStocks ='';
@@ -129,7 +141,7 @@ class StockItemController extends AbstractController
     public function singleBarcodeBranchStockAction($barcode)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $data = ['barcode'=>$barcode];
         $branchStocks ='';

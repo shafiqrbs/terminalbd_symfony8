@@ -2,8 +2,10 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Inventory\Entity\ItemAttribute;
 use App\Inventory\Form\ItemAttributeType;
@@ -12,8 +14,14 @@ use App\Inventory\Form\ItemAttributeType;
  * ItemAttribute controller.
  *
  */
-class ItemAttributeController extends Controller
+class ItemAttributeController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all ItemAttribute entities.
@@ -21,7 +29,7 @@ class ItemAttributeController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Inventory\Entity\ItemAttribute::class)->findBy(array(),array('name'=>'ASC'));
         return $this->render('Inventory/ItemAttribute/index.html.twig', array(
@@ -39,10 +47,10 @@ class ItemAttributeController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('itemattribute'));
@@ -63,7 +71,7 @@ class ItemAttributeController extends Controller
      */
     private function createCreateForm(ItemAttribute $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ItemAttributeType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new ItemAttributeType($em), $entity, array(
@@ -98,7 +106,7 @@ class ItemAttributeController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemAttribute::class)->find($id);
 
@@ -116,7 +124,7 @@ class ItemAttributeController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemAttribute::class)->find($id);
 
@@ -140,7 +148,7 @@ class ItemAttributeController extends Controller
     */
     private function createEditForm(ItemAttribute $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ItemAttributeType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new ItemAttributeType($em), $entity, array(
@@ -159,7 +167,7 @@ class ItemAttributeController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\ItemAttribute::class)->find($id);
 
@@ -171,7 +179,7 @@ class ItemAttributeController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('itemattribute_edit', array('id' => $id)));
@@ -192,7 +200,7 @@ class ItemAttributeController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Inventory\Entity\ItemAttribute::class)->find($id);
 
             if (!$entity) {
@@ -230,7 +238,7 @@ class ItemAttributeController extends Controller
     public function statusAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\ItemAttribute::class)->find($id);
 
         if (!$entity) {
@@ -244,7 +252,7 @@ class ItemAttributeController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('itemattribute'));

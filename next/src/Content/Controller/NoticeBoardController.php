@@ -2,6 +2,8 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Content\Entity\Page;
@@ -15,6 +17,12 @@ use App\Content\Form\NoticeBoardType;
  */
 class NoticeBoardController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Page entities.
@@ -22,7 +30,7 @@ class NoticeBoardController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Content\Entity\Page::class)->findBy(['globalOption'=> $globalOption,'module'=>8],['created'=>'desc']);
 
@@ -41,11 +49,11 @@ class NoticeBoardController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $user = $this->getUser();
             $entity->setUser($user);
             $globalOption = $this->getUser()->getGlobalOption();
-            $entity ->setModule($this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->find(8));
+            $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->find(8));
             $entity->setGlobalOption($globalOption);
             $entity->upload();
             $em->persist($entity);
@@ -104,7 +112,7 @@ class NoticeBoardController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -126,7 +134,7 @@ class NoticeBoardController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -171,7 +179,7 @@ class NoticeBoardController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -207,13 +215,13 @@ class NoticeBoardController extends AbstractController
      */
     public function deleteAction(Page $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($entity->getFile())){
             $entity->removeUpload();
         }
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add('success',"Data has been deleted successfully");
+        $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been deleted successfully");
         return $this->redirect($this->generateUrl('noticeboard'));
     }
 
@@ -243,7 +251,7 @@ class NoticeBoardController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
         if (!$entity) {
@@ -257,7 +265,7 @@ class NoticeBoardController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('noticeboard'));

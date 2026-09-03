@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 /**
  * SmsSender controller.
@@ -9,6 +10,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class SmsSenderController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all SmsSender entities.
@@ -16,9 +22,9 @@ class SmsSenderController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $global = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Tool\Entity\SmsSender::class)->findBy(['globalOption' => $global],['created'=>'DESC']);
+        $entities = $this->em->getRepository(\App\Tool\Entity\SmsSender::class)->findBy(['globalOption' => $global],['created'=>'DESC']);
         return $this->render('Tool/SmsSender/index.html.twig', [
             'entities' => $entities,
             'globalOption' => $global,
@@ -33,8 +39,8 @@ class SmsSenderController extends AbstractController
     {
 
         $global = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Tool\Entity\SmsSender::class)->findBy(['globalOption' => $global],['created'=>'DESC']);
-        $em = $this->getDoctrine()->getManager();
+        $entities = $this->em->getRepository(\App\Tool\Entity\SmsSender::class)->findBy(['globalOption' => $global],['created'=>'DESC']);
+        $em = $this->em;
         foreach($entities as $send){
             $em->remove($send);
             $em->flush();

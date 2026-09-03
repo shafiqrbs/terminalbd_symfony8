@@ -2,9 +2,12 @@
 
 namespace App\Content\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Content\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Content\Entity\Team;
 use App\Content\Form\TeamType;
@@ -13,16 +16,23 @@ use App\Content\Form\TeamType;
  * Team controller.
  *
  */
-class TeamController extends Controller
+class TeamController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -34,7 +44,7 @@ class TeamController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Content\Entity\Page::class)->getPagesFor($globalOption,'team');
@@ -56,15 +66,15 @@ class TeamController extends Controller
 
         $user = $this->getUser();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setUser($user);
             $entity->setGlobalOption($user->getGlobalOption());
-            $entity ->setModule($this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'team')));
+            $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'team')));
             $entity->upload();
             $em->persist($entity);
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('team'));
@@ -121,7 +131,7 @@ class TeamController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:Team')->find($id);
 
@@ -143,7 +153,7 @@ class TeamController extends Controller
      */
     public function editAction(Page $entity )
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $editForm = $this->createEditForm($entity);
 
         return $this->render('Content/Team/new.html.twig', array(
@@ -182,7 +192,7 @@ class TeamController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -201,7 +211,7 @@ class TeamController extends Controller
             }
             $entity->upload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add('success',"Data has been updated successfully");
+            $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been updated successfully");
             return $this->redirect($this->generateUrl('team_edit', array('id' => $id)));
         }
 
@@ -217,13 +227,13 @@ class TeamController extends Controller
      */
     public function deleteAction(Page $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($entity->getFile())){
             $entity->removeUpload();
         }
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add('success',"Data has been deleted successfully");
+        $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been deleted successfully");
         return $this->redirect($this->generateUrl('team'));
     }
 
@@ -251,7 +261,7 @@ class TeamController extends Controller
     public function statusAction(Request $request, Page $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $status = $entity->getStatus();
         if($status == 1){
             $entity->setStatus(0);
@@ -259,7 +269,7 @@ class TeamController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('team'));

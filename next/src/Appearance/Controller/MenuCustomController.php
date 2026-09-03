@@ -2,6 +2,8 @@
 
 namespace App\Appearance\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,12 @@ use App\Appearance\Form\MenuCustomType;
  */
 class MenuCustomController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all MenuCustom entities.
@@ -23,7 +31,7 @@ class MenuCustomController extends AbstractController
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Appearance\Entity\MenuCustom::class)->findAll();
 
         /*$globalOptions = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findBy(array('status'=>1));
@@ -61,7 +69,7 @@ class MenuCustomController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
 
@@ -115,7 +123,7 @@ class MenuCustomController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\MenuCustom::class)->find($id);
 
@@ -134,7 +142,7 @@ class MenuCustomController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\MenuCustom::class)->find($id);
 
@@ -175,7 +183,7 @@ class MenuCustomController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\MenuCustom::class)->find($id);
 
@@ -204,7 +212,7 @@ class MenuCustomController extends AbstractController
     public function deleteAction(MenuCustom $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find MenuCustom entity.');
         }
@@ -221,7 +229,7 @@ class MenuCustomController extends AbstractController
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Appearance\Entity\MenuCustom::class)->find($id);
 
         if (!$entity) {
@@ -235,7 +243,7 @@ class MenuCustomController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('menucustom'));

@@ -3,6 +3,10 @@
 namespace App\Tool\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use JMS\SecurityExtraBundle\Annotation\Secure;
@@ -19,14 +23,22 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class InvoiceSmsEmailController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -37,12 +49,12 @@ class InvoiceSmsEmailController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $_REQUEST['option'] ?? '';
-        if (empty($option) and $this->get('security.authorization_checker')->isGranted('ROLE_SUPER_ADMIN')) {
+        if (empty($option) and $this->isGranted('ROLE_SUPER_ADMIN')) {
             $entities = $em->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->findBy([], ['updated' => 'DESC']);
         }else{
-            $option = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->find($option);
+            $option = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($option);
             $entities = $em->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->findBy(['globalOption' => $option],['updated'=>'desc']);
         }
         $entities = $this->paginate($entities);
@@ -58,7 +70,7 @@ class InvoiceSmsEmailController extends AbstractController
      */
     public function domainAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->findBy(['globalOption'=>$globalOption],['updated'=>'desc']);
         $entities = $this->paginate($entities);
@@ -75,7 +87,7 @@ class InvoiceSmsEmailController extends AbstractController
     public function newAction(GlobalOption $option)
     {
         $entity = new InvoiceSmsEmail();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setGlobalOption($option);
         $em->persist($entity);
         $em->flush();
@@ -89,7 +101,7 @@ class InvoiceSmsEmailController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->find($id);
         if (!$entity) {
@@ -106,13 +118,13 @@ class InvoiceSmsEmailController extends AbstractController
      */
     public function editAction(InvoiceSmsEmail $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceSmsEmail entity.');
         }
 
         $editForm = $this->createEditForm($entity);
-        $sePricing = $this->getDoctrine()->getRepository(\App\Tool\Entity\SmsEmailPricing::class)->findBy(['status'=>1],['quantity'=>'asc']);
+        $sePricing = $this->em->getRepository(\App\Tool\Entity\SmsEmailPricing::class)->findBy(['status'=>1],['quantity'=>'asc']);
 
         $itemIds = [];
         foreach ($entity->getInvoiceSmsEmailItems() as $row ){
@@ -153,7 +165,7 @@ class InvoiceSmsEmailController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->find($id);
 
@@ -167,14 +179,14 @@ class InvoiceSmsEmailController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $data = $request->request->all();
             $intlMobile = $entity->getPaymentMobile();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($intlMobile);
+            $mobile = $this->toolManager->specialExpClean($intlMobile);
             $entity->setPaymentMobile($mobile);
             if($entity->getTransactionMethod()->getId() > 0){
                 $entity->setProcess('In-progress');
             }
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceSmsEmailItem::class)->insertItem($entity,$data);
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->updateInvoice($entity);
+            $this->em->getRepository(\App\Tool\Entity\InvoiceSmsEmailItem::class)->insertItem($entity,$data);
+            $this->em->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->updateInvoice($entity);
 
             return $this->redirect($this->generateUrl('invoicesmsemail_show', ['id' => $id]));
         }
@@ -190,7 +202,7 @@ class InvoiceSmsEmailController extends AbstractController
      */
     public function deleteAction(InvoiceSmsEmail $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceSmsEmail entity.');
         }
@@ -207,15 +219,15 @@ class InvoiceSmsEmailController extends AbstractController
      */
     public function deleteItemAction($invoice ,$package)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\InvoiceSmsEmailItem::class)->findOneBy(['invoiceSmsEmail'=> $invoice,'smsEmailPricing' => $package]);
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been deleted successfully"
         );
-        $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->updateInvoice($entity->getInvoiceSmsEmail());
+        $this->em->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->updateInvoice($entity->getInvoiceSmsEmail());
         exit;
 
 
@@ -227,7 +239,7 @@ class InvoiceSmsEmailController extends AbstractController
      */
     public function paymentAction(Request $request,InvoiceSmsEmail $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceSmsEmail entity.');
         }
@@ -236,14 +248,14 @@ class InvoiceSmsEmailController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $intlMobile = $entity->getPaymentMobile();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($intlMobile);
+            $mobile = $this->toolManager->specialExpClean($intlMobile);
             $entity->setPaymentMobile($mobile);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Data has been updated successfully"
             );
         }
-        $this->getDoctrine()->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->updateInvoice($entity);
+        $this->em->getRepository(\App\Tool\Entity\InvoiceSmsEmail::class)->updateInvoice($entity);
 
 
         exit;
@@ -256,7 +268,7 @@ class InvoiceSmsEmailController extends AbstractController
      */
     public function approveAction(InvoiceSmsEmail $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find InvoiceSmsEmail entity.');
         }
@@ -273,7 +285,7 @@ class InvoiceSmsEmailController extends AbstractController
         $em->getRepository(\App\Tool\Entity\SmsSenderTotal::class)->updateSmsBundle($entity);
 
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been updated successfully"
         );
         return new Response('success');

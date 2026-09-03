@@ -3,6 +3,9 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use JMS\SecurityExtraBundle\Annotation\Secure;
@@ -17,6 +20,13 @@ use App\Inventory\Form\InventoryConfigType;
  */
 class InventoryConfigController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     /**
      * Lists all InventoryConfig entities.
@@ -25,7 +35,7 @@ class InventoryConfigController extends AbstractController
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var GlobalOption $globalOption */
         $globalOption = $this->getUser()->getGlobalOption();
 
@@ -37,7 +47,7 @@ class InventoryConfigController extends AbstractController
     public function excelDataImportFormAction(InventoryConfig $inventory)
     {
         //echo $inventoryConfig->getId();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $em->getRepository(\App\Inventory\Entity\Item::class)->findBy([]);
         $data = $em->getRepository(\App\Inventory\Entity\ProductImport::class)->getMasterItem();
         $variant = $em->getRepository(\App\Inventory\Entity\ProductImport::class)->getColorSizeUnit('unit');
@@ -71,7 +81,7 @@ class InventoryConfigController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $data = $request->request->all();
 
             if($data['brandvendor'] == 'vendor'){
@@ -147,10 +157,10 @@ class InventoryConfigController extends AbstractController
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         return $pagination;
@@ -161,7 +171,7 @@ class InventoryConfigController extends AbstractController
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Inventory\Entity\Item::class)->findBy(['inventoryConfig'=> $id],['id'=>'ASC']);
         $pagination = $this->paginate($entities);
 
@@ -239,7 +249,7 @@ class InventoryConfigController extends AbstractController
             $em->flush();
         }
         echo "<ul>";
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success', "Item has been added successfully"
         );
         exit;
@@ -282,7 +292,7 @@ class InventoryConfigController extends AbstractController
 
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\InventoryConfig::class)->find($id);
 

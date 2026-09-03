@@ -2,13 +2,16 @@
 
 namespace App\Restaurant\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Restaurant\Entity\Particular;
 use App\Restaurant\Form\ParticularType;
 use App\Restaurant\Form\ProductionType;
 use App\Restaurant\Form\ProductType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -16,15 +19,22 @@ use Symfony\Component\HttpFoundation\Response;
  * ParticularController controller.
  *
  */
-class ProductController extends Controller
+class ProductController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         return $pagination;
@@ -39,7 +49,7 @@ class ProductController extends Controller
     {
         $entity = new Particular();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $pagination = $em->getRepository(\App\Restaurant\Entity\Particular::class)->findWithSearch($config,array('product'));
         $editForm = $this->createCreateForm($entity);
@@ -61,7 +71,7 @@ class ProductController extends Controller
     public function createAction(Request $request)
     {
         $entity = new Particular();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $pagination = $em->getRepository(\App\Restaurant\Entity\Particular::class)->findWithSearch($config,array('product'));
         //$pagination = $this->paginate($pagination);
@@ -69,14 +79,14 @@ class ProductController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setRestaurantConfig($config);
-            $service = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Service::class)->findOneBy(array('slug'=>'product'));
+            $service = $this->em->getRepository(\App\Restaurant\Entity\Service::class)->findOneBy(array('slug'=>'product'));
             $entity->setService($service);
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('restaurant_product'));
@@ -120,7 +130,7 @@ class ProductController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $pagination = $em->getRepository(\App\Restaurant\Entity\Particular::class)->findWithSearch($config,array('product'));
         //$pagination = $this->paginate($pagination);
@@ -167,7 +177,7 @@ class ProductController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $pagination = $em->getRepository(\App\Restaurant\Entity\Particular::class)->findWithSearch($config,array('product'));
         //$pagination = $this->paginate($pagination);
@@ -185,7 +195,7 @@ class ProductController extends Controller
             }
             $entity->upload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('restaurant_product'));
@@ -203,7 +213,7 @@ class ProductController extends Controller
      */
     public function deleteAction(Particular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -211,16 +221,16 @@ class ProductController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -235,7 +245,7 @@ class ProductController extends Controller
     public function statusAction(Particular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -247,7 +257,7 @@ class ProductController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('restaurant_product'));
@@ -256,7 +266,7 @@ class ProductController extends Controller
     public function sortingAction()
     {
         $entity = new Particular();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $pagination = $em->getRepository(\App\Restaurant\Entity\Particular::class)->productSortingList($config,array('product','stockable'));
         $editForm = $this->createCreateForm($entity);
@@ -271,7 +281,7 @@ class ProductController extends Controller
     public function sortedAction(Request $request)
     {
         $data = $request ->request->get('item');
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->setProductSorting($data);
+        $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->setProductSorting($data);
         exit;
     }
 

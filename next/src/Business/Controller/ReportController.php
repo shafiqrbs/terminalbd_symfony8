@@ -6,6 +6,9 @@ namespace App\Business\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use JMS\SecurityExtraBundle\Annotation\Secure;
@@ -19,13 +22,20 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 	public function paginate($entities)
 	{
-		$paginator = $this->get('knp_paginator');
+		$paginator = $this->paginator;
 		$pagination = $paginator->paginate(
 			$entities,
-			$this->get('request')->query->get('page', 1)/*page number*/,
+			$this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
 			25  /*limit per page*/
 		);
 		$pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -34,15 +44,15 @@ class ReportController extends AbstractController
 
     public function systemOverviewAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $transactionMethods = [1,2,3];
         $datetime = new DateTime("now");
         $dataIncome['startDate'] = $user->getGlobalOption()->getCreated()->format('Y-m-d');
         $dataIncome['endDate'] = $datetime->format('Y-m-d');
-        $income = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessTotalIncome($this->getUser(),$dataIncome);
-        $transactionCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview( $this->getUser(),$transactionMethods,$data);
+        $income = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessTotalIncome($this->getUser(),$dataIncome);
+        $transactionCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview( $this->getUser(),$transactionMethods,$data);
         $currentStockPrice = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->reportCurrentStockPrice($user);
         $accountPurchase = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($user, $data);
         $accountSales = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user, $data);
@@ -80,7 +90,7 @@ class ReportController extends AbstractController
 
     public function purchaseOverviewAction(){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
 
@@ -122,10 +132,10 @@ class ReportController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $cashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
+        $cashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
         $sales = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesOverview($user,$data);
         $customerSalesSummary = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportCustomerSales($user,$data);
         $purchasePrice = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesItemPurchaseSalesOverview($user,$data);
@@ -170,12 +180,12 @@ class ReportController extends AbstractController
     public function stockPriceReportAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->currentStockPrice($config,$data);
-        $type = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
-        $category = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig' => $config ,'status'=>1]);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->currentStockPrice($config,$data);
+        $type = $this->em->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
+        $category = $this->em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig' => $config ,'status'=>1]);
         return $this->render('Business/Report/stock-price.html.twig', [
             'pagination' => $entities,
             'types' => $type,
@@ -190,7 +200,7 @@ class ReportController extends AbstractController
 
 	public function salesDetailsAction()
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$entities = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->salesReport($user,$data);
@@ -234,13 +244,13 @@ class ReportController extends AbstractController
 
     public function stockItemReportAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->findWithSearch($config,$data);
         $pagination = $this->paginate($entities);
         $damages = $em->getRepository(\App\Business\Entity\BusinessDistributionReturnItem::class)->returnRemainingStock($config);
-        $category = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
+        $category = $this->em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
         return $this->render('Business/Report/stock.html.twig', [
             'pagination' => $pagination,
             'damages' => $damages,
@@ -251,15 +261,15 @@ class ReportController extends AbstractController
 
 	public function salesStockItemAction()
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $purchaseSalesPrice = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesItemPurchaseSalesOverview($user,$data);
 		$cashOverview = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesOverview($user,$data);
 		$entities = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->reportSalesStockItem($user,$data);
-		$type = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
-		$category = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
+		$type = $this->em->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
+		$category = $this->em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
 		return $this->render('Business/Report/sales/salesStock.html.twig', [
 			'option'  => $user->getGlobalOption() ,
 			'entities' => $entities,
@@ -274,12 +284,12 @@ class ReportController extends AbstractController
 
     public function salesCommissionStockItemAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->reportCommissionSalesStockItem($user,$data);
         $pagination = $this->paginate($entities);
-        $vendors = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption'=>$user->getGlobalOption(),'status'=>1],['companyName'=>'ASC']);
+        $vendors = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption'=>$user->getGlobalOption(),'status'=>1],['companyName'=>'ASC']);
 
         if(empty($data['pdf'])){
             return $this->render('Business/Report/sales/commissionSalesStock.html.twig', [
@@ -305,14 +315,14 @@ class ReportController extends AbstractController
 
 	public function productLedgerAction()
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$entities = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->reportCustomerSalesItem($user,$data);
 		$pagination = $this->paginate($entities);
-		$type = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
+		$type = $this->em->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-		$category = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
+		$category = $this->em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
 		return $this->render('Business/Report/productLedger.html.twig', [
 			'option'  => $user->getGlobalOption() ,
 			'entities' => $pagination,
@@ -326,10 +336,10 @@ class ReportController extends AbstractController
 
 	public function salesUserAction()
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
-		$salesPurchasePrice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->salesUserPurchasePriceReport($user,$data);
+		$salesPurchasePrice = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->salesUserPurchasePriceReport($user,$data);
 		$entities = $em->getRepository(\App\Business\Entity\BusinessInvoice::class)->salesUserReport($user,$data);
 		return $this->render('Business/Report/sales/salesUser.html.twig', [
 			'option'  => $user->getGlobalOption() ,
@@ -342,11 +352,11 @@ class ReportController extends AbstractController
 
     public function salesSrAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->salesSrReport($user,$data);
-        $executives = $this->getDoctrine()->getRepository(\App\Business\Entity\Marketing::class)->findBy(['businessConfig' => $user->getGlobalOption()->getBusinessConfig()]);
+        $executives = $this->em->getRepository(\App\Business\Entity\Marketing::class)->findBy(['businessConfig' => $user->getGlobalOption()->getBusinessConfig()]);
         if(empty($data['pdf'])){
 
             return $this->render('Business/Report/sales/salesSr.html.twig', [
@@ -359,7 +369,7 @@ class ReportController extends AbstractController
 
         }else{
 
-            $marketing = $this->getDoctrine()->getRepository(\App\Business\Entity\Marketing::class)->find($data['marketing']);
+            $marketing = $this->em->getRepository(\App\Business\Entity\Marketing::class)->find($data['marketing']);
             $html = $this->renderView(
                 'Business/Report/sales/salesSrPdf.html.twig', [
                     'option'        => $user->getGlobalOption() ,
@@ -375,11 +385,11 @@ class ReportController extends AbstractController
 
     public function salesDsrAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->salesSrReport($user,$data);
-        $executives = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findBy(['globalOption' => $user->getGlobalOption()]);
+        $executives = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findBy(['globalOption' => $user->getGlobalOption()]);
 
         if(empty($data['pdf'])){
 
@@ -393,7 +403,7 @@ class ReportController extends AbstractController
 
         }else{
 
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->find($data['customer']);
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->find($data['customer']);
             $html = $this->renderView(
                 'Business/Report/sales/salesDsrPdf.html.twig', [
                     'option'        => $user->getGlobalOption(),
@@ -409,11 +419,11 @@ class ReportController extends AbstractController
 
     public function salesAreaAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->salesSrReport($user,$data);
-        $executives = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessArea::class)->findBy(['businessConfig' => $user->getGlobalOption()->getBusinessConfig()]);
+        $executives = $this->em->getRepository(\App\Business\Entity\BusinessArea::class)->findBy(['businessConfig' => $user->getGlobalOption()->getBusinessConfig()]);
         if(empty($data['pdf'])){
 
             return $this->render('Business/Report/sales/salesArea.html.twig', [
@@ -426,7 +436,7 @@ class ReportController extends AbstractController
 
         }else{
 
-            $customer = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessArea::class)->find($data['area']);
+            $customer = $this->em->getRepository(\App\Business\Entity\BusinessArea::class)->find($data['area']);
             $html = $this->renderView(
                 'Business/Report/sales/salesAreaPdf.html.twig', [
                     'option'        => $user->getGlobalOption(),
@@ -442,11 +452,11 @@ class ReportController extends AbstractController
 
     public function conditionAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Business\Entity\BusinessInvoice::class)->salesConditionReport($user,$data);
-        $executives = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCondition::class)->findBy(['globalOption' => $user->getGlobalOption()]);
+        $executives = $this->em->getRepository(\App\Accounting\Entity\AccountCondition::class)->findBy(['globalOption' => $user->getGlobalOption()]);
         if(empty($data['pdf'])){
             return $this->render('Business/Report/condition/condition.html.twig', [
                 'option'            => $user->getGlobalOption() ,
@@ -473,11 +483,11 @@ class ReportController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Business\Entity\BusinessInvoice::class)->salesConditionCustomerReport($user,$data);
-        $conditions = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCondition::class)->findBy(['globalOption' => $user->getGlobalOption(),'status'=>1],['name'=>"ASC"]);
+        $conditions = $this->em->getRepository(\App\Accounting\Entity\AccountCondition::class)->findBy(['globalOption' => $user->getGlobalOption(),'status'=>1],['name'=>"ASC"]);
         if(empty($data['pdf'])){
 
             return $this->render('Business/Report/condition/customer.html.twig', [
@@ -490,7 +500,7 @@ class ReportController extends AbstractController
 
         }else{
 
-            $customer = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessArea::class)->find($data['courier']);
+            $customer = $this->em->getRepository(\App\Business\Entity\BusinessArea::class)->find($data['courier']);
             $html = $this->renderView(
                 'Business/Report/condition/customerPdf.html.twig', [
                     'option'        => $user->getGlobalOption(),
@@ -508,12 +518,12 @@ class ReportController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Business\Entity\BusinessInvoice::class)->salesConditionDetailsReport($user,$data);
-        //$customers = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findBy(array('globalOption' => $user->getGlobalOption()),array('name'=>"ASC"));
-        $conditions = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCondition::class)->findBy(['globalOption' => $user->getGlobalOption(),'status'=>1],['name'=>"ASC"]);
+        //$customers = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findBy(array('globalOption' => $user->getGlobalOption()),array('name'=>"ASC"));
+        $conditions = $this->em->getRepository(\App\Accounting\Entity\AccountCondition::class)->findBy(['globalOption' => $user->getGlobalOption(),'status'=>1],['name'=>"ASC"]);
         if(empty($data['pdf'])){
 
             return $this->render('Business/Report/condition/conditionDetails.html.twig', [
@@ -525,7 +535,7 @@ class ReportController extends AbstractController
 
         }else{
 
-            $customer = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCondition::class)->find($data['courier']);
+            $customer = $this->em->getRepository(\App\Accounting\Entity\AccountCondition::class)->find($data['courier']);
             $html = $this->renderView(
                 'Business/Report/condition/detailsPdf.html.twig', [
                     'option'        => $user->getGlobalOption(),
@@ -543,7 +553,7 @@ class ReportController extends AbstractController
 	public function monthlyUserSalesAction(){
         set_time_limit(0);
         ignore_user_abort(true);
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$config = $user->getGlobalOption()->getBusinessConfig();
@@ -566,7 +576,7 @@ class ReportController extends AbstractController
     public function monthlyProductSalesPriceAction(){
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getBusinessConfig();
@@ -586,7 +596,7 @@ class ReportController extends AbstractController
     public function monthlyProductSalesAction(){
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getBusinessConfig();
@@ -606,7 +616,7 @@ class ReportController extends AbstractController
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getBusinessConfig();
@@ -629,7 +639,7 @@ class ReportController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getBusinessConfig();
@@ -641,7 +651,7 @@ class ReportController extends AbstractController
         $customer = "";
         if (isset($_REQUEST['mobile']) and $_REQUEST['mobile']) {
             $mobile = $_REQUEST['mobile'];
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $user->getGlobalOption(), 'mobile' => $mobile]);
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $user->getGlobalOption(), 'mobile' => $mobile]);
             $stocks = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->getStockItemReport($config);
             $entities = $em->getRepository(\App\Business\Entity\BusinessInvoice::class)->customerDailyProductSalesReport($user, $data);
             $dailySalesArr = $entities['dailySalesArr'];
@@ -664,7 +674,7 @@ class ReportController extends AbstractController
 
 	public function purchaseVendorAction()
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$entities = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->purchaseVendorReport($user,$data);
@@ -680,11 +690,11 @@ class ReportController extends AbstractController
 	{
 		$data = $_REQUEST;
 		$globalOption = $this->getUser()->getGlobalOption();
-		$entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($globalOption,$data);
+		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($globalOption,$data);
 		$pagination = $this->paginate($entities);
-		$overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($globalOption,$data);
-		$accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =[5]);
-		$transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(['status'=>1],['name'=>'asc']);
+		$overview = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($globalOption,$data);
+		$accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =[5]);
+		$transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(['status'=>1],['name'=>'asc']);
 		return $this->render('Business/Report/purchase/purchase.html.twig', [
 			'globalOption' => $globalOption,
 			'entities' => $pagination,
@@ -700,14 +710,14 @@ class ReportController extends AbstractController
 	public function productPurchaseStockSalesAction()
 	{
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$config = $user->getGlobalOption()->getMedicineConfig();
 		$entities = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->productPurchaseStockSalesReport($user,$data);
 		$pagination = $this->paginate($entities);
-		$racks = $this->getDoctrine()->getRepository('BusinessBundle:MedicineParticular')->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
-		$modeFor = $this->getDoctrine()->getRepository('BusinessBundle:MedicineParticularType')->findBy(['modeFor'=>'brand']);
+		$racks = $this->em->getRepository('BusinessBundle:MedicineParticular')->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
+		$modeFor = $this->em->getRepository('BusinessBundle:MedicineParticularType')->findBy(['modeFor'=>'brand']);
 		return $this->render('Business/Report/purchase/purchaseVendorStockSales.html.twig', [
 			'option'                => $user->getGlobalOption() ,
 			'pagination'            => $pagination ,
@@ -721,14 +731,14 @@ class ReportController extends AbstractController
 	public function productPurchaseStockSalesPriceAction()
 	{
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$config = $user->getGlobalOption()->getMedicineConfig();
 		$entities = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->productPurchaseStockSalesPriceReport($user,$data);
 		$pagination = $this->paginate($entities);
-		$racks = $this->getDoctrine()->getRepository('BusinessBundle:MedicineParticular')->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
-		$modeFor = $this->getDoctrine()->getRepository('BusinessBundle:MedicineParticularType')->findBy(['modeFor'=>'brand']);
+		$racks = $this->em->getRepository('BusinessBundle:MedicineParticular')->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
+		$modeFor = $this->em->getRepository('BusinessBundle:MedicineParticularType')->findBy(['modeFor'=>'brand']);
 		return $this->render('Business/Report/purchase/purchaseVendorStockSales.html.twig', [
 			'option'                => $user->getGlobalOption() ,
 			'pagination'              => $pagination ,
@@ -742,7 +752,7 @@ class ReportController extends AbstractController
 	public function purchaseBrandStockSalesAction()
 	{
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$entities = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->purchaseVendorStockReport($user,$data);
@@ -756,7 +766,7 @@ class ReportController extends AbstractController
 
 	public function purchaseBrandAction()
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$entities = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->purchaseVendorReport($user,$data);
@@ -770,7 +780,7 @@ class ReportController extends AbstractController
 	public function purchaseDetailsAction()
 	{
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$entities = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->purchaseReport($user,$data);
@@ -788,12 +798,12 @@ class ReportController extends AbstractController
 
     public function vendorCommissionBaseSalesAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->reportVendorCommissionSalesItem($user,$data);
         $pagination = $this->paginate($entities);
-        $vendors = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $this->getUser()->getGlobalOption()],['companyName'=>'ASC']);
+        $vendors = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $this->getUser()->getGlobalOption()],['companyName'=>'ASC']);
 
         if(empty($data['pdf'])){
 
@@ -821,14 +831,14 @@ class ReportController extends AbstractController
 
     public function customerCommissionBaseSalesAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->reportCustomerSalesItem($user,$data);
         $pagination = $this->paginate($entities);
-        $type = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
+        $type = $this->em->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
         $config = $user->getGlobalOption()->getMedicineConfig();
-        $category = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
+        $category = $this->em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
 
         return $this->render('Business/Report/sales/customerSalesItem.html.twig', [
             'option'  => $user->getGlobalOption() ,
@@ -842,14 +852,14 @@ class ReportController extends AbstractController
 
     public function customerSalesItemAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->reportCustomerSalesItem($user,$data);
         $pagination = $this->paginate($entities);
-        $type = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
-        $category = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
+        $type = $this->em->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
+        $category = $this->em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
         return $this->render('Business/Report/sales/customerSalesItem.html.twig', [
             'option'  => $user->getGlobalOption() ,
             'entities' => $pagination,
@@ -870,7 +880,7 @@ class ReportController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         if(empty($data)){
@@ -895,9 +905,9 @@ class ReportController extends AbstractController
                 $start =  $compare->format("Y-m-{$no}");
                 $day =  $compare->format("{$no}-m-Y");
                 $data['startDate'] = $start;
-                $openingBalance[$day] = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->openingDailyQuantity($config,$data);
+                $openingBalance[$day] = $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->openingDailyQuantity($config,$data);
             }
-            $daily = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->monthlyStockLedger($config,$data);
+            $daily = $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->monthlyStockLedger($config,$data);
         }
         if(empty($data['pdf'])){
             return $this->render('Business/Stock/productLedger.html.twig', [
@@ -930,14 +940,14 @@ class ReportController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $pagination = '';
         $entity = '';
         if(isset($data['particular']) and !empty($data['particular'])){
-            $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(['businessConfig' => $config,'id'=> $data['particular']]);
-            $pagination = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->getStockHistoryLedger($config,$data);
+            $entity = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(['businessConfig' => $config,'id'=> $data['particular']]);
+            $pagination = $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->getStockHistoryLedger($config,$data);
         }
         $particulars = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->getProducts($config->getId());
         if(empty($data['pdf'])){

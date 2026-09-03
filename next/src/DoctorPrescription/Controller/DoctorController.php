@@ -2,26 +2,36 @@
 
 namespace App\DoctorPrescription\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DoctorPrescription\Entity\DpsParticular;
 use App\DoctorPrescription\Form\DoctorType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 /**
  * DoctorController controller.
  *
  */
-class DoctorController extends Controller
+class DoctorController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         return $pagination;
@@ -34,7 +44,7 @@ class DoctorController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
         $pagination = $em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getFindDentalServiceParticular($config , array('doctor'));
@@ -59,7 +69,7 @@ class DoctorController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setDpsConfig($globalOption ->getDpsConfig());
             $entity->setMode('doctor');
             $entity->setName($entity->getAssignDoctor()->getProfile()->getName());
@@ -70,7 +80,7 @@ class DoctorController extends Controller
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('dps_doctor_new', array('id' => $entity->getId())));
@@ -127,7 +137,7 @@ class DoctorController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find DpsParticular entity.');
@@ -143,7 +153,7 @@ class DoctorController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($id);
 
@@ -189,7 +199,7 @@ class DoctorController extends Controller
      */
     public function updateAction(Request $request, DpsParticular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity and $this->getUser()->getDpsConfig()->getId() == $entity ->getDpsConfig()->getId()) {
             throw $this->createNotFoundException('Unable to find DpsParticular entity.');
         }
@@ -211,7 +221,7 @@ class DoctorController extends Controller
                 $entity->upload();
             }
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('dps_doctor_edit',array('id' => $entity->getId())));
@@ -228,21 +238,21 @@ class DoctorController extends Controller
      */
     public function deleteAction(DpsParticular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         try {
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -257,7 +267,7 @@ class DoctorController extends Controller
     public function statusAction(DpsParticular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -269,7 +279,7 @@ class DoctorController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('dps_doctor'));

@@ -3,6 +3,10 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use JMS\SecurityExtraBundle\Annotation\Secure;
@@ -19,14 +23,22 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SalesReturnController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -37,7 +49,7 @@ class SalesReturnController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Inventory\Entity\SalesReturn::class)->findWithSearch($this->getUser());
         $pagination = $this->paginate($entities);
         return $this->render('Inventory/SalesReturn/index.html.twig', [
@@ -50,11 +62,11 @@ class SalesReturnController extends AbstractController
     {
 
         $salesId = $request->request->get('invoice');
-        $invoice = $this->get('settong.toolManageRepo')->specialExpClean($salesId);
+        $invoice = $this->toolManager->specialExpClean($salesId);
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy([ 'inventoryConfig' => $inventory,'invoice' => $invoice ,'process' =>'Done']);
+        $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy([ 'inventoryConfig' => $inventory,'invoice' => $invoice ,'process' =>'Done']);
         if(!empty($sales)){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = new SalesReturn();
 
             $entity->setSales($sales);
@@ -78,7 +90,7 @@ class SalesReturnController extends AbstractController
      */
     public function showAction(SalesReturn $salesReturn )
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         return $this->render('Inventory/SalesReturn/show.html.twig', [
             'entity'      => $salesReturn->getSales(),
             'salesReturn'      => $salesReturn,
@@ -126,7 +138,7 @@ class SalesReturnController extends AbstractController
 
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\SalesReturn::class)->find($id);
 
@@ -147,13 +159,13 @@ class SalesReturnController extends AbstractController
             $entity->setMode($mode);
             $entity->setProcess('complete');
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesReturn::class)->updateSalesReturn($entity);
+            $this->em->getRepository(\App\Inventory\Entity\SalesReturn::class)->updateSalesReturn($entity);
             return $this->redirect($this->generateUrl('inventory_salesreturn_edit', ['id' => $entity->getId()]));
         }elseif ($editForm->isValid() and $mode == 'payment') {
 		    $entity->setMode($mode);
 		    $entity->setProcess('complete');
 		    $em->flush();
-		    $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesReturn::class)->updateSalesReturn($entity);
+		    $this->em->getRepository(\App\Inventory\Entity\SalesReturn::class)->updateSalesReturn($entity);
 		    return $this->redirect($this->generateUrl('inventory_salesreturn_edit', ['id' => $entity->getId()]));
         }
 
@@ -167,15 +179,15 @@ class SalesReturnController extends AbstractController
 
     public function salesItemAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $salesReturn = $request->request->get('salesReturn');
         $item = $request->request->get('item');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
-        $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->find($item);
-        $salesReturn = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesReturn::class)->find($salesReturn);
-        $currentSalesReturnItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesReturn::class)->getSalesReturnItemSum($item);
+        $item = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->find($item);
+        $salesReturn = $this->em->getRepository(\App\Inventory\Entity\SalesReturn::class)->find($salesReturn);
+        $currentSalesReturnItem = $this->em->getRepository(\App\Inventory\Entity\SalesReturn::class)->getSalesReturnItemSum($item);
         $totalQnt = $currentSalesReturnItem + $quantity;
         if($totalQnt > $item->getQuantity()){
             return new Response(json_encode(['success'=>'invalid','message'=>'Sales return item already added']));
@@ -189,7 +201,7 @@ class SalesReturnController extends AbstractController
             $entity->setSubTotal($price * $quantity);
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesReturn::class)->updateSalesReturn($salesReturn);
+            $this->em->getRepository(\App\Inventory\Entity\SalesReturn::class)->updateSalesReturn($salesReturn);
             $totalAmount = number_format($entity->getSalesReturn()->getTotal());
             return new Response(json_encode(['success'=>'success','totalAmount'=> $totalAmount ,'message'=>'Sales return item added successfully']));
         }
@@ -205,7 +217,7 @@ class SalesReturnController extends AbstractController
      */
     public function deleteAction(SalesReturn $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sales Return entity.');
         }
@@ -222,12 +234,12 @@ class SalesReturnController extends AbstractController
      */
     public function itemDeleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\SalesReturnItem::class)->findOneBy(['salesItem'=>$id]);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesReturn::class)->updateSalesTotalReturnPrice($entity);
+        $this->em->getRepository(\App\Inventory\Entity\SalesReturn::class)->updateSalesTotalReturnPrice($entity);
         $em->remove($entity);
         $em->flush();
         return new Response(json_encode(['success'=>'success','message'=>'Cancel done']));
@@ -239,9 +251,9 @@ class SalesReturnController extends AbstractController
 	public function approveAction(SalesReturn $entity)
 	{
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		if (!empty($entity) and $entity->getProcess() !='approved') {
-			$em = $this->getDoctrine()->getManager();
+			$em = $this->em;
 			$entity->setProcess('approved');
 			if($entity->getMode() == 'payment'){
 				$journal = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->insertInventoryAccountSalesReturn($entity);

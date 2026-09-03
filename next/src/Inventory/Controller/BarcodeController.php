@@ -2,6 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Inventory\Entity\InventoryConfig;
 use App\Inventory\Entity\PurchaseItem;
@@ -16,14 +19,21 @@ use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
  */
 class BarcodeController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -31,7 +41,7 @@ class BarcodeController extends AbstractController
 
 
     public function  indexAction(Request $request){
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findWithSearch($inventory,$data);
@@ -244,7 +254,7 @@ class BarcodeController extends AbstractController
 			return $this->redirect($this->generateUrl('inventory_item'));
 		}
 		$inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-		$entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getBarcodeForPrint($inventory,$data);
+		$entities = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getBarcodeForPrint($inventory,$data);
 		return $this->render('Inventory/Barcode/item.html.twig', [
 			'entities'      => $entities
 		]);
@@ -255,12 +265,12 @@ class BarcodeController extends AbstractController
     {
         $data = explode(',',$request->cookies->get('barcodes'));
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(is_null($data)) {
             return $this->redirect($this->generateUrl('inventory_barcode'));
         }
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->getBarcodeForPrint($inventory,$data);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->getBarcodeForPrint($inventory,$data);
         return $this->render('Inventory/Barcode/add.html.twig', [
             'entities'      => $entities
         ]);
@@ -270,7 +280,7 @@ class BarcodeController extends AbstractController
     public function addedAction(PurchaseItem $purchaseItem)
     {
         $data = [];
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(is_null($purchaseItem)) {
             return $this->redirect($this->generateUrl('inventory_barcode'));
         }else{
@@ -284,7 +294,7 @@ class BarcodeController extends AbstractController
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $x = 0;
         foreach ($data['item'] as $row) {
             $barcode = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($row);
@@ -293,8 +303,8 @@ class BarcodeController extends AbstractController
             }
             $x++;
         }
-        $this->get('session')->set('barcodeQ',$barCoder);
-        $barCoder = $this->get('session')->get('barcodeQ');
+        $this->requestStack->getSession()->set('barcodeQ',$barCoder);
+        $barCoder = $this->requestStack->getSession()->get('barcodeQ');
         return $this->render('Inventory/Barcode/print.html.twig', [
             'config'        => $config,
             'barCoder'      => $barCoder
@@ -306,7 +316,7 @@ class BarcodeController extends AbstractController
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $x = 0;
         foreach ($data['item'] as $row) {
             $barcode = $em->getRepository(\App\Inventory\Entity\Item::class)->find($row);
@@ -315,8 +325,8 @@ class BarcodeController extends AbstractController
             }
             $x++;
         }
-        $this->get('session')->set('barcodeQ',$barCoder);
-        $barCoder = $this->get('session')->get('barcodeQ');
+        $this->requestStack->getSession()->set('barcodeQ',$barCoder);
+        $barCoder = $this->requestStack->getSession()->get('barcodeQ');
         return $this->render('Inventory/Barcode/print.html.twig', [
             'config'        => $config,
             'barCoder'      => $barCoder
@@ -327,7 +337,7 @@ class BarcodeController extends AbstractController
     public function printAction()
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $barCoder = $this->get('session')->get('barcodeQ');
+        $barCoder = $this->requestStack->getSession()->get('barcodeQ');
         return $this->render('Inventory/Barcode/print.html.twig', [
             'config'        => $config,
             'barCoder'      => $barCoder

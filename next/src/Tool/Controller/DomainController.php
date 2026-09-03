@@ -2,6 +2,9 @@
 
 namespace App\Tool\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Tool\Event\DomainNotification;
 use App\Tool\Event\PasswordChangeDomainSmsEvent;
@@ -22,13 +25,20 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DomainController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function generateDomainPathAction()
     {
 
 	    set_time_limit(0);
-    	$em = $this->getDoctrine()->getManager();
+    	$em = $this->em;
         $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findByDomain();
 
         $domains = [
@@ -85,10 +95,10 @@ class DomainController extends AbstractController
 
     public function paginate($entities)
     {
-	    $paginator = $this->get('knp_paginator');
+	    $paginator = $this->paginator;
 	    $pagination = $paginator->paginate(
 		    $entities,
-		    $this->get('request')->query->get('page', 1)/*page number*/,
+		    $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
 		    25  /*limit per page*/
 	    );
 	    $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -123,12 +133,12 @@ class DomainController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
       //  $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->getList($data);
         $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->getList($data);
         $entities = $this->paginate($entities);
-        $apps = $this->getDoctrine()->getRepository(\App\Tool\Entity\AppModule::class)->findBy(['status'=>1],['name'=>"ASC"]);
+        $apps = $this->em->getRepository(\App\Tool\Entity\AppModule::class)->findBy(['status'=>1],['name'=>"ASC"]);
         //$this->statusDeleteAction();
        // exit;
         return $this->render('Tool/Domain/index.html.twig', [
@@ -144,7 +154,7 @@ class DomainController extends AbstractController
      */
     public function clientAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findBy(['agent' => $user]);
         $entities = $this->paginate($entities);
@@ -166,7 +176,7 @@ class DomainController extends AbstractController
     public function optionStatusUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Item entity.');
@@ -184,13 +194,14 @@ class DomainController extends AbstractController
 
     public function resetDomainPasswordAction(GlobalOption $option)
     {
-        $entity = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->findOneBy(['globalOption'=> $option,'domainOwner' => 1]);
+        $entity = $this->em->getRepository(\App\User\Entity\User::class)->findOneBy(['globalOption'=> $option,'domainOwner' => 1]);
         if(!empty($entity)){
             //$a = mt_rand(1000,9999);
             $a = '*148148#';
             $entity->setPlainPassword($a);
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $this->get('fos_user.user_manager')->updateUser($entity);
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Change password successfully"
             );
         }
@@ -200,10 +211,11 @@ class DomainController extends AbstractController
 
     public function resetManualDomainPasswordAction(Request $request, GlobalOption $option)
     {
-        $entity = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->findOneBy(['globalOption'=> $option,'domainOwner'=>1]);
+        $entity = $this->em->getRepository(\App\User\Entity\User::class)->findOneBy(['globalOption'=> $option,'domainOwner'=>1]);
         if(!empty($entity)){
             $a = $request->request->get('password');
             $entity->setPlainPassword($a);
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $this->get('fos_user.user_manager')->updateUser($entity);
             $dispatcher = $this->container->get('event_dispatcher');
             $dispatcher->dispatch('setting_tool.post.change_domain_password', new PasswordChangeDomainSmsEvent($option,$entity->getUsername(),$a));
@@ -217,30 +229,30 @@ class DomainController extends AbstractController
         set_time_limit(0);
 
         if($option->getAccountingConfig()){
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountingConfig::class)->accountingReset($option);
+            $this->em->getRepository(\App\Accounting\Entity\AccountingConfig::class)->accountingReset($option);
         }
 
         if($option->getInventoryConfig()) {
-           $this->getDoctrine()->getRepository(\App\Inventory\Entity\InventoryConfig::class)->inventoryReset($option);
+           $this->em->getRepository(\App\Inventory\Entity\InventoryConfig::class)->inventoryReset($option);
         }
 
         if($option->getHospitalConfig()) {
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\HospitalConfig::class)->hospitalReset($option);
+            $this->em->getRepository(\App\Hospital\Entity\HospitalConfig::class)->hospitalReset($option);
         }
         if($option->getRestaurantConfig()) {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->reset($option);
+            $this->em->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->reset($option);
         }
         if($option->getMedicineConfig()) {
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineConfig::class)->medicineReset($option);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineConfig::class)->medicineReset($option);
         }
         if($option->getBusinessConfig()) {
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessConfig::class)->businessReset($option);
+            $this->em->getRepository(\App\Business\Entity\BusinessConfig::class)->businessReset($option);
         }
         $dir = WEB_PATH . "/uploads/domain/" . $option->getId() . "/inventory";
         $a = new Filesystem();
         $a->remove($dir);
         $a->mkdir($dir);
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Successfully reset data"
         );
         return new Response('success');
@@ -250,37 +262,37 @@ class DomainController extends AbstractController
 
     public function domainDeleteAction(GlobalOption $option)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         set_time_limit(0);
         $dir = WEB_PATH . "/uploads/domain/" . $option->getId();
         $a = new Filesystem();
         $a->remove($dir);
         $a->mkdir($dir);
-        $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->posReset($option);
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->posReset($option);
         if(!empty($option->getAccountingConfig()) and $option->getAccountingConfig()){
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountingConfig::class)->accountingReset($option);
+            $this->em->getRepository(\App\Accounting\Entity\AccountingConfig::class)->accountingReset($option);
         }
 
         if(!empty($option->getInventoryConfig()) and $option->getInventoryConfig()) {
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\InventoryConfig::class)->inventoryReset($option);
+            $this->em->getRepository(\App\Inventory\Entity\InventoryConfig::class)->inventoryReset($option);
         }
         if(!empty($option->getDpsConfig()) and $option->getDmsConfig()) {
-            $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsConfig::class)->dpsReset($option);
+            $this->em->getRepository(\App\DoctorPrescription\Entity\DpsConfig::class)->dpsReset($option);
         }
 
         if(!empty($option->getHospitalConfig()) and $option->getHospitalConfig()) {
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\HospitalConfig::class)->hospitalDelete($option);
+            $this->em->getRepository(\App\Hospital\Entity\HospitalConfig::class)->hospitalDelete($option);
         }
 
 
         if(!empty($option->getMedicineConfig()) and $option->getMedicineConfig()) {
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineConfig::class)->medicineDelete($option);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineConfig::class)->medicineDelete($option);
         }
         if(!empty($option->getBusinessConfig()) and $option->getBusinessConfig()) {
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessConfig::class)->businessDelete($option);
+            $this->em->getRepository(\App\Business\Entity\BusinessConfig::class)->businessDelete($option);
         }
          if(!empty($option->getRestaurantConfig()) and $option->getRestaurantConfig()) {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->delete($option);
+            $this->em->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->delete($option);
         }
 
         $em->remove($option);
@@ -288,7 +300,7 @@ class DomainController extends AbstractController
 
         /* Menu, Application Setting, website, module, apps , user*/
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Successfully reset data"
         );
         return $this->redirect($this->generateUrl('tools_domain'));
@@ -297,8 +309,8 @@ class DomainController extends AbstractController
     public function domainDeletePurchaseSalesAction(GlobalOption $option)
     {
         set_time_limit(0);
-        $this->getDoctrine()->getRepository(GlobalOption::class)->domainDeletePurchaseSales($option);
-        $this->get('session')->getFlashBag()->add(
+        $this->em->getRepository(GlobalOption::class)->domainDeletePurchaseSales($option);
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Successfully reset data"
         );
         return $this->redirect($this->generateUrl('tools_domain'));
@@ -306,7 +318,7 @@ class DomainController extends AbstractController
 
     public function statusDeleteAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         set_time_limit(0);
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->getRemoveList($data);
@@ -319,30 +331,30 @@ class DomainController extends AbstractController
         $a->remove($dir);
         $a->mkdir($dir);
       */
-        $this->getDoctrine()->getRepository(\App\Pos\Entity\Pos::class)->posReset($option);
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->posReset($option);
         if(!empty($option->getAccountingConfig()) and $option->getAccountingConfig()){
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountingConfig::class)->accountingReset($option);
+            $this->em->getRepository(\App\Accounting\Entity\AccountingConfig::class)->accountingReset($option);
         }
 
         if(!empty($option->getInventoryConfig()) and $option->getInventoryConfig()) {
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\InventoryConfig::class)->inventoryDelete($option);
+            $this->em->getRepository(\App\Inventory\Entity\InventoryConfig::class)->inventoryDelete($option);
         }
         if(!empty($option->getDpsConfig()) and $option->getDmsConfig()) {
-            $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsConfig::class)->dpsReset($option);
+            $this->em->getRepository(\App\DoctorPrescription\Entity\DpsConfig::class)->dpsReset($option);
         }
 
         if(!empty($option->getHospitalConfig()) and $option->getHospitalConfig()) {
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\HospitalConfig::class)->hospitalDelete($option);
+            $this->em->getRepository(\App\Hospital\Entity\HospitalConfig::class)->hospitalDelete($option);
         }
 
         if(!empty($option->getMedicineConfig()) and $option->getMedicineConfig()) {
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineConfig::class)->medicineDelete($option);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineConfig::class)->medicineDelete($option);
         }
         if(!empty($option->getBusinessConfig()) and $option->getBusinessConfig()) {
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessConfig::class)->businessDelete($option);
+            $this->em->getRepository(\App\Business\Entity\BusinessConfig::class)->businessDelete($option);
         }
         if(!empty($option->getRestaurantConfig()) and $option->getRestaurantConfig()) {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->delete($option);
+            $this->em->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->delete($option);
         }
         $em->remove($option);
         $em->flush();
@@ -350,7 +362,7 @@ class DomainController extends AbstractController
 
         /* Menu, Application Setting, website, module, apps , user*/
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Successfully reset data"
         );
         return $this->redirect($this->generateUrl('tools_domain'));
@@ -359,10 +371,10 @@ class DomainController extends AbstractController
 
     public function androidDataCleanAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->androidDataClean();
-        $this->getDoctrine()->getRepository(SmsSender::class)->smsHistoryDelete();
-        $this->get('session')->getFlashBag()->add(
+        $em = $this->em;
+        $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->androidDataClean();
+        $this->em->getRepository(SmsSender::class)->smsHistoryDelete();
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Successfully reset data"
         );
         return $this->redirect($this->generateUrl('tools_domain'));
@@ -373,6 +385,7 @@ class DomainController extends AbstractController
 
         exec("rm -rf app/cache/*");
         exec("rm -rf app/logs/*");
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $kernel = $this->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);

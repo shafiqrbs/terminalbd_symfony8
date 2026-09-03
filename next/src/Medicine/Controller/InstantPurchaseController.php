@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Medicine\Controller;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Medicine\Entity\MedicinePurchaseItem;
 use App\Medicine\Entity\MedicineSales;
@@ -14,13 +17,20 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class InstantPurchaseController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -34,12 +44,12 @@ class InstantPurchaseController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->findWithInstantItemSearch($config,$data,1);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->findWithInstantItemSearch($config,$data,1);
         $pagination = $this->paginate($entities);
-        $racks = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(['medicineConfig'=> $config,'particularType'=>1]);
+        $racks = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(['medicineConfig'=> $config,'particularType'=>1]);
         return $this->render('Medicine/InstantPurchase/index.html.twig', [
             'entities' => $pagination,
             'racks' => $racks,
@@ -50,7 +60,7 @@ class InstantPurchaseController extends AbstractController
     public function returnInstantPurchaseData($salesId){
 
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->getInstantPurchaseItem($config);
+        $invoiceParticulars = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->getInstantPurchaseItem($config);
         $data = '';
 
         /* @var $instant MedicinePurchaseItem */
@@ -98,12 +108,12 @@ class InstantPurchaseController extends AbstractController
     {
         $user = $this->getUser();
 	    $config = $user->getGlobalOption()->getMedicineConfig();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
-        $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->insertInstantPurchase($user,$data);
-        $purchaseItem = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->insertPurchaseItems($config,$entity,$data);
-	    $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->updatePurchaseTotalPrice($entity);
-	    $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->insertInstantSalesItem($data['salesId'],$purchaseItem,$data);
+        $entity = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->insertInstantPurchase($user,$data);
+        $purchaseItem = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->insertPurchaseItems($config,$entity,$data);
+	    $this->em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->updatePurchaseTotalPrice($entity);
+	    $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->insertInstantSalesItem($data['salesId'],$purchaseItem,$data);
         $result = $this->returnInstantPurchaseData($data['salesId']);
         return new Response(json_encode($result));
         exit;
@@ -112,7 +122,7 @@ class InstantPurchaseController extends AbstractController
     public function instantPurchaseLoadAction(MedicineSales $sales)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $instantPurchase = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->getInstantPurchaseItem($config);
+        $instantPurchase = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->getInstantPurchaseItem($config);
         $html = $this->renderView('Medicine/Sales/instant-purchase.html.twig',
             [
                 'instantPurchase' => $instantPurchase,
@@ -125,8 +135,8 @@ class InstantPurchaseController extends AbstractController
     public function instantPurchaseAddAction()
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $racks = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
-        $brands = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
+        $racks = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
+        $brands = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
         $html = $this->renderView('Medicine/Sales/instantPurchaseItem.html.twig',
             [ 'racks' => $racks ,'brands' => $brands]);
         return New Response($html);
@@ -134,8 +144,8 @@ class InstantPurchaseController extends AbstractController
 
     public function returnTemporaryResultData(User $user,$msg=''){
 
-	    $salesItems = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSalesItems($user);
-	    $total = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
+	    $salesItems = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSalesItems($user);
+	    $total = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
 	    $subTotal = floor($total['subTotal']);
 	    $purchaseSubTotal = floor($total['purchaseSubTotal']);
 	    $data = [
@@ -158,12 +168,12 @@ class InstantPurchaseController extends AbstractController
 
         $user = $this->getUser();
 	    $config = $user->getGlobalOption()->getMedicineConfig();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
-	    $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->insertInstantPurchase($user,$data);
-        $purchaseItem = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->insertPurchaseItems($config,$entity,$data);
-	    $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->updatePurchaseTotalPrice($entity);
-	    $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertInstantSalesTemporaryItem($this->getUser(),$purchaseItem,$data);
+	    $entity = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->insertInstantPurchase($user,$data);
+        $purchaseItem = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->insertPurchaseItems($config,$entity,$data);
+	    $this->em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->updatePurchaseTotalPrice($entity);
+	    $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->insertInstantSalesTemporaryItem($this->getUser(),$purchaseItem,$data);
         $result = $this->returnTemporaryResultData($this->getUser());
         return new Response(json_encode($result));
         exit;
@@ -172,14 +182,14 @@ class InstantPurchaseController extends AbstractController
 
     public function instantPurchaseDeleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
-        $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($id);
+        $em = $this->em;
+        $item = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($id);
 
         /* @var $item MedicinePurchaseItem */
 
         if(empty($item->getSalesQuantity())) {
             $this->removeInstantPurchaseItem($item);
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item->getMedicineStock());
+            $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item->getMedicineStock());
         }
         $em->remove($item->getMedicinePurchase());
         $em->flush();
@@ -187,7 +197,7 @@ class InstantPurchaseController extends AbstractController
     }
 
     public function removeInstantPurchaseItem(MedicinePurchaseItem $item){
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->remove($item);
         $em->flush();
     }

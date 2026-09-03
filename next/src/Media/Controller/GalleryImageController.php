@@ -2,6 +2,8 @@
 
 namespace App\Media\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +18,12 @@ use App\Media\Form\GalleryImageType;
  */
 class GalleryImageController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all GalleryImage entities.
@@ -23,7 +31,7 @@ class GalleryImageController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Media\Entity\GalleryImage::class)->findAll();
 
@@ -49,8 +57,8 @@ class GalleryImageController extends AbstractController
         $data = $request->request->all();
         $galleryId = $request->request->get('galleryId');
 
-        $this->getDoctrine()->getRepository(\App\Media\Entity\GalleryImage::class)->insertGalleryImage($data,$galleryId);
-        $this->get('session')->getFlashBag()->add(
+        $this->em->getRepository(\App\Media\Entity\GalleryImage::class)->insertGalleryImage($data,$galleryId);
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been inserted successfully"
         );
         return $this->redirect($this->generateUrl('galleryimage_edit', ['id' => $galleryId]));
@@ -86,8 +94,8 @@ class GalleryImageController extends AbstractController
      */
     public function newAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $galleryImageId =  $this->get('request')->get('galleryId');
+        $em = $this->em;
+        $galleryImageId =  $this->requestStack->getCurrentRequest()->get('galleryId');
 
         $entity = new GalleryImage();
         $form   = $this->createCreateForm($entity);
@@ -114,7 +122,7 @@ class GalleryImageController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
 
         $globalOption = $this->getUser()->getGlobalOption();
@@ -169,9 +177,9 @@ class GalleryImageController extends AbstractController
     {
 
         $data = $request->request->all();
-        $this->getDoctrine()->getRepository(\App\Media\Entity\GalleryImage::class)->updateGalleryImage($data);
+        $this->em->getRepository(\App\Media\Entity\GalleryImage::class)->updateGalleryImage($data);
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been updated successfully"
         );
         return $this->redirect($this->generateUrl('galleryimage_edit', ['id' => $id]));
@@ -181,7 +189,7 @@ class GalleryImageController extends AbstractController
     public function deleteImageAction(GalleryImage $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($entity)){
             $entity->removeUpload($entity->getPhotoGallery()->getGlobalOption()->getId(),$entity->getPhotoGallery()->getId());
             $em->remove($entity);

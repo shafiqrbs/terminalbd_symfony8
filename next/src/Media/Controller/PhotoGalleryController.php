@@ -2,9 +2,12 @@
 
 namespace App\Media\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Media\Entity\PhotoGallery;
 use App\Media\Form\PhotoGalleryType;
@@ -13,8 +16,15 @@ use App\Media\Form\PhotoGalleryType;
  * PhotoGallery controller.
  *
  */
-class PhotoGalleryController extends Controller
+class PhotoGalleryController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     /**
      * Lists all PhotoGallery entities.
@@ -22,7 +32,7 @@ class PhotoGalleryController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->findBy(array('globalOption' => $globalOption),array('created'=>'desc'));
 
@@ -37,7 +47,7 @@ class PhotoGalleryController extends Controller
 
     public function galleriesDeleteList()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->findAll();
 
@@ -54,10 +64,10 @@ class PhotoGalleryController extends Controller
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             30  /*limit per page*/
         );
         return $pagination;
@@ -69,7 +79,7 @@ class PhotoGalleryController extends Controller
      */
     public function galleryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $globalOption = $this->getUser()->getGlobalOption()->getId();
         $entities = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->findBy(array('globalOption' => $globalOption ),array('created'=>'desc'));
@@ -85,7 +95,7 @@ class PhotoGalleryController extends Controller
      */
     public function galleryDeleteAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->findBy(array('globalOption' => $globalOption ),array('created'=>'desc'));
@@ -108,13 +118,13 @@ class PhotoGalleryController extends Controller
         $globalOption = $this->getUser()->getGlobalOption();
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
 
             $entity->setGlobalOption($globalOption);
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             $this->createDirectory($entity->getId());
@@ -184,7 +194,7 @@ class PhotoGalleryController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->find($id);
 
@@ -203,7 +213,7 @@ class PhotoGalleryController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->find($id);
 
@@ -249,7 +259,7 @@ class PhotoGalleryController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->find($id);
 
@@ -264,7 +274,7 @@ class PhotoGalleryController extends Controller
             $entity->upload();
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('gallery_edit', array('id' => $id)));
@@ -283,7 +293,7 @@ class PhotoGalleryController extends Controller
     public function deleteAction(PhotoGallery $entity)
     {
 
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
 	    if (!$entity) {
 		    throw $this->createNotFoundException('Unable to find Product entity.');
 	    }
@@ -292,12 +302,12 @@ class PhotoGalleryController extends Controller
 		    $entity->deleteImageDirectory();
 		    $em->remove($entity);
 		    $em->flush();
-		    $this->get('session')->getFlashBag()->add(
+		    $this->requestStack->getSession()->getFlashBag()->add(
 			    'error',"Data has been deleted successfully"
 		    );
 
 	    } catch (ForeignKeyConstraintViolationException $e) {
-		    $this->get('session')->getFlashBag()->add(
+		    $this->requestStack->getSession()->getFlashBag()->add(
 			    'notice',"Data has been relation another Table"
 		    );
 	    }
@@ -314,7 +324,7 @@ class PhotoGalleryController extends Controller
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->find($id);
 
         if (!$entity) {
@@ -328,7 +338,7 @@ class PhotoGalleryController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('gallery'));

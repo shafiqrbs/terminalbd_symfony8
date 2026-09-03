@@ -2,6 +2,9 @@
 
 namespace App\Medicine\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Medicine\Entity\MedicineDamage;
@@ -15,13 +18,20 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class MedicineDamageController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 	public function paginate($entities)
 	{
-		$paginator = $this->get('knp_paginator');
+		$paginator = $this->paginator;
 		$pagination = $paginator->paginate(
 			$entities,
-			$this->get('request')->query->get('page', 1)/*page number*/,
+			$this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
 			25  /*limit per page*/
 		);
 		$pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -35,10 +45,10 @@ class MedicineDamageController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineDamage::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->findWithSearch($config,$data);
 	    $pagination = $this->paginate($entities);
 	    return $this->render('Medicine/Damage/index.html.twig', [
             'entities' => $pagination
@@ -66,12 +76,12 @@ class MedicineDamageController extends AbstractController
         $form->handleRequest($request);
         $data = $request->request->all();
         /* @var $stock MedicineStock */
-        $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['damage']['medicineStock']);
+        $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['damage']['medicineStock']);
         if(empty($stock)){
-            $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['medicineStock']);
+            $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['medicineStock']);
         }
         if ($form->isValid() and !empty($stock) and $stock->getRemainingQuantity() >= $entity->getQuantity()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
             $entity->setMedicineStock($stock);
@@ -79,13 +89,13 @@ class MedicineDamageController extends AbstractController
             $entity->setSubTotal($stock->getPurchasePrice() * $entity->getQuantity());
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'damage');
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'damage');
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('medicine_damage', ['id' => $entity->getId()]));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"Damage quantity must be less or equal current stock quantity"
         );
         return $this->render('Medicine/Damage/new.html.twig', [
@@ -120,9 +130,9 @@ class MedicineDamageController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineDamage::class)->findBy(['medicineConfig' => $config],['companyName'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->findBy(['medicineConfig' => $config],['companyName'=>'ASC']);
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->find($id);
 
@@ -162,9 +172,9 @@ class MedicineDamageController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineDamage::class)->findBy(['medicineConfig' => $config],['companyName'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->findBy(['medicineConfig' => $config],['companyName'=>'ASC']);
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->find($id);
 
@@ -177,7 +187,7 @@ class MedicineDamageController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             return $this->redirect($this->generateUrl('medicine_damage'));
@@ -195,13 +205,13 @@ class MedicineDamageController extends AbstractController
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->find($id);
         $stock = $entity->getMedicineStock();
         $em->remove($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'damage');
-        $this->get('session')->getFlashBag()->add(
+        $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'damage');
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('medicine_damage'));
@@ -209,14 +219,14 @@ class MedicineDamageController extends AbstractController
 
 	public function approvedAction($id)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$config = $this->getUser()->getGlobalOption()->getMedicineConfig();
 		$damage = $em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->findOneBy(['medicineConfig' => $config , 'id' => $id]);
 		if (!empty($damage) and ($damage->getProcess() == 'Created')) {
-			$em = $this->getDoctrine()->getManager();
+			$em = $this->em;
 			$damage->setProcess('Approved');
 			$em->flush();
-			$this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertGlobalDamageTransaction($this->getUser()->getGlobalOption(),$damage);
+			$this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertGlobalDamageTransaction($this->getUser()->getGlobalOption(),$damage);
 			return new Response('success');
 		} else {
 			return new Response('failed');

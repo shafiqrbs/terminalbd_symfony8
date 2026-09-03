@@ -4,6 +4,10 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Form\CustomerType;
 use App\Accounting\Form\UserType;
 use App\User\Entity\Profile;
@@ -11,7 +15,7 @@ use App\User\Entity\User;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\DomainUser\Entity\Customer;
@@ -21,17 +25,25 @@ use App\DomainUser\Entity\Customer;
  * Customer controller.
  *
  */
-class CustomerController extends Controller
+class CustomerController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -42,7 +54,7 @@ class CustomerController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $data['userGroup'] = 'account';
         $globalOption = $this->getUser()->getGlobalOption();
@@ -56,13 +68,13 @@ class CustomerController extends Controller
 
     public function restoreCustomerAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         /* @var $entity User */
         foreach ($entities as $entity){
             $mobile = $entity->getProfile()->getMobile();
-            $exist = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$globalOption,'mobile'=>$mobile]);
+            $exist = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$globalOption,'mobile'=>$mobile]);
             if(empty($exist)){
                 $customer = new Customer();
                 $customer->setGlobalOption($globalOption);
@@ -91,16 +103,16 @@ class CustomerController extends Controller
         $form->handleRequest($request);
         $data = $request->request->all();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $globalOption = $this->getUser()->getGlobalOption();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+            $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
-	        $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->insertAccountUser($globalOption,$mobile,$data);
+	        $user = $this->em->getRepository(\App\User\Entity\User::class)->insertAccountUser($globalOption,$mobile,$data);
 	        $entity->setUser($user);
             $em->persist($entity);
             $em->flush();
             if($entity->getUserGroup() != 'other'){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->insertUserAccount($entity);
+                $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->insertUserAccount($entity);
             }
             return $this->redirect($this->generateUrl('account_customer'));
         }
@@ -120,7 +132,7 @@ class CustomerController extends Controller
      */
     private function createCreateForm(Profile $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into UserType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new UserType($location), $entity, array(
@@ -150,7 +162,7 @@ class CustomerController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\User\Entity\Profile::class)->find($id);
 
@@ -166,7 +178,7 @@ class CustomerController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_CRM') or is_granted('ROLE_DOMAIN')"))]
     public function editAction(User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $user->getProfile();
      //   $entity = $em->getRepository(\App\User\Entity\Profile::class)->find($id);
 
@@ -190,7 +202,7 @@ class CustomerController extends Controller
     */
     private function createEditForm(Profile $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into UserType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new UserType($location), $entity, array(
@@ -209,7 +221,7 @@ class CustomerController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\User\Entity\Profile::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Customer entity.');
@@ -217,7 +229,7 @@ class CustomerController extends Controller
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         if ($editForm->isValid()) {
-	        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($entity->getMobile());
+	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
             $em->flush();
             return $this->redirect($this->generateUrl('account_customer'));
@@ -231,7 +243,7 @@ class CustomerController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_CRM') or is_granted('ROLE_DOMAIN')"))]
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\User\Entity\Profile::class)->findOneBy(array('globalOption'=>$globalOption,'id' => $id));
         if (!$entity) {
@@ -241,12 +253,12 @@ class CustomerController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }
@@ -258,7 +270,7 @@ class CustomerController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoComplete($go,$item);
+            $item = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoComplete($go,$item);
         }
         return new JsonResponse($item);
     }
@@ -276,7 +288,7 @@ class CustomerController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteName($go,$item);
+            $item = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteName($go,$item);
         }
         return new JsonResponse($item);
     }
@@ -294,7 +306,7 @@ class CustomerController extends Controller
 
         $q = $_REQUEST['term'];
         $option = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteCode($option,$q);
+        $entities = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteCode($option,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('id' => $entity['customer'],'value' => $entity['text']);
@@ -316,7 +328,7 @@ class CustomerController extends Controller
     {
         $item = $_REQUEST['q'];
         if ($item) {
-            $item = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class)->searchAutoComplete($item);
+            $item = $this->em->getRepository(\App\Location\Entity\Location::class)->searchAutoComplete($item);
         }
         return new JsonResponse($item);
 
@@ -334,7 +346,7 @@ class CustomerController extends Controller
     {
         $q = $_REQUEST['q'];
         $option = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteName($option,$q);
+        $entities = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoCompleteName($option,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('id' => $entity['id'],'value' => $entity['id']);
@@ -347,7 +359,7 @@ class CustomerController extends Controller
     {
         $q = $_REQUEST['term'];
         $option = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoComplete($option,$q);
+        $entities = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->searchAutoComplete($option,$q);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('id' => $entity['customer'],'value' => $entity['id']);

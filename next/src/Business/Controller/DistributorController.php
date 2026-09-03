@@ -3,6 +3,8 @@
 namespace App\Business\Controller;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\Business\Entity\BusinessInvoiceReturnItem;
@@ -20,6 +22,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DistributorController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     /**
      * ;
@@ -29,8 +37,8 @@ class DistributorController extends AbstractController
     public function addDistributionAction(Request $request, BusinessInvoice $invoice)
     {
         $data = $request->request->all();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertInvoiceDistributionItems($invoice,$data);
-        $result = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceDistributionTotalPrice($invoice);
+        $entity = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertInvoiceDistributionItems($invoice,$data);
+        $result = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceDistributionTotalPrice($invoice);
         $html = $this->renderView("Business/Distribution/invoice-item.html.twig", [
             'invoice' => $result,
             'entity' => $entity
@@ -56,8 +64,8 @@ class DistributorController extends AbstractController
 
         $data = $request->request->all();
         /* @var $invoice BusinessInvoice  */
-        $invoice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->updateInvoiceDistributionItems($data);
-        $result = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceDistributionTotalPrice($invoice);
+        $invoice = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->updateInvoiceDistributionItems($data);
+        $result = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceDistributionTotalPrice($invoice);
         $arrary = [
             'subTotal' => $result['subTotal'],
             'discount' => $invoice->getDiscount(),
@@ -80,16 +88,16 @@ class DistributorController extends AbstractController
 
     public function invoiceDistributionDeleteAction(BusinessInvoice $invoice, BusinessInvoiceParticular $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         if($particular->getBusinessParticular()){
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->deletePurchaseReturnItem($particular);
+            $this->em->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->deletePurchaseReturnItem($particular);
         }
         $em->remove($particular);
         $em->flush();
-        $result = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceDistributionTotalPrice($invoice);
+        $result = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceDistributionTotalPrice($invoice);
         $arrary = [
             'subTotal' => $result['subTotal'],
             'discount' => $invoice->getDiscount(),
@@ -140,12 +148,12 @@ class DistributorController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_INVOICE') or is_granted('ROLE_DOMAIN')"))]
     public function storePaymentAction(Request $request, BusinessInvoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $storeId = $data['store'];
         $transaction = $data['transactionType'];
         $amount = $data['amount'];
-        $store = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStore::class)->find($storeId);
+        $store = $this->em->getRepository(\App\Business\Entity\BusinessStore::class)->find($storeId);
         $entity = new BusinessStoreLedger();
         $entity->setBusinessConfig($invoice->getBusinessConfig());
         $entity->setInvoice($invoice);
@@ -182,14 +190,14 @@ class DistributorController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_INVOICE') or is_granted('ROLE_DOMAIN')"))]
     public function salesReturnItemAction(Request $request, BusinessInvoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $itemId = $data['returnItem'];
         $quantity = $data['quantity'];
         $amount = $data['salesPrice'];
         $itemProcess = $data['itemProcess'];
         $invoiceReturn = $em->getRepository(\App\Business\Entity\BusinessInvoiceReturn::class)->checkInvoiceReturnCreate($invoice);
-        $item = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->find($itemId);
+        $item = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($itemId);
         $existItem = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getProductCount($invoice->getCustomer()->getId(),$itemId);
         if($existItem > 0 and $existItem >= $quantity ){
             $entity = new BusinessInvoiceReturnItem();
@@ -203,7 +211,7 @@ class DistributorController extends AbstractController
             $em->persist($entity);
             $em->flush();
         }
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->updateInvoiceDistributionTotalPrice($invoice);
+        $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->updateInvoiceDistributionTotalPrice($invoice);
         $res = $this->returnResultData($invoice);
         return new Response(json_encode($res));
 
@@ -215,13 +223,13 @@ class DistributorController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_INVOICE') or is_granted('ROLE_DOMAIN')"))]
     public function deleteReturnItemAction(BusinessInvoice $invoice, BusinessInvoiceReturnItem $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
         $em->remove($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->updateInvoiceDistributionTotalPrice($invoice);
+        $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->updateInvoiceDistributionTotalPrice($invoice);
         $res = $this->returnResultData($invoice);
         return new Response(json_encode($res));
     }
@@ -236,7 +244,7 @@ class DistributorController extends AbstractController
         $store =$_REQUEST['id'];
         $balance = 0;
         if($store > 0){
-            $balance = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStoreLedger::class)->getStoreBalance($store);
+            $balance = $this->em->getRepository(\App\Business\Entity\BusinessStoreLedger::class)->getStoreBalance($store);
         }
         return new Response($balance);
 
@@ -249,7 +257,7 @@ class DistributorController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_INVOICE') or is_granted('ROLE_DOMAIN')"))]
     public function deleteLedgerAction(BusinessInvoice $invoice, BusinessStoreLedger $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -269,16 +277,16 @@ class DistributorController extends AbstractController
     public function storeCreateAction(Request $request)
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $name = $data['store'];
         $area = $data['area'];
         $mobile = $data['storeMobile'];
         $customer = $data['dsm'];
-        $customerId = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->find($customer);
-        $areaId = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessArea::class)->find($area);
-        $mobileno = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
-        $find = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStore::class)->findOneBy(['businessConfig' => $config,'area'=> $area,'name'=>$name]);
+        $customerId = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->find($customer);
+        $areaId = $this->em->getRepository(\App\Business\Entity\BusinessArea::class)->find($area);
+        $mobileno = $this->toolManager->specialExpClean($mobile);
+        $find = $this->em->getRepository(\App\Business\Entity\BusinessStore::class)->findOneBy(['businessConfig' => $config,'area'=> $area,'name'=>$name]);
         if(empty($find)){
             $entity = new BusinessStore();
             $entity->setBusinessConfig($config);
@@ -289,7 +297,7 @@ class DistributorController extends AbstractController
             $em->persist($entity);
             $em->flush();
         }
-        $areas = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessArea::class)->findBy(['businessConfig'=>$config],['name'=>'ASC']);
+        $areas = $this->em->getRepository(\App\Business\Entity\BusinessArea::class)->findBy(['businessConfig'=>$config],['name'=>'ASC']);
         $select= "";
         foreach ($areas as $area){
             $select .="<optgroup label='{$area->getName()}'>";
@@ -305,42 +313,42 @@ class DistributorController extends AbstractController
 
     public function approveAction(BusinessInvoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         if($entity){
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->insertInvoiceProductItem($entity);
+            $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->insertInvoiceProductItem($entity);
             if($entity->getTloPrice() > 0 and !empty($entity->getVendor())){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertTloAdjustment($entity);
+                $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertTloAdjustment($entity);
             }
-            $result = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->invoiceDistributionTotalPrice($entity);
+            $result = $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->invoiceDistributionTotalPrice($entity);
             if($result['damageQnt'] > 0 or $result['spoilQnt'] > 0) {
-                $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessDistributionReturnItem::class)->insertUpdateDistributionReturnItem($entity);
+                $this->em->getRepository(\App\Business\Entity\BusinessDistributionReturnItem::class)->insertUpdateDistributionReturnItem($entity);
             }
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountInvoice($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountInvoice($entity);
             if($entity->getSalesReturn() > 0 ){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountSalesReturn($entity);
+                $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountSalesReturn($entity);
             }
             if($entity->getStoreLedgers()){
                 foreach ($entity->getStoreLedgers() as $ledger){
-                    $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStoreLedger::class)->approveStorePayment($ledger,$user);
+                    $this->em->getRepository(\App\Business\Entity\BusinessStoreLedger::class)->approveStorePayment($ledger,$user);
                     if($ledger->getTransactionType() == "Receive"){
-                        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertStorePayment($ledger);
+                        $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertStorePayment($ledger);
                     }
                 }
             }
             if($entity->getInvoiceReturnItems()){
                 /* @var $row BusinessInvoiceReturnItem */
                 foreach ($entity->getInvoiceReturnItems() as $row){
-                    $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->approveSalesReturnItem($row);
+                    $this->em->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->approveSalesReturnItem($row);
                 }
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess("Done");
             $entity->setApprovedBy($this->getUser());
             $em->persist($entity);
             $em->flush();
             if($entity->getBusinessConfig()->isStockHistory() == 1 ){
-                $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processInsertSalesItem($entity);
+                $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processInsertSalesItem($entity);
             }
             return new Response("Success");
         }

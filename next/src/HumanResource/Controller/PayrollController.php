@@ -4,6 +4,9 @@ namespace App\HumanResource\Controller;
 
 
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\HumanResource\Entity\EmployeePayroll;
 use App\HumanResource\Entity\Payroll;
 use App\HumanResource\Entity\PayrollSheet;
@@ -11,7 +14,7 @@ use App\HumanResource\Form\PayrollType;
 
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 
@@ -19,16 +22,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  * Customer controller.
  *
  */
-class PayrollController extends Controller
+class PayrollController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -37,7 +47,7 @@ class PayrollController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\HumanResource\Entity\Payroll::class)->findWithSearch($globalOption->getId());
         $pagination = $this->paginate($entities);
@@ -58,15 +68,15 @@ class PayrollController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption();
             $entity->setGlobalOption($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
-            $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSheet::class)->insertUpdateParticular($entity);
+            $this->em->getRepository(\App\HumanResource\Entity\PayrollSheet::class)->insertUpdateParticular($entity);
             return $this->redirect($this->generateUrl('payroll_sheet', array('id' => $entity->getId())));
         }
         return $this->render('HumanResource/Payroll/new.html.twig', array(
@@ -118,14 +128,14 @@ class PayrollController extends Controller
         $form->handleRequest($request);
         $data = $request->request->all();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Data has been inserted successfully"
             );
-            $this->getDoctrine()->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->insertUpdateParticular($entity, $data);
-            $this->getDoctrine()->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->insertUpdate($entity);
+            $this->em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->insertUpdateParticular($entity, $data);
+            $this->em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->insertUpdate($entity);
         }
         return $this->render('HumanResource/EmployeePayroll/new.html.twig', array(
             'entity' => $entity,
@@ -135,7 +145,7 @@ class PayrollController extends Controller
 
     public function deleteAction(Payroll $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -145,11 +155,11 @@ class PayrollController extends Controller
             $em->flush();
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -161,8 +171,8 @@ class PayrollController extends Controller
     public function sheetAction(Payroll $entity)
     {
         $global = $this->getUser()->getGlobalOption()->getId();
-        $particulars = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$global),array('mode'=>'ASC'));
-        $attendances = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\Attendance::class)->monthlyEmployeeAttendance($this->getUser()->getGlobalOption());
+        $particulars = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$global),array('mode'=>'ASC'));
+        $attendances = $this->em->getRepository(\App\HumanResource\Entity\Attendance::class)->monthlyEmployeeAttendance($this->getUser()->getGlobalOption());
         $presents = array();
         foreach ($attendances as $attendance){
             $presents[$attendance['userId']] = $attendance;
@@ -228,8 +238,8 @@ class PayrollController extends Controller
     public function employeeSheetDetailsAction(Payroll $entity)
     {
         $global = $this->getUser()->getGlobalOption()->getId();
-        $particulars = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$global),array('mode'=>'ASC'));
-        $attendances = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\Attendance::class)->monthlyEmployeeAttendance($this->getUser()->getGlobalOption());
+        $particulars = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(array('globalOption'=>$global),array('mode'=>'ASC'));
+        $attendances = $this->em->getRepository(\App\HumanResource\Entity\Attendance::class)->monthlyEmployeeAttendance($this->getUser()->getGlobalOption());
         $presents = array();
         foreach ($attendances as $attendance){
             $presents[$attendance['userId']] = $attendance;

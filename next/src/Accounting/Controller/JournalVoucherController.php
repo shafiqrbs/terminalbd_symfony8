@@ -4,6 +4,10 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use Symfony\Component\Form\Form;
@@ -21,14 +25,22 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class JournalVoucherController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -39,7 +51,7 @@ class JournalVoucherController extends AbstractController
 
 	public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $data['mode'] = "double-entry";
@@ -56,12 +68,12 @@ class JournalVoucherController extends AbstractController
     public function journalDetailsAction()
     {
         $option = $this->getUser()->getGlobalOption();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
-         $accountSubHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['globalOption' => $option],['name'=>'ASC']);
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
+         $accountSubHeads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['globalOption' => $option],['name'=>'ASC']);
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
 
         $entities = $em->getRepository(\App\Accounting\Entity\AccountJournalItem::class)->findDoubleEntrySearch( $this->getUser(),$data);
         if(empty($data['pdf'])){
@@ -102,7 +114,7 @@ class JournalVoucherController extends AbstractController
         $form   = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if($data['totalDebit'] == $data['totalDebit']){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $entity->setMode('double-entry');
             $entity->setAmount($data['totalDebit']);
@@ -113,17 +125,17 @@ class JournalVoucherController extends AbstractController
             }
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournalItem::class)->insertDoubleEntry($entity,$data);
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Accounting\Entity\AccountJournalItem::class)->insertDoubleEntry($entity,$data);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('journal_voucher'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
 
         return $this->render('Accounting/JournalVoucher/new.html.twig', [
             'entity' => $entity,
@@ -160,10 +172,10 @@ class JournalVoucherController extends AbstractController
     public function newAction()
     {
         $entity = new AccountJournal();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $form   = $this->createCreateForm($entity);
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
         return $this->render('Accounting/JournalVoucher/new.html.twig', [
             'entity' => $entity,
             'accountHead' => $accountHead,
@@ -185,16 +197,16 @@ class JournalVoucherController extends AbstractController
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($id);
         $editForm = $this->createEditForm($entity);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
-        $subHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccount( $this->getUser()->getGlobalOption()->getId(),$entity);
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
+        $subHeads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccount( $this->getUser()->getGlobalOption()->getId(),$entity);
         return $this->render('Accounting/JournalVoucher/new.html.twig', [
             'entity' => $entity,
             'accountHead' => $accountHead,
@@ -230,7 +242,7 @@ class JournalVoucherController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $entity = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($id);
 
@@ -240,22 +252,22 @@ class JournalVoucherController extends AbstractController
         $editForm = $this->createEditForm($entity);
         if($data['totalDebit'] == $data['totalDebit']){
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $entity->setMode('double-entry');
             $entity->setAmount($data['totalDebit']);
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournalItem::class)->insertDoubleEntry($entity,$data);
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Accounting\Entity\AccountJournalItem::class)->insertDoubleEntry($entity,$data);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('journal_voucher_edit',['id'=> $entity->getId()]));
 
         }
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
 
-        $subHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccount( $this->getUser()->getGlobalOption()->getId(),$entity);
+        $subHeads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccount( $this->getUser()->getGlobalOption()->getId(),$entity);
 
         return $this->render('Accounting/JournalVoucher/new.html.twig', [
             'entity'      => $entity,
@@ -270,7 +282,7 @@ class JournalVoucherController extends AbstractController
     {
         $data = $request->request->all();
         $entity = new AccountJournal();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setGlobalOption($this->getUser()->getGlobalOption());
         $parent = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($data['parent']);
         $entity->setToUser($parent->getCreatedBy());
@@ -288,7 +300,7 @@ class JournalVoucherController extends AbstractController
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
@@ -301,7 +313,7 @@ class JournalVoucherController extends AbstractController
     public function approveAction(AccountJournal $entity)
     {
         if (!empty($entity) and $entity->getProcess() != 'approved') {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $accountClose = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -311,7 +323,7 @@ class JournalVoucherController extends AbstractController
                 $entity->setUpdated($datetime);
             }
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertDoubleEntryTransaction($entity);
+            $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertDoubleEntryTransaction($entity);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -324,7 +336,7 @@ class JournalVoucherController extends AbstractController
 
     public function deleteAction(AccountJournal $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
@@ -338,7 +350,7 @@ class JournalVoucherController extends AbstractController
 
     public function itemDeleteAction(AccountJournalItem $item)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$item) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
@@ -354,12 +366,12 @@ class JournalVoucherController extends AbstractController
      */
     public function approveDeleteAction(AccountJournal $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
         $em->remove($entity);
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->approvedDeleteRecord($entity,'Journal');
+        $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->approvedDeleteRecord($entity,'Journal');
         $em->flush();
         return new Response('success');
     }
@@ -369,8 +381,8 @@ class JournalVoucherController extends AbstractController
 
 	public function journalReverseAction(AccountJournal $entity){
 
-		$em = $this->getDoctrine()->getManager();
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountReverse($entity);
+		$em = $this->em;
+		$this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountReverse($entity);
 		$entity->setProcess(null);
 		$entity->setApprovedBy(null);
 		$entity->setAmount(0);
@@ -385,7 +397,7 @@ class JournalVoucherController extends AbstractController
 		set_time_limit(0);
 		ignore_user_abort(true);
 		$array = [];
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$entities = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findWithSearch( $this->getUser(),$data);
 		$entities = $entities->getResult();
@@ -431,7 +443,7 @@ class JournalVoucherController extends AbstractController
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data['mode'] = "double-entry";
         $entities = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findDoubleEntrySearch( $this->getUser(),$data);
         $pagination = $entities->getResult();
@@ -442,7 +454,7 @@ class JournalVoucherController extends AbstractController
             if (!empty($entity) and $entity->getProcess() == 'approved') {
                 $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
                 $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->resetDoubleEntryTransaction($entity);
+                $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->resetDoubleEntryTransaction($entity);
             } else {
                 return new Response('failed');
             }
@@ -457,13 +469,13 @@ class JournalVoucherController extends AbstractController
      */
     public function printAction(AccountJournal $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity and $entity->getGlobalOption()->getId() != $this->getUser()->getGlobalOption()->getId() ) {
             throw $this->createNotFoundException('Unable to find AccountSales entity.');
         }
         $template = ($entity->getGlobalOption()->getAccountingConfig()->isCustomPrint() == 1) ? $entity->getGlobalOption()->getSubDomain():'print';
-        $amountInWord = $this->get('settong.toolManageRepo')->intToWords($entity->getAmount());
+        $amountInWord = $this->toolManager->intToWords($entity->getAmount());
         return $this->render("AccountingBundle:JournalVoucher/print:{$template}.html.twig", [
             'entity'           => $entity,
             'config'           => $entity->getGlobalOption()->getAccountingConfig(),

@@ -3,7 +3,7 @@
 namespace App\Appearance\Service;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 
 
 use App\Appearance\Entity\ModuleSetup;
@@ -24,7 +24,7 @@ class ModuleManager
      */
     protected  $em;
 
-    public function  __construct(private readonly Registry $doctrine)
+    public function  __construct(private readonly ManagerRegistry $doctrine)
     {
         $this->em = $this->doctrine->getManager();
     }

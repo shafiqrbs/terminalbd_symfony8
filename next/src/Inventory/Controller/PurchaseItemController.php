@@ -2,11 +2,14 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Inventory\Entity\Purchase;
 use App\Inventory\Entity\PurchaseItemSerial;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Inventory\Entity\PurchaseItem;
 use App\Inventory\Form\PurchaseItemType;
@@ -16,16 +19,23 @@ use Symfony\Component\HttpFoundation\Response;
  * PurchaseItem controller.
  *
  */
-class PurchaseItemController extends Controller
+class PurchaseItemController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -37,7 +47,7 @@ class PurchaseItemController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findWithSearch($config,$data);
@@ -51,7 +61,7 @@ class PurchaseItemController extends Controller
 
     public function multiAddAction(Purchase $purchase)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         return $this->render('Inventory/PurchaseItem/group.html.twig', array(
             'entity'      => $purchase,
         ));
@@ -59,10 +69,10 @@ class PurchaseItemController extends Controller
 
     public function multiInsertAction(Request $request,Purchase $purchase)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->insertPurchaseItemAttribute($data);
-        $this->get('session')->getFlashBag()->add(
+        $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->insertPurchaseItemAttribute($data);
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been inserted successfully"
         );
         return $this->redirect($this->generateUrl('inventory_purchaseitem_multi_add', array('purchase' => $purchase->getId())));
@@ -78,9 +88,9 @@ class PurchaseItemController extends Controller
     {
             $data = $request->request->all();
 
-            $purchase = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Purchase::class)->find($purchase);
+            $purchase = $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->find($purchase);
             $this->checkQuantity($purchase,$data);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $i = 0 ;
             $checkQuantity = $this->checkQuantity($purchase,$data);
             if( $this->checkQuantity($purchase,$data) == 'success' ){
@@ -89,8 +99,8 @@ class PurchaseItemController extends Controller
                 {
 
                     $entity = new PurchaseItem();
-                    $purchaseVendorItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->find($data['purchaseVendorItem'][$i]);
-                    $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->find($data['item'][$i]);
+                    $purchaseVendorItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->find($data['purchaseVendorItem'][$i]);
+                    $item = $this->em->getRepository(\App\Inventory\Entity\Item::class)->find($data['item'][$i]);
                     $entity->setPurchase($purchase);
                     $entity->setInventoryConfig($purchase->getInventoryConfig());
                     $entity->setPurchaseVendorItem($purchaseVendorItem);
@@ -106,7 +116,7 @@ class PurchaseItemController extends Controller
                 }
                 $item = $purchase->getTotalItem();
                 $quantity = $purchase->getTotalQnt();
-                $vendorItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->getPurchaseItemQuantity($purchase);
+                $vendorItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->getPurchaseItemQuantity($purchase);
                 if( $vendorItem['totalQnt']  ==  $quantity or $vendorItem['totalItem'] == $item ){
                     $em->getRepository(\App\Inventory\Entity\Purchase::class)->updateProcess($purchase,'complete');
                 }else{
@@ -124,7 +134,7 @@ class PurchaseItemController extends Controller
     public function checkQuantity($purchase,$data)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $totalQnt = $em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->getPurchaseVendorQuantitySum($purchase);
         $itemQnt = 0;
         foreach ($data['quantity'] as $key => $quantity) {
@@ -169,16 +179,16 @@ class PurchaseItemController extends Controller
     public function newAction($purchase)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new PurchaseItem();
-        $purchaseInfo = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Purchase::class)->find($purchase);
+        $purchaseInfo = $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->find($purchase);
         $form   = $this->createCreateForm($entity,$purchase);
 
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         if($inventory->getIsVendor() == 1 ){
-            $items = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->findBy(array('inventoryConfig'=>$inventory,'vendor'=>$purchaseInfo->getVendor()),array('name'=>'ASC'));
+            $items = $this->em->getRepository(\App\Inventory\Entity\Item::class)->findBy(array('inventoryConfig'=>$inventory,'vendor'=>$purchaseInfo->getVendor()),array('name'=>'ASC'));
         }else{
-            $items = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->findBy(array('inventoryConfig'=>$inventory),array('name'=>'ASC'));
+            $items = $this->em->getRepository(\App\Inventory\Entity\Item::class)->findBy(array('inventoryConfig'=>$inventory),array('name'=>'ASC'));
         }
         return $this->render('Inventory/PurchaseItem/new.html.twig', array(
             'purchase' => $purchase,
@@ -195,7 +205,7 @@ class PurchaseItemController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($id);
 
@@ -213,7 +223,7 @@ class PurchaseItemController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($id);
 
@@ -252,7 +262,7 @@ class PurchaseItemController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
@@ -284,9 +294,9 @@ class PurchaseItemController extends Controller
      */
     public function deleteAction(PurchaseItem $purchaseItem)
     {
-        $salesQnt = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemQuantity($purchaseItem, array('sales','damage','purchaseReturn'));
+        $salesQnt = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemQuantity($purchaseItem, array('sales','damage','purchaseReturn'));
         if($purchaseItem and $salesQnt == 0 ){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->remove($purchaseItem);
             $em->flush();
             return new Response('success');
@@ -301,7 +311,7 @@ class PurchaseItemController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -309,7 +319,7 @@ class PurchaseItemController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
@@ -327,7 +337,7 @@ class PurchaseItemController extends Controller
             $em->flush();
             $em->getRepository(\App\Inventory\Entity\Purchase::class)->purchaseSimpleUpdate($entity->getPurchase());
         }
-        $salesQnt = $this->getDoctrine()->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemQuantity($entity,array('sales','damage','purchaseReturn'));
+        $salesQnt = $this->em->getRepository(\App\Inventory\Entity\StockItem::class)->getPurchaseItemQuantity($entity,array('sales','damage','purchaseReturn'));
         if($data['name'] == 'Quantity' and $salesQnt <= (int)$data['value']){
             $entity->setQuantity((int)$data['value']);
             $entity->setPurchaseSubTotal((int)$data['value'] * $entity->getPurchasePrice());
@@ -337,7 +347,7 @@ class PurchaseItemController extends Controller
         }
 
         if($data['name'] == 'Barcode'){
-            $existBarcode = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findBy(array('barcode' => $data['value']));
+            $existBarcode = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findBy(array('barcode' => $data['value']));
             if(empty($existBarcode)){
                 $process = 'set'.$data['name'];
                 $entity->$process($data['value']);
@@ -348,7 +358,7 @@ class PurchaseItemController extends Controller
 
             if($entity->getPurchase()->getProcess() == "approved"){
                 /* @var $item PurchaseItem */
-                $item = $this->getDoctrine()->getRepository(PurchaseItemSerial::class)->updatePurchaseItemSerial($entity,$data['value']);
+                $item = $this->em->getRepository(PurchaseItemSerial::class)->updatePurchaseItemSerial($entity,$data['value']);
                 $barcodes = array();
                 foreach ($item->getItemSerials() as $serial){
                     $barcodes[] = $serial->getBarcode();
@@ -370,7 +380,7 @@ class PurchaseItemController extends Controller
     {
        foreach ($purchase->getPurchaseItems() as $entity)
            if($entity->getSerialNo()){
-               $this->getDoctrine()->getRepository(PurchaseItemSerial::class)->sysncPurchaseItemSerial($entity);
+               $this->em->getRepository(PurchaseItemSerial::class)->sysncPurchaseItemSerial($entity);
            }
            return new Response('success');
     }
@@ -378,7 +388,7 @@ class PurchaseItemController extends Controller
     public function inlineItemUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
@@ -402,19 +412,19 @@ class PurchaseItemController extends Controller
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Item entity.');
         }
         $barcode = trim($data['value']);
-        $existBarcode = $this->getDoctrine()->getRepository( \App\Inventory\Entity\PurchaseItem::class )->findOneBy( array('inventoryConfig'=>$config, 'barcode' => $barcode) );
+        $existBarcode = $this->em->getRepository( \App\Inventory\Entity\PurchaseItem::class )->findOneBy( array('inventoryConfig'=>$config, 'barcode' => $barcode) );
         if ( empty( $existBarcode ) ) {
             $barcode = trim($data['value']);
             $entity->setBarcode($barcode);
             $em->flush();
         }else{
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice'," $barcode This barcode already used another item"
             );
         }

@@ -2,8 +2,10 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Tool\Entity\Syndicate;
 use App\Tool\Form\SyndicateType;
@@ -12,8 +14,14 @@ use App\Tool\Form\SyndicateType;
  * Syndicate controller.
  *
  */
-class SyndicateController extends Controller
+class SyndicateController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Syndicate entities.
@@ -21,7 +29,7 @@ class SyndicateController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\Syndicate::class)->findAll();
 
@@ -41,12 +49,12 @@ class SyndicateController extends Controller
 
         if ($form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
 
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('syndicate_new'));
@@ -69,7 +77,7 @@ class SyndicateController extends Controller
     private function createCreateForm(Syndicate $entity)
     {
 
-        $em = $this->getDoctrine()->getRepository(\App\Tool\Entity\Syndicate::class);
+        $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
 
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SyndicateType::configureOptions() and pass them as form options: $em), $entity, array(
@@ -107,7 +115,7 @@ class SyndicateController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Syndicate::class)->find($id);
 
@@ -129,7 +137,7 @@ class SyndicateController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Syndicate::class)->find($id);
 
@@ -157,7 +165,7 @@ class SyndicateController extends Controller
     private function createEditForm(Syndicate $entity)
     {
 
-        $em = $this->getDoctrine()->getRepository(\App\Tool\Entity\Syndicate::class);
+        $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
 
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SyndicateType::configureOptions() and pass them as form options: $em), $entity, array(
@@ -178,7 +186,7 @@ class SyndicateController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Syndicate::class)->find($id);
 
@@ -196,7 +204,7 @@ class SyndicateController extends Controller
             $em->persist($entity);
 
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('syndicate'));
@@ -214,14 +222,14 @@ class SyndicateController extends Controller
      */
     public function deleteAction(Syndicate $entity)
     {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Syndicate entity.');
             }
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
             return $this->redirect($this->generateUrl('syndicate'));
@@ -256,7 +264,7 @@ class SyndicateController extends Controller
         //$data = $request->request->all();
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\Syndicate::class)->find($id);
 
         if (!$entity) {
@@ -270,7 +278,7 @@ class SyndicateController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('syndicate'));

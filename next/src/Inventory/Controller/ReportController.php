@@ -3,6 +3,9 @@
 namespace App\Inventory\Controller;
 
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Knp\Snappy\Pdf;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,13 +17,20 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -33,7 +43,7 @@ class ReportController extends AbstractController
      */
     public function overviewAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
       //  $purchaseOverview = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findItemWithPurchaseQuantity($inventory);
@@ -56,7 +66,7 @@ class ReportController extends AbstractController
 
     public function tillStockAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $stockOverview = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockOverview($inventory,$data);
@@ -78,7 +88,7 @@ class ReportController extends AbstractController
 
     public function periodicStockAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $stockOverview = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockOverview($inventory,$data);
@@ -101,7 +111,7 @@ class ReportController extends AbstractController
 
     public function operationalStockAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\StockItem::class)->stockItem($inventory,$data);
@@ -117,7 +127,7 @@ class ReportController extends AbstractController
 
     public function groupStockAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         //$stockOverview = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockOverview($inventory,$data);
@@ -146,7 +156,7 @@ class ReportController extends AbstractController
 
     public function stockAction($group)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getGroupStock($inventory,$group);
@@ -160,7 +170,7 @@ class ReportController extends AbstractController
 
     public function stockItemAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $stockOverview = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockOverview($inventory,$data);
@@ -175,7 +185,7 @@ class ReportController extends AbstractController
 
     public function purchaseOverviewAction()
     {
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
 	    $data = $_REQUEST;
 	    $user = $this->getUser();
 	    $inventory = $user->getGlobalOption()->getInventoryConfig()->getId();
@@ -195,7 +205,7 @@ class ReportController extends AbstractController
 
     public function purchaseAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities       = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getProcessStock($inventory,$data);
@@ -210,7 +220,7 @@ class ReportController extends AbstractController
 
     public function salesTransactionOverviewAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
@@ -236,7 +246,7 @@ class ReportController extends AbstractController
 
     public function salesTransactionAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
@@ -260,7 +270,7 @@ class ReportController extends AbstractController
 
     public function salesStockItemAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
@@ -281,7 +291,7 @@ class ReportController extends AbstractController
 
     public function salesItemDetailsAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
@@ -302,7 +312,7 @@ class ReportController extends AbstractController
 
     public function dailySalesProfitAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
@@ -340,7 +350,7 @@ class ReportController extends AbstractController
 
     public function monthlySalesProfitAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $sales = $em->getRepository(\App\Inventory\Entity\Sales::class)->inventorySalesMonthly($user,$data);
@@ -379,7 +389,7 @@ class ReportController extends AbstractController
 
     public function dailySalesAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Inventory\Entity\Sales::class)->inventorySalesDaily($user,$data);
@@ -391,7 +401,7 @@ class ReportController extends AbstractController
 
     public function monthlySalesAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Inventory\Entity\Sales::class)->inventorySalesMonthly($user,$data);
@@ -403,7 +413,7 @@ class ReportController extends AbstractController
 
     public function salesUserAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
@@ -420,7 +430,7 @@ class ReportController extends AbstractController
 
     public function monthlyUserSalesAction(){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
@@ -443,7 +453,7 @@ class ReportController extends AbstractController
 
     public function categoryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
     }
@@ -454,7 +464,7 @@ class ReportController extends AbstractController
      */
     public function overviewinAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig()->getId();
 
@@ -471,7 +481,7 @@ class ReportController extends AbstractController
      */
     public function overviAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $stockOverview = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockPriceOverview($inventory,$data);
@@ -492,7 +502,7 @@ class ReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
         $html = $this->renderView(
             'Accounting/Report/incomePdf.html.twig', [
                 'overview' => $overview,
@@ -514,7 +524,7 @@ class ReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
         return $this->render('Accounting/Report/incomePdf.html.twig', [
             'overview' => $overview,
             'print' => '<script>window.print();</script>'

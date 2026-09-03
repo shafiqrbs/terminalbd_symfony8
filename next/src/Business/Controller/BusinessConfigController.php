@@ -2,26 +2,34 @@
 
 namespace App\Business\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\BusinessConfig;
 use App\Business\Form\ConfigType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * BusinessConfigController.
  *
  */
-class BusinessConfigController extends Controller
+class BusinessConfigController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     public function manageAction()
     {
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $this->getUser()->getGlobalOption()->getBusinessConfig();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity preparation.');
@@ -63,7 +71,7 @@ class BusinessConfigController extends Controller
      */
     public function updateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $this->getUser()->getGlobalOption()->getBusinessConfig();
         if (!$entity) {
@@ -80,7 +88,7 @@ class BusinessConfigController extends Controller
                 $entity->upload();
             }
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Report has been created successfully"
             );
             return $this->redirect($this->generateUrl('business_config_manage'));
@@ -97,7 +105,7 @@ class BusinessConfigController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
+            $item = $this->em->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
         }
         return new JsonResponse($item);
     }

@@ -4,6 +4,9 @@ namespace App\Restaurant\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Knp\Snappy\Pdf;
@@ -15,14 +18,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -36,7 +46,7 @@ class ReportController extends AbstractController
     public function salesSummaryAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $salesTotalTransactionOverview = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->todaySalesOverview($user,$data);
@@ -87,7 +97,7 @@ class ReportController extends AbstractController
     public function userBaseSalesSummaryAction()
     {
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $userSalesOverview = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->userSalesOverview($user,$data);
 
@@ -115,7 +125,7 @@ class ReportController extends AbstractController
     public function categoryBaseSalesSummaryAction()
     {
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $categoryOverview = $em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->findWithCategoryOverview($user,$data);
         if(empty($data['pdf'])){
@@ -139,7 +149,7 @@ class ReportController extends AbstractController
     public function productGroupBaseSalesSummaryAction()
     {
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $categoryOverview = $em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->findWithProductGroupOverview($user,$data);
         if(empty($data['pdf'])){
@@ -164,7 +174,7 @@ class ReportController extends AbstractController
     {
 
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $productOverview = $em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->findWithProductOverview($user,$data);
         if(empty($data['pdf'])){
@@ -187,15 +197,15 @@ class ReportController extends AbstractController
 
     public function salesDetailsAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->salesReport($user, $data);
         $pagination = $this->paginate($entities);
         $purchaseSalesPrice = $em->getRepository(\App\Medicine\Entity\MedicineSales::class)->reportSalesItemPurchaseSalesOverview($user, $data);
         $transactionMethods = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(['status' => 1], ['name' => 'ASC']);
-        $banks = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption' => $user->getGlobalOption(),'status' => 1], ['name' => 'ASC']);
-        $mobiles =  $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption' => $user->getGlobalOption() , 'status' => 1], ['name' => 'ASC']);
+        $banks = $this->em->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption' => $user->getGlobalOption(),'status' => 1], ['name' => 'ASC']);
+        $mobiles =  $this->em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption' => $user->getGlobalOption() , 'status' => 1], ['name' => 'ASC']);
 
         $cashOverview = $em->getRepository(\App\Medicine\Entity\MedicineSales::class)->reportSalesOverview($user, $data);
         return $this->render('Restaurant/Report/sales/sales.html.twig', [

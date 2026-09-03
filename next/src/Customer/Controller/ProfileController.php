@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Customer\Controller;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DomainUser\Entity\Customer;
 use App\DomainUser\Form\MemberEditProfileType;
 use App\User\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 
@@ -13,8 +14,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  * DomainUser controller.
  *
  */
-class ProfileController extends Controller
+class ProfileController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
 
 
@@ -24,7 +30,7 @@ class ProfileController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\User\Entity\User::class)->find($id);
 
@@ -43,7 +49,7 @@ class ProfileController extends Controller
     public function editAction()
     {
         $user = $this->getUser();
-        $profile = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
+        $profile = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
         $editForm = $this->createEditForm($profile);
         $globalOption = $this->getUser()->getGlobalOption();
 
@@ -64,7 +70,7 @@ class ProfileController extends Controller
     private function createEditForm(Customer $profile)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $em = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class);
+        $em = $this->em->getRepository(\App\DomainUser\Entity\Customer::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into MemberEditProfileType::configureOptions() and pass them as form options: $em), $profile, array(
         $form = $this->createForm(new MemberEditProfileType($em), $profile, array(
@@ -83,9 +89,9 @@ class ProfileController extends Controller
      */
     public function updateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
-        $profile = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
+        $profile = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
         if (!$profile) {
             throw $this->createNotFoundException('Unable to find customer entity.');
         }

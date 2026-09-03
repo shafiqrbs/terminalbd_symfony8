@@ -3,12 +3,15 @@
 namespace App\Accounting\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Form\VendorType;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Accounting\Entity\AccountVendor;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,16 +19,23 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountVendor controller.
  *
  */
-class VendorController extends Controller
+class VendorController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -36,7 +46,7 @@ class VendorController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findWithSearch($globalOption,$data);
@@ -60,11 +70,11 @@ class VendorController extends Controller
         $form->handleRequest($request);
         if ($form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_vendor'));
@@ -106,7 +116,7 @@ class VendorController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountVendor();
         $form   = $this->createCreateForm($entity);
         return $this->render('Accounting/AccountVendor/new.html.twig', array(
@@ -131,7 +141,7 @@ class VendorController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
@@ -178,7 +188,7 @@ class VendorController extends Controller
 
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
@@ -191,7 +201,7 @@ class VendorController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->updateVendorCompanyName($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->updateVendorCompanyName($entity);
             return $this->redirect($this->generateUrl('account_vendor'));
         }
 
@@ -208,7 +218,7 @@ class VendorController extends Controller
 
     public function deleteAction(AccountVendor $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
         }
@@ -225,7 +235,7 @@ class VendorController extends Controller
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
         if (!$entity) {
@@ -239,7 +249,7 @@ class VendorController extends Controller
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         exit;
@@ -251,7 +261,7 @@ class VendorController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $global = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->searchAutoComplete($item,$global);
+            $item = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->searchAutoComplete($item,$global);
         }
         return new JsonResponse($item);
     }
@@ -271,7 +281,7 @@ class VendorController extends Controller
         $vendor = $_REQUEST['vendor'];
         $balance = 0;
         if(!empty($vendor)){
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorSingleOutstanding($globalOption,$type,$vendor);
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorSingleOutstanding($globalOption,$type,$vendor);
             $balance = empty($result) ? 0 : $result;
         }
         $taka = number_format($balance).' Taka';

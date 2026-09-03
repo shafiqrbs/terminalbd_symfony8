@@ -2,8 +2,11 @@
 
 namespace App\Accounting\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Accounting\Entity\AccountOnlineOrder;
 use App\Accounting\Form\AccountOnlineOrderType;
@@ -13,16 +16,23 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountOnlineOrder controller.
  *
  */
-class AccountOnlineOrderController extends Controller
+class AccountOnlineOrderController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,14 +45,14 @@ class AccountOnlineOrderController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository('AccountingBundle:AccountOnlineOrder')->findWithSearch($globalOption,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository('AccountingBundle:AccountOnlineOrder')->onlineOrderOverview($globalOption,$data);
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(20,29));
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
+        $overview = $this->em->getRepository('AccountingBundle:AccountOnlineOrder')->onlineOrderOverview($globalOption,$data);
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getChildrenAccountHead($parent =array(20,29));
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
         return $this->render('Accounting/AccountOnlineOrder/index.html.twig', array(
             'entities' => $pagination,
             'accountHead' => $accountHead,
@@ -58,12 +68,12 @@ class AccountOnlineOrderController extends Controller
      */
     public function salesReturnAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository('AccountingBundle:AccountOnlineOrderReturn')->findWithSearch($globalOption,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository('AccountingBundle:AccountOnlineOrderReturn')->salesOverview($globalOption,$data);
+        $overview = $this->em->getRepository('AccountingBundle:AccountOnlineOrderReturn')->salesOverview($globalOption,$data);
         return $this->render('Accounting/AccountOnlineOrder/salesReturn.html.twig', array(
             'entities' => $pagination,
             'searchForm' => $data,
@@ -81,15 +91,15 @@ class AccountOnlineOrderController extends Controller
         $form->handleRequest($request);
         if ($form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $lastBalance = $em->getRepository('AccountingBundle:AccountOnlineOrder')->lastInsertOnlineOrder($this->getUser()->getGlobalOption(),$entity);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption( $this->getUser()->getGlobalOption());
             $entity->setProcessHead('Account Online');
             $entity->setBalance($lastBalance - $entity->getAmount());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_onlineorder'));
@@ -130,7 +140,7 @@ class AccountOnlineOrderController extends Controller
      */
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountOnlineOrder();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
@@ -147,7 +157,7 @@ class AccountOnlineOrderController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('AccountingBundle:AccountOnlineOrder')->find($id);
        if (!$entity) {
@@ -165,7 +175,7 @@ class AccountOnlineOrderController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('AccountingBundle:AccountOnlineOrder')->find($id);
 
@@ -208,7 +218,7 @@ class AccountOnlineOrderController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('AccountingBundle:AccountOnlineOrder')->find($id);
 
@@ -239,7 +249,7 @@ class AccountOnlineOrderController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository('AccountingBundle:AccountOnlineOrder')->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
@@ -254,11 +264,11 @@ class AccountOnlineOrderController extends Controller
     public function approveAction(AccountOnlineOrder $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $em->flush();
-            // $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountOnlineOrderTransaction($entity);
+            // $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountOnlineOrderTransaction($entity);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -272,7 +282,7 @@ class AccountOnlineOrderController extends Controller
      */
     public function deleteAction(AccountOnlineOrder $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
         }

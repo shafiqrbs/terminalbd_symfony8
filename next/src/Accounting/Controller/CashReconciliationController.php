@@ -4,6 +4,9 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\Accounting\Entity\CashReconciliationMeta;
@@ -18,14 +21,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CashReconciliationController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,7 +45,7 @@ class CashReconciliationController extends AbstractController
 
 	public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->findWithSearch( $this->getUser()->getGlobalOption(),$data);
         $pagination = $this->paginate($entities);
@@ -48,11 +58,11 @@ class CashReconciliationController extends AbstractController
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $global = $this->getUser()->getGlobalOption();
         $date = new DateTime('now');
         $entity = new CashReconciliation();
-        $exist = $this->getDoctrine()->getRepository(\App\Accounting\Entity\CashReconciliation::class)->checkExist($global);
+        $exist = $this->em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->checkExist($global);
         if(!$exist){
             $entity->setGlobalOption($global);
             $accountConfig = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -68,20 +78,20 @@ class CashReconciliationController extends AbstractController
             $em->persist($entity);
             $em->flush();
             $data = ['startDate' => $date,'endDate'=>$date];
-            $bankCash = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
-            $mobileCash = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\CashReconciliation::class)->initialUpdate($this->getUser(),$entity);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\CashReconciliation::class)->notesReconciliationInsert($entity,$bankCash,$mobileCash);
+            $bankCash = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
+            $mobileCash = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
+            $this->em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->initialUpdate($this->getUser(),$entity);
+            $this->em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->notesReconciliationInsert($entity,$bankCash,$mobileCash);
             return $this->redirect($this->generateUrl('account_cashreconciliation_edit',['id' => $entity->getId()]));
         }else{
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\CashReconciliation::class)->systemCashUpdate($this->getUser(),$exist);
+            $this->em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->systemCashUpdate($this->getUser(),$exist);
             return $this->redirect($this->generateUrl('account_cashreconciliation_edit',['id' => $exist->getId()]));
         }
     }
     
     public function editAction($id){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->findOneBy(['globalOption' => $option,'id' => $id]);
         if (!$entity) {
@@ -96,11 +106,11 @@ class CashReconciliationController extends AbstractController
             $date = $datetime->format("Y-m-d");
         }
         $data = ['startDate' => $date,'endDate'=>$date];
-        $transactionCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
+        $transactionCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
 
-        $transactionBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
-        $transactionMobileBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\CashReconciliation::class)->systemCashUpdate($this->getUser(),$entity);
+        $transactionBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
+        $transactionMobileBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
+        $this->em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->systemCashUpdate($this->getUser(),$entity);
         return $this->render('Accounting/CashReconciliation/new.html.twig', [
             'entity' => $entity,
             'transactionCashOverviews'          => $transactionCashOverview,
@@ -112,14 +122,14 @@ class CashReconciliationController extends AbstractController
 
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->findOneBy(['globalOption' => $option,'id' => $id]);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CashReconciliation entity.');
         }
-        $transactionBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser());
-        $transactionMobileBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser());
+        $transactionBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser());
+        $transactionMobileBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser());
         return $this->render('Accounting/CashReconciliation/show.html.twig', [
             'entity' => $entity,
             'transactionBankCashOverviews'          => $transactionBankCashOverviews,
@@ -137,7 +147,7 @@ class CashReconciliationController extends AbstractController
         $amount = $_REQUEST['amount'];
         $note = $_REQUEST['note'];
         $meta = $_REQUEST['metaKey'];
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CashReconciliation entity.');
         }
@@ -147,14 +157,14 @@ class CashReconciliationController extends AbstractController
             $entity->setMetaKey($meta);
         }
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\CashReconciliation::class)->update($entity->getCashReconciliation(),$entity->getTransactionMethod());
+        $this->em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->update($entity->getCashReconciliation(),$entity->getTransactionMethod());
         return new Response('success');
         exit;
     }
 
     public function addAction(CashReconciliation $reconciliation)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $method = $data['method'];
         $particular = $data['particular'];
@@ -167,7 +177,7 @@ class CashReconciliationController extends AbstractController
         $entity->setIsCustom(1);
         $em->persist($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\CashReconciliation::class)->update($reconciliation,$entity->getTransactionMethod());
+        $this->em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->update($reconciliation,$entity->getTransactionMethod());
         return new Response('success');
     }
 
@@ -175,7 +185,7 @@ class CashReconciliationController extends AbstractController
 
     public function deleteAction(CashReconciliation $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CashReconciliation entity.');
         }
@@ -189,7 +199,7 @@ class CashReconciliationController extends AbstractController
 
     public function metaDeleteAction(CashReconciliationMeta $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $recon = $entity->getCashReconciliation();
         $method = $entity->getTransactionMethod();
         if (!$entity) {
@@ -197,7 +207,7 @@ class CashReconciliationController extends AbstractController
         }
         $em->remove($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\CashReconciliation::class)->update($recon,$method);
+        $this->em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->update($recon,$method);
         return new Response('success');
         exit;
     }
@@ -208,12 +218,12 @@ class CashReconciliationController extends AbstractController
      */
     public function approveDeleteAction(CashReconciliation $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CashReconciliation entity.');
         }
         $em->remove($entity);
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->approvedDeleteRecord($entity,'BalanceTransfer');
+        $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->approvedDeleteRecord($entity,'BalanceTransfer');
         $em->flush();
         return new Response('success');
         exit;
@@ -223,8 +233,8 @@ class CashReconciliationController extends AbstractController
 
 	public function journalReverseAction(CashReconciliation $entity){
 
-		$em = $this->getDoctrine()->getManager();
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountReverse($entity);
+		$em = $this->em;
+		$this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountReverse($entity);
 		$entity->setProcess(null);
 		$entity->setApprovedBy(null);
 		$entity->setAmount(0);
@@ -238,14 +248,14 @@ class CashReconciliationController extends AbstractController
 	public function reportDownloadAction( $id){
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Accounting\Entity\CashReconciliation::class)->findOneBy(['globalOption' => $option,'id' => $id]);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CashReconciliation entity.');
         }
-        $transactionBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser());
-        $transactionMobileBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser());
+        $transactionBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser());
+        $transactionMobileBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser());
         $html = $this->renderView('Accounting/CashReconciliation/pdf.html.twig', [
             'entity' => $entity,
             'transactionBankCashOverviews'          => $transactionBankCashOverviews,

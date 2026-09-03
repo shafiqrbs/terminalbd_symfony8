@@ -2,6 +2,7 @@
 
 namespace App\Appearance\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,11 @@ use App\Appearance\Form\TemplateCustomizeType;
  */
 class SiteSeoController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all TemplateCustomize entities.
@@ -22,7 +28,7 @@ class SiteSeoController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->findAll();
 
@@ -42,7 +48,7 @@ class SiteSeoController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
             return $this->redirect($this->generateUrl('templatecustomize_show', ['id' => $entity->getId()]));
@@ -95,7 +101,7 @@ class SiteSeoController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->find($id);
 
@@ -115,7 +121,7 @@ class SiteSeoController extends AbstractController
     public function editAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->findOneBy(['globalOption'=>$id]);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find TemplateCustomize entity.');
@@ -155,7 +161,7 @@ class SiteSeoController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->findOneBy(['globalOption'=> $id]);
         $data = $request->request->all();
@@ -187,7 +193,7 @@ class SiteSeoController extends AbstractController
             }
             $entity->upload();
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->fileUploader($entity,$file);
+            $this->em->getRepository(\App\Appearance\Entity\TemplateCustomize::class)->fileUploader($entity,$file);
             return $this->redirect($this->generateUrl('templatecustomize_edit', ['id' => $id]));
         }
 
@@ -198,7 +204,7 @@ class SiteSeoController extends AbstractController
     }
 
     public function resetAction(TemplateCustomize $entity){
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity->setAnchorColor(NULL);
         $entity->setAnchorHoverColor(NULL);

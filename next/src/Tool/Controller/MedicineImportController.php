@@ -2,6 +2,9 @@
 
 namespace App\Tool\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Tool\Entity\MedicineImport;
@@ -14,14 +17,21 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class MedicineImportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -36,7 +46,7 @@ class MedicineImportController extends AbstractController
 	 */
 	public function indexAction()
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$entities = $em->getRepository(\App\Tool\Entity\MedicineImport::class)->findBy([],['updated'=>'DESC']);
 		return $this->render('Tool/MedicineImport/index.html.twig', [
 			'entities' => $entities,
@@ -57,7 +67,7 @@ class MedicineImportController extends AbstractController
 		$data = $request->request->all();
 		if ($form->isSubmitted() && $form->isValid()) {
 
-			$em = $this->getDoctrine()->getManager();
+			$em = $this->em;
 
 			/** @var $file UploadedFile */
 
@@ -72,10 +82,10 @@ class MedicineImportController extends AbstractController
 			$entity->setPath($imgName);
 			$em->persist($entity);
 			$em->flush();
-			$this->get('session')->getFlashBag()->add(
+			$this->requestStack->getSession()->getFlashBag()->add(
 				'success',"Data has been added successfully"
 			);
-		//	$this->getDoctrine()->getRepository(\App\Tool\Entity\MedicineImport::class)->fileUpload($entity,$data);
+		//	$this->em->getRepository(\App\Tool\Entity\MedicineImport::class)->fileUpload($entity,$data);
 			return $this->redirect($this->generateUrl('medicine_import'));
 		}
 
@@ -126,20 +136,22 @@ class MedicineImportController extends AbstractController
 		//set_time_limit(0);
 		ini_set('max_execution_time', 0);
 		ignore_user_abort(true);
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
+		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$importer = $this->get('appstore_medicine_importer_excel');
+		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$reader = $this->get('appstore_medicine.importer.excel_data_reader');
 		$file =  realpath($excelImporter->getAbsolutePath());
 		$data = $reader->getData($file);
 		if($importer->isValid($data)) {
 			$importer->import($data);
 			$excelImporter->setProgress('migrated');
-			$this->get('session')->getFlashBag()->add(
+			$this->requestStack->getSession()->getFlashBag()->add(
 				'success',"Data has been migration successfully"
 			);
 			$em->flush();
 		}else{
-			$this->get('session')->getFlashBag()->add(
+			$this->requestStack->getSession()->getFlashBag()->add(
 				'error',"Excel File memo no null or exist in your system"
 			);
 			$em->flush();
@@ -150,7 +162,7 @@ class MedicineImportController extends AbstractController
 
 	public function deleteAction(MedicineImport $excelImporter)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		if ($excelImporter) {
 			$excelImporter->removeUpload();
 			$em->remove($excelImporter);
@@ -168,7 +180,7 @@ class MedicineImportController extends AbstractController
     public function uploadAction(Request $request) {
 
         $data = explode( ',', $request->cookies->get( 'barcodes' ) );
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if ( is_null( $data ) ) {
             return $this->redirect( $this->generateUrl( 'medicine_stock_short_item' ) );
         }
@@ -192,7 +204,7 @@ class MedicineImportController extends AbstractController
     public function uploadCreateAction(Request $request) {
 
         $data = explode( ',', $request->cookies->get( 'barcodes' ) );
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if ( is_null( $data ) ) {
             return $this->redirect( $this->generateUrl( 'medicinebrand'));
         }
@@ -211,6 +223,7 @@ class MedicineImportController extends AbstractController
                     if (!file_exists($entity->getUploadDir())) {
                         mkdir($entity->getUploadDir(), 0777, true);
                     }
+                    // TODO(migration): AbstractController::get() was removed; inject this service.
                     $this->get('helper.imageresizer')->resizeImage(480, $path, $img);
                     $entity->setPath($imgName);
                     $em->persist($entity);

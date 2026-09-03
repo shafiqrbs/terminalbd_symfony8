@@ -3,6 +3,9 @@
 namespace App\Inventory\Controller;
 
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Inventory\Entity\Item;
 use Knp\Snappy\Pdf;
@@ -14,14 +17,21 @@ use Knp\Snappy\Pdf;
  */
 class BranchReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -34,7 +44,7 @@ class BranchReportController extends AbstractController
      */
     public function overviewAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $branch = $this->getUser()->getProfile()->getBranches();
@@ -54,7 +64,7 @@ class BranchReportController extends AbstractController
 
     public function stockAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockItem( $this->getUser(), $group = 'item',$data);
         $pagination = $this->paginate($entities);
@@ -75,7 +85,7 @@ class BranchReportController extends AbstractController
 
      public function stockBarcodeAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $entities =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockItem( $this->getUser(), $group = 'barcode',$data);
@@ -99,7 +109,7 @@ class BranchReportController extends AbstractController
     public function barcodeBranchStockAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $id = 9699 ;
         $purchaseItem = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($id);
         $user = $this->getUser();
@@ -141,7 +151,7 @@ class BranchReportController extends AbstractController
 
     public function branchItemDetailsAction(Item $item)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockItemDetails($user,$item);
         $stockSalesItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockSalesItemDetails($user,$item);
@@ -162,7 +172,7 @@ class BranchReportController extends AbstractController
 
     public function branchItemSalesAction(Item $item)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockItemDetails($user,$item);
         $totalQnt = $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockReceiveSingleItem($user,$item);
@@ -185,7 +195,7 @@ class BranchReportController extends AbstractController
 
     public function branchStockItemDetailsAction(Item $item)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockItemDetails($user,$item);
         $stockSalesItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockSalesItemDetails($user,$item);
@@ -218,7 +228,7 @@ class BranchReportController extends AbstractController
 
     public function branchSalesItemSearchAction(Item $item )
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $totalQnt = $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockReceiveSingleItem($user,$item);
         $entities =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockSalesItemHistory($user,$item);
@@ -235,7 +245,7 @@ class BranchReportController extends AbstractController
 
     public function branchSalesItemBarcodeAction($barcode)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $purchaseItem = $em->getRepository(\App\Inventory\Entity\Delivery::class)->barcodeWithItem($user, $barcode);
         $totalQnt = $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockReceiveSingleItem($user, $purchaseItem->getItem(),$barcode);
@@ -255,7 +265,7 @@ class BranchReportController extends AbstractController
 
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $purchaseItem = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($id);
         $user = $this->getUser();
         $branches = $user->getGlobalOption()->getBranches();
@@ -284,7 +294,7 @@ class BranchReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
         $html = $this->renderView(
             'Accounting/Report/incomePdf.html.twig', [
                 'overview' => $overview,
@@ -305,7 +315,7 @@ class BranchReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportIncome($globalOption,$data);
         return $this->render('Accounting/Report/incomePdf.html.twig', [
             'overview' => $overview,
             'print' => '<script>window.print();</script>'

@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Content\Entity\Page;
@@ -15,6 +16,11 @@ use App\Content\Form\TestimonialType;
  */
 class TestimonialController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all Testimonial entities.
@@ -22,7 +28,7 @@ class TestimonialController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Content\Entity\Page::class)->findBy(['globalOption'=> $globalOption,'module'=> 3],['name' => 'asc']);
@@ -41,11 +47,11 @@ class TestimonialController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $entity->setUser($this->getUser());
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
-            $entity ->setModule($this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->find(3));
+            $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->find(3));
             $entity->upload();
             $em->flush();
 
@@ -100,7 +106,7 @@ class TestimonialController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -122,7 +128,7 @@ class TestimonialController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -169,7 +175,7 @@ class TestimonialController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -203,7 +209,7 @@ class TestimonialController extends AbstractController
      */
     public function deleteAction(Page $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($entity->getFile())){
             $entity->removeUpload();
         }

@@ -2,9 +2,11 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Content\Entity\ContactPage;
 use App\Content\Form\ContactPageType;
@@ -13,8 +15,14 @@ use App\Content\Form\ContactPageType;
  * ContactPage controller.
  *
  */
-class ContactPageController extends Controller
+class ContactPageController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all ContactPage entities.
@@ -22,7 +30,7 @@ class ContactPageController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $globalOption = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Content\Entity\ContactPage::class)->findOneBy(array('globalOption'=>$globalOption));
@@ -45,7 +53,7 @@ class ContactPageController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\ContactPage::class)->find($id);
 
@@ -67,7 +75,7 @@ class ContactPageController extends Controller
      */
     public function modifyAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $globalOption = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Content\Entity\ContactPage::class)->findOneBy(array('globalOption'=>$globalOption));
@@ -94,7 +102,7 @@ class ContactPageController extends Controller
     private function createEditForm(ContactPage $entity)
     {
 
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ContactPageType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new ContactPageType($location), $entity, array(
@@ -114,7 +122,7 @@ class ContactPageController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\ContactPage::class)->find($id);
 
@@ -128,7 +136,7 @@ class ContactPageController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             $referer = $request->headers->get('referer');

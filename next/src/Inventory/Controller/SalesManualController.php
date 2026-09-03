@@ -3,6 +3,9 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Inventory\Entity\Item;
 use App\Inventory\Form\InventoryItemType;
 use App\Inventory\Form\SalesGeneralType;
@@ -14,7 +17,7 @@ use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Inventory\Entity\SalesItem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Inventory\Entity\Sales;
 use App\Inventory\Form\SalesType;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,16 +26,23 @@ use Symfony\Component\HttpFoundation\Response;
  * Sales controller.
  *
  */
-class SalesManualController extends Controller
+class SalesManualController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -43,7 +53,7 @@ class SalesManualController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Inventory\Entity\Sales::class)->salesLists($this->getUser(), $mode ='manual',$data);
         $pagination = $this->paginate($entities);
@@ -61,7 +71,7 @@ class SalesManualController extends Controller
     public function newAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = new Sales();
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
@@ -89,7 +99,7 @@ class SalesManualController extends Controller
     public function addItemAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = new Sales();
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
@@ -116,7 +126,7 @@ class SalesManualController extends Controller
     public function editAction($code)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entity = $em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory, 'invoice' => $code));
         if (!$entity) {

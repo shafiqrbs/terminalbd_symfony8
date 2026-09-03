@@ -1,6 +1,8 @@
 <?php
 
 namespace App\DomainUser\Controller;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\User\Form\AgentSignType;
 use App\User\Form\MemberEditProfileType;
 use FOS\UserBundle\Model\UserManager;
@@ -10,7 +12,7 @@ use App\User\Form\DomainEditSignType;
 use App\User\Form\DomainSignType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\DomainUser\Entity\DomainUser;
 use App\DomainUser\Form\DomainUserType;
@@ -19,8 +21,14 @@ use App\DomainUser\Form\DomainUserType;
  * DomainUser controller.
  *
  */
-class AgentPaymentController extends Controller
+class AgentPaymentController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all DomainUser entities.
@@ -28,7 +36,7 @@ class AgentPaymentController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $entities = $user->getGlobalOption()->getUsers();
         return $this->render('DomainUser/DomainUser/index.html.twig', array(
@@ -51,13 +59,13 @@ class AgentPaymentController extends Controller
         $form->handleRequest($request);
         if ($form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($globalOption);
             $entity->setAgent(true);
             $entity->getProfile()->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('domain_user'));
@@ -80,7 +88,7 @@ class AgentPaymentController extends Controller
     private function createCreateForm(User $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into AgentSignType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new AgentSignType($globalOption,$location), $entity, array(
@@ -118,7 +126,7 @@ class AgentPaymentController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\User\Entity\User::class)->find($id);
 
@@ -137,7 +145,7 @@ class AgentPaymentController extends Controller
     public function editAction(User $user)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $editForm = $this->createEditForm($user);
         $globalOption = $user->getGlobalOption();
         return $this->render('DomainUser/DomainUser/edit.html.twig', array(
@@ -157,7 +165,7 @@ class AgentPaymentController extends Controller
     private function createEditForm(User $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into AgentSignType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new AgentSignType($globalOption,$location), $entity, array(
@@ -176,7 +184,7 @@ class AgentPaymentController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\User\Entity\User::class)->find($id);
 
@@ -205,11 +213,11 @@ class AgentPaymentController extends Controller
      */
     public function deleteAction(User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user->setIsDelete(true);
         $user->setEnabled(false);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"Data has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('domain_user'));
@@ -226,7 +234,7 @@ class AgentPaymentController extends Controller
     {
 
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DomainEditSignType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new DomainEditSignType($globalOption,$location), $entity, array(
@@ -263,7 +271,7 @@ class AgentPaymentController extends Controller
      */
     public function updateProfileAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $this->getUser();
 
@@ -276,7 +284,7 @@ class AgentPaymentController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('domain_edit_profile'));
@@ -295,7 +303,7 @@ class AgentPaymentController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
+            $item = $this->em->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
         }
         return new JsonResponse($item);
     }
@@ -312,8 +320,9 @@ class AgentPaymentController extends Controller
     {
 
         $user->setPlainPassword(123456);
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $this->get('fos_user.user_manager')->updateUser($user);
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Password reset successfully"
         );
 

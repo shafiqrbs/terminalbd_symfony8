@@ -2,6 +2,8 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,12 @@ use App\Content\Form\BlackoutType;
  */
 class BlackoutController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Blackout entities.
@@ -23,8 +31,8 @@ class BlackoutController extends AbstractController
     public function indexAction()
     {
 
-        $user = $this->get('security.context')->getToken()->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:Blackout')->findOneBy(['user'=>$user]);
 
@@ -46,7 +54,7 @@ class BlackoutController extends AbstractController
      */
     public function createAction(Request $request)
     {
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
         $entity = new Blackout();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
@@ -56,12 +64,12 @@ class BlackoutController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setUser($user);
             $em->persist($entity);
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
         }
@@ -114,8 +122,8 @@ class BlackoutController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $em = $this->em;
+        $user = $this->getUser();
         $entity = $em->getRepository('SettingContentBundle:Blackout')->findOneBy(['id'=> $id ,'user'=>$user]);
 
         if (!$entity) {
@@ -170,9 +178,9 @@ class BlackoutController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
         $entity = $em->getRepository('SettingContentBundle:Blackout')->findOneBy(['id'=> $id ,'user'=>$user]);
 
         if (!$entity) {
@@ -185,7 +193,7 @@ class BlackoutController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
         }

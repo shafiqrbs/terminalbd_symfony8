@@ -2,6 +2,8 @@
 
 namespace App\Bindu\Controller;
 
+use App\Tool\Service\ToolManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\Tool\Event\PasswordChangeSmsEvent;
@@ -23,13 +25,19 @@ use App\Report\Entity\AppsApi;
 
 class ApiPoskeeperController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function checkApiValidation($request)
     {
         $key =  $this->getParameter('x-api-key');
         $value =  $this->getParameter('x-api-value');
         $unique = $request->headers->get('X-API-SECRET');
-        $setup = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $unique,'status'=> 1]);
+        $setup = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $unique,'status'=> 1]);
         if (!empty($setup) and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
             return $setup;
         }
@@ -52,7 +60,7 @@ class ApiPoskeeperController extends AbstractController
         $key =  $this->getParameter('x-api-key');
         $value =  $this->getParameter('x-api-value');
         if ($request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
-            $data =$this->getDoctrine()->getRepository(\App\Tool\Entity\AppModule::class)->getAndroidAppModules();
+            $data =$this->em->getRepository(\App\Tool\Entity\AppModule::class)->getAndroidAppModules();
         }else{
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }
@@ -74,14 +82,14 @@ class ApiPoskeeperController extends AbstractController
         $mobile = $formData['mobile'];
         $deviceId = $formData['deviceId'];
         $data = [];
-        $entity = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1]);
+        $entity = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1]);
         if (empty($entity) and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }else{
 
             /* @var $entity GlobalOption */
 
-            $device = $this->getDoctrine()->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity,$deviceId);
+            $device = $this->em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity,$deviceId);
             if($device) {
                 $address = '';
                 $vatRegNo = '';
@@ -200,41 +208,41 @@ class ApiPoskeeperController extends AbstractController
         $mobile = $formData['mobile'];
         $deviceId = $formData['deviceId'];
         $setup = [];
-        $entity = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1]);
+        $entity = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['uniqueCode' => $uniqueCode,'mobile' => $mobile,'status'=>1]);
         if (empty($entity) and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }else {
 
-            $device = $this->getDoctrine()->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity, $deviceId);
+            $device = $this->em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity, $deviceId);
             if ($device) {
-                $setup = $this->getDoctrine()->getRepository(AppsApi::class)->getApiSetup($entity,$device);
+                $setup = $this->em->getRepository(AppsApi::class)->getApiSetup($entity,$device);
             }
-            $users = $this->getDoctrine()->getRepository(AppsApi::class)->getApiUsers($entity);
-            $customers = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
-            $methods = $this->getDoctrine()->getRepository(AppsApi::class)->getApiMethodTransaction($entity);
-            $expenseCategories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiExpenseCategory($entity->getId());
-            $units = $this->getDoctrine()->getRepository(AppsApi::class)->getApiProductUnit();
+            $users = $this->em->getRepository(AppsApi::class)->getApiUsers($entity);
+            $customers = $this->em->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
+            $methods = $this->em->getRepository(AppsApi::class)->getApiMethodTransaction($entity);
+            $expenseCategories = $this->em->getRepository(AppsApi::class)->getApiExpenseCategory($entity->getId());
+            $units = $this->em->getRepository(AppsApi::class)->getApiProductUnit();
 
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
-                $stocks = $this->getDoctrine()->getRepository(AppsApi::class)->getApiStock($entity);
-                $categories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'category');
-                $brands = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
+                $vendors = $this->em->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
+                $stocks = $this->em->getRepository(AppsApi::class)->getApiStock($entity);
+                $categories = $this->em->getRepository(AppsApi::class)->getApiParticular($entity,'category');
+                $brands = $this->em->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
-                $categories = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Category::class)->getApiCategory($entity);
-                $vendors = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
+                $stocks = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
+                $categories = $this->em->getRepository(\App\Restaurant\Entity\Category::class)->getApiCategory($entity);
+                $vendors = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
                 $brands = '';
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
-                $categories = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiCategory($entity);
-                $vendors = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Vendor::class)->getApiVendor($entity);
+                $stocks = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
+                $categories = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiCategory($entity);
+                $vendors = $this->em->getRepository(\App\Inventory\Entity\Vendor::class)->getApiVendor($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
-                $categories = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->getApiCategory($entity);
-                $vendors = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
+                $stocks = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
+                $categories = $this->em->getRepository(\App\Business\Entity\Category::class)->getApiCategory($entity);
+                $vendors = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
             }
-           // $color_plate = $this->getDoctrine()->getRepository(AppsApi::class)->colourPlate('default');
+           // $color_plate = $this->em->getRepository(AppsApi::class)->colourPlate('default');
         }
         $jsonData = [
             'brands'                => $brands,
@@ -264,28 +272,28 @@ class ApiPoskeeperController extends AbstractController
         }else{
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $setup = $this->getDoctrine()->getRepository(AppsApi::class)->getApiSetup($entity,'');
-            $users = $this->getDoctrine()->getRepository(AppsApi::class)->getApiUsers($entity);
-            $customers = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
-            $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
-            $methods = $this->getDoctrine()->getRepository(AppsApi::class)->getApiMethodTransaction($entity);
-            $expenseCategories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiExpenseCategory($entity->getId());
-            $units = $this->getDoctrine()->getRepository(AppsApi::class)->getApiProductUnit();
+            $setup = $this->em->getRepository(AppsApi::class)->getApiSetup($entity,'');
+            $users = $this->em->getRepository(AppsApi::class)->getApiUsers($entity);
+            $customers = $this->em->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
+            $vendors = $this->em->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
+            $methods = $this->em->getRepository(AppsApi::class)->getApiMethodTransaction($entity);
+            $expenseCategories = $this->em->getRepository(AppsApi::class)->getApiExpenseCategory($entity->getId());
+            $units = $this->em->getRepository(AppsApi::class)->getApiProductUnit();
 
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $vendors = $this->getDoctrine()->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
-                $categories = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'category');
-                $brands = $this->getDoctrine()->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
+                $vendors = $this->em->getRepository(AppsApi::class)->apiApiVendorOutstanding($entity);
+                $categories = $this->em->getRepository(AppsApi::class)->getApiParticular($entity,'category');
+                $brands = $this->em->getRepository(AppsApi::class)->getApiParticular($entity,'brand');
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $categories = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Category::class)->getApiCategory($entity);
-                $vendors = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
+                $categories = $this->em->getRepository(\App\Restaurant\Entity\Category::class)->getApiCategory($entity);
+                $vendors = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
                 $brands = '';
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $categories = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiCategory($entity);
-                $vendors = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Vendor::class)->getApiVendor($entity);
+                $categories = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiCategory($entity);
+                $vendors = $this->em->getRepository(\App\Inventory\Entity\Vendor::class)->getApiVendor($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $categories = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->getApiCategory($entity);
-                $vendors = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
+                $categories = $this->em->getRepository(\App\Business\Entity\Category::class)->getApiCategory($entity);
+                $vendors = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->getApiVendor($entity);
             }
         }
         $jsonData = [
@@ -311,7 +319,7 @@ class ApiPoskeeperController extends AbstractController
         set_time_limit(0);
         ignore_user_abort(true);
         $color = $_REQUEST['color_plate'];
-        $color_plate = $this->getDoctrine()->getRepository(AppsApi::class)->colourPlate($color);
+        $color_plate = $this->em->getRepository(AppsApi::class)->colourPlate($color);
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         $response->setContent(json_encode($color_plate));
@@ -337,7 +345,7 @@ class ApiPoskeeperController extends AbstractController
             $datetime = new DateTime("now");
             $user_id = (isset($array['user_id']) and $array['user_id']) ? $array['user_id']:'';
             if($user_id){
-                $user = $this->getDoctrine()->getRepository(User::class)->find($array['user_id']);
+                $user = $this->em->getRepository(User::class)->find($array['user_id']);
                 $data = [];
                 if($user and in_array('ROLE_MANAGER',$user->getAppRoles())){
                     $data['userId'] = '';
@@ -353,16 +361,16 @@ class ApiPoskeeperController extends AbstractController
             $data['endDate'] = (isset($array['end_date']) and $array['end_date']) ? $array['end_date']:$datetime->format('Y-m-d');
             $data['device'] = $deviceId;
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $purchaseCashOverview = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->androidDevicePurchaseOverview($entity,$data);
-                $salesCashOverview = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->androidDeviceSalesOverview($entity,$data);
+                $purchaseCashOverview = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->androidDevicePurchaseOverview($entity,$data);
+                $salesCashOverview = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->androidDeviceSalesOverview($entity,$data);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $purchaseCashOverview = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Purchase::class)->androidDevicePurchaseOverview($entity,$data);
-                $salesCashOverview = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Invoice::class)->androidDeviceSalesOverview($entity,$data);
+                $purchaseCashOverview = $this->em->getRepository(\App\Restaurant\Entity\Purchase::class)->androidDevicePurchaseOverview($entity,$data);
+                $salesCashOverview = $this->em->getRepository(\App\Restaurant\Entity\Invoice::class)->androidDeviceSalesOverview($entity,$data);
             }
-            $expenditureOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->androidDeviceExpenditureOverview($entity,$data);
-            $transactionCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->apiTransactionCashOverview($entity,$data);
+            $expenditureOverview = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->androidDeviceExpenditureOverview($entity,$data);
+            $transactionCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->apiTransactionCashOverview($entity,$data);
 
-          //  $version = $this->getDoctrine()->getRepository(AppsApi::class)->find(1);
+          //  $version = $this->em->getRepository(AppsApi::class)->find(1);
             $versionNo = 1;
             $data = [
                 'globalOption'              => $entity->getId(),
@@ -401,16 +409,16 @@ class ApiPoskeeperController extends AbstractController
             $data = $request->request->all();
             $transactionMethods = [1,2,3];
             $datetime = new DateTime("now");
-            $user = $this->getDoctrine()->getRepository(User::class)->find($_REQUEST['user_id']);
+            $user = $this->em->getRepository(User::class)->find($_REQUEST['user_id']);
             $dataIncome['startDate'] = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $entity->getCreated()->format('Y-m-d');
             $dataIncome['endDate'] = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:$datetime->format('Y-m-d');
             $data['startDate'] = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $entity->getCreated()->format('Y-m-d');
             $data['endDate'] = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:$datetime->format('Y-m-d');
-            $income = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineTotalIncome($user,$dataIncome);
-            $transactionCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
-            $currentStockPrice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->reportCurrentStockPrice($user);
-            $accountPurchase = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($user, $data);
-            $accountSales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user, $data);
+            $income = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineTotalIncome($user,$dataIncome);
+            $transactionCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
+            $currentStockPrice = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->reportCurrentStockPrice($user);
+            $accountPurchase = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($user, $data);
+            $accountSales = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user, $data);
             $current_stock = [
                 'quantity'       => $currentStockPrice['quantity'] ,
                 'salesPrice'     => number_format($currentStockPrice['salesPrice'],2) ,
@@ -482,7 +490,7 @@ class ApiPoskeeperController extends AbstractController
             $dataIncome['endDate'] = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:$datetime->format('Y-m-d');
             $data['startDate'] = (isset($data['start_date']) and $data['start_date']) ? $data['start_date']: $entity->getCreated()->format('Y-m-d');
             $data['endDate'] = (isset($data['end_date']) and $data['end_date']) ? $data['end_date']:$datetime->format('Y-m-d');
-            $userSales = $this->getDoctrine()->getRepository(AccountSales::class)->UserSalesReceive($entity, $data);
+            $userSales = $this->em->getRepository(AccountSales::class)->UserSalesReceive($entity, $data);
             $data = [
                 'globalOption'              => $entity->getId(),
                 'user_sales'                => $userSales ,
@@ -503,7 +511,7 @@ class ApiPoskeeperController extends AbstractController
         }else {
             $entity = $this->checkApiValidation($request);
             $method_id = $request->request->get('method_id');
-            $entities = $this->getDoctrine()->getRepository(AccountCash::class)->apiAccountDetails($entity->getId(),$method_id);
+            $entities = $this->em->getRepository(AccountCash::class)->apiAccountDetails($entity->getId(),$method_id);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -521,9 +529,9 @@ class ApiPoskeeperController extends AbstractController
         if( $this->checkApiLoginValidation($request) == 'invalid') {
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }else {
-            $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->getAndroidOTP($mobile);
+            $user = $this->em->getRepository(\App\User\Entity\User::class)->getAndroidOTP($mobile);
             if($user){
-                $login = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->find($user);
+                $login = $this->em->getRepository(\App\User\Entity\User::class)->find($user);
                 $dispatcher = $this->container->get('event_dispatcher');
                 $dispatcher->dispatch('setting_tool.post.change_password', new PasswordChangeSmsEvent($login, $login->getAppPassword()));
                 $data = ['status'=>'valid','otp' => $login->getAppPassword(),'apiSecret'=> $login->getGlobalOption()->getUniqueCode()];
@@ -547,13 +555,13 @@ class ApiPoskeeperController extends AbstractController
         $value =  $this->getParameter('x-api-value');
         $deviceId = $formData['deviceId'];
         $mobile = $formData['mobile'];
-        $entity = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['mobile' => $mobile]);
-        $userExist = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->checkExistingUser($mobile);
+        $entity = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['mobile' => $mobile]);
+        $userExist = $this->em->getRepository(\App\User\Entity\User::class)->checkExistingUser($mobile);
         if (empty($formData) and $request->headers->get('X-API-KEY') != $key and $request->headers->get('X-API-VALUE') != $value) {
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }elseif (!empty($entity) and !empty($userExist)  and  $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
-            $data = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->getSetupInformation($entity);
-            $device = $this->getDoctrine()->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity,$deviceId);
+            $data = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->getSetupInformation($entity);
+            $device = $this->em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity,$deviceId);
             /* @var $entity GlobalOption */
             if($device) {
                 $mobile = empty($entity->getHotline()) ? $entity->getMobile() : $entity->getHotline();$address = $entity->getMedicineConfig()->getAddress();
@@ -588,9 +596,9 @@ class ApiPoskeeperController extends AbstractController
                 ];
             }
         }elseif ($formData and $request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
-            $entity = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->insertSetupInformation($formData);
-            $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->androidUserCreate($entity,$formData);
-            $device = $this->getDoctrine()->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity,$deviceId);
+            $entity = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->insertSetupInformation($formData);
+            $this->em->getRepository(\App\User\Entity\User::class)->androidUserCreate($entity,$formData);
+            $device = $this->em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->insert($entity,$deviceId);
             if($device) {
                 $mobile = empty($entity->getHotline()) ? $entity->getMobile() : $entity->getHotline();$address = $entity->getMedicineConfig()->getAddress();
                 $vatPercentage = $entity->getMedicineConfig()->getVatPercentage();
@@ -645,8 +653,8 @@ class ApiPoskeeperController extends AbstractController
 
             $formData = $request->request->all();
             $entity = $this->checkApiValidation($request);
-            $setup = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->updateSetupInformation($entity,$formData);
-             $data = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->getSetupInformation($setup);
+            $setup = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->updateSetupInformation($entity,$formData);
+             $data = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->getSetupInformation($setup);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -660,7 +668,7 @@ class ApiPoskeeperController extends AbstractController
 
         $formData = $request->request->all();
         $username = $formData['username'];
-        $userExist = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->checkExistingUser($username);
+        $userExist = $this->em->getRepository(\App\User\Entity\User::class)->checkExistingUser($username);
         if( $this->checkApiValidation($request) == 'invalid') {
 
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
@@ -668,9 +676,9 @@ class ApiPoskeeperController extends AbstractController
         }elseif(empty($userExist)){
 
             $entity = $this->checkApiValidation($request);
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->updateSetupInformation($entity,$formData);
-            $userId = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->androidUserCreate($entity,$formData);
-            $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->find($userId);
+            $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->updateSetupInformation($entity,$formData);
+            $userId = $this->em->getRepository(\App\User\Entity\User::class)->androidUserCreate($entity,$formData);
+            $user = $this->em->getRepository(\App\User\Entity\User::class)->find($userId);
             $data = [
                 'username' => $user->getUsername(),
                 'name' => $user->getName(),
@@ -696,7 +704,7 @@ class ApiPoskeeperController extends AbstractController
         }else{
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->getUsers($entity);
+            $data = $this->em->getRepository(\App\User\Entity\User::class)->getUsers($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -708,7 +716,7 @@ class ApiPoskeeperController extends AbstractController
     public function checkDuplicateUserAction(Request $request)
     {
         $username = $request->request->get('username');
-        $user = $this->getDoctrine()->getManager()->getRepository(\App\User\Entity\User::class)
+        $user = $this->em->getRepository(\App\User\Entity\User::class)
             ->checkExistingUser($username);
         if ($user == false) {
             $data = [
@@ -733,7 +741,7 @@ class ApiPoskeeperController extends AbstractController
      public function editUserAction(Request $request)
     {
         $username = $request->request->get('user_id');
-        $user = $this->getDoctrine()->getManager()->getRepository(\App\User\Entity\User::class)
+        $user = $this->em->getRepository(\App\User\Entity\User::class)
             ->findOneBy(['id' => $username]);
         $data = [
             'user_id' => $username,
@@ -753,14 +761,14 @@ class ApiPoskeeperController extends AbstractController
 
         $formData = $request->request->all();
         $username = $formData['user_id'];
-        $userExist = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->find($username);
+        $userExist = $this->em->getRepository(\App\User\Entity\User::class)->find($username);
         if( $this->checkApiValidation($request) == 'invalid') {
 
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
 
         }elseif($userExist){
 
-            $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->androidUserUpdate($userExist,$formData);
+            $this->em->getRepository(\App\User\Entity\User::class)->androidUserUpdate($userExist,$formData);
             $data = ['status' => 'success'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -788,7 +796,7 @@ class ApiPoskeeperController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $data = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiDims($data);
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiDims($data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -813,13 +821,13 @@ class ApiPoskeeperController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $stocks = $this->getDoctrine()->getRepository(AppsApi::class)->getApiStock($entity);
+                $stocks = $this->em->getRepository(AppsApi::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
+                $stocks = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
+                $stocks = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $stocks = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
+                $stocks = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -844,7 +852,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->getApiPurchaseShortListSearch($entity);
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->getApiPurchaseShortListSearch($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -869,15 +877,15 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
 
             if($process == 'brand' and !empty($keyword)){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicine($keyword);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicine($keyword);
             }elseif($process == 'generic' and !empty($keyword)){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicineGeneric($keyword);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicineGeneric($keyword);
             }elseif($process == 'strength'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicineStrength($keyword);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicineStrength($keyword);
             }elseif($process == 'form'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicineForm($keyword);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicineForm($keyword);
             }elseif($process == 'manufacture' and !empty($keyword)){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicineManufacture($keyword);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->getApiMedicineManufacture($keyword);
             }else{
                 return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
             }
@@ -903,7 +911,7 @@ class ApiPoskeeperController extends AbstractController
 
             /* @var $entity GlobalOption */
 
-            $data = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->getApiUnit();
+            $data = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->getApiUnit();
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -926,7 +934,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->getApiCategory($entity);
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->getApiCategory($entity);
 
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -953,8 +961,8 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $stock = $this->getDoctrine()->getRepository(AppsApi::class)->apiInsertStock($entity,$data);
-            $data = $this->getDoctrine()->getRepository(AppsApi::class)->getApiSingleStock($entity,$stock->getId());
+            $stock = $this->em->getRepository(AppsApi::class)->apiInsertStock($entity,$data);
+            $data = $this->em->getRepository(AppsApi::class)->getApiSingleStock($entity,$stock->getId());
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -976,7 +984,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $id = $_REQUEST['id'] ?? '';
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(AppsApi::class)->getStockEdit($entity,$id);
+            $data = $this->em->getRepository(AppsApi::class)->getStockEdit($entity,$id);
 
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -997,9 +1005,9 @@ class ApiPoskeeperController extends AbstractController
         }else{
 
             /* @var $entity GlobalOption */
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $stockId = $_REQUEST['id'] ?? '';
-            $entity = $this->getDoctrine()->getRepository(MedicineStock::class)->find($stockId);
+            $entity = $this->em->getRepository(MedicineStock::class)->find($stockId);
             if(empty($entity)) {
                 $status = 'failed';
             }
@@ -1042,7 +1050,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $request->request->all();
             $entity = $this->checkApiValidation($request);
             $stockId = $_REQUEST['id'] ?? '';
-            $array = $this->getDoctrine()->getRepository(AppsApi::class)->apiUpdateStock($entity,$data);
+            $array = $this->em->getRepository(AppsApi::class)->apiUpdateStock($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($array));
@@ -1068,8 +1076,8 @@ class ApiPoskeeperController extends AbstractController
             $stockId = $_REQUEST['stockId'] ?? '';
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $this->getDoctrine()->getRepository('MedicineBundle:MedicineMeasurement')->insertAndroidStockMeasurement($stockId,$data);
-            $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineMeasurement')->getApiMeasurement($stockId);
+            $this->em->getRepository('MedicineBundle:MedicineMeasurement')->insertAndroidStockMeasurement($stockId,$data);
+            $data = $this->em->getRepository('MedicineBundle:MedicineMeasurement')->getApiMeasurement($stockId);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -1091,7 +1099,7 @@ class ApiPoskeeperController extends AbstractController
 
         }else{
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $id = $_REQUEST['id'] ?? '';
             $entity = $em->getRepository('MedicineBundle:MedicineMeasurement')->find($id);
             if (!$entity) {
@@ -1100,7 +1108,7 @@ class ApiPoskeeperController extends AbstractController
             $em->remove($entity);
             $em->flush();
             $stockId = $_REQUEST['stockId'] ?? '';
-            $data = $this->getDoctrine()->getRepository('MedicineBundle:MedicineMeasurement')->getApiMeasurement($stockId);
+            $data = $this->em->getRepository('MedicineBundle:MedicineMeasurement')->getApiMeasurement($stockId);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -1125,7 +1133,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $request->request->all();
             $stockId = $_REQUEST['stockId'] ?? '';
             /* @var $entity GlobalOption */
-            $id = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->insertApiPurchaseShortList($stockId);
+            $id = $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->insertApiPurchaseShortList($stockId);
             $data = ['id' => $id];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1141,7 +1149,7 @@ class ApiPoskeeperController extends AbstractController
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if( $this->checkApiValidation($request) == 'invalid') {
 
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
@@ -1149,7 +1157,7 @@ class ApiPoskeeperController extends AbstractController
         }else{
 
             $stockId = $_REQUEST['id'] ?? '';
-            $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->find($stockId);
+            $entity = $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->find($stockId);
             $em->remove($entity);
             $em->flush();
             $data = ['status' => 'success'];
@@ -1177,7 +1185,7 @@ class ApiPoskeeperController extends AbstractController
             $option = $this->checkApiValidation($request);
             $stockId = $_REQUEST['medicineId'] ?? '';
             /* @var $entity GlobalOption */
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->insertApiGlobalToLocal($option,$stockId);
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->insertApiGlobalToLocal($option,$stockId);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -1199,7 +1207,7 @@ class ApiPoskeeperController extends AbstractController
 
             /* @var $entity GlobalOption */
 
-            $result = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findAll();
+            $result = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findAll();
             $data = [];
 
             /* @var $row TransactionMethod */
@@ -1229,7 +1237,7 @@ class ApiPoskeeperController extends AbstractController
 
             /* @var $entity GlobalOption */
 
-            $result = $this->getDoctrine()->getRepository(\App\Tool\Entity\PaymentCard::class)->findAll();
+            $result = $this->em->getRepository(\App\Tool\Entity\PaymentCard::class)->findAll();
             $data = [];
 
             /* @var $row TransactionMethod */
@@ -1260,7 +1268,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption'=>$entity]);
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption'=>$entity]);
 
             $data = [];
 
@@ -1296,7 +1304,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption'=>$entity]);
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption'=>$entity]);
             $data = [];
 
             /* @var $row AccountMobileBank */
@@ -1331,7 +1339,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->getApiCategory($entity);
+            $data = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->getApiCategory($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -1421,7 +1429,7 @@ class ApiPoskeeperController extends AbstractController
 
            // $data = array('mode' => "online/offline",'itemCount'=> 1,'itemCount'=> 1,'subItem'=> $jsonInputItem,'subItemCount'=> 4);
 
-            $this->getDoctrine()->getRepository(AppsApi::class)->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
+            $this->em->getRepository(AppsApi::class)->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
 
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
@@ -1447,7 +1455,7 @@ class ApiPoskeeperController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
-            $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoice::class)->insertApiInvoiceToken($entity,$data);
+            $data = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->insertApiInvoiceToken($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode("success"));
@@ -1472,13 +1480,13 @@ class ApiPoskeeperController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $stockId = $_REQUEST['id'] ?? '';
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStockDelete($entity,$stockId);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStockDelete($entity,$stockId);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStockDelete($entity,$stockId);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStockDelete($entity,$stockId);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStockDelete($entity,$stockId);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStockDelete($entity,$stockId);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStockDelete($entity,$stockId);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStockDelete($entity,$stockId);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1502,15 +1510,15 @@ class ApiPoskeeperController extends AbstractController
             $data = $request->request->all();
             $entity = $this->checkApiValidation($request);
             $stockId = $_REQUEST['id'] ?? '';
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateAndroidStock($data);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateAndroidStock($data);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiStock($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiStock($entity);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1540,7 +1548,7 @@ class ApiPoskeeperController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $request->request->all();
-            $status = $this->getDoctrine()->getRepository(AppsApi::class)->insertFlutterOrderProcess($entity,$deviceId,$data);
+            $status = $this->em->getRepository(AppsApi::class)->insertFlutterOrderProcess($entity,$deviceId,$data);
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1566,7 +1574,7 @@ class ApiPoskeeperController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $request->request->all();
-            $entities = $this->getDoctrine()->getRepository(AppsApi::class)->apiSyncList($entity);
+            $entities = $this->em->getRepository(AppsApi::class)->apiSyncList($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -1592,7 +1600,7 @@ class ApiPoskeeperController extends AbstractController
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $request->request->all();
             $processId = $data['id'];
-            $status = $this->getDoctrine()->getRepository(AppsApi::class)->apiSyncProcess($processId);
+            $status = $this->em->getRepository(AppsApi::class)->apiSyncProcess($processId);
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1630,7 +1638,7 @@ class ApiPoskeeperController extends AbstractController
 
             $data = $request->request->all();
 
-            $status = $this->getDoctrine()->getRepository(AppsApi::class)->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
+            $status = $this->em->getRepository(AppsApi::class)->insertFlutterSalesProcess($entity,$deviceId,'sales',$data);
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1649,7 +1657,7 @@ class ApiPoskeeperController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $_REQUEST;
-            $entities = $this->getDoctrine()->getRepository(AppsApi::class)->apiInventorySales($entity,$data);
+            $entities = $this->em->getRepository(AppsApi::class)->apiInventorySales($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -1666,7 +1674,7 @@ class ApiPoskeeperController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $_REQUEST;
-            $entities = $this->getDoctrine()->getRepository(AppsApi::class)->apiInventorySalesReturn($entity,$data);
+            $entities = $this->em->getRepository(AppsApi::class)->apiInventorySalesReturn($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -1683,7 +1691,7 @@ class ApiPoskeeperController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $salesId = $_REQUEST['id'];
-            $entities = $this->getDoctrine()->getRepository(AppsApi::class)->apiSalesInvoiceDetails($entity,$salesId);
+            $entities = $this->em->getRepository(AppsApi::class)->apiSalesInvoiceDetails($entity,$salesId);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -1697,10 +1705,10 @@ class ApiPoskeeperController extends AbstractController
         if( $this->checkApiValidation($request) == 'invalid') {
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }else{
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $this->checkApiValidation($request);
             $salesId = $_REQUEST['id'];
-            $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->find($salesId);
+            $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->find($salesId);
             if(empty($entity)) {
                 $status = 'failed';
             }elseif($entity){
@@ -1730,13 +1738,13 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineSales::class)->getApiSalesInvoice($entity,$invoice);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineSales::class)->getApiSalesInvoice($entity,$invoice);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiSalesInvoice($entity,$invoice);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiSalesInvoice($entity,$invoice);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->getApiSalesInvoice($entity,$invoice);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getApiSalesInvoice($entity,$invoice);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiSalesInvoice($entity,$invoice);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getApiSalesInvoice($entity,$invoice);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1759,13 +1767,13 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             if($entity->getMainApp()->getSlug() == 'miss'){
-                $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->apiInvoiceMessage($entity);
+                $data = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->apiInvoiceMessage($entity);
             }elseif($entity->getMainApp()->getSlug() == 'restaurant'){
-                $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->apiInvoiceMessage($entity);
+                $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->apiInvoiceMessage($entity);
             }elseif($entity->getMainApp()->getSlug() == 'inventory'){
-                $data = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->apiInvoiceMessage($entity);
+                $data = $this->em->getRepository(\App\Inventory\Entity\Item::class)->apiInvoiceMessage($entity);
             }elseif($entity->getMainApp()->getSlug() == 'business'){
-                $data = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->apiInvoiceMessage($entity);
+                $data = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->apiInvoiceMessage($entity);
             }
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -1790,7 +1798,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $request->request->all();
             /* @var $option GlobalOption */
             $option = $this->checkApiValidation($request);
-            $status = $this->getDoctrine()->getRepository(AppsApi::class)->apiInsertSalesReceive($option,$data);
+            $status = $this->em->getRepository(AppsApi::class)->apiInsertSalesReceive($option,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status'=> $status]));
@@ -1815,7 +1823,7 @@ class ApiPoskeeperController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $id = $_REQUEST['id'];
-            $status = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiDeleteSales($id);
+            $status = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiDeleteSales($id);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status'=> $status]));
@@ -1838,7 +1846,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $status = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiApproveAccountSales($entity,$form);
+            $status = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiApproveAccountSales($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status'=> $status]));
@@ -1861,7 +1869,7 @@ class ApiPoskeeperController extends AbstractController
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountSales($entity,$formArray);
+            $result = $this->em->getRepository(AppsApi::class)->apiAccountSales($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -1880,7 +1888,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($entity,$data);
+            $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -1902,7 +1910,7 @@ class ApiPoskeeperController extends AbstractController
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountSales($entity,$formArray);
+            $result = $this->em->getRepository(AppsApi::class)->apiAccountSales($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -1924,7 +1932,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $data = $_REQUEST;
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
+            $data = $this->em->getRepository(AppsApi::class)->getApiCustomerOutstanding($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -1944,7 +1952,7 @@ class ApiPoskeeperController extends AbstractController
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountSales($entity,$formArray);
+            $result = $this->em->getRepository(AppsApi::class)->apiAccountSales($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -1967,7 +1975,7 @@ class ApiPoskeeperController extends AbstractController
 
             $form = $_REQUEST;
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->apiCreateCustomer($entity,$form);
+            $data = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->apiCreateCustomer($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -1990,7 +1998,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->apiUpdateCustomer($entity,$form);
+            $data = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->apiUpdateCustomer($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -2014,7 +2022,7 @@ class ApiPoskeeperController extends AbstractController
 
             $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->apiUpdateCustomer($form);
+            $data = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->apiUpdateCustomer($form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -2042,7 +2050,7 @@ class ApiPoskeeperController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $request->request->all();
-            $status = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->insertFlutterPurchaseProcess($entity,$deviceId,'purchase',$data);
+            $status = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->insertFlutterPurchaseProcess($entity,$deviceId,'purchase',$data);
             $ipAddress = $_SERVER['REMOTE_ADDR'];
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -2061,7 +2069,7 @@ class ApiPoskeeperController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $data = $_REQUEST;
-            $entities = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiInventoryPurchase($entity,$data);
+            $entities = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiInventoryPurchase($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -2078,7 +2086,7 @@ class ApiPoskeeperController extends AbstractController
             $entity = $this->checkApiValidation($request);
             $deviceId = $request->headers->get('X-DEVICE-ID');
             $salesId = $_REQUEST['id'];
-            $entities = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiPurchaseInvoiceDetails($entity,$salesId);
+            $entities = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiPurchaseInvoiceDetails($entity,$salesId);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -2092,10 +2100,10 @@ class ApiPoskeeperController extends AbstractController
         if( $this->checkApiValidation($request) == 'invalid') {
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }else{
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $this->checkApiValidation($request);
             $salesId = $_REQUEST['id'];
-            $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->find($salesId);
+            $entity = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->find($salesId);
             if(empty($entity)) {
                 $status = 'failed';
             }elseif($entity){
@@ -2128,7 +2136,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $request->request->all();
             /* @var $option GlobalOption */
             $option = $this->checkApiValidation($request);
-            $status = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiInsertPurchasePayment($option,$data);
+            $status = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiInsertPurchasePayment($option,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status' => $status]));
@@ -2152,7 +2160,7 @@ class ApiPoskeeperController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $id = $_REQUEST['id'];
-            $status = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiDeleteAccountPurchase($id);
+            $status = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiDeleteAccountPurchase($id);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status' => $status]));
@@ -2175,7 +2183,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $status = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiApproveAccountPurchase($entity,$form);
+            $status = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiApproveAccountPurchase($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status' => $status]));
@@ -2195,7 +2203,7 @@ class ApiPoskeeperController extends AbstractController
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountPurchase($entity,$formArray);
+            $result = $this->em->getRepository(AppsApi::class)->apiAccountPurchase($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -2214,7 +2222,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->apiVendorMedicineOutstanding($entity);
+            $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->apiVendorMedicineOutstanding($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -2236,7 +2244,7 @@ class ApiPoskeeperController extends AbstractController
             $formArray = $_REQUEST;
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
-            $result = $this->getDoctrine()->getRepository(AppsApi::class)->apiAccountPurchase($entity,$formArray);
+            $result = $this->em->getRepository(AppsApi::class)->apiAccountPurchase($entity,$formArray);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($result));
@@ -2256,7 +2264,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $keyword = $_REQUEST['keyword'] ?? '';
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->getApiVendor($entity,$keyword);
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->getApiVendor($entity,$keyword);
 
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
@@ -2281,7 +2289,7 @@ class ApiPoskeeperController extends AbstractController
 
             $form = $_REQUEST;
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->apiCreateVendor($entity,$form);
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->apiCreateVendor($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -2304,7 +2312,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->apiGetVendor($entity,$form);
+            $data = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->apiGetVendor($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -2328,7 +2336,7 @@ class ApiPoskeeperController extends AbstractController
 
             $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $data = $this->getDoctrine()->getRepository(MedicineVendor::class)->apiUpdateVendor($form);
+            $data = $this->em->getRepository(MedicineVendor::class)->apiUpdateVendor($form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -2356,7 +2364,7 @@ class ApiPoskeeperController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseAndroidProcess::class)->insertAndroidProcess($entity,$ipAddress,$deviceId,'expenditure',$data);
+            $this->em->getRepository(\App\Accounting\Entity\ExpenseAndroidProcess::class)->insertAndroidProcess($entity,$ipAddress,$deviceId,'expenditure',$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['message'=>"success", 'ipAddress'=>$ipAddress]));
@@ -2383,7 +2391,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $_REQUEST;
             $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
-            $entities = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiExpense($entity,$data);
+            $entities = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiExpense($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -2410,7 +2418,7 @@ class ApiPoskeeperController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
-            $status =$this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiInsertExpense($entity,$data);
+            $status =$this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiInsertExpense($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status' => $status]));
@@ -2434,7 +2442,7 @@ class ApiPoskeeperController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $id = $_REQUEST['id'];
-            $status = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiDeleteExpense($entity,$id);
+            $status = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiDeleteExpense($entity,$id);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status'=>$status]));
@@ -2457,7 +2465,7 @@ class ApiPoskeeperController extends AbstractController
             /* @var $entity GlobalOption */
             $entity = $this->checkApiValidation($request);
             $form = $_REQUEST;
-            $status = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiApproveExpense($entity,$form);
+            $status = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiApproveExpense($entity,$form);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status' => $status]));
@@ -2484,7 +2492,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $_REQUEST;
             $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
-            $entities = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiExpenseCategory($entity,$data);
+            $entities = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiExpenseCategory($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -2512,7 +2520,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $_REQUEST;
             $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
-            $entities = $this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiExpenseHead($entity,$data);
+            $entities = $this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiExpenseHead($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($entities));
@@ -2533,7 +2541,7 @@ class ApiPoskeeperController extends AbstractController
         }else{
 
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Coupon::class)->getApiDiscountCoupon($entity);
+            $data = $this->em->getRepository(\App\Restaurant\Entity\Coupon::class)->getApiDiscountCoupon($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -2553,7 +2561,7 @@ class ApiPoskeeperController extends AbstractController
 
             $data = $_REQUEST;
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Coupon::class)->getValidCouponCode($entity,$data);
+            $data = $this->em->getRepository(\App\Restaurant\Entity\Coupon::class)->getValidCouponCode($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -2569,7 +2577,7 @@ class ApiPoskeeperController extends AbstractController
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }else{
             $entity = $this->checkApiValidation($request);
-            $data = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getApiRestaurantToken($entity);
+            $data = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getApiRestaurantToken($entity);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode($data));
@@ -2594,8 +2602,8 @@ class ApiPoskeeperController extends AbstractController
             $address = (isset($data['address']) and $data['address']) ? $data['address'] :'';
             $mobile = (isset($data['mobile']) and $data['mobile']) ? $data['mobile'] :'';
             $userRole = (isset($data['user_role']) and $data['user_role']) ? $data['user_role'] :'';
-            $em = $this->getDoctrine()->getManager();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
+            $em = $this->em;
+            $mobile = $this->toolManager->specialExpClean($mobile);
             $user = $em->getRepository(\App\User\Entity\User::class)->findOneBy(['username'=> $user_name,'userGroup'=> 'user','enabled'=> 1]);
 
             /* @var $user User */
@@ -2636,7 +2644,7 @@ class ApiPoskeeperController extends AbstractController
                 $em->persist($profile);
                 $em->flush();
             }
-            $entity = $this->getDoctrine()->getRepository(User::class)->find($user->getId());
+            $entity = $this->em->getRepository(User::class)->find($user->getId());
             $returnData['user_id'] = (int) $entity->getId();
             $returnData['user_name'] = $entity->getUsername();
             $returnData['email'] = $entity->getEmail();
@@ -2662,7 +2670,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $request->request->all();
             $name = (isset($data['name']) and $data['name']) ? $data['name'] : '';
             $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : '';
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
 
             $config = $entity->getMedicineConfig();
 
@@ -2680,7 +2688,7 @@ class ApiPoskeeperController extends AbstractController
                 $em->flush();
             }
 
-            $entity = $this->getDoctrine()->getRepository(MedicineParticular::class)->find($user->getId());
+            $entity = $this->em->getRepository(MedicineParticular::class)->find($user->getId());
             if($entity->getParticularType()->getSlug() == 'category'){
                 $returnData['category_id'] = (int) $entity->getId();
             }else{
@@ -2707,7 +2715,7 @@ class ApiPoskeeperController extends AbstractController
             $data = $request->request->all();
             $id = (isset($data['id']) and $data['id']) ? $data['id'] : '';
             $name = (isset($data['name']) and $data['name']) ? $data['name'] : '';
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $user = $em->getRepository(MedicineParticular::class)->find($id);
             /* @var $user MedicineParticular */
             if($user){
@@ -2715,7 +2723,7 @@ class ApiPoskeeperController extends AbstractController
                 $em->persist($user);
                 $em->flush();
             }
-            $entity = $this->getDoctrine()->getRepository(MedicineParticular::class)->find($user->getId());
+            $entity = $this->em->getRepository(MedicineParticular::class)->find($user->getId());
             if($entity->getParticularType()->getSlug() == 'category'){
                 $returnData['category_id'] = (int) $entity->getId();
             }else{
@@ -2751,7 +2759,7 @@ class ApiPoskeeperController extends AbstractController
 
             $entity = $this->checkApiValidation($request);
             $data = $request->request->all();
-            $status =$this->getDoctrine()->getRepository(\App\Report\Entity\AppsApi::class)->apiInsertLogs($entity,$data);
+            $status =$this->em->getRepository(\App\Report\Entity\AppsApi::class)->apiInsertLogs($entity,$data);
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent(json_encode(['status' => $status]));
@@ -2774,21 +2782,21 @@ class ApiPoskeeperController extends AbstractController
             $data = $request->request->all();
             $mobile = $data['mobile'];
             $username = $data['user_name'];
-            $em = $this->getDoctrine()->getManager();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
-            $exist = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->checkExistingUser($mobile);
-            $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->checkExistingUser($username);
-            $option = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['mobile' => $mobile]);
-         //   $this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($option);
+            $em = $this->em;
+            $mobile = $this->toolManager->specialExpClean($mobile);
+            $exist = $this->em->getRepository(\App\User\Entity\User::class)->checkExistingUser($mobile);
+            $user = $this->em->getRepository(\App\User\Entity\User::class)->checkExistingUser($username);
+            $option = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['mobile' => $mobile]);
+         //   $this->em->getRepository(MedicineConfig::class)->GenerateStock($option);
             if(empty($exist)and empty($user) and empty($option)){
 
                 /** @var $user User */
-                $user = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->appGlobalOption($mobile,$data);
+                $user = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->appGlobalOption($mobile,$data);
                 /* @var $globalOption GlobalOption */
                 $globalOption = $user->getGlobalOption();
 
-                $this->get('settong.toolManageRepo')->createDirectory($globalOption->getId());
-                $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->initialSetup($globalOption);
+                $this->toolManager->createDirectory($globalOption->getId());
+                $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->initialSetup($globalOption);
                 $entity = new User();
                 $entity->setPlainPassword("*148148#");
                 $entity->setAppPassword('@123456');
@@ -2798,15 +2806,15 @@ class ApiPoskeeperController extends AbstractController
                 $entity->setUsername($mobile);
                 $entity->setEmail($mobile.'@gmail.com');
                 $entity->setRoles(['ROLE_DOMAIN']);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->em;
                 $em->persist($entity);
                 $em->flush();
                 if($globalOption->isStock() == 1 and $globalOption->getMainApp()->getSlug() == 'miss'){
-                    $this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
+                    $this->em->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
                 }elseif($globalOption->isStock() == 1 and $globalOption->getMainApp()->getSlug() == 'restaurant'){
-                    //$this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
+                    //$this->em->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
                 }elseif($globalOption->isStock() == 1 and $globalOption->getMainApp()->getSlug() == 'invoice'){
-                    //$this->getDoctrine()->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
+                    //$this->em->getRepository(MedicineConfig::class)->GenerateStock($globalOption);
                 }
                 $returnData['name'] = $globalOption->getName();
                 $returnData['license_no'] = (string) $globalOption->getMobile();

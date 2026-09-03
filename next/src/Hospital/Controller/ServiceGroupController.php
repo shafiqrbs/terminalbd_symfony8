@@ -2,6 +2,8 @@
 
 namespace App\Hospital\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -17,6 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ServiceGroupController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     /**
@@ -27,7 +35,7 @@ class ServiceGroupController extends AbstractController
     {
 
         $entity = new HmsServiceGroup();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(['hospitalConfig' => $config],['name'=>'ASC']);
         $form = $this->createCreateForm($entity);
@@ -46,18 +54,18 @@ class ServiceGroupController extends AbstractController
     public function createAction(Request $request)
     {
         $entity = new HmsServiceGroup();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(['hospitalConfig' => $config,'service'=>4],['name'=>'ASC']);
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setHospitalConfig($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_service_group', ['id' => $entity->getId()]));
@@ -97,7 +105,7 @@ class ServiceGroupController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(['hospitalConfig' => $config],['name'=>'ASC']);
         $entity = $em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->find($id);
@@ -138,7 +146,7 @@ class ServiceGroupController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(['hospitalConfig' => $config],['name'=>'ASC']);
         $entity = $em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->find($id);
@@ -151,7 +159,7 @@ class ServiceGroupController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_service_group'));
@@ -169,7 +177,7 @@ class ServiceGroupController extends AbstractController
      */
     public function deleteAction(HmsServiceGroup $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find HmsServiceGroup entity.');
         }
@@ -177,16 +185,16 @@ class ServiceGroupController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -201,7 +209,7 @@ class ServiceGroupController extends AbstractController
     public function statusAction(HmsServiceGroup $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -213,7 +221,7 @@ class ServiceGroupController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_service_group'));

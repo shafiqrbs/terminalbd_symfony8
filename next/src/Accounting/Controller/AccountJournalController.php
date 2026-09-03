@@ -4,8 +4,11 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Accounting\Entity\AccountJournal;
@@ -16,16 +19,23 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountJournal controller.
  *
  */
-class AccountJournalController extends Controller
+class AccountJournalController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,18 +45,18 @@ class AccountJournalController extends Controller
 
 	public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $data['mode'] = "journal";
         $entities = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findWithSearch( $this->getUser(),$data);
         $pagination = $this->paginate($entities);
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(array('isParent' => 1),array('name'=>'ASC'));
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(array('isParent' => 1),array('name'=>'ASC'));
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
 
-        $debit = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountCashOverview($this->getUser(),'Debit',$data);
-        $credit = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountCashOverview($this->getUser(),'Credit',$data);
+        $debit = $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountCashOverview($this->getUser(),'Debit',$data);
+        $credit = $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountCashOverview($this->getUser(),'Credit',$data);
         $overview = array('debit' => $debit,'credit' => $credit);
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($this->getUser()->getGlobalOption());
 
         return $this->render('Accounting/AccountJournal/index.html.twig', array(
@@ -71,14 +81,14 @@ class AccountJournalController extends Controller
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
         if ($form->isValid() && empty($method)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             if(!empty($this->getUser()->getProfile()->getBranches())){
                 $entity->setBranches($this->getUser()->getProfile()->getBranches());
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_journal'));
@@ -86,19 +96,19 @@ class AccountJournalController extends Controller
             ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             if(!empty($this->getUser()->getProfile()->getBranches())){
                 $entity->setBranches($this->getUser()->getProfile()->getBranches());
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_journal'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         return $this->render('Accounting/AccountJournal/new.html.twig', array(
@@ -135,12 +145,12 @@ class AccountJournalController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountJournal();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
-        $accountHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(array('isParent' => 1),array('name'=>'ASC'));
-        $heads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
+        $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(array('isParent' => 1),array('name'=>'ASC'));
+        $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
         return $this->render('Accounting/AccountJournal/new.html.twig', array(
             'entity' => $entity,
             'accountHead' => $accountHead,
@@ -156,7 +166,7 @@ class AccountJournalController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($id);
          if (!$entity) {
@@ -198,7 +208,7 @@ class AccountJournalController extends Controller
     {
         $data = $request->request->all();
         $entity = new AccountJournal();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setGlobalOption($this->getUser()->getGlobalOption());
         $parent = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($data['parent']);
         $entity->setToUser($parent->getCreatedBy());
@@ -216,7 +226,7 @@ class AccountJournalController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
@@ -229,7 +239,7 @@ class AccountJournalController extends Controller
     public function approveAction(AccountJournal $entity)
     {
         if (!empty($entity) and $entity->getProcess() != 'approved') {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $accountClose = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -240,9 +250,9 @@ class AccountJournalController extends Controller
             }
             $em->flush();
             if($entity->getTransactionMethod()){
-	            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($entity,'Journal');
+	            $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($entity,'Journal');
             }
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($entity);
+            $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($entity);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -255,7 +265,7 @@ class AccountJournalController extends Controller
 
     public function deleteAction(AccountJournal $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
@@ -272,12 +282,12 @@ class AccountJournalController extends Controller
      */
     public function approveDeleteAction(AccountJournal $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountJournal entity.');
         }
         $em->remove($entity);
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->approvedDeleteRecord($entity,'Journal');
+        $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->approvedDeleteRecord($entity,'Journal');
         $em->flush();
         return new Response('success');
     }
@@ -287,8 +297,8 @@ class AccountJournalController extends Controller
 
 	public function journalReverseAction(AccountJournal $entity){
 
-		$em = $this->getDoctrine()->getManager();
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountReverse($entity);
+		$em = $this->em;
+		$this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->accountReverse($entity);
 		$entity->setProcess(null);
 		$entity->setApprovedBy(null);
 		$entity->setAmount(0);
@@ -303,7 +313,7 @@ class AccountJournalController extends Controller
 		set_time_limit(0);
 		ignore_user_abort(true);
 		$array = array();
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 		$entities = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findWithSearch( $this->getUser(),$data);
 		$entities = $entities->getResult();
@@ -350,7 +360,7 @@ class AccountJournalController extends Controller
         set_time_limit(0);
         ignore_user_abort(true);
         $array = array();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findWithSearch( $this->getUser(),$data);
         $entities = $entities->getResult();

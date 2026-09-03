@@ -2,8 +2,10 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Tool\Entity\InstituteLevel;
 use App\Tool\Form\InstituteLevelType;
@@ -12,8 +14,14 @@ use App\Tool\Form\InstituteLevelType;
  * InstituteLevel controller.
  *
  */
-class InstituteLevelController extends Controller
+class InstituteLevelController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all InstituteLevel entities.
@@ -21,7 +29,7 @@ class InstituteLevelController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository('SettingToolBundle:InstituteLevel')->findAll();
 
@@ -40,7 +48,7 @@ class InstituteLevelController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
 
@@ -62,7 +70,7 @@ class InstituteLevelController extends Controller
      */
     private function createCreateForm(InstituteLevel $entity)
     {
-        $em = $this->getDoctrine()->getRepository('SettingToolBundle:InstituteLevel');
+        $em = $this->em->getRepository('SettingToolBundle:InstituteLevel');
 
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into InstituteLevelType::configureOptions() and pass them as form options: $em), $entity, array(
@@ -99,7 +107,7 @@ class InstituteLevelController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingToolBundle:InstituteLevel')->find($id);
 
@@ -121,7 +129,7 @@ class InstituteLevelController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingToolBundle:InstituteLevel')->find($id);
 
@@ -148,7 +156,7 @@ class InstituteLevelController extends Controller
     */
     private function createnewForm(InstituteLevel $entity)
     {
-        $em = $this->getDoctrine()->getRepository('SettingToolBundle:InstituteLevel');
+        $em = $this->em->getRepository('SettingToolBundle:InstituteLevel');
 
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into InstituteLevelType::configureOptions() and pass them as form options: $em), $entity, array(
@@ -167,7 +175,7 @@ class InstituteLevelController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingToolBundle:InstituteLevel')->find($id);
 
@@ -201,7 +209,7 @@ class InstituteLevelController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository('SettingToolBundle:InstituteLevel')->find($id);
 
             if (!$entity) {
@@ -244,7 +252,7 @@ class InstituteLevelController extends Controller
         //$data = $request->request->all();
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository('SettingToolBundle:InstituteLevel')->find($id);
 
         if (!$entity) {
@@ -258,7 +266,7 @@ class InstituteLevelController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('institutelevel'));

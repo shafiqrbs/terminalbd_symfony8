@@ -2,18 +2,24 @@
 
 namespace App\Accounting\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use Knp\Snappy\Pdf;
 
 class HmsReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
     public function balanceAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
         return $this->render('Accounting/Report/incomePdf.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
@@ -22,10 +28,10 @@ class HmsReportController extends AbstractController
 
     public function incomeAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
         return $this->render('AccountingBundle:Report/Hms:income.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
@@ -36,7 +42,7 @@ class HmsReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
         $html = $this->renderView(
             'AccountingBundle:Report/Hms:incomePdf.html.twig', [
                 'globalOption' => $globalOption,
@@ -60,7 +66,7 @@ class HmsReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
         return $this->render('AccountingBundle:Report/Hms:incomePdf.html.twig', [
             'globalOption' => $globalOption,
             'overview' => $overview,
@@ -72,9 +78,9 @@ class HmsReportController extends AbstractController
 
     public function monthlyIncomeAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsMonthlyIncome( $this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsMonthlyIncome( $this->getUser(),$data);
         if(!empty($data['startMonth']) and !empty($data['endMonth'])){
             $sm = "01-{$data['startMonth']}-{$data['year']}";
             $compareTo = new DateTime($sm);
@@ -98,7 +104,7 @@ class HmsReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsMonthlyIncome( $this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsMonthlyIncome( $this->getUser(),$data);
         if(!empty($data['startMonth']) and !empty($data['endMonth'])){
             $sm = "01-{$data['startMonth']}-{$data['year']}";
             $compareTo = new DateTime($sm);
@@ -135,7 +141,7 @@ class HmsReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsMonthlyIncome( $this->getUser(),$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsMonthlyIncome( $this->getUser(),$data);
         exit;
         return $this->render('AccountingBundle:Report/Hms:monthlyIncomePdf.html.twig', [
             'globalOption' => $globalOption,

@@ -2,6 +2,9 @@
 
 namespace App\Tool\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +18,13 @@ use App\Tool\Form\SyndicateModuleType;
  */
 class SyndicateModuleController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     /**
      * Lists all SyndicateModule entities.
@@ -22,7 +32,7 @@ class SyndicateModuleController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\SyndicateModule::class)->findAll([],['name'=>'asc']);
         $pagination = $this->paginate($entities);
@@ -36,10 +46,10 @@ class SyndicateModuleController extends AbstractController
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             30  /*limit per page*/
         );
         return $pagination;
@@ -56,10 +66,10 @@ class SyndicateModuleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('syndicatemodule_show', ['id' => $entity->getId()]));
@@ -115,7 +125,7 @@ class SyndicateModuleController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\SyndicateModule::class)->find($id);
 
@@ -137,7 +147,7 @@ class SyndicateModuleController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\SyndicateModule::class)->find($id);
 
@@ -180,7 +190,7 @@ class SyndicateModuleController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\SyndicateModule::class)->find($id);
 
@@ -194,7 +204,7 @@ class SyndicateModuleController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             return $this->redirect($this->generateUrl('syndicatemodule_edit', ['id' => $id]));
@@ -216,7 +226,7 @@ class SyndicateModuleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Tool\Entity\SyndicateModule::class)->find($id);
 
             if (!$entity) {
@@ -259,7 +269,7 @@ class SyndicateModuleController extends AbstractController
         //$data = $request->request->all();
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\MobileTheme::class)->find($id);
 
         if (!$entity) {
@@ -273,7 +283,7 @@ class SyndicateModuleController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('syndicatemodule'));

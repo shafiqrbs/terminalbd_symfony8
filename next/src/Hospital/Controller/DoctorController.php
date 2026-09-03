@@ -2,6 +2,9 @@
 
 namespace App\Hospital\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\Particular;
 use App\Hospital\Form\DoctorType;
 use App\Hospital\Form\ParticularType;
@@ -9,7 +12,7 @@ use App\Hospital\Form\PathologyType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\Constraint;
@@ -19,15 +22,22 @@ use Symfony\Component\Validator\Constraint;
  * DoctorController controller.
  *
  */
-class DoctorController extends Controller
+class DoctorController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -36,13 +46,13 @@ class DoctorController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entities = $em->getRepository(\App\Hospital\Entity\Particular::class)->findWithSearch($config , $service = 5, $data);
         $pagination = $this->paginate($entities);
-        $categories = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>2),array('name' =>'asc' ));
-        $departments = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>7),array('name' =>'asc' ));
+        $categories = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>2),array('name' =>'asc' ));
+        $departments = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>7),array('name' =>'asc' ));
         return $this->render('Hospital/Doctor/index.html.twig', array(
             'entities' => $pagination,
             'categories' => $categories,
@@ -63,21 +73,21 @@ class DoctorController extends Controller
         $form = $this->createCreateForm($entity,$globalOption);
         $form->handleRequest($request);
         $data = $request->request->all();
-        $visitMods = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('service'=>13,'hospitalConfig' => $globalOption->getHospitalConfig()));
+        $visitMods = $this->em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('service'=>13,'hospitalConfig' => $globalOption->getHospitalConfig()));
         $valid = 0;
         if($entity->getAssignDoctor()){
-            $validCount = $this->getDoctrine()->getRepository(Particular::class)->findOneBy(array('assignDoctor'=> $entity->getAssignDoctor()));
+            $validCount = $this->em->getRepository(Particular::class)->findOneBy(array('assignDoctor'=> $entity->getAssignDoctor()));
             $valid = count($validCount);
         }
         if($valid > 0 ){
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Doctor already existing,Please try again."
             );
         }
         if ($form->isValid() and $valid == 0) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setHospitalConfig($globalOption->getHospitalConfig());
-            $service = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Service::class)->find(5);
+            $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(5);
             $entity->setService($service);
             if($entity->getParticularCode()){
                $entity->setParticularCode($entity->getParticularCode());
@@ -87,10 +97,10 @@ class DoctorController extends Controller
             $entity->upload();
             $entity->signatureUpload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
-            $this->getDoctrine()->getRepository(Particular::class)->insertDoctorVisitModes($entity,$data);
+            $this->em->getRepository(Particular::class)->insertDoctorVisitModes($entity,$data);
             return $this->redirect($this->generateUrl('hms_doctor_new', array('id' => $entity->getId())));
         }
 
@@ -132,7 +142,7 @@ class DoctorController extends Controller
     private function createCreateForm(Particular $entity, $globalOption)
     {
 
-        $em = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DoctorType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
         $form = $this->createForm(new DoctorType($em,$globalOption), $entity, array(
@@ -155,7 +165,7 @@ class DoctorController extends Controller
         $entity = new Particular();
         $globalOption = $this->getUser()->getGlobalOption();
         $form   = $this->createCreateForm($entity,$globalOption);
-        $visitMods = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('service'=>13,'hospitalConfig' => $globalOption->getHospitalConfig()));
+        $visitMods = $this->em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('service'=>13,'hospitalConfig' => $globalOption->getHospitalConfig()));
         return $this->render('Hospital/Doctor/new.html.twig', array(
             'entity' => $entity,
             'visitMods' => $visitMods,
@@ -169,7 +179,7 @@ class DoctorController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
@@ -185,7 +195,7 @@ class DoctorController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $config = $globalOption->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(array('hospitalConfig' => $config,'id'=>$id));
@@ -194,7 +204,7 @@ class DoctorController extends Controller
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
         $editForm = $this->createEditForm($entity,$globalOption);
-        $visitMods = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('service'=>13,'hospitalConfig' => $config));
+        $visitMods = $this->em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('service'=>13,'hospitalConfig' => $config));
         $visitAmounts = array();
         if($entity->getVisitModes()){
             foreach ( $entity->getVisitModes() as $mod){
@@ -218,7 +228,7 @@ class DoctorController extends Controller
      */
     private function createEditForm(Particular $entity,$globalOption)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DoctorType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
         $form = $this->createForm(new DoctorType($em,$globalOption), $entity, array(
@@ -239,7 +249,7 @@ class DoctorController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var $entity Particular */
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
         if (!$entity) {
@@ -263,13 +273,13 @@ class DoctorController extends Controller
             $entity->setIsDoctor(1);
             $entity->signatureUpload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
-            $this->getDoctrine()->getRepository(Particular::class)->updateDoctorVisitModes($entity,$data);
+            $this->em->getRepository(Particular::class)->updateDoctorVisitModes($entity,$data);
             return $this->redirect($this->generateUrl('hms_doctor_edit',array('id'=>$id)));
         }
-        $visitMods = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('service'=>13,'hospitalConfig' => $globalOption->getHospitalConfig()));
+        $visitMods = $this->em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(array('service'=>13,'hospitalConfig' => $globalOption->getHospitalConfig()));
         $visitAmounts = array();
         if($entity->getVisitModes()){
             foreach ( $entity->getVisitModes() as $mod){
@@ -289,21 +299,21 @@ class DoctorController extends Controller
      */
     public function deleteAction(Particular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         try {
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -318,7 +328,7 @@ class DoctorController extends Controller
     public function statusAction(Particular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -330,7 +340,7 @@ class DoctorController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_doctor'));

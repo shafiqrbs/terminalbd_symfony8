@@ -2,7 +2,7 @@
 
 namespace App\Tool\Importer;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Inventory\Entity\Product;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 

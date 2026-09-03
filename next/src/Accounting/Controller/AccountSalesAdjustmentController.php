@@ -4,8 +4,11 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Accounting\Entity\AccountSalesAdjustment;
@@ -16,16 +19,23 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountSalesAdjustment controller.
  *
  */
-class AccountSalesAdjustmentController extends Controller
+class AccountSalesAdjustmentController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,11 +45,11 @@ class AccountSalesAdjustmentController extends Controller
 
 	public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->findWithSearch( $this->getUser()->getGlobalOption(),$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($this->getUser(),'Debit',$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($this->getUser(),'Debit',$data);
         return $this->render('Accounting/AccountSalesAdjustment/index.html.twig', array(
             'entities' => $pagination,
             'searchForm' => $data,
@@ -60,7 +70,7 @@ class AccountSalesAdjustmentController extends Controller
             ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             if(!empty($this->getUser()->getProfile()->getBranches())){
                 $entity->setBranches($this->getUser()->getProfile()->getBranches());
@@ -71,12 +81,12 @@ class AccountSalesAdjustmentController extends Controller
             $entity->setPurchase($purchase);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_salesadjustment'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         return $this->render('Accounting/AccountSalesAdjustment/new.html.twig', array(
@@ -112,7 +122,7 @@ class AccountSalesAdjustmentController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountSalesAdjustment();
         $form   = $this->createCreateForm($entity);
         return $this->render('Accounting/AccountSalesAdjustment/new.html.twig', array(
@@ -130,7 +140,7 @@ class AccountSalesAdjustmentController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountSalesAdjustment entity.');
@@ -147,7 +157,7 @@ class AccountSalesAdjustmentController extends Controller
     public function approveAction(AccountSalesAdjustment $entity)
     {
         if (!empty($entity) and $entity->getProcess() != 'approved') {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('approved');
             $entity->setApprovedBy($this->getUser());
             $accountConfig = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -157,7 +167,7 @@ class AccountSalesAdjustmentController extends Controller
                 $entity->setUpdated($datetime);
             }
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertSalesAdjustment($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertSalesAdjustment($entity);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -169,7 +179,7 @@ class AccountSalesAdjustmentController extends Controller
 
     public function deleteAction(AccountSalesAdjustment $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find account sales adjustment entity.');
         }
@@ -185,8 +195,8 @@ class AccountSalesAdjustmentController extends Controller
 
 	public function reverseAction(AccountSalesAdjustment $entity){
 
-		$em = $this->getDoctrine()->getManager();
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesAdjustmentReverse($entity);
+		$em = $this->em;
+		$this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesAdjustmentReverse($entity);
 		$entity->setProcess(null);
 		$entity->setApprovedBy(null);
 		$entity->setSales(0);

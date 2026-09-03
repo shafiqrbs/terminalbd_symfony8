@@ -2,6 +2,9 @@
 
 namespace App\Tool\Controller;
 
+use App\Tool\Service\ToolManager;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +18,13 @@ use App\Tool\Form\PortalMobileBankAccountType;
  */
 class PortalMobileBankAccountController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     /**
      * Lists all PortalMobileBankAccount entities.
@@ -22,7 +32,7 @@ class PortalMobileBankAccountController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\PortalMobileBankAccount::class)->findAll();
 
@@ -41,15 +51,15 @@ class PortalMobileBankAccountController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $intlMobile = $entity->getMobile();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($intlMobile);
+            $mobile = $this->toolManager->specialExpClean($intlMobile);
             $entity->setMobile($mobile);
             $name = $entity->getMobile().','.$entity->getServiceName().','.$entity->getAccountType();
             $entity->setName($name);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Status has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('mobilebankaccount'));
@@ -98,7 +108,7 @@ class PortalMobileBankAccountController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\PortalMobileBankAccount::class)->find($id);
 
@@ -116,7 +126,7 @@ class PortalMobileBankAccountController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\PortalMobileBankAccount::class)->find($id);
 
@@ -152,7 +162,7 @@ class PortalMobileBankAccountController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\PortalMobileBankAccount::class)->find($id);
 
@@ -164,12 +174,12 @@ class PortalMobileBankAccountController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $intlMobile = $entity->getMobile();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($intlMobile);
+            $mobile = $this->toolManager->specialExpClean($intlMobile);
             $entity->setMobile($mobile);
             $name = $entity->getMobile().','.$entity->getServiceName().','.$entity->getAccountType();
             $entity->setName($name);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('mobilebankaccount_edit', ['id' => $id]));
@@ -186,14 +196,14 @@ class PortalMobileBankAccountController extends AbstractController
      */
     public function deleteAction(PortalMobileBankAccount $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PortalMobileBankAccount entity.');
         }
 
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('mobilebankaccount'));
@@ -206,7 +216,7 @@ class PortalMobileBankAccountController extends AbstractController
     public function statusAction(PortalMobileBankAccount $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $status = $entity->getStatus();
         if($status == 1){
             $entity->setStatus(0);
@@ -214,7 +224,7 @@ class PortalMobileBankAccountController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('mobilebankaccount'));

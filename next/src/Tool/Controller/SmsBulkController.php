@@ -2,9 +2,11 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Tool\Entity\GlobalOption;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Tool\Entity\SmsBulk;
 use App\Tool\Form\SmsBulkType;
@@ -13,8 +15,14 @@ use App\Tool\Form\SmsBulkType;
  * SmsBulk controller.
  *
  */
-class SmsBulkController extends Controller
+class SmsBulkController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all SmsBulk entities.
@@ -22,7 +30,7 @@ class SmsBulkController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\SmsBulk::class)->findAll();
 
@@ -41,12 +49,12 @@ class SmsBulkController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('smsbulk_show', array('id' => $entity->getId())));
@@ -83,7 +91,7 @@ class SmsBulkController extends Controller
     private function createCreateForm(SmsBulk $entity)
     {
 
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SmsBulkType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new SmsBulkType($location), $entity, array(
@@ -118,7 +126,7 @@ class SmsBulkController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\SmsBulk::class)->find($id);
 
@@ -140,7 +148,7 @@ class SmsBulkController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\SmsBulk::class)->find($id);
 
@@ -167,7 +175,7 @@ class SmsBulkController extends Controller
     */
     private function createEditForm(SmsBulk $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SmsBulkType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new SmsBulkType($location), $entity, array(
@@ -186,7 +194,7 @@ class SmsBulkController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\SmsBulk::class)->find($id);
 
@@ -202,7 +210,7 @@ class SmsBulkController extends Controller
 
             $entity->upload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('smsbulk_edit', array('id' => $id)));
@@ -220,14 +228,14 @@ class SmsBulkController extends Controller
      */
     public function deleteAction(SmsBulk $entity)
     {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find SmsBulk entity.');
             }
             $entity->removeUpload();
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
             return $this->redirect($this->generateUrl('smsbulk'));
@@ -262,7 +270,7 @@ class SmsBulkController extends Controller
         //$data = $request->request->all();
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\SmsBulk::class)->find($id);
 
         if (!$entity) {
@@ -276,7 +284,7 @@ class SmsBulkController extends Controller
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('smsbulk'));
@@ -287,7 +295,7 @@ class SmsBulkController extends Controller
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var $global GlobalOption */
         $global = $this->getUser()->getGlobalOption();
         if ($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {

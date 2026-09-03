@@ -12,6 +12,7 @@
 namespace App\User\Controller;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,11 +25,16 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class SecurityController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     public function loginAction(Request $request)
     {
 
-        if($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')){
+        if($this->isGranted('IS_AUTHENTICATED_REMEMBERED')){
             return $this->redirect($this->generateUrl('homepage'));
         }
         /** @var $session \Symfony\Component\HttpFoundation\Session\Session */
@@ -59,20 +65,22 @@ class SecurityController extends AbstractController
         $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
 
         if ($this->has('security.csrf.token_manager')) {
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $csrfToken = $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue();
         } else {
             // BC for SF < 2.4
             $csrfToken = $this->has('form.csrf_provider')
+                // TODO(migration): AbstractController::get() was removed; inject this service.
                 ? $this->get('form.csrf_provider')->generateCsrfToken('authenticate')
                 : null;
         }
         if ($error) {
             $error = $error->getMessage();
         }
-	    $slides = $this->getDoctrine()->getRepository(\App\Content\Entity\SiteSlider::class)->findBy([],['id'=>'DESC']);
-	    $apps =$this->getDoctrine()->getRepository(\App\Tool\Entity\AppModule::class)->findBy(['status'=>1]);
-	    $clients =$this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findBySubdomain();
-	    $testimonials =$this->getDoctrine()->getRepository(\App\Content\Entity\Testimonial::class)->findBy(['status'=>1]);
+	    $slides = $this->em->getRepository(\App\Content\Entity\SiteSlider::class)->findBy([],['id'=>'DESC']);
+	    $apps =$this->em->getRepository(\App\Tool\Entity\AppModule::class)->findBy(['status'=>1]);
+	    $clients =$this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findBySubdomain();
+	    $testimonials =$this->em->getRepository(\App\Content\Entity\Testimonial::class)->findBy(['status'=>1]);
 	    return $this->renderLogin([
             'last_username'         => $lastUsername,
             'error'                 => $error,
@@ -132,10 +140,12 @@ class SecurityController extends AbstractController
         $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
 
         if ($this->has('security.csrf.token_manager')) {
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $csrfToken = $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue();
         } else {
             // BC for SF < 2.4
             $csrfToken = $this->has('form.csrf_provider')
+                // TODO(migration): AbstractController::get() was removed; inject this service.
                 ? $this->get('form.csrf_provider')->generateCsrfToken('authenticate')
                 : null;
         }

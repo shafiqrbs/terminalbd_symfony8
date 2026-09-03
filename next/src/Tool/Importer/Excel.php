@@ -3,7 +3,7 @@
 namespace App\Tool\Importer;
 use App\Medicine\Repository\MedicineCompanyRepository;
 use App\Medicine\Repository\MedicineGenericRepository;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Medicine\Entity\MedicineBrand;
 use App\Medicine\Entity\MedicineCompany;
 use App\Medicine\Entity\MedicineGeneric;

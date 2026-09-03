@@ -3,6 +3,11 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DomainUser\Entity\Branches;
 use App\DomainUser\Entity\Customer;
 use App\Inventory\Entity\Item;
@@ -16,7 +21,7 @@ use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
 use Hackzilla\BarcodeBundle\Utility\Barcode;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Mike42\Escpos\Printer;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,16 +29,25 @@ use Symfony\Component\HttpFoundation\Response;
  * Sales controller.
  *
  */
-class SalesOnlineController extends Controller
+class SalesOnlineController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -45,7 +59,7 @@ class SalesOnlineController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Inventory\Entity\Sales::class)->salesLists( $this->getUser() , $mode='general-sales', $data);
@@ -62,7 +76,7 @@ class SalesOnlineController extends Controller
 
     public function customerAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findWithSearch($globalOption,$data);
@@ -82,7 +96,7 @@ class SalesOnlineController extends Controller
     public function newAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Sales();
         $globalOption = $this->getUser()->getGlobalOption();
         $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->defaultCustomer($globalOption);
@@ -106,7 +120,7 @@ class SalesOnlineController extends Controller
 
     public function editAction($code)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entity = $em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory, 'invoice' => $code));
         if (!$entity) {
@@ -166,7 +180,7 @@ class SalesOnlineController extends Controller
     private function createEditForm(Sales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SalesOnlineType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new SalesOnlineType($globalOption,$location), $entity, array(
@@ -186,7 +200,7 @@ class SalesOnlineController extends Controller
     public function salesItemAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\SalesItem::class)->salesItems($inventory, $data);
@@ -201,7 +215,7 @@ class SalesOnlineController extends Controller
 
     public function updateAction(Request $request, Sales $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sales entity.');
@@ -214,16 +228,16 @@ class SalesOnlineController extends Controller
 
             $globalOption = $this->getUser()->getGlobalOption();
             if (!empty($data['customerMobile'])) {
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($globalOption,$mobile,$data);
+                $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($globalOption,$mobile,$data);
                 $entity->setCustomer($customer);
             } elseif(!empty($data['mobile'])) {
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['mobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'mobile' => $mobile ));
+                $mobile = $this->toolManager->specialExpClean($data['mobile']);
+                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'mobile' => $mobile ));
                 $entity->setCustomer($customer);
             }
             $entity->setDue($entity->getTotal() - $entity->getPayment());
-            $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getPayment());
+            $amountInWords = $this->toolManager->intToWords($entity->getPayment());
             $entity->setPaymentInWord($amountInWords);
             if ($entity->getTotal() <= $entity->getPayment()) {
                 $entity->setPayment($entity->getTotal());
@@ -240,7 +254,7 @@ class SalesOnlineController extends Controller
             if(empty($entity->getPayment()) AND $entity->getProcess() =="Done"){
                 $entity->setTransactionMethod(NULL);
             }
-            $purchaseAmount = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->getItemPurchasePrice($entity);
+            $purchaseAmount = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->getItemPurchasePrice($entity);
             $entity->setPurchasePrice($purchaseAmount);
             $profit = ( $entity->getTotal()-($entity->getVat() + $purchaseAmount));
             $entity->setProfit($profit);
@@ -292,7 +306,7 @@ class SalesOnlineController extends Controller
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig()->getId();
 
         if(!empty($this->getUser()->getProfile()->getBranches())){
-            $itemBranchStock = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Delivery::class)->returnBranchSalesItem($this->getUser(),$entity);
+            $itemBranchStock = $this->em->getRepository(\App\Inventory\Entity\Delivery::class)->returnBranchSalesItem($this->getUser(),$entity);
         }else{
             $data = array('stockReceiveItem' => '' , 'stockSalesItem' => '' , 'stockSalesReturnItem' => '', 'stockReturnItem' => ''  );
             $itemBranchStock = $data ;
@@ -323,11 +337,11 @@ class SalesOnlineController extends Controller
     public function invoicePrintAction($invoice)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory,'invoice'=>$invoice));
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory,'invoice'=>$invoice));
 
         $barcode = $this->getBarcode($entity->getInvoice());
         $totalAmount = ( $entity->getTotal() + $entity->getDeliveryCharge());
-        $inWard = $this->get('settong.toolManageRepo')->intToWords($totalAmount);
+        $inWard = $this->toolManager->intToWords($totalAmount);
         if($inventory->isCustomPrint() == 1){
             $print = $this->getUser()->getGlobalOption()->getSubDomain();
         }else{
@@ -352,7 +366,7 @@ class SalesOnlineController extends Controller
         $data = $request->request->all();
         $salesId = $data['salesId'];
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory, 'id' => $salesId));
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory, 'id' => $salesId));
         $this->updateOnlineSalesByPosPrint($entity,$data);
         $option = $entity->getInventoryConfig()->getGlobalOption();
 
@@ -801,24 +815,24 @@ class SalesOnlineController extends Controller
     public function updateOnlineSalesByPosPrint(Sales $entity,$data){
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $globalOption = $this->getUser()->getGlobalOption();
         if (!empty($data['sales_general']['customer']['mobile'])) {
 
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['sales_general']['customer']['mobile']);
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomer($globalOption,$mobile,$data);
+            $mobile = $this->toolManager->specialExpClean($data['sales_general']['customer']['mobile']);
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomer($globalOption,$mobile,$data);
             $entity->setCustomer($customer);
 
         } elseif(!empty($data['mobile'])) {
 
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['mobile']);
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'mobile' => $mobile ));
+            $mobile = $this->toolManager->specialExpClean($data['mobile']);
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'mobile' => $mobile ));
             $entity->setCustomer($customer);
 
         } else {
 
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'name' => 'Default'));
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption, 'name' => 'Default'));
             if(empty($customer)){
                 $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->defaultCustomer($globalOption);
 
@@ -835,7 +849,7 @@ class SalesOnlineController extends Controller
         $entity->setDiscount($data['discount']);
         $entity->setTotal($data['paymentTotal']);
         $entity->setPayment($data['paymentTotal'] - $data['dueAmount']);
-        $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getPayment());
+        $amountInWords = $this->toolManager->intToWords($entity->getPayment());
         $entity->setPaymentInWord($amountInWords);
 
         if ($data['paymentTotal'] <= $data['paymentAmount']) {
@@ -876,13 +890,13 @@ class SalesOnlineController extends Controller
     public function reverseAction($invoice)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory,'invoice' => $invoice));
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory,'invoice' => $invoice));
         if($entity){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->getRepository(\App\Inventory\Entity\StockItem::class)->saleaItemStockReverse($entity);
             $em->getRepository(\App\Inventory\Entity\Item::class)->getSalesItemReverse($entity);
             $em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountSalesReverse($entity);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setRevised(true);
             $entity->setProcess('In-progress');
             $entity->setRevised(true);
@@ -894,7 +908,7 @@ class SalesOnlineController extends Controller
             $entity->setPayment(null);
             $entity->setPaymentStatus('Pending');
             $em->flush();
-            $template = $this->get('twig')->render('Inventory/Reverse/salesReverse.html.twig', array(
+            $template = $this->twig->render('Inventory/Reverse/salesReverse.html.twig', array(
                 'entity' => $entity,
                 'inventoryConfig' => $inventory,
             ));
@@ -907,7 +921,7 @@ class SalesOnlineController extends Controller
 
     public function invoiceGroupReverseAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = ['startDate' => '2019-07-04','endateDate' => '2019-07-04','process'=>"Done"];
         $entities = $em->getRepository(\App\Inventory\Entity\Sales::class)->salesLists( $this->getUser() , $mode='general-sales', $data);
         $pagination = $entities->getResult();
@@ -919,7 +933,7 @@ class SalesOnlineController extends Controller
             $em->getRepository(\App\Inventory\Entity\Item::class)->getSalesItemReverse($entity);
             $em->getRepository(\App\Inventory\Entity\GoodsItem::class)->ecommerceItemReverse($entity);
             $em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountSalesReverse($entity);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setRevised(true);
             $entity->setProcess("Revised");
             $em->flush();
@@ -930,7 +944,7 @@ class SalesOnlineController extends Controller
 
     public function invoiceGroupApprovedAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data=$_REQUEST;
         //  $data = ['startDate' => '2021-11-12','endateDate' => '2021-11-12'];
         $entities = $em->getRepository(\App\Inventory\Entity\Sales::class)->salesLists( $this->getUser() , $mode='pos', $data);
@@ -938,7 +952,7 @@ class SalesOnlineController extends Controller
         /* @var $entity Sales */
         foreach ($pagination as $entity):
             $entity->setPayment($entity->getTotal());
-            $method = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+            $method = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
             $entity->setTransactionMethod($method);
             $entity->setDue(0);
             $em->flush();
@@ -951,7 +965,7 @@ class SalesOnlineController extends Controller
     public function createItemAction($id,Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $pItem = isset($data['purchaseItem']) ? $data['purchaseItem']:'';
@@ -964,7 +978,7 @@ class SalesOnlineController extends Controller
         $sales = $em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $inventory,'id'=>$id));
 
         /* @var $itemStock Item */
-        $itemStock = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig' => $config,'id' => $item));
+        $itemStock = $this->em->getRepository(\App\Inventory\Entity\Item::class)->findOneBy(array('inventoryConfig' => $config,'id' => $item));
         $purchaseItem = '';
         if(empty($pItem)){
             $purchaseItem = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->returnPurchaseItemDetails($inventory,trim($pItem));
@@ -974,15 +988,15 @@ class SalesOnlineController extends Controller
 
             /* @var $purchaseItem PurchaseItem */
 
-            $checkQuantity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->checkPurchaseItemSalesQuantity($purchaseItem);
+            $checkQuantity = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->checkPurchaseItemSalesQuantity($purchaseItem);
             $itemStock = $purchaseItem->getQuantity();
             if(!empty($purchaseItem) and $itemStock > 0 and  $itemStock > $checkQuantity) {
                 $data = array('quantity'=> $quantity ,'salesPrice'=> $price ,'purchasePrice' => $itemStock->getPurchasePrice());
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->insertOnlineSalesPurchaseItem($sales, $purchaseItem,$data);
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->insertOnlineSalesPurchaseItem($sales, $purchaseItem,$data);
+                $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = 'success';
             } else {
-                $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = 'invalid';
             }
             $data = $this->returnResultData($sales,$msg);
@@ -990,14 +1004,14 @@ class SalesOnlineController extends Controller
 
         }elseif($itemStock) {
 
-            $checkQuantity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesItemQuantity($itemStock);
+            $checkQuantity = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesItemQuantity($itemStock);
             if($itemStock->getRemainingQnt() > 0 and  $itemStock->getRemainingQnt() > $checkQuantity) {
                 $data = array('quantity'=> $quantity ,'salesPrice'=> $price ,'purchasePrice' => $itemStock->getPurchasePrice());
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSalesItems($sales, $itemStock,$data);
-                $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->insertSalesItems($sales, $itemStock,$data);
+                $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = 'success';
             } else {
-                $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+                $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
                 $msg = 'invalid';
             }
             $data = $this->returnResultData($sales,$msg);
@@ -1008,10 +1022,10 @@ class SalesOnlineController extends Controller
 
     public function returnResultData($sales,$msg=''){
 
-        //$salesItems = $this->getDoctrine()->getRepository(\App\Inventory\Entity\SalesItem::class)->getSalesItems($sales);
+        //$salesItems = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->getSalesItems($sales);
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $sales = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
-        $entity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $config,'id' => $sales));
+        $sales = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($sales);
+        $entity = $this->em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(array('inventoryConfig' => $config,'id' => $sales));
         /*
          * $salesItems = $this->renderView('Inventory/Sales/item.html.twig', array(
             'entity' => $entity

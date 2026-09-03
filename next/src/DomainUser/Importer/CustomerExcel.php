@@ -3,7 +3,7 @@
 namespace App\DomainUser\Importer;
 
 use Exception;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\DomainUser\Entity\Customer;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 

@@ -2,24 +2,34 @@
 
 namespace App\Customer\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DomainUser\Entity\Customer;
 use App\DomainUser\Form\MemberEditProfileType;
 use Frontend\FrontentBundle\Service\Cart;
 use App\Tool\Entity\Module;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MemberController extends Controller
+class MemberController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -28,14 +38,14 @@ class MemberController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $data['type'] = 'member';
         $data['process'] = 'Approved';
         $entities = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findWithSearch($globalOption,$data);
         $pagination = $this->paginate($entities);
-        $batches = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->studentBatchChoiceList();
+        $batches = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->studentBatchChoiceList();
         return $this->render('Customer/Member/index.html.twig', array(
             'globalOption' => $globalOption,
             'batches' => $batches,
@@ -51,7 +61,7 @@ class MemberController extends Controller
     public function editAction()
     {
         $user = $this->getUser();
-        $profile = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
+        $profile = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
         $editForm = $this->createEditForm($profile);
         $globalOption = $this->getUser()->getGlobalOption();
         return $this->render('Customer/Member/editProfile.html.twig', array(
@@ -68,7 +78,7 @@ class MemberController extends Controller
     public function showAction()
     {
         $user = $this->getUser();
-        $profile = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
+        $profile = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
         $editForm = $this->createEditForm($profile);
         $globalOption = $this->getUser()->getGlobalOption();
         return $this->render('Customer/Member/show.html.twig', array(
@@ -85,7 +95,7 @@ class MemberController extends Controller
     public function memberProfileAction($customer)
     {
         $user = $this->getUser();
-        $profile = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'customerId' => $customer));
+        $profile = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'customerId' => $customer));
         $editForm = $this->createEditForm($profile);
         $globalOption = $this->getUser()->getGlobalOption();
         return $this->render('Customer/Member/show.html.twig', array(
@@ -107,7 +117,7 @@ class MemberController extends Controller
     private function createEditForm(Customer $profile)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $em = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class);
+        $em = $this->em->getRepository(\App\DomainUser\Entity\Customer::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into MemberEditProfileType::configureOptions() and pass them as form options: $em), $profile, array(
         $form = $this->createForm(new MemberEditProfileType($em), $profile, array(
@@ -126,9 +136,9 @@ class MemberController extends Controller
      */
     public function updateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
-        $profile = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
+        $profile = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $user->getGlobalOption(),'user' => $user->getId()));
         if (!$profile) {
             throw $this->createNotFoundException('Unable to find customer entity.');
         }

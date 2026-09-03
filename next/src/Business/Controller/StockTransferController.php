@@ -2,6 +2,9 @@
 
 namespace App\Business\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\BusinessParticular;
 use App\Business\Entity\ItemStockAdjustment;
 use App\Business\Entity\ProductTransfer;
@@ -10,22 +13,29 @@ use App\Business\Form\StockAdjustmentType;
 use App\Business\Form\StockTransferType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Damage controller.
  *
  */
-class StockTransferController extends Controller
+class StockTransferController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 	public function paginate($entities)
 	{
-		$paginator = $this->get('knp_paginator');
+		$paginator = $this->paginator;
 		$pagination = $paginator->paginate(
 			$entities,
-			$this->get('request')->query->get('page', 1)/*page number*/,
+			$this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
 			25  /*limit per page*/
 		);
 		$pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -39,13 +49,13 @@ class StockTransferController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\ProductTransfer::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\ProductTransfer::class)->findWithSearch($config,$data);
 	    $pagination = $this->paginate($entities);
         $form = $this->createCreateForm(new ProductTransfer());
-        $wearhouses = $this->getDoctrine()->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
+        $wearhouses = $this->em->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
         return $this->render('Business/StockTransfer/index.html.twig', array(
             'entities' => $pagination,
             'wearhouses' => $wearhouses,
@@ -69,20 +79,20 @@ class StockTransferController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setBusinessConfig($config);
             if($particular){
-                $item = $this->getDoctrine()->getRepository(BusinessParticular::class)->findOneBy(array('businessConfig'=>$config,'name'=>$particular));
+                $item = $this->em->getRepository(BusinessParticular::class)->findOneBy(array('businessConfig'=>$config,'name'=>$particular));
                 $entity->setBusinessParticular($item);
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('business_stock_transfer'));
         }
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\ProductTransfer::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\ProductTransfer::class)->findWithSearch($config,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Business/StockAdjustment/new.html.twig', array(
             'entities' => $pagination,
@@ -116,7 +126,7 @@ class StockTransferController extends Controller
 
 	public function deleteAction(ProductTransfer $entity)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
         $em->remove($entity);
         $em->flush();
 		return new Response('success');
@@ -127,11 +137,11 @@ class StockTransferController extends Controller
     {
 
         if (!empty($entity) and ($entity->getProcess() == 'Created')) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('Approved');
             $entity->setApprovedBy($this->getUser());
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->stockTransfer($entity);
+            $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->stockTransfer($entity);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -141,7 +151,7 @@ class StockTransferController extends Controller
     public function reverseAction(ProductTransfer $entity)
     {
         if (!empty($entity) and ($entity->getProcess() == 'Approved')) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setProcess('Created');
             $entity->setApprovedBy($this->getUser());
             $em->flush();

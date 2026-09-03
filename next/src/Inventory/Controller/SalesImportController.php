@@ -3,6 +3,8 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use JMS\SecurityExtraBundle\Annotation\Secure;
@@ -17,12 +19,18 @@ use App\Inventory\Form\SalesImportType;
  */
 class SalesImportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     #[IsGranted('ROLE_DOMAIN_INVENTORY_SALES')]
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\SalesImport::class)->findBy(['inventoryConfig'=>$inventory],['updated'=>'DESC']);
         return $this->render('Inventory/SalesImport/index.html.twig', [
@@ -39,13 +47,13 @@ class SalesImportController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('inventory_salesimport'));
@@ -93,16 +101,18 @@ class SalesImportController extends AbstractController
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $importer = $this->get('appstore_inventory_sales_import');
         $importer->setSalesImport($SalesImport);
+        // TODO(migration): AbstractController::get() was removed; inject this service.
         $reader = $this->get('appstore_inventory.importer.sales_excel_data_reader');
         $file =  realpath($SalesImport->getAbsolutePath());
         $importer->import($reader->getData($file));
         $SalesImport->setProgress('migrated');
         $em->flush();
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been migration successfully"
         );
         return $this->redirect($this->generateUrl('inventory_salesimport'));
@@ -112,7 +122,7 @@ class SalesImportController extends AbstractController
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Sales::class)->find($id);
 
@@ -147,7 +157,7 @@ class SalesImportController extends AbstractController
 
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\SalesImport::class)->find($id);
 
@@ -174,7 +184,7 @@ class SalesImportController extends AbstractController
 
     public function deleteAction(SalesImport $salesImport)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if ($salesImport) {
             $em->remove($salesImport);
             $em->flush();
@@ -187,12 +197,12 @@ class SalesImportController extends AbstractController
     public function updatedAction(SalesImport $salesImport)
     {
 
-        $em = $this->getDoctrine()->getManager();
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($salesImport->getSales(),'import');
+        $em = $this->em;
+        $this->em->getRepository(\App\Inventory\Entity\Sales::class)->updateSalesTotalPrice($salesImport->getSales(),'import');
         $salesImport->setProgress('updated');
         $em->persist($salesImport);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been updated successfully"
         );
 

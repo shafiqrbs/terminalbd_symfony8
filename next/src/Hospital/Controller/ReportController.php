@@ -2,6 +2,9 @@
 
 namespace App\Hospital\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\Hospital\Entity\Particular;
@@ -14,13 +17,20 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -30,7 +40,7 @@ class ReportController extends AbstractController
     public function patientDownloadAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->invoiceLists( $user,$mode ='admission', $data);
@@ -55,7 +65,7 @@ class ReportController extends AbstractController
     public function salesSummaryAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         if (!empty($data['date'])) {
@@ -105,7 +115,7 @@ class ReportController extends AbstractController
     public function salesSummaryPdfAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -164,7 +174,7 @@ class ReportController extends AbstractController
     public function serviceBaseSummaryAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -185,7 +195,7 @@ class ReportController extends AbstractController
     public function serviceBaseSummaryPdfAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entity = '';
@@ -216,7 +226,7 @@ class ReportController extends AbstractController
 
     public function salesDetailsAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -228,9 +238,9 @@ class ReportController extends AbstractController
         $salesTodayUser      = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todaySalesUsers($user);
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->invoiceDetailReporets($user, $mode = 'diagnostic', $data);
         $pagination = $entities->getQuery()->getResult();
-        $commissionSummary = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommissionSummary($hospital, $entities);
-        $commissions = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommission($hospital, $entities);
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [5, 6]);
+        $commissionSummary = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommissionSummary($hospital, $entities);
+        $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommission($hospital, $entities);
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [5, 6]);
         return $this->render('HospitalBundle:Report/Sales:details.html.twig', [
             'entities' => $pagination,
             'commissions' => $commissions,
@@ -245,7 +255,7 @@ class ReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -257,9 +267,9 @@ class ReportController extends AbstractController
 
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->invoiceDetailReporets($user, $mode = 'diagnostic', $data);
         $pagination = $entities->getQuery()->getResult();
-        $commissions = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommission($hospital, $entities);
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [6]);
-        $commissionSummary = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommissionSummary($hospital, $entities);
+        $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommission($hospital, $entities);
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [6]);
+        $commissionSummary = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommissionSummary($hospital, $entities);
         $html = $this->renderView(
             'HospitalBundle:Report/Sales:detailsPdf.html.twig', [
                 'globalOption' => $user->getGlobalOption(),
@@ -283,7 +293,7 @@ class ReportController extends AbstractController
 
     public function salesDetailsDiscountAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
@@ -294,7 +304,7 @@ class ReportController extends AbstractController
         $salesTodayUser      = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todaySalesUsers($user);
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->invoiceDetailReporets($user, $mode = 'diagnostic', $data);
         $pagination = $entities->getQuery()->getResult();
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [5, 6]);
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [5, 6]);
         return $this->render('HospitalBundle:Report/sales-discount:details.html.twig', [
             'entities' => $pagination,
             'referredDoctors' => $referredDoctors,
@@ -307,7 +317,7 @@ class ReportController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -318,7 +328,7 @@ class ReportController extends AbstractController
         }
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->invoiceDetailReporets($user, $mode = 'diagnostic', $data);
         $pagination = $entities->getQuery()->getResult();
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [6]);
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [6]);
         $html = $this->renderView(
             'HospitalBundle:Report/sales-discount:detailsPdf.html.twig', [
                 'globalOption' => $user->getGlobalOption(),
@@ -342,7 +352,7 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $monthlySales = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->monthlySales($user, $data);
         $monthlyCommissionSales = $em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyCommission($user, $data);
         $monthlySalesReturns = $em->getRepository(\App\Hospital\Entity\HmsInvoiceReturn::class)->monthlySalesReturn($user, $data);
@@ -360,7 +370,7 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (empty($data['month']) and empty($data['year'])) {
             $data = [];
         }
@@ -401,10 +411,10 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
-        $commissions = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyCommissionGroup($user, $data);
-        $commissionEntity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyGroupBaseCommissionSummary($user, $data);
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($user->getGlobalOption()->getHospitalConfig(), [5, 6]);
+        $em = $this->em;
+        $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyCommissionGroup($user, $data);
+        $commissionEntity = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyGroupBaseCommissionSummary($user, $data);
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($user->getGlobalOption()->getHospitalConfig(), [5, 6]);
         return $this->render('Hospital/Report/monthlyCommission.html.twig', [
             'referredDoctors' => $referredDoctors,
             'commissions' => $commissions,
@@ -417,15 +427,15 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (empty($data['month']) and empty($data['year'])) {
             $data = [];
         }
-        $commissions = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyCommissionGroup($user, $data);
-        $commissionEntity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyGroupBaseCommissionSummary($user, $data);
+        $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyCommissionGroup($user, $data);
+        $commissionEntity = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyGroupBaseCommissionSummary($user, $data);
         $referred = "";
         if(!empty($data['referred'])){
-            $referred = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->find($data['referred']);
+            $referred = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['referred']);
         }
         $html = $this->renderView(
             'Hospital/Report/monthlyCommissionPdf.html.twig', [
@@ -458,14 +468,14 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
-        $commissions = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->dailyCommissionDetails($user, $data);
-        $monthlyReferredCommissionInvoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->dailyReferredCommissionInvoice($user, $data);
-        $commissionSummary = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->dailyGroupBaseCommissionSummary($user, $data);
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($user->getGlobalOption()->getHospitalConfig(), [5, 6]);
+        $em = $this->em;
+        $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->dailyCommissionDetails($user, $data);
+        $monthlyReferredCommissionInvoice = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->dailyReferredCommissionInvoice($user, $data);
+        $commissionSummary = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->dailyGroupBaseCommissionSummary($user, $data);
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($user->getGlobalOption()->getHospitalConfig(), [5, 6]);
         $mode =(isset($data['mode']) and !empty($data['mode'] )) ? $data['mode'] :'';
         if($mode == "pdf"){
-            $referred = $this->getDoctrine()->getRepository(Particular::class)->find($data['referred']);
+            $referred = $this->em->getRepository(Particular::class)->find($data['referred']);
             $html = $this->renderView(
                 'Hospital/Report/dailyCommissionDetailsPdf.html.twig', [
                     'globalOption' => $user->getGlobalOption(),
@@ -500,11 +510,11 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
-        $commissions = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyCommissionDetails($user, $data);
-        $monthlyReferredCommissionInvoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyReferredCommissionInvoice($user, $data);
-        $commissionSummary = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyGroupBaseCommissionSummary($user, $data);
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($user->getGlobalOption()->getHospitalConfig(), [5, 6]);
+        $em = $this->em;
+        $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyCommissionDetails($user, $data);
+        $monthlyReferredCommissionInvoice = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyReferredCommissionInvoice($user, $data);
+        $commissionSummary = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyGroupBaseCommissionSummary($user, $data);
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($user->getGlobalOption()->getHospitalConfig(), [5, 6]);
 
         return $this->render('Hospital/Report/monthlyCommissionDetails.html.twig', [
             'referredInvoice' => $monthlyReferredCommissionInvoice,
@@ -519,13 +529,13 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
-        $commissions = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyCommissionDetails($user, $data);
-        $monthlyReferredCommissionInvoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyReferredCommissionInvoice($user, $data);
-        $commissionSummary = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyGroupBaseCommissionSummary($user, $data);
+        $em = $this->em;
+        $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyCommissionDetails($user, $data);
+        $monthlyReferredCommissionInvoice = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyReferredCommissionInvoice($user, $data);
+        $commissionSummary = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyGroupBaseCommissionSummary($user, $data);
         $referred = "";
         if(!empty($data['referred'])){
-            $referred = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->find($data['referred']);
+            $referred = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['referred']);
         }
         $html = $this->renderView(
             'Hospital/Report/monthlyCommissionDetailsPdf.html.twig', [
@@ -559,8 +569,8 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         $data = $_REQUEST;
-        $commissions = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->commissionGroup($user, $data);
-        $referreds = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->commissionReferred($user, $data);
+        $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->commissionGroup($user, $data);
+        $referreds = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->commissionReferred($user, $data);
         return $this->render('Hospital/Report/commissionSummary.html.twig', [
             'commissions' => $commissions,
             'referreds' => $referreds,
@@ -572,8 +582,8 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         $data = $_REQUEST;
-        $commissions = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->commissionGroup($user, $data);
-        $referreds = $this->getDoctrine()->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->commissionReferred($user, $data);
+        $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->commissionGroup($user, $data);
+        $referreds = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->commissionReferred($user, $data);
         $html = $this->renderView('Hospital/Report/commissionSummaryPdf.html.twig', [
             'globalOption' => $user->getGlobalOption(),
             'commissions' => $commissions,

@@ -2,6 +2,8 @@
 
 namespace App\Medicine\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Medicine\Entity\MedicinePurchase;
 use App\Medicine\Entity\MedicineTransfer;
 use App\Medicine\Entity\MedicinePurchaseItem;
@@ -12,15 +14,21 @@ use App\Medicine\Form\TransferItemType;
 use App\Medicine\Form\TransferType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * MedicineTransfer controller.
  *
  */
-class MedicineTransferController extends Controller
+class MedicineTransferController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all MedicineTransfer entities.
@@ -28,11 +36,11 @@ class MedicineTransferController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new MedicineTransfer();
         $form = $this->createCreateForm($entity);
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineTransfer::class)->findBy(array('medicineConfig' => $config),array('created'=>'ASC'));
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineTransfer::class)->findBy(array('medicineConfig' => $config),array('created'=>'ASC'));
         return $this->render('Medicine/MedicineTransfer/index.html.twig', array(
             'entities' => $entities,
             'entity' => $entity,
@@ -53,7 +61,7 @@ class MedicineTransferController extends Controller
 
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineTransfer::class)->find($id);
 
@@ -75,12 +83,12 @@ class MedicineTransferController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('medicine_transfer_edit', array('id' => $entity->getId())));
@@ -121,7 +129,7 @@ class MedicineTransferController extends Controller
      */
     public function editAction(MedicineTransfer $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $purchaseItem = new MedicineTransferItem();
         $form = $this->createEditForm($entity,$purchaseItem);
         if (!$entity) {
@@ -158,7 +166,7 @@ class MedicineTransferController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineTransfer::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find MedicineTransfer entity.');
@@ -171,18 +179,18 @@ class MedicineTransferController extends Controller
 
             $medicineTransferItem->setMedicineTransfer($entity);
 
-            $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['medicineStock']);
+            $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['medicineStock']);
             $medicineTransferItem->setMedicineStock($stock);
-          //  $purchaseItem = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($data['medicinePurchaseItem']);
+          //  $purchaseItem = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($data['medicinePurchaseItem']);
            // $medicineTransferItem->setMedicinePurchaseItem($purchaseItem);
             $medicineTransferItem->setPurchasePrice($stock->getPurchasePrice());
             $medicineTransferItem->setSubTotal($medicineTransferItem->getPurchasePrice() * $medicineTransferItem->getQuantity());
             $em->persist($medicineTransferItem);
             $em->flush();
-           // $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($purchaseItem,'purchase-return');
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineTransfer::class)->updateMedicineTransferTotalPrice($entity);
-            $this->get('session')->getFlashBag()->add(
+           // $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($purchaseItem,'purchase-return');
+            $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
+            $this->em->getRepository(\App\Medicine\Entity\MedicineTransfer::class)->updateMedicineTransferTotalPrice($entity);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('medicine_transfer_edit',array('id'=>$entity->getId())));
@@ -199,12 +207,12 @@ class MedicineTransferController extends Controller
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineTransfer::class)->find($id);
         $this->allMedicineTransferItemDelete($entity);
 	    $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('medicine_transfer'));
@@ -212,7 +220,7 @@ class MedicineTransferController extends Controller
 
 	public function allMedicineTransferItemDelete(MedicineTransfer $invoice){
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 
 		/* @var $particular MedicineTransferItem */
 
@@ -221,11 +229,11 @@ class MedicineTransferController extends Controller
 			foreach ($invoice->getMedicineTransferItems() as $particular){
 
 				$stock = $particular->getMedicineStock();
-				$this->get('session')->set('stock', $stock);
+				$this->requestStack->getSession()->set('stock', $stock);
 				$em->remove($particular);
 				$em->flush();
-				$stock = $this->get('session')->get('stock');
-				$this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
+				$stock = $this->requestStack->getSession()->get('stock');
+				$this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
 
 			}
 
@@ -243,23 +251,23 @@ class MedicineTransferController extends Controller
     public function deleteItemAction(MedicineTransfer $purchase,$id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 	    $config = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
         if($config == $purchase->getMedicineConfig()->getId()){
 		    $entity = $em->getRepository(\App\Medicine\Entity\MedicineTransferItem::class)->find($id);
 		    $stock = $entity->getMedicineStock();
 		    $medicineTransfer = $entity->getMedicineTransfer()->getId();
-		    $this->get('session')->set('stock', $stock);
-		    $this->get('session')->set('MedicineTransfer', $medicineTransfer);
+		    $this->requestStack->getSession()->set('stock', $stock);
+		    $this->requestStack->getSession()->set('MedicineTransfer', $medicineTransfer);
 		    // $purchaseItem = $entity->getMedicinePurchaseItem();
 		    $em->remove($entity);
 		    $em->flush();
-		    $stock = $this->get('session')->get('stock');
-		    $medicineTransfer = $this->get('session')->get('MedicineTransfer');
-		    // $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($purchaseItem,'purchase_return');
-		    $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
-	        $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineTransfer::class)->updateMedicineTransferTotalPrice($purchase);
-	        $this->get('session')->getFlashBag()->add(
+		    $stock = $this->requestStack->getSession()->get('stock');
+		    $medicineTransfer = $this->requestStack->getSession()->get('MedicineTransfer');
+		    // $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($purchaseItem,'purchase_return');
+		    $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($stock,'purchase-return');
+	        $this->em->getRepository(\App\Medicine\Entity\MedicineTransfer::class)->updateMedicineTransferTotalPrice($purchase);
+	        $this->requestStack->getSession()->getFlashBag()->add(
 			    'error',"Data has been deleted successfully"
 		    );
         }
@@ -270,7 +278,7 @@ class MedicineTransferController extends Controller
 	public function invoiceDiscountUpdateAction(Request $request)
 	{
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$discountType = $request->request->get('discountType');
 		$discountCal = (float)$request->request->get('discount');
 		$invoice = $request->request->get('purchase');
@@ -310,7 +318,7 @@ class MedicineTransferController extends Controller
 
     public function approveAction(MedicineTransfer $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!empty($entity) and $entity->getProcess() != 'approved') {
             $payment = $_REQUEST['payment'];
             $entity->setProcess('approved');
@@ -318,7 +326,7 @@ class MedicineTransferController extends Controller
             $entity->setPayment($payment);
             $entity->setDue($entity->getTotal() - $entity->getPayment());
             $em->flush();
-            $accountSales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountTransferInvoice($entity);
+            $accountSales = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountTransferInvoice($entity);
             $em->getRepository(\App\Accounting\Entity\Transaction::class)->salesGlobalTransaction($accountSales);
             return new Response('success');
         } else {

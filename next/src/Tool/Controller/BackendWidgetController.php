@@ -3,23 +3,29 @@
 namespace App\Tool\Controller;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class BackendWidgetController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     public function topBarAction($slug='')
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         return $this->render('@SettingTool/Widget/common.html.twig');
 
-        if ($this->get('security.authorization_checker')->isGranted('ROLE_SUPER_ADMIN')) {
+        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
 
             $globalOption = $this->getUser()->getGlobalOption();
             return $this->render('@SettingTool/Widget/admin.html.twig', [
                 'globalOption' => $globalOption
             ]);
 
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_DOMAIN')) {
+        }elseif ($this->isGranted('ROLE_DOMAIN')) {
 
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
            // $todaySalesOverview = $em->getRepository(\App\Inventory\Entity\Sales::class)->todaySalesOverview($inventory);
@@ -29,7 +35,7 @@ class BackendWidgetController extends AbstractController
                 //'accountHeads'      => $accountHeads,
             ]);
 
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_DOMAIN_INVENTORY') ) {
+        }elseif ($this->isGranted('ROLE_DOMAIN_INVENTORY') ) {
 
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $todaySalesOverview = $em->getRepository(\App\Inventory\Entity\Sales::class)->todaySalesOverview($inventory);
@@ -39,7 +45,7 @@ class BackendWidgetController extends AbstractController
                 'accountHeads'      => $accountHeads,
             ]);
 
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_DOMAIN_INVENTORY_SALES')) {
+        }elseif ($this->isGranted('ROLE_DOMAIN_INVENTORY_SALES')) {
 
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $todaySalesOverview = $em->getRepository(\App\Inventory\Entity\Sales::class)->todaySalesOverview($inventory);

@@ -4,28 +4,38 @@ namespace App\Restaurant\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Restaurant\Entity\Particular;
 use App\Restaurant\Form\AccessoriesType;
 use App\Restaurant\Form\StockType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * StockController controller.
  *
  */
-class StockController extends Controller
+class StockController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -39,12 +49,12 @@ class StockController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $data = $_REQUEST;
-        $entities = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getAccessoriesParticular($config,$data);
+        $entities = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getAccessoriesParticular($config,$data);
         $pagination = $this->paginate($entities);
-        $categories = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=>$config,'status'=>1),array('name'=>"ASC"));
+        $categories = $this->em->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=>$config,'status'=>1),array('name'=>"ASC"));
         $entity = new Particular();
         $form = $this->createCreateForm($entity);
         return $this->render('Restaurant/Stock/index.html.twig', array(
@@ -64,28 +74,28 @@ class StockController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getAccessoriesParticular($config);
+        $entities = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getAccessoriesParticular($config);
         $pagination = $this->paginate($entities);
         $entity = new Particular();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setRestaurantConfig($config);
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('restaurant_stock'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Required field does not input"
         );
-        $categories = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig' => $config,'status' => 1),array('name'=>"ASC"));
+        $categories = $this->em->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig' => $config,'status' => 1),array('name'=>"ASC"));
         return $this->render('Restaurant/Stock/index.html.twig', array(
             'entity' => $entity,
             'pagination' => $pagination,
@@ -127,16 +137,16 @@ class StockController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Particular::class)->findOneBy(array('restaurantConfig'=>$config,'id'=>$id));
-        $entities = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getAccessoriesParticular($config);
+        $entities = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getAccessoriesParticular($config);
         $pagination = $this->paginate($entities);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
         $editForm = $this->createEditForm($entity);
-        $categories = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=> $config,'status' => 1),array('name' => "ASC"));
+        $categories = $this->em->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=> $config,'status' => 1),array('name' => "ASC"));
 
         return $this->render('Restaurant/Stock/index.html.twig', array(
             'pagination'        => $pagination,
@@ -177,9 +187,9 @@ class StockController extends Controller
     public function updateAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getAccessoriesParticular($config);
+        $entities = $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getAccessoriesParticular($config);
         $pagination = $this->paginate($entities);
         $entity = $em->getRepository(\App\Restaurant\Entity\Particular::class)->find($id);
 
@@ -196,14 +206,14 @@ class StockController extends Controller
             }
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionElementPrice($entity,$entity->getPurchasePrice());
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionPrice($config->getId());
+            $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionElementPrice($entity,$entity->getPurchasePrice());
+            $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionPrice($config->getId());
             return $this->redirect($this->generateUrl('restaurant_stock'));
         }
-        $categories = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=>$config,'status'=>1),array('name'=>"ASC"));
+        $categories = $this->em->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=>$config,'status'=>1),array('name'=>"ASC"));
         return $this->render('Restaurant/Stock/index.html.twig', array(
             'pagination'      => $pagination,
             'entity'      => $entity,
@@ -218,7 +228,7 @@ class StockController extends Controller
      */
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Particular::class)->findOneBy(array('restaurantConfig' => $config,'id'=>$id));
         if (!$entity) {
@@ -228,16 +238,16 @@ class StockController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -252,7 +262,7 @@ class StockController extends Controller
     public function statusAction(Particular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -264,7 +274,7 @@ class StockController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('restaurant_stock'));
@@ -273,7 +283,7 @@ class StockController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find particular entity.');
@@ -283,9 +293,9 @@ class StockController extends Controller
             $price = abs($data['value']);
             $entity->setPrice($price);
         }elseif($data['name'] == "PurchasePrice") {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionElementPrice($entity, $price);
+            $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionElementPrice($entity, $price);
             $config = $entity->getRestaurantConfig()->getId();
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionPrice($config);
+            $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionPrice($config);
         }else{
             $price = $data['value'];
             $entity->$setField($price);
@@ -299,7 +309,7 @@ class StockController extends Controller
     public function productionUpdateAction()
     {
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig()->getId();
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionPrice($config);
+        $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->updateProductionPrice($config);
         return new Response('success');
 
     }
@@ -310,11 +320,11 @@ class StockController extends Controller
      */
     public function copyAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var $entity Particular */
         $entity = $em->getRepository(\App\Restaurant\Entity\Particular::class)->find($id);
         $newEntity = new Particular();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $newEntity->setRestaurantConfig($entity->getRestaurantConfig());
         $newEntity->setName($entity->getName());
         $newEntity->setCategory($entity->getCategory());
@@ -325,7 +335,7 @@ class StockController extends Controller
         $newEntity->setPurchasePrice($entity->getPurchasePrice());
         $em->persist($newEntity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\ProductionElement::class)->copyElement($newEntity,$entity);
+        $this->em->getRepository(\App\Restaurant\Entity\ProductionElement::class)->copyElement($newEntity,$entity);
         return $this->redirect($this->generateUrl('restaurant_production_edit',array('id'=>$newEntity->getId())));
     }
 

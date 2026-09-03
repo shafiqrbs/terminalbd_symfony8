@@ -3,6 +3,9 @@
 namespace App\Medicine\Controller;
 
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Medicine\Entity\MedicineStockHouse;
 use App\Medicine\Entity\MedicineStockHouseItem;
 use App\Medicine\Entity\MedicineStock;
@@ -12,7 +15,7 @@ use App\Medicine\Form\HouseStockInType;
 use App\Medicine\Form\HouseStockOutType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 
@@ -20,15 +23,22 @@ use Symfony\Component\Serializer\Encoder\JsonEncode;
  * StockHouse controller.
  *
  */
-class StockHouseController extends Controller
+class StockHouseController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -42,12 +52,12 @@ class StockHouseController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->findWithSearch($config,$data);
         $pagination = $this->paginate($entities);
-        $stockHouses = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('particularType' => 10));
+        $stockHouses = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('particularType' => 10));
         return $this->render('Medicine/StockHouse/index.html.twig', array(
             'entities' => $pagination,
             'stockHouses' => $stockHouses,
@@ -61,12 +71,12 @@ class StockHouseController extends Controller
      */
     public function stockDetailsAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->findStockDetails($config,$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->findStockDetails($config,$data);
         $pagination = $this->paginate($entities);
-        $stockHouses = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('particularType' => 10));
+        $stockHouses = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('particularType' => 10));
         return $this->render('Medicine/StockHouse/stockDetails.html.twig', array(
             'entities' => $pagination,
             'stockHouses' => $stockHouses,
@@ -82,19 +92,19 @@ class StockHouseController extends Controller
 
         $entity = new MedicineStockHouse();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig' => $config),array('particularType'=>'ASC'));
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig' => $config),array('particularType'=>'ASC'));
         $form = $this->createStockInForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
-            $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($entity->getStockName());
+            $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($entity->getStockName());
             $entity->setMedicineStock($stock);
             $entity->setStockName($stock->getName());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('medicine_stockhouse'));
@@ -108,7 +118,7 @@ class StockHouseController extends Controller
 
     public function stockInAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = new MedicineStockHouse();
         if (!$entity) {
@@ -140,7 +150,7 @@ class StockHouseController extends Controller
 
     public function stockOutAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = new MedicineStockHouse();
         $stockItemForm = $this->createStockOutForm($entity);
@@ -161,21 +171,21 @@ class StockHouseController extends Controller
         $form = $this->createStockOutForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $stock = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name' => $entity->getStockName()));
-            $remainingQnt = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->getStockRemainingQnt($stock,$entity->getWearHouse());
+            $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name' => $entity->getStockName()));
+            $remainingQnt = $this->em->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->getStockRemainingQnt($stock,$entity->getWearHouse());
             if($remainingQnt >= $entity->getStockOut()){
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->em;
                 $entity->setMedicineConfig($config);
                 $entity->setMedicineStock($stock);
                 $entity->setStockName($stock->getName());
                 $em->persist($entity);
                 $em->flush();
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'success',"Data has been inserted successfully"
                 );
                 return $this->redirect($this->generateUrl('medicine_stockhouse'));
             }else{
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'error',"Quantity must be less or equal the remaining quantity "
                 );
                 return $this->render('Medicine/StockHouse/stockOut.html.twig', array(
@@ -212,7 +222,7 @@ class StockHouseController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->findOneBy(array('medicineConfig' => $config , 'id' => $id));
         if (!$entity) {
@@ -229,16 +239,16 @@ class StockHouseController extends Controller
      */
     public function deleteAction(MedicineStockHouse $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
-        $remainingQnt = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->getStockRemainingQnt($entity->getMedicineStock(),$entity->getWearHouse());
+        $remainingQnt = $this->em->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->getStockRemainingQnt($entity->getMedicineStock(),$entity->getWearHouse());
         if($config == $entity->getMedicineConfig()->getId() and $remainingQnt >= $entity->getStockIn()){
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been deleted successfully"
             );
         }
@@ -250,7 +260,7 @@ class StockHouseController extends Controller
        $item = trim($_REQUEST['q']);
        if ($item) {
            $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->searchAutoStock($item,$config);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->searchAutoStock($item,$config);
         }
         return new JsonResponse($item);
     }

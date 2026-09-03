@@ -4,11 +4,15 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Form\AccountLoanInvoiceType;
 use App\Inventory\Entity\Sales;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Accounting\Entity\AccountLoan;
 use App\Accounting\Form\AccountLoanType;
@@ -18,16 +22,24 @@ use Symfony\Component\HttpFoundation\Response;
  * AccountLoan controller.
  *
  */
-class AccountLoanController extends Controller
+class AccountLoanController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -41,17 +53,17 @@ class AccountLoanController extends Controller
     public function indexAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $option = $this->getUser()->getGlobalOption();
-        $transactionMethods = $this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
+        $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(array('status'=>1),array('name'=>'asc'));
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($option);
         if(isset($data['submit']) and $data['submit'] == 'print' and isset($data['employee']) and $data['employee']){
             $data[] = array('process'=>'Approved');
             $entities = $em->getRepository(\App\Accounting\Entity\AccountLoan::class)->findWithSearch($option,$data);
             $pagination = $entities->getQuery()->getResult();
             $employee = $data['employee'];
-            $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->find($employee);
+            $user = $this->em->getRepository(\App\User\Entity\User::class)->find($employee);
             return $this->render('Accounting/AccountLoan/print.html.twig', array(
                 'entities' => $pagination,
                 'user' => $user,
@@ -77,7 +89,7 @@ class AccountLoanController extends Controller
      */
     public function loanOutstandingAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\AccountLoan::class)->outstandingLoan($option->getId());
         return $this->render('Accounting/AccountLoan/loanOutstanding.html.twig', array(
@@ -97,13 +109,13 @@ class AccountLoanController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $data = $request->request->all();
         $balance =  $em->getRepository(\App\Accounting\Entity\AccountLoan::class)->getLastBalance($option);
         $accountConfig = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
         if($entity->getTransactionType() == "Credit" and $entity->getAmount() > $balance ){
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"This {$entity->getAmount()} amount must be went to equal or less then credit {$balance} amount"
             );
             return $this->render('Accounting/AccountLoan/new.html.twig', array(
@@ -133,7 +145,7 @@ class AccountLoanController extends Controller
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_loan'));
@@ -164,13 +176,13 @@ class AccountLoanController extends Controller
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_loan'));
         }
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         return $this->render('Accounting/AccountLoan/new.html.twig', array(
@@ -208,7 +220,7 @@ class AccountLoanController extends Controller
      */
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountLoan();
         $form   = $this->createCreateForm($entity);
         $banks = $em->getRepository(\App\Tool\Entity\Bank::class)->findAll();
@@ -227,7 +239,7 @@ class AccountLoanController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountLoan::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
@@ -242,7 +254,7 @@ class AccountLoanController extends Controller
     public function approveAction(AccountLoan $entity)
     {
 	    if (!empty($entity) and $entity->getProcess() != 'approved') {
-		    $em = $this->getDoctrine()->getManager();
+		    $em = $this->em;
 		    $entity->setProcess('approved');
 		    $entity->setApprovedBy($this->getUser());
             $accountConfig = $this->getUser()->getGlobalOption()->getAccountingConfig()->isAccountClose();
@@ -253,7 +265,7 @@ class AccountLoanController extends Controller
             }
 		    $em->flush();
 		    $em->getRepository(\App\Accounting\Entity\AccountLoan::class)->updateCustomerBalance($entity);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertLoanCash($entity);
+            $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertLoanCash($entity);
 		    return new Response('success');
 
         } else {
@@ -267,7 +279,7 @@ class AccountLoanController extends Controller
      */
     public function deleteAction(AccountLoan $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountPurchase entity.');
         }
@@ -281,8 +293,8 @@ class AccountLoanController extends Controller
 
     public function salesReverseAction(AccountLoan $entity){
 
-        $em = $this->getDoctrine()->getManager();
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountLoan::class)->accountReverse($entity);
+        $em = $this->em;
+        $this->em->getRepository(\App\Accounting\Entity\AccountLoan::class)->accountReverse($entity);
         $entity->setProcess(null);
         $entity->setApprovedBy(null);
         $entity->setAmount(0);
@@ -295,11 +307,11 @@ class AccountLoanController extends Controller
 
     public function salesPrint(AccountLoan $sales)
     {
-    	$em = $this->getDoctrine()->getManager();
+    	$em = $this->em;
 	    $template = $sales->getGlobalOption()->getSlug();
-	    $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountLoan::class)->customerOutstanding($sales->getGlobalOption(), $data = array('mobile'=> $sales->getCustomer()->getMobile()));
+	    $result = $this->em->getRepository(\App\Accounting\Entity\AccountLoan::class)->customerOutstanding($sales->getGlobalOption(), $data = array('mobile'=> $sales->getCustomer()->getMobile()));
 	    $balance = empty($result) ? 0 :$result[0]['customerBalance'];
-	    $amountInWords = $this->get('settong.toolManageRepo')->intToWords($sales->getAmount());
+	    $amountInWords = $this->toolManager->intToWords($sales->getAmount());
 	    return  $this->render("Business/Print/{$template}.html.twig",
 		    array(
 			    'amountInWords' => $amountInWords,
@@ -316,9 +328,9 @@ class AccountLoanController extends Controller
 	    $customerId = $_REQUEST['customer'];
 	    $globalOption = $this->getUser()->getGlobalOption();
 	    $balance = 0;
-	    $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'id'=> $customerId));
+	    $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'id'=> $customerId));
 	    if(!empty($customer)){
-		    $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountLoan::class)->customerSingleOutstanding($globalOption,$customer);
+		    $result = $this->em->getRepository(\App\Accounting\Entity\AccountLoan::class)->customerSingleOutstanding($globalOption,$customer);
 		    $balance = empty($result) ? 0 : $result;
 	    }
         $taka = number_format($balance).' Taka';
@@ -333,9 +345,9 @@ class AccountLoanController extends Controller
         $customerId = $_REQUEST['customer'];
         $globalOption = $this->getUser()->getGlobalOption();
         $balance = 0;
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'mobile'=> $customerId));
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'mobile'=> $customerId));
         if(!empty($customer)){
-            $result = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountLoan::class)->customerSingleOutstanding($globalOption,$customer);
+            $result = $this->em->getRepository(\App\Accounting\Entity\AccountLoan::class)->customerSingleOutstanding($globalOption,$customer);
             $balance = empty($result) ? 0 : $result;
         }
         $taka = number_format($balance).' Taka';

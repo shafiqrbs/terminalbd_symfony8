@@ -2,6 +2,9 @@
 
 namespace App\Content\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Tool\Event\SmsEvent;
 use App\Tool\Event\EmailEvent;
@@ -13,15 +16,22 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ContactMessageController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -34,8 +44,8 @@ class ContactMessageController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $em = $this->em;
+        $user = $this->getUser();
 
         $entities = $em->getRepository(\App\Content\Entity\ContactMessage::class)->findBy(['user'=> $user ,'archive' => 0 ],['created' => 'desc']);
         $entities = $this->paginate($entities);
@@ -50,9 +60,9 @@ class ContactMessageController extends AbstractController
      */
     public function archiveAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
 
         $entities = $em->getRepository(\App\Content\Entity\ContactMessage::class)->findBy(['user'=> $user ,'archive' => 1],['created' => 'desc']);
         $entities = $this->paginate($entities);
@@ -69,17 +79,17 @@ class ContactMessageController extends AbstractController
     public function updateAction(Request $request)
     {
         $data = $request ->request->all();
-        $this->getDoctrine()->getRepository(\App\Content\Entity\ContactMessage::class)->reply($data);
+        $this->em->getRepository(\App\Content\Entity\ContactMessage::class)->reply($data);
         exit;
 
     }
 
     public function deleteAction($id){
 
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $em = $this->em;
+        $user = $this->getUser();
 
-        $entity = $this->getDoctrine()->getRepository(\App\Content\Entity\ContactMessage::class)->findOneBy(['user' => $user,'id' => $id]);
+        $entity = $this->em->getRepository(\App\Content\Entity\ContactMessage::class)->findOneBy(['user' => $user,'id' => $id]);
 
         $dispatcher = $this->container->get('event_dispatcher');
         $dispatcher->dispatch('setting_tool.post.sms_message', new SmsEvent($entity));
@@ -90,7 +100,7 @@ class ContactMessageController extends AbstractController
         $em->remove($entity);
         $em->flush();
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been deleted successfully"
         );
 

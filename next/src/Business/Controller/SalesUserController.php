@@ -2,6 +2,7 @@
 
 namespace App\Business\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\DomainUser\Entity\DomainUser;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,10 +14,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SalesUserController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         return $this->render('DomainUser/SalesUser/index.html.twig', [
@@ -32,18 +38,18 @@ class SalesUserController extends AbstractController
     public function createAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $request->request->all();
 
 
         foreach ($data['user'] as $key => $value){
-            $user = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->find($value);
-            $domainUser = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\DomainUser::class)->findOneBy(['user' => $user->getId()]);
+            $user = $this->em->getRepository(\App\User\Entity\User::class)->find($value);
+            $domainUser = $this->em->getRepository(\App\DomainUser\Entity\DomainUser::class)->findOneBy(['user' => $user->getId()]);
             if(!empty($domainUser)){
                 $month = $data['monthlySales'][$key];
                 $year = $data['yearlySales'][$key];
-                $this->getDoctrine()->getRepository(\App\DomainUser\Entity\DomainUser::class)->updateSalesTarget($user,$month,$year);
+                $this->em->getRepository(\App\DomainUser\Entity\DomainUser::class)->updateSalesTarget($user,$month,$year);
             }else{
                 $entity = new DomainUser();
                 $entity->setGlobalOption($globalOption);

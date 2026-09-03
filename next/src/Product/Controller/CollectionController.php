@@ -2,6 +2,7 @@
 
 namespace App\Product\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,11 @@ use App\Product\Form\CollectionType;
  */
 class CollectionController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all Collection entities.
@@ -22,7 +28,7 @@ class CollectionController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Product\Entity\Collection::class)->findAll();
 
@@ -41,10 +47,10 @@ class CollectionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->upload();
             $name = $entity->getName();
-            $slug = $this->getDoctrine()->getRepository(\App\Product\Entity\Collection::class)->urlSlug($name);
+            $slug = $this->em->getRepository(\App\Product\Entity\Collection::class)->urlSlug($name);
             $entity->setSlug($slug);
 
             $em->persist($entity);
@@ -102,7 +108,7 @@ class CollectionController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Product\Entity\Collection::class)->find($id);
 
@@ -124,7 +130,7 @@ class CollectionController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Product\Entity\Collection::class)->find($id);
 
@@ -167,7 +173,7 @@ class CollectionController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Product\Entity\Collection::class)->find($id);
 
@@ -182,7 +188,7 @@ class CollectionController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             $name = $entity->getName();
-            $slug = $this->getDoctrine()->getRepository(\App\Product\Entity\Collection::class)->urlSlug($name);
+            $slug = $this->em->getRepository(\App\Product\Entity\Collection::class)->urlSlug($name);
             $entity->setSlug($slug);
 
             $entity->upload();
@@ -207,7 +213,7 @@ class CollectionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Product\Entity\Collection::class)->find($id);
 
             if (!$entity) {

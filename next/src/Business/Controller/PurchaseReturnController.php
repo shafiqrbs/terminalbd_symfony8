@@ -2,6 +2,9 @@
 
 namespace App\Business\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountVendor;
 use App\Business\Entity\BusinessInvoice;
 use App\Business\Entity\BusinessInvoiceReturn;
@@ -16,22 +19,29 @@ use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Knp\Snappy\Pdf;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Vendor controller.
  *
  */
-class PurchaseReturnController extends Controller
+class PurchaseReturnController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -45,10 +55,10 @@ class PurchaseReturnController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
 	    $data = $_REQUEST;
-	    $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findWithSearch($config->getId(),$data);
+	    $entities = $this->em->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findWithSearch($config->getId(),$data);
         $pagination = $this->paginate($entities);
         return $this->render('Business/PurchaseReturn/index.html.twig', array(
             'entities' => $pagination,
@@ -86,17 +96,17 @@ class PurchaseReturnController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new BusinessPurchaseReturn();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $particulars = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->getVendorItem($config,$entity->getVendor());
+        $particulars = $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->getVendorItem($config,$entity->getVendor());
         if ($form->isValid() and !empty($particulars)) {
             $entity->setBusinessConfig($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('business_purchase_return_edit', array('id' => $entity->getId())));
@@ -134,7 +144,7 @@ class PurchaseReturnController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $em->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
@@ -152,15 +162,15 @@ class PurchaseReturnController extends Controller
 
     public function updateAction(Request $request, BusinessPurchaseReturn $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
         $data = $request->request->all();
         $entity->setProcess('Done');
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->insertPurchaseReturnItem($entity,$data);
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->updatePurchaseTotalPrice($entity);
+        $this->em->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->insertPurchaseReturnItem($entity,$data);
+        $this->em->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->updatePurchaseTotalPrice($entity);
         $this->approvePurchaseReturn($entity);
         return $this->redirect($this->generateUrl('business_purchase_return'));
 
@@ -173,7 +183,7 @@ class PurchaseReturnController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
 	    $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
 	    $entity = $em->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
@@ -189,7 +199,7 @@ class PurchaseReturnController extends Controller
 
     public function approvedAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 		$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
 	    $purchase = $em->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 	    $arrs = array('created','sales','commission','Done');
@@ -203,12 +213,12 @@ class PurchaseReturnController extends Controller
 
     public function approvePurchaseReturn(BusinessPurchaseReturn $purchase)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $purchase->setProcess('Approved');
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->getPurchaseUpdateReturnQnt($purchase);
+        $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getPurchaseUpdateReturnQnt($purchase);
         if($purchase->getBusinessConfig()->isStockHistory() == 1 ){
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processInsertPurchaseReturnItem($purchase);
+            $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processInsertPurchaseReturnItem($purchase);
         }
         $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertBusinessAccountPurchaseReturn($purchase);
 
@@ -222,9 +232,9 @@ class PurchaseReturnController extends Controller
     {
 
     	$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-	    $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
+	    $entity = $this->em->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -236,7 +246,7 @@ class PurchaseReturnController extends Controller
     public function vendorSelectAction()
     {
         $config = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(
             array('globalOption' => $config,'status'=>1)
         );
         $items = array();
@@ -250,13 +260,13 @@ class PurchaseReturnController extends Controller
     public function vendorUpdateAction(Request $request,$id)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
+        $entity = $this->em->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find BusinessInvoiceReturn entity.');
         }
-        $setValue = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($data['value']);
+        $setValue = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($data['value']);
         $entity->setVendor($setValue);
         $em->persist($entity);
         $em->flush();

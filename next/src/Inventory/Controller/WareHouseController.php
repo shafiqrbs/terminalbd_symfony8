@@ -2,8 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Inventory\Entity\WareHouse;
 use App\Inventory\Form\WareHouseType;
@@ -12,8 +13,13 @@ use App\Inventory\Form\WareHouseType;
  * WareHouse controller.
  *
  */
-class WareHouseController extends Controller
+class WareHouseController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all WareHouse entities.
@@ -21,7 +27,7 @@ class WareHouseController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\WareHouse::class)->findBy(array('inventoryConfig'=>$inventoryConfig),array('updated'=>'desc'));
 
@@ -40,7 +46,7 @@ class WareHouseController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventoryConfig);
             $em->persist($entity);
@@ -103,7 +109,7 @@ class WareHouseController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\WareHouse::class)->find($id);
 
@@ -125,7 +131,7 @@ class WareHouseController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\WareHouse::class)->find($id);
 
@@ -167,7 +173,7 @@ class WareHouseController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\WareHouse::class)->find($id);
 
@@ -201,7 +207,7 @@ class WareHouseController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Inventory\Entity\WareHouse::class)->find($id);
 
             if (!$entity) {

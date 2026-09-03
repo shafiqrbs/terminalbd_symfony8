@@ -4,6 +4,10 @@ namespace App\Hospital\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\HmsDoctorVisitMode;
 use App\Hospital\Entity\HmsInvoiceTemporaryParticular;
 use App\Hospital\Entity\Invoice;
@@ -17,25 +21,33 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Invoice controller.
  *
  */
-class DoctorAppointmentController extends Controller
+class DoctorAppointmentController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
 
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -51,19 +63,19 @@ class DoctorAppointmentController extends Controller
     {
         ini_set('max_execution_time', 0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->invoiceLists( $user , $mode = 'visit' , $data);
         $records = $entities->getResult();
         foreach ($records as $invoice){
             if($invoice->getProcess() == "Done"){
-                $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->insertVisitTransaction($invoice);
+                $this->em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->insertVisitTransaction($invoice);
             }
         }
         $pagination = $this->paginate($entities);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5,6));
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5));
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital,array(5,6));
         return $this->render('Hospital/Prescription/index.html.twig', array(
             'entities'                          => $pagination,
             'assignDoctors'                     => $assignDoctors,
@@ -77,7 +89,7 @@ class DoctorAppointmentController extends Controller
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $entity = new Invoice();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $form = $this->createInvoiceCustomerForm($entity);
         $html = $this->renderView('Hospital/Prescription/appointment.html.twig', array(
             'initialDiscount'   => 0,
@@ -93,7 +105,7 @@ class DoctorAppointmentController extends Controller
     private function createInvoiceCustomerForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $category = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DoctorAppointmentType::configureOptions() and pass them as form options: $globalOption,$category), $entity, array(
         $form = $this->createForm(new DoctorAppointmentType($globalOption,$category), $entity, array(
@@ -110,7 +122,7 @@ class DoctorAppointmentController extends Controller
 
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = New Invoice();
         $user = $this->getUser();
         $option = $user->getGlobalOption();
@@ -121,7 +133,7 @@ class DoctorAppointmentController extends Controller
         $data = $appointment['appointment_invoice'];
         $isConfirm = isset($data['isConfirm']) ? $data['isConfirm'] :'';
         $entity->setHospitalConfig($hospital);
-        $assignDoctor = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->find($data['assignDoctor']);
+        $assignDoctor = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['assignDoctor']);
         $entity->setAssignDoctor($assignDoctor);
        // $transactionMethod = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
        // $entity->setTransactionMethod($transactionMethod);
@@ -130,8 +142,8 @@ class DoctorAppointmentController extends Controller
         $entity->setCreatedBy($this->getUser());
         if (!empty($data['customer']['name'])) {
             $patientId = $request->request->get('patientId');
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customer']['mobile']);
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findHmsExistingCustomerDiagnostic($this->getUser()->getGlobalOption(), $mobile,$patientId,$data);
+            $mobile = $this->toolManager->specialExpClean($data['customer']['mobile']);
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findHmsExistingCustomerDiagnostic($this->getUser()->getGlobalOption(), $mobile,$patientId,$data);
             $entity->setCustomer($customer);
             $entity->setMobile($mobile);
         }
@@ -146,7 +158,7 @@ class DoctorAppointmentController extends Controller
             $entity->setDue($assignDoctor->getPrice());
             $entity->setProcess('In-progress');
         }
-        $amountInWords = $this->get('settong.toolManageRepo')->intToWords($entity->getTotal());
+        $amountInWords = $this->toolManager->intToWords($entity->getTotal());
         $entity->setPaymentInWord($amountInWords);
         $em->persist($entity);
         $em->flush();
@@ -172,7 +184,7 @@ class DoctorAppointmentController extends Controller
         $visit = "";
         $visitType = isset($_REQUEST['visitType']) ? $_REQUEST['visitType'] :'';
         if($visitType){
-            $visit = $this->getDoctrine()->getRepository(HmsDoctorVisitMode::class)->findOneBy(array('doctor'=>$particular,'service'=>$visitType));
+            $visit = $this->em->getRepository(HmsDoctorVisitMode::class)->findOneBy(array('doctor'=>$particular,'service'=>$visitType));
         }
         $amount = empty($visit) ? $particular->getPrice() : $visit->getAmount();
         return new Response($amount);
@@ -180,16 +192,16 @@ class DoctorAppointmentController extends Controller
 
     public function invoiceApproveAction(Invoice $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $invoice->setApprovedBy($this->getUser());
         $invoice->setProcess('Done');
         $em->persist($invoice);
         $em->flush();
         if($invoice->getPayment() > 0) {
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->insertVisitTransaction($invoice);
+            $this->em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->insertVisitTransaction($invoice);
         }
         if($invoice->getAssignDoctor()->isSendToAccount() == 1){
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalVisitAccount($invoice);
+            $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalVisitAccount($invoice);
         }
         return new Response('Success');
     }

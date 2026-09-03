@@ -4,6 +4,8 @@ namespace App\Business\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -19,6 +21,12 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
  */
 class CourierController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Courier entities.
@@ -30,7 +38,7 @@ class CourierController extends AbstractController
     {
 
         $entity = new Courier();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\Courier::class)->findBy(['businessConfig' => $option],[ 'name' =>'asc' ]);
         $form   = $this->createCreateForm($entity);
@@ -50,7 +58,7 @@ class CourierController extends AbstractController
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\Courier::class)->findBy(['businessConfig' => $option],[ 'name' =>'asc' ]);
 
@@ -62,7 +70,7 @@ class CourierController extends AbstractController
             $entity->setBusinessConfig($option);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('business_courier', ['id' => $entity->getId()]));
@@ -104,7 +112,7 @@ class CourierController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_STOCK') or is_granted('ROLE_DOMAIN')"))]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\Courier::class)->findBy(['businessConfig' => $option],[ 'name' =>'asc' ]);
 
@@ -149,7 +157,7 @@ class CourierController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository(\App\Business\Entity\Courier::class)->findBy(['businessConfig' => $option],[ 'name' =>'asc' ]);
         $entity = $em->getRepository(\App\Business\Entity\Courier::class)->find($id);
@@ -162,7 +170,7 @@ class CourierController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('business_courier'));
@@ -182,21 +190,21 @@ class CourierController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_STOCK') or is_granted('ROLE_DOMAIN')"))]
     public function deleteAction(Courier $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         try {
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -210,8 +218,8 @@ class CourierController extends AbstractController
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
-        $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\Courier::class)->find($id);
+        $em = $this->em;
+        $entity = $this->em->getRepository(\App\Business\Entity\Courier::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
@@ -224,7 +232,7 @@ class CourierController extends AbstractController
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('business_courier'));

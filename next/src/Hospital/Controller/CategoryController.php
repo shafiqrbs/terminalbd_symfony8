@@ -2,26 +2,36 @@
 
 namespace App\Hospital\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\HmsCategory;
 use App\Hospital\Form\CategoryType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 /**
  * Category controller.
  *
  */
-class CategoryController extends Controller
+class CategoryController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -35,7 +45,7 @@ class CategoryController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findWithSearch($data);
         $pagination = $this->paginate($entities);
@@ -60,10 +70,10 @@ class CategoryController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_category_new', array('id' => $entity->getId())));
@@ -85,7 +95,7 @@ class CategoryController extends Controller
     private function createCreateForm(HmsCategory $entity, $globalOption)
     {
 
-        $em = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into CategoryType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
         $form = $this->createForm(new CategoryType($em,$globalOption), $entity, array(
@@ -130,7 +140,7 @@ class CategoryController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Hospital\Entity\HmsCategory::class)->find($id);
 
@@ -155,7 +165,7 @@ class CategoryController extends Controller
      */
     private function createEditForm(HmsCategory $entity,$globalOption)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into CategoryType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
         $form = $this->createForm(new CategoryType($em,$globalOption), $entity, array(
@@ -176,7 +186,7 @@ class CategoryController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Hospital\Entity\HmsCategory::class)->find($id);
 
@@ -192,7 +202,7 @@ class CategoryController extends Controller
             $entity->setSlug($entity->getName());
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_category'));
@@ -209,21 +219,21 @@ class CategoryController extends Controller
      */
     public function deleteAction(HmsCategory $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         try {
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -238,7 +248,7 @@ class CategoryController extends Controller
      */
     public function sortingAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('level'=> 1 ),array('sorting'=>'asc'));
         $pagination = $this->paginate($entities);
         return $this->render('Hospital/Category/sorting.html.twig', array(
@@ -250,7 +260,7 @@ class CategoryController extends Controller
     public function sortedAction(Request $request){
 
         $data = $request->request->get('menuItem');
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class)->setFeatureOrdering($data);
+        $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->setFeatureOrdering($data);
         exit;
 
     }
@@ -258,7 +268,7 @@ class CategoryController extends Controller
     public function featureAction()
     {
         $data = $_REQUEST;
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class)->setCategoryFeature($data);
+        $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->setCategoryFeature($data);
         return $this->redirect($this->generateUrl('hms_category_sorting'));
 
     }
@@ -271,7 +281,7 @@ class CategoryController extends Controller
     {
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -283,7 +293,7 @@ class CategoryController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_category'));

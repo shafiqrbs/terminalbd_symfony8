@@ -3,6 +3,9 @@
 namespace App\Tool\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -22,13 +25,20 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class MedicineController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -37,9 +47,9 @@ class MedicineController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findWithSearch($data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findWithSearch($data);
         $pagination = $this->paginate($entities);
         return $this->render('Tool/MedicineBrand/index.html.twig', [
             'pagination' => $pagination,
@@ -54,7 +64,7 @@ class MedicineController extends AbstractController
     public function newAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new MedicineBrand();
         $form   = $this->createCreateForm($entity);
         return $this->render('Tool/MedicineBrand/medicine.html.twig', [
@@ -70,7 +80,7 @@ class MedicineController extends AbstractController
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $file = $request->files->all()['medicine']['file'];
         $option = $this->getUser()->getGlobalOption();
@@ -80,11 +90,11 @@ class MedicineController extends AbstractController
         $entity->setMedicineForm($data['medicineForm']);
         $entity->setPackSize($data['packSize']);
         $entity->setName($data['brand']);
-        $exist = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName(),'strength'=> $entity->getStrength(),'medicineForm'=>$entity->getMedicineForm()]);
+        $exist = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName(),'strength'=> $entity->getStrength(),'medicineForm'=>$entity->getMedicineForm()]);
         if(empty($exist)){
-            $generic = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineGeneric::class)->checkGenericName($data['generic']);
+            $generic = $this->em->getRepository(\App\Medicine\Entity\MedicineGeneric::class)->checkGenericName($data['generic']);
             $entity->setMedicineGeneric($generic);
-            $company = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineCompany::class)->checkCompanyName($data['companyName']);
+            $company = $this->em->getRepository(\App\Medicine\Entity\MedicineCompany::class)->checkCompanyName($data['companyName']);
             $entity->setMedicineCompany($company);
             $fileName = $file->getClientOriginalName();
             $imgName = uniqid() . '.' . $fileName;
@@ -92,13 +102,14 @@ class MedicineController extends AbstractController
             if (!file_exists($entity->getUploadDir())) {
                 mkdir($entity->getUploadDir(), 0777, true);
             }
+            // TODO(migration): AbstractController::get() was removed; inject this service.
             $this->get('helper.imageresizer')->resizeImage(480, $path, $file);
             $entity->setPath($imgName);
             $em->persist($entity);
             $em->flush();
             return $this->redirect($this->generateUrl('medicinebrand'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been already exist"
         );
         $form   = $this->createCreateForm($entity);
@@ -137,7 +148,7 @@ class MedicineController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($id);
 
@@ -178,7 +189,7 @@ class MedicineController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($id);
 
@@ -188,7 +199,7 @@ class MedicineController extends AbstractController
 
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        $exist = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName(),'medicineForm' => $entity->getMedicineForm(),'strength'=>$entity->getStrength()]);
+        $exist = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName(),'medicineForm' => $entity->getMedicineForm(),'strength'=>$entity->getStrength()]);
         if ($editForm->isValid() and empty($exist)) {
             if($entity->upload()){
                 $entity->removeUpload();
@@ -208,7 +219,7 @@ class MedicineController extends AbstractController
 
     public function copyAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find MedicineBrand entity.');
@@ -228,7 +239,7 @@ class MedicineController extends AbstractController
 
     public function deleteAction(Request $request , MedicineBrand $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find MedicineStock entity.');
         }
@@ -236,16 +247,16 @@ class MedicineController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -260,7 +271,7 @@ class MedicineController extends AbstractController
     public function statusAction(Request $request, MedicineBrand $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -271,7 +282,7 @@ class MedicineController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         $referer = $request->headers->get('referer');
@@ -283,7 +294,7 @@ class MedicineController extends AbstractController
     public function medicineDetailsAction(){
 
         $data = $_REQUEST['medicine'];
-        $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data);
+        $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data);
         $items = [];
         if($entity) {
             $items =[
@@ -301,7 +312,7 @@ class MedicineController extends AbstractController
         $items = [];
 
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -314,7 +325,7 @@ class MedicineController extends AbstractController
     {
         $item = trim($_REQUEST['q']);
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
         }
         return new JsonResponse($entities);
 
@@ -325,7 +336,7 @@ class MedicineController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -347,7 +358,7 @@ class MedicineController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchBrandNameAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchBrandNameAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -360,7 +371,7 @@ class MedicineController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchCompanyNameAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchCompanyNameAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -373,7 +384,7 @@ class MedicineController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchGenericNameAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchGenericNameAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -386,7 +397,7 @@ class MedicineController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineGenericAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineGenericAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
                 //   $items[] = array('value' => $entity['id'], 'label' => $entity['text'], 'desc' => $entity['text'], 'icon' => 'img/avatar.png');
@@ -401,7 +412,7 @@ class MedicineController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchPackSizeAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchPackSizeAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -414,7 +425,7 @@ class MedicineController extends AbstractController
         $item = trim($_REQUEST['term']);
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchStrengthAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchStrengthAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -427,7 +438,7 @@ class MedicineController extends AbstractController
         $item = $_REQUEST['term'];
         $items = [];
         if ($item) {
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineFormAutoComplete($item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->searchMedicineFormAutoComplete($item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -438,7 +449,7 @@ class MedicineController extends AbstractController
     public function selectMedicineFormAction()
     {
 
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->selectMedicineFormAutoComplete();
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->selectMedicineFormAutoComplete();
         $items = [];
         $items[]=['value' => '','text'=> '-MedicineForm-'];
         foreach ($entities as $entity):
@@ -450,7 +461,7 @@ class MedicineController extends AbstractController
 
     public function selectStrengthAction()
     {
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->selectStrengthAutoComplete();
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->selectStrengthAutoComplete();
         $items = [];
         $items[]=['value' => '','text'=> '-Strength-'];
         foreach ($entities as $entity):
@@ -463,22 +474,22 @@ class MedicineController extends AbstractController
     public function inlineItemUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
-        $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['pk']);
+        $em = $this->em;
+        $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
         }
 
         if($data['name'] == 'MedicineForm'){
 
-            $exist = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName(),'strength'=> $entity->getStrength() , 'medicineForm'=>$data['value']]);
+            $exist = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName(),'strength'=> $entity->getStrength() , 'medicineForm'=>$data['value']]);
             if(empty($exist)){
                 $entity->setMedicineForm($data['value']);
             }
 
         }elseif($data['name'] == 'Strength'){
 
-            $exist = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName(),'strength'=> $data['value'] , 'medicineForm'=> $entity->getMedicineForm()]);
+            $exist = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName(),'strength'=> $data['value'] , 'medicineForm'=> $entity->getMedicineForm()]);
             if(empty($exist)){
                 $entity->setStrength($data['value']);
             }

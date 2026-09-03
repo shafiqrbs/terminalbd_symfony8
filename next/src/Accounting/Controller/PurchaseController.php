@@ -4,6 +4,11 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountPurchase;
 use App\Accounting\Entity\BusinessParticular;
 use App\Accounting\Entity\BusinessPurchase;
@@ -16,22 +21,31 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\Tool\Entity\GlobalOption;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Vendor controller.
  *
  */
-class PurchaseController extends Controller
+class PurchaseController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -46,11 +60,11 @@ class PurchaseController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
 	    $data = $_REQUEST;
         $data['processHead'] = 'Expense';
-	    $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($config,$data);
+	    $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($config,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Accounting/Purchase/index.html.twig', array(
             'entities' => $pagination,
@@ -60,7 +74,7 @@ class PurchaseController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountPurchase();
         $config = $this->getUser()->getGlobalOption();
         $entity->setGlobalOption($config);
@@ -102,7 +116,7 @@ class PurchaseController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_DOMAIN_ACCOUNTING_PURCHASE') or is_granted('ROLE_DOMAIN_ACCOUNTING_OPERATOR') or is_granted('ROLE_DOMAIN')"))]
     public function paymentAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entity = new AccountPurchase();
         $form   = $this->paymentCreateForm($entity);
@@ -127,11 +141,11 @@ class PurchaseController extends Controller
         $global = $this->getUser()->getGlobalOption();
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
         if($form->isValid() && empty($method)){
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($global);
             if (empty($entity->getAccountVendor()) and !empty($data['companyName']) and !empty($data['customerMobile'])){
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->newExistingCustomerForSales($global, $mobile, $data);
+                $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+                $customer = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->newExistingCustomerForSales($global, $mobile, $data);
                 $entity->setAccountVendor($customer);
             }
             $entity->setAccountVendor($entity->getAccountVendor());
@@ -149,7 +163,7 @@ class PurchaseController extends Controller
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             if($this->getUser()->getCheckExistRole('ROLE_DOMAIN_ACCOUNTING_OPERATOR')){
@@ -161,11 +175,11 @@ class PurchaseController extends Controller
             ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
             ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($global);
             if (empty($entity->getAccountVendor()) and !empty($data['companyName']) and !empty($data['customerMobile'])){
-                $mobile = $this->get('settong.toolManageRepo')->specialExpClean($data['customerMobile']);
-                $customer = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->newExistingCustomerForSales($global, $mobile, $data);
+                $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
+                $customer = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->newExistingCustomerForSales($global, $mobile, $data);
                 $entity->setAccountVendor($customer);
             }
             $entity->setAccountVendor($entity->getAccountVendor());
@@ -183,12 +197,12 @@ class PurchaseController extends Controller
             }
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_purchase'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         return $this->render('Accounting/Purchase/payment.html.twig', array(
@@ -201,7 +215,7 @@ class PurchaseController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getId();
         $entity = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
         if (!$entity) {
@@ -225,7 +239,7 @@ class PurchaseController extends Controller
     private function createEditForm(AccountPurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $emHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class);
+        $emHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into PurchaseType::configureOptions() and pass them as form options: $globalOption,$emHead), $entity, array(
         $form = $this->createForm(new PurchaseType($globalOption,$emHead), $entity, array(
@@ -242,7 +256,7 @@ class PurchaseController extends Controller
 
     public function returnResultData(AccountPurchase $invoice,$msg=''){
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenditureItem::class)->getPurchaseItems($invoice);
+        $invoiceParticulars = $this->em->getRepository(\App\Accounting\Entity\ExpenditureItem::class)->getPurchaseItems($invoice);
         $subTotal = $invoice->getTotalAmount() > 0 ? $invoice->getTotalAmount() : 0;
         $payment = $invoice->getPayment() > 0 ? $invoice->getPayment() : 0;
         $data = array(
@@ -260,13 +274,13 @@ class PurchaseController extends Controller
 
     public function addParticularAction(Request $request, AccountPurchase $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particular = $request->request->get('particular');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
         $invoiceItems = array('particular' => $particular , 'quantity' => $quantity,'price' => $price);
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenditureItem::class)->insertPurchaseItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenditureItem::class)->updatePurchaseTotalPrice($invoice);
+        $this->em->getRepository(\App\Accounting\Entity\ExpenditureItem::class)->insertPurchaseItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Accounting\Entity\ExpenditureItem::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
     }
@@ -274,13 +288,13 @@ class PurchaseController extends Controller
 
     public function invoiceParticularDeleteAction(AccountPurchase $invoice, ExpenditureItem $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenditureItem::class)->updatePurchaseTotalPrice($invoice);
+        $invoice = $this->em->getRepository(\App\Accounting\Entity\ExpenditureItem::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -294,7 +308,7 @@ class PurchaseController extends Controller
 
     public function updateAction(Request $request, AccountPurchase $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountVendor entity.');
         }
@@ -310,12 +324,12 @@ class PurchaseController extends Controller
             $entity->upload();
             $entity->setUpdated($entity->getCreated());
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_expense_purchase_show',['id'=>$entity->getId()]));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         if($entity->getProcess() == 'Approved'){
@@ -335,7 +349,7 @@ class PurchaseController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
 	    $config = $this->getUser()->getGlobalOption();
 	    $entity = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
@@ -349,14 +363,14 @@ class PurchaseController extends Controller
 
     public function approvedAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 		$config = $this->getUser()->getGlobalOption();
 
 		/* @var $purchase AccountPurchase */
 
 		$purchase = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
 	    if (!empty($purchase) and empty($purchase->getApprovedBy())) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $purchase->setProcess('approved');
             $purchase->setApprovedBy($this->getUser());
             if($purchase->getPayment() === 0 ){
@@ -369,9 +383,9 @@ class PurchaseController extends Controller
                 $purchase->setUpdated($datetime);
             }
 		    $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->updateVendorBalance($purchase);
+            $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->updateVendorBalance($purchase);
             if($purchase->getPayment() > 0){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseExpenditureCash($purchase);
+                $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseExpenditureCash($purchase);
             }
             return new Response('success');
         } else {
@@ -387,9 +401,9 @@ class PurchaseController extends Controller
     {
 
     	$config = $this->getUser()->getGlobalOption();
-	    $entity = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
+	    $entity = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -418,26 +432,26 @@ class PurchaseController extends Controller
 		 * Delete Journal & Account Purchase
 		 */
 		$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-		$purchase = $this->getDoctrine()->getRepository('AccountingBundle:BusinessPurchase')->findOneBy(array('businessConfig' => $config , 'id' => $id));
+		$purchase = $this->em->getRepository('AccountingBundle:BusinessPurchase')->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
 		set_time_limit(0);
 		ignore_user_abort(true);
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		if($purchase->getAsInvestment() == 1 ) {
-			$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedBusinessPurchaseJournal($purchase);
+			$this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedBusinessPurchaseJournal($purchase);
 		}
-		$this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountBusinessPurchaseReverse($purchase);
+		$this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountBusinessPurchaseReverse($purchase);
 		$purchase->setIsReversed(true);
 		$purchase->setProcess('created');
 		$purchase->setApprovedBy(NULL);
 		$em->flush();
-		//$this->getDoctrine()->getRepository('AccountingBundle:BusinessParticular')->getPurchaseUpdateQnt($purchase);
-		$template = $this->get('twig')->render('Accounting/Purchase/purchaseReverse.html.twig', array(
+		//$this->em->getRepository('AccountingBundle:BusinessParticular')->getPurchaseUpdateQnt($purchase);
+		$template = $this->twig->render('Accounting/Purchase/purchaseReverse.html.twig', array(
 			'entity' => $purchase,
 			'config' => $purchase->getBusinessConfig(),
 		));
-		//$this->getDoctrine()->getRepository('AccountingBundle:BusinessReverse')->purchaseReverse($purchase, $template);
+		//$this->em->getRepository('AccountingBundle:BusinessReverse')->purchaseReverse($purchase, $template);
 		return $this->redirect($this->generateUrl('account_expense_purchase_edit',array('id' => $purchase->getId())));
 	}
 

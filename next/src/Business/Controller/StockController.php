@@ -3,6 +3,9 @@
 namespace App\Business\Controller;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Business\Entity\BusinessConfig;
 use App\Business\Entity\BusinessParticular;
 use App\Business\Entity\BusinessStockHistory;
@@ -12,7 +15,7 @@ use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Knp\Snappy\Pdf;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,16 +23,23 @@ use Symfony\Component\HttpFoundation\Response;
  * StockController controller.
  *
  */
-class StockController extends Controller
+class StockController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -44,16 +54,16 @@ class StockController extends Controller
     public function indexAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->findWithSearch($config,$data);
         $pagination = $this->paginate($entities);
-        $type = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(array('status'=>1));
-        $category = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->findBy(array('businessConfig' => $config ,'status'=>1));
+        $type = $this->em->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(array('status'=>1));
+        $category = $this->em->getRepository(\App\Business\Entity\Category::class)->findBy(array('businessConfig' => $config ,'status'=>1));
         $selected = explode(',', $request->cookies->get('barcodes', ''));
-        $wearHouseStocks = $this->getDoctrine()->getRepository(BusinessStockHistory::class)->getWearHouseStocks($pagination);
-        $wearhouses = $this->getDoctrine()->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
+        $wearHouseStocks = $this->em->getRepository(BusinessStockHistory::class)->getWearHouseStocks($pagination);
+        $wearhouses = $this->em->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
 
         return $this->render('Business/Stock/index.html.twig', array(
             'pagination' => $pagination,
@@ -78,13 +88,13 @@ class StockController extends Controller
     public function shortListAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->findWithSearch($config,$data);
         $pagination = $this->paginate($entities);
-        $type = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(array('status'=>1));
-        $category = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->findBy(array('businessConfig' => $config ,'status'=>1));
+        $type = $this->em->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(array('status'=>1));
+        $category = $this->em->getRepository(\App\Business\Entity\Category::class)->findBy(array('businessConfig' => $config ,'status'=>1));
         return $this->render('Business/Stock/shortlist.html.twig', array(
             'pagination' => $pagination,
             'types' => $type,
@@ -105,7 +115,7 @@ class StockController extends Controller
     public function stockLedgerAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         if(empty($data)){
@@ -131,9 +141,9 @@ class StockController extends Controller
                 $start =  $compare->format("Y-m-{$no}");
                 $day =  $compare->format("{$no}-m-Y");
                 $data['startDate'] = $start;
-                $openingBalance[$day] = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->openingDailyQuantity($config,$data);
+                $openingBalance[$day] = $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->openingDailyQuantity($config,$data);
             }
-            $daily = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->monthlyStockLedger($config,$data);
+            $daily = $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->monthlyStockLedger($config,$data);
         }
         if(empty($data['pdf'])){
             return $this->render('Business/Stock/productLedger.html.twig', array(
@@ -166,13 +176,13 @@ class StockController extends Controller
 
     public function stockItemHistoryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $pagination = '';
         $entity = '';
         if(isset($data['name']) and !empty($data['name'])){
-            $entity = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(array('businessConfig' => $config,'name'=> $data['name']));
+            $entity = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(array('businessConfig' => $config,'name'=> $data['name']));
         }
         if(!empty($data['name']) and $data['report'] == 'Purchase'){
 
@@ -229,7 +239,7 @@ class StockController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         /* @var $config BusinessConfig */
 
@@ -239,34 +249,34 @@ class StockController extends Controller
         $form->handleRequest($request);
 	    if(!empty($entity->getWearHouse()) and !empty($entity->getWearHouse()->getWearHouseCode())) {
 		    $name = $entity->getWearHouse()->getShortCode() . '-' . $entity->getName();
-		    $checkName = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessParticular::class )->findOneBy( array(
+		    $checkName = $this->em->getRepository( \App\Business\Entity\BusinessParticular::class )->findOneBy( array(
 			    'businessConfig' => $config,
 			    'name'           => $name
 		    ) );
 	    }else{
 		    $name = $entity->getName();
-		    $checkName = $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessParticular::class )->findOneBy( array(
+		    $checkName = $this->em->getRepository( \App\Business\Entity\BusinessParticular::class )->findOneBy( array(
 			    'businessConfig' => $config,
 			    'name'           => $name
 		    ) );
 	    }
         if ($form->isValid() and empty($checkName)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setBusinessConfig($config);
             if(empty($entity->getUnit())){
-                $unit = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
+                $unit = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
                 $entity->setUnit($unit);
             }
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('business_stock_new'));
         }
 	    $stockFormat = $config->getStockFormat();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Required field does not input"
         );
         return $this->render('Business/Stock/new.html.twig', array(
@@ -309,7 +319,7 @@ class StockController extends Controller
     #[IsGranted(new Expression("is_granted('ROLE_BUSINESS_STOCK') or is_granted('ROLE_DOMAIN')"))]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
@@ -353,7 +363,7 @@ class StockController extends Controller
     public function updateAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
@@ -366,7 +376,7 @@ class StockController extends Controller
                 $entity->removeUpload();
             }
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('business_stock'));
@@ -385,7 +395,7 @@ class StockController extends Controller
 
     public function deleteAction(BusinessParticular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
@@ -395,16 +405,16 @@ class StockController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -420,7 +430,7 @@ class StockController extends Controller
     public function statusAction(BusinessParticular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -431,7 +441,7 @@ class StockController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('business_stock'));
@@ -440,7 +450,7 @@ class StockController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find particular entity.');
@@ -449,8 +459,8 @@ class StockController extends Controller
 		    $setField = 'set' . $data['name'];
 		    $quantity = ($data['value']);
 		    $entity->setOpeningQuantity($quantity);
-		    $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->remainingQnt($entity);
-		    $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessStockHistory::class)->OpeningInsertQuantity($entity);
+		    $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->remainingQnt($entity);
+		    $this->em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->OpeningInsertQuantity($entity);
 	    }elseif('name' == $data['name']) {
 		    $entity->setName($data['value']);
 	    }else{
@@ -476,7 +486,7 @@ class StockController extends Controller
     public function allStockDeleteAction()
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $account = $em->createQuery('DELETE BusinessBundle:BusinessParticular e WHERE e.businessConfig = '.$config);
         if(!empty($account)){
             $account->execute();
@@ -489,7 +499,7 @@ class StockController extends Controller
 		$item = $_REQUEST['q'];
 		if ($item) {
 			$inventory = $this->getUser()->getGlobalOption()->getBusinessConfig();
-			$item = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->searchAutoComplete($inventory,$item);
+			$item = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->searchAutoComplete($inventory,$item);
 		}
 		return new JsonResponse($item);
 	}
@@ -506,18 +516,18 @@ class StockController extends Controller
 	{
 		set_time_limit(0);
 		ignore_user_abort(true);
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$config = $this->getUser()->getGlobalOption()->getBussinessConfig();
-		$items = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->findBy(array('businessConfig'=>$config));
+		$items = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->findBy(array('businessConfig'=>$config));
 
 		/* @var BusinessParticular $item */
 
 		foreach ($items as $item){
-			$this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'');
-			$this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'sales');
-			$this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'sales-return');
-			$this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'purchase-return');
-			$this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'damage');
+			$this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'');
+			$this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'sales');
+			$this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'sales-return');
+			$this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'purchase-return');
+			$this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemovePurchaseQuantity($item,'damage');
 		}
 		return $this->redirect($this->generateUrl('medicine_stock'));
 	}
@@ -528,10 +538,10 @@ class StockController extends Controller
         set_time_limit(0);
         ignore_user_abort(true);
         $array = array();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->findWithSearch($config,$data);
         $entities = $entities->getQuery()->getResult();
         $array[] = 'SKU,Name,Quantity,Purchase Price,Total Purchase ,Sales Price,Total Sales';
 

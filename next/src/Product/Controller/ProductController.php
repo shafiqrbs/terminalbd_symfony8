@@ -2,6 +2,10 @@
 
 namespace App\Product\Controller;
 
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Product\Entity\ProductGallery;
@@ -16,6 +20,14 @@ use App\Product\Form\ProductType;
  */
 class ProductController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     /**
      * Lists all Product entities.
@@ -23,10 +35,10 @@ class ProductController extends AbstractController
      */
     public function indexAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $search = $this->getRequest()->query->all();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
         $entities = $em->getRepository(\App\Product\Entity\Product::class)->getProducts($user->getId(),$search);
         $pagination = $this->paginate($entities);
         $collections = $em->getRepository(\App\Product\Entity\Collection::class)->findBy(['parent'=>NULL,'status'=>1],['name'=>'asc']);
@@ -54,10 +66,10 @@ class ProductController extends AbstractController
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             30  /*limit per page*/
         );
         return $pagination;
@@ -72,10 +84,10 @@ class ProductController extends AbstractController
     {
         $data = $request->request->all();
 
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
 
-        $this->getDoctrine()->getRepository(\App\Product\Entity\Product::class)->insertProduct($data,$user);
-        $this->get('session')->getFlashBag()->add(
+        $this->em->getRepository(\App\Product\Entity\Product::class)->insertProduct($data,$user);
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been inserted successfully"
         );
         return $this->redirect($this->generateUrl('product_insert'));
@@ -87,15 +99,15 @@ class ProductController extends AbstractController
     {
         $entity = new Product();
 
-        $user = $this->get('security.context')->getToken()->getUser();
-        $this->get('settong.toolManageRepo')->createDirectory($user,'products');
+        $user = $this->getUser();
+        $this->toolManager->createDirectory($user,'products');
         $entity ->upload($user);
     }
 
     public function uploadProductGalleryAction()
     {
         $entity = new ProductGallery();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
         $entity ->upload($user);
     }
 
@@ -105,8 +117,8 @@ class ProductController extends AbstractController
      */
     public function insertAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $em = $this->em;
+        $user = $this->getUser();
 
         $entities = $em->getRepository(\App\Product\Entity\Product::class)->findBy(['user'=>$user,'status'=>2],['created'=>'desc']);
         // \Doctrine\Common\Util\Debug::dump($entities);
@@ -123,8 +135,8 @@ class ProductController extends AbstractController
             }
         }
         $productCategories = $em->getRepository(\App\Product\Entity\Category::class)->findBy(['status'=>1,'parent'=>NULL],['name'=>'asc']);
-        $categories = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class)->getSelectdDropdownCategories($productCategories,$array);
-        $itemUnits = $this->getDoctrine()->getRepository(\App\Product\Entity\Product::class)->getItemUnit();
+        $categories = $this->em->getRepository(\App\Product\Entity\Category::class)->getSelectdDropdownCategories($productCategories,$array);
+        $itemUnits = $this->em->getRepository(\App\Product\Entity\Product::class)->getItemUnit();
 
 
         return $this->render('Product/Product/insert.html.twig', [
@@ -141,12 +153,12 @@ class ProductController extends AbstractController
      */
     public function multiinsertAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $data = $request->request->all();
         if(!empty($data['name'])){
-            $this->getDoctrine()->getRepository(\App\Product\Entity\Product::class)->multiInsert($data);
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Product\Entity\Product::class)->multiInsert($data);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('product'));
@@ -194,7 +206,7 @@ class ProductController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Product\Entity\Product::class)->find($id);
 
@@ -216,8 +228,8 @@ class ProductController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.context')->getToken()->getUser();
+        $em = $this->em;
+        $user = $this->getUser();
 
 
         $entity = $em->getRepository(\App\Product\Entity\Product::class)->findOneBY(['id'=>$id,'user'=>$user]);
@@ -228,7 +240,7 @@ class ProductController extends AbstractController
 
         $grouping = $em->getRepository(\App\Product\Entity\CategoryGrouping::class)->findOneBy(['user'=>$user]);
 
-        $categories = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class)->getSelectedCategories($productCategories,$entity);
+        $categories = $this->em->getRepository(\App\Product\Entity\Category::class)->getSelectedCategories($productCategories,$entity);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Product entity.');
@@ -248,12 +260,12 @@ class ProductController extends AbstractController
     }
     public function duplicateAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Product\Entity\Product::class)->find($id);
-        $newEntity = $this->getDoctrine()->getRepository(\App\Product\Entity\Product::class)->insertDuplicate($entity);
-        $this->getDoctrine()->getRepository(\App\Product\Entity\Product::class)->updateDuplicateProduct($newEntity);
-        $this->getDoctrine()->getRepository(\App\Product\Entity\ProductCustomAttribute::class)->insertDuplicateProductAttribute($newEntity,$entity);
-        $this->getDoctrine()->getRepository(\App\Product\Entity\ProductGallery::class)->insertDuplicateProductGallery($newEntity,$entity);
+        $newEntity = $this->em->getRepository(\App\Product\Entity\Product::class)->insertDuplicate($entity);
+        $this->em->getRepository(\App\Product\Entity\Product::class)->updateDuplicateProduct($newEntity);
+        $this->em->getRepository(\App\Product\Entity\ProductCustomAttribute::class)->insertDuplicateProductAttribute($newEntity,$entity);
+        $this->em->getRepository(\App\Product\Entity\ProductGallery::class)->insertDuplicateProductGallery($newEntity,$entity);
         return $this->redirect($this->generateUrl('product'));
 
 
@@ -288,7 +300,7 @@ class ProductController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $data = $request->request->all();
         $entity = $em->getRepository(\App\Product\Entity\Product::class)->find($id);
@@ -313,11 +325,11 @@ class ProductController extends AbstractController
 
             $entity->editUpload($entity->getUser()->getUserName());
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Product\Entity\Product::class)->updateCollection($entity,$data);
-            $this->getDoctrine()->getRepository(\App\Product\Entity\ProductCustomAttribute::class)->insertProductAttribute($entity,$data);
-            $this->getDoctrine()->getRepository(\App\Product\Entity\ProductGallery::class)->insertProductGallery($entity,$data);
+            $this->em->getRepository(\App\Product\Entity\Product::class)->updateCollection($entity,$data);
+            $this->em->getRepository(\App\Product\Entity\ProductCustomAttribute::class)->insertProductAttribute($entity,$data);
+            $this->em->getRepository(\App\Product\Entity\ProductGallery::class)->insertProductGallery($entity,$data);
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
 
@@ -345,7 +357,7 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Product\Entity\Product::class)->find($id);
 
             if (!$entity) {
@@ -381,7 +393,7 @@ class ProductController extends AbstractController
     {
 
         $data = $request ->request->all();
-        $this->getDoctrine()->getRepository(\App\Product\Entity\Product::class)->insertProductCollection($data);
+        $this->em->getRepository(\App\Product\Entity\Product::class)->insertProductCollection($data);
         exit;
 
 

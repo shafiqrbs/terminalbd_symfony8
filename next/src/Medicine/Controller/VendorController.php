@@ -2,6 +2,9 @@
 
 namespace App\Medicine\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -17,13 +20,20 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class VendorController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -37,10 +47,10 @@ class VendorController extends AbstractController
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findWithSearch($this->getUser(),$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findWithSearch($this->getUser(),$data);
         $pagination = $this->paginate($entities);
         return $this->render('Medicine/Vendor/index.html.twig', [
             'entities' => $pagination,
@@ -54,7 +64,7 @@ class VendorController extends AbstractController
      */
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new MedicineVendor();
         $form = $this->createCreateForm($entity);
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
@@ -72,27 +82,27 @@ class VendorController extends AbstractController
     {
         $entity = new MedicineVendor();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findWithSearch($this->getUser());
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findWithSearch($this->getUser());
         $pagination = $this->paginate($entities);
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
 	    $company = $data['vendor']['companyName'];
-	    $exitVendor = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=>$config,'companyName'=>$company]);
+	    $exitVendor = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=>$config,'companyName'=>$company]);
         if ($form->isValid() and empty($exitVendor)) {
-	        $em = $this->getDoctrine()->getManager();
+	        $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->insertVendor($entity);
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->insertVendor($entity);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('medicine_vendor'));
         }
 
-	    $this->get('session')->getFlashBag()->add(
+	    $this->requestStack->getSession()->getFlashBag()->add(
 		    'success',"User mobile no already exist,Please try again."
 	    );
         return $this->render('Medicine/Vendor/new.html.twig', [
@@ -128,7 +138,7 @@ class VendorController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=> $config,'id'=>$id]);
         if (!$entity) {
@@ -166,10 +176,10 @@ class VendorController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $global = $this->getUser()->getGlobalOption();
         $config = $global->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findWithSearch($this->getUser());
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findWithSearch($this->getUser());
         $pagination = $this->paginate($entities);
 
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->find($id);
@@ -182,13 +192,13 @@ class VendorController extends AbstractController
         $editForm->handleRequest($request);
         $data = $request->request->all();
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $global , 'mobile' => $data['customer']]);
+            $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $global , 'mobile' => $data['customer']]);
             if(!empty($customer)){
                 $entity->setCustomer($customer);
             }
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->updateVendorCompanyName($entity);
-            $this->get('session')->getFlashBag()->add(
+            $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->updateVendorCompanyName($entity);
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             return $this->redirect($this->generateUrl('medicine_vendor'));
@@ -207,7 +217,7 @@ class VendorController extends AbstractController
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->find($id);
 
         if (!$entity) {
@@ -217,16 +227,16 @@ class VendorController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -242,7 +252,7 @@ class VendorController extends AbstractController
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->find($id);
 
         if (!$entity) {
@@ -256,7 +266,7 @@ class VendorController extends AbstractController
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('medicine_vendor'));
@@ -268,7 +278,7 @@ class VendorController extends AbstractController
         $items = [];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchAutoComplete($inventory,$item);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchAutoComplete($inventory,$item);
             foreach ($entities as $entity):
                 $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
             endforeach;
@@ -281,7 +291,7 @@ class VendorController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchVendor($inventory,$item);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchVendor($inventory,$item);
         }
         return new JsonResponse($item);
     }

@@ -2,11 +2,13 @@
 
 namespace App\Accounting\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountingConfig;
 use App\Accounting\Entity\BusinessConfig;
 use App\Accounting\Form\AccountConfigType;
 use App\Accounting\Form\ConfigType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,15 +16,21 @@ use Symfony\Component\HttpFoundation\Request;
  * BusinessConfigController.
  *
  */
-class AccountConfigController extends Controller
+class AccountConfigController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     public function manageAction()
     {
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $this->getUser()->getGlobalOption()->getAccountingConfig();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity preparation.');
@@ -36,13 +44,13 @@ class AccountConfigController extends Controller
 
     public function resetAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $this->getUser()->getGlobalOption()->getAccountingConfig();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity preparation.');
         }
         $globalOption = $this->getUser()->getGlobalOption();
-        $this->getDoctrine()->getRepository(AccountingConfig::class)->accountingReset($globalOption);
+        $this->em->getRepository(AccountingConfig::class)->accountingReset($globalOption);
         return $this->redirect($this->generateUrl('account_config_manage'));
     }
 
@@ -75,7 +83,7 @@ class AccountConfigController extends Controller
      */
     public function updateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $this->getUser()->getGlobalOption()->getAccountingConfig();
         if (!$entity) {
@@ -87,7 +95,7 @@ class AccountConfigController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Report has been created successfully"
             );
             return $this->redirect($this->generateUrl('account_config_manage'));
@@ -104,7 +112,7 @@ class AccountConfigController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
+            $item = $this->em->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
         }
         return new JsonResponse($item);
     }

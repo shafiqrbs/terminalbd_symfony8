@@ -2,19 +2,29 @@
 
 namespace App\DoctorPrescription\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\ExpenseCategory;
 use App\Accounting\Form\ExpenseCategoryType;
 use App\Hospital\Entity\HmsCategory;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * ExpenseCategory controller.
  *
  */
-class ExpenseCategoryController extends Controller
+class ExpenseCategoryController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     /**
      * Lists all ExpenseCategory entities.
@@ -23,7 +33,7 @@ class ExpenseCategoryController extends Controller
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(array('globalOption' => $option),array( 'parent'=>'asc' , 'name' =>'asc' ));
         $pagination = $this->paginate($entities);
@@ -35,10 +45,10 @@ class ExpenseCategoryController extends Controller
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         return $pagination;
@@ -57,11 +67,11 @@ class ExpenseCategoryController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($globalOption);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('dps_expensecategory_new', array('id' => $entity->getId())));
@@ -83,8 +93,8 @@ class ExpenseCategoryController extends Controller
     private function createCreateForm(ExpenseCategory $entity, $globalOption)
     {
 
-        $em = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseCategory::class);
-        $emHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class);
+        $em = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class);
+        $emHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ExpenseCategoryType::configureOptions() and pass them as form options: $em,$emHead,$globalOption), $entity, array(
         $form = $this->createForm(new ExpenseCategoryType($em,$emHead,$globalOption), $entity, array(
@@ -120,7 +130,7 @@ class ExpenseCategoryController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->find($id);
 
@@ -142,7 +152,7 @@ class ExpenseCategoryController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->find($id);
 
@@ -167,8 +177,8 @@ class ExpenseCategoryController extends Controller
      */
     private function createEditForm(ExpenseCategory $entity,$globalOption)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ExpenseCategory::class);
-        $emHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class);
+        $em = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class);
+        $emHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ExpenseCategoryType::configureOptions() and pass them as form options: $em,$emHead,$globalOption), $entity, array(
         $form = $this->createForm(new ExpenseCategoryType($em,$emHead,$globalOption), $entity, array(
@@ -189,7 +199,7 @@ class ExpenseCategoryController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->find($id);
 
@@ -204,7 +214,7 @@ class ExpenseCategoryController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('dps_expensecategory'));
@@ -221,21 +231,21 @@ class ExpenseCategoryController extends Controller
      */
     public function deleteAction(ExpenseCategory $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         try {
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -265,7 +275,7 @@ class ExpenseCategoryController extends Controller
      */
     public function sortingAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(array('level'=> 1 ),array('sorting'=>'asc'));
         $pagination = $this->paginate($entities);
         return $this->render('Accounting/ExpenseCategory/sorting.html.twig', array(

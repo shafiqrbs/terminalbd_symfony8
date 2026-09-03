@@ -2,26 +2,36 @@
 
 namespace App\Restaurant\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Restaurant\Entity\Category;
 use App\Restaurant\Form\CategoryType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 /**
  * CategoryController controller.
  *
  */
-class CategoryController extends Controller
+class CategoryController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         return $pagination;
@@ -36,7 +46,7 @@ class CategoryController extends Controller
     {
         $entity = new Category();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig()->getId();
         $pagination = $em->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=>$config),array('sorting'=>'ASC'));
         //$pagination = $this->paginate($pagination);
@@ -56,18 +66,18 @@ class CategoryController extends Controller
     public function createAction(Request $request)
     {
         $entity = new Category();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $pagination = $em->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=>$config),array('sorting'=>'ASC'));
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setRestaurantConfig($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('restaurant_category'));
@@ -111,7 +121,7 @@ class CategoryController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $pagination = $em->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=>$config),array('sorting'=>'ASC'));
         $entity = $em->getRepository(\App\Restaurant\Entity\Category::class)->find($id);
@@ -156,7 +166,7 @@ class CategoryController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $pagination = $em->getRepository(\App\Restaurant\Entity\Category::class)->findBy(array('restaurantConfig'=>$config),array('sorting'=>'ASC'));
         $entity = $em->getRepository(\App\Restaurant\Entity\Category::class)->find($id);
@@ -170,7 +180,7 @@ class CategoryController extends Controller
         if ($editForm->isValid()) {
             $entity->setSlug($entity->getName());
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('restaurant_category'));
@@ -188,7 +198,7 @@ class CategoryController extends Controller
      */
     public function deleteAction(Category $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Category entity.');
         }
@@ -196,16 +206,16 @@ class CategoryController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -220,7 +230,7 @@ class CategoryController extends Controller
     public function statusAction(Category $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -232,7 +242,7 @@ class CategoryController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('restaurant_category'));
@@ -241,7 +251,7 @@ class CategoryController extends Controller
     public function sortedAction(Request $request)
     {
         $data = $request ->request->get('item');
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Category::class)->setCategorySorting($data);
+        $this->em->getRepository(\App\Restaurant\Entity\Category::class)->setCategorySorting($data);
         exit;
     }
 

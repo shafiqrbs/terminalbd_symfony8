@@ -2,26 +2,36 @@
 
 namespace App\Restaurant\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Restaurant\Entity\RestaurantDamage;
 use App\Restaurant\Form\RestaurantDamageType;
 use App\Restaurant\Form\ResturantDamageType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Damage controller.
  *
  */
-class DamageController extends Controller
+class DamageController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 	public function paginate($entities)
 	{
-		$paginator = $this->get('knp_paginator');
+		$paginator = $this->paginator;
 		$pagination = $paginator->paginate(
 			$entities,
-			$this->get('request')->query->get('page', 1)/*page number*/,
+			$this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
 			25  /*limit per page*/
 		);
 		$pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -35,9 +45,9 @@ class DamageController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->findBy(array('restaurantConfig' => $config),array('created'=>'ASC'));
+        $entities = $this->em->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->findBy(array('restaurantConfig' => $config),array('created'=>'ASC'));
 	    $pagination = $this->paginate($entities);
         return $this->render('Restaurant/Damage/index.html.twig', array(
             'entities' => $pagination,
@@ -64,13 +74,13 @@ class DamageController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
             $entity->setRestaurantConfig($config);
             $entity->setSubTotal($entity->getParticular()->getPurchasePrice() * $entity->getQuantity());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('restaurant_damage', array('id' => $entity->getId())));
@@ -111,9 +121,9 @@ class DamageController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->findBy(array('medicineConfig' => $config),array('companyName'=>'ASC'));
+        $entities = $this->em->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->findBy(array('medicineConfig' => $config),array('companyName'=>'ASC'));
 
         $entity = $em->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->find($id);
 
@@ -159,9 +169,9 @@ class DamageController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->findBy(array('medicineConfig' => $config),array('companyName'=>'ASC'));
+        $entities = $this->em->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->findBy(array('medicineConfig' => $config),array('companyName'=>'ASC'));
 
         $entity = $em->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->find($id);
 
@@ -174,7 +184,7 @@ class DamageController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             return $this->redirect($this->generateUrl('restaurant_damage'));
@@ -191,12 +201,12 @@ class DamageController extends Controller
      */
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->find($id);
         $stock = $entity->getBusinessParticular();
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Data has been deleted successfully"
         );
         return $this->redirect($this->generateUrl('restaurant_damage'));
@@ -204,15 +214,15 @@ class DamageController extends Controller
 
 	public function approvedAction($id)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
 		$damage = $em->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->findOneBy(array('restaurantConfig' => $config , 'id' => $id));
 		if (!empty($damage) and ($damage->getProcess() == 'Created')) {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getDamageQnt($damage);
+            $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getDamageQnt($damage);
             if($damage->getRestaurantConfig()->isStockHistory() == 1 ) {
-                $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertDamageItem($damage);
+                $this->em->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertDamageItem($damage);
             }
-			$em = $this->getDoctrine()->getManager();
+			$em = $this->em;
 			$damage->setProcess('Approved');
 			$em->flush();
 			return new Response('success');

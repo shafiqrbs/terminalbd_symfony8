@@ -2,6 +2,8 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,12 @@ use App\Content\Form\MallConnectType;
  */
 class MallConnectController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all MallConnect entities.
@@ -22,7 +30,7 @@ class MallConnectController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository('SettingContentBundle:MallConnect')->findBy(['globalOption'=>$globalOption]);
         return $this->render('Content/MallConnect/index.html.twig', [
@@ -46,7 +54,7 @@ class MallConnectController extends AbstractController
 
         if ($form->isValid() and $this->checkDuplicateEntry($entity) == true) {
 
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->em;
                 $globalOption = $this->getUser()->getGlobalOption();
                 $entity->setGlobalOption($globalOption);
                 $entity->setName($globalOption->getName());
@@ -54,7 +62,7 @@ class MallConnectController extends AbstractController
                 $em->flush();
                 return $this->redirect($this->generateUrl('mallconnect'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"This data is already in use"
         );
         return $this->render('Content/MallConnect/new.html.twig', [
@@ -65,7 +73,7 @@ class MallConnectController extends AbstractController
 
     public function checkDuplicateEntry(MallConnect $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $true = $em->getRepository('SettingContentBundle:MallConnect')->findBy(['shopNo'=>$entity->getShopNo(),'mall'=>$entity->getMall()]);
         if(!empty($true))
         {
@@ -115,7 +123,7 @@ class MallConnectController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:MallConnect')->find($id);
 
@@ -134,7 +142,7 @@ class MallConnectController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:MallConnect')->find($id);
 
@@ -175,7 +183,7 @@ class MallConnectController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:MallConnect')->find($id);
 
@@ -203,7 +211,7 @@ class MallConnectController extends AbstractController
     public function deleteAction(MallConnect $entity)
     {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find MallConnect entity.');
             }
@@ -218,7 +226,7 @@ class MallConnectController extends AbstractController
      */
     public function statusAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository('SettingContentBundle:MallConnect')->find($id);
 
         if (!$entity) {
@@ -232,7 +240,7 @@ class MallConnectController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('mallconnect'));

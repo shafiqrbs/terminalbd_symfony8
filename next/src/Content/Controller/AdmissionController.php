@@ -2,8 +2,11 @@
 
 namespace App\Content\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Content\Entity\Admission;
 use App\Content\Form\AdmissionType;
@@ -12,17 +15,24 @@ use App\Content\Form\AdmissionType;
  * Admission controller.
  *
  */
-class AdmissionController extends Controller
+class AdmissionController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -35,9 +45,9 @@ class AdmissionController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
         $entities = $em->getRepository('SettingContentBundle:Admission')->findBy(array('user'=> $user),array('name' => 'asc'));
         $entities = $this->paginate($entities);
         return $this->render('Content/Admission/index.html.twig', array(
@@ -53,9 +63,9 @@ class AdmissionController extends Controller
         $entity = new Admission();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity ->setUser($user);
             $entity->upload();
             $em->persist($entity);
@@ -79,7 +89,7 @@ class AdmissionController extends Controller
      */
     private function createCreateForm(Admission $entity)
     {
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
 
         $modules = $user->getSiteSetting()->getModules();
         $branch ="";
@@ -126,7 +136,7 @@ class AdmissionController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:Admission')->find($id);
 
@@ -148,7 +158,7 @@ class AdmissionController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:Admission')->find($id);
 
@@ -175,7 +185,7 @@ class AdmissionController extends Controller
     */
     private function createEditForm(Admission $entity)
     {
-        $user = $this->get('security.context')->getToken()->getUser();
+        $user = $this->getUser();
         $modules = $user->getSiteSetting()->getModules();
         $branch ="";
         if(!empty($modules)){
@@ -206,7 +216,7 @@ class AdmissionController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('SettingContentBundle:Admission')->find($id);
 
@@ -241,7 +251,7 @@ class AdmissionController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository('SettingContentBundle:Admission')->find($id);
 
             if (!$entity) {
@@ -281,7 +291,7 @@ class AdmissionController extends Controller
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository('SettingContentBundle:Admission')->find($id);
 
         if (!$entity) {
@@ -295,7 +305,7 @@ class AdmissionController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('admission'));

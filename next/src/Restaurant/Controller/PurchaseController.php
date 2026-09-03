@@ -4,6 +4,9 @@ namespace App\Restaurant\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Restaurant\Entity\Purchase;
 use App\Restaurant\Entity\PurchaseItem;
 use App\Restaurant\Entity\Particular;
@@ -12,22 +15,29 @@ use App\Restaurant\Form\VendorType;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Vendor controller.
  *
  */
-class PurchaseController extends Controller
+class PurchaseController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -41,10 +51,10 @@ class PurchaseController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Purchase::class)->findBy(array('restaurantConfig' => $config),array('created'=>'DESC'));
+        $entities = $this->em->getRepository(\App\Restaurant\Entity\Purchase::class)->findBy(array('restaurantConfig' => $config),array('created'=>'DESC'));
         $pagination = $this->paginate($entities);
 
         return $this->render('Restaurant/Purchase/index.html.twig', array(
@@ -63,12 +73,12 @@ class PurchaseController extends Controller
     public function newAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Purchase();
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity->setRestaurantConfig($config);
         $entity->setCreatedBy($this->getUser());
-        $entity->setTransactionMethod($this->getDoctrine()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
+        $entity->setTransactionMethod($this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         $em->persist($entity);
         $em->flush();
         return $this->redirect($this->generateUrl('restaurant_purchase_edit', array('id' => $entity->getId())));
@@ -78,7 +88,7 @@ class PurchaseController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $entity = $em->getRepository(\App\Restaurant\Entity\Purchase::class)->findOneBy(array('restaurantConfig' => $config , 'id' => $id));
 
@@ -127,7 +137,7 @@ class PurchaseController extends Controller
 
     public function returnResultData(Purchase $invoice,$msg=''){
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\PurchaseItem::class)->getPurchaseItems($invoice);
+        $invoiceParticulars = $this->em->getRepository(\App\Restaurant\Entity\PurchaseItem::class)->getPurchaseItems($invoice);
         $subTotal = $invoice->getSubTotal() > 0 ? $invoice->getSubTotal() : 0;
         $netTotal = $invoice->getNetTotal() > 0 ? $invoice->getNetTotal() : 0;
         $due = $invoice->getDue() > 0 ? $invoice->getDue() : 0;
@@ -149,13 +159,13 @@ class PurchaseController extends Controller
 
     public function addParticularAction(Request $request, Purchase $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price );
-        $this->getDoctrine()->getRepository(\App\Restaurant\Entity\PurchaseItem::class)->insertPurchaseItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Purchase::class)->updatePurchaseTotalPrice($invoice);
+        $this->em->getRepository(\App\Restaurant\Entity\PurchaseItem::class)->insertPurchaseItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Restaurant\Entity\Purchase::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -163,13 +173,13 @@ class PurchaseController extends Controller
 
     public function invoiceParticularDeleteAction(Purchase $invoice, PurchaseItem $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Purchase::class)->updatePurchaseTotalPrice($invoice);
+        $invoice = $this->em->getRepository(\App\Restaurant\Entity\Purchase::class)->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
 
@@ -178,7 +188,7 @@ class PurchaseController extends Controller
 
     public function invoiceDiscountUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $discount = (float)$request->request->get('discount');
         $purchase = $request->request->get('invoice');
 
@@ -201,7 +211,7 @@ class PurchaseController extends Controller
 
     public function updateAction(Request $request, Purchase $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -232,7 +242,7 @@ class PurchaseController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Restaurant\Entity\Purchase::class)->find($id);
 
@@ -246,15 +256,15 @@ class PurchaseController extends Controller
 
     public function approvedAction(Purchase $purchase)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!empty($purchase) and $purchase->getProcess() == "Done") {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $purchase->setProcess('Approved');
             $purchase->setApprovedBy($this->getUser());
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\Particular::class)->getPurchaseUpdateQnt($purchase);
+            $this->em->getRepository(\App\Restaurant\Entity\Particular::class)->getPurchaseUpdateQnt($purchase);
             if($purchase->getRestaurantConfig()->isStockHistory() == 1 ) {
-                $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertPurchaseItem($purchase);
+                $this->em->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertPurchaseItem($purchase);
             }
             $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertRestaurantAccountPurchase($purchase);
             return new Response('success');
@@ -271,7 +281,7 @@ class PurchaseController extends Controller
     public function deleteAction(Purchase $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -290,7 +300,7 @@ class PurchaseController extends Controller
     {
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Restaurant\Entity\Purchase::class)->find($id);
 
         if (!$entity) {
@@ -304,7 +314,7 @@ class PurchaseController extends Controller
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('restaurant_purchase'));
@@ -312,16 +322,16 @@ class PurchaseController extends Controller
 
     public function reverseAction(Purchase $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->getRepository(\App\Restaurant\Entity\Purchase::class)->purchaseTransactionReverse($entity);
         $em->getRepository(\App\Restaurant\Entity\Purchase::class)->reversePurchaseParticularUpdate($entity);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity->setProcess('Revised');
         $entity->setReceiveDate(NULL);
         $entity->setDue($entity->getNetTotal() - $entity->getPayment());
         $em->flush();
         if($entity->getRestaurantConfig()->isStockHistory() == 1 ) {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processReversePurchaseItem($entity);
+            $this->em->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processReversePurchaseItem($entity);
         }
         return $this->redirect($this->generateUrl('restaurant_purchase_edit',array('id' => $entity->getId())));
 

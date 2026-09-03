@@ -3,6 +3,9 @@
 namespace App\Hospital\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Medicine\Entity\MedicineSalesItem;
 use App\Medicine\Entity\MedicineStock;
 use App\Medicine\Form\AccessoriesStockType;
@@ -11,7 +14,7 @@ use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,16 +23,23 @@ use Symfony\Component\HttpFoundation\Response;
  * MedicineStockController controller.
  *
  */
-class MedicineStockController extends Controller
+class MedicineStockController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -41,12 +51,12 @@ class MedicineStockController extends Controller
 
     public function indexAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findWithSearch($config,$data);
-        $racks = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig'=> $config,'particularType'=>'1'));
-        $modeFor = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(array('modeFor'=>'brand'));
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findWithSearch($config,$data);
+        $racks = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig'=> $config,'particularType'=>'1'));
+        $modeFor = $this->em->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(array('modeFor'=>'brand'));
         $pagination = $this->paginate($entities);
         $selected = explode(',', $request->cookies->get('barcodes', ''));
         return $this->render('Hospital/MedicineStock/index.html.twig', array(
@@ -64,16 +74,16 @@ class MedicineStockController extends Controller
 
     public function stockSearchAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $pagination = "";
         if(isset($data['name']) and $data['name']){
-            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findWithGlobalSearch($data);
+            $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findWithGlobalSearch($data);
             $pagination = $this->paginate($entities);
         }
-        $racks = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig'=> $config,'particularType'=>'1'));
-        $modeFor = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(array('modeFor'=>'brand'));
+        $racks = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig'=> $config,'particularType'=>'1'));
+        $modeFor = $this->em->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(array('modeFor'=>'brand'));
 
         return $this->render('Hospital/MedicineStock/stockSearch.html.twig', array(
             'pagination'    => $pagination,
@@ -91,14 +101,14 @@ class MedicineStockController extends Controller
 
 	public function itemShortListAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 	    $data['minQnt'] = 'minimum';
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entities = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findWithShortListSearch($config,$data);
         $pagination = $this->paginate($entities);
-        $racks = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig'=> $config,'particularType'=>'1'));
-        $modeFor = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(array('modeFor'=>'brand'));
+        $racks = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig'=> $config,'particularType'=>'1'));
+        $modeFor = $this->em->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(array('modeFor'=>'brand'));
         return $this->render('Hospital/MedicineStock/shortList.html.twig', array(
             'pagination' => $pagination,
             'racks' => $racks,
@@ -113,13 +123,13 @@ class MedicineStockController extends Controller
 
 	public function currentShortListAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 	    $config = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
         $entities = $em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->currentShortList($config,$data);
         $pagination = $this->paginate($entities);
-        $racks = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig'=> $config,'particularType'=>'1'));
-        $modeFor = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(array('modeFor'=>'brand'));
+        $racks = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig'=> $config,'particularType'=>'1'));
+        $modeFor = $this->em->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(array('modeFor'=>'brand'));
         return $this->render('Hospital/MedicineStock/currentShortList.html.twig', array(
             'pagination' => $pagination,
             'racks' => $racks,
@@ -134,33 +144,33 @@ class MedicineStockController extends Controller
 
 	public function stockItemHistoryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
 	    $pagination = '';
 	    $entity = '';
 	    if(!empty($data['name']) and $data['report'] == 'Purchase'){
-		    $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
+		    $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
 		    $entities = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getPurchaseDetails($config,$entity);
 		    $pagination = $this->paginate($entities);
 	    }
         if(!empty($data['name']) and $data['report'] == 'Purchase-Return'){
-		    $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
+		    $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
 		    $entities = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getPurchaseReturnDetails($config,$entity);
 		    $pagination = $this->paginate($entities);
 	    }
         if(!empty($data['name']) and $data['report'] == 'Sales'){
-		    $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
+		    $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
 		    $entities = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getSalesDetails($config,$entity);
 		    $pagination = $this->paginate($entities);
 	    }
         if(!empty($data['name']) and $data['report'] == 'Sales-Return'){
-		    $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
+		    $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
 		    $entities = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getSalesReturnDetails($config,$entity);
 		    $pagination = $this->paginate($entities);
 	    }
         if(!empty($data['name']) and $data['report'] == 'Damage'){
-		    $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
+		    $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name'=> $data['name']));
 		    $entities = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getDamageDetails($config,$entity);
 		    $pagination = $this->paginate($entities);
 	    }
@@ -201,17 +211,17 @@ class MedicineStockController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = new MedicineStock();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
         if(empty($data['medicineId'])) {
-            $checkStockMedicine = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config, $entity->getName());
+            $checkStockMedicine = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config, $entity->getName());
         }else{
-            $medicine = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
-            $checkStockMedicine = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
+            $medicine = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
+            $checkStockMedicine = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
         }
         if ($form->isValid() and empty($checkStockMedicine)){
             $entity->setMedicineConfig($config);
@@ -233,18 +243,18 @@ class MedicineStockController extends Controller
                 $entity->setSlug(strtolower($slug));
             }
             if(empty($entity->getUnit())){
-                $unit = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
+                $unit = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
                 $entity->setUnit($unit);
             }
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_stock_new'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Required or Duplicate has been exist"
         );
         return $this->render('Hospital/MedicineStock/medicine.html.twig', array(
@@ -255,7 +265,7 @@ class MedicineStockController extends Controller
 
     public function accessoriesCreateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = new MedicineStock();
         $form = $this->createCreateAccessoriesForm($entity);
@@ -270,12 +280,12 @@ class MedicineStockController extends Controller
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_stock'));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Required field does not input"
         );
         return $this->render('Hospital/MedicineStock/accessories.html.twig', array(
@@ -330,7 +340,7 @@ class MedicineStockController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find MedicineStock entity.');
@@ -351,7 +361,7 @@ class MedicineStockController extends Controller
 
     public function shortItemCloseAction(MedicineSalesItem $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
         if($entity->getMedicineSales()->getMedicineConfig()->getId() != $config) {
             throw $this->createNotFoundException('Unable to find MedicineStock entity.');
@@ -365,7 +375,7 @@ class MedicineStockController extends Controller
 
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'id' => $id));
         if (!$entity) {
@@ -420,7 +430,7 @@ class MedicineStockController extends Controller
     public function updateAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($id);
 
         if (!$entity) {
@@ -444,7 +454,7 @@ class MedicineStockController extends Controller
             $entity->setSlug(trim(strtolower($slug)));
             $entity->upload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_stock'));
@@ -460,7 +470,7 @@ class MedicineStockController extends Controller
 
     public function deleteAction(Request $request , MedicineStock $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $msg = 'invalid';
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find MedicineStock entity.');
@@ -470,17 +480,17 @@ class MedicineStockController extends Controller
             $em->remove($entity);
             $em->flush();
             $msg = "success";
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
             $msg = "invalid";
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
             $msg = "invalid";
@@ -493,7 +503,7 @@ class MedicineStockController extends Controller
     public function rackSelectAction()
     {
         $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig' => $inventory, 'particularType' => 1,'status'=>1),array('name'=>'ASC'));
+        $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig' => $inventory, 'particularType' => 1,'status'=>1),array('name'=>'ASC'));
         $items  = array();
         foreach ($entity as $row){
             $items[]= array('value' => $row->getId(),'text' => $row->getName());
@@ -509,7 +519,7 @@ class MedicineStockController extends Controller
     public function statusAction(Request $request , MedicineStock $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -520,7 +530,7 @@ class MedicineStockController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         $referer = $request->headers->get('referer');
@@ -534,14 +544,14 @@ class MedicineStockController extends Controller
     public function isWebAction(Request $request,MedicineStock $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=> $config,'id' => $entity->getId()));
-        $em = $this->getDoctrine()->getManager();
+        $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=> $config,'id' => $entity->getId()));
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
         $status = $entity->isWeb();
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         $referer = $request->headers->get('referer');
@@ -551,7 +561,7 @@ class MedicineStockController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var $entity MedicineStock */
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['pk']);
         if (!$entity) {
@@ -562,9 +572,9 @@ class MedicineStockController extends Controller
             $quantity = abs($data['value']);
             $entity->$setField($quantity);
           //  $remainingQuantity = $entity->getRemainingQuantity() + $quantity;
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->remainingQnt($entity);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->remainingQnt($entity);
         }elseif('rackNo' == $data['name']){
-            $rackNo = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['value']);
+            $rackNo = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['value']);
             $entity->setRackNo($rackNo);
         }elseif('itemName' == $data['name']){
             $entity->setName($data['value']);
@@ -585,7 +595,7 @@ class MedicineStockController extends Controller
         $item = trim($_REQUEST['q']);
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -595,7 +605,7 @@ class MedicineStockController extends Controller
         $item = trim($_REQUEST['q']);
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoPurchaseStock($item,$inventory);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoPurchaseStock($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -605,7 +615,7 @@ class MedicineStockController extends Controller
         $item = trim($_REQUEST['q']);
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchNameAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchNameAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -615,7 +625,7 @@ class MedicineStockController extends Controller
         $item = trim($_REQUEST['pram']);
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchGenericStockComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchGenericStockComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -639,7 +649,7 @@ class MedicineStockController extends Controller
         $item = trim($_REQUEST['q']);
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoCompleteBrandName($item,$inventory);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoCompleteBrandName($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -657,14 +667,14 @@ class MedicineStockController extends Controller
 	    set_time_limit(0);
 	    ignore_user_abort(true);
 
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
 	    $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-	    $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findBy(array('medicineConfig'=>$config));
+	    $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findBy(array('medicineConfig'=>$config));
 
 	    /* @var $item MedicineStock */
 	    foreach ($entities as $item){
 		    $percentage = floatval(12.50);
-		    $purchasePrice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->stockInstantPurchaseItemPrice($percentage,$item->getSalesPrice());
+		    $purchasePrice = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->stockInstantPurchaseItemPrice($percentage,$item->getSalesPrice());
 		    $item->setPurchasePrice($purchasePrice);
 		    $em->persist($item);
 		    $em->flush();
@@ -675,10 +685,10 @@ class MedicineStockController extends Controller
     public function stockUpdatepaginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             500  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -690,18 +700,18 @@ class MedicineStockController extends Controller
 	{
 		set_time_limit(0);
 		ignore_user_abort(true);
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $data = [];
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findWithSearch($config,$data);
         $pagination = $this->paginate($entities);
 		/* @var MedicineStock $item */
 		foreach ($pagination as $item){
-			$this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'');
-			$this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'sales');
-			$this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'sales-return');
-			$this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'purchase-return');
-			$this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'damage');
+			$this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'');
+			$this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'sales');
+			$this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'sales-return');
+			$this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'purchase-return');
+			$this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item,'damage');
 		}
 		return $this->redirect($this->generateUrl('hms_stock'));
 	}

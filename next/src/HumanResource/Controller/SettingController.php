@@ -3,6 +3,8 @@
 
 namespace App\HumanResource\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -17,6 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SettingController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Particular entities.
@@ -24,11 +32,11 @@ class SettingController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new PayrollSetting();
         $form = $this->createCreateForm($entity);
         $config = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(['globalOption' => $config],['mode'=>'ASC']);
+        $entities = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(['globalOption' => $config],['mode'=>'ASC']);
         return $this->render('HumanResource/Setting/index.html.twig', [
             'entities' => $entities,
             'entity' => $entity,
@@ -43,17 +51,17 @@ class SettingController extends AbstractController
     {
         $entity = new PayrollSetting();
         $config = $this->getUser()->getGlobalOption();
-       $entities = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(['globalOption' => $config],['mode'=>'ASC']);
+       $entities = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(['globalOption' => $config],['mode'=>'ASC']);
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $config = $this->getUser()->getGlobalOption();
             $entity->setGlobalOption($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('payrollsetting', ['id' => $entity->getId()]));
@@ -92,9 +100,9 @@ class SettingController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
-       $entities = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(['globalOption' => $config],['mode'=>'ASC']);
+       $entities = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(['globalOption' => $config],['mode'=>'ASC']);
         $entity = $em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
@@ -133,9 +141,9 @@ class SettingController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
-       $entities = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(['globalOption' => $config],['mode'=>'ASC']);
+       $entities = $this->em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->findBy(['globalOption' => $config],['mode'=>'ASC']);
 
         $entity = $em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->find($id);
 
@@ -148,7 +156,7 @@ class SettingController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             return $this->redirect($this->generateUrl('payrollsetting'));
@@ -167,7 +175,7 @@ class SettingController extends AbstractController
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->find($id);
 
         if (!$entity) {
@@ -177,16 +185,16 @@ class SettingController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -202,7 +210,7 @@ class SettingController extends AbstractController
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->find($id);
 
         if (!$entity) {
@@ -216,7 +224,7 @@ class SettingController extends AbstractController
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('payrollsetting'));

@@ -2,10 +2,13 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Inventory\Entity\Product;
 use App\Inventory\Form\ProductType;
@@ -14,16 +17,23 @@ use App\Inventory\Form\ProductType;
  * Product controller.
  *
  */
-class ProductController extends Controller
+class ProductController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -37,7 +47,7 @@ class ProductController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\Product::class)->findWithSearch($inventory,$data);
@@ -58,17 +68,17 @@ class ProductController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
             if(empty($entity->getProductUnit())){
-                $unit = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
+                $unit = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
                 $entity->setProductUnit($unit);
             }
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('inventory_product', array('id' => $entity->getId())));
@@ -91,13 +101,13 @@ class ProductController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
             $entity->setStatus(true);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
         }
@@ -115,7 +125,7 @@ class ProductController extends Controller
     private function createCreateForm(Product $entity)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ProductType::configureOptions() and pass them as form options: $em,$inventory), $entity, array(
         $form = $this->createForm(new ProductType($em,$inventory), $entity, array(
@@ -131,7 +141,7 @@ class ProductController extends Controller
 
     public function getItemCategory($inventory){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $productCategories = $em->getRepository(\App\Product\Entity\Category::class)->findBy(array('status'=>1,'level'=>2),array('name'=>'asc'));
         if($productCategories)
             $grouping = $em->getRepository(\App\Inventory\Entity\ItemTypeGrouping::class)->findOneBy(array('inventoryConfig'=>$inventory));
@@ -144,7 +154,7 @@ class ProductController extends Controller
             }
         }
 
-        return $categories = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class)->getSelectdDropdownCategories($productCategories,$array);
+        return $categories = $this->em->getRepository(\App\Product\Entity\Category::class)->getSelectdDropdownCategories($productCategories,$array);
 
 
     }
@@ -170,7 +180,7 @@ class ProductController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Product::class)->find($id);
 
@@ -188,7 +198,7 @@ class ProductController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Product::class)->find($id);
 
@@ -212,7 +222,7 @@ class ProductController extends Controller
     private function createEditForm(Product $entity)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $em = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class);
+        $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into ProductType::configureOptions() and pass them as form options: $em,$inventory), $entity, array(
         $form = $this->createForm(new ProductType($em,$inventory), $entity, array(
@@ -233,7 +243,7 @@ class ProductController extends Controller
 
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Product::class)->find($id);
 
@@ -250,7 +260,7 @@ class ProductController extends Controller
             $entity->upload();
             $entity->setSlug($entity->getName());
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('inventory_product'));
@@ -268,7 +278,7 @@ class ProductController extends Controller
     public function deleteAction(Product $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Product entity.');
         }
@@ -277,12 +287,12 @@ class ProductController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }
@@ -295,7 +305,7 @@ class ProductController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Product::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\Product::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -313,7 +323,7 @@ class ProductController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Product\Entity\Category::class)->searchAutoComplete($inventory,$item);
+            $item = $this->em->getRepository(\App\Product\Entity\Category::class)->searchAutoComplete($inventory,$item);
         }
         return new JsonResponse($item);
     }
@@ -331,7 +341,7 @@ class ProductController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Tool\Entity\ProductUnit::class)->searchAutoComplete($inventory,$item);
+            $item = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->searchAutoComplete($inventory,$item);
         }
         return new JsonResponse($item);
     }
@@ -348,7 +358,7 @@ class ProductController extends Controller
     public function masterItemSelectAction()
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Product::class)->findBy(
+        $entities = $this->em->getRepository(\App\Inventory\Entity\Product::class)->findBy(
             array('inventoryConfig'=>$inventory,'status'=>1)
         );
         $items = array();
@@ -363,7 +373,7 @@ class ProductController extends Controller
     {
         $q = $_REQUEST['term'];
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Product::class)->searchAutoComplete($q,$inventory);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\Product::class)->searchAutoComplete($q,$inventory);
         $items = array();
         foreach ($entities as $entity):
             $items[]=array('id' => $entity['id'],'value' => $entity['id']);

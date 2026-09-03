@@ -2,6 +2,9 @@
 
 namespace App\Hospital\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\HmsMasterDiagnosticReport;
 use App\Hospital\Entity\HmsMasterDiagnosticReportFormat;
 use App\Hospital\Entity\Particular;
@@ -11,7 +14,7 @@ use App\Hospital\Entity\DiagnosticReport;
 use App\Hospital\Entity\DiagnosticReportFormat;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -19,15 +22,22 @@ use Symfony\Component\HttpFoundation\Response;
  * Pathology controller.
  *
  */
-class PathologyController extends Controller
+class PathologyController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -41,13 +51,13 @@ class PathologyController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entities = $em->getRepository(\App\Hospital\Entity\Particular::class)->findWithSearch($config , $service = 1, $data);
         $pagination = $this->paginate($entities);
-        $categories = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>2),array('name' =>'asc' ));
-        $departments = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>7),array('name' =>'asc' ));
+        $categories = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>2),array('name' =>'asc' ));
+        $departments = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(array('parent'=>7),array('name' =>'asc' ));
         return $this->render('Hospital/Pathology/index.html.twig', array(
             'entities' => $pagination,
             'categories' => $categories,
@@ -69,13 +79,13 @@ class PathologyController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setHospitalConfig($globalOption -> getHospitalConfig());
-            $service = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Service::class)->find(1);
+            $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(1);
             $entity->setService($service);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_pathology_new', array('id' => $entity->getId())));
@@ -97,7 +107,7 @@ class PathologyController extends Controller
     private function createCreateForm(Particular $entity, $globalOption)
     {
 
-        $em = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into PathologyType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
         $form = $this->createForm(new PathologyType($em,$globalOption), $entity, array(
@@ -142,7 +152,7 @@ class PathologyController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
 
@@ -168,7 +178,7 @@ class PathologyController extends Controller
      */
     private function createEditForm(Particular $entity,$globalOption)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into PathologyType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
         $form = $this->createForm(new PathologyType($em,$globalOption), $entity, array(
@@ -190,7 +200,7 @@ class PathologyController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
 
@@ -205,7 +215,7 @@ class PathologyController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_pathology_edit',array('id' => $entity->getId())));
@@ -223,26 +233,26 @@ class PathologyController extends Controller
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         try {
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -257,7 +267,7 @@ class PathologyController extends Controller
     public function statusAction(Particular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -269,7 +279,7 @@ class PathologyController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_pathology'));
@@ -280,12 +290,12 @@ class PathologyController extends Controller
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $option = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->find($_REQUEST['option']);
+        $option = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($_REQUEST['option']);
         $config = $option->getMedicineConfig();
         if($option and !empty($config)) {
             $fromConfig = $config->getId();
             $toConfig = $this->getUser()->getGlobalOption()->getMedicineConfig()->getId();
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->processStockMigration($fromConfig,$toConfig);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->processStockMigration($fromConfig,$toConfig);
             return new Response('success');
         }
         return new Response('failed');
@@ -296,8 +306,8 @@ class PathologyController extends Controller
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
-        $option = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->find($_REQUEST['option']);
+        $em = $this->em;
+        $option = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($_REQUEST['option']);
         $toConfig = $option->getHospitalConfig();
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         if($option and !empty($config)) {
@@ -309,7 +319,7 @@ class PathologyController extends Controller
             $entities = $ent->getQuery()->getResult();
             /* @var $entity Particular */
             foreach ($entities as $entity) {
-                $exist = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(array('hospitalConfig' => $config, 'oldReportId' => $entity->getId()));
+                $exist = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(array('hospitalConfig' => $config, 'oldReportId' => $entity->getId()));
                 if (empty($exist)) {
                     $pathological = new Particular();
                     $pathological->setHospitalConfig($config);
@@ -343,7 +353,7 @@ class PathologyController extends Controller
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         foreach ($entity->getPathologicalReports() as $report){
             $format = New PathologicalReport();
             $format->setParticular($pathological);
@@ -361,7 +371,7 @@ class PathologyController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var $entity Particular */
         $entity = $em->getRepository(Particular::class)->find($data['pk']);
         if (!$entity) {

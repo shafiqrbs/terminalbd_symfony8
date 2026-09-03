@@ -2,8 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Inventory\Entity\PurchaseOrder;
 use App\Inventory\Form\PurchaseOrderType;
@@ -12,8 +13,13 @@ use App\Inventory\Form\PurchaseOrderType;
  * PurchaseOrder controller.
  *
  */
-class PurchaseOrderController extends Controller
+class PurchaseOrderController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all PurchaseOrder entities.
@@ -21,7 +27,7 @@ class PurchaseOrderController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Inventory\Entity\PurchaseOrder::class)->findAll();
 
@@ -40,8 +46,8 @@ class PurchaseOrderController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $user = $this->get('security.context')->getToken()->getUser();
+            $em = $this->em;
+            $user = $this->getUser();
             $inventoryConfig = $user->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventoryConfig);
             $entity->upload();
@@ -66,7 +72,7 @@ class PurchaseOrderController extends Controller
      */
     private function createCreateForm(PurchaseOrder $entity)
     {
-        $inventoryConfig =  $user = $this->get('security.context')->getToken()->getUser()->getGlobalOption()->getInventoryConfig();
+        $inventoryConfig =  $user = $this->getUser()->getGlobalOption()->getInventoryConfig();
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into PurchaseOrderType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
         $form = $this->createForm(new PurchaseOrderType($inventoryConfig), $entity, array(
@@ -101,7 +107,7 @@ class PurchaseOrderController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseOrder::class)->find($id);
 
@@ -123,7 +129,7 @@ class PurchaseOrderController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseOrder::class)->find($id);
 
@@ -150,7 +156,7 @@ class PurchaseOrderController extends Controller
     */
     private function createEditForm(PurchaseOrder $entity)
     {
-        $inventoryConfig =  $user = $this->get('security.context')->getToken()->getUser()->getGlobalOption()->getInventoryConfig();
+        $inventoryConfig =  $user = $this->getUser()->getGlobalOption()->getInventoryConfig();
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into PurchaseOrderType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
         $form = $this->createForm(new PurchaseOrderType($inventoryConfig), $entity, array(
@@ -168,7 +174,7 @@ class PurchaseOrderController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\PurchaseOrder::class)->find($id);
 
@@ -202,7 +208,7 @@ class PurchaseOrderController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Inventory\Entity\PurchaseOrder::class)->find($id);
 
             if (!$entity) {

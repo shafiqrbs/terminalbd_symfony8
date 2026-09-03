@@ -4,10 +4,13 @@ namespace App\DomainUser\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use App\DomainUser\Entity\Notepad;
@@ -17,17 +20,24 @@ use App\DomainUser\Form\NotepadType;
  * Notepad controller.
  *
  */
-class NotepadController extends Controller
+class NotepadController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -38,12 +48,12 @@ class NotepadController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\DomainUser\Entity\Notepad::class)->findWithSearch($globalOption,$data);
         $pagination = $this->paginate($entities);
-		$notepadID = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Notepad::class)->generateNotepad($globalOption);
+		$notepadID = $this->em->getRepository(\App\DomainUser\Entity\Notepad::class)->generateNotepad($globalOption);
 	    $entity = $em->getRepository(\App\DomainUser\Entity\Notepad::class)->findOneBy(array('globalOption'=>$globalOption,'id' => $notepadID));
 
 	    return $this->render('DomainUser/Notepad/index.html.twig', array(
@@ -64,7 +74,7 @@ class NotepadController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $globalOption = $this->getUser()->getGlobalOption();
             $entity->setGlobalOption($globalOption);
             $em->persist($entity);
@@ -87,7 +97,7 @@ class NotepadController extends Controller
      */
     private function createCreateForm(Notepad $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into NotepadType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new NotepadType($location), $entity, array(
@@ -125,7 +135,7 @@ class NotepadController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Notepad::class)->find($id);
 
@@ -147,7 +157,7 @@ class NotepadController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Notepad::class)->find($id);
 
@@ -164,7 +174,7 @@ class NotepadController extends Controller
 
      public function insertAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 		$notes = $_REQUEST['notes'];
         $entity = $em->getRepository(\App\DomainUser\Entity\Notepad::class)->find($id);
         if (!$entity) {
@@ -187,7 +197,7 @@ class NotepadController extends Controller
     */
     private function createEditForm(Notepad $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into NotepadType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new NotepadType($location), $entity, array(
@@ -206,7 +216,7 @@ class NotepadController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\DomainUser\Entity\Notepad::class)->find($id);
 
@@ -236,7 +246,7 @@ class NotepadController extends Controller
 
     public function deleteAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\DomainUser\Entity\Notepad::class)->findOneBy(array('globalOption'=>$globalOption,'id' => $id));
         if (!$entity) {
@@ -246,12 +256,12 @@ class NotepadController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }

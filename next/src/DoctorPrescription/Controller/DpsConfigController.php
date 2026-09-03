@@ -2,25 +2,33 @@
 
 namespace App\DoctorPrescription\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DoctorPrescription\Entity\DoctorService;
 use App\DoctorPrescription\Entity\DpsConfig;
 use App\DoctorPrescription\Entity\DpsService;
 use App\DoctorPrescription\Form\ConfigType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * DpsConfigController.
  *
  */
-class DpsConfigController extends Controller
+class DpsConfigController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     public function manageAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $this->getUser()->getGlobalOption()->getDpsConfig();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity preparation.');
@@ -64,7 +72,7 @@ class DpsConfigController extends Controller
      */
     public function updateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $this->getUser()->getGlobalOption()->getDpsConfig();
         $pagination = $em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->getServiceForPrescription($entity);
@@ -79,11 +87,11 @@ class DpsConfigController extends Controller
         if ($editForm->isValid()) {
 
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Report has been created successfully"
             );
             $data = $request->request->all();
-            $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->prescriptionServiceUpdate($entity,$data);
+            $this->em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->prescriptionServiceUpdate($entity,$data);
             if($entity->isCustomPrescription() == 1){
                /*// $print = '../src/Appstore/Bundle/DoctorPrescriptionBundle/Resources/views/Print/print.html.twig';
                // $copy = '../src/Appstore/Bundle/DoctorPrescriptionBundle/Resources/views/Print/'.$entity->getGlobalOption()->getSlug().'.html.twig';
@@ -109,12 +117,12 @@ class DpsConfigController extends Controller
 
     public function resetDefaultServiceAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DoctorService::class)->findBy(array('status'=>1));
+        $entities = $this->em->getRepository(\App\DoctorPrescription\Entity\DoctorService::class)->findBy(array('status'=>1));
         /* @var $entity DoctorService */
         foreach ($entities as $entity){
-            $exist = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->findOneBy(array('dpsConfig'=> $config,'doctorService' => $entity));
+            $exist = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->findOneBy(array('dpsConfig'=> $config,'doctorService' => $entity));
             if(empty($exist)){
                 $service = new DpsService();
                 $service->setName(trim($entity->getName()));

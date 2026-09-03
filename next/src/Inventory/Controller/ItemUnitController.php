@@ -2,6 +2,8 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,6 +18,12 @@ use App\Inventory\Form\ItemUnitType;
  */
 class ItemUnitController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all ItemUnit entities.
@@ -23,7 +31,7 @@ class ItemUnitController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository('InventoryBundle:ItemUnit')->findBy(['inventoryConfig'=>$inventory],['name'=>'asc']);
         return $this->render('Inventory/ItemUnit/index.html.twig', [
@@ -41,12 +49,12 @@ class ItemUnitController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('itemunit'));
@@ -99,7 +107,7 @@ class ItemUnitController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('InventoryBundle:ItemUnit')->find($id);
 
@@ -121,7 +129,7 @@ class ItemUnitController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('InventoryBundle:ItemUnit')->find($id);
 
@@ -164,7 +172,7 @@ class ItemUnitController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository('InventoryBundle:ItemUnit')->find($id);
 
@@ -178,7 +186,7 @@ class ItemUnitController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('itemunit_edit', ['id' => $id]));
@@ -200,7 +208,7 @@ class ItemUnitController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository('InventoryBundle:ItemUnit')->find($id);
 
             if (!$entity) {
@@ -236,7 +244,7 @@ class ItemUnitController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository('InventoryBundle:ItemUnit')->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository('InventoryBundle:ItemUnit')->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }

@@ -4,6 +4,8 @@ namespace App\Restaurant\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -21,6 +23,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class VendorController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
 
@@ -31,7 +39,7 @@ class VendorController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountVendor();
         $form = $this->createCreateForm($entity);
         $config = $this->getUser()->getGlobalOption();
@@ -52,16 +60,16 @@ class VendorController extends AbstractController
     {
         $entity = new AccountVendor();
         $config = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $config],['companyName'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $config],['companyName'=>'ASC']);
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($config);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('restaurant_vendor', ['id' => $entity->getId()]));
@@ -100,9 +108,9 @@ class VendorController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $config],['companyName'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $config],['companyName'=>'ASC']);
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
@@ -145,9 +153,9 @@ class VendorController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $config],['companyName'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->findBy(['globalOption' => $config],['companyName'=>'ASC']);
 
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
@@ -160,7 +168,7 @@ class VendorController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"
             );
             return $this->redirect($this->generateUrl('restaurant_vendor_edit', ['id' => $id]));
@@ -179,7 +187,7 @@ class VendorController extends AbstractController
     public function deleteAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
         if (!$entity) {
@@ -189,16 +197,16 @@ class VendorController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -214,7 +222,7 @@ class VendorController extends AbstractController
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($id);
 
         if (!$entity) {
@@ -228,7 +236,7 @@ class VendorController extends AbstractController
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('restaurant_vendor'));
@@ -239,7 +247,7 @@ class VendorController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }

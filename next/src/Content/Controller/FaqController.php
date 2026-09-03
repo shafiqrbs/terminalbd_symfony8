@@ -2,6 +2,8 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Content\Entity\Page;
@@ -14,6 +16,12 @@ use App\Content\Form\FaqType;
  */
 class FaqController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Faq entities.
@@ -21,7 +29,7 @@ class FaqController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
 
         $entities = $em->getRepository(\App\Content\Entity\Page::class)->findBy(['globalOption'=>$globalOption,'module'=>11],['created'=>'desc']);
@@ -41,10 +49,10 @@ class FaqController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $user = $this->getUser();
             $entity->setUser($user);
-            $entity ->setModule($this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->findOneBy(['slug' => 'faq']));
+            $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(['slug' => 'faq']));
             $entity->setGlobalOption($user->getGlobalOption());
             $em->persist($entity);
             $em->flush();
@@ -100,7 +108,7 @@ class FaqController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -122,7 +130,7 @@ class FaqController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -166,7 +174,7 @@ class FaqController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -195,13 +203,13 @@ class FaqController extends AbstractController
      */
     public function deleteAction(Page $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($entity->getFile())){
             $entity->removeUpload();
         }
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add('success',"Data has been updated successfully");
+        $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been updated successfully");
         return $this->redirect($this->generateUrl('faq'));
     }
 
@@ -231,7 +239,7 @@ class FaqController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
         if (!$entity) {
@@ -245,7 +253,7 @@ class FaqController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('faq'));

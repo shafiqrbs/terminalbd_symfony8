@@ -2,9 +2,21 @@
 
 namespace App\User\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use App\Tool\Service\ToolManager;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DefaultController extends AbstractController
 {
+    public function __construct(
+        private readonly RequestStack $requestStack,
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly ToolManager $toolManager,
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
     public function indexAction()
     {
         return $this->render('User/Default/index.html.twig', []);
@@ -19,18 +31,18 @@ class DefaultController extends AbstractController
         $globalOption = $user->getGlobalOption();
         /* @var $globalOption GlobalOption */
 
-        $this->get('settong.toolManageRepo')->createMasterDirectory($globalOption->getId());
+        $this->toolManager->createMasterDirectory($globalOption->getId());
 
         if($globalOption->getStatus() == 2 or $globalOption->getStatus() == 3 ) {
 
-            $this->get('security.context')->setToken(null);
-            $this->get('request')->getSession()->invalidate();
-            $this->get('session')->getFlashBag()->add('notice', "Your account has been temporary suspended. Please contact administrator for further any query");
+            $this->tokenStorage->setToken(null);
+            $this->requestStack->getSession()->invalidate();
+            $this->requestStack->getSession()->getFlashBag()->add('notice', "Your account has been temporary suspended. Please contact administrator for further any query");
             return $this->redirect($this->generateUrl('fos_user_security_login'));
         }elseif($globalOption->getStatus() == 4 ){
-            $this->get('security.context')->setToken(null);
-            $this->get('request')->getSession()->invalidate();
-            $this->get('session')->getFlashBag()->add(
+            $this->tokenStorage->setToken(null);
+            $this->requestStack->getSession()->invalidate();
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Your account has been deleted. Please contact administrator for further any query"
             );
             return $this->redirect($this->generateUrl('fos_user_security_login'));
@@ -54,33 +66,33 @@ class DefaultController extends AbstractController
 
         $mainApp = !empty($globalOption->getMainApp()) ? $globalOption->getMainApp()->getSlug() : "";
 
-	    if ($this->get('security.authorization_checker')->isGranted('ROLE_SUPER_ADMIN')) {
+	    if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             return $this->redirect($this->generateUrl('tools_domain'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_DOMAIN') && $enable != 1) {
+        }elseif ($this->isGranted('ROLE_DOMAIN') && $enable != 1) {
             return $this->redirect($this->generateUrl('bindu_build'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_RESTAURANT') && $enable == 1 and $mainApp == 'restaurant') {
+        }elseif ($this->isGranted('ROLE_RESTAURANT') && $enable == 1 and $mainApp == 'restaurant') {
             return $this->redirect($this->generateUrl('restaurant_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_DPS') && $enable == 1 &&  $mainApp == 'dps') {
+        }elseif ($this->isGranted('ROLE_DPS') && $enable == 1 &&  $mainApp == 'dps') {
             return $this->redirect($this->generateUrl('dps_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_HOSPITAL') && $enable == 1 &&  $mainApp == 'hms' ) {
+        }elseif ($this->isGranted('ROLE_HOSPITAL') && $enable == 1 &&  $mainApp == 'hms' ) {
             return $this->redirect($this->generateUrl('hospital_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_MEDICINE') && $enable == 1 && $mainApp == 'miss' ) {
+        }elseif ($this->isGranted('ROLE_MEDICINE') && $enable == 1 && $mainApp == 'miss' ) {
             return $this->redirect($this->generateUrl('medicine_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_BUSINESS') && $enable == 1 && $mainApp == 'business' ) {
+        }elseif ($this->isGranted('ROLE_BUSINESS') && $enable == 1 && $mainApp == 'business' ) {
             return $this->redirect($this->generateUrl('business_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_INVENTORY') && $enable == 1 && $mainApp == 'inventory') {
+        }elseif ($this->isGranted('ROLE_INVENTORY') && $enable == 1 && $mainApp == 'inventory') {
         	return $this->redirect($this->generateUrl('inventory_homepage'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_WEBSITE') && $enable == 1 && $mainApp == 'website') {
+        }elseif ($this->isGranted('ROLE_WEBSITE') && $enable == 1 && $mainApp == 'website') {
             return $this->redirect($this->generateUrl('website'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_WEBSITE') && $enable == 1 && $mainApp == 'accounting') {
+        }elseif ($this->isGranted('ROLE_WEBSITE') && $enable == 1 && $mainApp == 'accounting') {
             return $this->redirect($this->generateUrl('account_transaction_cash_summary'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_DOMAIN') && $enable == 1) {
+        }elseif ($this->isGranted('ROLE_DOMAIN') && $enable == 1) {
 	        return $this->redirect($this->generateUrl('domain'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_AGENT')) {
+        }elseif ($this->isGranted('ROLE_AGENT')) {
               return $this->redirect($this->generateUrl('agentclient'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_CUSTOMER')) {
+        }elseif ($this->isGranted('ROLE_CUSTOMER')) {
               return $this->redirect($this->generateUrl('customer'));
-        }elseif ($this->get('security.authorization_checker')->isGranted('ROLE_ACCOUNTING') && $enable == 1 ) {
+        }elseif ($this->isGranted('ROLE_ACCOUNTING') && $enable == 1 ) {
             return $this->redirect($this->generateUrl('account_transaction_cash_overview'));
         }elseif (!empty($user) && $enable == 2 ) {
             return $this->redirect($this->generateUrl('domain_pendig'));
@@ -99,7 +111,7 @@ class DefaultController extends AbstractController
     public function adminAction()
     {
         $user = $this->getUser();
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->em;
         return $this->render('User/Default/admin.html.twig', [
             'user' => $user
         ]);
@@ -109,7 +121,7 @@ class DefaultController extends AbstractController
     public function userAction()
     {
         $user = $this->getUser();
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->em;
 
         return $this->render('User/Default/admin.html.twig', [
             'user' => $user
@@ -200,20 +212,20 @@ class DefaultController extends AbstractController
     {
 
         $user = $this->getUser();
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->em;
         return $this->render('User/Default/domain.html.twig', [
             'user' => $user
         ]);
     }
     public function tutorAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->em;
         return $this->render('User/Default/index.html.twig', []);
     }
 
     public function generalAction()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->em;
         return $this->render('User/Default/index.html.twig', []);
     }
 

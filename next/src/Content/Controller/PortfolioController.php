@@ -2,9 +2,11 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Content\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Content\Entity\Portfolio;
 use App\Content\Form\PortfolioType;
@@ -13,8 +15,14 @@ use App\Content\Form\PortfolioType;
  * Page controller.
  *
  */
-class PortfolioController extends Controller
+class PortfolioController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Page entities.
@@ -22,7 +30,7 @@ class PortfolioController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Content\Entity\Page::class)->getPagesFor($globalOption , $module ='portfolio');
         return $this->render('Content/Portfolio/index.html.twig', array(
@@ -40,14 +48,14 @@ class PortfolioController extends Controller
         $form->handleRequest($request);
         $data = $request->request->all();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $user = $this->getUser();
-            $entity ->setModule($this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'portfolio')));
+            $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'portfolio')));
             $entity->setGlobalOption($user->getGlobalOption());
             $entity->upload();
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Content\Entity\PageMeta::class)->pageMeta($entity,$data);
+            $this->em->getRepository(\App\Content\Entity\PageMeta::class)->pageMeta($entity,$data);
             return $this->redirect($this->generateUrl('portfolio'));
         }
 
@@ -101,7 +109,7 @@ class PortfolioController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -119,7 +127,7 @@ class PortfolioController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -164,7 +172,7 @@ class PortfolioController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
         if (!$entity) {
@@ -180,7 +188,7 @@ class PortfolioController extends Controller
             }
             $entity->upload();
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Content\Entity\PageMeta::class)->pageMeta($entity,$data);
+            $this->em->getRepository(\App\Content\Entity\PageMeta::class)->pageMeta($entity,$data);
             return $this->redirect($this->generateUrl('portfolio_edit', array('id' => $id)));
         }
 
@@ -197,13 +205,13 @@ class PortfolioController extends Controller
      */
     public function deleteAction(Page $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($entity->getFile())){
             $entity->removeUpload();
         }
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add('success',"Data has been deleted successfully");
+        $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been deleted successfully");
         return $this->redirect($this->generateUrl('portfolio'));
     }
 
@@ -216,7 +224,7 @@ class PortfolioController extends Controller
     public function statusAction($id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
         if (!$entity) {
@@ -230,7 +238,7 @@ class PortfolioController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('portfolio'));

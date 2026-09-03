@@ -2,13 +2,17 @@
 
 namespace App\Tool\Controller;
 
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\User\Entity\User;
 use App\User\Form\SignupType;
 use App\Tool\Form\GlobalOptionModifyType;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Tool\Entity\GlobalOption;
 use App\Tool\Form\GlobalOptionType;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,16 +21,24 @@ use Symfony\Component\HttpFoundation\Response;
  * GlobalOption controller.
  *
  */
-class GlobalOptionController extends Controller
+class GlobalOptionController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             20  /*limit per page*/
         );
         return $pagination;
@@ -38,7 +50,7 @@ class GlobalOptionController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findAll();
         $entities = $this->paginate($entities);
@@ -57,13 +69,13 @@ class GlobalOptionController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $intlMobile = $entity->getProfile()->getMobile();
-        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($intlMobile);
+        $mobile = $this->toolManager->specialExpClean($intlMobile);
         $entity->getProfile()->setMobile($mobile);
         $data = $request->request->all();
-        $exist = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->checkExistingUser($mobile);
+        $exist = $this->em->getRepository(\App\User\Entity\User::class)->checkExistingUser($mobile);
         if ($form->isValid() and $exist == false) {
             $user = $this->getUser();
-            $globalOption = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->createGlobalOption($mobile,$data,$user);
+            $globalOption = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->createGlobalOption($mobile,$data,$user);
             $entity->setPlainPassword("*148148#");
             $entity->setGlobalOption($globalOption);
             $entity->setEnabled(true);
@@ -71,17 +83,17 @@ class GlobalOptionController extends Controller
             $entity->setUsername($mobile);
             $entity->setEmail($mobile.'@gmail.com');
             $entity->setRoles(array('ROLE_DOMAIN'));
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->initialSetup($entity);
-            $this->get('settong.toolManageRepo')->createDirectory($entity->getGlobalOption()->getId());
+            $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->initialSetup($entity);
+            $this->toolManager->createDirectory($entity->getGlobalOption()->getId());
           //  $dispatcher = $this->container->get('event_dispatcher');
         //    $dispatcher->dispatch('setting_tool.post.user_signup_msg', new \App\Tool\Event\UserSignup($entity));
             return $this->redirect($this->generateUrl('globaloption_edit', array('id' => $globalOption->getId())));
         }
 
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"The mobile no have to be unique"
         );
 
@@ -94,8 +106,8 @@ class GlobalOptionController extends Controller
 
     private function createCreateForm(User $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $em = $this->getDoctrine()->getRepository(\App\Tool\Entity\Syndicate::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SignupType::configureOptions() and pass them as form options: $em,$location), $entity, array(
         $form = $this->createForm(new SignupType($em,$location), $entity, array(
@@ -132,7 +144,7 @@ class GlobalOptionController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($id);
 
@@ -155,12 +167,12 @@ class GlobalOptionController extends Controller
     public function editAction(GlobalOption $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find GlobalOption entity.');
         }
-        $this->get('settong.toolManageRepo')->createDirectory($entity->getId());
-        $this->getDoctrine()->getRepository(\App\Tool\Entity\SiteSetting::class)->globalOptionSetting($entity);
+        $this->toolManager->createDirectory($entity->getId());
+        $this->em->getRepository(\App\Tool\Entity\SiteSetting::class)->globalOptionSetting($entity);
 
         $subSyndicates = $this->getSubSyndicateUnderVendor($entity);
         $editForm = $this->createEditForm($entity);
@@ -174,28 +186,28 @@ class GlobalOptionController extends Controller
 
     public function hardResetSystemDataAction(GlobalOption $option)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         set_time_limit(0);
 
         if($option->getInventoryConfig()) {
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\HospitalConfig::class)->hospitalDelete($option);
+            $this->em->getRepository(\App\Hospital\Entity\HospitalConfig::class)->hospitalDelete($option);
         }
         if($option->getInventoryConfig()) {
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\InventoryConfig::class)->inventoryReset($option);
+            $this->em->getRepository(\App\Inventory\Entity\InventoryConfig::class)->inventoryReset($option);
         }
         if($option->getMedicineConfig()) {
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineConfig::class)->medicineDelete($option);
+            $this->em->getRepository(\App\Medicine\Entity\MedicineConfig::class)->medicineDelete($option);
         }
         if($option->getBusinessConfig()) {
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessConfig::class)->businessDelete($option);
+            $this->em->getRepository(\App\Business\Entity\BusinessConfig::class)->businessDelete($option);
         }
         if($option->getRestaurantConfig()) {
-            $this->getDoctrine()->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->delete($option);
+            $this->em->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->delete($option);
         }
 
         if($option->getAccountingConfig()){
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountingConfig::class)->accountingDeleteReset($option);
+            $this->em->getRepository(\App\Accounting\Entity\AccountingConfig::class)->accountingDeleteReset($option);
         }
 
         $account = $em->createQuery("DELETE UserBundle:User e WHERE e.globalOption = {$option->getId()} and e.domainOwner !=1 and e.username != {$option->getMobile()}");
@@ -207,14 +219,14 @@ class GlobalOptionController extends Controller
         if($deletecustomer){
             $deletecustomer->execute();
         }
-        $existOption = $this->getDoctrine()->getRepository(GlobalOption::class)->findBy(array('hotline'=>$option->getHotline()));
+        $existOption = $this->em->getRepository(GlobalOption::class)->findBy(array('hotline'=>$option->getHotline()));
         if($option->getHotline() and count($existOption) == 1){
-            $masterUser = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->findOneBy(array('globalOption'=>$option->getId(),'domainOwner'=>1,'username'=>$option->getMobile()));
+            $masterUser = $this->em->getRepository(\App\User\Entity\User::class)->findOneBy(array('globalOption'=>$option->getId(),'domainOwner'=>1,'username'=>$option->getMobile()));
             if($masterUser){
                 $masterUser->setUsername($option->getHotline());
                 $masterUser->setUsernameCanonical($option->getHotline());
             }
-            $masterCustomer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'name'=>"Default",'mobile'=>$option->getMobile()));
+            $masterCustomer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'name'=>"Default",'mobile'=>$option->getMobile()));
             if($masterCustomer){
                 $masterCustomer->setMobile($option->getHotline());
             }
@@ -227,7 +239,7 @@ class GlobalOptionController extends Controller
         $a = new Filesystem();
         $a->remove($dir);
         $a->mkdir($dir);
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Successfully reset data"
         );
         return $this->redirect($this->generateUrl('globaloption_edit', array('id' => $option->getId())));
@@ -242,7 +254,7 @@ class GlobalOptionController extends Controller
     */
     private function createEditForm(GlobalOption $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into GlobalOptionType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new GlobalOptionType($location), $entity, array(
@@ -266,7 +278,7 @@ class GlobalOptionController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($id);
 
@@ -280,11 +292,11 @@ class GlobalOptionController extends Controller
         if ($editForm->isValid()) {
             $entity->upload();
             $em->flush();
-            //$this->getDoctrine()->getRepository(\App\Content\Entity\HomePage::class)->globalOptionHome($user);
-            //$this->getDoctrine()->getRepository(\App\Content\Entity\ContactPage::class)->globalOptionContact($user);
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\SiteSetting::class)->updateSettingMenu($entity);
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->systemConfigUpdate($entity);
-            $this->get('session')->getFlashBag()->add('success',"Data has been updated successfully");
+            //$this->em->getRepository(\App\Content\Entity\HomePage::class)->globalOptionHome($user);
+            //$this->em->getRepository(\App\Content\Entity\ContactPage::class)->globalOptionContact($user);
+            $this->em->getRepository(\App\Tool\Entity\SiteSetting::class)->updateSettingMenu($entity);
+            $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->systemConfigUpdate($entity);
+            $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been updated successfully");
 
             /*$referer = $request->headers->get('referer');
             return new RedirectResponse($referer);*/
@@ -305,14 +317,14 @@ class GlobalOptionController extends Controller
      */
     public function deleteAction(GlobalOption $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find GlobalOption entity.');
         }
 
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add('error',"Data has been deleted successfully");
+        $this->requestStack->getSession()->getFlashBag()->add('error',"Data has been deleted successfully");
         return $this->redirect($this->generateUrl('tools_domain'));
     }
 
@@ -322,7 +334,7 @@ class GlobalOptionController extends Controller
      */
     public function resetLogoAction(Request $request,GlobalOption $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find GlobalOption entity.');
         }
@@ -351,7 +363,7 @@ class GlobalOptionController extends Controller
             $template->setAndroidLogo(NULL);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add('error',"Data has been reset successfully");
+        $this->requestStack->getSession()->getFlashBag()->add('error',"Data has been reset successfully");
         $referer = $request->headers->get('referer');
         return new RedirectResponse($referer);
     }
@@ -379,7 +391,7 @@ class GlobalOptionController extends Controller
      */
     public function modifyUpdateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($id);
 
@@ -393,11 +405,11 @@ class GlobalOptionController extends Controller
         if ($editForm->isValid()) {
             $entity->upload();
             $em->flush();
-            //$this->getDoctrine()->getRepository(\App\Content\Entity\HomePage::class)->globalOptionHome($user);
-            //$this->getDoctrine()->getRepository(\App\Content\Entity\ContactPage::class)->globalOptionContact($user);
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\SiteSetting::class)->updateSettingMenu($entity);
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->systemConfigUpdate($entity);
-            $this->get('session')->getFlashBag()->add('success',"Data has been updated successfully");
+            //$this->em->getRepository(\App\Content\Entity\HomePage::class)->globalOptionHome($user);
+            //$this->em->getRepository(\App\Content\Entity\ContactPage::class)->globalOptionContact($user);
+            $this->em->getRepository(\App\Tool\Entity\SiteSetting::class)->updateSettingMenu($entity);
+            $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->systemConfigUpdate($entity);
+            $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been updated successfully");
 
             /*$referer = $request->headers->get('referer');
             return new RedirectResponse($referer);*/
@@ -422,7 +434,7 @@ class GlobalOptionController extends Controller
      */
     private function createModifyForm(GlobalOption $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into GlobalOptionModifyType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new GlobalOptionModifyType($location), $entity, array(
@@ -445,14 +457,14 @@ class GlobalOptionController extends Controller
      */
     public function modifyAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $this->getUser()->getGlobalOption();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find GlobalOption entity.');
         }
 
-        $this->get('settong.toolManageRepo')->createDirectory($entity->getId());
-        $this->getDoctrine()->getRepository(\App\Tool\Entity\SiteSetting::class)->globalOptionSetting($entity);
+        $this->toolManager->createDirectory($entity->getId());
+        $this->em->getRepository(\App\Tool\Entity\SiteSetting::class)->globalOptionSetting($entity);
         $editForm = $this->createModifyForm($entity);
 
         $subSyndicates = $this->getSubSyndicateUnderVendor($entity);
@@ -466,11 +478,11 @@ class GlobalOptionController extends Controller
 
     public function getSubSyndicateUnderVendor($entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if($entity->getSyndicate()){
             $parentId       = $entity->getSyndicate()->getId();
             $syndicates     = $em->getRepository(\App\Tool\Entity\Syndicate::class)->findBy(array('status' => 1,'parent' => $parentId),array('name' => 'asc'));
-            return $subSyndicates  = $this->getDoctrine()->getRepository(\App\Tool\Entity\Syndicate::class)->getSelectedSubSyndicates($syndicates,$entity);
+            return $subSyndicates  = $this->em->getRepository(\App\Tool\Entity\Syndicate::class)->getSelectedSubSyndicates($syndicates,$entity);
         }
 
     }

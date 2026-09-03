@@ -2,6 +2,9 @@
 
 namespace App\Hospital\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Form\AccountHmsPurchaseType;
 use App\Hospital\Entity\HmsPurchase;
 use App\Hospital\Entity\HmsPurchaseItem;
@@ -11,22 +14,29 @@ use App\Hospital\Form\AccessoriesPurchaseType;
 use App\Hospital\Form\PurchaseType;
 use App\Hospital\Form\VendorType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Vendor controller.
  *
  */
-class AccessoriesPurchaseController extends Controller
+class AccessoriesPurchaseController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -40,9 +50,9 @@ class AccessoriesPurchaseController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsPurchase::class)->findBy(array('hospitalConfig' => $hospital,'mode'=>'accessories'),array('created'=>'DESC'));
+        $entities = $this->em->getRepository(\App\Hospital\Entity\HmsPurchase::class)->findBy(array('hospitalConfig' => $hospital,'mode'=>'accessories'),array('created'=>'DESC'));
         $pagination = $this->paginate($entities);
         return $this->render('Hospital/AccessoriesPurchase/index.html.twig', array(
             'entities' => $pagination,
@@ -53,7 +63,7 @@ class AccessoriesPurchaseController extends Controller
     public function newAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new HmsPurchase();
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity->setHospitalConfig($hospital);
@@ -68,7 +78,7 @@ class AccessoriesPurchaseController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\HmsPurchase::class)->findOneBy(array('hospitalConfig' => $hospital , 'id' => $id));
 
@@ -115,14 +125,14 @@ class AccessoriesPurchaseController extends Controller
 
     public function addParticularAction(Request $request, HmsPurchase $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price );
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsPurchaseItem::class)->insertPurchaseItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsPurchase::class)->updatePurchaseTotalPrice($invoice);
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsPurchaseItem::class)->getPurchaseItems($invoice);
+        $this->em->getRepository(\App\Hospital\Entity\HmsPurchaseItem::class)->insertPurchaseItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Hospital\Entity\HmsPurchase::class)->updatePurchaseTotalPrice($invoice);
+        $invoiceParticulars = $this->em->getRepository(\App\Hospital\Entity\HmsPurchaseItem::class)->getPurchaseItems($invoice);
         $msg = 'Particular added successfully';
 
         $subTotal = $invoice->getSubTotal() > 0 ? $invoice->getSubTotal() : 0;
@@ -135,15 +145,15 @@ class AccessoriesPurchaseController extends Controller
 
     public function invoiceParticularDeleteAction(HmsPurchase $invoice, HmsPurchaseItem $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
 
         $em->remove($particular);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsPurchase::class)->updatePurchaseTotalPrice($invoice);
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsPurchaseItem::class)->getPurchaseItems($invoice);
+        $invoice = $this->em->getRepository(\App\Hospital\Entity\HmsPurchase::class)->updatePurchaseTotalPrice($invoice);
+        $invoiceParticulars = $this->em->getRepository(\App\Hospital\Entity\HmsPurchaseItem::class)->getPurchaseItems($invoice);
 
         $msg = 'Particular deleted successfully';
         $subTotal = $invoice->getSubTotal() > 0 ? $invoice->getSubTotal() : 0;
@@ -157,7 +167,7 @@ class AccessoriesPurchaseController extends Controller
 
     public function invoiceDiscountUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $discount = (float)$request->request->get('discount');
         $purchase = $request->request->get('invoice');
 
@@ -173,7 +183,7 @@ class AccessoriesPurchaseController extends Controller
             $em->flush();
         }
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsPurchaseItem::class)->getPurchaseItems($purchase);
+        $invoiceParticulars = $this->em->getRepository(\App\Hospital\Entity\HmsPurchaseItem::class)->getPurchaseItems($purchase);
         $subTotal = $purchase->getSubTotal() > 0 ? $purchase->getSubTotal() : 0;
         $grandTotal = $purchase->getNetTotal() > 0 ? $purchase->getNetTotal() : 0;
         $dueAmount = $purchase->getDue() > 0 ? $purchase->getDue() : 0;
@@ -183,7 +193,7 @@ class AccessoriesPurchaseController extends Controller
 
     public function updateAction(Request $request, HmsPurchase $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -216,7 +226,7 @@ class AccessoriesPurchaseController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Hospital\Entity\HmsPurchase::class)->find($id);
 
@@ -230,13 +240,13 @@ class AccessoriesPurchaseController extends Controller
 
     public function approvedAction(HmsPurchase $purchase)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!empty($purchase)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $purchase->setProcess('Approved');
             $purchase->setApprovedBy($this->getUser());
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->getPurchaseUpdateQnt($purchase);
+            $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getPurchaseUpdateQnt($purchase);
             $accountPurchase = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertHmsAccountPurchase($purchase);
             $em->getRepository(\App\Accounting\Entity\Transaction::class)->purchaseGlobalTransaction($accountPurchase);
             return new Response('success');
@@ -255,7 +265,7 @@ class AccessoriesPurchaseController extends Controller
     public function deleteAction(HmsPurchase $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -274,7 +284,7 @@ class AccessoriesPurchaseController extends Controller
     {
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Hospital\Entity\HmsVendor::class)->find($id);
 
         if (!$entity) {
@@ -288,7 +298,7 @@ class AccessoriesPurchaseController extends Controller
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_vendor'));
@@ -299,7 +309,7 @@ class AccessoriesPurchaseController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsVendor::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Hospital\Entity\HmsVendor::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }

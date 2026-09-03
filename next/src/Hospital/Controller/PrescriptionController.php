@@ -4,6 +4,11 @@ namespace App\Hospital\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DoctorPrescription\Entity\DpsInvoice;
 use App\DomainUser\Entity\Customer;
 use App\Hospital\Entity\Invoice;
@@ -15,23 +20,32 @@ use JMS\SecurityExtraBundle\Annotation\RunAs;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Invoice controller.
  *
  */
-class PrescriptionController extends Controller
+class PrescriptionController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -45,16 +59,16 @@ class PrescriptionController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->invoiceLists( $user , $mode = 'visit' , $data);
         $pagination = $this->paginate($entities);
-        $diseasesProfile = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getDiseasesProfile($hospital,'visit');
-        $processes = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'visit',$data);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'assign-doctor');
-        $referredDoctors = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'referred-doctor');
+        $diseasesProfile = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getDiseasesProfile($hospital,'visit');
+        $processes = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'visit',$data);
+        $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'assign-doctor');
+        $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignProcess($hospital,'referred-doctor');
 
         return $this->render('Hospital/Prescription/index.html.twig', array(
             'hospital'                          => $hospital,
@@ -89,7 +103,7 @@ class PrescriptionController extends Controller
     private function createInvoiceCustomerForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $category = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DoctorAppointmentType::configureOptions() and pass them as form options: $globalOption,$category), $entity, array(
         $form = $this->createForm(new DoctorAppointmentType($globalOption,$category), $entity, array(
@@ -116,10 +130,10 @@ class PrescriptionController extends Controller
         $invoiceId = $request->request->get('invoice');
         $patient = $request->request->get('patientId');
         $option = $this->getUser()->getGlobalOption();
-        $patientId = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'customerId'=>$patient));
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'mobile'=>$customerId));
-        $invoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'invoice' => $invoiceId));
-        $em = $this->getDoctrine()->getManager();
+        $patientId = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'customerId'=>$patient));
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$option,'mobile'=>$customerId));
+        $invoice = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'invoice' => $invoiceId));
+        $em = $this->em;
         if($invoice){
             /* @var $invoice Invoice */
             $entity = new Invoice();
@@ -171,7 +185,7 @@ class PrescriptionController extends Controller
 
     public function patientInvoiceAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital , 'id' => $id));
 
@@ -192,7 +206,7 @@ class PrescriptionController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital , 'id' => $id));
         if (!$entity) {
@@ -218,7 +232,7 @@ class PrescriptionController extends Controller
     private function createEditForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $category = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsCategory::class);
+        $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DoctorAppointmentType::configureOptions() and pass them as form options: $globalOption,$category), $entity, array(
         $form = $this->createForm(new DoctorAppointmentType($globalOption,$category), $entity, array(
@@ -235,7 +249,7 @@ class PrescriptionController extends Controller
 
     public function updateAction(Request $request, Invoice $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -259,7 +273,7 @@ class PrescriptionController extends Controller
     public function particularSearchAction()
     {
         $id = $_REQUEST['id'];
-        $particular = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
+        $particular = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
         $quantity = $particular->getQuantity() > 0 ? $particular->getQuantity() :1;
         return new Response(json_encode(array('particularId'=> $particular->getId() ,'price'=> $particular->getPrice() , 'quantity'=> $quantity, 'minimumPrice'=> $particular->getMinimumPrice(), 'instruction'=> $particular->getInstruction())));
     }
@@ -281,7 +295,7 @@ class PrescriptionController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         /* @var $entity Invoice */
         $entity = $em->getRepository(Invoice::class)->find($data['pk']);
         if (!$entity) {
@@ -307,16 +321,16 @@ class PrescriptionController extends Controller
     public function invoiceApproveAction(Invoice $invoice)
     {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $invoice->setApprovedBy($this->getUser());
             $invoice->setProcess('Done');
             $em->persist($invoice);
             $em->flush();
             if($invoice->getPayment() > 0) {
-                $this->getDoctrine()->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->insertVisitTransaction($invoice);
+                $this->em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->insertVisitTransaction($invoice);
             }
             if($invoice->getAssignDoctor()->isSendToAccount() == 1){
-                $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalVisitAccount($invoice);
+                $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalVisitAccount($invoice);
             }
             return new Response('Success');
     }
@@ -324,15 +338,15 @@ class PrescriptionController extends Controller
 
     public function printAction(Request $request,$id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'id'=>$id));
+        $entity = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'id'=>$id));
         if (!$entity) {
            throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
         $barcode = $this->getBarcode($entity->getInvoice());
         $patientId = $this->getBarcode($entity->getCustomer()->getCustomerId());
-        $inWords = $this->get('settong.toolManageRepo')->intToWords($entity->getPayment());
+        $inWords = $this->toolManager->intToWords($entity->getPayment());
 
         if($hospital->isCustomPrint() == 1){
             $template = "Print/{$hospital->getGlobalOption()->getId()}:{$entity->getPrintFor()}";
@@ -353,14 +367,14 @@ class PrescriptionController extends Controller
 
     public function doctorPrescriptionPrintAction(Request $request,$id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'id'=>$id));
+        $entity = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'id'=>$id));
         if (!$entity) {
            throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
         $patientId = $this->getBarcode($entity->getCustomer()->getCustomerId());
-        $inWords = $this->get('settong.toolManageRepo')->intToWords($entity->getPayment());
+        $inWords = $this->toolManager->intToWords($entity->getPayment());
 
         if($hospital->isCustomPrint() == 1){
             $template = "Print/{$hospital->getGlobalOption()->getId()}:prescription";
@@ -387,13 +401,13 @@ class PrescriptionController extends Controller
 
     public function generateAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $invoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'id' => $id));
+        $invoice = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig'=>$hospital,'id' => $id));
         if($invoice) {
             /* @var $invoice Invoice */
-            $exist = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->findOneBy(array('dpsConfig'=>$config,'customer'=>$invoice->getCustomer(),'process'=>'In-progress'));
+            $exist = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->findOneBy(array('dpsConfig'=>$config,'customer'=>$invoice->getCustomer(),'process'=>'In-progress'));
             if(empty($exist)){
                 $entity = new DpsInvoice();
                 $entity->setDpsConfig($config);
@@ -421,7 +435,7 @@ class PrescriptionController extends Controller
 
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital , 'id' => $id));
         if (!$entity) {
@@ -450,9 +464,9 @@ class PrescriptionController extends Controller
 
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital, 'id' => $id));
+        $entity = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->findOneBy(array('hospitalConfig' => $hospital, 'id' => $id));
         $entity->setRevised(true);
         $entity->setProcess('In-progress');
         $entity->setPaymentStatus('Due');
@@ -462,7 +476,7 @@ class PrescriptionController extends Controller
         $entity->setCommissionApproved(0);
         $entity->setPayment(null);
         $em->flush();
-        $template = $this->get('twig')->render('Hospital/Reverse/reverse.html.twig',array(
+        $template = $this->twig->render('Hospital/Reverse/reverse.html.twig',array(
             'entity' => $entity,
         ));
         $em->getRepository(\App\Hospital\Entity\HmsReverse::class)->insertInvoice($entity,$template);

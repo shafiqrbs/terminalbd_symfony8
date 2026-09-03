@@ -2,17 +2,27 @@
 
 namespace App\Content\Controller;
 
+use App\Tool\Service\ToolManager;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Content\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Content\Form\EventType;
 
 /**
  * Event controller.
  *
  */
-class EventController extends Controller
+class EventController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
     /**
      * Lists all Event entities.
@@ -20,7 +30,7 @@ class EventController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Content\Entity\Page::class)->getPagesFor($globalOption,'event');
@@ -39,12 +49,12 @@ class EventController extends Controller
         $form->handleRequest($request);
         $user = $this->getUser();
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $mobile = $entity->getMobile();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
+            $mobile = $this->toolManager->specialExpClean($mobile);
             $entity->setMobile($mobile);
             $entity->setUser($user);
-            $entity ->setModule($this->getDoctrine()->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'event')));
+            $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'event')));
             $entity->setGlobalOption($user->getGlobalOption());
             $entity->upload();
             $em->persist($entity);
@@ -69,7 +79,7 @@ class EventController extends Controller
     private function createCreateForm(Page $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption()->getId();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into EventType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new EventType($globalOption,$location), $entity, array(
@@ -105,7 +115,7 @@ class EventController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -127,7 +137,7 @@ class EventController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -156,7 +166,7 @@ class EventController extends Controller
     {
 
         $globalOption = $this->getUser()->getGlobalOption()->getId();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into EventType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new EventType($globalOption,$location), $entity, array(
@@ -177,7 +187,7 @@ class EventController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
@@ -191,7 +201,7 @@ class EventController extends Controller
 
         if ($editForm->isValid()) {
             $mobile = $entity->getMobile();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($mobile);
+            $mobile = $this->toolManager->specialExpClean($mobile);
             $entity->setMobile($mobile);
             if( $entity->upload() and !empty($entity->getFile())){
                 $entity->removeUpload();
@@ -214,13 +224,13 @@ class EventController extends Controller
      */
     public function deleteAction(Page $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if(!empty($entity->getFile())){
             $entity->removeUpload();
         }
         $em->remove($entity);
         $em->flush();
-        $this->get('session')->getFlashBag()->add('success',"Data has been updated successfully");
+        $this->requestStack->getSession()->getFlashBag()->add('success',"Data has been updated successfully");
         return $this->redirect($this->generateUrl('event'));
     }
 
@@ -250,7 +260,7 @@ class EventController extends Controller
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Content\Entity\Page::class)->find($id);
 
         if (!$entity) {
@@ -264,7 +274,7 @@ class EventController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('news'));

@@ -3,6 +3,10 @@
 namespace App\Accounting\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Accounting\Entity\AccountPurchase;
 use App\Accounting\Entity\BusinessParticular;
 use App\Accounting\Entity\BusinessPurchase;
@@ -14,22 +18,30 @@ use App\Accounting\Form\VoucherType;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Vendor controller.
  *
  */
-class AccountVoucherController extends Controller
+class AccountVoucherController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -44,11 +56,11 @@ class AccountVoucherController extends Controller
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
         $data['processHead'] = 'Expense';
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findWithSearch($config,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Accounting/AccountVoucher/index.html.twig', array(
             'entities' => $pagination,
@@ -58,7 +70,7 @@ class AccountVoucherController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new AccountPurchase();
         $config = $this->getUser()->getGlobalOption();
         $entity->setGlobalOption($config);
@@ -75,7 +87,7 @@ class AccountVoucherController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getId();
         $entity = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
         $products = '';
@@ -101,7 +113,7 @@ class AccountVoucherController extends Controller
     private function createEditForm(AccountPurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $emHead = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountHead::class);
+        $emHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into VoucherType::configureOptions() and pass them as form options: $globalOption,$emHead), $entity, array(
         $form = $this->createForm(new VoucherType($globalOption,$emHead), $entity, array(
@@ -118,7 +130,7 @@ class AccountVoucherController extends Controller
 
     public function returnResultData(AccountPurchase $invoice,$msg=''){
 
-        $invoiceParticulars = $this->getDoctrine()->getRepository('AccountingBundle:VoucherItem')->getPurchaseItems($invoice);
+        $invoiceParticulars = $this->em->getRepository('AccountingBundle:VoucherItem')->getPurchaseItems($invoice);
         $subTotal = $invoice->getTotalAmount() > 0 ? $invoice->getTotalAmount() : 0;
         $payment = $invoice->getPayment() > 0 ? $invoice->getPayment() : 0;
         $data = array(
@@ -136,14 +148,14 @@ class AccountVoucherController extends Controller
 
     public function addParticularAction(Request $request, AccountPurchase $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $productGroup = $request->request->get('productGroup');
         $particular = $request->request->get('name');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
         $invoiceItems = array('productGroup' => $productGroup , 'name' => $particular , 'quantity' => $quantity,'price' => $price);
-        $this->getDoctrine()->getRepository('AccountingBundle:VoucherItem')->insertPurchaseItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository('AccountingBundle:VoucherItem')->updatePurchaseTotalPrice($invoice);
+        $this->em->getRepository('AccountingBundle:VoucherItem')->insertPurchaseItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository('AccountingBundle:VoucherItem')->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
         exit;
@@ -153,13 +165,13 @@ class AccountVoucherController extends Controller
 
     public function invoiceParticularDeleteAction(AccountPurchase $invoice, VoucherItem $particular){
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository('AccountingBundle:VoucherItem')->updatePurchaseTotalPrice($invoice);
+        $invoice = $this->em->getRepository('AccountingBundle:VoucherItem')->updatePurchaseTotalPrice($invoice);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
         exit;
@@ -173,7 +185,7 @@ class AccountVoucherController extends Controller
 
     public function updateAction(Request $request, AccountPurchase $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find AccountVendor entity.');
         }
@@ -188,12 +200,12 @@ class AccountVoucherController extends Controller
             $entity->setCompanyName($entity->getAccountVendor()->getCompanyName());
             $entity->setUpdated($entity->getCreated());
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_voucher_show',['id'=>$entity->getId()]));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',"May be you are missing to select bank or mobile account"
         );
         if($entity->getProcess() == 'Approved'){
@@ -213,7 +225,7 @@ class AccountVoucherController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $config = $this->getUser()->getGlobalOption();
         $entity = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
@@ -227,14 +239,14 @@ class AccountVoucherController extends Controller
 
     public function approvedAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
 
         /* @var $purchase AccountPurchase */
 
         $purchase = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
         if (!empty($purchase) and empty($purchase->getApprovedBy())) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $purchase->setProcess('approved');
             $purchase->setApprovedBy($this->getUser());
             if($purchase->getPayment() === 0 ){
@@ -247,8 +259,8 @@ class AccountVoucherController extends Controller
                 $purchase->setUpdated($datetime);
             }
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->updateVendorBalance($purchase);
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseExpenditureCash($purchase);
+            $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->updateVendorBalance($purchase);
+            $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseExpenditureCash($purchase);
             return new Response('success');
         } else {
             return new Response('failed');
@@ -264,9 +276,9 @@ class AccountVoucherController extends Controller
     {
 
         $config = $this->getUser()->getGlobalOption();
-        $entity = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
+        $entity = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(array('globalOption' => $config , 'id' => $id));
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -292,26 +304,26 @@ class AccountVoucherController extends Controller
          * Delete Journal & Account Purchase
          */
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $purchase = $this->getDoctrine()->getRepository('AccountingBundle:BusinessPurchase')->findOneBy(array('businessConfig' => $config , 'id' => $id));
+        $purchase = $this->em->getRepository('AccountingBundle:BusinessPurchase')->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if($purchase->getAsInvestment() == 1 ) {
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedBusinessPurchaseJournal($purchase);
+            $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedBusinessPurchaseJournal($purchase);
         }
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountBusinessPurchaseReverse($purchase);
+        $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountBusinessPurchaseReverse($purchase);
         $purchase->setIsReversed(true);
         $purchase->setProcess('created');
         $purchase->setApprovedBy(NULL);
         $em->flush();
-        //$this->getDoctrine()->getRepository('AccountingBundle:BusinessParticular')->getPurchaseUpdateQnt($purchase);
-        $template = $this->get('twig')->render('Accounting/AccountVoucher/purchaseReverse.html.twig', array(
+        //$this->em->getRepository('AccountingBundle:BusinessParticular')->getPurchaseUpdateQnt($purchase);
+        $template = $this->twig->render('Accounting/AccountVoucher/purchaseReverse.html.twig', array(
             'entity' => $purchase,
             'config' => $purchase->getBusinessConfig(),
         ));
-        //$this->getDoctrine()->getRepository('AccountingBundle:BusinessReverse')->purchaseReverse($purchase, $template);
+        //$this->em->getRepository('AccountingBundle:BusinessReverse')->purchaseReverse($purchase, $template);
         return $this->redirect($this->generateUrl('account_voucher_edit',array('id' => $purchase->getId())));
     }
 

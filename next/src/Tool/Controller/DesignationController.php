@@ -3,12 +3,14 @@
 namespace App\Tool\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use App\Tool\Entity\Designation;
 use App\Tool\Form\DesignationType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 
@@ -17,8 +19,14 @@ use JMS\SecurityExtraBundle\Annotation\RunAs;
  * Designation controller.
  *
  */
-class DesignationController extends Controller
+class DesignationController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Designation entities.
@@ -26,7 +34,7 @@ class DesignationController extends Controller
     #[IsGranted('ROLE_ADMIN')]
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\Tool\Entity\Designation::class)->findBy(array(),array('code'=>'asc'));
         return $this->render('Tool/Designation/index.html.twig', array(
             'entities' => $entities,
@@ -43,10 +51,10 @@ class DesignationController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('designation'));
@@ -68,7 +76,7 @@ class DesignationController extends Controller
     private function createCreateForm(Designation $entity)
     {
 
-        $em = $this->getDoctrine()->getRepository(\App\Tool\Entity\Designation::class);
+        $em = $this->em->getRepository(\App\Tool\Entity\Designation::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DesignationType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new DesignationType($em), $entity, array(
@@ -104,7 +112,7 @@ class DesignationController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Designation::class)->find($id);
 
@@ -123,7 +131,7 @@ class DesignationController extends Controller
     #[IsGranted('ROLE_ADMIN')]
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Designation::class)->find($id);
 
@@ -147,7 +155,7 @@ class DesignationController extends Controller
     */
     private function createEditForm(Designation $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Tool\Entity\Designation::class);
+        $em = $this->em->getRepository(\App\Tool\Entity\Designation::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into DesignationType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new DesignationType($em), $entity, array(
@@ -166,7 +174,7 @@ class DesignationController extends Controller
     #[IsGranted('ROLE_ADMIN')]
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Designation::class)->find($id);
 
@@ -178,7 +186,7 @@ class DesignationController extends Controller
 
         if ($editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('designation_edit', array('id' => $id)));
@@ -196,7 +204,7 @@ class DesignationController extends Controller
     #[IsGranted('ROLE_ADMIN')]
     public function deleteAction(Designation $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Product entity.');
         }
@@ -205,12 +213,12 @@ class DesignationController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }

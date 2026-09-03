@@ -3,6 +3,9 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use App\Inventory\Entity\Sales;
@@ -12,14 +15,21 @@ use App\Inventory\Entity\Sales;
  */
 class SalesGeneralController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -30,7 +40,7 @@ class SalesGeneralController extends AbstractController
     public function indexAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $entities = $em->getRepository(\App\Inventory\Entity\Sales::class)->salesLists($this->getUser(), $mode='general',$data);
         $pagination = $this->paginate($entities);
@@ -45,7 +55,7 @@ class SalesGeneralController extends AbstractController
 
     public function customerAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
@@ -63,7 +73,7 @@ class SalesGeneralController extends AbstractController
     public function newAction()
     {
         $customer = $_REQUEST['customer'] ?? '';
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new Sales();
         $globalOption = $this->getUser()->getGlobalOption();
 

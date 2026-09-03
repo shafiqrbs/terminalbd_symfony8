@@ -2,6 +2,8 @@
 
 namespace App\Hospital\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\Particular;
 use App\Hospital\Form\DoctorType;
 use App\Hospital\Form\CabinType;
@@ -9,15 +11,21 @@ use App\Hospital\Form\ParticularType;
 use App\Hospital\Form\PathologyType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 /**
  * CabinController controller.
  *
  */
-class CabinController extends Controller
+class CabinController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     /**
@@ -27,7 +35,7 @@ class CabinController extends Controller
     public function indexAction()
     {
         $entity = new Particular();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(array('hospitalConfig' => $config,'service'=> 2),array('name'=>'ASC'));
         $form = $this->createCreateForm($entity);
@@ -47,7 +55,7 @@ class CabinController extends Controller
     public function createAction(Request $request)
     {
         $entity = new Particular();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(array('hospitalConfig' => $config,'service'=>2),array('name'=>'ASC'));
 
@@ -55,15 +63,15 @@ class CabinController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setHospitalConfig($config);
-            $service = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Service::class)->find(2);
+            $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(2);
             $entity->setService($service);
             $name = $entity->getServiceGroup()->getName().'-'.$entity->getRoom();
             $entity->setName($name);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_cabin', array('id' => $entity->getId())));
@@ -106,7 +114,7 @@ class CabinController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(array('hospitalConfig' => $config,'service'=> 2),array('name'=>'ASC'));
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
@@ -150,7 +158,7 @@ class CabinController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(array('hospitalConfig' => $config,'service'=> 2),array('name'=>'ASC'));
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
@@ -165,7 +173,7 @@ class CabinController extends Controller
             $name = $entity->getServiceGroup()->getName().'-'.$entity->getRoom();
             $entity->setName($name);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_cabin'));
@@ -183,7 +191,7 @@ class CabinController extends Controller
      */
     public function deleteAction(Particular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -191,16 +199,16 @@ class CabinController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -215,7 +223,7 @@ class CabinController extends Controller
     public function statusAction(Particular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -227,7 +235,7 @@ class CabinController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_cabin'));

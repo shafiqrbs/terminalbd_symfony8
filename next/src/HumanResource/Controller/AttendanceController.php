@@ -2,6 +2,8 @@
 
 namespace App\HumanResource\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DomainUser\Entity\HrAttendance;
 use App\DomainUser\Entity\HrAttendanceMonth;
 use App\HumanResource\Entity\DailyAttendance;
@@ -10,7 +12,7 @@ use App\HumanResource\Form\EmployeeLeaveType;
 use App\User\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\DomainUser\Entity\Customer;
 use App\DomainUser\Form\CustomerType;
@@ -21,13 +23,19 @@ use Symfony\Component\Validator\Constraints\Date;
  * Customer controller.
  *
  */
-class AttendanceController extends Controller
+class AttendanceController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         return $this->render('HumanResource/Attendance/index.html.twig', array(
@@ -43,7 +51,7 @@ class AttendanceController extends Controller
      */
     public function attendanceAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         $blackoutdate ='';
@@ -62,7 +70,7 @@ class AttendanceController extends Controller
 
     public function employeeDetailsAction(User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new EmployeeLeave();
         $form = $this->createCreateForm($entity,$user->getId());
         $globalOption = $this->getUser()->getGlobalOption();
@@ -103,7 +111,7 @@ class AttendanceController extends Controller
 
     public function employeeLeaveCreateAction(Request $request ,User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new EmployeeLeave();
         $global = $this->getUser()->getGlobalOption();
         $form = $this->createCreateForm($entity,$user->getId());
@@ -125,7 +133,7 @@ class AttendanceController extends Controller
 
         $datetime = new \DateTime("now");
         if ($form->isValid() and $entity->getLeaveSetup()->getOffDay() >= $remaining) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($global);
             $entity->setEmployee($user);
             $entity->setYear($datetime->format('Y'));
@@ -134,12 +142,12 @@ class AttendanceController extends Controller
             $entity->setNoOffDay($offDay);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('attendance_user', array('user' => $user->getId())));
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'notice',$entity->getLeaveSetup()->getName() ." is not available"
         );
         $monthWiseAttendance = $em->getRepository(\App\HumanResource\Entity\Attendance::class)->findBy(array('employee'=>$user),array('year'=>'DESC','month'=>'ASC'));
@@ -157,7 +165,7 @@ class AttendanceController extends Controller
 
     public function employeeLeaveApproveAction(EmployeeLeave $leave)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $leave->setApprovedBy($this->getUser());
         $em->persist($leave);
         $em->flush();
@@ -175,7 +183,7 @@ class AttendanceController extends Controller
 
     public function employeeLeaveDeleteAction(EmployeeLeave $leave)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $em->remove($leave);
         $em->flush();
         return new Response('success');
@@ -183,7 +191,7 @@ class AttendanceController extends Controller
 
     public function manualAttendanceAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         return $this->render('HumanResource/DailyAttendance/manualAttendance.html.twig', array(

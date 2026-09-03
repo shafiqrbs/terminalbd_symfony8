@@ -2,6 +2,9 @@
 
 namespace App\Hospital\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\HmsStockOut;
 use App\Hospital\Entity\HmsStockOutItem;
 use App\Hospital\Entity\HmsVendor;
@@ -10,22 +13,29 @@ use App\Hospital\Form\StockOutItemType;
 use App\Hospital\Form\StockOutType;
 use App\Hospital\Form\VendorType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * StockOutController controller.
  *
  */
-class StockOutController extends Controller
+class StockOutController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -39,10 +49,10 @@ class StockOutController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsStockOut::class)->findBy(array('hospitalConfig' => $hospital),array('created'=>'DESC'));
+        $entities = $this->em->getRepository(\App\Hospital\Entity\HmsStockOut::class)->findBy(array('hospitalConfig' => $hospital),array('created'=>'DESC'));
         $pagination = $this->paginate($entities);
 
         return $this->render('Hospital/StockOut/index.html.twig', array(
@@ -54,7 +64,7 @@ class StockOutController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new HmsStockOut();
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity->setHospitalConfig($hospital);
@@ -68,7 +78,7 @@ class StockOutController extends Controller
 
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $entity = $em->getRepository(\App\Hospital\Entity\HmsStockOut::class)->findOneBy(array('hospitalConfig' => $hospital , 'id' => $id));
 
@@ -134,13 +144,13 @@ class StockOutController extends Controller
 
     public function addParticularAction(Request $request, HmsStockOut $invoice)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
         $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price );
-        $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsStockOutItem::class)->insertStockOutItems($invoice, $invoiceItems);
-        $invoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsStockOut::class)->updateStockOutTotalPrice($invoice);
+        $this->em->getRepository(\App\Hospital\Entity\HmsStockOutItem::class)->insertStockOutItems($invoice, $invoiceItems);
+        $invoice = $this->em->getRepository(\App\Hospital\Entity\HmsStockOut::class)->updateStockOutTotalPrice($invoice);
         $msg = 'Particular added successfully';
 	    $result = $this->returnResultData($invoice,$msg);
 	    return new Response(json_encode($result));
@@ -149,14 +159,14 @@ class StockOutController extends Controller
 
     public function invoiceParticularDeleteAction(HmsStockOut $invoice, $id){
 
-	    $em = $this->getDoctrine()->getManager();
-	    $particular = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsStockOutItem::class)->find($id);
+	    $em = $this->em;
+	    $particular = $this->em->getRepository(\App\Hospital\Entity\HmsStockOutItem::class)->find($id);
         if (empty($particular)) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsStockOut::class)->updateStockOutTotalPrice($invoice);
+        $invoice = $this->em->getRepository(\App\Hospital\Entity\HmsStockOut::class)->updateStockOutTotalPrice($invoice);
         $msg = 'Particular deleted successfully';
 		$result = $this->returnResultData($invoice,$msg);
 	    return new Response(json_encode($result));
@@ -168,7 +178,7 @@ class StockOutController extends Controller
 
 	public function returnResultData(HmsStockOut $invoice,$msg=''){
 
-		$invoiceParticulars = $this->getDoctrine()->getRepository(\App\Hospital\Entity\HmsStockOutItem::class)->getStockOutItems($invoice);
+		$invoiceParticulars = $this->em->getRepository(\App\Hospital\Entity\HmsStockOutItem::class)->getStockOutItems($invoice);
 		$subTotal = $invoice->getSubTotal() > 0 ? $invoice->getSubTotal() : 0;
 		$grandTotal = $invoice->getNetTotal() > 0 ? $invoice->getNetTotal() : 0;
 		$dueAmount = $invoice->getDue() > 0 ? $invoice->getDue() : 0;
@@ -186,7 +196,7 @@ class StockOutController extends Controller
 
     public function invoiceDiscountUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $discount = (float)$request->request->get('discount');
 	    $invoice = $request->request->get('invoice');
 
@@ -208,7 +218,7 @@ class StockOutController extends Controller
 
     public function updateAction(Request $request, HmsStockOut $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
@@ -229,7 +239,7 @@ class StockOutController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Hospital\Entity\HmsStockOut::class)->find($id);
 
@@ -243,15 +253,15 @@ class StockOutController extends Controller
 
     public function approvedAction(HmsStockOut $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!empty($entity) and $entity->getProcess() == "Done") {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
 	        $entity->setProcess('Approved');
 	        $entity->setApprovedBy($this->getUser());
             $em->flush();
           //  $accountStockOut = $em->getRepository('AccountingBundle:AccountStockOut')->insertHmsAccountStockOut($purchase);
           //  $em->getRepository(\App\Accounting\Entity\Transaction::class)->purchaseGlobalTransaction($accountStockOut);
-	        $this->getDoctrine()->getRepository(\App\Hospital\Entity\Particular::class)->insertIssueItem($entity);
+	        $this->em->getRepository(\App\Hospital\Entity\Particular::class)->insertIssueItem($entity);
 
 	        return new Response('success');
         } else {
@@ -269,7 +279,7 @@ class StockOutController extends Controller
     public function deleteAction(HmsStockOut $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -287,7 +297,7 @@ class StockOutController extends Controller
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Hospital\Entity\HmsStockOut::class)->find($id);
 
         if (!$entity) {
@@ -301,7 +311,7 @@ class StockOutController extends Controller
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_stockout'));

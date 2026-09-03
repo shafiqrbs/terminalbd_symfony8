@@ -2,6 +2,7 @@
 
 namespace App\HumanResource\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,11 @@ use App\HumanResource\Form\LeavePolicyType;
  */
 class LeavePolicyController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all LeavePolicy entities.
@@ -22,7 +28,7 @@ class LeavePolicyController extends AbstractController
      */
     public function indexAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entities = $em->getRepository(\App\HumanResource\Entity\LeavePolicy::class)->findAll();
         $entity = new LeavePolicy();
         $form = $this->createCreateForm($entity);
@@ -44,7 +50,7 @@ class LeavePolicyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
 
@@ -98,7 +104,7 @@ class LeavePolicyController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\HumanResource\Entity\LeavePolicy::class)->find($id);
 
@@ -119,7 +125,7 @@ class LeavePolicyController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\HumanResource\Entity\LeavePolicy::class)->find($id);
 
@@ -165,7 +171,7 @@ class LeavePolicyController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\HumanResource\Entity\LeavePolicy::class)->find($id);
 
@@ -198,7 +204,7 @@ class LeavePolicyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\HumanResource\Entity\LeavePolicy::class)->find($id);
 
             if (!$entity) {

@@ -3,27 +3,39 @@
 namespace App\Customer\Controller;
 
 
+use App\Tool\Service\ToolManager;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\User\Entity\Profile;
 use App\User\Entity\User;
 use App\User\Form\AgentProfileType;
 use App\User\Form\CustomerEditProfileType;
 use App\User\Form\SignupType;
 use Frontend\FrontentBundle\Service\Cart;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AgentClientController extends Controller
+class AgentClientController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly ToolManager $toolManager,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,7 +47,7 @@ class AgentClientController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $user = $this->getUser();
         $entities = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findBy(array('agent' => $user));
         $entities = $this->paginate($entities);
@@ -56,12 +68,12 @@ class AgentClientController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $intlMobile = $entity->getProfile()->getMobile();
-        $mobile = $this->get('settong.toolManageRepo')->specialExpClean($intlMobile);
+        $mobile = $this->toolManager->specialExpClean($intlMobile);
         $entity->getProfile()->setMobile($mobile);
         $data = $request->request->all();
         if ($form->isValid()) {
             $user = $this->getUser();
-            $globalOption = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->createGlobalOption($mobile,$data,$user);
+            $globalOption = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->createGlobalOption($mobile,$data,$user);
             $entity->setPlainPassword("1234");
             $entity->setGlobalOption($globalOption);
             $entity->setEnabled(true);
@@ -69,11 +81,11 @@ class AgentClientController extends Controller
             $entity->setUsername($mobile);
             $entity->setEmail($mobile.'@gmail.com');
             $entity->setRoles(array('ROLE_DOMAIN'));
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->initialSetup($entity);
-            $this->get('settong.toolManageRepo')->createDirectory($entity->getGlobalOption()->getId());
+            $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->initialSetup($entity);
+            $this->toolManager->createDirectory($entity->getGlobalOption()->getId());
 
             $dispatcher = $this->container->get('event_dispatcher');
             $dispatcher->dispatch('setting_tool.post.user_signup_msg', new \App\Tool\Event\UserSignup($entity));
@@ -89,8 +101,8 @@ class AgentClientController extends Controller
 
     private function createCreateForm(User $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
-        $em = $this->getDoctrine()->getRepository(\App\Tool\Entity\Syndicate::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
+        $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into SignupType::configureOptions() and pass them as form options: $em,$location), $entity, array(
         $form = $this->createForm(new SignupType($em,$location), $entity, array(
@@ -134,7 +146,7 @@ class AgentClientController extends Controller
      */
     private function createEditProfileForm(Profile $entity)
     {
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into AgentProfileType::configureOptions() and pass them as form options: $location), $entity, array(
         $form = $this->createForm(new AgentProfileType($location), $entity, array(
@@ -165,7 +177,7 @@ class AgentClientController extends Controller
 
     public function profileUpdateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $user = $this->getUser();
 
@@ -181,14 +193,14 @@ class AgentClientController extends Controller
 
         if ($editForm->isValid()) {
             $intlMobile = $entity->getMobile();
-            $mobile = $this->get('settong.toolManageRepo')->specialExpClean($intlMobile);
+            $mobile = $this->toolManager->specialExpClean($intlMobile);
             $entity->setMobile($mobile);
             if($entity->upload() &&  !empty($entity->getFile()) and !empty($entity->getPath()) ){
                 $entity->removeUpload();
             }
             $entity->upload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('customer_self_edit_profile'));

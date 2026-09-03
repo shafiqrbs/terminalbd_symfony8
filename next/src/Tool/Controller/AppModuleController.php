@@ -2,8 +2,10 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Tool\Entity\AppModule;
 use App\Tool\Form\AppModuleType;
@@ -12,8 +14,14 @@ use App\Tool\Form\AppModuleType;
  * AppModule controller.
  *
  */
-class AppModuleController extends Controller
+class AppModuleController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all AppModule entities.
@@ -21,7 +29,7 @@ class AppModuleController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\AppModule::class)->findAll(array(),array('name'=>'ASC'));
         return $this->render('Tool/AppModule/index.html.twig', array(
@@ -42,7 +50,7 @@ class AppModuleController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->upload();
             $em->persist($entity);
             $em->flush();
@@ -100,7 +108,7 @@ class AppModuleController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\AppModule::class)->find($id);
 
@@ -122,7 +130,7 @@ class AppModuleController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\AppModule::class)->find($id);
 
@@ -169,7 +177,7 @@ class AppModuleController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\AppModule::class)->find($id);
 
@@ -200,7 +208,7 @@ class AppModuleController extends Controller
      */
     public function deleteAction(AppModule $entity)
     {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find AppModule entity.');
             }
@@ -236,7 +244,7 @@ class AppModuleController extends Controller
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\Module::class)->find($id);
 
         if (!$entity) {
@@ -250,7 +258,7 @@ class AppModuleController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('appmodule'));

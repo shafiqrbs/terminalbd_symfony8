@@ -2,6 +2,7 @@
 
 namespace App\Appearance\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +15,11 @@ use App\Appearance\Form\MenuGroupingType;
  */
 class MenuGroupingController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     /**
      * Lists all MenuGrouping entities.
@@ -23,7 +29,7 @@ class MenuGroupingController extends AbstractController
     {
         /** @var EntityManager $em */
 
-        $entities = $this->getDoctrine()->getRepository(\App\Appearance\Entity\MenuGroup::class)->findBy(['status'=>1],['name'=>'ASC']);
+        $entities = $this->em->getRepository(\App\Appearance\Entity\MenuGroup::class)->findBy(['status'=>1],['name'=>'ASC']);
         return $this->render('Appearance/MenuGrouping/index.html.twig', [
             'entities' => $entities
         ]);
@@ -35,7 +41,7 @@ class MenuGroupingController extends AbstractController
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
 
         $posts = $request->request->all();
@@ -47,7 +53,7 @@ class MenuGroupingController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $menuGroup = $request->request->get('menuGroup');
-            $this->getDoctrine()->getRepository(\App\Appearance\Entity\MenuGrouping::class)->insertMenuGrouping($posts,$globalOption,$menuGroup);
+            $this->em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->insertMenuGrouping($posts,$globalOption,$menuGroup);
             return $this->redirect($this->generateUrl('menugrouping_sorting', ['menuGroup' => $menuGroup ]));
         }
 
@@ -84,7 +90,7 @@ class MenuGroupingController extends AbstractController
      */
     public function newAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $menuGroup = $em->getRepository(\App\Appearance\Entity\MenuGroup::class)->find($id);
         $entities = $em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['globalOption' => $globalOption,'status'=>1]);
@@ -117,7 +123,7 @@ class MenuGroupingController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->find($id);
 
@@ -139,7 +145,7 @@ class MenuGroupingController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $groupings =[];
 
 
@@ -169,11 +175,11 @@ class MenuGroupingController extends AbstractController
 
     public function sortingAction($menuGroup)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
 
         $menus = $em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->findBy(['globalOption'=>$globalOption,'parent'=>NULL,'menuGroup'=>$menuGroup],['sorting'=>'asc']);
-        $menusTree = $this->getDoctrine()->getRepository(\App\Appearance\Entity\MenuGrouping::class)->getMenuTree($menus);
+        $menusTree = $this->em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->getMenuTree($menus);
         $menuGroup = $em->getRepository(\App\Appearance\Entity\MenuGroup::class)->find($menuGroup);
 
         return $this->render('Appearance/MenuGrouping/sorting.html.twig', [
@@ -188,7 +194,7 @@ class MenuGroupingController extends AbstractController
     public function sortedAction(Request $request)
     {
         $data = $request ->request->get('menuItem');
-        $this->getDoctrine()->getRepository(\App\Appearance\Entity\MenuGrouping::class)->setMenuOrdering($data);
+        $this->em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->setMenuOrdering($data);
         exit;
 
     }

@@ -2,6 +2,8 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,12 @@ use App\Tool\Form\ThemeType;
  */
 class ThemeController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Lists all Theme entities.
@@ -22,7 +30,7 @@ class ThemeController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Tool\Entity\Theme::class)->findAll();
 
@@ -41,12 +49,12 @@ class ThemeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->upload();
             $em->persist($entity);
             $em->flush();
             //$this->createThemeFolder($entity->getFolderName());
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been inserted successfully"
             );
             return $this->redirect($this->generateUrl('theme_show', ['id' => $entity->getId()]));
@@ -114,7 +122,7 @@ class ThemeController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Theme::class)->find($id);
 
@@ -136,7 +144,7 @@ class ThemeController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Theme::class)->find($id);
 
@@ -180,7 +188,7 @@ class ThemeController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\Theme::class)->find($id);
 
@@ -196,7 +204,7 @@ class ThemeController extends AbstractController
 
             $entity->upload();
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('theme_edit', ['id' => $id]));
@@ -214,14 +222,14 @@ class ThemeController extends AbstractController
      */
     public function deleteAction(Theme $entity)
     {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Theme entity.');
             }
             $entity->removeUpload();
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
             return $this->redirect($this->generateUrl('theme'));
@@ -256,7 +264,7 @@ class ThemeController extends AbstractController
         //$data = $request->request->all();
 
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\Theme::class)->find($id);
 
         if (!$entity) {
@@ -270,7 +278,7 @@ class ThemeController extends AbstractController
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('theme'));

@@ -2,6 +2,9 @@
 
 namespace App\Inventory\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,15 +20,22 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DeliveryReturnController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -37,10 +47,10 @@ class DeliveryReturnController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $entities = $this->getDoctrine()->getManager()->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->findWithSearch($user,$data);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->findWithSearch($user,$data);
         $paginate = $this->paginate($entities);
         return $this->render('Inventory/DeliveryReturn/index.html.twig', [
             'entities' => $paginate,
@@ -51,7 +61,7 @@ class DeliveryReturnController extends AbstractController
     public function todayDeliveryReturn()
     {
         $data = ['startDate'=> date('Y-m-d'),'endDate'=> date('Y-m-d')];
-        $entities = $this->getDoctrine()->getManager()->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->findWithSearch( $this->getUser() ,$data);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->findWithSearch( $this->getUser() ,$data);
         if($entities){
             $paginate = $this->paginate($entities);
             return $paginate;
@@ -74,28 +84,28 @@ class DeliveryReturnController extends AbstractController
         $form->handleRequest($request);
         $data = $request->request->all();
         $barcode = trim($data['appstore_bundle_inventorybundle_delivery_return']['purchaseItem']);
-        $purchaseItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(['barcode' => $barcode]);
+        $purchaseItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(['barcode' => $barcode]);
 
          if ($form->isValid() and !empty($purchaseItem)) {
 
-             $deliveryItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\DeliveryItem::class)->checkItem($this->getUser(),$purchaseItem,$entity->getQuantity());
+             $deliveryItem = $this->em->getRepository(\App\Inventory\Entity\DeliveryItem::class)->checkItem($this->getUser(),$purchaseItem,$entity->getQuantity());
              if(!empty($deliveryItem) and $deliveryItem == 'valid') {
 
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->em;
                 $entity->setInventoryConfig($this->getUser()->getGlobalOption()->getInventoryConfig());
                 $entity->setBranch($branch);
                 $entity->setItem($purchaseItem->getItem());
                 $entity->setPurchaseItem($purchaseItem);
                 $em->persist($entity);
                 $em->flush();
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'success', "Data has been added successfully"
                 );
                 return $this->redirect($this->generateUrl('inventory_deliveryreturn_new'));
 
             }else{
 
-                $this->get('session')->getFlashBag()->add(
+                $this->requestStack->getSession()->getFlashBag()->add(
                     'error', "Your current branch stock ".$deliveryItem
                 );
 
@@ -108,7 +118,7 @@ class DeliveryReturnController extends AbstractController
             }
 
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error', "This barcode not found at delivery invoice in branch"
         );
         $todayDeliveryReturn = $this->todayDeliveryReturn();
@@ -161,7 +171,7 @@ class DeliveryReturnController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->find($id);
 
@@ -183,7 +193,7 @@ class DeliveryReturnController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->find($id);
 
@@ -227,7 +237,7 @@ class DeliveryReturnController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->find($id);
 
@@ -241,7 +251,7 @@ class DeliveryReturnController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('inventory_deliveryreturn_edit', ['id' => $id]));
@@ -261,7 +271,7 @@ class DeliveryReturnController extends AbstractController
     public function deleteAction($id)
     {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity = $em->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->findOneBy(['inventoryConfig'=>$inventory,'id' => $id]);
             if (!$entity) {
@@ -296,7 +306,7 @@ class DeliveryReturnController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\DeliveryReturn::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -312,7 +322,7 @@ class DeliveryReturnController extends AbstractController
     public function approveAction(DeliveryReturn $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setApprovedBy($this->getUser());
             $em->flush();
             return new Response('success');

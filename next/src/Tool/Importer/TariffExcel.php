@@ -2,7 +2,7 @@
 
 namespace App\Tool\Importer;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Tool\Entity\TaxTariff;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 

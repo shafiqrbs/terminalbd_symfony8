@@ -2,6 +2,7 @@
 
 namespace App\Bindu\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -9,6 +10,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ApiPortalController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
 
     public function portalInformationAction(Request $request)
@@ -47,7 +53,7 @@ class ApiPortalController extends AbstractController
         $key =  $this->getParameter('x-api-key');
         $value =  $this->getParameter('x-api-value');
         if ($request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
-            $data = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->apiDomains();
+            $data = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->apiDomains();
         }else{
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
 
@@ -66,7 +72,7 @@ class ApiPortalController extends AbstractController
         $key =  $this->getParameter('x-api-key');
         $value =  $this->getParameter('x-api-value');
         if ($request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
-          //  $data =$this->getDoctrine()->getRepository(\App\Tool\Entity\AppModule::class)->getAppModules();
+          //  $data =$this->em->getRepository(\App\Tool\Entity\AppModule::class)->getAppModules();
             $data = $this->getAppModules();
         }else{
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
@@ -204,7 +210,7 @@ Your growth is our priority, and every feature we create is designed to make you
         $value =  $this->getParameter('x-api-value');
         $id = $_REQUEST['id'];
         if ($request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
-            $data =$this->getDoctrine()->getRepository(\App\Tool\Entity\AppModule::class)->getAppModuleDetails($id);
+            $data =$this->em->getRepository(\App\Tool\Entity\AppModule::class)->getAppModuleDetails($id);
         }else{
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }
@@ -222,7 +228,7 @@ Your growth is our priority, and every feature we create is designed to make you
         $value =  $this->getParameter('x-api-value');
         $id = $_REQUEST['id'];
         if ($request->headers->get('X-API-KEY') == $key and $request->headers->get('X-API-VALUE') == $value) {
-            $data =$this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->apiAppDomain($id);
+            $data =$this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->apiAppDomain($id);
         }else{
             return new Response('Unauthorized access.', Response::HTTP_UNAUTHORIZED);
         }

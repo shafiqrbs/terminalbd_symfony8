@@ -4,6 +4,9 @@ namespace App\Accounting\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\Accounting\Entity\AccountHead;
@@ -17,14 +20,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TransactionController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -35,7 +45,7 @@ class TransactionController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\Accounting\Entity\Transaction::class)->getGroupByAccountHead($globalOption);
@@ -47,7 +57,7 @@ class TransactionController extends AbstractController
 		    $serviceName = $item['parentName'];
 		    $invoiceDetails[$serviceName][$key] = $item;
 		}
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->transactionOverview($globalOption);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->transactionOverview($globalOption);
         $accountHead = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['status'=>1],['name'=>'asc']);
         return $this->render('Accounting/Transaction/balancesheet.html.twig', [
             'entities' => $invoiceDetails,
@@ -63,13 +73,13 @@ class TransactionController extends AbstractController
 	public function accountCashAction()
 	{
 
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
 		$data = $_REQUEST;
 		$user = $this->getUser();
 		$transactionMethods = [1,2,3,4];
-		$entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data);
+		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data);
 		$pagination = $this->paginate($entities);
-		$overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
+		$overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
 		$globalOption = $this->getUser()->getGlobalOption();
 		$globalOption->getId();
         if(empty($data['pdf'])){
@@ -80,7 +90,7 @@ class TransactionController extends AbstractController
             ]);
 
         }else{
-            $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data)->getResult();
+            $entities = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data)->getResult();
             $html = $this->renderView(
                 'AccountingBundle:Transaction/Report:allsCashDetailsPdf.html.twig', [
                     'globalOption'                  => $this->getUser()->getGlobalOption(),
@@ -100,11 +110,11 @@ class TransactionController extends AbstractController
      */
     public function showAction(AccountHead $entity )
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->specificAccountHead($globalOption,$entity->getId());
+        $entities = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->specificAccountHead($globalOption,$entity->getId());
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->transactionOverview($globalOption,$entity->getId());
+        $overview = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->transactionOverview($globalOption,$entity->getId());
         $accountHead = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['status'=> 1],['name'=>'asc']);
         return $this->render('Accounting/Transaction/show.html.twig', [
             'entity' => $entity,
@@ -121,15 +131,15 @@ class TransactionController extends AbstractController
      */
     public function transactionCashOverviewAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $transactionMethods = [1,4];
         $globalOption = $this->getUser()->getGlobalOption();
-        $transactionCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
-        $transactionBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
-        $transactionMobileBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
-        $transactionAccountHeadCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
+        $transactionCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
+        $transactionBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
+        $transactionMobileBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
+        $transactionAccountHeadCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
         if(empty($data['pdf'])){
             return $this->render('Accounting/Transaction/cashoverview.html.twig', [
                 'transactionCashOverviews'                  => $transactionCashOverview,
@@ -160,7 +170,7 @@ class TransactionController extends AbstractController
      */
     public function transactionSummaryAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         if(empty($data)){
             $date = new DateTime("now");
@@ -170,18 +180,18 @@ class TransactionController extends AbstractController
         }
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
-        $todayCustomerSales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->dailySalesReceive($this->getUser(),$data);
-        $todayVendorSales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->dailyPurchasePayment($this->getUser(),$data);
-        $todayExpense = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->dailyPurchasePayment($this->getUser(),$data);
-        $todayJournal = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournalItem::class)->dailyJournal($this->getUser(),$data);
-        $todayLoan = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountLoan::class)->dailyLoan($this->getUser(),$data);
+        $todayCustomerSales = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->dailySalesReceive($this->getUser(),$data);
+        $todayVendorSales = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->dailyPurchasePayment($this->getUser(),$data);
+        $todayExpense = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->dailyPurchasePayment($this->getUser(),$data);
+        $todayJournal = $this->em->getRepository(\App\Accounting\Entity\AccountJournalItem::class)->dailyJournal($this->getUser(),$data);
+        $todayLoan = $this->em->getRepository(\App\Accounting\Entity\AccountLoan::class)->dailyLoan($this->getUser(),$data);
 
         $transactionMethods = [1,4];
 
-        $transactionCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
-        $transactionBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
-        $transactionMobileBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
-        $transactionAccountHeadCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
+        $transactionCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
+        $transactionBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
+        $transactionMobileBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
+        $transactionAccountHeadCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
 
         if(empty($data['pdf'])){
 
@@ -227,14 +237,14 @@ class TransactionController extends AbstractController
 
     public function transactionCashOverviewPdfAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $transactionMethods = [1,4];
         $globalOption = $this->getUser()->getGlobalOption();
-        $transactionCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
-        $transactionBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
-        $transactionMobileBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
-        $transactionAccountHeadCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
+        $transactionCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
+        $transactionBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
+        $transactionMobileBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
+        $transactionAccountHeadCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
         $html = $this->renderView('Accounting/Transaction/cashoverviewPdf.html.twig', [
             'globalOption'                          => $this->getUser()->getGlobalOption(),
             'transactionCashOverviews'              => $transactionCashOverview,
@@ -264,14 +274,14 @@ class TransactionController extends AbstractController
      */
     public function cashAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $transactionMethods = [1,4];
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
-        $processHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ProcessHead::class)->findBy(['status'=>1]);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
+        $processHeads = $this->em->getRepository(\App\Accounting\Entity\ProcessHead::class)->findBy(['status'=>1]);
 
         if(empty($data['pdf'])){
 
@@ -303,17 +313,17 @@ class TransactionController extends AbstractController
      */
     public function bankAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
         $globalOption = $user->getGlobalOption();
         $transactionMethods = [2];
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
-        $processHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ProcessHead::class)->findBy(['status'=>1]);
-        $accountBanks = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption'=>$globalOption,'status'=>1]);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
+        $processHeads = $this->em->getRepository(\App\Accounting\Entity\ProcessHead::class)->findBy(['status'=>1]);
+        $accountBanks = $this->em->getRepository(\App\Accounting\Entity\AccountBank::class)->findBy(['globalOption'=>$globalOption,'status'=>1]);
 
         return $this->render('Accounting/Transaction/bank.html.twig', [
             'entities' => $pagination,
@@ -331,16 +341,16 @@ class TransactionController extends AbstractController
      */
     public function mobileBankAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $globalOption = $user->getGlobalOption();
         $transactionMethods = [3];
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data);
         $pagination = $this->paginate($entities);
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
-        $processHeads = $this->getDoctrine()->getRepository(\App\Accounting\Entity\ProcessHead::class)->findBy(['status'=>1]);
-        $accountMobileBanks = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption' => $globalOption,'status' => 1]);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
+        $processHeads = $this->em->getRepository(\App\Accounting\Entity\ProcessHead::class)->findBy(['status'=>1]);
+        $accountMobileBanks = $this->em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->findBy(['globalOption' => $globalOption,'status' => 1]);
         return $this->render('Accounting/Transaction/mobilebank.html.twig',[
             'entities'              => $pagination,
             'overview'              => $overview,
@@ -353,7 +363,7 @@ class TransactionController extends AbstractController
 
     public function purchaseExpenseAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         $transactionMethods = [1,2,3,4];
@@ -361,7 +371,7 @@ class TransactionController extends AbstractController
             $compare = new DateTime("now");
             $data['date'] = $compare->format('Y-m-d');
         }
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->purchaseExpense($user,$transactionMethods,$data);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->purchaseExpense($user,$transactionMethods,$data);
         $globalOption = $this->getUser()->getGlobalOption();
 
         $date ="purchase-expense-{$data['date']}.pdf";
@@ -387,7 +397,7 @@ class TransactionController extends AbstractController
 
     public function monthlyAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         if(empty($data)){
@@ -409,13 +419,13 @@ class TransactionController extends AbstractController
             $start =  $compare->format("Y-m-{$no}");
             $day =  $compare->format("{$no}-m-Y");
             $data['startDate'] = $start;
-            $openingBalance[$day] = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->openingBalanceGroup($user,'',$data);
+            $openingBalance[$day] = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->openingBalanceGroup($user,'',$data);
         }
-        $sales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Sales',$data);
-        $purchase = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Purchase',$data);
-        $purchaseCommission = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Purchase-Commission',$data);
-        $expenditure = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Expenditure',$data);
-        $journal = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Journal',$data);
+        $sales = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Sales',$data);
+        $purchase = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Purchase',$data);
+        $purchaseCommission = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Purchase-Commission',$data);
+        $expenditure = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Expenditure',$data);
+        $journal = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Journal',$data);
 
         if(empty($data['pdf'])){
 
@@ -449,7 +459,7 @@ class TransactionController extends AbstractController
 
     public function yearlyAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
         if(empty($data)){
@@ -466,14 +476,14 @@ class TransactionController extends AbstractController
             $compare = new DateTime("{$year}-{$month}-01");
             $start =  $compare->format("Y-m-01");
             $data['startDate'] = $start;
-            $openingBalance[$i] = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->openingBalanceGroup($user,'',$data);
+            $openingBalance[$i] = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->openingBalanceGroup($user,'',$data);
             $i++;
         }
-        $sales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Sales',$data);
-        $purchase = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Purchase',$data);
-        $purchaseCommission = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Purchase-Commission',$data);
-        $expenditure = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Expenditure',$data);
-        $journal = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Journal',$data);
+        $sales = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Sales',$data);
+        $purchase = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Purchase',$data);
+        $purchaseCommission = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Purchase-Commission',$data);
+        $expenditure = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Expenditure',$data);
+        $journal = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Journal',$data);
         if(empty($data['pdf'])){
 
             return $this->render('AccountingBundle:Transaction/Report:yearly.html.twig',[
@@ -518,7 +528,7 @@ class TransactionController extends AbstractController
     public function transactionJournalAction()
     {
         $globalOption = $this->getUser()->getglobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->finalTransaction($globalOption);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->finalTransaction($globalOption);
         $paginate =$this->paginate($entities);
         return $this->render('Accounting/Transaction/transactionJournal.html.twig', [
             'entities' => $paginate,
@@ -529,7 +539,7 @@ class TransactionController extends AbstractController
     public function trailBalanceAction()
     {
         $globalOption = $this->getUser()->getglobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->finalTransaction($globalOption);
+        $entities = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->finalTransaction($globalOption);
         $paginate =$this->paginate($entities);
 
         return $this->render('Accounting/Transaction/transactionTrailBalance.html.twig', [
@@ -540,7 +550,7 @@ class TransactionController extends AbstractController
 
     public function balanceSheetAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $search = $_REQUEST;
         $data = [];
         if(!empty($search)){
@@ -597,7 +607,7 @@ class TransactionController extends AbstractController
 
     public function balanceSheetxAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entitiesDebit = $em->getRepository(\App\Accounting\Entity\Transaction::class)->getGroupByAccountHead($globalOption);
@@ -622,7 +632,7 @@ class TransactionController extends AbstractController
 
     public function dailyTransactionSheet()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
 
@@ -670,10 +680,10 @@ class TransactionController extends AbstractController
 
     public function incomeAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $overview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineIncome($user,$data);
+        $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineIncome($user,$data);
         if(empty($data['pdf'])){
             return $this->render('AccountingBundle:Report/Medicine:income.html.twig', [
                 'overview' => $overview,

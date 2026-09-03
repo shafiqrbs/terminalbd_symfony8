@@ -2,9 +2,12 @@
 
 namespace App\Location\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Location\Entity\Location;
 use App\Location\Form\LocationType;
@@ -13,8 +16,15 @@ use App\Location\Form\LocationType;
  * Location controller.
  *
  */
-class LocationController extends Controller
+class LocationController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     /**
      * Lists all Location entities.
@@ -22,7 +32,7 @@ class LocationController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entities = $em->getRepository(\App\Location\Entity\Location::class)->findAll();
         $pagination = $this->paginate($entities);
@@ -34,10 +44,10 @@ class LocationController extends Controller
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             30  /*limit per page*/
         );
         return $pagination;
@@ -55,7 +65,7 @@ class LocationController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($entity);
             $em->flush();
 
@@ -77,7 +87,7 @@ class LocationController extends Controller
      */
     private function createCreateForm(Location $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $em = $this->em->getRepository(\App\Location\Entity\Location::class);
 
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into LocationType::configureOptions() and pass them as form options: $em), $entity, array(
@@ -114,7 +124,7 @@ class LocationController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Location\Entity\Location::class)->find($id);
 
@@ -136,7 +146,7 @@ class LocationController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Location\Entity\Location::class)->find($id);
 
@@ -163,7 +173,7 @@ class LocationController extends Controller
     */
     private function createEditForm(Location $entity)
     {
-        $em = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $em = $this->em->getRepository(\App\Location\Entity\Location::class);
 
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into LocationType::configureOptions() and pass them as form options: $em), $entity, array(
@@ -184,7 +194,7 @@ class LocationController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Location\Entity\Location::class)->find($id);
 
@@ -218,7 +228,7 @@ class LocationController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity = $em->getRepository(\App\Location\Entity\Location::class)->find($id);
 
             if (!$entity) {
@@ -253,7 +263,7 @@ class LocationController extends Controller
     {
         $item = $_REQUEST['q'];
         if ($item) {
-            $item = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class)->searchAutoComplete($item);
+            $item = $this->em->getRepository(\App\Location\Entity\Location::class)->searchAutoComplete($item);
         }
         return new JsonResponse($item);
     }

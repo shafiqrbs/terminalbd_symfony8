@@ -2,6 +2,9 @@
 
 namespace App\HumanResource\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\HumanResource\Entity\Attendance;
@@ -15,14 +18,21 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DailyAttendanceController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         return $pagination;
@@ -35,7 +45,7 @@ class DailyAttendanceController extends AbstractController
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $em->getRepository(\App\HumanResource\Entity\DailyAttendance::class)->attendanceYearMonth($globalOption,$data);
@@ -52,7 +62,7 @@ class DailyAttendanceController extends AbstractController
      */
     public function attendanceAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $blackoutdate ='';
 
@@ -62,8 +72,8 @@ class DailyAttendanceController extends AbstractController
         if($blackOutDate){
             $blackoutdate = (array_map(trim(...),array_filter(explode(',',$blackOutDate))));
         }
-        $this->getDoctrine()->getRepository(\App\HumanResource\Entity\Attendance::class)->setupMonthlyAttendance($globalOption,$employees,$blackoutdate);
-        $currentMonthEmployeeAttendance = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\Attendance::class)->currentMonthEmployeeAttendance($globalOption);
+        $this->em->getRepository(\App\HumanResource\Entity\Attendance::class)->setupMonthlyAttendance($globalOption,$employees,$blackoutdate);
+        $currentMonthEmployeeAttendance = $this->em->getRepository(\App\HumanResource\Entity\Attendance::class)->currentMonthEmployeeAttendance($globalOption);
 
         return $this->render('HumanResource/DailyAttendance/attendance.html.twig', [
             'globalOption'                          => $globalOption,
@@ -78,12 +88,12 @@ class DailyAttendanceController extends AbstractController
     public function addAttendanceAction(Attendance $attendance)
     {
         $present = $_REQUEST['present'];
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $datetime = new DateTime("now");
         $today  = $datetime->format('d');
         $month  = $datetime->format('F');
         $year   = $datetime->format('Y');
-        $exist = $this->getDoctrine()->getRepository(\App\HumanResource\Entity\DailyAttendance::class)->checkLeaveToday($attendance);
+        $exist = $this->em->getRepository(\App\HumanResource\Entity\DailyAttendance::class)->checkLeaveToday($attendance);
         if($exist){
             $entity = $exist;
         }else{
@@ -107,7 +117,7 @@ class DailyAttendanceController extends AbstractController
         $entity->setYear($year);
         $em->persist($entity);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\HumanResource\Entity\Attendance::class)->employeeTotalPresentDay($attendance);
+        $this->em->getRepository(\App\HumanResource\Entity\Attendance::class)->employeeTotalPresentDay($attendance);
         exit;
 
     }
@@ -115,7 +125,7 @@ class DailyAttendanceController extends AbstractController
     public function showAction($month,$year)
     {
         $showMonth = new DateTime("$month $year");
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $blackoutdate ='';
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployeeEntities($globalOption);
@@ -134,7 +144,7 @@ class DailyAttendanceController extends AbstractController
 
     public function employeeList()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         return $this->render('HumanResource/DailyAttendance/employee.html.twig', [
@@ -145,7 +155,7 @@ class DailyAttendanceController extends AbstractController
 
     public function employeeAttendance(User $user)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         return $this->render('HumanResource/DailyAttendance/employee.html.twig', [
@@ -158,7 +168,7 @@ class DailyAttendanceController extends AbstractController
 
     public function manualAttendanceAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
         return $this->render('HumanResource/DailyAttendance/manualAttendance.html.twig', [

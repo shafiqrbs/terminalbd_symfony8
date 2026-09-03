@@ -3,6 +3,10 @@
 namespace App\Medicine\Controller;
 
 
+use Twig\Environment;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Medicine\Entity\MedicinePrepurchase;
 use App\Medicine\Entity\MedicinePrepurchaseItem;
 use App\Medicine\Entity\MedicinePurchase;
@@ -18,7 +22,7 @@ use Knp\Snappy\Pdf;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 
@@ -26,15 +30,23 @@ use Symfony\Component\Serializer\Encoder\JsonEncode;
  * Prepurchase controller.
  *
  */
-class PrepurchaseController extends Controller
+class PrepurchaseController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+        private readonly Environment $twig,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -48,10 +60,10 @@ class PrepurchaseController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->findWithSearch($config,$data);
+        $entities = $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->findWithSearch($config,$data);
         $pagination = $this->paginate($entities);
         return $this->render('Medicine/Prepurchase/index.html.twig', array(
             'entities' => $pagination,
@@ -66,11 +78,11 @@ class PrepurchaseController extends Controller
     public function createAction(Request $request) {
 
     	$data = explode( ',', $request->cookies->get( 'barcodes' ) );
-  	    $em = $this->getDoctrine()->getManager();
+  	    $em = $this->em;
 	    if ( is_null( $data ) ) {
 		    return $this->redirect( $this->generateUrl( 'medicine_stock_short_item' ) );
 	    }
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
 	    $entity = new MedicinePrepurchase();
 	    $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
 	    $entity->setMedicineConfig($config);
@@ -79,10 +91,10 @@ class PrepurchaseController extends Controller
 	    foreach ($data as $key => $value ){
 		    $stock = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($value);
 		    if(!empty($stock)){
-			    $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->insertShortList($entity,$stock);
+			    $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->insertShortList($entity,$stock);
 		    }
 	    }
-        $invoice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($entity);
+        $invoice = $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($entity);
 	    return $this->redirect($this->generateUrl('medicine_prepurchase_edit', array('id' => $entity->getId())));
 
     }
@@ -90,7 +102,7 @@ class PrepurchaseController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new MedicinePrepurchase();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity->setMedicineConfig($config);
@@ -103,7 +115,7 @@ class PrepurchaseController extends Controller
 
     public function editAction(Request $request , $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = $em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->findOneBy(array('medicineConfig' => $config , 'id' => $id));
         if (!$entity) {
@@ -113,7 +125,7 @@ class PrepurchaseController extends Controller
         $editForm = $this->createEditForm($entity);
         unset($_COOKIE['barcodes']);
         setcookie('barcodes', '', time() - 3600, '/');
-        $brands = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
+        $brands = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
         return $this->render('Medicine/Prepurchase/new.html.twig', array(
             'entity' => $entity,
             'brands' => $brands,
@@ -126,13 +138,13 @@ class PrepurchaseController extends Controller
     {
         set_time_limit(0);
         ignore_user_abort(true);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = $em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->findOneBy(array('medicineConfig' => $config , 'id' => $id));
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
-        $return = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->purchaseGenerate($entity->getId());
+        $return = $this->em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->purchaseGenerate($entity->getId());
         if($return == 'invalid'){
             return $this->redirect($this->generateUrl('medicine_prepurchase'));
         }else{
@@ -208,16 +220,16 @@ class PrepurchaseController extends Controller
     public function stockItemCreateAction(Request $request,MedicinePrepurchase $purchase)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $request->request->all();
         $entity = new MedicineStock();
         $form = $this->createStockItemForm($entity, $purchase);
         $form->handleRequest($request);
         $medicine = $data['medicineStock']['name'];
         $quantity = $data['medicineStock']['purchaseQuantity'];
-        $checkStockMedicine = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=>$config,'id'=>$medicine));
-        $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->insertStockPurchaseItems($purchase, $checkStockMedicine, $quantity);
-        $invoice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($purchase);
+        $checkStockMedicine = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig'=>$config,'id'=>$medicine));
+        $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->insertStockPurchaseItems($purchase, $checkStockMedicine, $quantity);
+        $invoice = $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($purchase);
         $msg = 'Medicine added successfully';
         $result = $this->returnResultData($invoice, $msg);
         return new Response(json_encode($result));
@@ -227,8 +239,8 @@ class PrepurchaseController extends Controller
     public function purchaseItemUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $purchase = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->updatePurchaseItem($data);
-        $invoice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($purchase);
+        $purchase = $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->updatePurchaseItem($data);
+        $invoice = $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($purchase);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
     }
@@ -256,13 +268,13 @@ class PrepurchaseController extends Controller
     public function invoiceParticularDeleteAction(MedicinePrepurchase $invoice, MedicinePrepurchaseItem $particular){
 
         $stock = $particular->getMedicineStock();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$particular) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($particular);
         $em->flush();
-        $invoice = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($invoice);
+        $invoice = $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($invoice);
         $msg = 'Medicine added successfully';
         $result = $this->returnResultData($invoice,$msg);
         return new Response(json_encode($result));
@@ -272,7 +284,7 @@ class PrepurchaseController extends Controller
     public function invoiceDiscountUpdateAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $discountCal = (float)$request->request->get('discount');
         $invoice = $request->request->get('purchase');
         $entity = $em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->find($invoice);
@@ -297,7 +309,7 @@ class PrepurchaseController extends Controller
 
     public function updateAction(Request $request, MedicinePrepurchase $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity.');
         }
@@ -310,7 +322,7 @@ class PrepurchaseController extends Controller
             return $this->redirect($this->generateUrl('medicine_prepurchase_show', array('id' => $entity->getId())));
         }
         $stockItemForm = $this->createStockItemForm(new MedicineStock(), $entity);
-        $brands = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
+        $brands = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
 
         return $this->render('Medicine/Prepurchase/new.html.twig', array(
             'entity' => $entity,
@@ -327,7 +339,7 @@ class PrepurchaseController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
 	    $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
 	    $entity = $em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->findOneBy(array('medicineConfig' => $config , 'id' => $id));
@@ -343,7 +355,7 @@ class PrepurchaseController extends Controller
 
     public function approvedAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 	    $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
 	    $purchase = $em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->findOneBy(array('medicineConfig' => $config , 'id' => $id));
 	    if (!empty($purchase) and $purchase->getProcess() == "Complete" ) {
@@ -362,7 +374,7 @@ class PrepurchaseController extends Controller
     public function deleteAction(MedicinePrepurchase $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
@@ -379,7 +391,7 @@ class PrepurchaseController extends Controller
      */
     public function statusAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->find($id);
 
         if (!$entity) {
@@ -393,7 +405,7 @@ class PrepurchaseController extends Controller
             $entity->setStatus(true);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('medicine_vendor'));
@@ -402,7 +414,7 @@ class PrepurchaseController extends Controller
     public function inlineUpdateAction(Request $request)
     {
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->find($data['pk']);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find PurchaseItem entity.');
@@ -416,7 +428,7 @@ class PrepurchaseController extends Controller
             $entity->setSalesPrice((float)$data['value']);
             $entity->setSubTotal((float)$data['value'] * $entity->getQuantity());
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($entity->getMedicinePrepurchase());
+            $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->updatePurchaseTotalPrice($entity->getMedicinePrepurchase());
         }
 	    if($data['name'] == 'expirationDate' and !empty($data['value'])){
 		    $expirationEndDate = $data['value'];
@@ -433,7 +445,7 @@ class PrepurchaseController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -464,16 +476,16 @@ class PrepurchaseController extends Controller
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if($purchase->getAsInvestment() == 1 ) {
-            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedMedicinePrepurchaseJournal($purchase);
+            $this->em->getRepository(\App\Accounting\Entity\AccountJournal::class)->removeApprovedMedicinePrepurchaseJournal($purchase);
         }
-        $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountMedicinePrepurchaseReverse($purchase);
+        $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountMedicinePrepurchaseReverse($purchase);
         $purchase->setRevised(true);
         $purchase->setProcess('Created');
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->getPurchaseUpdateQnt($purchase);
-        $template = $this->get('twig')->render('Medicine/Prepurchase/purchaseReverse.html.twig', array(
+        $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getPurchaseUpdateQnt($purchase);
+        $template = $this->twig->render('Medicine/Prepurchase/purchaseReverse.html.twig', array(
             'entity' => $purchase,
             'config' => $purchase->getMedicineConfig(),
         ));
@@ -484,7 +496,7 @@ class PrepurchaseController extends Controller
     public function reverseShowAction($id)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $entity = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineReverse::class)->findOneBy(array('medicineConfig' => $config, 'medicinePurchase' => $id));
+        $entity = $this->em->getRepository(\App\Medicine\Entity\MedicineReverse::class)->findOneBy(array('medicineConfig' => $config, 'medicinePurchase' => $id));
         return $this->render('Medicine/MedicineReverse/purchase.html.twig', array(
             'entity' => $entity,
         ));
@@ -494,7 +506,7 @@ class PrepurchaseController extends Controller
 
 	public function downloadPdfAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity = $em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->findOneBy(array('medicineConfig' => $config , 'id' => $id));
         if (!$entity) {
@@ -529,7 +541,7 @@ class PrepurchaseController extends Controller
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new MedicinePrepurchase();
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $entity->setMedicineConfig($config);
@@ -542,7 +554,7 @@ class PrepurchaseController extends Controller
         $em->persist($entity);
         $em->flush();
 
-        $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->mergePurchaseItem($entity,$vendor);
+        $this->em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->mergePurchaseItem($entity,$vendor);
 
         return $this->redirect($this->generateUrl('medicine_prepurchase_edit', array('id' => $entity->getId())));
 
@@ -554,8 +566,8 @@ class PrepurchaseController extends Controller
      */
     public function updateBrandAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
-        $purchase = $this->getDoctrine()->getRepository(MedicinePrepurchase::class)->find($id);
+        $em = $this->em;
+        $purchase = $this->em->getRepository(MedicinePrepurchase::class)->find($id);
         $brand = $_REQUEST['brandName'];
         $purchase->setBrandName($brand);
         $em->flush();
@@ -565,12 +577,12 @@ class PrepurchaseController extends Controller
     public function autoPurchaseStockItemSearchAction(Request $request)
     {
         $purchase = trim($_REQUEST['purchase']);
-        $entity = $this->getDoctrine()->getRepository(MedicinePrepurchase::class)->find($purchase);
+        $entity = $this->em->getRepository(MedicinePrepurchase::class)->find($purchase);
         $brand = $entity->getBrandName();
         $item = trim($_REQUEST['q']);
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoPurchaseStockItemWithBrand($item,$inventory,$brand);
+            $item = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->searchAutoPurchaseStockItemWithBrand($item,$inventory,$brand);
         }
         return new JsonResponse($item);
     }

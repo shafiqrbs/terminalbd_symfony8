@@ -3,22 +3,32 @@
 namespace App\Customer\Controller;
 
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Frontend\FrontentBundle\Service\Cart;
 use App\Tool\Entity\Module;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CustomerController extends Controller
+class CustomerController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -29,7 +39,7 @@ class CustomerController extends Controller
         
         $user = $this->getUser();
         if(!empty($shop)){
-            $globalOption = $this->getDoctrine()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(array('slug' => $shop));
+            $globalOption = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(array('slug' => $shop));
         }else{
             $globalOption ='';
         }
@@ -48,8 +58,8 @@ class CustomerController extends Controller
 
     public function newAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$this->getUser()->getId()));
+        $em = $this->em;
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$this->getUser()->getId()));
         $entity = new BusinessInvoice();
         $editForm = $this->createCreateForm($entity);
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
@@ -72,7 +82,7 @@ class CustomerController extends Controller
     private function createCreateForm(BusinessInvoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        $location = $this->getDoctrine()->getRepository(\App\Location\Entity\Location::class);
+        $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         // TODO(migration): SF3+ takes a form type class-string, not an instance.
         // Move these constructor arguments into CustomerInvoiceType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
         $form = $this->createForm(new CustomerInvoiceType($globalOption,$location), $entity, array(
@@ -97,7 +107,7 @@ class CustomerController extends Controller
         $entity = new BusinessInvoice();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$user));
+        $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$user));
 
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
         if (($form->isValid() && $method == 'cash') ||
@@ -106,17 +116,17 @@ class CustomerController extends Controller
         ) {
             var_dump($data);
             exit;
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setBusinessConfig($config->getBusinessConfig());
             $entity->setCustomer($customer);
             $entity->setMobile($customer->getMobile());
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Data has been inserted successfully"
             );
-            $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertCustomerInvoiceParticular($entity, $data);
-            $this->getDoctrine()->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
+            $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertCustomerInvoiceParticular($entity, $data);
+            $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);
             return $this->redirect($this->generateUrl('customerweb_invoice', array('shop' => $config->getSlug())));
         }
 
@@ -139,7 +149,7 @@ class CustomerController extends Controller
     {
 
         $globalOption = $this->getUser()->getGlobalOption();
-        $entities = $this->getDoctrine()->getRepository(\App\Content\Entity\Page::class)->findModuleContentList($globalOption,$module->getId());
+        $entities = $this->em->getRepository(\App\Content\Entity\Page::class)->findModuleContentList($globalOption,$module->getId());
         $pagination = $this->paginate($entities);
         return $this->render('Customer/Customer/module.html.twig', array(
             'globalOption' => $globalOption,

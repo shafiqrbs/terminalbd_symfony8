@@ -3,6 +3,9 @@
 namespace App\Inventory\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Inventory\Entity\DeliveryItem;
@@ -20,15 +23,22 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DeliveryController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 
     public function paginate($entities)
     {
 
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         return $pagination;
@@ -38,12 +48,12 @@ class DeliveryController extends AbstractController
 
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $entities = $this->getDoctrine()->getManager()->getRepository(\App\Inventory\Entity\Delivery::class)->findWithSearch($user,$data);
+        $entities = $this->em->getRepository(\App\Inventory\Entity\Delivery::class)->findWithSearch($user,$data);
         $paginate = $this->paginate($entities);
-        $shops = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Branches::class)->findBy(['globalOption'=> $this->getUser()->getGlobalOption()],['name'=>'ASC']);
+        $shops = $this->em->getRepository(\App\DomainUser\Entity\Branches::class)->findBy(['globalOption'=> $this->getUser()->getGlobalOption()],['name'=>'ASC']);
         return $this->render('Inventory/Delivery/index.html.twig', [
             'entities' => $paginate,
             'shops' => $shops,
@@ -57,15 +67,15 @@ class DeliveryController extends AbstractController
     public function createAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = new DeliveryItem();
         $barcode = $request->request->get('barcode');
         $quantity = $request->request->get('quantity');
         $delivery = $request->request->get('delivery');
 
-        $purchaseItem = $this->getDoctrine()->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(['barcode' => $barcode]);
+        $purchaseItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(['barcode' => $barcode]);
         $delivery =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->find($delivery);
-        $receiveQuantity = $this->getDoctrine()->getRepository(\App\Inventory\Entity\DeliveryItem::class)->checkTotalReceiveQuantity($this->getUser(), $purchaseItem);
+        $receiveQuantity = $this->em->getRepository(\App\Inventory\Entity\DeliveryItem::class)->checkTotalReceiveQuantity($this->getUser(), $purchaseItem);
         $remainingQnt = ($purchaseItem->getQuantity() - $receiveQuantity);
         if ($remainingQnt >= $quantity){
 
@@ -78,14 +88,14 @@ class DeliveryController extends AbstractController
             $em->persist($entity);
             $em->flush();
 
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\Delivery::class)->updateDeliveryTotal($delivery);
-            $deliveryItems =$this->getDoctrine()->getRepository(\App\Inventory\Entity\Delivery::class)->getDeliveryItems($delivery);
+            $this->em->getRepository(\App\Inventory\Entity\Delivery::class)->updateDeliveryTotal($delivery);
+            $deliveryItems =$this->em->getRepository(\App\Inventory\Entity\Delivery::class)->getDeliveryItems($delivery);
 
             return new Response(json_encode(['deliveryItems' => $deliveryItems ,'totalAmount' => $delivery->getTotalAmount(),'totalItem' => $delivery->getTotalItem() ,'totalQuantity' => $delivery->getTotalQuantity(),'msg' => 'success']));
 
         }else{
 
-            $deliveryItems =$this->getDoctrine()->getRepository(\App\Inventory\Entity\Delivery::class)->getDeliveryItems($delivery);
+            $deliveryItems =$this->em->getRepository(\App\Inventory\Entity\Delivery::class)->getDeliveryItems($delivery);
             return new Response(json_encode(['deliveryItems' => $deliveryItems ,'totalAmount' => $delivery->getTotalAmount(),'totalItem' => $delivery->getTotalItem() ,'totalQuantity' => $delivery->getTotalQuantity() ,'msg' => 'invalid barcode or quantity']));
         }
         exit;
@@ -100,7 +110,7 @@ class DeliveryController extends AbstractController
         $shop = $request->request->get('shop');
         $grn = $request->request->get('grn');
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $purchase = $em->getRepository(\App\Inventory\Entity\Purchase::class)->findOneBy(['grn' => $grn]);
         if($shop > 0 and !empty($purchase) and !empty($shop) ){
@@ -125,12 +135,12 @@ class DeliveryController extends AbstractController
                 $em->flush($delivery);
 
             }
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\Delivery::class)->updateDeliveryTotal($entity);
+            $this->em->getRepository(\App\Inventory\Entity\Delivery::class)->updateDeliveryTotal($entity);
             return $this->redirect($this->generateUrl('inventory_delivery_edit', [ 'code' => $entity->getInvoice()]));
 
         }else{
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', "Your missing branch or grn no"
             );
             return $this->redirect($this->generateUrl('inventory_delivery'));
@@ -147,7 +157,7 @@ class DeliveryController extends AbstractController
     {
         $entity = new Delivery();
         $shop = $_REQUEST['shop'] ?? '';
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
 
         if($shop > 0 ){
@@ -169,7 +179,7 @@ class DeliveryController extends AbstractController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Delivery::class)->find($id);
 
@@ -187,7 +197,7 @@ class DeliveryController extends AbstractController
     #[IsGranted('ROLE_DOMAIN_INVENTORY_BRANCH')]
     public function editAction($code)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Delivery::class)->findOneBy(['invoice' =>$code ]);
 
@@ -227,7 +237,7 @@ class DeliveryController extends AbstractController
     #[IsGranted('ROLE_DOMAIN_INVENTORY_BRANCH')]
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Inventory\Entity\Delivery::class)->find($id);
 
@@ -237,9 +247,9 @@ class DeliveryController extends AbstractController
         if($request->request->get('save') == 'save'){
             $entity->setProcess('completed');
             $em->flush();
-            $this->getDoctrine()->getRepository(\App\Inventory\Entity\Delivery::class)->updateDeliveryTotal($entity);
+            $this->em->getRepository(\App\Inventory\Entity\Delivery::class)->updateDeliveryTotal($entity);
         }
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Data has been updated successfully"
         );
         return $this->redirect($this->generateUrl('inventory_delivery'));
@@ -254,7 +264,7 @@ class DeliveryController extends AbstractController
     public function deleteAction($id)
     {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity = $em->getRepository(\App\Inventory\Entity\Delivery::class)->findOneBy(['inventoryConfig'=>$inventory,'id' => $id]);
             if (!$entity) {
@@ -263,7 +273,7 @@ class DeliveryController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
            return $this->redirect($this->generateUrl('inventory_delivery'));
@@ -276,13 +286,13 @@ class DeliveryController extends AbstractController
     public function deliveryItemDeleteAction(Delivery $delivery , DeliveryItem $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig()->getId();
         if ($entity->getDelivery()->getInventoryConfig()->getId() == $inventory){
             $em->remove($entity);
             $em->flush();
         }
-        $this->getDoctrine()->getRepository(\App\Inventory\Entity\Delivery::class)->updateDeliveryTotal($delivery);
+        $this->em->getRepository(\App\Inventory\Entity\Delivery::class)->updateDeliveryTotal($delivery);
         exit;
     }
 
@@ -292,7 +302,7 @@ class DeliveryController extends AbstractController
         $item = $_REQUEST['q'];
         if ($item) {
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-            $item = $this->getDoctrine()->getRepository(\App\Inventory\Entity\Delivery::class)->searchAutoComplete($item,$inventory);
+            $item = $this->em->getRepository(\App\Inventory\Entity\Delivery::class)->searchAutoComplete($item,$inventory);
         }
         return new JsonResponse($item);
     }
@@ -308,7 +318,7 @@ class DeliveryController extends AbstractController
     public function approveAction(Delivery $entity)
     {
         if (!empty($entity)) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setApprovedBy($this->getUser());
             $entity->setProcess('approved');
             $em->flush();

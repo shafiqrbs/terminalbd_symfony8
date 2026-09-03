@@ -4,6 +4,7 @@ namespace App\Hospital\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
 use App\DomainUser\Entity\Customer;
@@ -12,6 +13,11 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 
 class DefaultController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
 
     public function indexAction()
     {
@@ -19,18 +25,19 @@ class DefaultController extends AbstractController
         /* @var GlobalOption $globalOption */
 
         $globalOption = $this->getUser()->getGlobalOption();
+        // TODO(migration): AbstractController::getDoctrine() was removed; inject ManagerRegistry.
         $em = $this->getDoctrine();
         $data = $_REQUEST;
         $datetime = new DateTime("now");
         $data['startDate'] = $datetime->format('Y-m-d');
         $data['endDate'] = $datetime->format('Y-m-d');
         $user = $this->getUser();
-        $salesCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->userBaseSalesOverview($user,$data,['diagnostic','visit']);
-        $salesCashAdmission = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data,['admission']);
-        $purchaseCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($user,$data);
+        $salesCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->userBaseSalesOverview($user,$data,['diagnostic','visit']);
+        $salesCashAdmission = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data,['admission']);
+        $purchaseCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->accountPurchaseOverview($user,$data);
         $transactionMethods                 = [1];
-        $transactionCashOverview            = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview( $this->getUser(),$transactionMethods,$data);
-        $expenditureOverview                = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview($user,$data);
+        $transactionCashOverview            = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview( $this->getUser(),$transactionMethods,$data);
+        $expenditureOverview                = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->expenditureOverview($user,$data);
 
         $salesTodayTransactionOverview      = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todayUserSalesOverview($user,$data,'false',['diagnostic','admission','visit']);
         $previousSalesTransactionOverview   = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todayUserSalesOverview($user,$data,'true',['diagnostic','admission','visit']);
@@ -45,9 +52,9 @@ class DefaultController extends AbstractController
         $userSalesTodaySalesCommission      = $em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->userGroupCommissionSummary($user,$data);
         $userInvoiceReturn   = $em->getRepository(\App\Hospital\Entity\HmsInvoiceReturn::class)->userGroupInvoiceReturnAmount($user,$data);
         $hospital = $globalOption->getHospitalConfig()->getId();
-        $diagonesticProcesses = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'diagnostic',$data);
-        $admissionProcesses = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'admission',$data);
-        $visitProcesses = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'visit',$data);
+        $diagonesticProcesses = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'diagnostic',$data);
+        $admissionProcesses = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'admission',$data);
+        $visitProcesses = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'visit',$data);
 
         return $this->render('Hospital/Default/dashboard.html.twig', [
             'option'                            => $user->getGlobalOption() ,
@@ -95,7 +102,7 @@ class DefaultController extends AbstractController
     #[IsGranted(new Expression("is_granted('ROLE_HOSPITAL') or is_granted('ROLE_DOMAIN')"))]
     public function idcardAction(Customer $customer)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $barcode = $this->getBarcode($customer->getCustomerId());
         return $this->render('Hospital/Default/patient-idcard.html.twig', [

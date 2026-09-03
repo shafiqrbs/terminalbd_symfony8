@@ -3,6 +3,9 @@ namespace App\Business\Controller;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\Business\Entity\BusinessParticular;
@@ -19,14 +22,21 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
  */
 class ProductionController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
 	public function paginate($entities)
 	{
 
-		$paginator = $this->get('knp_paginator');
+		$paginator = $this->paginator;
 		$pagination = $paginator->paginate(
 			$entities,
-			$this->get('request')->query->get('page', 1)/*page number*/,
+			$this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
 			25  /*limit per page*/
 		);
 		$pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -41,14 +51,14 @@ class ProductionController extends AbstractController
 	public function indexAction()
 	{
 
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$data = $_REQUEST;
 	//	$data['type']= 7;
 		$config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-		$entities = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessProduction::class)->findWithSearch($config,$data);
+		$entities = $this->em->getRepository(\App\Business\Entity\BusinessProduction::class)->findWithSearch($config,$data);
 		$pagination = $this->paginate($entities);
-		$type = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
-		$category = $this->getDoctrine()->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
+		$type = $this->em->getRepository(\App\Business\Entity\BusinessParticularType::class)->findBy(['status'=>1]);
+		$category = $this->em->getRepository(\App\Business\Entity\Category::class)->findBy(['businessConfig'=>$config,'status'=>1]);
 		return $this->render('Business/Production/index.html.twig', [
 			'pagination' => $pagination,
 			'types' => $type,
@@ -86,7 +96,7 @@ class ProductionController extends AbstractController
     {
 
 
-    	$em = $this->getDoctrine()->getManager();
+    	$em = $this->em;
         $config =$this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
         if($entity->getBusinessParticularType()->getSlug() != 'post-production' and $entity->getBusinessConfig()->getId() != $config){
             return $this->redirect($this->generateUrl('business_stock'));
@@ -103,7 +113,7 @@ class ProductionController extends AbstractController
 
     public function productionUpdateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($id);
 
         if (!$entity) {
@@ -115,7 +125,7 @@ class ProductionController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setSalesPrice($data['productionSalesPrice']);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('business_stock'));
@@ -131,7 +141,7 @@ class ProductionController extends AbstractController
 	public function preProductionAction(BusinessParticular  $item){
 
 		$entity = new BusinessProduction();
-    	$em = $this->getDoctrine()->getManager();
+    	$em = $this->em;
 		$config =$this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
 		if($item->getBusinessParticularType()->getSlug() != 'pre-production' and $item->getBusinessConfig()->getId() != $config){
 			return $this->redirect($this->generateUrl('business_stock'));
@@ -185,7 +195,7 @@ class ProductionController extends AbstractController
 
 	public function preProductionCreateAction(BusinessParticular $item , Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 	    $entity = new BusinessProduction();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
@@ -193,7 +203,7 @@ class ProductionController extends AbstractController
         $editForm = $this->createPreProductionForm($entity,$item);
         $editForm->handleRequest($request);
         $data = $request->request->all();
-        $productionElementPrice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessProductionElement::class)->getProductPurchaseSalesPrice($item);
+        $productionElementPrice = $this->em->getRepository(\App\Business\Entity\BusinessProductionElement::class)->getProductPurchaseSalesPrice($item);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
 	        $entity->setBusinessParticular($item);
 	        $entity->setPurchasePrice($productionElementPrice['purchasePrice']);
@@ -203,7 +213,7 @@ class ProductionController extends AbstractController
 	        $entity->setSalesSubTotal($productionElementPrice['salesPrice'] * $data['productionQuantity']);
 	        $em->persist($entity);
 	        $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('business_production'));
@@ -217,7 +227,7 @@ class ProductionController extends AbstractController
 
 	public function preProductionUpdateAction(Request $request)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$entity = new BusinessProduction();
 		if (!$entity) {
 			throw $this->createNotFoundException('Unable to find Particular entity.');
@@ -226,8 +236,8 @@ class ProductionController extends AbstractController
 		$editForm->handleRequest($request);
 		$data = $request->request->all();
 		if ($editForm->isValid()) {
-			$particular = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
-            $productionElementPrice = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessProductionElement::class)->getProductPurchaseSalesPrice($particular);
+			$particular = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
+            $productionElementPrice = $this->em->getRepository(\App\Business\Entity\BusinessProductionElement::class)->getProductPurchaseSalesPrice($particular);
 			$entity->setBusinessParticular($particular);
 			$entity->setPurchasePrice($data['purchasePrice']);
             $entity->setPurchasePrice($productionElementPrice['purchasePrice']);
@@ -237,7 +247,7 @@ class ProductionController extends AbstractController
             $entity->setSalesSubTotal($productionElementPrice['salesPrice'] * $data['quantity']);
 			$em->persist($entity);
 			$em->flush();
-			$this->get('session')->getFlashBag()->add(
+			$this->requestStack->getSession()->getFlashBag()->add(
 				'success',"Data has been updated successfully"
 			);
 			return $this->redirect($this->generateUrl('business_production'));
@@ -257,34 +267,34 @@ class ProductionController extends AbstractController
 
     public function addParticularAction(Request $request, BusinessParticular $particular)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $particularId = $request->request->get('particularId');
         $quantity = $request->request->get('quantity');
         $price = $request->request->get('price');
         $data = ['particularId' => $particularId , 'quantity' => $quantity,'price' => $price ];
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessProductionElement::class)->insertProductionElement($particular, $data);
-	    $particularReturn = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateSalesPrice($particular);
-        $production = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessProductionElement::class)->particularProductionElements($particular);
+        $this->em->getRepository(\App\Business\Entity\BusinessProductionElement::class)->insertProductionElement($particular, $data);
+	    $particularReturn = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateSalesPrice($particular);
+        $production = $this->em->getRepository(\App\Business\Entity\BusinessProductionElement::class)->particularProductionElements($particular);
         return new Response(json_encode(['subTotal' => $particularReturn->getSalesPrice(),'purchasePrice' => $particular->getPurchasePrice(),'particulars' => $production]));
 
     }
 
     public function deleteAction(BusinessParticular $particular , $id){
 
-        $em = $this->getDoctrine()->getManager();
-        $element = $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessProductionElement::class)->find($id);
+        $em = $this->em;
+        $element = $this->em->getRepository(\App\Business\Entity\BusinessProductionElement::class)->find($id);
         if (!$element) {
             throw $this->createNotFoundException('Unable to find SalesItem entity.');
         }
         $em->remove($element);
         $em->flush();
-        $this->getDoctrine()->getRepository(\App\Business\Entity\BusinessParticular::class)->updateSalesPrice($particular);
+        $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateSalesPrice($particular);
         exit;
     }
 
     public function showAction($id)
     {
-	    $em = $this->getDoctrine()->getManager();
+	    $em = $this->em;
 	    $entity = $em->getRepository(\App\Business\Entity\BusinessProduction::class)->find($id);
 	    return $this->render('Business/Production/show.html.twig', [
 		    'entity'      => $entity,
@@ -293,12 +303,12 @@ class ProductionController extends AbstractController
 
 	public function approvedAction($id)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->em;
 		$production = $em->getRepository(\App\Business\Entity\BusinessProduction::class)->find($id);
 		if (!empty($production) and ($production->getProcess() == 'created')) {
 			$production->setProcess('approved');
 			$em->flush();
-			$this->getDoctrine()->getRepository(\App\Business\Entity\BusinessProduction::class)->insertStockProductionItem($production);
+			$this->em->getRepository(\App\Business\Entity\BusinessProduction::class)->insertStockProductionItem($production);
 			return new Response('success');
 		} else {
 			return new Response('failed');

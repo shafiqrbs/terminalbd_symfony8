@@ -1,6 +1,8 @@
 <?php
 
 namespace App\HumanResource\Controller;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use App\HumanResource\Entity\Weekend;
@@ -13,6 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class WeekendController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
     /**
      * Lists all Blackout entities.
      *
@@ -21,12 +29,12 @@ class WeekendController extends AbstractController
     {
 
         $option = $this->getUser()->getGlobalOption();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\HumanResource\Entity\Weekend::class)->findOneBy(['globalOption' => $option]);
         if (empty($entity)) {
             $entity = new  Weekend();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setGlobalOption($option);
             $em->persist($entity);
             $em->flush();
@@ -76,7 +84,7 @@ class WeekendController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\HumanResource\Entity\Weekend::class)->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Weekend entity.');
@@ -85,7 +93,7 @@ class WeekendController extends AbstractController
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
         }

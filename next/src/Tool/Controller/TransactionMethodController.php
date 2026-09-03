@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Tool\Controller;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,12 @@ use App\Tool\Form\TransactionMethodType;
  */
 class TransactionMethodController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
     /**
      * Creates a new TransactionMethod entity.
@@ -25,7 +33,7 @@ class TransactionMethodController extends AbstractController
         $entity = new TransactionMethod();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if ($form->isSubmitted() && $form->isValid()) {
 
             $em->persist($entity);
@@ -69,7 +77,7 @@ class TransactionMethodController extends AbstractController
     public function newAction()
     {
         $entity = new TransactionMethod();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $form   = $this->createCreateForm($entity);
         $entities = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findAll([],['name'=>'asc']);
         return $this->render('Tool/TransactionMethod/new.html.twig', [
@@ -86,7 +94,7 @@ class TransactionMethodController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find($id);
 
@@ -130,7 +138,7 @@ class TransactionMethodController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find($id);
 
@@ -159,7 +167,7 @@ class TransactionMethodController extends AbstractController
     public function deleteAction(TransactionMethod $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find TransactionMethod entity.');
         }
@@ -177,7 +185,7 @@ class TransactionMethodController extends AbstractController
     public function statusAction(Request $request, $id)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find($id);
 
         if (!$entity) {
@@ -191,7 +199,7 @@ class TransactionMethodController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'error',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('transactionmethod_new'));

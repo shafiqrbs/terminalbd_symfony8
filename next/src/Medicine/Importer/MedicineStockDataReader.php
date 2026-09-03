@@ -9,7 +9,7 @@ namespace App\Medicine\Importer;
 
 
 use PHPExcel;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Liuggio\ExcelBundle\Factory;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 

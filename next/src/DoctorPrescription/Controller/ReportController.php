@@ -4,6 +4,9 @@
 namespace App\DoctorPrescription\Controller;
 
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Knp\Snappy\Pdf;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,14 +17,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ReportController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
 
-        $paginator = $this->get('knp_paginator');
+        $paginator = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             25  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -32,7 +42,7 @@ class ReportController extends AbstractController
     public function salesSummaryAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -52,7 +62,7 @@ class ReportController extends AbstractController
 
     public function salesSummaryPdfAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -81,7 +91,7 @@ class ReportController extends AbstractController
     public function serviceBaseSummaryAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -107,7 +117,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $user = $this->getUser();
         $dmsConfig = $user->getGlobalOption()->getDmsConfig();
-        $dailyReceive = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->allYearlySales($dmsConfig,$data);
+        $dailyReceive = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->allYearlySales($dmsConfig,$data);
         return $this->render('DoctorPrescription/Report/allYearlySales.html.twig', [
             'entities' => $dailyReceive,
             'searchForm' => $data,
@@ -120,7 +130,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $user = $this->getUser();
         $dmsConfig = $user->getGlobalOption()->getDmsConfig();
-        $dailyReceive = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->allYearlySales($dmsConfig,$data);
+        $dailyReceive = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->allYearlySales($dmsConfig,$data);
         $html = $this->renderView(
             'DoctorPrescription/Report/allYearlySalesPdf.html.twig', [
                 'entities' => $dailyReceive,
@@ -143,7 +153,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $user = $this->getUser();
         $dmsConfig = $user->getGlobalOption()->getDmsConfig();
-        $dailyReceive = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->yearlySales($dmsConfig,$data);
+        $dailyReceive = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->yearlySales($dmsConfig,$data);
         return $this->render('DoctorPrescription/Report/yearlySales.html.twig', [
             'entities' => $dailyReceive,
             'searchForm' => $data,
@@ -156,7 +166,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $user = $this->getUser();
         $dmsConfig = $user->getGlobalOption()->getDmsConfig();
-        $dailyReceive = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->monthlySales($dmsConfig,$data);
+        $dailyReceive = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->monthlySales($dmsConfig,$data);
         $html = $this->renderView(
             'DoctorPrescription/Report/yearlySalesPdf.html.twig', [
                 'entities' => $dailyReceive,
@@ -180,7 +190,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $user = $this->getUser();
         $dmsConfig = $user->getGlobalOption()->getDmsConfig();
-        $dailyReceive = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->monthlySales($dmsConfig,$data);
+        $dailyReceive = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->monthlySales($dmsConfig,$data);
         return $this->render('DoctorPrescription/Report/monthlySales.html.twig', [
             'entities' => $dailyReceive,
             'searchForm' => $data,
@@ -193,7 +203,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $user = $this->getUser();
         $dmsConfig = $user->getGlobalOption()->getDmsConfig();
-        $dailyReceive = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->monthlySales($dmsConfig,$data);
+        $dailyReceive = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->monthlySales($dmsConfig,$data);
         $html = $this->renderView(
             'DoctorPrescription/Report/monthlySalesPdf.html.twig', [
                 'entities' => $dailyReceive,
@@ -216,9 +226,9 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getDmsConfig();
-        $dailyReceive = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->salesDetails($config,$data);
-        $assignDoctors = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getFindWithParticular($config,['doctor']);
-        $treatments = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getFindDentalServiceParticular($config,['treatment']);
+        $dailyReceive = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->salesDetails($config,$data);
+        $assignDoctors = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getFindWithParticular($config,['doctor']);
+        $treatments = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getFindDentalServiceParticular($config,['treatment']);
 
         return $this->render('DoctorPrescription/Report/sales.html.twig', [
             'entities' => $dailyReceive,
@@ -234,7 +244,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $user = $this->getUser();
         $config = $user->getGlobalOption()->getDmsConfig();
-        $dailyReceive = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->salesDetails($config,$data);
+        $dailyReceive = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->salesDetails($config,$data);
         $html = $this->renderView(
             'DoctorPrescription/Report/salesPdf.html.twig', [
                 'entities' => $dailyReceive,
@@ -255,7 +265,7 @@ class ReportController extends AbstractController
 
     public function treatmentWiseSalesAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -271,7 +281,7 @@ class ReportController extends AbstractController
 
     public function treatmentWiseSalesPdfAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -298,14 +308,14 @@ class ReportController extends AbstractController
     public function cashAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $transactionMethods = [1,4];
         $globalOption = $this->getUser()->getGlobalOption();
-        $transactionCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
-        $transactionBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
-        $transactionMobileBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
-        $transactionAccountHeadCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
+        $transactionCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
+        $transactionBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
+        $transactionMobileBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
+        $transactionAccountHeadCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
         return $this->render('DoctorPrescription/Report/cashoverview.html.twig', [
             'transactionCashOverviews'               => $transactionCashOverview,
             'transactionBankCashOverviews'          => $transactionBankCashOverviews,
@@ -319,14 +329,14 @@ class ReportController extends AbstractController
 
     public function cashPdfAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $transactionMethods = [1,4];
         $globalOption = $this->getUser()->getGlobalOption();
-        $transactionCashOverview = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
-        $transactionBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
-        $transactionMobileBankCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
-        $transactionAccountHeadCashOverviews = $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
+        $transactionCashOverview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview( $this->getUser(),$data);
+        $transactionBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionBankCashOverview( $this->getUser(),$data);
+        $transactionMobileBankCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionMobileBankCashOverview( $this->getUser(),$data);
+        $transactionAccountHeadCashOverviews = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionAccountHeadCashOverview( $this->getUser(),$data);
         $html = $this->renderView('DoctorPrescription/Report/cashoverviewPdf.html.twig', [
             'transactionCashOverviews'               => $transactionCashOverview,
             'transactionBankCashOverviews'          => $transactionBankCashOverviews,
@@ -350,12 +360,12 @@ class ReportController extends AbstractController
     public function incomeAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $sales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->reportDebitTransactionIncome($user->getGlobalOption(), $accountHeads = [3,10,30], $data);
-        $expenditures = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [37], $data);
-        $accessories = $this->getDoctrine()->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->reportAccessoriesOut($user->getGlobalOption()->getDmsConfig(), $data);
+        $sales = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->reportDebitTransactionIncome($user->getGlobalOption(), $accountHeads = [3,10,30], $data);
+        $expenditures = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [37], $data);
+        $accessories = $this->em->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->reportAccessoriesOut($user->getGlobalOption()->getDmsConfig(), $data);
         return $this->render('DoctorPrescription/Report/income.html.twig', [
             'sales'             => $sales,
             'expenditures'      => $expenditures,
@@ -368,12 +378,12 @@ class ReportController extends AbstractController
     public function incomePdfAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $sales = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->reportDebitTransactionIncome($user->getGlobalOption(), $accountHeads = [3,10,30], $data);
-        $expenditures = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [37], $data);
-        $accessories = $this->getDoctrine()->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->reportAccessoriesOut($user->getGlobalOption()->getDmsConfig(), $data);
+        $sales = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->reportDebitTransactionIncome($user->getGlobalOption(), $accountHeads = [3,10,30], $data);
+        $expenditures = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [37], $data);
+        $accessories = $this->em->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->reportAccessoriesOut($user->getGlobalOption()->getDmsConfig(), $data);
         $html = $this->renderView('DoctorPrescription/Report/incomePdf.html.twig', [
             'sales'             => $sales,
             'expenditures'      => $expenditures,
@@ -397,10 +407,10 @@ class ReportController extends AbstractController
     public function expenditureAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $expenditures = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->reportForExpenditure($user->getGlobalOption(), $data);
+        $expenditures = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportForExpenditure($user->getGlobalOption(), $data);
         return $this->render('DoctorPrescription/Report/expenditure.html.twig', [
                 'expenditures'      => $expenditures,
                 'searchForm'        => $data,
@@ -411,10 +421,10 @@ class ReportController extends AbstractController
     public function expenditurePdfAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $expenditures = $this->getDoctrine()->getRepository(\App\Accounting\Entity\Expenditure::class)->reportForExpenditure($user->getGlobalOption(), $data);
+        $expenditures = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportForExpenditure($user->getGlobalOption(), $data);
         $html = $this->renderView('DoctorPrescription/Report/expenditurePdf.html.twig', [
             'expenditures'      => $expenditures,
             'searchForm'        => $data,
@@ -435,10 +445,10 @@ class ReportController extends AbstractController
     public function stockOutAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $stockOuts = $this->getDoctrine()->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->getAccessoriesItemOut($user->getGlobalOption()->getDmsConfig(), $data);
+        $stockOuts = $this->em->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->getAccessoriesItemOut($user->getGlobalOption()->getDmsConfig(), $data);
         return $this->render('DoctorPrescription/Report/stockout.html.twig', [
             'entities'      => $stockOuts,
             'searchForm'        => $data,
@@ -449,10 +459,10 @@ class ReportController extends AbstractController
     public function stockoutPdfAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        $stockOuts = $this->getDoctrine()->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->getAccessoriesItemOut($user->getGlobalOption()->getDmsConfig(), $data);
+        $stockOuts = $this->em->getRepository('DoctorPrescriptionBundle:DpsInvoiceAccessories')->getAccessoriesItemOut($user->getGlobalOption()->getDmsConfig(), $data);
         $html = $this->renderView('DoctorPrescription/Report/stockoutPdf.html.twig', [
             'entities'      => $stockOuts,
             'searchForm'        => $data,
@@ -472,10 +482,10 @@ class ReportController extends AbstractController
 
     public function stockAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getDmsConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getMedicineParticular($config,['accessories'],$data)->getArrayResult();
+        $entities = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getMedicineParticular($config,['accessories'],$data)->getArrayResult();
         return $this->render('DoctorPrescription/Report/stock.html.twig', [
             'pagination' => $entities,
             'searchForm'        => $data,
@@ -485,10 +495,10 @@ class ReportController extends AbstractController
     public function stockPdfAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $data = $_REQUEST;
         $config = $this->getUser()->getGlobalOption()->getDmsConfig();
-        $entities = $this->getDoctrine()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getMedicineParticular($config,['accessories'],$data)->getArrayResult();
+        $entities = $this->em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->getMedicineParticular($config,['accessories'],$data)->getArrayResult();
         $html =  $this->renderView('DoctorPrescription/Report/stockPdf.html.twig', [
             'pagination' => $entities,
             'searchForm'        => $data,

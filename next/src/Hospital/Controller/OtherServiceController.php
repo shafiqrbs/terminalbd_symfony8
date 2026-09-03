@@ -2,6 +2,9 @@
 
 namespace App\Hospital\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 use Symfony\Component\Form\Form;
@@ -17,13 +20,20 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class OtherServiceController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         $pagination->setTemplate('Tool/Widget/pagination.html.twig');
@@ -39,7 +49,7 @@ class OtherServiceController extends AbstractController
     {
         $entity = new Particular();
         $data = $_REQUEST;
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(['hospitalConfig' => $config,'service'=> 7],['name'=>'ASC']);
         $editForm = $this->createCreateForm($entity);
@@ -58,7 +68,7 @@ class OtherServiceController extends AbstractController
     public function createAction(Request $request)
     {
         $entity = new Particular();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(['hospitalConfig' => $config,'service'=> 7],['name'=>'ASC']);
 
@@ -66,13 +76,13 @@ class OtherServiceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setHospitalConfig($config);
-            $service = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Service::class)->find(7);
+            $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(7);
             $entity->setService($service);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_other_service'));
@@ -113,7 +123,7 @@ class OtherServiceController extends AbstractController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(['hospitalConfig' => $config,'service'=> 7],['name'=>'ASC']);
 
@@ -157,7 +167,7 @@ class OtherServiceController extends AbstractController
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(['hospitalConfig' => $config,'service'=> 7],['name'=>'ASC']);
 
@@ -171,7 +181,7 @@ class OtherServiceController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_other_service'));
@@ -189,7 +199,7 @@ class OtherServiceController extends AbstractController
      */
     public function deleteAction(Particular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -197,16 +207,16 @@ class OtherServiceController extends AbstractController
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (Exception) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -221,7 +231,7 @@ class OtherServiceController extends AbstractController
     public function statusAction(Particular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -233,7 +243,7 @@ class OtherServiceController extends AbstractController
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_other_service'));

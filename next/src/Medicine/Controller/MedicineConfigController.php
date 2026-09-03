@@ -2,24 +2,32 @@
 
 namespace App\Medicine\Controller;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Medicine\Entity\MedicineConfig;
 use App\Medicine\Form\ConfigType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * MedicineConfigController.
  *
  */
-class MedicineConfigController extends Controller
+class MedicineConfigController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
 
 
     public function manageAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $entity = $this->getUser()->getGlobalOption()->getMedicineConfig();
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice entity preparation.');
@@ -61,7 +69,7 @@ class MedicineConfigController extends Controller
      */
     public function updateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
 
         $entity = $this->getUser()->getGlobalOption()->getMedicineConfig();
         if (!$entity) {
@@ -74,7 +82,7 @@ class MedicineConfigController extends Controller
         if ($editForm->isValid()) {
 
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Report has been created successfully"
             );
             return $this->redirect($this->generateUrl('medicine_config_manage'));
@@ -91,7 +99,7 @@ class MedicineConfigController extends Controller
         $item = $_REQUEST['q'];
         if ($item) {
             $go = $this->getUser()->getGlobalOption();
-            $item = $this->getDoctrine()->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
+            $item = $this->em->getRepository(\App\User\Entity\User::class)->searchAutoComplete($item,$go);
         }
         return new JsonResponse($item);
     }

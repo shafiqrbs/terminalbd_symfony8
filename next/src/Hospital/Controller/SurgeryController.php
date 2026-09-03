@@ -2,6 +2,9 @@
 
 namespace App\Hospital\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Hospital\Entity\Particular;
 use App\Hospital\Form\DoctorType;
 use App\Hospital\Form\CabinType;
@@ -10,22 +13,29 @@ use App\Hospital\Form\PathologyType;
 use App\Hospital\Form\SurgeryType;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 /**
  * SurgeryController controller.
  *
  */
-class SurgeryController extends Controller
+class SurgeryController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
 
     public function paginate($entities)
     {
-        $paginator  = $this->get('knp_paginator');
+        $paginator  = $this->paginator;
         $pagination = $paginator->paginate(
             $entities,
-            $this->get('request')->query->get('page', 1)/*page number*/,
+            $this->requestStack->getCurrentRequest()->query->get('page', 1)/*page number*/,
             50  /*limit per page*/
         );
         return $pagination;
@@ -40,7 +50,7 @@ class SurgeryController extends Controller
     {
 
         $entity = new Particular();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(array('hospitalConfig' => $config,'service'=> 3),array('name'=>'ASC'));
         $form = $this->createCreateForm($entity);
@@ -59,20 +69,20 @@ class SurgeryController extends Controller
     public function createAction(Request $request)
     {
         $entity = new Particular();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(array('hospitalConfig' => $config,'service'=> 3),array('name'=>'ASC'));
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $entity->setHospitalConfig($config);
-            $service = $this->getDoctrine()->getRepository(\App\Hospital\Entity\Service::class)->find(3);
+            $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(3);
             $entity->setService($service);
             $em->persist($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('hms_surgery'));
@@ -115,7 +125,7 @@ class SurgeryController extends Controller
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(array('hospitalConfig' => $config,'service'=> 3),array('name'=>'ASC'));
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
@@ -161,7 +171,7 @@ class SurgeryController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $pagination = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(array('hospitalConfig' => $config,'service'=>4),array('name'=>'ASC'));
         $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($id);
@@ -175,7 +185,7 @@ class SurgeryController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
             );
             return $this->redirect($this->generateUrl('hms_surgery'));
@@ -193,7 +203,7 @@ class SurgeryController extends Controller
      */
     public function deleteAction(Particular $entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Particular entity.');
         }
@@ -201,16 +211,16 @@ class SurgeryController extends Controller
 
             $em->remove($entity);
             $em->flush();
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',"Data has been deleted successfully"
             );
 
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Data has been relation another Table"
             );
         }catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'notice', 'Please contact system administrator further notification.'
             );
         }
@@ -225,7 +235,7 @@ class SurgeryController extends Controller
     public function statusAction(Particular $entity)
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->em;
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find District entity.');
         }
@@ -237,7 +247,7 @@ class SurgeryController extends Controller
             $entity->setStatus(1);
         }
         $em->flush();
-        $this->get('session')->getFlashBag()->add(
+        $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Status has been changed successfully"
         );
         return $this->redirect($this->generateUrl('hms_surgery'));
