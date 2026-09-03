@@ -1,0 +1,126 @@
+medicinebrand:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::indexAction' }
+
+medicinebrand_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::newAction' }
+
+medicinebrand_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::createAction' }
+    methods:  POST
+
+medicinebrand_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::editAction' }
+
+medicinebrand_copy:
+    path:     /{id}/copy
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::copyAction' }
+
+medicinebrand_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::deleteAction' }
+
+medicinebrand_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::statusAction' }
+
+medicinebrand_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::updateAction' }
+    methods:  [POST, PUT]
+
+medicinebrand_select_search:
+    path:     /select-medicine-search
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::selectSearchMedicineAction' }
+    options:
+            expose: true
+
+medicinebrand_search:
+    path:     /medicine-search
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::autoSearchMedicineAction' }
+    options:
+            expose: true
+
+medicinebrand_details:
+    path:     /medicine-details
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::medicineDetailsAction' }
+    options:
+            expose: true
+
+medicinebrand_generic_search:
+    path:     /generic-search
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::autoSearchGenericAction' }
+    options:
+            expose: true
+
+medicinebrand_name:
+    path:      /{medicine}/medicine-name
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::searchProductNameAction' }
+    options:
+            expose: true
+
+
+medicinebrand_search_brand_name_complete:
+    path:     /search-brand-name-auto-complete
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::searchBrandNameAutoCompleteAction' }
+    options:
+            expose: true
+
+medicinebrand_search_company_name_complete:
+    path:     /search-company-name-auto-complete
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::searchCompanyNameAutoCompleteAction' }
+    options:
+            expose: true
+
+medicinebrand_search_generic_name_complete:
+    path:     /search-generic-name-auto-complete
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::searchGenericNameAutoCompleteAction' }
+    options:
+            expose: true
+
+medicinebrand_search_pack_size_name_complete:
+    path:     /search-pack-size-name-auto-complete
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::searchPackSizeAutoCompleteAction' }
+    options:
+            expose: true
+
+medicinebrand_search_strength_name_complete:
+    path:     /search-strength-name-auto-complete
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::searchStrengthAutoCompleteAction' }
+    options:
+            expose: true
+
+medicinebrand_search_form_name_complete:
+    path:     /search-form-name-auto-complete
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::searchMedicineFormAutoCompleteAction' }
+    options:
+            expose: true
+
+medicinebrand_search_medicine_generic_complete:
+    path:     /search-generic-medicine-auto-complete
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::searchMedicineGenericNameAutoCompleteAction' }
+    options:
+            expose: true
+
+
+medicinebrand_select_medicine_form:
+    path:     /inline-select-medicine-form
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::selectMedicineFormAction' }
+    options:
+           expose: true
+
+medicinebrand_select_strength:
+    path:     /inline-select-strength
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::selectStrengthAction' }
+    options:
+           expose: true
+
+medicinebrand_item_inline_update:
+    path:     /inline-product-update
+    defaults: { _controller: 'App\Tool\Controller\MedicineController::inlineItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true

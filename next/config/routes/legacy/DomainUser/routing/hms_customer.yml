@@ -1,0 +1,33 @@
+hms_customer:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::indexAction' }
+
+hms_customer_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::showAction' }
+
+hms_customer_new:
+    path:     /new
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::newAction' }
+
+hms_customer_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::createAction' }
+    methods:  POST
+
+hms_customer_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::editAction' }
+
+hms_customer_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_customer_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::deleteAction' }
+
+hms_customer_details:
+    path:     /{mobile}/patient-details
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::detailsAction' }

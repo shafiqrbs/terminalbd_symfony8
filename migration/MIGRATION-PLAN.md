@@ -20,31 +20,40 @@ Companion summary (charts, tables, roadmap): https://claude.ai/code/artifact/be6
 
 ## 1. Status
 
-**Phase 1 complete. Phase 2 partially complete — security layer built and tested; login UI and session sharing outstanding.**
+**The whole application now builds on Symfony 8.1 / PHP 8.5.** Every mechanically portable layer is
+ported and the result compiles, lints, routes and passes its tests. What remains is semantic work
+that cannot be automated — see §6.5 and §11.
 
 ```
-$ ./migration/bin/port.sh
+$ ./migration/bin/migrate.sh
 ...
-== verify ==
-references to DBAL types removed in v4: 0 (must be 0)
-files with leftover @ORM annotations:   0
-files with leftover @Gedmo annotations: 0
-syntax: clean
+############ verify ############
+php syntax: clean
+leftover @Secure          0 files
+leftover @ORM\\           0 files
+leftover @Gedmo\\         0 files
+leftover Types::ARRAY     0 files
 
-$ cd next && php8.5 bin/validate-mapping.php
-loaded 339 entity metadata definitions
-309 entities valid, 30 with mapping errors
+-- does it actually build? --
+ [OK] Cache for the "dev" environment (debug=true) was successfully cleared.
+ [OK] The container was linted successfully
+routes loaded: 3484
+OK (20 tests, 33 assertions)
 ```
 
 | Metric | Value |
 |---|---|
-| Files ported into `App\` | 686 |
-| `#[ORM\...]` attributes generated | 8,388 |
-| `#[Gedmo\...]` attributes converted | 432 |
-| Metadata definitions loaded | 339 |
-| Entities validating clean | 309 |
-| Entities with pre-existing mapping errors | 30 |
-| Syntax errors on PHP 8.5 | 0 |
+| PHP files ported into `App\` | 1,562 |
+| Templates ported | 1,754 (+42 vendored from the removed FOS bundles) |
+| Routing files ported | 362, plus 18 regenerated auth routes |
+| Routes loading | **3,484** |
+| Doctrine metadata definitions | 339 (309 validate clean) |
+| `#[ORM\]` / `#[Gedmo\]` attributes | 8,388 / 432 |
+| `@Secure` → `#[IsGranted]` | 521 (184 single-role, 337 OR-expressions) |
+| Doctrine short-name aliases → FQCN | 6,507 |
+| Container lint | passes |
+| Test suite | 20 tests, 33 assertions, green |
+| PHP syntax errors | 0 |
 
 The 30 remaining are legacy defects, not port artifacts — see §5.6.
 
@@ -94,13 +103,24 @@ foundation, ported once; the **HTTP layer** is what moves module by module on to
 
 | File | Purpose |
 |---|---|
-| `port.sh` | 7-step idempotent pipeline. Rebuilds `next/src/` from the untouched SF2.8 tree. Safe to re-run after any legacy change. |
+| `migrate.sh` | **The whole migration.** 9 idempotent steps from the untouched SF2.8 tree to a building app, then verifies: syntax, leftover-legacy greps, container compile, container lint, route count, test suite. |
+| `port.sh` | Steps 1-7 of the entity graph, called by `migrate.sh` |
 | `port-entities.php` | Copies 686 entity/repository files, rewrites legacy namespaces → `App\` |
 | `gedmo-to-attributes.php` | `@Gedmo` docblocks → attributes (Rector has no Gedmo rules) |
 | `fix-duplicate-attributes.php` | Collapses repeated non-repeatable ORM attributes, keeping the last |
 | `fix-joincolumns.php` | Drops `JoinColumn` from illegal association sides |
 | `fixups.php` | Targeted corrections for individually malformed legacy annotations |
 | `port-security.php` | Generates `next/config/packages/security_roles.yaml` from `app/config/security.yml` |
+| `port-http.php` | Lifts controllers, forms, services, listeners and all 1,754 templates |
+| `port-routing.php` | 362 routing files: `pattern:`→`path:`, `Bundle:C:a`→FQCN, relative imports, XML/dead-bundle imports commented, duplicate route names collapsed the way SF2 resolved them |
+| `port-auth-routes.php` | Regenerates the 18 routes that lived in FOSUserBundle's XML plus the app's own |
+| `port-security.php` | Role hierarchy + access control |
+| `port-parameters.php` | `parameters.yml.dist` → container parameters backed by env vars |
+| `gen-service-excludes.php` | Excludes the 214 non-autowirable legacy form types from service registration |
+| `fix-dql-aliases.php` | Doctrine short-name aliases → FQCN |
+| `fix-signatures.php` | Return types SF8/Doctrine 3 base classes require (class-aware) |
+| `secure-to-isgranted.php` | JMS `@Secure` → `#[IsGranted]`, preserving OR semantics |
+| `mark-manual-forms.php` | Flags the 317 form instantiations that cannot be converted mechanically |
 | `capture.php` | Records golden API responses from an app |
 | `compare.php` | Diffs response **shape** (keys + value types) and status; exit 1 on drift |
 
@@ -222,6 +242,28 @@ Removing the unreachable line preserves behaviour byte-for-byte. **The typo is d
 left in place**: correcting it would activate three constructors that have never executed,
 which initialise collections and set `status = true`.
 
+### 5.9 Corrupted entity alias — 1 case, runtime fatal today
+
+`src/Setting/Bundle/ContentBundle/Controller/MallShopController.php:122` reads
+`getRepository('SettinMallShopTypegContentBundle:MallConnect')` — a bad find-replace spliced
+`MallShopType` into the middle of `SettingContentBundle`. That line throws
+`Unknown Entity namespace alias` whenever the route is hit.
+
+### 5.10 Duplicate route names — 147 (145 pre-existing)
+
+Symfony keeps the last route defined with a given name and drops the rest silently; Symfony 2 did
+the same. Catalogued in `migration/contract/route-collisions.md`. One consequence matters:
+`/android-api-portal/apps` is shadowed by an identically named route in `apiPoskeeper.yml`, so one
+of the 96 "wire-locked" mobile endpoints is already dead in production.
+
+### 5.11 Aliases for entities that do not exist — 205 references
+
+`Blog`, `Admission`, `MallConnect`, `Team`, `EcommerceMenu`, `MegaMenu`, `Course` and
+`InstituteLevel` are referenced by controllers and repositories but exist nowhere in the legacy
+tree. Those routes are dead code that fails at runtime. Left untouched and catalogued in
+`migration/contract/unresolved-dql-aliases.txt` rather than pointed at a plausible-looking wrong
+entity.
+
 ### 5.8 Namespace and registration inconsistencies — 2 cases
 
 `appstore\Bundle\DomainUserBundle` is declared with a lowercase leading character;
@@ -292,53 +334,57 @@ Remaining in this phase:
 - [ ] Convert 112 files of `@Secure` / `@PreAuthorize` → `#[IsGranted]` (lands with each module port)
 - [ ] Replace `symfony/security-acl` usage (9 files) with voters
 
-### Phase 3 — Mobile APIs (wire-locked)
+### Phase 3 — Mobile APIs (wire-locked) — routes ported, contract not yet verified
 
-96 endpoints: `/flutter-api` (66), `/android-api` (24), `/android-api-portal` (6). Clients are
-shipped and cannot be updated in lockstep.
+All 96 endpoints route in the new app: `/flutter-api` **66**, `/android-api` **24**,
+`/android-api-portal` **5**. FOSRestBundle's `type: rest` loader is gone; every file it loaded
+declares explicit paths, so the standard YAML loader handles them.
 
-- [ ] Fill in `migration/capture-config.json` (base URL, `X-API-KEY`, auth, per-endpoint params)
-- [ ] `php migration/bin/capture.php legacy` against production/staging
-- [ ] Port controllers off FOSRestBundle 1.5 → native controllers + Serializer
-- [ ] `php migration/bin/capture.php next && php migration/bin/compare.php`
-- [ ] **Gate every API deploy on `compare.php` exiting 0.** Treat drift as a release blocker.
+> `/android-api-portal/apps` shows 5 rather than the contract's 6 because `api_portal_app` is
+> declared in both `apiPortal.yml` and `apiPoskeeper.yml`. Symfony keeps the last, and Symfony 2
+> did too — so that endpoint is **already unreachable in production today**. See
+> `migration/contract/route-collisions.md` (147 collisions here, 145 in the legacy tree).
 
-`compare.php` diffs shape and status — keys and value types, not volatile ids or timestamps —
-so it does not produce false failures on changing data.
+- [ ] Record golden responses: `php migration/bin/capture.php legacy` (needs a URL + credentials)
+- [ ] Port the controller bodies off FOSRestBundle's view layer onto the Serializer
+- [ ] Gate every deploy on `compare.php`
 
-### Phase 4 — Shared presentation layer
+### Phase 4 — Shared presentation layer — mechanically done
 
-Built once, consumed by every module port that follows.
+- [x] 1,754 templates ported to `next/templates/`
+- [x] 1,834 `Bundle:Dir:file.twig` references rewritten, including interpolated ones
+      (`"BusinessBundle:Print:{$template}.html.twig"`)
+- [x] 42 templates vendored from FOSUserBundle/FOSCommentBundle into protected `_`-prefixed
+      directories, since app templates `{% include %}` their partials
+- [ ] Assetic `{% stylesheets %}` / `{% javascripts %}` blocks → AssetMapper (**428 blocks**)
+- [ ] PDF pipeline off the abandoned wkhtmltopdf shims; PHPExcel → PhpSpreadsheet
+- [ ] Render-test templates against real data
 
-- [ ] Base layouts on Twig 3
-- [ ] `Bundle:Dir:file.twig` → `@Dir/file.html.twig` across **1,854** references
-- [ ] Assetic → AssetMapper: **428** `{% stylesheets %}` / `{% javascripts %}` blocks
-- [ ] PDF pipeline off the abandoned `h4cc/wkhtmltopdf-amd64` shims (wkhtmltopdf itself is EOL)
-- [ ] ESC/POS thermal receipt printing (`mike42/escpos-php` is maintained — verify SF8 wiring)
-- [ ] PHPExcel → PhpSpreadsheet
-- [ ] 8,426 legacy Twig form helper calls; 85 `app.request.*` accesses
+### Phase 5 — Module ports — mechanical layer done, semantic layer outstanding
 
-### Phase 5 — Module ports
+Every module's controllers, forms, services and listeners are ported and compile. What is left is
+per-module semantic work that automation would have gotten wrong:
 
-Order in §8. Each port converts controllers to autowired services, form types to the SF8 API,
-templates to Twig 3, and fixes that module's share of the 48 broken associations.
-
-Per-module checklist:
-- [ ] Controllers: drop the SF2 `Controller` base, inject dependencies (`$this->getDoctrine()` ×5,845 and `$this->get()` ×1,434 app-wide)
-- [ ] Form types: `setDefaultOptions()` → `configureOptions()`, remove `getName()` (873 methods app-wide)
-- [ ] Templates → Twig 3
-- [ ] Fix that module's broken associations
-- [ ] Record + diff golden responses for its highest-traffic routes
-- [ ] Flip the proxy route; keep the legacy route ready for rollback
+- [ ] **317 form-type instantiations across 172 files** (`createForm(new XType($deps))` and
+      `$builder->add('f', new XType($deps))`). Symfony 3 removed instance-passing; each dependency
+      must move into that type's `configureOptions()`. Every site carries a `TODO(migration)`
+      comment naming its arguments; the files are listed in
+      `migration/contract/manual-form-files.txt`, and the 214 affected types are excluded from
+      service registration in `next/config/services_legacy.yaml`. **Remove a type from that file as
+      you convert it.**
+- [ ] **205 unresolvable Doctrine aliases** (`migration/contract/unresolved-dql-aliases.txt`) —
+      these name entities that do not exist in the legacy tree either (`Blog`, `Admission`,
+      `MallConnect`, `Team`, `EcommerceMenu`, `MegaMenu`, `Course`, `InstituteLevel`). Dead code:
+      decide per route whether to restore the entity or delete the controller.
+- [ ] **19 template references to bundles that never existed here** (`DocudexUserBundle`) —
+      leftovers from another project; dead today.
+- [ ] 48 broken bidirectional associations (`migration/contract/broken-associations.md`)
+- [ ] Verify behaviour against real data, module by module, before flipping each proxy route
 
 ### Phase 6 — Decommission
 
-- [ ] Retire the PHP 7.4 pool once the last route is served by `next/`
-- [ ] Collapse proxy rules
-- [ ] Drop unreachable compatibility shims
-- [ ] `LegacyArrayType` stays until §7 is done deliberately
-
----
+Unchanged: retire the PHP 7.4 pool, collapse proxy rules, drop shims that are no longer reachable.
+`LegacyArrayType` stays until §7 is done deliberately.
 
 ## 7. Deferred work — deliberately not done during the migration
 

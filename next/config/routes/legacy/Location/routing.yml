@@ -1,0 +1,8 @@
+setting_location_location:
+    resource: 'routing/location.yml'
+    prefix:   /location
+
+setting_location_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: App\Location\Controller\DefaultController::indexAction }
+

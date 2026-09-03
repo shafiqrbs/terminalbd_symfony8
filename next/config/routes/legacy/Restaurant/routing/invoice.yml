@@ -1,0 +1,161 @@
+restaurant_invoice:
+    path:     /
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::indexAction' }
+
+restaurant_invoice_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::showAction' }
+
+restaurant_invoice_new:
+    path:     /new
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::newAction' }
+
+restaurant_invoice_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::editAction' }
+
+restaurant_invoice_particular_search:
+    path:     /{id}/particular-search
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::particularSearchAction' }
+
+
+restaurant_invoice_particular_add:
+    path:     /{invoice}/particular-add
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::addParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_invoice_product_add:
+    path:     /{invoice}/{product}/product-add
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::addProductAction' }
+
+
+restaurant_invoice_product_update:
+    path:     /{invoice}/{product}/product-update
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::updateProductAction' }
+
+
+restaurant_invoice_particular_delete:
+    path:     /{invoice}/{id}/particular-delete
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::invoiceParticularDeleteAction' }
+
+restaurant_invoice_particular_create:
+    path:     /{id}/particular-create
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::updateAction' }
+    methods:  [POST]
+
+restaurant_invoice_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::updateAction' }
+    methods:  [POST, PUT]
+
+restaurant_invoice_discount_update:
+    path:     /dicount-update
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::invoiceDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_invoice_discount_coupon:
+    path:     /dicount-coupon
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::invoiceDiscountCouponAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_invoice_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::deleteAction' }
+
+restaurant_sales_invoice_delete:
+    path:     /{id}/invoice-delete
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::deleteAction' }
+
+
+restaurant_invoice_reverse:
+    path:     /{invoice}/sales-reverse
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::reverseAction' }
+
+restaurant_invoice_approve:
+    path:     /{id}/sales-approve
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::approvedOrderAction' }
+
+restaurant_invoice_reverse_show:
+    path:     /{invoice}/sales-reverse-show
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::reverseShowAction' }
+
+
+
+restaurant_invoice_empty_delete:
+    path:     /delete/empty-invoice
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::deleteEmptyInvoiceAction' }
+
+restaurant_invoice_customer_details:
+    path:     /invoice-patient-details
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::detailsAction' }
+    methods:  POST
+    options:
+           expose: true
+
+restaurant_invoice_pos:
+    path:     /{invoice}/invoice-pos-print
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::PosPrintAction' }
+    methods:  [PUT,POST]
+    options:
+            expose: true
+
+restaurant_invoice_delivery_print:
+    path:     /{id}/invoice-delivery-print
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::PosDeliveryPrintAction' }
+    methods:  [GET]
+    options:
+            expose: true
+
+
+restaurant_invoice_save:
+    path:     /{invoice}/invoice-save
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::saveAction' }
+
+
+restaurant_today_sales:
+    path:     /today-sales
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::todaySalesAction' }
+    options:
+           expose: true
+
+
+restaurant_load_product:
+    path:     /{invoice}/loading-sales-product
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::productsAction' }
+    options:
+            expose: true
+
+
+restaurant_invoice_kitchen:
+    path:     /{invoice}/invoice-kitchen-print
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::KitchenPrintAction' }
+    options:
+            expose: true
+
+restaurant_invoice_payment:
+    path:     /{id}/invoice-payment-print
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::PaymentPrintAction' }
+    options:
+            expose: true
+
+restaurant_invoice_token_check:
+    path:      /invoice-token-check
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::checkTokenBookingAction' }
+    methods:  [POST]
+    options:
+            expose: true
+
+restaurant_invoice_android:
+    path:     /android
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::androidSalesAction' }
+
+
+restaurant_device_sales_import:
+    path:      /device-sales-delete-import/{android}
+    defaults: { _controller: 'App\Restaurant\Controller\InvoiceController::insertGroupApiSalesImportAction' }

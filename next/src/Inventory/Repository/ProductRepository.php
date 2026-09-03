@@ -44,7 +44,7 @@ class ProductRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(e)');
-        $qb->from('InventoryBundle:Product','e');
+        $qb->from(\App\Inventory\Entity\Product::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory);
         $count = $qb->getQuery()->getSingleScalarResult();
@@ -122,12 +122,12 @@ class ProductRepository extends EntityRepository
             $entity->setName($masterItem);
             $category = $data['item']['category'] ?? '';
             if($category){
-                $cat = $em->getRepository("ProductProductBundle:Category")->findOneBy(['inventoryConfig'=>$inventory,'name' => $category,'permission'=>'private']);
+                $cat = $em->getRepository(\App\Product\Entity\Category::class)->findOneBy(['inventoryConfig'=>$inventory,'name' => $category,'permission'=>'private']);
                 $entity->setCategory($cat);
             }
             $itemUnit = $data['item']['itemUnit'] ?? 4;
             if($itemUnit){
-                $unit = $em->getRepository("SettingToolBundle:ProductUnit")->find($itemUnit);
+                $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->find($itemUnit);
                 $entity->setProductUnit($unit);
             }
             $em->persist($entity);

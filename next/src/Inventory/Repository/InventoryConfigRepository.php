@@ -68,7 +68,7 @@ class InventoryConfigRepository extends EntityRepository
       //  $ItemBrand->execute();
 
         $qb = $this->_em->createQueryBuilder();
-        $q = $qb->update('InventoryBundle:Item', 's')
+        $q = $qb->update(\App\Inventory\Entity\Item::class, 's')
             ->set('s.remainingQnt', '?1')
             ->set('s.purchaseQuantity', '?2')
             ->set('s.purchaseQuantityReturn', '?3')

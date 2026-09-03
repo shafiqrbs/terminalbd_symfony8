@@ -1,0 +1,30 @@
+_www_main_domain:
+    prefix: /
+    name_prefix: "main_"
+    resource: '../Bindu/main.yml'
+    host: "{domain_name}"
+    requirements:
+      domain_name: www.%domain.main%|%domain.main%
+
+#xiidea_education_domain_homepage:
+#    path:     /
+#    defaults: { _controller: App\Domain\Controller\DefaultController::educationHomeAction }
+#    host: "www.%education_domain%"
+#
+#xiidea_education_domain_app_homepage:
+#    path:     /
+#    host: "{subdomain}.%education_domain%"
+#    defaults:
+#            _controller: App\Domain\Controller\DefaultController::educationAppHomeAction
+#            subdomain: ""
+#
+#xiidea_education_domain_app_mobile_homepage:
+#    path:     /
+#    host: "m.{subdomain}.%education_domain%"
+#    defaults:
+#            _controller: App\Domain\Controller\DefaultController::educationAppMobileHomeAction
+#            subdomain: ""
+#
+#xiidea_domain_error_page:
+#    path:     /
+#    defaults: { _controller: App\Domain\Controller\DefaultController::errorAction }

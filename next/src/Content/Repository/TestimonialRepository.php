@@ -16,7 +16,7 @@ class TestimonialRepository extends EntityRepository
     {
         $count = 2;
         $em = $this->_em;
-        $entities = $em->getRepository('SettingContentBundle:Testimonial')->findBy(['status' => 1]);
+        $entities = $em->getRepository(\App\Content\Entity\Testimonial::class)->findBy(['status' => 1]);
         if (!empty($entities)){
             return $data = $this->createQueryBuilder('t')
                 ->where('t.status = :status')

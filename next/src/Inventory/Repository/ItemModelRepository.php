@@ -16,7 +16,7 @@ class ItemModelRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(cs)');
-        $qb->from('InventoryBundle:ItemModel','cs');
+        $qb->from(\App\Inventory\Entity\ItemModel::class,'cs');
         $qb->where("cs.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory);
         $count = $qb->getQuery()->getSingleScalarResult();

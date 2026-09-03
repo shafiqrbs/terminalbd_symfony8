@@ -1,0 +1,25 @@
+hms_commission:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\CommissionController::indexAction' }
+
+hms_commission_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\CommissionController::createAction' }
+    methods:  POST
+
+hms_commission_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\CommissionController::editAction' }
+
+hms_commission_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\CommissionController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_commission_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\CommissionController::statusAction' }
+
+hms_commission_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\CommissionController::deleteAction' }

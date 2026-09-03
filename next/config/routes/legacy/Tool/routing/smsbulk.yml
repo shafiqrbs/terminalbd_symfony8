@@ -1,0 +1,38 @@
+smsbulk:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\SmsBulkController::indexAction' }
+
+smsbulk_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\SmsBulkController::showAction' }
+
+smsbulk_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\SmsBulkController::newAction' }
+
+smsbulk_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\SmsBulkController::createAction' }
+    requirements: { _method: post }
+
+smsbulk_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\SmsBulkController::editAction' }
+
+smsbulk_send_msg:
+    path:     /{id}/send-msg
+    defaults: { _controller: 'App\Tool\Controller\SmsBulkController::sendingAction' }
+
+smsbulk_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\SmsBulkController::updateAction' }
+    requirements: { _method: post|put }
+
+smsbulk_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\SmsBulkController::deleteAction' }
+
+smsbulk_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\SmsBulkController::statusAction' }
+

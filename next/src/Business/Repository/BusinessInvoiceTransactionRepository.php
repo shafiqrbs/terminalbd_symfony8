@@ -154,7 +154,7 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
         $entity->setDiscount($data['discount']);
         $entity->setPayment($data['payment']);
         $entity->setProcess('In-progress');
-        $transactionMethod = $this->_em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+        $transactionMethod = $this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         $entity->setTransactionMethod($transactionMethod);
         $this->_em->persist($entity);
         $this->_em->flush($entity);
@@ -217,8 +217,8 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
             $this->_em->persist($entity);
             $this->_em->flush($entity);
             if($invoice->getPayment() > 0){
-                $accountBusinessInvoice = $this->_em->getRepository('AccountingBundle:AccountSales')->insertAccountBusinessInvoice($entity);
-                $this->_em->getRepository('AccountingBundle:Transaction')->hmsSalesTransaction($entity, $accountBusinessInvoice);
+                $accountBusinessInvoice = $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountBusinessInvoice($entity);
+                $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountBusinessInvoice);
             }
 
 
@@ -260,12 +260,12 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
             $entity->setVat($vat);
         }
         if(empty($entity->getTransactionMethod())){
-            $entity->setTransactionMethod($this->_em->getRepository('SettingToolBundle:TransactionMethod')->find(1));
+            $entity->setTransactionMethod($this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         }
         $this->_em->persist($entity);
         $this->_em->flush($entity);
-        $accountBusinessInvoice = $this->_em->getRepository('AccountingBundle:AccountSales')->insertAccountBusinessInvoice($entity);
-        $this->_em->getRepository('AccountingBundle:Transaction')->hmsSalesTransaction($entity, $accountBusinessInvoice);
+        $accountBusinessInvoice = $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountBusinessInvoice($entity);
+        $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountBusinessInvoice);
 
     }
 

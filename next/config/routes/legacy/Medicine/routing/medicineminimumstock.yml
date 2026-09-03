@@ -1,0 +1,29 @@
+medicine_minimum:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\MedicineMinimumStockController::indexAction' }
+
+medicine_minimum_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\MedicineMinimumStockController::createAction' }
+    methods:  POST
+
+medicine_minimum_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\MedicineMinimumStockController::editAction' }
+
+medicine_minimum_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\MedicineMinimumStockController::updateAction' }
+    methods:  [POST, PUT]
+
+medicine_minimum_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Medicine\Controller\MedicineMinimumStockController::statusAction' }
+
+medicine_minimum_process:
+    path:     /{id}/process
+    defaults: { _controller: 'App\Medicine\Controller\MedicineMinimumStockController::processAction' }
+
+medicine_minimum_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineMinimumStockController::deleteAction' }

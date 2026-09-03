@@ -76,7 +76,7 @@ class SyndicateRepository extends MaterializedPathRepository{
 
         $ret = [];
         $em = $this->_em;
-        $Syndicates = $em->getRepository('SettingToolBundle:Syndicate')->findBy([],['name'=>'asc']);
+        $Syndicates = $em->getRepository(\App\Tool\Entity\Syndicate::class)->findBy([],['name'=>'asc']);
 
         foreach( $Syndicates as $cat ){
             if( !$cat->getParent() ){

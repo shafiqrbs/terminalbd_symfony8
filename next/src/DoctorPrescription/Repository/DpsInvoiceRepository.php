@@ -323,7 +323,7 @@ class DpsInvoiceRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('DoctorPrescriptionBundle:DpsTreatmentPlan','si')
+            ->from(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class,'si')
             ->select('sum(si.price) as estimateTotal')
             ->where('si.dpsInvoice = :invoice')
             ->setParameter('invoice', $invoice ->getId())
@@ -352,7 +352,7 @@ class DpsInvoiceRepository extends EntityRepository
     {
         $em = $this->_em;
         $res = $em->createQueryBuilder()
-            ->from('DoctorPrescriptionBundle:DpsTreatmentPlan','si')
+            ->from(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class,'si')
             ->select('sum(si.price) as subTotal ,sum(si.payment) as payment ,sum(si.discount) as discount')
             ->where('si.dpsInvoice = :invoice')
             ->setParameter('invoice', $invoice ->getId())
@@ -411,7 +411,7 @@ class DpsInvoiceRepository extends EntityRepository
     public function updatePatientInfo($invoice,Customer $patient)
     {
         $em = $this->_em;
-        $invoice = $this->_em->getRepository('DoctorPrescriptionBundle:DpsInvoice')->find($invoice);
+        $invoice = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->find($invoice);
         $invoice->setCustomer($patient);
         $invoice->setMobile($patient->getMobile());
         $em->persist($invoice);

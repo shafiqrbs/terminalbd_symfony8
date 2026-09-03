@@ -1,0 +1,33 @@
+mallconnect:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\MallConnectController::indexAction' }
+
+mallconnect_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\MallConnectController::showAction' }
+
+mallconnect_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\MallConnectController::newAction' }
+
+mallconnect_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\MallConnectController::createAction' }
+    methods:  POST
+
+mallconnect_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\MallConnectController::editAction' }
+
+mallconnect_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Content\Controller\MallConnectController::statusAction' }
+
+mallconnect_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\MallConnectController::updateAction' }
+    methods:  [POST, PUT]
+
+mallconnect_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\MallConnectController::deleteAction' }

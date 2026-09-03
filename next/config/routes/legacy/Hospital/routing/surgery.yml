@@ -1,0 +1,25 @@
+hms_surgery:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\SurgeryController::indexAction' }
+
+hms_surgery_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\SurgeryController::createAction' }
+    methods:  POST
+
+hms_surgery_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\SurgeryController::editAction' }
+
+hms_surgery_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\SurgeryController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_surgery_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\SurgeryController::deleteAction' }
+
+hms_surgery_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\SurgeryController::statusAction' }

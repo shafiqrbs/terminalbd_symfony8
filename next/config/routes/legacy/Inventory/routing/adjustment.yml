@@ -1,0 +1,20 @@
+inv_stock_adjustment:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\StockAdjustmentController::indexAction' }
+
+inv_stock_adjustment_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\StockAdjustmentController::newAction' }
+
+inv_stock_adjustment_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\StockAdjustmentController::createAction' }
+    methods:  POST
+
+inv_stock_adjustment_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\StockAdjustmentController::deleteAction' }
+
+inv_stock_adjustment_approved:
+    path:     /{id}/approved
+    defaults: { _controller: 'App\Inventory\Controller\StockAdjustmentController::approvedAction' }

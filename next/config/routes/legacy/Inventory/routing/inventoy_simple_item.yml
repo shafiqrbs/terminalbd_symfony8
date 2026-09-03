@@ -1,0 +1,87 @@
+inventory_simple_stock_simple_stock:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::indexAction' }
+
+inventory_simple_stock_inventory_simple_stock:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::indexAction' }
+
+inventory_simple_stock_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::showAction' }
+
+inventory_simple_stock_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::newAction' }
+
+inventory_simple_stock_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::createAction' }
+    methods:  POST
+
+inventory_simple_stock_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::editAction' }
+
+
+inventory_simple_stock_edit_web:
+    path:     /{id}/edit-web
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::editWebAction' }
+
+inventory_simple_stock_web_status:
+    path:     /{id}/inventory_simple_stock-web-status
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::webStatusAction' }
+
+inventory_simple_stock_inventory_simple_stock_web_price:
+    path:     /update-web-price
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::updateWebPriceAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_simple_stock_gallery:
+    path:     /{inventory_simple_stock}/upload
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::uploadItemImageAction' }
+    options:
+           expose: true
+
+inventory_simple_stock_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::statusAction' }
+
+inventory_simple_stock_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_simple_stock_web_update:
+    path:     /{id}/web-update
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::updateWebAction' }
+    methods:  [POST, PUT]
+
+inventory_simple_stock_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::deleteAction' }
+
+inventory_simple_stock_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::autoSearchAction' }
+    options:
+           expose: true
+
+inventory_simple_stock_search_all:
+    path:     /all-search
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::autoSearchItemAllAction' }
+    options:
+           expose: true
+
+inventory_simple_stock_inventory_simple_stock_inline_update:
+    path:     /{vendor}/vendor-inventory_simple_stock
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::vendorItemAction' }
+    options:
+           expose: true
+
+inventory_simple_stock_price:
+    path:      /price
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::priceAction' }
+    methods:  [POST]

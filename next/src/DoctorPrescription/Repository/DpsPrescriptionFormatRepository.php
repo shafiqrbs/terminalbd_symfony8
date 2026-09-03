@@ -24,7 +24,7 @@ class DpsPrescriptionFormatRepository extends EntityRepository
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){
-            $qb->update('DoctorPrescriptionBundle:DpsService', 'mg')
+            $qb->update(\App\DoctorPrescription\Entity\DpsService::class, 'mg')
                 ->set('mg.sorting', $i)
                 ->where('mg.id = :id')
                 ->setParameter('id', $value)
@@ -204,7 +204,7 @@ class DpsPrescriptionFormatRepository extends EntityRepository
 
             $entity = new Particular();
             if(!empty($location)){
-                $location = $em->getRepository('SettingLocationBundle:Location')->find($location);
+                $location = $em->getRepository(\App\Location\Entity\Location::class)->find($location);
                 $entity->setLocation($location);
             }
             if(!empty($department)){

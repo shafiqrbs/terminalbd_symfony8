@@ -1,0 +1,34 @@
+sponsor:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\SponsorController::indexAction' }
+
+sponsor_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\SponsorController::showAction' }
+
+sponsor_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\SponsorController::newAction' }
+
+sponsor_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\SponsorController::createAction' }
+    methods:  POST
+
+sponsor_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\SponsorController::editAction' }
+
+sponsor_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Content\Controller\SponsorController::statusAction' }
+
+sponsor_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\SponsorController::updateAction' }
+    methods:  [POST, PUT]
+
+sponsor_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\SponsorController::deleteAction' }
+

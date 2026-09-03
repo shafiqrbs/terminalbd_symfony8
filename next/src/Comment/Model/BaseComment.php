@@ -63,7 +63,7 @@ abstract class BaseComment
         $this->depth     = count($ancestors);
     }
 
-    public function getParent() { return $this->parent; }
+    public function getParent(): ?string { return $this->parent; }
 
     public function setParent(self $parent): void
     {

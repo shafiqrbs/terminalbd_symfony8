@@ -40,7 +40,7 @@ class ContentRepository extends EntityRepository
 
         $em = $this->_em;
 
-        $entity = $em->getRepository('SettingAppearanceBundle:Menu')->findOneBy(['page' => $page->getId()]);
+        $entity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['page' => $page->getId()]);
         if(!empty($entity)){
 
             $entity->setMenu($page->getMenu());

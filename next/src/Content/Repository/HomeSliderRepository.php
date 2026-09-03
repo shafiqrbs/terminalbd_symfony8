@@ -23,7 +23,7 @@ class HomeSliderRepository extends EntityRepository
         foreach ($data as $key => $value){
 
             $val = $value ?: 0 ;
-            $q = $qb->update('SettingContentBundle:HomeSlider', 'mg')
+            $q = $qb->update(\App\Content\Entity\HomeSlider::class, 'mg')
                 ->set('mg.sorting', $i)
                 ->where('mg.id = :id')
                 ->setParameter('id', $key)

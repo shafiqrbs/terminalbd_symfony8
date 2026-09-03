@@ -1,0 +1,9 @@
+hms_config_manage:
+    path:     /manage
+    defaults: { _controller: 'App\Hospital\Controller\HospitalConfigController::manageAction' }
+
+hms_config_update:
+    path:     /update
+    defaults: { _controller: 'App\Hospital\Controller\HospitalConfigController::updateAction' }
+    methods:  [POST, PUT]
+

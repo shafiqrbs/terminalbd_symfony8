@@ -15,7 +15,7 @@ class ColorSizeRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(cs)');
-        $qb->from('InventoryBundle:ColorSize','cs');
+        $qb->from(\App\Inventory\Entity\ColorSize::class,'cs');
         $qb->where("cs.type = :type");
         $qb->setParameter('type', $type);
         $qb->andWhere("cs.inventoryConfig = :inventory");

@@ -1,0 +1,153 @@
+medicine_medicine_brand:
+    resource: 'routing/medicine.yml'
+    prefix:   /drug
+
+medicine_medicine_user:
+    resource: 'routing/medicineuser.yml'
+    prefix:   /drug-user
+
+medicine_medicine_company:
+    resource: 'routing/medicinecompany.yml'
+    prefix:   /drug-company
+
+medicine_medicine_config:
+    resource: 'routing/config.yml'
+    prefix:   /config
+
+medicine_medicine_stock:
+    resource: 'routing/stock.yml'
+    prefix:   /stock
+
+medicine_medicine_adjustment:
+    resource: 'routing/adjustment.yml'
+    prefix:   /stock-adjustment
+
+medicine_medicine_sales_user:
+    resource: 'routing/salesuser.yml'
+    prefix:   /sales-user
+
+medicine_medicine_minimum_stock:
+    resource: 'routing/medicineminimumstock.yml'
+    prefix:   /medicine-minimum-stock
+
+medicine_medicine_sales:
+    resource: 'routing/sales.yml'
+    prefix:   /sales
+
+medicine_medicine_sales_temporary:
+    resource: 'routing/salestemporary.yml'
+    prefix:   /sales-temporary
+
+medicine_medicine_purchase:
+    resource: 'routing/purchase.yml'
+    prefix:   /purchase
+
+medicine_medicine_prepurchase:
+    resource: 'routing/prepurchase.yml'
+    prefix:   /pre-purchase
+
+medicine_medicine_stockhouse:
+    resource: 'routing/stockhouse.yml'
+    prefix:   /stock-wear-house
+
+medicine_medicine_instantpurchase:
+    resource: 'routing/instantpurchase.yml'
+    prefix:   /instant-purchase
+
+medicine_medicine_vendor:
+    resource: 'routing/vendor.yml'
+    prefix:   /vendor
+
+medicine_medicine_damage:
+    resource: 'routing/damage.yml'
+    prefix:   /damage
+
+medicine_medicine_purchase_return:
+    resource: 'routing/purchasereturn.yml'
+    prefix:   /purchase-return
+
+medicine_medicine_transfer:
+    resource: 'routing/medicinetransfer.yml'
+    prefix:   /medicine-transfer
+
+medicine_medicine_sales_return:
+    resource: 'routing/salesreturn.yml'
+    prefix:   /sales-return
+
+medicine_medicine_particular:
+    resource: 'routing/particular.yml'
+    prefix:   /particular
+
+medicine_medicine_report:
+    resource: 'routing/report.yml'
+    prefix:   /report
+
+medicine_medicine_reverse:
+    resource: 'routing/reverse.yml'
+    prefix:   /reverse
+
+medicine_import:
+    resource: 'routing/medicinestockimport.yml'
+    prefix:   /medicine-stock-import
+
+medicine_homepage:
+    path:     /
+    defaults: { _controller: App\Medicine\Controller\DefaultController::indexAction }
+
+medicine_update_expiration:
+    path:     /update-expiration-medicine
+    defaults: { _controller: App\Medicine\Controller\DefaultController::updateExpirationMedicineAction }
+
+medicine_particular_migration:
+    path:     /copy-particular-migration
+    defaults: { _controller: App\Medicine\Controller\DefaultController::copyToMedicineParticularAction }
+
+medicine_stock_migration:
+    path:     /copy-stock-migration
+    defaults: { _controller: App\Medicine\Controller\DefaultController::copyToMedicineStockAction }
+
+medicine_ecommerce_migration:
+    path:     /copy-ecommerce-migration
+    defaults: { _controller: App\Medicine\Controller\DefaultController::copyStockToEcommerceAction }
+
+medicine_vendor_migration:
+    path:     /copy-vendor-migration
+    defaults: { _controller: App\Medicine\Controller\DefaultController::copyToMedicineVendorAction }
+
+medicine_report_vendor_sales:
+    path:     /vendor-purchase-sales
+    defaults: { _controller: 'App\Medicine\Controller\DefaultController::vendorCustomerAccountAction' }
+
+medicine_update_remaining_quantity:
+    path:     /update-remaining-quantity
+    defaults: { _controller: 'App\Medicine\Controller\DefaultController::updateRemainingQuantityAction' }
+
+medicine_report_vendor_sales_medicine:
+    path:     /vendor-purchase-sales-medicine
+    defaults: { _controller: 'App\Medicine\Controller\DefaultController::vendorCustomerMedicineAction' }
+
+medicine_report_vendor_payment_receive:
+    path:     /{vendor}/vendor-payment-receive
+    defaults: { _controller: 'App\Medicine\Controller\DefaultController::vendorPaymentReceiveAction' }
+
+medicine_group_purchase_reverse:
+    path:     /group/purchase/reverse
+    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::groupReverseAction' }
+
+medicine_group_purchase_approved:
+    path:      /group/purchase/approved
+    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::groupApprovedAction' }
+
+medicine_group_sales_reverse:
+    path:     /group/sales/reverse
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::groupReverseAction' }
+
+medicine_group_sales_approved:
+    path:      /group/sales/approved
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::groupApprovedAction' }
+
+medicine_update_brand:
+    path:     /medicine-update-brand
+    defaults: { _controller: 'App\Medicine\Controller\DefaultController::medicineBrandUpdateAction' }
+
+

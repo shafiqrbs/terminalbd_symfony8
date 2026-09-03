@@ -41,7 +41,7 @@ class RestaurantTemporaryRepository extends EntityRepository
 
     public function insertInvoiceItems(User $user, $data)
     {
-        $particular = $this->_em->getRepository('RestaurantBundle:Particular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
         $em = $this->_em;
 
         $entity = new RestaurantTemporary();

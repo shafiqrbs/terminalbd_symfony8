@@ -1,0 +1,36 @@
+module:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\ModuleController::indexAction' }
+
+module_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\ModuleController::showAction' }
+
+module_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\ModuleController::newAction' }
+
+module_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\ModuleController::createAction' }
+    requirements: { _method: post }
+
+
+module_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\ModuleController::editAction' }
+
+module_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\ModuleController::updateAction' }
+    requirements: { _method: post|put }
+
+module_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\ModuleController::deleteAction' }
+    requirements: { _method: post|delete }
+
+module_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\ModuleController::statusAction' }
+

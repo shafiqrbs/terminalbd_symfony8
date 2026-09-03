@@ -1,0 +1,25 @@
+attendance:
+    path:     /
+    defaults: { _controller: 'App\HumanResource\Controller\AttendanceController::indexAction' }
+
+attendance_user:
+    path:     /{user}/employee
+    defaults: { _controller: 'App\HumanResource\Controller\AttendanceController::employeeDetailsAction' }
+
+attendance_user_create:
+    path:     /{user}/employee-create
+    defaults: { _controller: 'App\HumanResource\Controller\AttendanceController::employeeLeaveCreateAction' }
+
+attendance_leave_approve:
+    path:     /{id}/employee-leave-approve
+    defaults: { _controller: 'App\HumanResource\Controller\AttendanceController::employeeLeaveApproveAction' }
+
+attendance_leave_delete:
+    path:     /{id}/employee-leave-delete
+    defaults: { _controller: 'App\HumanResource\Controller\AttendanceController::employeeLeaveDeleteAction' }
+
+weekend_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\HumanResource\Controller\WeekendController::updateAction' }
+    methods:  [POST, PUT]
+

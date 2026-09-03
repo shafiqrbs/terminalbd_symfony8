@@ -81,7 +81,7 @@ class MedicineStockRepository extends EntityRepository
     public function getPurchaseDetails(MedicineConfig $config,MedicineStock $stock){
 
     	$qb = $this->_em->createQueryBuilder();
-	    $qb->from('MedicineBundle:MedicinePurchaseItem','e');
+	    $qb->from(\App\Medicine\Entity\MedicinePurchaseItem::class,'e');
 	    $qb->join('e.medicinePurchase','mp');
 	    $qb->select('e');
 	    $qb->where('e.medicineStock = :item')->setParameter('item',$stock->getId());
@@ -95,7 +95,7 @@ class MedicineStockRepository extends EntityRepository
     public function getPurchaseReturnDetails(MedicineConfig $config,MedicineStock $stock){
 
     	$qb = $this->_em->createQueryBuilder();
-	    $qb->from('MedicineBundle:MedicinePurchaseReturnItem','e');
+	    $qb->from(\App\Medicine\Entity\MedicinePurchaseReturnItem::class,'e');
 	    $qb->join('e.medicinePurchaseReturn','mp');
 	    $qb->select('e');
 	    $qb->where('e.medicineStock = :item')->setParameter('item',$stock->getId());
@@ -109,7 +109,7 @@ class MedicineStockRepository extends EntityRepository
     public function getSalesDetails(MedicineConfig $config,MedicineStock $stock){
 
     	$qb = $this->_em->createQueryBuilder();
-	    $qb->from('MedicineBundle:MedicineSalesItem','e');
+	    $qb->from(\App\Medicine\Entity\MedicineSalesItem::class,'e');
 	    $qb->join('e.medicineSales','mp');
 	    $qb->select('e');
 	    $qb->where('e.medicineStock = :item')->setParameter('item',$stock->getId());
@@ -123,7 +123,7 @@ class MedicineStockRepository extends EntityRepository
     public function getSalesReturnDetails(MedicineConfig $config,MedicineStock $stock){
 
     	$qb = $this->_em->createQueryBuilder();
-	    $qb->from('MedicineBundle:MedicineSalesReturn','e');
+	    $qb->from(\App\Medicine\Entity\MedicineSalesReturn::class,'e');
 	    $qb->select('e');
 	    $qb->where('e.medicineStock = :item')->setParameter('item',$stock->getId());
 	    $qb->andWhere('e.medicineConfig = :config')->setParameter('config',$config->getId());
@@ -136,7 +136,7 @@ class MedicineStockRepository extends EntityRepository
     public function getDamageDetails(MedicineConfig $config,MedicineStock $stock){
 
     	$qb = $this->_em->createQueryBuilder();
-	    $qb->from('MedicineBundle:MedicineDamage','e');
+	    $qb->from(\App\Medicine\Entity\MedicineDamage::class,'e');
 	    $qb->select('e');
 	    $qb->where('e.medicineStock = :item')->setParameter('item',$stock->getId());
 	    $qb->andWhere('e.medicineConfig = :config')->setParameter('config',$config->getId());
@@ -241,7 +241,7 @@ class MedicineStockRepository extends EntityRepository
         $entity->setName(trim($data['name']));
         $entity->setSlug(strtolower($data['name']));
         $entity->setSalesPrice($price);
-        $unit = $em->getRepository('SettingToolBundle:ProductUnit')->find(4);
+        $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
         $entity->setUnit($unit);
         $em->persist($entity);
         $em->flush();
@@ -433,20 +433,20 @@ class MedicineStockRepository extends EntityRepository
 
     	$em = $this->_em;
         if($fieldName == 'sales'){
-            $qnt = $em->getRepository('MedicineBundle:MedicineSalesItem')->salesStockItemUpdate($stock);
+            $qnt = $em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesStockItemUpdate($stock);
             $stock->setSalesQuantity($qnt);
         }elseif($fieldName == 'sales-return'){
-	        $quantity = $this->_em->getRepository('MedicineBundle:MedicineSalesReturn')->salesReturnStockUpdate($stock);
+	        $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesReturn::class)->salesReturnStockUpdate($stock);
             $stock->setSalesReturnQuantity($quantity);
         }elseif($fieldName == 'purchase-return'){
-            $qnt = $em->getRepository('MedicineBundle:MedicinePurchaseReturnItem')->purchaseReturnStockUpdate($stock);
+            $qnt = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturnItem::class)->purchaseReturnStockUpdate($stock);
             $stock->setPurchaseReturnQuantity($qnt);
         }elseif($fieldName == 'damage'){
-            $quantity = $em->getRepository('MedicineBundle:MedicineDamage')->damageStockItemUpdate($stock);
+            $quantity = $em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->damageStockItemUpdate($stock);
             $stock->setDamageQuantity($quantity);
         }else{
-            $qnt = $em->getRepository('MedicineBundle:MedicinePurchaseItem')->purchaseStockItemUpdate($stock);
-            $bonusQnt = $em->getRepository('MedicineBundle:MedicinePurchaseItem')->purchaseStockBonusItemUpdate($stock);
+            $qnt = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->purchaseStockItemUpdate($stock);
+            $bonusQnt = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->purchaseStockBonusItemUpdate($stock);
             if($openStock > 0){
                 $stock->setOpeningQuantity($openStock);
             }
@@ -464,7 +464,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function stockAdjustment(MedicineStock $stock){
         $em = $this->_em;
-        $adjustment = $em->getRepository('MedicineBundle:MedicineStockAdjustment')->adjustmentStockItemUpdate($stock);
+        $adjustment = $em->getRepository(\App\Medicine\Entity\MedicineStockAdjustment::class)->adjustmentStockItemUpdate($stock);
         $stock->setAdjustmentQuantity($adjustment['quantity']);
         $stock->setBonusAdjustment($adjustment['bonus']);
         $em->persist($stock);
@@ -484,7 +484,7 @@ class MedicineStockRepository extends EntityRepository
     public function updatePurchasePrice(MedicineStock $stock,MedicinePurchaseItem $item)
     {
         $em = $this->_em;
-        //$avg = $em->getRepository('MedicineBundle:MedicinePurchaseItem')->getPurchaseSalesAvg($stock);
+        //$avg = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->getPurchaseSalesAvg($stock);
         $stock->setPurchasePrice($item->getPurchasePrice());
 	    $stock->setSalesPrice($item->getSalesPrice());
         $stock->setAveragePurchasePrice($item->getPurchaseAvgPrice());
@@ -528,7 +528,7 @@ class MedicineStockRepository extends EntityRepository
                 if($item->getMedicineStock()){
                     /** @var  $stock MedicineStock */
                     $stock = $item->getMedicineStock();
-                    $qnt = $em->getRepository('MedicineBundle:MedicineSalesItem')->salesStockItemUpdate($stock);
+                    $qnt = $em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesStockItemUpdate($stock);
                     $stock->setSalesQuantity($qnt);
                     $em->persist($stock);
                     $em->flush();
@@ -542,7 +542,7 @@ class MedicineStockRepository extends EntityRepository
     public function updateRemoveSalesQuantity(MedicineStock $stock){
 
         $em = $this->_em;
-        $qnt = $em->getRepository('MedicineBundle:MedicineSalesItem')->salesStockItemUpdate($stock);
+        $qnt = $em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesStockItemUpdate($stock);
         $stock->setPurchaseQuantity($qnt);
         $em->persist($stock);
         $em->flush();
@@ -1061,7 +1061,7 @@ class MedicineStockRepository extends EntityRepository
             $entity->setName($name);
             $entity->setBrandName($brand->getMedicineCompany()->getName());
             $entity->setMedicineBrand($brand);
-            $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(['name'=>'Pcs']);
+            $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->findOneBy(['name'=>'Pcs']);
             $entity->setUnit($unit);
             $entity->setSalesPrice($brand->getPrice());
             if($brand->getPrice()){
@@ -1085,19 +1085,19 @@ class MedicineStockRepository extends EntityRepository
             $entity->setMedicineConfig($config);
             $entity->setName($data['name']);
             $entity->setBrandName($data['brandName']);
-            $medicine = $em->getRepository('MedicineBundle:MedicineBrand')->findOneBy(['name'=>$entity->getName()]);
+            $medicine = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName()]);
             if($medicine){
                 $entity->setMedicineBrand($medicine);
             }
             if($data['unit']){
-                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(['name' => $data['unit']]);
+                $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->findOneBy(['name' => $data['unit']]);
                 $entity->setUnit($unit);
             }else{
-                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(['name'=>'Pcs']);
+                $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->findOneBy(['name'=>'Pcs']);
                 $entity->setUnit($unit);
             }
             if($data['category']){
-                $category = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(['medicineConfig'=>$config,'name' => $data['category']]);
+                $category = $em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findOneBy(['medicineConfig'=>$config,'name' => $data['category']]);
                 $entity->setCategory($category);
             }
             $entity->setOpeningQuantity($data['openingQuantity']);
@@ -1129,11 +1129,11 @@ class MedicineStockRepository extends EntityRepository
             $entity->setName($data['name']);
             $entity->setBrandName($data['brandName']);
             if($data['category']){
-                $category = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(['name' => $data['category']]);
+                $category = $em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findOneBy(['name' => $data['category']]);
                 $entity->setCategory($category);
             }
             if($data['unit']){
-                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(['name' => $data['unit']]);
+                $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->findOneBy(['name' => $data['unit']]);
                 $entity->setUnit($unit);
             }
             $entity->setSalesPrice($data['price']);

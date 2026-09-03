@@ -1,0 +1,18 @@
+customer_business_dashboard:
+    path:     /
+    defaults: { _controller: 'App\Customer\Controller\BusinessController::indexAction' }
+
+student_invoice_create:
+       path:     /invoice-create
+       defaults: { _controller: 'App\Customer\Controller\BusinessController::createAction' }
+       methods:  [POST]
+
+customer_self_new:
+    path:     /new
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::newAction' }
+
+customer_self_create:
+    path:     /create
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::createAction' }
+    methods:  POST
+

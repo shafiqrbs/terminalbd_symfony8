@@ -1,0 +1,22 @@
+itemtypegrouping:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ItemTypeGroupingController::indexAction' }
+
+itemtypegrouping_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\ItemTypeGroupingController::createAction' }
+    methods:  POST
+
+itemtypegrouping_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\ItemTypeGroupingController::editAction' }
+
+itemtypegrouping_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\ItemTypeGroupingController::updateAction' }
+    methods:  [POST, PUT]
+
+itemtypegrouping_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\ItemTypeGroupingController::deleteAction' }
+    methods:  [POST, DELETE]

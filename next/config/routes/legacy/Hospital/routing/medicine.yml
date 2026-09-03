@@ -1,0 +1,33 @@
+hms_medicine:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\MedicineController::indexAction' }
+
+hms_medicine_shortlist:
+    path:     /short-list
+    defaults: { _controller: 'App\Hospital\Controller\MedicineController::shortListAction' }
+
+hms_medicine_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\MedicineController::createAction' }
+    methods:  POST
+
+hms_medicine_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\MedicineController::editAction' }
+
+hms_medicine_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\MedicineController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_medicine_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\MedicineController::deleteAction' }
+
+hms_medicine_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\MedicineController::statusAction' }
+
+hms_medicine_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Hospital\Controller\MedicineController::inlineUpdateAction' }

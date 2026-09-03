@@ -39,7 +39,7 @@ class SalesReturnRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(e.id)');
-        $qb->from('InventoryBundle:SalesReturn','e');
+        $qb->from(\App\Inventory\Entity\SalesReturn::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory->getId());
         $count = $qb->getQuery()->getSingleScalarResult();
@@ -55,7 +55,7 @@ class SalesReturnRepository extends EntityRepository
     {
         $em = $this->_em;
         $itemQnt = $em->createQueryBuilder()
-            ->from('InventoryBundle:SalesReturnItem','e')
+            ->from(\App\Inventory\Entity\SalesReturnItem::class,'e')
             ->select('sum(e.quantity) as quantity')
             ->where('e.salesItem = :item')
             ->setParameter('item', $item->getId())
@@ -71,7 +71,7 @@ class SalesReturnRepository extends EntityRepository
     {
         $em = $this->_em;
         $entity = $em->createQueryBuilder()
-            ->from('InventoryBundle:SalesReturnItem','e')
+            ->from(\App\Inventory\Entity\SalesReturnItem::class,'e')
             ->select('sum(e.subTotal) as total , count(e.id) as totalItem, sum(e.quantity) as totalQuantity')
             ->where('e.salesReturn = :salesReturn')
             ->setParameter('salesReturn', $salesReturn ->getId())

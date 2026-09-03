@@ -80,7 +80,7 @@ class UserRepository extends EntityRepository
         $name = $data['customerName'];
         $address = $data['customerAddress'] ?? '';
         $email = $data['customerEmail'] ?? '';
-        $entity = $em->getRepository('UserBundle:User')->findOneBy(['globalOption' => $globalOption ,'username' => $mobile]);
+        $entity = $em->getRepository(\App\User\Entity\User::class)->findOneBy(['globalOption' => $globalOption ,'username' => $mobile]);
         if($entity){
             $profile = $entity->getProfile();
             $profile->setUser($entity);

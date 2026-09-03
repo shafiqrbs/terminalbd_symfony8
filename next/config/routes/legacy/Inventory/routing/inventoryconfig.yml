@@ -1,0 +1,51 @@
+inventoryconfig_dashboard:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\InventoryConfigController::indexAction' }
+
+inventoryconfig_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\InventoryConfigController::showAction' }
+
+inventoryconfig_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\InventoryConfigController::newAction' }
+
+inventoryconfig_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\InventoryConfigController::createAction' }
+    methods:  POST
+
+inventoryconfig_edit:
+    path:     /manage
+    defaults: { _controller: 'App\Inventory\Controller\InventoryConfigController::editAction' }
+
+inventoryconfig_data_import_form:
+    path:     /{id}/data-import-form
+    defaults: { _controller: 'App\Inventory\Controller\InventoryConfigController::excelDataImportFormAction' }
+    methods:  GET
+
+
+inventoryconfig_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\InventoryConfigController::updateAction' }
+    methods:  [POST, PUT]
+
+
+inventory_branches_search:
+    path:     /search
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::autoSearchAction' }
+    options:
+            expose: true
+
+inventory_branches_name:
+    path:      /{branch}/branch-name
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::searchBranchNameAction' }
+    options:
+            expose: true
+
+inventory_location_search:
+    path:     /location-auto-search
+    defaults: { _controller: 'App\Location\Controller\LocationController::autoSearchAction' }
+    options:
+           expose: true
+

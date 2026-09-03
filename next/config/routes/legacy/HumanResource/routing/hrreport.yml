@@ -1,0 +1,54 @@
+domain_hr_report:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::indexAction' }
+
+agent_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::showAction' }
+
+agent_new:
+    path:     /new
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::newAction' }
+
+agent_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::createAction' }
+    methods:  POST
+
+agent_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::editAction' }
+
+agent_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::updateAction' }
+    methods:  [POST, PUT]
+
+agent_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::deleteAction' }
+    methods:  [POST, DELETE]
+
+agent_search:
+    path:     /customer-search
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::autoSearchAction' }
+    options:
+            expose: true
+
+agent_name:
+    path:      /{customer}/customer-name
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::searchCustomerNameAction' }
+    options:
+           expose: true
+
+domain_location_search:
+    path:     /location-search
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::autoLocationSearchAction' }
+    options:
+            expose: true
+
+domain_location_name:
+    path:      /{location}/location-name
+    defaults: { _controller: 'App\DomainUser\Controller\AgentController::searchLocationNameAction' }
+    options:
+           expose: true

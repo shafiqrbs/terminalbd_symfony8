@@ -29,7 +29,7 @@ class PosRepository extends EntityRepository
         $em = $this->_em;
         $find = $this->findOneBy(['createdBy' => $user , 'process' => 'Created']);
         $config = $user->getGlobalOption()->getInventoryConfig();
-        $method = $em->getRepository("SettingToolBundle:TransactionMethod")->find(1);
+        $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         if(empty($find)){
             $entity = new Pos();
             $entity ->setCreatedBy($user);
@@ -157,7 +157,7 @@ class PosRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(e.id)');
-        $qb->from('InventoryBundle:Vendor','e');
+        $qb->from(\App\Inventory\Entity\Vendor::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory);
         $count = $qb->getQuery()->getSingleScalarResult();

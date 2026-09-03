@@ -1,0 +1,37 @@
+user_password_reset:
+    path:  /edit/{id}
+    defaults: { _controller: App\User\Controller\ManageUserController::editAction }
+
+docudex_user_manager:
+    path:  /{page}
+    defaults: { _controller: App\User\Controller\ManageUserController::indexAction, page: 1 }
+    requirements:
+            page:  \d+
+
+docudex_user_manager_create:
+    path:  /new
+    defaults: { _controller: App\User\Controller\ManageUserController::createAction }
+
+
+
+docudex_user_manager_change_password:
+    path:  /change-password/{id}
+    defaults: { _controller: App\User\Controller\ManageUserController::changeUserPasswordAction }
+    methods:  [POST]
+    options:
+            expose: true
+
+docudex_user_manager_delete:
+    path:  /delete/{id}
+    defaults: { _controller: App\User\Controller\ManageUserController::deleteAction }
+
+docudex_user_manager_duplicacy_check:
+    path:  /check/{type}
+    defaults: { _controller: App\User\Controller\ManageUserController::checkDuplicateAction }
+    methods:  [POST]
+    options:
+            expose: true
+
+#fos_user_group:
+#    resource: "group.xml"   # superseded by config/routes/auth.yaml
+#    prefix: /group

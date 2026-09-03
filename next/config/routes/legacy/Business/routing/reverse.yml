@@ -1,0 +1,16 @@
+business_reverse:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\BusinessReverseController::indexAction' }
+
+business_purchase_reverse:
+    path:     /{id}/purchase
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::reverseAction' }
+
+business_sales_reverse:
+    path:     /{id}/sales
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceReverseAction' }
+
+business_reverse_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Business\Controller\BusinessReverseController::showAction' }
+

@@ -1,0 +1,20 @@
+member_index:
+    path:     /
+    defaults: { _controller: 'App\Customer\Controller\MemberController::indexAction' }
+
+member_show_profile:
+    path:     /show-profile
+    defaults: { _controller: 'App\Customer\Controller\MemberController::showAction' }
+
+member_profile:
+    path:     /{customer}/show-profile
+    defaults: { _controller: 'App\Customer\Controller\MemberController::memberProfileAction' }
+
+member_edit_profile:
+    path:     /edit-profile
+    defaults: { _controller: 'App\Customer\Controller\MemberController::editAction' }
+
+member_profile_update:
+    path:     /update-profile
+    defaults: { _controller: 'App\Customer\Controller\MemberController::updateAction' }
+    methods:  [POST, PUT]

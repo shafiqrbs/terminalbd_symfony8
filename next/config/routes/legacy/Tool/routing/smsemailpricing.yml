@@ -1,0 +1,34 @@
+smspricing:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\SmsEmailPricingController::indexAction' }
+
+smspricing_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\SmsEmailPricingController::showAction' }
+
+smspricing_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\SmsEmailPricingController::newAction' }
+
+smspricing_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\SmsEmailPricingController::createAction' }
+    methods:  POST
+
+smspricing_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\SmsEmailPricingController::editAction' }
+
+smspricing_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\SmsEmailPricingController::updateAction' }
+    methods:  [POST, PUT]
+
+smspricing_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\SmsEmailPricingController::deleteAction' }
+
+smspricing_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\SmsEmailPricingController::statusAction' }
+

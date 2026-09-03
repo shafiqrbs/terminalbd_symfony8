@@ -1,0 +1,92 @@
+inventory_purchasesimple:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::indexAction' }
+
+inventory_purchasesimple_serial:
+    path:     /serial
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::processSerialNoAction' }
+
+inventory_purchasesimple_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::showAction' }
+
+inventory_purchasesimple_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::newAction' }
+
+inventory_purchasesimple_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::editAction' }
+
+inventory_purchasesimple_reverse:
+    path:     /{id}/reverse
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::reverseAction' }
+
+inventory_purchasesimple_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_purchasesimple_create:
+    path:     /{purchase}/create
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::createPurchaseItemAction' }
+    methods:  POST
+
+inventory_purchasesimple_approve:
+    path:     /{id}/approve
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::approveAction' }
+
+inventory_purchasesimple_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::deleteAction' }
+
+approved_inventory_purchasesimple_deleted:
+    path:     /{id}/approved-inventory_purchasesimple-deleted
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::approvedPurchaseDeletedAction' }
+
+inventory_purchasesimple_edit_approve:
+    path:     /{id}/edit-approve
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::editApproveAction' }
+
+
+inventory_purchasesimple_update_approve:
+    path:      /{id}/update-approve
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::updateApproveAction' }
+    methods:  [POST, PUT]
+
+inventory_purchasesimple_create_stock_item:
+    path:      /create-new-stock-item
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::createStockItemAction' }
+    methods:  [POST, PUT]
+
+
+inventory_purchasesimple_item_delete:
+    path:     /{purchase}/{id}/purchase-simple-item-delete
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::purchaseItemDeleteAction' }
+
+
+inventory_grn_search:
+    path:     /inventory_purchasesimple-auto-search
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::autoSearchAction' }
+    options:
+           expose: true
+
+inventory_grn_name:
+    path:     /{grn}/inventory_purchasesimple-search-name
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::searchNameAction' }
+    options:
+           expose: true
+
+inventory_purchasesimple_inline_item_update:
+    path:     /inline-item-update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::inlineUpdateAction' }
+    methods:  POST
+    options:
+        expose: true
+
+inventory_purchasesimple_barcode_insert:
+    path:     /{id}/barcode-item-insert
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseSimpleController::barcodeItemInsertAction' }
+    methods:  POST
+    options:
+        expose: true

@@ -1,0 +1,33 @@
+dps_doctor:
+    path:     /
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DoctorController::indexAction' }
+
+dps_doctor_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DoctorController::showAction' }
+
+dps_doctor_new:
+    path:     /new
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DoctorController::newAction' }
+
+dps_doctor_create:
+    path:     /create
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DoctorController::createAction' }
+    methods:  POST
+
+dps_doctor_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DoctorController::editAction' }
+
+dps_doctor_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DoctorController::updateAction' }
+    methods:  [POST, PUT]
+
+dps_doctor_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DoctorController::deleteAction' }
+
+dps_doctor_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DoctorController::statusAction' }

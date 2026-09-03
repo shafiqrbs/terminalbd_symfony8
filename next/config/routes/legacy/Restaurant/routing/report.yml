@@ -1,0 +1,32 @@
+restaurant_report_sales_summary:
+    path:     /sales-summary
+    defaults: { _controller: 'App\Restaurant\Controller\ReportController::salesSummaryAction' }
+
+restaurant_report_sales_details:
+    path:     /sales-details
+    defaults: { _controller: 'App\Restaurant\Controller\ReportController::salesDetailsAction' }
+
+restaurant_report_sales_user:
+    path:     /user-wise-sales
+    defaults: { _controller: 'App\Restaurant\Controller\ReportController::userBaseSalesSummaryAction' }
+
+restaurant_report_sales_category:
+    path:     /category-wise-sales
+    defaults: { _controller: 'App\Restaurant\Controller\ReportController::categoryBaseSalesSummaryAction' }
+
+restaurant_report_sales_group:
+    path:     /group-wise-sales
+    defaults: { _controller: 'App\Restaurant\Controller\ReportController::productGroupBaseSalesSummaryAction' }
+
+restaurant_report_sales_product:
+    path:     /product-wise-sales
+    defaults: { _controller: 'App\Restaurant\Controller\ReportController::productBaseSalesSummaryAction' }
+
+restaurant_report_purchase_summary:
+    path:     /purchase-summary
+    defaults: { _controller: 'App\Restaurant\Controller\ReportController::purchaseSummaryAction' }
+
+restaurant_report_stock:
+    path:     /stock-summary
+    defaults: { _controller: 'App\Restaurant\Controller\ReportController::stockAction' }
+

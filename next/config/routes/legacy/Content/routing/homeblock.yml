@@ -1,0 +1,4 @@
+homeblock_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\HomePageController::deleteAction' }
+

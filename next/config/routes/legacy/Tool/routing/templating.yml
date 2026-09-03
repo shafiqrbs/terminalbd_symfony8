@@ -1,0 +1,30 @@
+templating:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\TemplatingController::indexAction' }
+
+templating_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\TemplatingController::showAction' }
+
+templating_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\TemplatingController::newAction' }
+
+templating_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\TemplatingController::createAction' }
+    methods:  POST
+
+templating_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\TemplatingController::editAction' }
+
+templating_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\TemplatingController::updateAction' }
+    methods:  [POST, PUT]
+
+templating_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\TemplatingController::deleteAction' }
+    methods:  [POST, DELETE]

@@ -1,0 +1,44 @@
+inventory_salesreturn:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\SalesReturnController::indexAction' }
+
+inventory_salesreturn_search:
+    path:     /serach-with-edit
+    defaults: { _controller: 'App\Inventory\Controller\SalesReturnController::searchAction' }
+    methods:  POST
+
+inventory_salesreturn_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\SalesReturnController::showAction' }
+
+
+inventory_salesreturn_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\SalesReturnController::editAction' }
+
+inventory_salesreturn_item:
+    path:     /sales-return-item
+    defaults: { _controller: 'App\Inventory\Controller\SalesReturnController::salesItemAction' }
+    methods:  [POST, PUT]
+    options:
+            expose: true
+
+inventory_salesreturn_approve:
+    path:     /{id}/sales-return-approve
+    defaults: { _controller: 'App\Inventory\Controller\SalesReturnController::approveAction' }
+    options:
+            expose: true
+
+inventory_salesreturn_item_delete:
+    path:     /{id}/item-delete
+    defaults: { _controller: 'App\Inventory\Controller\SalesReturnController::itemDeleteAction' }
+
+inventory_salesreturn_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\SalesReturnController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_salesreturn_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\SalesReturnController::deleteAction' }
+

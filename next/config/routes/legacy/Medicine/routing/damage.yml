@@ -1,0 +1,29 @@
+medicine_damage:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\MedicineDamageController::indexAction' }
+
+medicine_damage_new:
+    path:     /new
+    defaults: { _controller: 'App\Medicine\Controller\MedicineDamageController::newAction' }
+
+medicine_damage_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\MedicineDamageController::createAction' }
+    methods:  POST
+
+medicine_damage_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\MedicineDamageController::editAction' }
+
+medicine_damage_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\MedicineDamageController::updateAction' }
+    methods:  [POST, PUT]
+
+medicine_damage_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineDamageController::deleteAction' }
+
+medicine_damage_approved:
+    path:     /{id}/approved
+    defaults: { _controller: 'App\Medicine\Controller\MedicineDamageController::approvedAction' }

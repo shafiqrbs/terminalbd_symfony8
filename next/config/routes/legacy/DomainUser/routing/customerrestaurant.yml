@@ -1,0 +1,30 @@
+restaurant_customer:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::indexAction' }
+
+restaurant_customer_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::showAction' }
+
+restaurant_customer_new:
+    path:     /new
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::newAction' }
+
+restaurant_customer_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::createAction' }
+    methods:  POST
+
+restaurant_customer_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::editAction' }
+
+restaurant_customer_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::updateAction' }
+    methods:  [POST, PUT]
+
+restaurant_customer_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::deleteAction' }
+    methods:  [POST, DELETE]

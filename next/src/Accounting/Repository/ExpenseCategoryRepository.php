@@ -27,7 +27,7 @@ class ExpenseCategoryRepository extends MaterializedPathRepository
         //echo $menu_id;
         $tempTree="";
 
-        $childData = $em->getRepository('AccountingBundle:ExpenseCategory')->findBy(['parent'=>$oldID],['name'=>'asc']);
+        $childData = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(['parent'=>$oldID],['name'=>'asc']);
 
         foreach ( $childData as $child ){
 
@@ -164,7 +164,7 @@ class ExpenseCategoryRepository extends MaterializedPathRepository
 
         $ret = [];
         $em = $this->_em;
-        $categories = $em->getRepository('AccountingBundle:ExpenseCategory')->findBy(['globalOption' => $globalOption ,'status' => 1],['name'=>'asc']);
+        $categories = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(['globalOption' => $globalOption ,'status' => 1],['name'=>'asc']);
 
         foreach( $categories as $cat ){
 

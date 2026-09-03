@@ -27,7 +27,7 @@ class PageMetaRepository extends EntityRepository
                 if (isset($data['metaValue'][$i]) and !empty($data['metaValue'][$i])) {
 
                     if (!empty($data['metaValue'][$i]) and !empty($data['metaId'][$i])) {
-                        $entity = $em->getRepository('SettingContentBundle:PageMeta')->find($data['metaId'][$i]);
+                        $entity = $em->getRepository(\App\Content\Entity\PageMeta::class)->find($data['metaId'][$i]);
                     } elseif (!empty($data['metaValue'][$i])) {
                         $entity = new PageMeta();
                         $entity->setPage($page);

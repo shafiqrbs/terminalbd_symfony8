@@ -1,0 +1,50 @@
+restaurant_production:
+    path:     /
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::indexAction' }
+
+restaurant_production_new:
+    path:     /new
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::newAction' }
+
+restaurant_production_create:
+    path:     /create
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::createAction' }
+    methods:  POST
+
+restaurant_production_edit:
+    path:     /recipe/{id}/
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::productionAction' }
+
+restaurant_production_approve:
+    path:     /{id}/approve
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::approveAction' }
+
+restaurant_production_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::productionUpdateAction' }
+    methods:  [POST, PUT]
+
+
+restaurant_production_delete:
+    path:     /{product}/{id}/delete
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::productionElementDeleteAction' }
+
+restaurant_production_particular_search:
+    path:     /{id}/particular-search
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::particularSearchAction' }
+
+
+restaurant_production_particular_add:
+    path:     /{id}/particular-add
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::addParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_production_valueadded:
+    path:     /{id}/item-value-add
+    defaults: { _controller: 'App\Restaurant\Controller\ProductionController::itemValueAddAction' }
+    methods:  GET
+    options:
+            expose: true
+

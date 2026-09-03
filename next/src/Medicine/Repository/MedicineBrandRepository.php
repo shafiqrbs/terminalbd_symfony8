@@ -107,8 +107,8 @@ class MedicineBrandRepository extends EntityRepository
 
         /** @var $row MedicineBrand */
         foreach ($results as $row ){
-            $company = $this->_em->getRepository('MedicineBundle:MedicineCompany')->findOneBy(['companyId'=> $row->getCompanyId()]);
-            $generic = $this->_em->getRepository('MedicineBundle:MedicineGeneric')->findOneBy(['genericId'=> $row->getGenericId()]);
+            $company = $this->_em->getRepository(\App\Medicine\Entity\MedicineCompany::class)->findOneBy(['companyId'=> $row->getCompanyId()]);
+            $generic = $this->_em->getRepository(\App\Medicine\Entity\MedicineGeneric::class)->findOneBy(['genericId'=> $row->getGenericId()]);
             $row->setMedicineGeneric($generic);
             $row->setMedicineCompany($company);
             $this->_em->persist($row);
@@ -136,7 +136,7 @@ class MedicineBrandRepository extends EntityRepository
     public function searchCompanyNameAutoComplete($q)
     {
         $query = $this->_em->createQueryBuilder();
-        $query->from('MedicineBundle:MedicineCompany','e');
+        $query->from(\App\Medicine\Entity\MedicineCompany::class,'e');
         $query->select('e.id as id');
         $query->addSelect('e.name AS text');
         $query->where($query->expr()->like("e.name", "'$q%'"  ));
@@ -151,7 +151,7 @@ class MedicineBrandRepository extends EntityRepository
     public function searchGenericNameAutoComplete($q)
     {
         $query = $this->_em->createQueryBuilder();
-        $query->from('MedicineBundle:MedicineGeneric','g');
+        $query->from(\App\Medicine\Entity\MedicineGeneric::class,'g');
         $query->select('g.id as id');
         $query->addSelect('g.name AS text');
         $query->where($query->expr()->like("g.name", "'$q%'"  ));

@@ -1,0 +1,11 @@
+setting_media_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: App\Media\Controller\DefaultController::indexAction }
+
+SettingMediaBundle_gallery:
+        resource: 'routing/photogallery.yml'
+        prefix:   /website/gallery
+
+SettingMediaBundle_galleryimage:
+        resource: 'routing/galleryimage.yml'
+        prefix:   /website/galleryimage

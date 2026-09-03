@@ -1,0 +1,26 @@
+business_area:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\BusinessAreaController::indexAction' }
+
+business_area_create:
+    path:     /create
+    defaults: { _controller: 'App\Business\Controller\BusinessAreaController::createAction' }
+    methods:  POST
+
+business_area_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Business\Controller\BusinessAreaController::editAction' }
+
+business_area_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Business\Controller\BusinessAreaController::updateAction' }
+    methods:  [POST, PUT]
+
+business_area_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\BusinessAreaController::deleteAction' }
+
+business_area_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Business\Controller\BusinessAreaController::statusAction' }
+

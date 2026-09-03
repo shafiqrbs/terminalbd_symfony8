@@ -1,0 +1,34 @@
+purchaseorder:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseOrderController::indexAction' }
+
+purchaseorder_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseOrderController::showAction' }
+
+purchaseorder_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseOrderController::newAction' }
+
+purchaseorder_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseOrderController::createAction' }
+    methods:  POST
+
+purchaseorder_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseOrderController::editAction' }
+
+purchaseorder_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseOrderController::updateAction' }
+    methods:  [POST, PUT]
+
+purchaseorder_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseOrderController::deleteAction' }
+    methods:  [POST, DELETE]
+
+purchaseorder_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseOrderController::editAction' }

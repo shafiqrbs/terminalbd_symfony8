@@ -1,0 +1,30 @@
+business_store:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreController::indexAction' }
+
+business_store_new:
+    path:     /new
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreController::newAction' }
+
+business_store_create:
+    path:     /create
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreController::createAction' }
+    methods:  POST
+
+business_store_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreController::editAction' }
+
+business_store_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreController::updateAction' }
+    methods:  [POST, PUT]
+
+business_store_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreController::deleteAction' }
+
+business_store_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreController::statusAction' }
+

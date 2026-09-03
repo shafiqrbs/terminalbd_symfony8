@@ -1,0 +1,30 @@
+accounthead:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountHeadController::indexAction' }
+
+accounthead_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\AccountHeadController::showAction' }
+
+accounthead_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountHeadController::newAction' }
+
+accounthead_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\AccountHeadController::createAction' }
+    methods:  POST
+
+accounthead_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\AccountHeadController::editAction' }
+
+accounthead_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\AccountHeadController::updateAction' }
+    methods:  [POST, PUT]
+
+accounthead_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountHeadController::deleteAction' }
+    methods:  [POST, DELETE]

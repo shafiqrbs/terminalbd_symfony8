@@ -1,0 +1,47 @@
+category:
+    path:     /
+    defaults: { _controller: 'App\Product\Controller\CategoryController::indexAction' }
+
+category_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Product\Controller\CategoryController::showAction' }
+
+category_new:
+    path:     /new
+    defaults: { _controller: 'App\Product\Controller\CategoryController::newAction' }
+
+category_create:
+    path:     /create
+    defaults: { _controller: 'App\Product\Controller\CategoryController::createAction' }
+    requirements: { _method: post }
+
+category_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Product\Controller\CategoryController::editAction' }
+
+category_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Product\Controller\CategoryController::statusAction' }
+
+category_sorting:
+    path:     /sorting
+    defaults: { _controller: 'App\Product\Controller\CategoryController::sortingAction' }
+
+category_sorted:
+    path:     /sorted
+    defaults: { _controller: 'App\Product\Controller\CategoryController::sortedAction' }
+
+category_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Product\Controller\CategoryController::updateAction' }
+    requirements: { _method: post|put }
+
+category_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Product\Controller\CategoryController::deleteAction' }
+
+category_feature:
+   path:     /feature
+   defaults: { _controller: 'App\Product\Controller\CategoryController::featureAction' }
+   requirements: { _method: post }
+

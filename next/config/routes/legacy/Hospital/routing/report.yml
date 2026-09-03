@@ -1,0 +1,73 @@
+hms_report_sales_summary:
+    path:     /sales-summary
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::salesSummaryAction' }
+
+hms_report_admission_patient_download:
+    path:     /patient-download
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::patientDownloadAction' }
+
+hms_report_sales_summary_pdf:
+    path:     /sales-summary-pdf
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::salesSummaryPdfAction' }
+
+hms_report_sales_details:
+    path:     /sales-details
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::salesDetailsAction' }
+
+hms_report_sales_details_pdf:
+    path:     /sales-details-pdf
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::salesDetailsPdfAction' }
+
+hms_report_sales_discount_details:
+    path:     /sales-discount-details
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::salesDetailsDiscountAction' }
+
+hms_report_sales_discount_details_pdf:
+    path:     /sales-discount-details-pdf
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::salesDetailsDiscountPdfAction' }
+
+hms_report_sales_service:
+    path:     /service-wise-sales
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::serviceBaseSummaryAction' }
+
+hms_report_sales_service_pdf:
+    path:     /service-wise-sales-pdf
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::serviceBaseSummaryPdfAction' }
+
+hms_report_monthly_cash:
+    path:     /monthly-cash
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::monthlyCashAction' }
+
+hms_report_monthly_cash_pdf:
+    path:     /monthly-cash-pdf
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::monthlyCashPdfAction' }
+
+hms_report_monthly_commission:
+    path:     /monthly-commission
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::monthlyCommissionAction' }
+
+hms_report_monthly_commission_pdf:
+    path:     /monthly-commission-pdf
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::monthlyCommissionPdfAction' }
+
+hms_report_daily_referred_commission:
+    path:     /daily-commission-details
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::dailyCommissionDetailsAction' }
+
+hms_report_monthly_referred_commission:
+    path:     /monthly-commission-details
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::monthlyCommissionDetailsAction' }
+
+hms_report_monthly_referred_commission_pdf:
+    path:     /monthly-commission-details-pdf
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::monthlyCommissionDetailsPdfAction' }
+
+hms_report_commission_group:
+    path:     /commission-group
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::commissionGroupAction' }
+
+hms_report_commission_group_pdf:
+    path:     /commission-group-pdf
+    defaults: { _controller: 'App\Hospital\Controller\ReportController::commissionGroupPdfAction' }
+
+

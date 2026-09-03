@@ -94,7 +94,7 @@ class AccountSalesReturnRepository extends EntityRepository
     public function lastInsertSales($globalOption,$entity)
     {
         $em = $this->_em;
-        $entity = $em->getRepository('AccountingBundle:AccountSalesReturn')->findOneBy(
+        $entity = $em->getRepository(\App\Accounting\Entity\AccountSalesReturn::class)->findOneBy(
             ['globalOption'=>$globalOption,'customer'=> $entity->getSales()->getCustomer(),'process'=>'approved'],
             ['id' => 'DESC']
         );
@@ -120,7 +120,7 @@ class AccountSalesReturnRepository extends EntityRepository
         $accountSales->setAmount($entity->getTotal());
         $accountSales->setProcess('approved');
         $accountSales->setProcessHead('SalesReturn');
-        $accountSales->setTransactionMethod($this->_em->getRepository('SettingToolBundle:TransactionMethod')->find(1));
+        $accountSales->setTransactionMethod($this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         $em->persist($accountSales);
         $em->flush();
 
@@ -136,7 +136,7 @@ class AccountSalesReturnRepository extends EntityRepository
         $accountSales->setSalesReturn($entity);
         $accountSales->setCustomer($entity->getSales()->getCustomer());
         /* Cash - Sales Return Payment Account */
-        $accountSales->setAccountHead($this->_em->getRepository('AccountingBundle:AccountHead')->find(35));
+        $accountSales->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(35));
 
         $accountSales->setReturnAmount($entity->getTotal());
         $accountSales->setApprovedBy($entity->getCreatedBy());

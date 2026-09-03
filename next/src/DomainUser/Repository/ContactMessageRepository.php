@@ -17,7 +17,7 @@ class ContactMessageRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $user = $em->getRepository('UserBundle:User')->find($data['user']);
+        $user = $em->getRepository(\App\User\Entity\User::class)->find($data['user']);
 
         if($data){
             $entity = new CustomerInbox();

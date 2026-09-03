@@ -1,0 +1,30 @@
+galleryimage:
+    path:     /
+    defaults: { _controller: 'App\Media\Controller\GalleryImageController::indexAction' }
+
+galleryimage_new:
+    path:     /new
+    defaults: { _controller: 'App\Media\Controller\GalleryImageController::newAction' }
+
+galleryimage_create:
+    path:     /create
+    defaults: { _controller: 'App\Media\Controller\GalleryImageController::createAction' }
+    requirements: { _method: post }
+
+galleryimage_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Media\Controller\GalleryImageController::editAction' }
+
+galleryimage_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Media\Controller\GalleryImageController::updateAction' }
+    requirements: { _method: post|put }
+
+galleryimage_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Media\Controller\GalleryImageController::deleteImageAction' }
+
+
+galleryimage_upload:
+    path:     /{id}/upload
+    defaults: { _controller: 'App\Media\Controller\GalleryImageController::uploadAction' }

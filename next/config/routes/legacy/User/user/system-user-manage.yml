@@ -1,0 +1,50 @@
+system_user_manager:
+    path:  /{page}
+    defaults: { _controller: App\User\Controller\ManageUserController::indexAction, page: 1 }
+    requirements:
+            page:  \d+
+
+system_user_manager_create:
+    path:  /new
+    defaults: { _controller: App\User\Controller\SystemUserController::createAction }
+
+system_user_manager_update:
+    path:  /account/update
+    defaults: { _controller: App\User\Controller\SystemUserController::updateAction }
+    methods:  [POST]
+    options:
+       expose: true
+
+system_user_manager_credential:
+    path:  /account/credential
+    defaults: { _controller: App\User\Controller\SystemUserController::credentialAction }
+    methods:  [POST]
+    options:
+       expose: true
+
+system_user_manager_change_password:
+    path:  /change-password/{id}
+    defaults: { _controller: App\User\Controller\ManageUserController::changeUserPasswordAction }
+    methods:  [POST]
+    options:
+            expose: true
+
+system_user_manager_delete:
+    path:  /delete/{id}
+    defaults: { _controller: App\User\Controller\ManageUserController::deleteAction }
+
+system_user_manager_duplicacy_check_user:
+    path:  /check/credential
+    defaults: { _controller: App\User\Controller\ManageUserController::checkDuplicateAction }
+    methods:  [POST]
+    options:
+            expose: true
+
+system_user_manager_duplicacy_check_mobile:
+    path:  /check/mobile
+    defaults: { _controller: App\User\Controller\ManageUserController::checkMobileDuplicateAction }
+    methods:  [POST]
+    options:
+            expose: true
+
+

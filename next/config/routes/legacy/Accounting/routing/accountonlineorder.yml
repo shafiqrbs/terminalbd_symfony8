@@ -1,0 +1,45 @@
+account_onlineorder:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::indexAction' }
+
+account_onlineorder_return:
+    path:     /return
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::salesReturnAction' }
+
+account_onlineorder_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::showAction' }
+
+account_onlineorder_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::newAction' }
+
+account_onlineorder_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::createAction' }
+    methods:  POST
+
+account_onlineorder_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::editAction' }
+
+account_onlineorder_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::updateAction' }
+    methods:  [POST, PUT]
+
+account_onlineorder_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::approveAction' }
+    options:
+           expose: true
+
+account_onlineorder_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::inlineUpdateAction' }
+
+account_onlineorder_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountOnlineOrderController::deleteAction' }
+    options:
+           expose: true

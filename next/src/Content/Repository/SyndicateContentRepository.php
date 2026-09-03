@@ -16,7 +16,7 @@ class SyndicateContentRepository extends EntityRepository
     public function insertContent($id,$user)
     {
         $em = $this->_em;
-        $reEntity = $em->getRepository('SettingToolBundle:Syndicate')->find($id);
+        $reEntity = $em->getRepository(\App\Tool\Entity\Syndicate::class)->find($id);
 
         if($reEntity){
             $entity = new SyndicateContent();

@@ -1,0 +1,13 @@
+dps_config_manage:
+    path:     /manage
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DpsConfigController::manageAction' }
+
+dps_default_service:
+    path:     /reset-default-service
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DpsConfigController::resetDefaultServiceAction' }
+
+dps_config_update:
+    path:     /update
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DpsConfigController::updateAction' }
+    methods:  [POST, PUT]
+

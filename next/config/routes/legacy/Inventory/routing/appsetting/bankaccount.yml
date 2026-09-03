@@ -1,0 +1,34 @@
+appsetting_bank:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::indexAction' }
+
+appsetting_bank_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::showAction' }
+
+appsetting_bank_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::newAction' }
+
+appsetting_bank_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::createAction' }
+    methods:  POST
+
+appsetting_bank_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::editAction' }
+
+appsetting_bank_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::updateAction' }
+    methods:  [POST, PUT]
+
+appsetting_bank_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::deleteAction' }
+
+appsetting_bank_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::statusAction' }
+

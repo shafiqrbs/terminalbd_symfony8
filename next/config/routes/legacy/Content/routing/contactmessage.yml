@@ -1,0 +1,18 @@
+contactmessage:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\ContactMessageController::indexAction' }
+
+contactmessage_archive:
+    path:     /archive
+    defaults: { _controller: 'App\Content\Controller\ContactMessageController::archiveAction' }
+
+
+contactmessage_update:
+    path:     /update
+    defaults: { _controller: 'App\Content\Controller\ContactMessageController::updateAction' }
+    requirements: { _method: post }
+
+
+contactmessage_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\ContactMessageController::deleteAction' }

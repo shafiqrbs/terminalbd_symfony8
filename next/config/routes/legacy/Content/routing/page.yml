@@ -1,0 +1,72 @@
+pages_delete:
+    path:     listing/delete
+    defaults: { _controller: 'App\Content\Controller\PageController::listingDeleteAction' }
+
+page:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\PageController::indexAction' }
+
+page_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\PageController::showAction' }
+
+page_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\PageController::newAction' }
+
+page_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\PageController::createAction' }
+    requirements: { _method: post }
+
+page_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\PageController::editAction' }
+
+page_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\PageController::updateAction' }
+    requirements: { _method: post|put }
+
+page_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\PageController::deleteAction' }
+
+page_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Content\Controller\PageController::statusAction' }
+
+page_meta_delete:
+    path:     /{id}/meta-delete
+    defaults: { _controller: 'App\Content\Controller\PageController::metaDeleteAction' }
+    options:
+       expose: true
+
+page_print_list:
+    path:     /print-list
+    defaults: { _controller: 'App\Content\Controller\PageController::printListAction' }
+
+page_pdf_list:
+    path:     /pdf-list
+    defaults: { _controller: 'App\Content\Controller\PageController::pdfListAction' }
+
+page_export_list:
+    path:     /export-list
+    defaults: { _controller: 'App\Content\Controller\PageController::exportListAction' }
+
+page_print:
+    path:     /{id}/print-details
+    defaults: { _controller: 'App\Content\Controller\PageController::printDetailsAction' }
+
+page_pdf:
+    path:     /{id}/pdf-details
+    defaults: { _controller: 'App\Content\Controller\PageController::pdfDetailsAction' }
+
+page_import:
+    path:     /import
+    defaults: { _controller: 'App\Content\Controller\PageController::importAction' }
+
+page_export:
+    path:     /{id}/export-details
+    defaults: { _controller: 'App\Content\Controller\PageController::exportDetailsAction' }
+

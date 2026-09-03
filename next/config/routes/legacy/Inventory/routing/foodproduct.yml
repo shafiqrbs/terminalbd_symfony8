@@ -1,0 +1,48 @@
+inventory_foodproduct:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\FoodProductController::indexAction' }
+
+inventory_foodproduct_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\FoodProductController::showAction' }
+
+inventory_foodproduct_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\FoodProductController::newAction' }
+
+inventory_foodproduct_create:
+    path:      /create
+    defaults: { _controller: 'App\Inventory\Controller\FoodProductController::createAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_foodproduct_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\FoodProductController::editAction' }
+
+inventory_foodproduct_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\FoodProductController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_foodproduct_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\FoodProductController::deleteAction' }
+
+inventory_vendoritem_status:
+    path:     /{id}/web-status
+    defaults: { _controller: 'App\Inventory\Controller\FoodProductController::webStatusAction' }
+
+inventory_vendoritem_inline_update:
+    path:     /inline-item-update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::inlineItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_vendoritem_gallery:
+    path:     /{item}/upload
+    defaults: { _controller: 'App\Inventory\Controller\FoodProductController::uploadItemImageAction' }
+    options:
+           expose: true

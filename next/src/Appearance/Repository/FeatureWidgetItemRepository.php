@@ -21,7 +21,7 @@ class FeatureWidgetItemRepository extends EntityRepository
             foreach ($data['feature'] as $row){
                 $entity = new FeatureWidgetItem();
                 $entity->setFeatureWidget($featureWidget);
-                $entity->setFeature($em->getRepository('SettingAppearanceBundle:Feature')->find($row));
+                $entity->setFeature($em->getRepository(\App\Appearance\Entity\Feature::class)->find($row));
                 $em->persist($entity);
                 $em->flush();
             }
@@ -47,7 +47,7 @@ class FeatureWidgetItemRepository extends EntityRepository
         $em = $this->_em;
         foreach ($data['checkId'] as $row){
 
-            $entity = $em->getRepository('SettingAppearanceBundle:FeatureWidgetItem')->findOneBy(['featureWidget' => $featureWidget,'feature'=>$row]);
+            $entity = $em->getRepository(\App\Appearance\Entity\FeatureWidgetItem::class)->findOneBy(['featureWidget' => $featureWidget,'feature'=>$row]);
             $em->remove($entity);
             $em->flush();
 

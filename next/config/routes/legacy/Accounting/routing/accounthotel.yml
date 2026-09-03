@@ -1,0 +1,61 @@
+account_sales_hotel:
+    path:     /sales
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::salesAction' }
+
+account_hotel_income:
+    path:     /income
+    defaults: { _controller: 'App\Accounting\Controller\HotelReportController::incomeAction' }
+
+account_hotel_income_monthly:
+    path:     /income-monthly
+    defaults: { _controller: 'App\Accounting\Controller\HotelReportController::monthlyIncomeAction' }
+
+account_sales_hotel_new:
+    path:     /sales-receive
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::salesNewAction' }
+
+account_sales_hotel_due:
+    path:     /{sales}/sales-receive
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::duePaymentAction' }
+
+account_sales_hotel_create:
+    path:     /sales-receive-create
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::salesCreateAction' }
+
+account_sales_hotel_update:
+    path:     /{id}/sales-receive-update
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::duePaymentUpdateAction' }
+
+account_purchase_hotel:
+    path:     /purchase
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::purchaseAction' }
+
+account_purchase_hotel_outstanding:
+    path:     /vendor-outstanding
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::vendorOutstandingAction' }
+
+account_sales_hotel_outstanding:
+    path:     /customer-outstanding
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::customerOutstandingAction' }
+
+account_sales_hotel_ledger:
+    path:     /customer-ledger
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::customerLedgerAction' }
+
+account_purchase_hotel_new:
+    path:     /purchase-new
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::purchaseNewAction' }
+
+account_purchase_hotel_reverse:
+    path:     /purchase-reverse
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::purchaseReverseAction' }
+
+account_purchase_hotel_create:
+    path:     /purchase-create
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::purchaseCreateAction' }
+
+account_sales_hotel_approve:
+    path:     /{id}/business-payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountHotelController::salesApproveAction' }
+    options:
+           expose: true

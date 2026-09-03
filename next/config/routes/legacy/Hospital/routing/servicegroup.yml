@@ -1,0 +1,25 @@
+hms_service_group:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\ServiceGroupController::indexAction' }
+
+hms_service_group_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\ServiceGroupController::createAction' }
+    methods:  POST
+
+hms_service_group_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\ServiceGroupController::editAction' }
+
+hms_service_group_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\ServiceGroupController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_service_group_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\ServiceGroupController::deleteAction' }
+
+hms_service_group_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\ServiceGroupController::statusAction' }

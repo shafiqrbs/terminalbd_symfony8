@@ -1,0 +1,30 @@
+medicine_import:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\MedicineImportController::indexAction' }
+
+medicine_import_migration:
+    path:     /{id}/data-migration
+    defaults: { _controller: 'App\Tool\Controller\MedicineImportController::excelDataImportAction' }
+
+medicine_import_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\MedicineImportController::newAction' }
+
+medicine_import_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\MedicineImportController::createAction' }
+    methods:  POST
+
+medicine_import_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\MedicineImportController::deleteAction' }
+
+
+medicine_file_upload:
+    path:     /medicine/upload
+    defaults: { _controller: 'App\Tool\Controller\MedicineImportController::uploadAction' }
+
+medicine_upload_create:
+    path:     /medicine/upload/create
+    defaults: { _controller: 'App\Tool\Controller\MedicineImportController::uploadCreateAction' }
+

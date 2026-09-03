@@ -114,7 +114,7 @@ class ExpenditureRepository extends EntityRepository
         $globalOption = $user->getGlobalOption();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('AccountingBundle:Expenditure','e');
+        $qb->from(\App\Accounting\Entity\Expenditure::class,'e');
         $qb->select('sum(e.amount) as amount');
         $qb->where('e.process = :process');
         $qb->setParameter('process', 'approved');
@@ -162,7 +162,7 @@ class ExpenditureRepository extends EntityRepository
     {
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('AccountingBundle:Expenditure','e');
+        $qb->from(\App\Accounting\Entity\Expenditure::class,'e');
         $qb->select('sum(e.amount) as amount');
         $qb->where('e.process = :process');
         $qb->setParameter('process', 'approved');
@@ -210,7 +210,7 @@ class ExpenditureRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $entity = $em->getRepository('AccountingBundle:Expenditure')->findOneBy(
+        $entity = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->findOneBy(
             ['globalOption' => $entity->getGlobalOption(),'expenseCategory' => $entity->getExpenseCategory(),'process'=>'approved'],
             ['id' => 'DESC']
         );
@@ -226,7 +226,7 @@ class ExpenditureRepository extends EntityRepository
         $em = $this->_em;
         $entity = new Expenditure();
         $global = $doctorInvoice->getHospitalConfig()->getGlobalOption();
-        $head = $this->_em->getRepository('AccountingBundle:AccountHead')->find(52);
+        $head = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(52);
         $entity->setGlobalOption($global);
         $entity->setDoctorInvoice($doctorInvoice);
         $entity->setAmount($doctorInvoice->getPayment());
@@ -244,8 +244,8 @@ class ExpenditureRepository extends EntityRepository
         $entity->setProcess('approved');
         $em->persist($entity);
         $em->flush();
-        $em->getRepository('AccountingBundle:AccountCash')->insertExpenditureCash($entity);
-       // $em->getRepository('AccountingBundle:Transaction')->insertExpenditureTransaction($entity);
+        $em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertExpenditureCash($entity);
+       // $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertExpenditureTransaction($entity);
 
     }
 
@@ -351,27 +351,27 @@ class ExpenditureRepository extends EntityRepository
         $expense->setAmount($data['amount']);
         $expense->setBalance($data['amount']);
         if($data['transactionMethod']){
-            $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>$data['transactionMethod']]);
+            $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>$data['transactionMethod']]);
             $expense->setTransactionMethod($method);
         }
         if($data['bankAccount']){
-            $bank = $em->getRepository('AccountingBundle:AccountBank')->find($data['bankAccount']);
+            $bank = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($data['bankAccount']);
             $expense->setAccountBank($bank);
         }
         if($data['mobileBankAccount']){
-            $mobile = $em->getRepository('AccountingBundle:AccountMobileBank')->find($data['mobileBankAccount']);
+            $mobile = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($data['mobileBankAccount']);
             $expense->setAccountMobileBank($mobile);
         }
         if($data['createdBy']){
-            $createdBy = $em->getRepository('UserBundle:User')->find($data['createdBy']);
+            $createdBy = $em->getRepository(\App\User\Entity\User::class)->find($data['createdBy']);
             $expense->setCreatedBy($createdBy);
         }
         if($data['toUser']){
-            $toUser = $em->getRepository('UserBundle:User')->find($data['toUser']);
+            $toUser = $em->getRepository(\App\User\Entity\User::class)->find($data['toUser']);
             $expense->setToUser($toUser);
         }
         if($data['expenseCategory']){
-            $category = $em->getRepository('AccountingBundle:ExpenseCategory')->find($data['expenseCategory']);
+            $category = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->find($data['expenseCategory']);
             $expense->setExpenseCategory($category);
         }
         $expense->setUpdated($expense->getCreated());
@@ -426,33 +426,33 @@ class ExpenditureRepository extends EntityRepository
                 $sales->setAccountRefNo($item['invoiceId']);
                 $sales->setAmount($item['payment']);
                 if(isset($item['transactionMethod']) and $item['transactionMethod']){
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>$item['transactionMethod']]);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>$item['transactionMethod']]);
                     if($method){
                         $sales->setTransactionMethod($method);
                     }
                 }elseif(isset($item['transactionMethod']) and empty($item['transactionMethod']) and $sales->getAmount() > 0){
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>'cash']);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>'cash']);
                     $sales->setTransactionMethod($method);
                 }
                 if(isset($item['bankAccount']) and $item['bankAccount'] > 0 ){
-                    $bank = $em->getRepository('AccountingBundle:AccountBank')->find($item['bankAccount']);
+                    $bank = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($item['bankAccount']);
                     if($bank){ $sales->setAccountBank($bank); }
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>'bank']);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>'bank']);
                     $sales->setTransactionMethod($method);
                 }
                 if(isset($item['mobileBankAccount']) and $item['mobileBankAccount'] > 0 ){
-                    $mobile = $em->getRepository('AccountingBundle:AccountMobileBank')->find($item['mobileBankAccount']);
+                    $mobile = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($item['mobileBankAccount']);
                     if($mobile){ $sales->setAccountMobileBank($mobile); }
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>'mobile']);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>'mobile']);
                     $sales->setTransactionMethod($method);
                 }
-                $category = $em->getRepository('AccountingBundle:ExpenseCategory')->find($item['expenseCategory']);
+                $category = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->find($item['expenseCategory']);
                 if(!empty($category)){
                     $sales->setExpenseCategory($category);
                     $sales->setAccountHead($sales->getExpenseCategory()->getAccountHead());
                 }
                 if(($item['toUser'])){
-                    $createdBy = $em->getRepository('UserBundle:User')->find($item['toUser']);
+                    $createdBy = $em->getRepository(\App\User\Entity\User::class)->find($item['toUser']);
                     $sales->setCreatedBy($createdBy);
                     $sales->setToUser($createdBy);
                 }

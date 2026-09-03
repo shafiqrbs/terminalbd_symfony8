@@ -1,0 +1,29 @@
+hms_marketing_executive:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\MarketingExecutiveController::indexAction' }
+
+hms_marketing_executive_new:
+    path:     /new
+    defaults: { _controller: 'App\Hospital\Controller\MarketingExecutiveController::newAction' }
+
+hms_marketing_executive_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\MarketingExecutiveController::createAction' }
+    methods:  POST
+
+hms_marketing_executive_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\MarketingExecutiveController::editAction' }
+
+hms_marketing_executive_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\MarketingExecutiveController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_marketing_executive_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\MarketingExecutiveController::deleteAction' }
+
+hms_marketing_executive_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\MarketingExecutiveController::statusAction' }

@@ -1,0 +1,20 @@
+business_store_ledger:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreLedgerController::indexAction' }
+
+business_store_ledger_new:
+    path:     /new
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreLedgerController::newAction' }
+
+business_store_ledger_create:
+    path:     /create
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreLedgerController::createAction' }
+    methods:  POST
+
+business_store_ledger_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreLedgerController::deleteAction' }
+
+business_store_ledger_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Business\Controller\BusinessStoreLedgerController::statusAction' }

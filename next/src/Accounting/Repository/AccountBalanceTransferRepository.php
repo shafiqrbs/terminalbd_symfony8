@@ -122,7 +122,7 @@ class AccountBalanceTransferRepository extends EntityRepository
         $accountHead = $data['accountHead'] ?? '';
 
 
-        $qb->from('AccountingBundle:AccountJournal','s');
+        $qb->from(\App\Accounting\Entity\AccountJournal::class,'s');
         $qb->select('sum(s.amount) as amount');
         $qb->where('s.globalOption = :globalOption');
         $qb->setParameter('globalOption', $globalOption);
@@ -169,10 +169,10 @@ class AccountBalanceTransferRepository extends EntityRepository
     {
         $journalSource = "inventory-{$purchase->getId()}";
         $entity = new AccountJournal();
-        $accountHeadCredit = $this->_em->getRepository('AccountingBundle:AccountHead')->find(49);
-        $accountCashHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(30);
-        $accountBankHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(38);
-        $accountMobileHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(45);
+        $accountHeadCredit = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(49);
+        $accountCashHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30);
+        $accountBankHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(38);
+        $accountMobileHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(45);
 
         $entity->setGlobalOption($purchase->getInventoryConfig()->getGlobalOption());
         $entity->setTransactionType('Debit');
@@ -203,15 +203,15 @@ class AccountBalanceTransferRepository extends EntityRepository
     {
         $option =  $purchase->getInventoryConfig()->getGlobalOption()->getId();
         $journalSource = "inventory-{$purchase->getId()}";
-        $journal = $this->_em->getRepository('AccountingBundle:AccountJournal')->findOneBy(['approvedBy' => $purchase->getApprovedBy(),'globalOption'=> $option ,'amount'=> $purchase->getPaymentAmount(),'journalSource' => $journalSource ]);
+        $journal = $this->_em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findOneBy(['approvedBy' => $purchase->getApprovedBy(),'globalOption'=> $option ,'amount'=> $purchase->getPaymentAmount(),'journalSource' => $journalSource ]);
         if(!empty($journal)) {
-            $accountCash = $this->_em->getRepository('AccountingBundle:AccountCash')->findOneBy(['processHead' => 'Journal', 'globalOption' => $option, 'accountRefNo' => $journal->getAccountRefNo()]);
+            $accountCash = $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->findOneBy(['processHead' => 'Journal', 'globalOption' => $option, 'accountRefNo' => $journal->getAccountRefNo()]);
             if ($accountCash) {
                 $this->_em->remove($accountCash);
                 $this->_em->flush();
             }
 
-            $transactions = $this->_em->getRepository('AccountingBundle:Transaction')->findBy(['processHead' => 'Journal', 'globalOption' => $journal->getGlobalOption(), 'accountRefNo' => $journal->getAccountRefNo()]);
+            $transactions = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->findBy(['processHead' => 'Journal', 'globalOption' => $journal->getGlobalOption(), 'accountRefNo' => $journal->getAccountRefNo()]);
             foreach ($transactions as $transaction) {
                 if ($transaction) {
                     $this->_em->remove($transaction);
@@ -228,10 +228,10 @@ class AccountBalanceTransferRepository extends EntityRepository
 
         $journalSource = "medicine-{$purchase->getId()}";
         $entity = new AccountJournal();
-        $accountHeadCredit = $this->_em->getRepository('AccountingBundle:AccountHead')->find(49);
-        $accountCashHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(30);
-        $accountBankHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(38);
-        $accountMobileHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(45);
+        $accountHeadCredit = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(49);
+        $accountCashHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30);
+        $accountBankHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(38);
+        $accountMobileHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(45);
 
         $entity->setGlobalOption($purchase->getMedicineConfig()->getGlobalOption());
         $entity->setTransactionType('Debit');
@@ -262,7 +262,7 @@ class AccountBalanceTransferRepository extends EntityRepository
     {
         $option =  $purchase->getMedicineConfig()->getGlobalOption()->getId();
         $journalSource = "medicine-{$purchase->getId()}";
-        $journal = $this->_em->getRepository('AccountingBundle:AccountJournal')->findOneBy(['approvedBy' => $purchase->getApprovedBy(),'globalOption'=> $option,'journalSource' => $journalSource ]);
+        $journal = $this->_em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findOneBy(['approvedBy' => $purchase->getApprovedBy(),'globalOption'=> $option,'journalSource' => $journalSource ]);
         $em = $this->_em;
         if(!empty($journal)) {
 
@@ -291,9 +291,9 @@ class AccountBalanceTransferRepository extends EntityRepository
 
 		$journalSource = "Sales-Return-{$salesReturn->getSales()->getInvoice()}";
 		$entity = new AccountJournal();
-		$accountCashHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(34);
-		$accountHeadCredit = $this->_em->getRepository('AccountingBundle:AccountHead')->find(31);
-		$transaction = $this->_em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+		$accountCashHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(34);
+		$accountHeadCredit = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31);
+		$transaction = $this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
 
 		$entity->setTransactionType('Credit');
 		$entity->setAmount($salesReturn->getTotal());
@@ -309,8 +309,8 @@ class AccountBalanceTransferRepository extends EntityRepository
 		$entity->setProcess('approved');
 		$this->_em->persist($entity);
 		$this->_em->flush();
-		$this->_em->getRepository('AccountingBundle:AccountCash')->insertAccountCash($entity);
-		$this->_em->getRepository('AccountingBundle:Transaction')->insertAccountJournalTransaction($entity);
+		$this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($entity);
+		$this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($entity);
 		return $entity->getAccountRefNo();
 
 	}
@@ -325,9 +325,9 @@ class AccountBalanceTransferRepository extends EntityRepository
 
 		$journalSource = "Sales-Return-{$sales->getId()}";
 		$entity = new AccountJournal();
-		$accountCashHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(34);
-		$accountHeadCredit = $this->_em->getRepository('AccountingBundle:AccountHead')->find(31);
-		$transaction = $this->_em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+		$accountCashHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(34);
+		$accountHeadCredit = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31);
+		$transaction = $this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
 
      	$entity->setTransactionType('Credit');
 		$entity->setAmount($salesReturn->getSubTotal());
@@ -342,8 +342,8 @@ class AccountBalanceTransferRepository extends EntityRepository
 		$entity->setProcess('approved');
 		$this->_em->persist($entity);
 		$this->_em->flush();
-		$this->_em->getRepository('AccountingBundle:AccountCash')->insertAccountCash($entity);
-		$this->_em->getRepository('AccountingBundle:Transaction')->insertAccountJournalTransaction($entity);
+		$this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountCash($entity);
+		$this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->insertAccountJournalTransaction($entity);
 		return $entity->getAccountRefNo();
 
 	}
@@ -354,10 +354,10 @@ class AccountBalanceTransferRepository extends EntityRepository
 
 		$journalSource = "business-{$purchase->getId()}";
 		$entity = new AccountJournal();
-		$accountHeadCredit = $this->_em->getRepository('AccountingBundle:AccountHead')->find(49);
-		$accountCashHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(30);
-		$accountBankHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(38);
-		$accountMobileHead = $this->_em->getRepository('AccountingBundle:AccountHead')->find(45);
+		$accountHeadCredit = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(49);
+		$accountCashHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30);
+		$accountBankHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(38);
+		$accountMobileHead = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(45);
 
 		$entity->setGlobalOption($purchase->getBusinessConfig()->getGlobalOption());
 		$entity->setTransactionType('Debit');
@@ -388,7 +388,7 @@ class AccountBalanceTransferRepository extends EntityRepository
 	{
 		$option =  $purchase->getBusinessConfig()->getGlobalOption()->getId();
 		$journalSource = "business-{$purchase->getId()}";
-		$journal = $this->_em->getRepository('AccountingBundle:AccountJournal')->findOneBy(['approvedBy' => $purchase->getApprovedBy(),'globalOption'=> $option,'journalSource' => $journalSource ]);
+		$journal = $this->_em->getRepository(\App\Accounting\Entity\AccountJournal::class)->findOneBy(['approvedBy' => $purchase->getApprovedBy(),'globalOption'=> $option,'journalSource' => $journalSource ]);
 		$em = $this->_em;
 		if(!empty($journal)) {
 

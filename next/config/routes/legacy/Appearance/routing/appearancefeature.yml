@@ -1,0 +1,41 @@
+appearancefeature:
+    path:     /
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::indexAction' }
+
+appearancefeature_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::showAction' }
+
+appearancefeature_new:
+    path:     /new
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::newAction' }
+
+appearancefeature_create:
+    path:     /create
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::createAction' }
+    methods:  POST
+
+appearancefeature_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::editAction' }
+
+appearancefeature_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::updateAction' }
+    methods:  [POST, PUT]
+
+appearancefeature_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::deleteAction' }
+
+appearancefeature_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::statusAction' }
+
+appearancefeature_resizing:
+    path:     /resizing
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::resizeAction' }
+
+appearancefeature_sorted:
+    path:     /sorted
+    defaults: { _controller: 'App\Appearance\Controller\FeatureController::sortedAction' }

@@ -45,29 +45,29 @@ class MedicineDoctorPrescribeRepository extends EntityRepository
         $entity = new MedicineDoctorPrescribe();
 
         if(!empty($data['medicineQuantity']) and $data['medicineQuantity'] != 'NaN'){
-            $entity->setMedicineQuantity($em->getRepository('MedicineBundle:PrescriptionAttribute')->find($data['medicineQuantity'])->getNameBn());
+            $entity->setMedicineQuantity($em->getRepository(\App\Medicine\Entity\PrescriptionAttribute::class)->find($data['medicineQuantity'])->getNameBn());
         }
         if(!empty($data['medicineDose']) and $data['medicineDose'] != 'NaN'){
-            $entity->setMedicineDose($em->getRepository('MedicineBundle:PrescriptionAttribute')->find($data['medicineDose'])->getNameBn());
+            $entity->setMedicineDose($em->getRepository(\App\Medicine\Entity\PrescriptionAttribute::class)->find($data['medicineDose'])->getNameBn());
         }
         if(!empty($data['medicineDoseTime']) and $data['medicineDoseTime'] != 'NaN'){
-            $entity->setMedicineDoseTime($em->getRepository('MedicineBundle:PrescriptionAttribute')->find($data['medicineDoseTime'])->getNameBn());
+            $entity->setMedicineDoseTime($em->getRepository(\App\Medicine\Entity\PrescriptionAttribute::class)->find($data['medicineDoseTime'])->getNameBn());
         }
         if(!empty($data['medicineDurationType']) and $data['medicineDurationType'] != 'NaN'){
-            $entity->setMedicineDurationType($em->getRepository('MedicineBundle:PrescriptionAttribute')->find($data['medicineDurationType'])->getNameBn());
+            $entity->setMedicineDurationType($em->getRepository(\App\Medicine\Entity\PrescriptionAttribute::class)->find($data['medicineDurationType'])->getNameBn());
         }
         if(!empty($data['medicineDuration'])){
             $entity->setMedicineDuration($data['medicineDuration']);
         }
         if(!empty($data['unit'])){
-            $entity->setUnit($em->getRepository('MedicineBundle:PrescriptionAttribute')->find($data['unit'])->getNameBn());
+            $entity->setUnit($em->getRepository(\App\Medicine\Entity\PrescriptionAttribute::class)->find($data['unit'])->getNameBn());
         }
         if(!empty($data['totalQuantity'])){
             $entity->setTotalQuantity($data['totalQuantity']);
         }
         $entity->setDmsInvoice($invoice);
         if(!empty($data['medicineId'])) {
-            $medicine = $this->_em->getRepository('MedicineBundle:MedicineBrand')->find($data['medicineId']);
+            $medicine = $this->_em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
             $entity->setMedicine($medicine);
         }elseif($data['medicine']){
             $entity->setMedicineName($data['medicine']);
@@ -141,13 +141,13 @@ class MedicineDoctorPrescribeRepository extends EntityRepository
             $entity->setMedicineQuantity($data['medicineQuantity']);
         }
         if(!empty($data['medicineDose']) and $data['medicineDose'] != 'NaN'){
-            $entity->setMedicineDose($em->getRepository('MedicineBundle:PrescriptionAttribute')->find($data['medicineDose'])->getNameBn());
+            $entity->setMedicineDose($em->getRepository(\App\Medicine\Entity\PrescriptionAttribute::class)->find($data['medicineDose'])->getNameBn());
         }
         if(!empty($data['medicineDoseTime']) and $data['medicineDoseTime'] != 'NaN'){
-            $entity->setMedicineDoseTime($em->getRepository('MedicineBundle:PrescriptionAttribute')->find($data['medicineDoseTime'])->getNameBn());
+            $entity->setMedicineDoseTime($em->getRepository(\App\Medicine\Entity\PrescriptionAttribute::class)->find($data['medicineDoseTime'])->getNameBn());
         }
         if(!empty($data['medicineDurationType']) and $data['medicineDurationType'] != 'NaN'){
-            $entity->setMedicineDurationType($em->getRepository('MedicineBundle:PrescriptionAttribute')->find($data['medicineDurationType'])->getNameBn());
+            $entity->setMedicineDurationType($em->getRepository(\App\Medicine\Entity\PrescriptionAttribute::class)->find($data['medicineDurationType'])->getNameBn());
         }
         if(!empty($data['medicineDuration'])){
             $entity->setMedicineDuration($data['medicineDuration']);
@@ -155,7 +155,7 @@ class MedicineDoctorPrescribeRepository extends EntityRepository
 
         $entity->setDpsInvoice($invoice);
         if(!empty($data['medicineId'])) {
-            $medicine = $this->_em->getRepository('MedicineBundle:MedicineBrand')->find($data['medicineId']);
+            $medicine = $this->_em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
             $entity->setMedicine($medicine);
         }elseif($data['medicine']){
             $entity->setMedicineName($data['medicine']);

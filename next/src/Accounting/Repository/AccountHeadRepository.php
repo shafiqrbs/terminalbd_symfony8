@@ -435,7 +435,7 @@ class AccountHeadRepository extends EntityRepository
     {
 
         /* @var $exist AccountHead */
-        $entity = $this->_em->getRepository('AccountingBundle:AccountBank')->find($bank);
+        $entity = $this->_em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($bank);
         $exist = $this->findOneBy(['accountBank' => $entity]);
         if ($exist) {
             $exist->setName($entity->getName());
@@ -459,7 +459,7 @@ class AccountHeadRepository extends EntityRepository
     public function insertMobileSubHead($mobile)
     {
 
-        $entity = $this->_em->getRepository('AccountingBundle:AccountMobileBank')->find($mobile);
+        $entity = $this->_em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($mobile);
         /* @var $exist AccountHead */
         $exist = $this->findOneBy(['accountMobileBank' => $entity]);
         if ($exist) {

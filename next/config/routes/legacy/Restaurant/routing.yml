@@ -1,0 +1,59 @@
+restaurant_report:
+    resource: 'routing/report.yml'
+    prefix:   /report
+
+restaurant_itemimport:
+    resource: 'routing/itemimporter.yml'
+    prefix:   /item-import
+
+restaurant_purchase:
+    resource: 'routing/purchase.yml'
+    prefix:   /purchase
+
+restaurant_production:
+    resource: 'routing/production.yml'
+    prefix:   /production
+
+restaurant_vendor:
+    resource: 'routing/vendor.yml'
+    prefix:   /vendor
+
+restaurant_invoice:
+    resource: 'routing/invoice.yml'
+    prefix:   /invoice
+
+restaurant_temporary:
+    resource: 'routing/temporary.yml'
+    prefix:   /temporary
+
+restaurant_table_invoice:
+    resource: 'routing/tableinvoice.yml'
+    prefix:   /table-invoice
+
+restaurant_particular:
+    resource: 'routing/particular.yml'
+    prefix:   /particular
+
+restaurant_category:
+    resource: 'routing/category.yml'
+    prefix:   /category
+
+restaurant_product:
+    resource: 'routing/product.yml'
+    prefix:   /product
+
+restaurant_stock:
+    resource: 'routing/stock.yml'
+    prefix:   /stock
+
+restaurant_damage:
+    resource: 'routing/damage.yml'
+    prefix:   /damage
+
+restaurant_config:
+    resource: 'routing/config.yml'
+    prefix:   /config
+
+restaurant_homepage:
+    path:     /dashoard
+    defaults: { _controller: App\Restaurant\Controller\DefaultController::indexAction }

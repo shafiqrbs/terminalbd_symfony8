@@ -179,7 +179,7 @@ class InvoiceParticularRepository extends EntityRepository
     {
         $em = $this->_em;
         $particularId = (int)$data['particularId'];
-        $particular = $this->_em->getRepository('RestaurantBundle:Particular')->find($particularId);
+        $particular = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($particularId);
         $entity = new InvoiceParticular();
         $invoiceParticular = $this->findOneBy(['invoice' => $invoice ,'particular' => $particular]);
         if(!empty($invoiceParticular) and $data['process'] == 'create') {
@@ -388,7 +388,7 @@ class InvoiceParticularRepository extends EntityRepository
                 $particular->setSalesQuantity($qnt);
                 $em->persist($particular);
                 $em->flush();
-                $em->getRepository('RestaurantBundle:Particular')->remainingQnt($particular);
+                $em->getRepository(\App\Restaurant\Entity\Particular::class)->remainingQnt($particular);
             }
         }
     }

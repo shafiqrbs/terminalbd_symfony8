@@ -106,7 +106,7 @@ class NotepadRepository extends EntityRepository
         $trainRoute = ((isset($data['train_route']) and $data['train_route'])) ? $data['train_route']:'';
         $trainTrip = ((isset($data['train_trip']) and $data['train_trip'])) ? $data['train_trip']:'';
         $trainTripUrl = ((isset($data['train_trip_url']) and $data['train_trip_url'])) ? $data['train_trip_url']:'';
-        $entity = $em->getRepository('DomainUserBundle:Notepad')->findOneBy(['globalOption' => $global ,'model' => $model]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Notepad::class)->findOneBy(['globalOption' => $global ,'model' => $model]);
         if($entity){
             return 'invalid';
         }else {

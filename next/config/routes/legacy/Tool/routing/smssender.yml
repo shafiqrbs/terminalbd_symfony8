@@ -1,0 +1,29 @@
+smssender:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\SmsSenderController::indexAction' }
+
+smssender_delete:
+    path:     /delete
+    defaults: { _controller: 'App\Tool\Controller\SmsSenderController::deleteAction' }
+
+smssender_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\SmsSenderController::indexAction' }
+
+smssender_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\SmsSenderController::indexAction' }
+    requirements: { _method: post }
+
+smssender_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\SmsSenderController::indexAction' }
+
+smssender_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\SmsSenderController::indexAction' }
+    requirements: { _method: post|put }
+
+
+
+

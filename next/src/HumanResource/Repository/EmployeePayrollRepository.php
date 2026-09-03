@@ -97,8 +97,8 @@ class EmployeePayrollRepository extends EntityRepository
             foreach ($data['particular'] as $key => $value):
 
                 if (!empty($data['unit'][$key])) {
-                    $particular = $em->getRepository('HumanResourceBundle:PayrollSetting')->find($value);
-                    $exist = $em->getRepository('HumanResourceBundle:EmployeePayrollParticular')->findOneBy(['employeePayroll' => $payroll, 'particular' => $particular]);
+                    $particular = $em->getRepository(\App\HumanResource\Entity\PayrollSetting::class)->find($value);
+                    $exist = $em->getRepository(\App\HumanResource\Entity\EmployeePayrollParticular::class)->findOneBy(['employeePayroll' => $payroll, 'particular' => $particular]);
                     if ($exist) {
                         $exist->setUnit($data['unit'][$key]);
                         if ($data['unit'][$key] and $data['type'][$key] == 'Percentage') {

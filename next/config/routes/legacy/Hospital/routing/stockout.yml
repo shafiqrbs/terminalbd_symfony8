@@ -1,0 +1,61 @@
+hms_stockout:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::indexAction' }
+
+hms_stockout_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::showAction' }
+
+hms_stockout_new:
+    path:     /new
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::newAction' }
+
+hms_stockout_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::editAction' }
+
+hms_stockout_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_stockout_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::editAction' }
+
+hms_stockout_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::deleteAction' }
+
+hms_stockout_particular_search:
+    path:     /{id}/particular-search
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::particularSearchAction' }
+    options:
+            expose: true
+
+hms_stockout_particular_add:
+    path:     /{invoice}/particular-add
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::addParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+hms_stockout_discount_update:
+    path:     /stockout/dicount-update
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::invoiceDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+hms_stockout_approved:
+    path:     /{id}/invoice-approved
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::approvedAction' }
+
+
+hms_stockout_particular_delete:
+    path:     /{invoice}/{id}/particular-delete
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::invoiceParticularDeleteAction' }
+
+hms_stockout_print_invoice:
+    path:     /{id}/print
+    defaults: { _controller: 'App\Hospital\Controller\StockOutController::invoicePrintAction' }

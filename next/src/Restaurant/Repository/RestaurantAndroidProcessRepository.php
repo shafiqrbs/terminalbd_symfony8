@@ -31,7 +31,7 @@ class RestaurantAndroidProcessRepository extends EntityRepository
     {
         $em =  $this->_em;
 
-        $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(['globalOption'=> $option,'id' => $device]);
+        $device = $em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->findOneBy(['globalOption'=> $option,'id' => $device]);
 
         $entity = new RestaurantAndroidProcess();
         $entity->setRestaurantConfig($option->getRestaurantConfig());

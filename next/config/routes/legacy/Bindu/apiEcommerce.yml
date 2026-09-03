@@ -1,0 +1,179 @@
+api_ecommerce_setup:
+    path:     /setup
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::setupAction }
+
+api_ecommerce_setup_splash:
+    path:     /splash
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::splashAction }
+
+api_ecommerce_dashboard:
+    path:     /dashboard
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::dashboardAction }
+
+api_ecommerce_config:
+    path:     /configuration
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::configurationAction }
+
+api_ecommerce_portal_store:
+    path:     /portal-store
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::portalStoreAction }
+
+api_ecommerce_sidebar_menu:
+    path:     /sidebar-menu
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::menuAction }
+
+api_ecommerce_page_menu:
+    path:     /page-menu
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::pageMenuAction }
+
+api_ecommerce_page_details:
+    path:     /page
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::pageAction }
+
+api_ecommerce_home_feature_slider:
+    path:     /home-feature-slider
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::homeFeatureSliderAction }
+
+api_ecommerce_intro_slider:
+    path:     /intro-slider
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::introSliderAction }
+
+api_ecommerce_feature_widget_product:
+    path:     /feature-widget-product
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::featureProductAction }
+
+api_ecommerce_all_feature_product:
+    path:     /all-feature-product
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::allFeatureProductsAction }
+
+api_ecommerce_item_details:
+    path:     /product-details
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::productDetailsAction }
+
+api_ecommerce_item:
+    path:     /product
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::productAction }
+
+api_ecommerce_item_global_search:
+    path:     /search
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::productAction }
+
+api_ecommerce_item_search:
+    path:     /product-search
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::productAction }
+
+api_ecommerce_item_keyword_search:
+    path:     /product-keyword-search
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::productKeywordAction }
+
+api_ecommerce_item_category:
+    path:     /feature-category
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::categoryAction }
+
+api_ecommerce_feature_item:
+    path:     /feature-product
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::featureProductAction }
+
+api_ecommerce_item_all_category:
+    path:     /all-category
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::allCategoryAction }
+
+api_ecommerce_item_brand:
+    path:     /feature-brand
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::brandAction }
+
+api_ecommerce_item_all_brand:
+    path:     /all-brand
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::allBrandAction }
+
+api_ecommerce_item_promotion:
+    path:     /promotion
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::promotionAction }
+
+api_ecommerce_item_tag:
+    path:     /tag
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::tagAction }
+
+api_ecommerce_item_discount:
+    path:     /discount
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::discountAction }
+
+api_ecommerce_testimonial:
+    path:     /testimonial
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::testimonialAction }
+
+
+api_ecommerce_order:
+    path:     /order-create
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::orderCreateAction }
+    methods:  POST
+    options:
+            expose: true
+
+api_ecommerce_upload_order:
+    path:     /order-upload
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::orderUploadAction }
+    methods:  POST
+    options:
+            expose: true
+
+api_ecommerce_order_list:
+    path:     /order-list
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::orderListAction }
+
+api_ecommerce_process_order:
+    path:     /process-order
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::processOrderAction }
+
+api_ecommerce_order_details:
+    path:     /order-details
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::orderDetailsAction }
+
+api_ecommerce_order_delete:
+    path:     /order-delete
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::orderDeleteAction }
+
+api_ecommerce_related_product:
+    path:     /related-product
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::relatedProductAction }
+
+api_ecommerce_time_period:
+    path:     /order-time-period
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::orderTimePeriodAction }
+
+api_ecommerce_order_location:
+    path:     /order-location
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::orderDeliveryLocationAction }
+
+api_ecommerce_mobile_account:
+    path:     /mobile-account
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::mobileAccountAction }
+
+api_ecommerce_login:
+    path:     /user-login
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::userLoginAction }
+    methods:  POST
+    options:
+        expose: true
+
+
+api_ecommerce_registration:
+    path:     /user-register
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::userRegisterAction }
+    methods:  POST
+    options:
+            expose: true
+
+api_ecommerce_additional_address:
+    path:     /customer-address
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::customerAddressAction }
+    methods:  POST
+    options:
+            expose: true
+
+api_ecommerce_update_registration:
+    path:     /update-register
+    defaults: { _controller: App\Bindu\Controller\ApiEcommerceController::userUpdateProfileAction }
+    methods:  POST
+    options:
+            expose: true

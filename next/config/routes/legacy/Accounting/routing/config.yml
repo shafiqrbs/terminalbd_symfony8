@@ -1,0 +1,13 @@
+account_config_manage:
+    path:     /manage
+    defaults: { _controller: 'App\Accounting\Controller\AccountConfigController::manageAction' }
+
+account_config_reset:
+    path:     /reset
+    defaults: { _controller: 'App\Accounting\Controller\AccountConfigController::resetAction' }
+
+account_config_update:
+    path:     /update
+    defaults: { _controller: 'App\Accounting\Controller\AccountConfigController::updateAction' }
+    methods:  [POST, PUT]
+

@@ -1,0 +1,42 @@
+itemunit:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ItemUnitController::indexAction' }
+
+inventory_itemunit_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\ItemUnitController::autoSearchAction' }
+    options:
+            expose: true
+
+inventory_itemunit_name:
+    path:      /{size}/size-name
+    defaults: { _controller: 'App\Inventory\Controller\ItemUnitController::searchItemUnitNameAction' }
+    options:
+            expose: true
+
+itemunit_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\ItemUnitController::showAction' }
+
+itemunit_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\ItemUnitController::newAction' }
+
+itemunit_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\ItemUnitController::createAction' }
+    methods:  POST
+
+itemunit_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\ItemUnitController::editAction' }
+
+itemunit_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\ItemUnitController::updateAction' }
+    methods:  [POST, PUT]
+
+itemunit_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\ItemUnitController::deleteAction' }
+    methods:  [POST, DELETE]

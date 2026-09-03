@@ -202,7 +202,7 @@ class StockItemRepository extends EntityRepository
     {
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:PurchaseItem','pi');
+        $qb->from(\App\Inventory\Entity\PurchaseItem::class,'pi');
         $qb->join('pi.purchase', 'purchase');
         $qb->leftJoin('pi.item', 'item');
         $qb->leftJoin('item.masterItem','m');
@@ -539,7 +539,7 @@ class StockItemRepository extends EntityRepository
     {
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:PurchaseItem','pi');
+        $qb->from(\App\Inventory\Entity\PurchaseItem::class,'pi');
         $qb->join('pi.purchase', 'purchase');
         $qb->leftJoin('pi.item', 'item');
         $qb->leftJoin('item.masterItem','m');
@@ -564,7 +564,7 @@ class StockItemRepository extends EntityRepository
     public function getSizeStock($inventory,$data)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:PurchaseItem','pi');
+        $qb->from(\App\Inventory\Entity\PurchaseItem::class,'pi');
         $qb->join('pi.stockItem','e');
         $qb->join('pi.purchase','p');
         $qb->join('pi.item','item');
@@ -629,7 +629,7 @@ class StockItemRepository extends EntityRepository
 
         foreach($purchase->getPurchaseItems() as $purchaseItem ) {
 
-            if (empty($this->_em->getRepository('InventoryBundle:StockItem')->findBy(['purchaseItem' => $purchaseItem->getId(),'process'=>'purchase']))) {
+            if (empty($this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->findBy(['purchaseItem' => $purchaseItem->getId(),'process'=>'purchase']))) {
 
                 $entity = new StockItem();
                 $entity->setInventoryConfig($purchase->getInventoryConfig());
@@ -687,7 +687,7 @@ class StockItemRepository extends EntityRepository
 
         foreach($purchaseReturn->getPurchaseReturnItems() as $purchaseReturnItem ) {
 
-            if (empty($this->_em->getRepository('InventoryBundle:StockItem')->findBy(['purchaseReturnItem' => $purchaseReturnItem->getId(),'process' => 'purchaseReturn']))) {
+            if (empty($this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->findBy(['purchaseReturnItem' => $purchaseReturnItem->getId(),'process' => 'purchaseReturn']))) {
 
                 $entity = new StockItem();
                 $entity->setInventoryConfig($purchaseReturn->getInventoryConfig());
@@ -758,11 +758,11 @@ class StockItemRepository extends EntityRepository
 
         $em = $this->_em;
         /* @var $row SalesItem */
-        $salesItems = $em->getRepository('InventoryBundle:SalesItem')->findBy(['sales'=>$sales]);
+        $salesItems = $em->getRepository(\App\Inventory\Entity\SalesItem::class)->findBy(['sales'=>$sales]);
         if($salesItems){
             foreach ($salesItems as $row ) {
 
-                if (empty($this->_em->getRepository('InventoryBundle:StockItem')->findBy(['salesItem' => $row->getId()]))){
+                if (empty($this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->findBy(['salesItem' => $row->getId()]))){
 
                     $entity = new StockItem();
                     $entity->setInventoryConfig($sales->getInventoryConfig());
@@ -872,7 +872,7 @@ class StockItemRepository extends EntityRepository
 
         foreach ($salesReturn ->getSalesReturnItems() as $row ) {
 
-            if (empty($this->_em->getRepository('InventoryBundle:StockItem')->findBy(['salesReturnItem' => $row->getId(), 'process' => 'salesReturn']))) {
+            if (empty($this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->findBy(['salesReturnItem' => $row->getId(), 'process' => 'salesReturn']))) {
 
                 $entity = new StockItem();
                 $entity->setInventoryConfig($salesReturn->getInventoryConfig());
@@ -924,7 +924,7 @@ class StockItemRepository extends EntityRepository
 
     public function insertDamageItem(Damage $damage){
 
-        if (empty($this->_em->getRepository('InventoryBundle:StockItem')->findBy(['damage' => $damage->getId(), 'process' => 'damage']))) {
+        if (empty($this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->findBy(['damage' => $damage->getId(), 'process' => 'damage']))) {
 
             $em = $this->_em;
             $entity = new StockItem();
@@ -1160,7 +1160,7 @@ class StockItemRepository extends EntityRepository
         $em = $this->_em;
         foreach($purchase->getPurchaseItems() as $purchaseItem ){
 
-            $stockItem = $this->_em->getRepository('InventoryBundle:StockItem')->findOneBy(['purchaseItem' => $purchaseItem]);
+            $stockItem = $this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->findOneBy(['purchaseItem' => $purchaseItem]);
             if(!empty($stockItem)){
                 $em->remove($stockItem);
                 $em->flush();
@@ -1195,11 +1195,11 @@ class StockItemRepository extends EntityRepository
                 $table .= '<td>'.$row['barcode'].'</td>';
                 $table .= '<td>'.$row['name'].'</td>';
                     $data = ['barcode' => $row['barcode']];
-                    $purchase = $em->getRepository('InventoryBundle:StockItem')->getStockBarcodeWise($process ='purchase',$inventory,$data);
-                    $purchaseReturn = $em->getRepository('InventoryBundle:StockItem')->getStockBarcodeWise($mode ='purchaseReturn',$inventory,$data);
-                    $sales = $em->getRepository('InventoryBundle:StockItem')->getStockBarcodeWise($mode ='sales',$inventory,$data);
-                    $salesReturn = $em->getRepository('InventoryBundle:StockItem')->getStockBarcodeWise($mode ='salesReturn',$inventory,$data);
-                    $damage = $em->getRepository('InventoryBundle:StockItem')->getStockBarcodeWise($mode ='damage',$inventory,$data);
+                    $purchase = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockBarcodeWise($process ='purchase',$inventory,$data);
+                    $purchaseReturn = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockBarcodeWise($mode ='purchaseReturn',$inventory,$data);
+                    $sales = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockBarcodeWise($mode ='sales',$inventory,$data);
+                    $salesReturn = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockBarcodeWise($mode ='salesReturn',$inventory,$data);
+                    $damage = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockBarcodeWise($mode ='damage',$inventory,$data);
 
                     $purchase = !empty($purchase) ? (int)$purchase['quantity'] :0;
                     $purchaseReturn = !empty($purchaseReturn) ? (int)$purchaseReturn['quantity'] :0;
@@ -1258,11 +1258,11 @@ class StockItemRepository extends EntityRepository
                 foreach ($branches as $branch) {
 
                     $data = ['barcode' => $row['barcode']];
-                    $receiveItem =  $em->getRepository('InventoryBundle:Delivery')->getStockOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
-                    $returnItem =  $em->getRepository('InventoryBundle:Delivery')->getReturnOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
-                    $ongoingItem =  $em->getRepository('InventoryBundle:Delivery')->getSalesOngoingOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
-                    $salesItem =  $em->getRepository('InventoryBundle:Delivery')->getSalesOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
-                    $salesReturnItem =  $em->getRepository('InventoryBundle:Delivery')->getSalesReturnOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $receiveItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getStockOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $returnItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getReturnOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $ongoingItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getSalesOngoingOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $salesItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getSalesOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $salesReturnItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getSalesReturnOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
 
                     $receiveItemQnt = !empty($receiveItem) ? (int)$receiveItem['quantity'] :0;
                     $returnItemQnt = !empty($returnItem) ? (int)$returnItem['quantity'] :0;
@@ -1314,11 +1314,11 @@ class StockItemRepository extends EntityRepository
                     $table .='<tr>';
                     $table .= '<td>'.$branch->getName().'</td>';
                     $data = ['barcode' => $row['barcode']];
-                    $receiveItem =  $em->getRepository('InventoryBundle:Delivery')->getStockOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
-                    $returnItem =  $em->getRepository('InventoryBundle:Delivery')->getReturnOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
-                    $ongoingItem =  $em->getRepository('InventoryBundle:Delivery')->getSalesOngoingOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
-                    $salesItem =  $em->getRepository('InventoryBundle:Delivery')->getSalesOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
-                    $salesReturnItem =  $em->getRepository('InventoryBundle:Delivery')->getSalesReturnOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $receiveItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getStockOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $returnItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getReturnOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $ongoingItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getSalesOngoingOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $salesItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getSalesOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
+                    $salesReturnItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->getSalesReturnOverview( $globalOption->getInventoryConfig()->getId(), $branch->getId() , $data);
 
                     $receiveItemQnt = !empty($receiveItem) ? (int)$receiveItem['quantity'] :0;
                     $returnItemQnt = !empty($returnItem) ? (int)$returnItem['quantity'] :0;
@@ -1361,7 +1361,7 @@ class StockItemRepository extends EntityRepository
         $mode = $data['mode'] ?? '';
         $process = $data['process'] ?? '';
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:SalesItem','stock');
+        $qb->from(\App\Inventory\Entity\SalesItem::class,'stock');
         $qb->join('stock.item','item');
         $qb->join('stock.sales','e');
         $qb->select('SUM(stock.quantity) AS quantity');
@@ -1404,7 +1404,7 @@ class StockItemRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:SalesItem','stock');
+        $qb->from(\App\Inventory\Entity\SalesItem::class,'stock');
         $qb->join('stock.item','item');
         $qb->join('stock.sales','e');
         $qb->select('SUM(stock.quantity) AS quantity');
@@ -1446,7 +1446,7 @@ class StockItemRepository extends EntityRepository
         $process = $data['process'] ?? '';
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:Sales','e');
+        $qb->from(\App\Inventory\Entity\Sales::class,'e');
         $qb->select('e');
         $qb->where("e.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory);
@@ -1482,7 +1482,7 @@ class StockItemRepository extends EntityRepository
         $process = $data['process'] ?? '';
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:SalesReturnItem','e');
+        $qb->from(\App\Inventory\Entity\SalesReturnItem::class,'e');
         $qb->join('e.salesReturn','salesreturn');
         $qb->join('e.salesItem','stock');
         $qb->select('SUM(e.quantity) AS quantity');

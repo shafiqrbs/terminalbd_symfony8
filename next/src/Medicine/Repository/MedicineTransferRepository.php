@@ -18,7 +18,7 @@ class MedicineTransferRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('MedicineBundle:MedicineTransferItem','si')
+            ->from(\App\Medicine\Entity\MedicineTransferItem::class,'si')
             ->select('sum(si.subTotal) as total')
             ->where('si.medicineTransfer = :entity')
             ->setParameter('entity', $entity ->getId())

@@ -1,0 +1,94 @@
+domain_user:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::indexAction' }
+
+domain_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::showAction' }
+
+domain_new:
+    path:     /new
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::newAction' }
+
+domain_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::createAction' }
+    methods:  POST
+
+domain_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::editAction' }
+
+domain_update_inline:
+    path:     /{id}/inline-update
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::inlineUpdateAction' }
+    options:
+        expose: true
+
+domain_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::updateAction' }
+    methods:  [POST, PUT]
+
+domain_update_profile:
+    path:     /update-profile
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::updateProfileAction' }
+    methods:  [POST, PUT]
+
+domain_change_password:
+    path:     /change-password
+    defaults: { _controller: 'App\User\Controller\ChangePasswordController::changePasswordAction' }
+
+domain_forget_password:
+    path:     /{id}/forget-user-password
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::forgetPasswordAction' }
+
+domain_reset_password:
+    path:     /{id}/reset-user-password
+    defaults: { _controller: 'App\DomainUser\Controller\ResettingController::resetForgetPasswordAction' }
+    methods:  [POST, PUT]
+
+
+domain_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::deleteAction' }
+
+domain_print:
+    path:     /print
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::newAction' }
+
+domain_export:
+    path:     /export
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::newAction' }
+
+domain_pdf:
+    path:     /pdf
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::newAction' }
+
+domain_import:
+    path:     /import
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::newAction' }
+
+domain_user_search:
+    path:     /search
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::autoSearchAction' }
+    options:
+            expose: true
+
+domain_user_profilename_search:
+    path:     /search-profile-name
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::autoSearchProfileNameAction' }
+    options:
+        expose: true
+
+
+domain_user_name:
+    path:      /{user}/user-name
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::searchUserNameAction' }
+    options:
+           expose: true
+
+domain_edit_profile:
+    path:     /edit-profile
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::editProfileAction' }
+

@@ -1,0 +1,33 @@
+applicationtestimonial:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\ApplicationTestimonialController::indexAction' }
+
+applicationtestimonial_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\ApplicationTestimonialController::showAction' }
+
+applicationtestimonial_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\ApplicationTestimonialController::newAction' }
+
+applicationtestimonial_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\ApplicationTestimonialController::createAction' }
+    methods:  POST
+
+applicationtestimonial_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\ApplicationTestimonialController::statusAction' }
+
+applicationtestimonial_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\ApplicationTestimonialController::editAction' }
+
+applicationtestimonial_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\ApplicationTestimonialController::updateAction' }
+    methods:  [POST, PUT]
+
+applicationtestimonial_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\ApplicationTestimonialController::deleteAction' }

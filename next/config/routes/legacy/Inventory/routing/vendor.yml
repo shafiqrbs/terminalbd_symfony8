@@ -1,0 +1,45 @@
+inventory_vendor:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::indexAction' }
+
+inventory_vendor_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::autoSearchAction' }
+    options:
+            expose: true
+
+inventory_vendor_name:
+    path:      /{vendor}/vendor-name
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::searchVendorNameAction' }
+    options:
+            expose: true
+
+inventory_vendor_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::showAction' }
+
+inventory_vendor_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::newAction' }
+
+inventory_vendor_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::createAction' }
+    methods:  POST
+
+inventory_vendor_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::editAction' }
+
+inventory_vendor_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_vendor_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::statusAction' }
+
+inventory_vendor_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\VendorController::deleteAction' }

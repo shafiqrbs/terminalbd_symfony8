@@ -1,0 +1,58 @@
+inventory_purchasevendoritem:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseVendorItemController::indexAction' }
+
+inventory_purchasevendoritem_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseVendorItemController::showAction' }
+
+inventory_purchasevendoritem_new:
+    path:     /{purchase}/new
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseVendorItemController::newAction' }
+
+inventory_purchasevendoritem_create:
+    path:      /{purchase}/create
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseVendorItemController::createAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_purchasevendoritem_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseVendorItemController::editAction' }
+
+inventory_purchasevendoritem_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseVendorItemController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_purchasevendoritem_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseVendorItemController::deleteAction' }
+
+inventory_vendoritem_status:
+    path:     /{id}/web-status
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseVendorItemController::webStatusAction' }
+
+inventory_vendoritem_inline_update:
+    path:     /inline-item-update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::inlineItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+purchase_vendoritem_inline_update:
+    path:     /inline-update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::inlineItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+
+inventory_vendoritem_gallery:
+    path:     /{item}/upload
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseVendorItemController::uploadItemImageAction' }
+    options:
+           expose: true
+
+

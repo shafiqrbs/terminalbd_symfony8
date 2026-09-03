@@ -248,7 +248,7 @@ class MedicineSalesRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('MedicineBundle:MedicineSalesItem','si')
+            ->from(\App\Medicine\Entity\MedicineSalesItem::class,'si')
             ->select('sum(si.subTotal) as subTotal')
             ->addSelect('sum(si.purchasePrice * si.quantity) as purchasePrice')
             ->where('si.medicineSales = :invoice')
@@ -848,21 +848,21 @@ class MedicineSalesRepository extends EntityRepository
                     }
                     $sales->setVat($item['vat']);
                     if(isset($item['transactionMethod']) and $item['transactionMethod']){
-                        $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>$item['transactionMethod']]);
+                        $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>$item['transactionMethod']]);
                         if($method){
                             $sales->setTransactionMethod($method);
                         }
                     }elseif(isset($item['transactionMethod']) and empty($item['transactionMethod']) and $sales->getReceived() > 0){
-                        $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>'cash']);
+                        $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>'cash']);
                         $sales->setTransactionMethod($method);
                     }
                     if(isset($item['bankAccount']) and $item['bankAccount'] > 0 ){
-                        $bank = $em->getRepository('AccountingBundle:AccountBank')->find($item['bankAccount']);
+                        $bank = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($item['bankAccount']);
                         if($bank){
                             $sales->setAccountBank($bank);
                         }
                         if(isset($item['paymentCard']) and $item['paymentCard']){
-                            $card = $em->getRepository('SettingToolBundle:PaymentCard')->find($item['paymentCard']);
+                            $card = $em->getRepository(\App\Tool\Entity\PaymentCard::class)->find($item['paymentCard']);
                             $sales->setPaymentCard($card);
                         }
                     }
@@ -873,7 +873,7 @@ class MedicineSalesRepository extends EntityRepository
                         $sales->setCardNo($item['transactionId']);
                     }
                     if(isset($item['mobileBankAccount']) and $item['mobileBankAccount'] > 0){
-                        $mobile = $em->getRepository('AccountingBundle:AccountMobileBank')->find($item['mobileBankAccount']);
+                        $mobile = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($item['mobileBankAccount']);
                         if($mobile){
                             $sales->setAccountMobileBank($mobile);
                         }
@@ -882,21 +882,21 @@ class MedicineSalesRepository extends EntityRepository
                         $sales->setPaymentMobile($item['paymentMobile']);
                     }
                     if(isset($item['customerName']) and $item['customerName'] and isset($item['customerMobile']) and $item['customerMobile']){
-                        $customer = $em->getRepository('DomainUserBundle:Customer')->newExistingCustomerForSales($option,$item['customerMobile'],$item);
+                        $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option,$item['customerMobile'],$item);
                         $sales->setCustomer($customer);
                     }elseif(($item['customerId']) and $item['customerId'] > 0 ){
-                        $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption'=>$option,'id'=>$item['customerId']]);
+                        $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$option,'id'=>$item['customerId']]);
                         $sales->setCustomer($customer);
                     }else{
-                        $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $option, 'mobile' => $option->getMobile()]);
+                        $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $option, 'mobile' => $option->getMobile()]);
                         $sales->setCustomer($customer);
                     }
                     if(($item['createdBy']) and $item['createdBy'] > 0){
-                        $createdBy = $em->getRepository('UserBundle:User')->find($item['createdBy']);
+                        $createdBy = $em->getRepository(\App\User\Entity\User::class)->find($item['createdBy']);
                         $sales->setCreatedBy($createdBy);
                     }
                     if(($item['salesBy']) and $item['salesBy'] > 0){
-                        $salesBy = $em->getRepository('UserBundle:User')->find($item['salesBy']);
+                        $salesBy = $em->getRepository(\App\User\Entity\User::class)->find($item['salesBy']);
                         $sales->setSalesBy($salesBy);
                     }
                     if($sales->getTransactionMethod() and $sales->getTransactionMethod()->getSlug() == 'mobile' and $sales->getAccountMobileBank() and $sales->getAccountMobileBank()->getServiceCharge() > 0){
@@ -934,12 +934,12 @@ class MedicineSalesRepository extends EntityRepository
         if($items  and $numSubItems > 0 ) {
             foreach ($items as $item):
                 $deviceSalesId = $item['salesId'];
-                $sales = $em->getRepository('MedicineBundle:MedicineSales')->findOneBy(['medicineConfig' => $conf, 'deviceSalesId' => $deviceSalesId]);
+                $sales = $em->getRepository(\App\Medicine\Entity\MedicineSales::class)->findOneBy(['medicineConfig' => $conf, 'deviceSalesId' => $deviceSalesId]);
                 if ($sales) {
                     $salesItem = new MedicineSalesItem();
                     $salesItem->setAndroidProcess($process);
                     $salesItem->setMedicineSales($sales);
-                    $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($item['stockId']);
+                    $stockId = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($item['stockId']);
                     if ($stockId) {
                         $salesItem->setMedicineStock($stockId);
                         $salesItem->setPurchasePrice($stockId->getAveragePurchasePrice());
@@ -953,7 +953,7 @@ class MedicineSalesRepository extends EntityRepository
                     $em->persist($salesItem);
                     $em->flush();
                     if ($salesItem->getMedicineStock()) {
-                        $em->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales');
+                        $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales');
                     }
                 }
             endforeach;
@@ -1055,7 +1055,7 @@ class MedicineSalesRepository extends EntityRepository
                 if(isset($item['customerName'])  and $item['customerName'] == 'Default'){
                     $customer = $default->getId();
                 }elseif(isset($item['customerName']) and $item['customerName'] and isset($item['customerMobile']) and $item['customerMobile']){
-                    $customer = $em->getRepository('DomainUserBundle:Customer')->newExistingCustomerForMedicineSales($option,$item['customerMobile'],$item)->getId();
+                    $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForMedicineSales($option,$item['customerMobile'],$item)->getId();
                 }else{
                     $customer = $default->getId();
                 }
@@ -1073,12 +1073,12 @@ class MedicineSalesRepository extends EntityRepository
             if($subItems  and $numSubItems > 0 ) {
                 foreach ($subItems as $sub):
                     $deviceSalesId = $sub['salesId'];
-                    $sales = $em->getRepository('MedicineBundle:MedicineSales')->findOneBy(['medicineConfig' => $config, 'deviceSalesId' => $deviceSalesId]);
+                    $sales = $em->getRepository(\App\Medicine\Entity\MedicineSales::class)->findOneBy(['medicineConfig' => $config, 'deviceSalesId' => $deviceSalesId]);
                     if ($sales) {
                         $salesItem = new MedicineSalesItem();
                         $salesItem->setAndroidProcess($process);
                         $salesItem->setMedicineSales($sales);
-                        $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($sub['stockId']);
+                        $stockId = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($sub['stockId']);
                         if ($stockId) {
                             $stockIds[] = $stockId->getId();
                             $salesItem->setMedicineStock($stockId);
@@ -1149,7 +1149,7 @@ class MedicineSalesRepository extends EntityRepository
             $qbCash->execute();
 
             $total = $em->createQueryBuilder()
-                ->from('MedicineBundle:MedicineSales','si')
+                ->from(\App\Medicine\Entity\MedicineSales::class,'si')
                 ->select('count(si.id) as totalCount')
                 ->where("si.androidProcess={$androidProcess_id}")
                 ->getQuery()->getSingleResult();
@@ -1164,7 +1164,7 @@ class MedicineSalesRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('MedicineBundle:MedicineSales','si')
+            ->from(\App\Medicine\Entity\MedicineSales::class,'si')
             ->select('count(si.id) as totalCount')
             ->where("si.androidProcess={$batch}")
             ->getQuery()->getOneOrNullResult();
@@ -1176,7 +1176,7 @@ class MedicineSalesRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('MedicineBundle:MedicineSalesItem','si')
+            ->from(\App\Medicine\Entity\MedicineSalesItem::class,'si')
             ->select('count(si.id) as totalCount')
             ->where("si.androidProcess={$batch}")
             ->getQuery()->getOneOrNullResult();
@@ -1222,13 +1222,13 @@ class MedicineSalesRepository extends EntityRepository
             $entity->setUpdated($entity->getCreated());
             $entity->setDeviceApproved(true);
             $em->flush();
-            $em->getRepository('MedicineBundle:MedicineStock')->getSalesUpdateQnt($entity);
-            $em->getRepository('AccountingBundle:AccountSales')->insertMedicineAccountInvoice($entity);
+            $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getSalesUpdateQnt($entity);
+            $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($entity);
         }
     }
 
     public function deleteSalesRecords(MedicineConfig $config){
-      //  $this->_em->getRepository('AccountingBundle:AccountSales')->accountMedicineSalesReverse($sales);
+      //  $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountMedicineSalesReverse($sales);
     }
 
     public function getCalculationBankServiceCharge(MedicineSales $entity){
@@ -1279,7 +1279,7 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
                     $salesItem = new MedicineSalesItem();
                     $salesItem->setAndroidProcess($process);
                     $salesItem->setMedicineSales($sales);
-                    $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($item['stockId']);
+                    $stockId = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($item['stockId']);
                     if ($stockId) {
                         $salesItem->setMedicineStock($stockId);
                         $salesItem->setPurchasePrice($stockId->getAveragePurchasePrice());
@@ -1292,7 +1292,7 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
                     $em->persist($salesItem);
                     $em->flush();
                     if ($salesItem->getMedicineStock()) {
-                        $em->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales');
+                        $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales');
                     }
                 }
             endforeach;
@@ -1360,7 +1360,7 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
                 $salesItem->setSubTotal($salesItem->getQuantity() * $salesItem->getSalesPrice());
                 $em->persist($salesItem);
                 $em->flush();
-                $em->getRepository( 'MedicineBundle:MedicineStock' )->updateRemovePurchaseQuantity($stockId, 'sales' );
+                $em->getRepository( \App\Medicine\Entity\MedicineStock::class )->updateRemovePurchaseQuantity($stockId, 'sales' );
 
             endforeach;
 

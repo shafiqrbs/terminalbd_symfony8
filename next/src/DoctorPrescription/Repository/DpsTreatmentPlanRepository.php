@@ -230,7 +230,7 @@ class DpsTreatmentPlanRepository extends EntityRepository
     public function insertInvoiceItems($invoice, $data)
     {
 
-        $particular = $this->_em->getRepository('DoctorPrescriptionBundle:DpsParticular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($data['particularId']);
         $em = $this->_em;
         $entity = new DpsTreatmentPlan();
         $entity->setQuantity(1);
@@ -293,9 +293,9 @@ class DpsTreatmentPlanRepository extends EntityRepository
         $payment = $data['receive'] !="" ? $data['receive'] : 0 ;
 
         if($treatmentId > 0){
-            $treatmentPlan = $this->_em->getRepository('DoctorPrescriptionBundle:DpsTreatmentPlan')->find($treatmentId);
+            $treatmentPlan = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->find($treatmentId);
         }elseif(empty($treatmentPlan)){
-            $particular =  $this->_em->getRepository('DoctorPrescriptionBundle:DpsParticular')->find($particular);
+            $particular =  $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($particular);
             $treatmentPlan = new DpsTreatmentPlan();
             $treatmentPlan->setDpsInvoice($entity);
             $treatmentPlan->setDpsParticular($particular);
@@ -307,15 +307,15 @@ class DpsTreatmentPlanRepository extends EntityRepository
         }
         $treatmentPlan->setStatus(1);
         if($payment > 0) {
-            $treatmentPlan->setTransactionMethod($em->getRepository('SettingToolBundle:TransactionMethod')->find($transactionMethod));
+            $treatmentPlan->setTransactionMethod($em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find($transactionMethod));
             if ($mobileBank) {
-                $treatmentPlan->setAccountMobileBank($em->getRepository('AccountingBundle:AccountMobileBank')->find($mobileBank));
+                $treatmentPlan->setAccountMobileBank($em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($mobileBank));
             }
             if ($accountBank) {
-                $treatmentPlan->setAccountBank($em->getRepository('AccountingBundle:AccountBank')->find($accountBank));
+                $treatmentPlan->setAccountBank($em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($accountBank));
             }
             if ($paymentCard) {
-                $treatmentPlan->setPaymentCard($em->getRepository('SettingToolBundle:PaymentCard')->find($paymentCard));
+                $treatmentPlan->setPaymentCard($em->getRepository(\App\Tool\Entity\PaymentCard::class)->find($paymentCard));
             }
             $treatmentPlan->setPaymentMobile($paymentMobile);
             $treatmentPlan->setTransactionId($transactionId);
@@ -405,15 +405,15 @@ class DpsTreatmentPlanRepository extends EntityRepository
 
         $user = $this->getUser();
 
-        $salesTotalTransactionOverview = $em->getRepository('HospitalBundle:InvoiceTransaction')->todaySalesOverview($user,$data);
-        $salesTransactionOverview = $em->getRepository('HospitalBundle:InvoiceTransaction')->todaySalesOverview($user,$data,'true');
-        $previousSalesTransactionOverview = $em->getRepository('HospitalBundle:InvoiceTransaction')->todaySalesOverview($user,$data,'false');
+        $salesTotalTransactionOverview = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todaySalesOverview($user,$data);
+        $salesTransactionOverview = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todaySalesOverview($user,$data,'true');
+        $previousSalesTransactionOverview = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->todaySalesOverview($user,$data,'false');
 
-        $diagnosticOverview = $em->getRepository('HospitalBundle:Invoice')->findWithSalesOverview($user,$data,$mode = 'diagnostic');
-        $admissionOverview = $em->getRepository('HospitalBundle:Invoice')->findWithSalesOverview($user,$data,$mode = 'admission');
-        $serviceOverview = $em->getRepository('HospitalBundle:Invoice')->findWithServiceOverview($user,$data);
-        $transactionOverview = $em->getRepository('HospitalBundle:InvoiceTransaction')->findWithTransactionOverview($user,$data);
-        $commissionOverview = $em->getRepository('HospitalBundle:Invoice')->findWithCommissionOverview($user,$data);
+        $diagnosticOverview = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findWithSalesOverview($user,$data,$mode = 'diagnostic');
+        $admissionOverview = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findWithSalesOverview($user,$data,$mode = 'admission');
+        $serviceOverview = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findWithServiceOverview($user,$data);
+        $transactionOverview = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->findWithTransactionOverview($user,$data);
+        $commissionOverview = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findWithCommissionOverview($user,$data);
 
         return $this->render('HospitalBundle:Report:salesSumary.html.twig', [
 
@@ -439,11 +439,11 @@ class DpsTreatmentPlanRepository extends EntityRepository
         $user = $this->getUser();
         $entity = '';
         if(!empty($data) and $data['service']){
-            $entity = $em->getRepository('HospitalBundle:Service')->find($data['service']);
+            $entity = $em->getRepository(\App\Hospital\Entity\Service::class)->find($data['service']);
         }
-        $services = $em->getRepository('HospitalBundle:Service')->findBy([],['name'=>'ASC']);
-        $serviceOverview = $em->getRepository('HospitalBundle:Invoice')->findWithServiceOverview($user,$data);
-        $serviceGroup = $em->getRepository('HospitalBundle:InvoiceParticular')->serviceParticularDetails($user,$data);
+        $services = $em->getRepository(\App\Hospital\Entity\Service::class)->findBy([],['name'=>'ASC']);
+        $serviceOverview = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findWithServiceOverview($user,$data);
+        $serviceGroup = $em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->serviceParticularDetails($user,$data);
         return $this->render('HospitalBundle:Report:serviceBaseSales.html.twig', [
             'serviceOverview'       => $serviceOverview,
             'serviceGroup'          => $serviceGroup,

@@ -153,7 +153,7 @@ class ItemGroupRepository extends MaterializedPathRepository
 
         $ret = [];
         $em = $this->_em;
-        $categories = $em->getRepository('ProductProductBundle:ItemGroup')->findBy(['status'=>1],['name'=>'asc']);
+        $categories = $em->getRepository(\App\Product\Entity\ItemGroup::class)->findBy(['status'=>1],['name'=>'asc']);
 
         foreach( $categories as $cat ){
             if( !$cat->getParent() ){

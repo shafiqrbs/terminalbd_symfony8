@@ -1,0 +1,17 @@
+barcode:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\BarCodeController::barcodeAction' }
+
+barcode_image:
+    path:     /{id}/barcode-image
+    defaults: { _controller: 'App\Tool\Controller\BarCodeController::barcodeImageAction' }
+
+barcode_html:
+    path:     /{id}/barcode-html
+    defaults: { _controller: 'App\Tool\Controller\BarCodeController::barcodeHtmlAction' }
+
+barcode_text:
+    path:     /{id}/barcode-text
+    defaults: { _controller: 'App\Tool\Controller\BarCodeController::barcodeTextAction' }
+
+

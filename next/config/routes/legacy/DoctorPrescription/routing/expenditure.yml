@@ -1,0 +1,29 @@
+dps_account_expenditure:
+    path:     /
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ExpenditureController::indexAction' }
+
+dps_account_expenditure_new:
+    path:     /new
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ExpenditureController::newAction' }
+
+dps_account_expenditure_create:
+    path:     /create
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ExpenditureController::createAction' }
+    methods:  POST
+
+dps_account_expenditure_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ExpenditureController::approveAction' }
+    options:
+           expose: true
+
+dps_account_expenditure_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ExpenditureController::inlineUpdateAction' }
+
+
+dps_account_expenditure_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ExpenditureController::deleteAction' }
+    options:
+           expose: true

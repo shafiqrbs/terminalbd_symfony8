@@ -1,0 +1,80 @@
+inventory_purchaseitem:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::indexAction' }
+
+inventory_purchaseitem_multi_add:
+    path:     /{purchase}/multi-add
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::multiAddAction' }
+
+inventory_purchaseitem_multi_insert:
+    path:     /{purchase}/multi-insert
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::multiInsertAction' }
+    methods:  POST
+
+inventory_purchaseitem_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::showAction' }
+
+inventory_purchaseitem_new:
+    path:     /{purchase}/new
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::newAction' }
+
+inventory_purchaseitem_create:
+    path:     /{purchase}/create
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::createAction' }
+    methods:  POST
+
+inventory_purchaseitem_inline_update:
+    path:     /inline-update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::inlineUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_purchaseitem_serialno_update:
+    path:     /inline-serialno-update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::inlineSerialUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_purchaseitem_inline_item_update:
+    path:     /inline-item-update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::inlineItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_purchaseitem_search:
+    path:     /item-search
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::searchAutoCompleteAction' }
+    options:
+            expose: true
+
+inventory_barcode_name:
+    path:     /{barcode}/barcode-name
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::searchNameAction' }
+    options:
+            expose: true
+
+inventory_purchaseitem_barcode:
+    path:     /{id}/update-barcode
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::updateBarcodeAction' }
+    options:
+            expose: true
+
+inventory_purchaseitem_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::editAction' }
+
+inventory_purchaseitem_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::deleteAction' }
+
+inventory_purchaseitem_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseItemController::updateAction' }
+    methods:  [POST, PUT]
+
+
+

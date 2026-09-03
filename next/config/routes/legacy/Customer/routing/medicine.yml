@@ -1,0 +1,17 @@
+customer_medicine_dashboard:
+    path:     /
+    defaults: { _controller: 'App\Customer\Controller\BusinessController::indexAction' }
+
+customer_medicine_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::showAction' }
+
+customer_medicine_new:
+    path:     /new
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::newAction' }
+
+customer_medicine_create:
+    path:     /create
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::createAction' }
+    methods:  POST
+

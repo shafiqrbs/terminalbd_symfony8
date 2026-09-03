@@ -22,7 +22,7 @@ class FeatureWidgetRepository extends EntityRepository
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){
-            $qb->update('SettingAppearanceBundle:FeatureWidget', 'mg')
+            $qb->update(\App\Appearance\Entity\FeatureWidget::class, 'mg')
                 ->set('mg.sorting', $i)
                 ->where('mg.id = :id')
                 ->setParameter('id', $value)
@@ -43,7 +43,7 @@ class FeatureWidgetRepository extends EntityRepository
 
         foreach ($data as $key => $value){
 
-            $qb->update('SettingAppearanceBundle:FeatureWidgetItem', 'mg')
+            $qb->update(\App\Appearance\Entity\FeatureWidgetItem::class, 'mg')
                 ->set('mg.sorting', $i)
                 ->where('mg.id = :id')
                 ->setParameter('id', $value)
@@ -65,7 +65,7 @@ class FeatureWidgetRepository extends EntityRepository
             $width = 100;
         }
         $qb = $em->createQueryBuilder();
-        $qb->update('SettingAppearanceBundle:FeatureWidgetItem', 'mg')
+        $qb->update(\App\Appearance\Entity\FeatureWidgetItem::class, 'mg')
             ->set('mg.divWidth',$width)
             ->set('mg.divHeight', $data['height'])
             ->where('mg.id = :id')

@@ -22,11 +22,11 @@ class ItemMeatAttributeRepository extends EntityRepository
         if(isset($data['attributeId'])){
             foreach ($data['attributeId'] as $value) {
 
-                $metaAttribute = $this->_em->getRepository('InventoryBundle:ItemMetaAttribute')->findOneBy(['purchaseVendorItem'=>$reEntity,'itemAttribute'=>$value]);
+                $metaAttribute = $this->_em->getRepository(\App\Inventory\Entity\ItemMetaAttribute::class)->findOneBy(['purchaseVendorItem'=>$reEntity,'itemAttribute'=>$value]);
                 if(!empty($metaAttribute)){
                     $this->updateMetaAttribute($metaAttribute,$data['value'][$i]);
                 }else{
-                    $itemAttribute= $this->_em->getRepository('InventoryBundle:ItemAttribute')->find($value);
+                    $itemAttribute= $this->_em->getRepository(\App\Inventory\Entity\ItemAttribute::class)->find($value);
                     $entity = new ItemMetaAttribute();
                     $entity->setValue($data['value'][$i]);
                     $entity->setItemAttribute($itemAttribute);

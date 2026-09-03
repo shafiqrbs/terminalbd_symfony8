@@ -18,7 +18,7 @@ class MedicinePurchaseReturnRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('MedicineBundle:MedicinePurchaseReturnItem','si')
+            ->from(\App\Medicine\Entity\MedicinePurchaseReturnItem::class,'si')
             ->select('sum(si.subTotal) as total')
             ->where('si.medicinePurchaseReturn = :entity')
             ->setParameter('entity', $entity ->getId())

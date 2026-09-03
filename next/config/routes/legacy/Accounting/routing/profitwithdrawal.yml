@@ -1,0 +1,45 @@
+account_profit_withdrawal:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\ProfitWithdrawalController::indexAction' }
+
+account_profit_withdrawal_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\ProfitWithdrawalController::newAction' }
+
+account_profit_withdrawal_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\ProfitWithdrawalController::createAction' }
+    methods:  POST
+
+account_profit_withdrawal_reverse:
+    path:     /{id}/reverse
+    defaults: { _controller: 'App\Accounting\Controller\ProfitWithdrawalController::journalReverseAction' }
+
+account_profit_withdrawal_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\ProfitWithdrawalController::approveAction' }
+    options:
+           expose: true
+
+account_profit_withdrawal_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Accounting\Controller\ProfitWithdrawalController::inlineUpdateAction' }
+
+
+account_profit_withdrawal_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\ProfitWithdrawalController::deleteAction' }
+    options:
+           expose: true
+
+
+account_profit_withdrawal_stakeholder:
+    path:     /{id}/profit-withdrawal-stakeholder
+    defaults: { _controller: 'App\Accounting\Controller\ProfitWithdrawalController::stakeholderProfitAction' }
+    options:
+           expose: true
+
+account_profit_withdrawal_pdf:
+    path:     /report-pdf
+    defaults: { _controller: 'App\Accounting\Controller\ProfitWithdrawalController::journalPdfAction' }
+

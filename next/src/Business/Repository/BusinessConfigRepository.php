@@ -57,7 +57,7 @@ class BusinessConfigRepository extends EntityRepository
         $stockAdjustment->execute();
 
 
-        $items = $this->_em->getRepository('BusinessBundle:BusinessParticular')->findBy(['businessConfig'=>$config]);
+        $items = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->findBy(['businessConfig'=>$config]);
 
 	    /* @var BusinessParticular $item */
 
@@ -94,7 +94,7 @@ class BusinessConfigRepository extends EntityRepository
         $sales = $em->createQuery('DELETE BusinessBundle:BusinessInvoice e WHERE e.businessConfig = '.$config);
         $sales->execute();
 
-        $items = $this->_em->getRepository('BusinessBundle:BusinessStore')->findBy(['businessConfig'=>$config]);
+        $items = $this->_em->getRepository(\App\Business\Entity\BusinessStore::class)->findBy(['businessConfig'=>$config]);
 
         /* @var BusinessStore $item */
 

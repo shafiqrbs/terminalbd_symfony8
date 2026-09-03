@@ -1,0 +1,48 @@
+expensecategory:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::indexAction' }
+
+expensecategory_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::showAction' }
+
+expensecategory_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::newAction' }
+
+expensecategory_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::createAction' }
+    requirements: { _method: post }
+
+expensecategory_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::editAction' }
+
+expensecategory_status:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::statusAction' }
+
+expensecategory_sorting:
+    path:     /sorting
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::sortingAction' }
+
+expensecategory_sorted:
+    path:     /sorted
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::sortedAction' }
+
+expensecategory_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::updateAction' }
+    requirements: { _method: post|put }
+
+expensecategory_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::deleteAction' }
+    requirements: { _method: post|delete }
+
+expensecategory_feature:
+   path:     /feature
+   defaults: { _controller: 'App\Accounting\Controller\ExpenseCategoryController::featureAction' }
+   requirements: { _method: post }
+

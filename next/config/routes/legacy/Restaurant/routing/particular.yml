@@ -1,0 +1,30 @@
+restaurant_particular:
+    path:     /
+    defaults: { _controller: 'App\Restaurant\Controller\ParticularController::indexAction' }
+
+restaurant_particular_create:
+    path:     /create
+    defaults: { _controller: 'App\Restaurant\Controller\ParticularController::createAction' }
+    methods:  POST
+
+restaurant_particular_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Restaurant\Controller\ParticularController::editAction' }
+
+restaurant_particular_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Restaurant\Controller\ParticularController::updateAction' }
+    methods:  [POST, PUT]
+
+restaurant_particular_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Restaurant\Controller\ParticularController::deleteAction' }
+
+restaurant_particular_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Restaurant\Controller\ParticularController::statusAction' }
+
+restaurant_particular_sorted:
+    path:     /product-sorted
+    defaults: { _controller: 'App\Restaurant\Controller\ParticularController::sortedAction' }
+

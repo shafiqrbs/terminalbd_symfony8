@@ -16,7 +16,7 @@ class VendorRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(e.id)');
-        $qb->from('InventoryBundle:Vendor','e');
+        $qb->from(\App\Inventory\Entity\Vendor::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory);
         $count = $qb->getQuery()->getSingleScalarResult();

@@ -1,0 +1,64 @@
+customer_domain_product:
+    resource: 'routing/product.yml'
+    prefix:   /{shop}/product
+
+
+customer_domain:
+    resource: 'routing/domain.yml'
+    prefix:   /{shop}
+
+customer_order_process:
+    resource: 'routing/order.yml'
+    prefix:   /{shop}/order
+
+customer_order_wishlist:
+    resource: 'routing/wishlist.yml'
+    prefix:   /{shop}/wishlist
+
+customer_order_inbox:
+    resource: 'routing/inbox.yml'
+    prefix:   /{shop}/inbox
+
+customer_pre_order_process:
+    resource: 'routing/preorder.yml'
+    prefix:   /{shop}/pre-order
+
+agent_client:
+    resource: 'routing/agentclient.yml'
+    prefix:   /agent
+
+customer_website:
+    resource: 'routing/customerweb.yml'
+    prefix:   /{shop}/content
+
+member_invoice:
+    resource: 'routing/customerinvoice.yml'
+    prefix:   /{shop}/invoice
+
+member_profile:
+    resource: 'routing/member.yml'
+    prefix:   /{shop}/member
+
+domain_business_dashboard:
+   resource: 'routing/business.yml'
+   prefix:   /{shop}/dashboard
+
+domain_customer_homepage:
+    path:     /{shop}/dashboard/
+    defaults: { _controller: 'App\Customer\Controller\CustomerController::indexAction' }
+
+domain_customer_domainpage:
+    path:     /domaindas-hboard/
+    defaults: { _controller: 'App\Customer\Controller\CustomerController::customerDomainAction' }
+
+customerweb_profile:
+    path:     /{shop}/profile
+    defaults: { _controller: 'App\Customer\Controller\ProfileController::editAction' }
+
+customerweb_profile_update:
+    path:      /{shop}/profile-update
+    defaults: { _controller: 'App\Customer\Controller\ProfileController::updateAction' }
+    methods:  [POST, PUT]
+
+
+

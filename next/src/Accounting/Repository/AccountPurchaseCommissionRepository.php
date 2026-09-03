@@ -143,7 +143,7 @@ class AccountPurchaseCommissionRepository extends EntityRepository
         $cash->setProcessHead('Purchase');
         $cash->setAccountRefNo($entity->getAccountRefNo());
         $cash->setUpdated($entity->getUpdated());
-        $cash->setAccountHead($this->_em->getRepository('AccountingBundle:AccountHead')->find(32));
+        $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(32));
         $cash->setBalance($balance - $entity->getPayment() );
         $cash->setCredit($entity->getPayment());
         $em->persist($cash);

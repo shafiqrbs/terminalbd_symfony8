@@ -188,7 +188,7 @@ class LocationRepository extends MaterializedPathRepository{
     {
 
         $em = $this->_em;
-        $entities = $em->getRepository('SettingLocationBundle:Location')->findBy(['parent'=>$parent],['name'=>'asc']);
+        $entities = $em->getRepository(\App\Location\Entity\Location::class)->findBy(['parent'=>$parent],['name'=>'asc']);
         $data = '';
         $data .= '<label>Thana/Upazilla</label>';
         $data .= '<p><select id="thana" name="thana" class="select2"  >';

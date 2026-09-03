@@ -17,7 +17,7 @@ class ContactPageRepository extends EntityRepository
     {
         $em = $this->_em;
 
-        $reEntity = $em->getRepository('SettingContentBundle:ContactPage')->findOneBy(['user'=>$user]);
+        $reEntity = $em->getRepository(\App\Content\Entity\ContactPage::class)->findOneBy(['user'=>$user]);
         if(empty($reEntity) && $user){
 
             $entity = New ContactPage();
@@ -43,7 +43,7 @@ class ContactPageRepository extends EntityRepository
 
         $em = $this->_em;
 
-        $entity = $em->getRepository('SettingContentBundle:ContactPage')->findOneBy(['globalOption'=>$globalOption]);
+        $entity = $em->getRepository(\App\Content\Entity\ContactPage::class)->findOneBy(['globalOption'=>$globalOption]);
 
         if(isset($data['address1']) and $data['address1'] != '') {
             $entity->setAddress1($data['address1']);
@@ -55,13 +55,13 @@ class ContactPageRepository extends EntityRepository
 
         if(isset($data['district']) and $data['district'] != '') {
 
-            $district = $em->getRepository('SettingLocationBundle:Location')->find( $data['district']);
+            $district = $em->getRepository(\App\Location\Entity\Location::class)->find( $data['district']);
             $entity->setDistrict($district);
         }
 
         if(isset($data['thana']) and $data['thana'] != '') {
 
-            $thana = $em->getRepository('SettingLocationBundle:Location')->find( $data['thana']);
+            $thana = $em->getRepository(\App\Location\Entity\Location::class)->find( $data['thana']);
             $entity->setThana($thana);
         }
 

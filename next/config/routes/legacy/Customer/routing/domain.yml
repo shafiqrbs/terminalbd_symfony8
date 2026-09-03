@@ -1,0 +1,15 @@
+customer_dashboard:
+    path:     /dashboard
+    defaults: { _controller: 'App\Customer\Controller\DefaultController::dashboardAction' }
+
+customer_domain:
+    path:     /domain
+    defaults: { _controller: 'App\Customer\Controller\DomainController::indexAction' }
+
+customer_domain_bookmark:
+    path:     /bookmark
+    defaults: { _controller: 'App\Customer\Controller\DomainController::domainBookmarkAction' }
+
+allproduct:
+    path:      /all-products
+    defaults: { _controller: 'App\Customer\Controller\ProductController::allProductAction' }

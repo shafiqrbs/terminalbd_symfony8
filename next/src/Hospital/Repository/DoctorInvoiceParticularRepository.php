@@ -17,7 +17,7 @@ class DoctorInvoiceParticularRepository extends EntityRepository
 
     public function insertInvoiceItems($invoice, $data)
     {
-        $particular = $this->_em->getRepository('HospitalBundle:Particular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
         $em = $this->_em;
         $entity = new InvoiceParticular();
         $entity->setHmsInvoice($invoice);

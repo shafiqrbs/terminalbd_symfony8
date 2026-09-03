@@ -1,0 +1,59 @@
+business_invoice_distribution_invoice_return:
+    path:     /{invoice}/invoice-item-return
+    defaults: { _controller: 'App\Business\Controller\DistributorController::salesReturnItemAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_invoice_distribution_store_payment:
+    path:     /{invoice}/store-payment
+    defaults: { _controller: 'App\Business\Controller\DistributorController::storePaymentAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_invoice_distribution_store_create:
+    path:     /store-create
+    defaults: { _controller: 'App\Business\Controller\DistributorController::storeCreateAction' }
+    methods:  POST
+    options:
+        expose: true
+
+business_invoice_distributor_ledger_delete:
+    path:     /{invoice}/{id}/delete-ledger
+    defaults: { _controller: 'App\Business\Controller\DistributorController::deleteLedgerAction' }
+
+business_invoice_distribution_store_balance:
+    path:     /store-balance
+    defaults: { _controller: 'App\Business\Controller\DistributorController::storeBalanceAction' }
+    methods:  GET
+    options:
+        expose: true
+
+business_invoice_distribution_return_item_delete:
+    path:     /{invoice}/{id}/return-item-delete
+    defaults: { _controller: 'App\Business\Controller\DistributorController::deleteReturnItemAction' }
+
+
+business_invoice_distribution:
+    path:     /{id}/add-distribution
+    defaults: { _controller: 'App\Business\Controller\DistributorController::addDistributionAction' }
+    methods:  POST
+    options:
+        expose: true
+
+business_invoice_distribution_delete:
+    path:     /{invoice}/{id}/distribution-delete
+    defaults: { _controller: 'App\Business\Controller\DistributorController::invoiceDistributionDeleteAction' }
+
+business_invoice_distribution_item_update:
+    path:     /sales-distribution-item-update
+    defaults: { _controller: 'App\Business\Controller\DistributorController::invoiceDistributionItemUpdateAction' }
+    methods:  POST
+    options:
+        expose: true
+
+business_invoice_distributor_approve:
+    path:     /{id}/approve
+    defaults: { _controller: 'App\Business\Controller\DistributorController::approveAction' }
+

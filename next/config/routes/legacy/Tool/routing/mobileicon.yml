@@ -1,0 +1,30 @@
+mobileicon:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\MobileIconController::indexAction' }
+
+mobileicon_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\MobileIconController::showAction' }
+
+mobileicon_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\MobileIconController::newAction' }
+
+mobileicon_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\MobileIconController::createAction' }
+    methods:  POST
+
+mobileicon_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\MobileIconController::editAction' }
+
+mobileicon_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\MobileIconController::updateAction' }
+    methods:  [POST, PUT]
+
+mobileicon_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\MobileIconController::deleteAction' }
+    methods:  [POST, DELETE]

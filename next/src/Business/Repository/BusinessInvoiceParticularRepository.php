@@ -64,14 +64,14 @@ class BusinessInvoiceParticularRepository extends EntityRepository
             $entity->setSubTotal($data['price']);
         }
         if($data['unit']) {
-            $unit = $this->_em->getRepository('SettingToolBundle:ProductUnit')->find($data['unit']);
+            $unit = $this->_em->getRepository(\App\Tool\Entity\ProductUnit::class)->find($data['unit']);
             $entity->setUnit($unit);
         }
-        $wearhouse = $this->_em->getRepository('BusinessBundle:WearHouse')->find($data['wearhouse']);
+        $wearhouse = $this->_em->getRepository(\App\Business\Entity\WearHouse::class)->find($data['wearhouse']);
         if($wearhouse){
             $entity->setWearhouse($wearhouse);
         }
-        $batchItem = $this->_em->getRepository('BusinessBundle:BusinessBatchParticular')->find($data['batchItem']);
+        $batchItem = $this->_em->getRepository(\App\Business\Entity\BusinessBatchParticular::class)->find($data['batchItem']);
         if($batchItem){
             $entity->setBatchItem($batchItem);
         }
@@ -115,7 +115,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
             $price = floatval ($data['salesPrice'][$key] ?: 0 );
             if($price > 0){
 
-                $particular = $this->_em->getRepository('BusinessBundle:BusinessParticular')->findOneBy(['businessConfig' => $invoice->getBusinessConfig(), 'name' => $value ]);
+                $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(['businessConfig' => $invoice->getBusinessConfig(), 'name' => $value ]);
                 $invoiceParticular = $this->findOneBy(['businessInvoice' => $invoice, 'businessParticular' => $particular]);
                 if ($invoiceParticular) {
                     $entity = $invoiceParticular;
@@ -160,7 +160,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
                $entity = new BusinessInvoiceParticular();
            }
 
-            $particular = $this->_em->getRepository('BusinessBundle:BusinessParticular')->find($value);
+            $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($value);
 
             $entity->setBusinessInvoice($invoice);
             $entity->setBusinessParticular($particular);
@@ -190,15 +190,15 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         $entity->setSubQuantity(0);
         $entity->setTotalQuantity($quantity);
         $entity->setSubTotal($data['price'] * $quantity);
-        $stock = $em->getRepository('BusinessBundle:BusinessParticular')->find($data['particular']);
+        $stock = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particular']);
         $entity->setParticular($stock->getName());
         $entity->setBusinessParticular($stock);
         if($data['vendor']) {
-            $vendor = $this->_em->getRepository('AccountingBundle:AccountVendor')->find($data['vendor']);
+            $vendor = $this->_em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($data['vendor']);
             $entity->setVendor($vendor);
         }
         if($data['stockGrn']) {
-            $stockGrn = $this->_em->getRepository('BusinessBundle:BusinessVendorStockItem')->find($data['stockGrn']);
+            $stockGrn = $this->_em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->find($data['stockGrn']);
             $entity->setVendorStockItem($stockGrn);
         }
         $em->persist($entity);
@@ -213,11 +213,11 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         $entity = new BusinessInvoiceParticular();
         $quantity = !empty($data['quantity']) ? $data['quantity'] :1;
         $bonusQuantity = !empty($data['bonusQuantity']) ? $data['bonusQuantity'] :0;
-        $wearhouse = $this->_em->getRepository('BusinessBundle:WearHouse')->find($data['wearhouse']);
+        $wearhouse = $this->_em->getRepository(\App\Business\Entity\WearHouse::class)->find($data['wearhouse']);
         if($wearhouse){
             $entity->setWearhouse($wearhouse);
         }
-        $batchItem = $this->_em->getRepository('BusinessBundle:BusinessBatchParticular')->find($data['batchItem']);
+        $batchItem = $this->_em->getRepository(\App\Business\Entity\BusinessBatchParticular::class)->find($data['batchItem']);
         if($batchItem){
             $entity->setBatchItem($batchItem);
         }
@@ -227,7 +227,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
 	    $accessoriesId = $data['accessories'];
 	    $price = $data['price'];
         $description = $data['description'];
-	    $stock = $em->getRepository('BusinessBundle:BusinessParticular')->find($accessoriesId);
+	    $stock = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($accessoriesId);
 	    $entity->setParticular($stock->getName());
 	    $entity->setBusinessParticular($stock);
 	    $entity->setDescription($description);
@@ -252,7 +252,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         $description = !empty($data['description']) ? $data['description'] :'';
         $entity->setQuantity($quantity);
         $particular = $data['particular'];
-        $stock = $em->getRepository('BusinessBundle:BusinessParticular')->find($particular);
+        $stock = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($particular);
         $entity->setParticular($stock->getName());
         $entity->setBusinessParticular($stock);
         if(!empty($stock->getUnit())) {
@@ -618,7 +618,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
 
         $item = $data['particular'];
 
-        $particular = $em->getRepository('BusinessBundle:BusinessParticular')->find($item);
+        $particular = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($item);
 
         /* @var $entity BusinessInvoiceParticular */
         $config = $invoice->getBusinessConfig();

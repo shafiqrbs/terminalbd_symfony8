@@ -197,7 +197,7 @@ class ReportRepository extends EntityRepository
         $grn = $data['grn'] ?? '';
         $vendor = $data['vendor'] ?? '';
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:Purchase','purchase');
+        $qb->from(\App\Inventory\Entity\Purchase::class,'purchase');
         $qb->select('SUM(purchase.totalQnt) AS quantity ');
         $qb->addSelect('SUM(purchase.totalAmount) AS total ');
         $qb->addSelect('SUM(purchase.paymentAmount) AS payment');
@@ -241,7 +241,7 @@ class ReportRepository extends EntityRepository
         $vendor = $data['vendor'] ?? '';
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:Purchase','s');
+        $qb->from(\App\Inventory\Entity\Purchase::class,'s');
         $qb->join('s.transactionMethod','t');
         $qb->select('t.name as transactionName , sum(s.totalAmount) as total ,sum(s.paymentAmount) as payment , sum(s.dueAmount) as due, sum(s.commissionAmount) as discount, sum(s.vatAmount) as vat');
         $qb->where('s.inventoryConfig = :inventory');
@@ -278,7 +278,7 @@ class ReportRepository extends EntityRepository
         $global =  $user->getGlobalOption()->getId();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('AccountingBundle:AccountPurchase','e');
+        $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
         $qb->where('e.globalOption = :config');
         $qb->setParameter('config', $global);
@@ -291,7 +291,7 @@ class ReportRepository extends EntityRepository
     public function invReportStockPriceOverview($inventory,$data ="")
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb->from("InventoryBundle:Item",'e');
+        $qb->from(\App\Inventory\Entity\Item::class,'e');
         $qb->select('SUM(e.quantity) AS quantity');
         $qb->addSelect('SUM(e.remainingQnt * e.purchaseAvgPrice) AS purchasePrice');
         $qb->addSelect('SUM(e.remainingQnt * e.salesPrice) AS salesPrice');
@@ -305,7 +305,7 @@ class ReportRepository extends EntityRepository
     public function invReportSalesPurchasePrice($inventory,$data)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:Sales','sales');
+        $qb->from(\App\Inventory\Entity\Sales::class,'sales');
         $qb->select("SUM(sales.total) as totalSales");
         $qb->where("sales.inventoryConfig = :inventoryConfig");
         $qb->setParameter('inventoryConfig', $inventory);
@@ -313,7 +313,7 @@ class ReportRepository extends EntityRepository
         $sales = $qb->getQuery()->getSingleScalarResult();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:SalesItem','si');
+        $qb->from(\App\Inventory\Entity\SalesItem::class,'si');
         $qb->join('si.sales','sales');
         $qb->select('SUM(si.quantity * si.purchasePrice ) AS totalPurchaseAmount');
         $qb->where("sales.inventoryConfig = :inventoryConfig");
@@ -328,12 +328,12 @@ class ReportRepository extends EntityRepository
     public  function getStockOverview($inventory,$data=''){
 
         $em = $this->_em;
-        $purchase = $em->getRepository('InventoryBundle:Item')->getSumStock($inventory,'purchase',$data);
-        $purchaseReturn = $em->getRepository('InventoryBundle:Item')->getSumStock($inventory,'purchaseReturn',$data);
-        $purchaseReplace = $em->getRepository('InventoryBundle:Item')->getSumStock($inventory,'purchaseReplace',$data);
-        $sales = $em->getRepository('InventoryBundle:Item')->getSumStock($inventory,'sales',$data);
-        $salesReturn = $em->getRepository('InventoryBundle:Item')->getSumStock($inventory,'salesReturn',$data);
-        $damage = $em->getRepository('InventoryBundle:Item')->getSumStock($inventory,'damage',$data);
+        $purchase = $em->getRepository(\App\Inventory\Entity\Item::class)->getSumStock($inventory,'purchase',$data);
+        $purchaseReturn = $em->getRepository(\App\Inventory\Entity\Item::class)->getSumStock($inventory,'purchaseReturn',$data);
+        $purchaseReplace = $em->getRepository(\App\Inventory\Entity\Item::class)->getSumStock($inventory,'purchaseReplace',$data);
+        $sales = $em->getRepository(\App\Inventory\Entity\Item::class)->getSumStock($inventory,'sales',$data);
+        $salesReturn = $em->getRepository(\App\Inventory\Entity\Item::class)->getSumStock($inventory,'salesReturn',$data);
+        $damage = $em->getRepository(\App\Inventory\Entity\Item::class)->getSumStock($inventory,'damage',$data);
 
         $remaining = (($purchase + $salesReturn ) + ($purchaseReturn + $sales + $damage ));
         $data = [
@@ -353,7 +353,7 @@ class ReportRepository extends EntityRepository
     {
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:Item', 'item');
+        $qb->from(\App\Inventory\Entity\Item::class, 'item');
         $qb->join('item.masterItem', 'm');
         $qb->join('m.productUnit', 'u');
         $qb->addSelect('item.name as name','item.purchaseQuantity','item.purchaseQuantityReturn','item.salesQuantity','item.salesQuantityReturn','item.damageQuantity','item.remainingQnt','item.salesPrice as salesPrice','item.purchaseAvgPrice');
@@ -372,7 +372,7 @@ class ReportRepository extends EntityRepository
     {
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:Item', 'item');
+        $qb->from(\App\Inventory\Entity\Item::class, 'item');
         $qb->join('item.masterItem', 'm');
         $qb->join('m.category', 'c');
         $qb->addSelect('c.id as cid','c.name as name','SUM(item.remainingQnt) as quantity','SUM(item.purchaseAvgPrice*item.remainingQnt) as amount');
@@ -390,7 +390,7 @@ class ReportRepository extends EntityRepository
     {
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:Item', 'item');
+        $qb->from(\App\Inventory\Entity\Item::class, 'item');
         $qb->join('item.brand', 'c');
         $qb->addSelect('c.id as cid','c.name as name','SUM(item.remainingQnt) as quantity','SUM(item.purchaseAvgPrice*item.remainingQnt) as amount');
         $qb->where("item.inventoryConfig = :inventory");
@@ -413,7 +413,7 @@ class ReportRepository extends EntityRepository
         $datetime = new DateTime("now");
         $today_startdatetime = $datetime->format('Y-m-d 00:00:00');
         $today_enddatetime = $datetime->format('Y-m-d 23:59:59');
-        $qb->from('InventoryBundle:Sales','s');
+        $qb->from(\App\Inventory\Entity\Sales::class,'s');
         $qb->select('s')
             ->where('s.inventoryConfig = :inventory')
             ->andWhere('s.salesMode =:mode')
@@ -434,7 +434,7 @@ class ReportRepository extends EntityRepository
     public function invReportSales( $inventory , $data)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:Sales', 's');
+        $qb->from(\App\Inventory\Entity\Sales::class, 's');
         $qb->leftJoin('s.salesBy', 'u');
         $qb->leftJoin('s.transactionMethod', 't');
         $qb->innerJoin('s.salesItems', 'si');
@@ -468,7 +468,7 @@ class ReportRepository extends EntityRepository
     public  function invReportSalesItem($inventory, $data=''){
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:SalesItem','si');
+        $qb->from(\App\Inventory\Entity\SalesItem::class,'si');
         $qb->join('si.sales','s');
         $qb->join('s.salesBy','u');
         $qb->leftJoin('s.customer','customer');

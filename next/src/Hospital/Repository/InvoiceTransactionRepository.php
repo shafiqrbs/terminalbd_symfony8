@@ -327,7 +327,7 @@ class InvoiceTransactionRepository extends EntityRepository
    public function insertDefaultAdmissionParticular(Invoice $invoice){
 
        $em = $this->_em;
-       $records = $em->getRepository("HospitalBundle:Particular")->findBy(['hospitalConfig'=>$invoice->getHospitalConfig(),'admissionDefault' => 1]);
+       $records = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(['hospitalConfig'=>$invoice->getHospitalConfig(),'admissionDefault' => 1]);
        if(count($records) > 0){
            $code = $this->getLastCode($invoice);
            $entity = New InvoiceTransaction();
@@ -336,12 +336,12 @@ class InvoiceTransactionRepository extends EntityRepository
            $transactionCode = sprintf("%s", str_pad($entity->getCode(),2, '0', STR_PAD_LEFT));
            $entity->setProcess('Pending');
            $entity->setTransactionCode($transactionCode);
-           $transactionMethod = $em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+           $transactionMethod = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
            $entity->setTransactionMethod($transactionMethod);
            $this->_em->persist($entity);
            $this->_em->flush();
-           $em->getRepository('HospitalBundle:AdmissionPatientParticular')->insertDefaultInvoiceItems($entity,$records);
-           $em->getRepository('HospitalBundle:AdmissionPatientParticular')->updateInvoiceTransactionTotalPrice($entity);
+           $em->getRepository(\App\Hospital\Entity\AdmissionPatientParticular::class)->insertDefaultInvoiceItems($entity,$records);
+           $em->getRepository(\App\Hospital\Entity\AdmissionPatientParticular::class)->updateInvoiceTransactionTotalPrice($entity);
            return $entity;
        }
     }
@@ -374,7 +374,7 @@ class InvoiceTransactionRepository extends EntityRepository
         $entity->setDiscount($data['discount']);
         $entity->setPayment($data['payment']);
         $entity->setProcess('In-progress');
-        $transactionMethod = $this->_em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+        $transactionMethod = $this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         $entity->setTransactionMethod($transactionMethod);
         $this->_em->persist($entity);
         $this->_em->flush($entity);
@@ -469,7 +469,7 @@ class InvoiceTransactionRepository extends EntityRepository
             $this->_em->persist($entity);
             $this->_em->flush($entity);
             if($invoice->getPayment() > 0){
-                $this->_em->getRepository('AccountingBundle:AccountSales')->insertHospitalAccountInvoice($entity);
+                $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalAccountInvoice($entity);
             }
     }
 
@@ -539,7 +539,7 @@ class InvoiceTransactionRepository extends EntityRepository
     {
         $em = $this->_em;
         $res = $em->createQueryBuilder()
-            ->from('HospitalBundle:InvoiceTransaction','si')
+            ->from(\App\Hospital\Entity\InvoiceTransaction::class,'si')
             ->select('sum(si.payment) as payment , sum(si.discount) as discount, sum(si.vat) as vat')
             ->where('si.hmsInvoice = :invoice')
             ->setParameter('invoice', $invoice)
@@ -559,14 +559,14 @@ class InvoiceTransactionRepository extends EntityRepository
             $entity->setVat($vat);
         }
         if(empty($entity->getTransactionMethod())){
-            $entity->setTransactionMethod($em->getRepository('SettingToolBundle:TransactionMethod')->find(1));
+            $entity->setTransactionMethod($em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         }
         $invoice->setDiscountRequestedBy($entity->getDiscountRequestedBy());
         $invoice->setDiscountRequestedComment($entity->getDiscountRequestedComment());
         $invoice->setComment($entity->getComment());
         $em->persist($entity);
         $em->flush($entity);
-        $em->getRepository('AccountingBundle:AccountSales')->insertHospitalAccountInvoice($entity);
+        $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalAccountInvoice($entity);
 
     }
 
@@ -666,7 +666,7 @@ class InvoiceTransactionRepository extends EntityRepository
             if( empty($transaction->getPayment()) and empty($transaction->getDiscount())){
 
                 $qb = $this->_em->createQueryBuilder();
-                $qb->delete('HospitalBundle:InvoiceTransaction', 'trans')
+                $qb->delete(\App\Hospital\Entity\InvoiceTransaction::class, 'trans')
                     ->where($qb->expr()->eq('trans.id', ':id'))
                     ->setParameter('id', $transaction->getId());
                 $qb->getQuery()->execute();
@@ -678,7 +678,7 @@ class InvoiceTransactionRepository extends EntityRepository
     {
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
-        $query = $qb->delete('HospitalBundle:InvoiceTransaction', 'e')
+        $query = $qb->delete(\App\Hospital\Entity\InvoiceTransaction::class, 'e')
             ->where('e.hmsInvoice = :hmsInvoice')
             ->setParameter('hmsInvoice', $entity->getId())
             ->andWhere('e.process IN (:process)')
@@ -726,7 +726,7 @@ class InvoiceTransactionRepository extends EntityRepository
 
     public function getLastCode(Invoice $invoice)
     {
-        $qb = $this->_em->getRepository('HospitalBundle:InvoiceTransaction')->createQueryBuilder('s');
+        $qb = $this->_em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->createQueryBuilder('s');
         $qb
             ->select('MAX(s.code)')
             ->where('s.hmsInvoice = :invoice')

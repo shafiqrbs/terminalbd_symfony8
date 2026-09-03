@@ -57,15 +57,15 @@ class AccountProfitRepository extends EntityRepository
         if($journalAccountPurchase) {
             foreach ($journalAccountPurchase as $row):
                 if (in_array($row['processType'], ['Credit','Outstanding', 'Opening'])) {
-                    $em->getRepository('AccountingBundle:Transaction')->insertPurchaseMonthlyOpeningTransaction($profit, $row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertPurchaseMonthlyOpeningTransaction($profit, $row);
                 } elseif ($row['amount'] > 0 and $row['processType'] == 'Debit') {
-                    $em->getRepository('AccountingBundle:Transaction')->insertPurchaseMonthlyDiscountTransaction($profit, $row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertPurchaseMonthlyDiscountTransaction($profit, $row);
                 } elseif ($row['amount'] > 0 and $row['processType'] == 'Due') {
-                    $em->getRepository('AccountingBundle:Transaction')->insertPurchaseMonthlyDueTransaction($profit, $row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertPurchaseMonthlyDueTransaction($profit, $row);
                 } elseif ($row['total'] > 0 and $row['processType'] == 'Purchase') {
-                    $em->getRepository('AccountingBundle:Transaction')->insertPurchaseMonthlyTransaction($profit, $row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertPurchaseMonthlyTransaction($profit, $row);
                 } elseif ($row['amount'] > 0 and $row['processType'] == 'Advance') {
-                    $em->getRepository('AccountingBundle:Transaction')->insertPurchaseAdvanceMonthlyTransaction($profit, $row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertPurchaseAdvanceMonthlyTransaction($profit, $row);
                 }
             endforeach;
         }
@@ -76,49 +76,49 @@ class AccountProfitRepository extends EntityRepository
             foreach ($journalAccountSales as $row):
 
                 if(in_array($row['processHead'],['Debit','Outstanding','Opening'])){
-                    $em->getRepository('AccountingBundle:Transaction')->insertSalesMonthlyOpeningTransaction($profit,$row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertSalesMonthlyOpeningTransaction($profit,$row);
                 }elseif($row['amount'] > 0 and $row['processHead'] == 'Credit' ){
-                    $em->getRepository('AccountingBundle:Transaction')->insertSalesMonthlyDiscountTransaction($profit,$row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertSalesMonthlyDiscountTransaction($profit,$row);
                 }elseif($row['amount'] > 0 and $row['processHead'] == 'Due' ){
-                    $em->getRepository('AccountingBundle:Transaction')->insertSalesMonthlyDueTransaction($profit,$row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertSalesMonthlyDueTransaction($profit,$row);
                 }elseif($row['amount'] > 0 and $row['processHead'] == 'Sales-Return'){
-                    $em->getRepository('AccountingBundle:Transaction')->insertSalesMonthlyMedicineReturnTransaction($profit,$row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertSalesMonthlyMedicineReturnTransaction($profit,$row);
                 }elseif(in_array($row['processHead'],['medicine','business','inventory','restaurant','hotel'])){
-                    $em->getRepository('AccountingBundle:Transaction')->insertSalesMonthlyTransaction($profit,$row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertSalesMonthlyTransaction($profit,$row);
                 }elseif(in_array($row['processHead'],['hospital','diagnostic','admission','visit'])){
-                    $em->getRepository('AccountingBundle:Transaction')->insertSalesHospitalMonthlyTransaction($profit,$row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertSalesHospitalMonthlyTransaction($profit,$row);
                 }elseif(in_array($row['processHead'],['Advance'])){
-                    $em->getRepository('AccountingBundle:Transaction')->insertSalesAdvanceMonthlyTransaction($profit,$row);
+                    $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertSalesAdvanceMonthlyTransaction($profit,$row);
                 }
 
             endforeach;
         }
         if($journalAccountSalesAdjustment) {
-            $em->getRepository('AccountingBundle:Transaction')->insertSalesAdjustmentMonthlyTransaction($profit, $journalAccountSalesAdjustment);
+            $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertSalesAdjustmentMonthlyTransaction($profit, $journalAccountSalesAdjustment);
         }
         if($salesPurchasePrice['total'] > 0) {
-            $em->getRepository('AccountingBundle:Transaction')->insertSalesMonthlyPurchaseTransaction($profit, round($salesPurchasePrice['total']));
+            $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertSalesMonthlyPurchaseTransaction($profit, round($salesPurchasePrice['total']));
         }
         if($journalExpenditure){
             foreach ($journalExpenditure as $row):
-                $em->getRepository('AccountingBundle:Transaction')->insertExpenseMonthlyTransaction($profit,$row);
+                $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertExpenseMonthlyTransaction($profit,$row);
             endforeach;
         }
         if($journalContra){
             foreach ($journalContra as $row):
-                $em->getRepository('AccountingBundle:Transaction')->insertContraMonthlyTransaction($profit,$row);
+                $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertContraMonthlyTransaction($profit,$row);
             endforeach;
         }
         $salesReturn =$this->getTransactionSalesReturn($profit, 'Sales-Return');
-       // $em->getRepository('AccountingBundle:Transaction')->insertMonthlySalesAccountReceivable($profit,$monthlySalesAccountReceivable);
+       // $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertMonthlySalesAccountReceivable($profit,$monthlySalesAccountReceivable);
         $salesReconcialtion = $this->monthlyProfitReconcialtionProcess($profit, 'sales');
         $salesAdjustmentReconcialtion = $this->monthlyProfitReconcialtionProcess($profit, 'sales-adjustment');
         $salesPurchaserReconcialtion = $this->monthlyProfitReconcialtionProcess($profit, 'sales-purchase');
         $end = $profit->getGenerateMonth();
         $date['startDate'] = $end->format('Y-m-01 00:00:00');
         $date['endDate'] = $end->format('Y-m-t 23:59:59');
-        $expenditures = $this->_em->getRepository('AccountingBundle:Transaction')->reportTransactionIncomeLoss($profit->getGlobalOption(), $accountHeads = [37,23],$date);
-        $operatingRevenue = $this->_em->getRepository('AccountingBundle:Transaction')->reportTransactionIncomeLoss($profit->getGlobalOption(), $accountHeads = [20],$date);
+        $expenditures = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncomeLoss($profit->getGlobalOption(), $accountHeads = [37,23],$date);
+        $operatingRevenue = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncomeLoss($profit->getGlobalOption(), $accountHeads = [20],$date);
         $data =  ['sales' => $monthlySalesAccountReceivable['total'] , 'salesReturn' => $salesReturn['debit'] ,'salesAdjustment' => $salesAdjustmentReconcialtion['debit'] ,'purchaseAdjustment' => $salesAdjustmentReconcialtion['credit'] ,'purchase' => $salesPurchaserReconcialtion['credit'], 'operatingRevenue' => $operatingRevenue['amount'], 'expenditure' => $expenditures['amount']];
         return $data;
 

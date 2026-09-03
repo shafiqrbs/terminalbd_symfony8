@@ -1,0 +1,52 @@
+itemsize:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::indexAction' }
+
+inventory_itemsize_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::autoSearchAction' }
+    options:
+            expose: true
+
+inventory_itemsize_name:
+    path:      /{size}/size-name
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::searchItemSizeNameAction' }
+    options:
+            expose: true
+
+itemsize_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::showAction' }
+
+itemsize_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::newAction' }
+
+itemsize_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::createAction' }
+    methods:  POST
+
+itemsize_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::editAction' }
+
+itemsize_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::updateAction' }
+    methods:  [POST, PUT]
+
+itemsize_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::deleteAction' }
+    methods:  [POST, DELETE]
+
+itemsize_group:
+    path:     /size-group
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::sizeGroupAction' }
+
+
+itemsize_group_create:
+    path:     /size-group-create
+    defaults: { _controller: 'App\Inventory\Controller\ItemSizeController::sizeGroupCreateAction' }
+    methods:  POST

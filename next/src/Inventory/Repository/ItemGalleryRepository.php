@@ -42,7 +42,7 @@ class ItemGalleryRepository extends EntityRepository
     {
         $em = $this->_em;
         foreach ($posts as $post ){
-            $entity = $em->getRepository('InventoryBundle:ItemGallery')->find($post);
+            $entity = $em->getRepository(\App\Inventory\Entity\ItemGallery::class)->find($post);
             $entity->removeUpload($entity->getPurchaseVendorItem()->getInventoryConfig()->getGlobalOption()->getId(),$entity->getPurchaseVendorItem()->getId());
             $em->remove($entity);
         }

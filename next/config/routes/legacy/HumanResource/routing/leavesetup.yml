@@ -1,0 +1,8 @@
+leave_setup:
+    path:     /
+    defaults: { _controller: 'App\HumanResource\Controller\LeaveSetupController::leaveSetupAction' }
+
+leave_setup_update:
+    path:     /update
+    defaults: { _controller: 'App\HumanResource\Controller\LeaveSetupController::updateAction' }
+    methods:  [POST, PUT]

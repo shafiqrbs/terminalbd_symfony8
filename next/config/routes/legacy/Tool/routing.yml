@@ -1,0 +1,153 @@
+setting_tool_sms:
+    resource: 'routing/smssender.yml'
+    prefix:   /sms/sender-sms
+
+setting_tool_invoicemodule:
+    resource: 'routing/invoicemodule.yml'
+    prefix:   /domain/invoicemodule
+
+setting_tool_sidebar:
+    resource: 'routing/sidebar.yml'
+    prefix:   /domain/sidebar
+
+setting_tool_designation:
+    resource: 'routing/designation.yml'
+    prefix:   /admin/designation
+
+setting_tool_color:
+    resource: 'routing/color.yml'
+    prefix:   /admin/color
+
+setting_tool_testimonial:
+    resource: 'routing/applicationtestimonial.yml'
+    prefix:   /admin/testimonial
+
+setting_tool_size:
+    resource: 'routing/size.yml'
+    prefix:   /admin/size
+
+setting_tool_hms_cateory:
+    resource: 'routing/category.yml'
+    prefix:   /admin/hms-category
+
+setting_tool_invoicesmsemail:
+    resource: 'routing/invoicesmsemail.yml'
+    prefix:   /sms/invoice-sms-email
+
+setting_tool_smsbulk:
+    resource: 'routing/smsbulk.yml'
+    prefix:   /sms/bulk-sms
+
+setting_tool_bankaccount:
+    resource: 'routing/portalbankaccount.yml'
+    prefix:   /admin/bank
+
+setting_tool_bkash:
+    resource: 'routing/portalmobilebankaccount.yml'
+    prefix:   /admin/mobile-bank
+
+setting_tool_applicationpricing:
+    resource: 'routing/applicationpricing.yml'
+    prefix:   /admin/applicationpricing
+
+setting_tool_domain:
+    resource: 'routing/domain.yml'
+    prefix:   /admin/domain
+
+setting_tool_tools_smspricing:
+    resource: 'routing/smsemailpricing.yml'
+    prefix:   /admin/smspricing
+
+setting_tool_adstool:
+    resource: 'routing/adstool.yml'
+    prefix:   /admin/adstool
+
+setting_tool_theme:
+    resource: 'routing/theme.yml'
+    prefix:   /admin/theme
+
+setting_tool_templating:
+    resource: 'routing/templating.yml'
+    prefix:   /vendor/templating
+
+setting_tool_barcode:
+    resource: 'routing/barcode.yml'
+    prefix:   /barcode
+
+setting_tool_appmodule:
+    resource: 'routing/appmodule.yml'
+    prefix:   /admin/appmodule
+
+setting_tool_mobileicon:
+    resource: 'routing/mobileicon.yml'
+    prefix:   /domain/mobileicon
+
+setting_tool_footersetting:
+    resource: 'routing/footersetting.yml'
+    prefix:   /domain/footersetting
+
+setting_tool_institutelevel:
+    resource: 'routing/institutelevel.yml'
+    prefix:   /domain/institutelevel
+
+setting_tool_course:
+    resource: 'routing/course.yml'
+    prefix:   /domain/course
+
+setting_tool_branding:
+    resource: 'routing/branding.yml'
+    prefix:   /admin/branding
+
+setting_tool_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: App\Tool\Controller\DefaultController::indexAction }
+
+SettingToolBundle_syndicate:
+        resource: 'routing/syndicate.yml'
+        prefix:   /admin/syndicate
+
+SettingToolBundle_globaloption:
+        resource: 'routing/globaloption.yml'
+        prefix:   /domain/globaloption
+
+SettingToolBundle_webtheme:
+        resource: 'routing/webtheme.yml'
+        prefix:   /webtheme
+
+SettingToolBundle_mobiletheme:
+        resource: 'routing/mobiletheme.yml'
+        prefix:   /mobiletheme
+
+SettingToolBundle_sitesetting:
+        resource: 'routing/sitesetting.yml'
+        prefix:   /admin/sitesetting
+
+SettingToolBundle_syndicatemodule:
+        resource: 'routing/syndicatemodule.yml'
+        prefix:   /admin/syndicatemodule
+
+SettingToolBundle_module:
+        resource: 'routing/module.yml'
+        prefix:   /admin/module
+
+SettingToolBundle_transaction_method:
+        resource: 'routing/transactionmethod.yml'
+        prefix:   /admin/transaction-method
+
+SettingToolBundle_medicine:
+        resource: 'routing/medicineimport.yml'
+        prefix:   /admin/medicine-import
+
+SettingToolBundle_medicinebrand:
+        resource: 'routing/medicinebrand.yml'
+        prefix:   /admin/medicine-brand
+
+SettingToolBundle_taxtarrif_upload:
+        resource: 'routing/tarrif_upload.yml'
+        prefix:   /admin/tariff-upload
+
+SettingToolBundle_taxtarrif:
+        resource: 'routing/tariff.yml'
+        prefix:   /admin/tax-tariff
+
+

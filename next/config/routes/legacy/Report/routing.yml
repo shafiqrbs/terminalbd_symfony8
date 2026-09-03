@@ -1,0 +1,3 @@
+report_controllers:
+    resource: '../../../../src/Report/Controller/ReportController.php'
+    type: attribute

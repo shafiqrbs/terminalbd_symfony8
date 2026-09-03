@@ -1,0 +1,32 @@
+designation:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\DesignationController::indexAction' }
+
+designation_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\DesignationController::showAction' }
+
+designation_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\DesignationController::newAction' }
+
+designation_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\DesignationController::createAction' }
+    methods:  POST
+
+designation_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\DesignationController::editAction' }
+
+designation_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\DesignationController::updateAction' }
+    methods:  [POST, PUT]
+
+designation_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\DesignationController::deleteAction' }
+    methods:  [POST, DELETE]
+
+

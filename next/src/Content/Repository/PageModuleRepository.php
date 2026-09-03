@@ -28,11 +28,11 @@ class PageModuleRepository extends EntityRepository
                     $moduleId = !empty($data['module'][$key]) ? $data['module'][$key] :0;
 
                     if($pageModuleId > 0){
-                        $entity = $this->_em->getRepository('SettingContentBundle:PageModule')->find($pageModuleId);
+                        $entity = $this->_em->getRepository(\App\Content\Entity\PageModule::class)->find($pageModuleId);
                     }else{
                         $entity = new PageModule();
                     }
-                    $module = $this->_em->getRepository('SettingToolBundle:Module')->find($moduleId);
+                    $module = $this->_em->getRepository(\App\Tool\Entity\Module::class)->find($moduleId);
                     $entity->setName($data['name'][$key]);
                     $entity->setShowLimit($data['showLimit'][$key]);
                     $entity->setShowColumn($data['showColumn'][$key]);
@@ -66,11 +66,11 @@ class PageModuleRepository extends EntityRepository
                     $moduleId = !empty($data['module'][$key]) ? $data['module'][$key] :0;
 
                     if($pageModuleId > 0){
-                        $entity = $this->_em->getRepository('SettingContentBundle:PageModule')->find($pageModuleId);
+                        $entity = $this->_em->getRepository(\App\Content\Entity\PageModule::class)->find($pageModuleId);
                     }else{
                         $entity = new PageModule();
                     }
-                    $module = $this->_em->getRepository('SettingToolBundle:Module')->find($moduleId);
+                    $module = $this->_em->getRepository(\App\Tool\Entity\Module::class)->find($moduleId);
                     $entity->setName($data['name'][$key]);
                     $entity->setShowLimit($data['showLimit'][$key]);
                     $entity->setContentPosition($data['contentPosition'][$key]);
@@ -91,7 +91,7 @@ class PageModuleRepository extends EntityRepository
     {
         if(!empty($pageModule)){
             $em =$this->_em;
-            $entity = $em->getRepository('SettingContentBundle:PageModule')->find($pageModule);
+            $entity = $em->getRepository(\App\Content\Entity\PageModule::class)->find($pageModule);
             $em->remove($entity);
             $em->flush();
         }
@@ -109,7 +109,7 @@ class PageModuleRepository extends EntityRepository
                if(isset($data['module'][$i]) and !empty( $data['module'][$i]) ) {
 
                     $moduleId = $data['module'][$i];
-                    $module = $this->_em->getRepository('SettingToolBundle:Module')->find($moduleId);
+                    $module = $this->_em->getRepository(\App\Tool\Entity\Module::class)->find($moduleId);
                     $entity = new PageModule();
                     $entity->setName($data['name'][$i]);
                     $entity->setShowLimit($data['showLimit'][$i]);
@@ -130,7 +130,7 @@ class PageModuleRepository extends EntityRepository
     {
 
         $em =$this->_em;
-        $entities = $em->getRepository('SettingContentBundle:PageModule')->findBy(['homePage'=>$page]);
+        $entities = $em->getRepository(\App\Content\Entity\PageModule::class)->findBy(['homePage'=>$page]);
         foreach ($entities as $entity )
         {
             $em->remove($entity);

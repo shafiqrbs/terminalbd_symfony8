@@ -16,7 +16,7 @@ class BrandingRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $entity = $em->getRepository('SettingToolBundle:Branding')->findBy(['status'=>1,'sponsor'=>1]);
+        $entity = $em->getRepository(\App\Tool\Entity\Branding::class)->findBy(['status'=>1,'sponsor'=>1]);
         if(!empty($entity)){
 
             return $entity;

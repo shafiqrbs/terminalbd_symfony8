@@ -1,0 +1,34 @@
+menucustom:
+    path:     /
+    defaults: { _controller: 'App\Appearance\Controller\MenuCustomController::indexAction' }
+
+menucustom_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Appearance\Controller\MenuCustomController::showAction' }
+
+menucustom_new:
+    path:     /new
+    defaults: { _controller: 'App\Appearance\Controller\MenuCustomController::newAction' }
+
+menucustom_create:
+    path:     /create
+    defaults: { _controller: 'App\Appearance\Controller\MenuCustomController::createAction' }
+    methods:  POST
+
+menucustom_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Appearance\Controller\MenuCustomController::editAction' }
+
+menucustom_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Appearance\Controller\MenuCustomController::updateAction' }
+    methods:  [POST, PUT]
+
+menucustom_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Appearance\Controller\MenuCustomController::deleteAction' }
+    methods:  [POST, DELETE]
+
+menucustom_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Appearance\Controller\MenuCustomController::statusAction' }

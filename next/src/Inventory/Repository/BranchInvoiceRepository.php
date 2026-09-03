@@ -73,7 +73,7 @@ class BranchInvoiceRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('InventoryBundle:BranchInvoiceItem','si')
+            ->from(\App\Inventory\Entity\BranchInvoiceItem::class,'si')
             ->select('sum(si.subTotal) as total , count(si.id) as totalItem , sum(si.quantity) as totalQuantity')
             ->where('si.branchInvoice = :branchInvoice')
             ->setParameter('branchInvoice', $branchInvoice ->getId())

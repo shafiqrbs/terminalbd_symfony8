@@ -1,0 +1,33 @@
+hms_referreddoctor:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\ReferredDoctorController::indexAction' }
+
+hms_referreddoctor_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Hospital\Controller\ReferredDoctorController::showAction' }
+
+hms_referreddoctor_new:
+    path:     /new
+    defaults: { _controller: 'App\Hospital\Controller\ReferredDoctorController::newAction' }
+
+hms_referreddoctor_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\ReferredDoctorController::createAction' }
+    methods:  POST
+
+hms_referreddoctor_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\ReferredDoctorController::editAction' }
+
+hms_referreddoctor_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\ReferredDoctorController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_referreddoctor_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\ReferredDoctorController::deleteAction' }
+
+hms_referreddoctor_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\ReferredDoctorController::statusAction' }

@@ -18,7 +18,7 @@ class HmsPurchaseRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('HospitalBundle:HmsPurchaseItem','si')
+            ->from(\App\Hospital\Entity\HmsPurchaseItem::class,'si')
             ->select('sum(si.purchaseSubTotal) as total')
             ->where('si.purchase = :entity')
             ->setParameter('entity', $entity ->getId())

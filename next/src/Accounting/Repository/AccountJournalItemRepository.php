@@ -88,12 +88,12 @@ class AccountJournalItemRepository extends EntityRepository
                    $item = new AccountJournalItem();
                }
                $item->setAccountJournal($journal);
-               $accountHead = $em->getRepository('AccountingBundle:AccountHead')->find($value);
+               $accountHead = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->find($value);
                $item->setAccountHead($accountHead);
                $item->setDebit($data['debit'][$key]);
                $item->setCredit($data['credit'][$key]);
                if ($data['subAccountHead'][$key] > 0) {
-                   $accountSubHead = $em->getRepository('AccountingBundle:AccountHead')->find($data['subAccountHead'][$key]);
+                   $accountSubHead = $em->getRepository(\App\Accounting\Entity\AccountHead::class)->find($data['subAccountHead'][$key]);
                    $item->setAccountSubHead($accountSubHead);
                }
                $item->setNarration($data['narration'][$key]);

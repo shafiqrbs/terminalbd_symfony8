@@ -86,7 +86,7 @@ class BusinessPurchaseRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('BusinessBundle:BusinessPurchaseItem','si')
+            ->from(\App\Business\Entity\BusinessPurchaseItem::class,'si')
             ->select('sum(si.purchaseSubTotal) as total')
             ->where('si.businessPurchase = :entity')
             ->setParameter('entity', $entity ->getId())
@@ -181,7 +181,7 @@ class BusinessPurchaseRepository extends EntityRepository
 	$global =  $user->getGlobalOption()->getId();
 
 	$qb = $this->_em->createQueryBuilder();
-	$qb->from('AccountingBundle:AccountPurchase','e');
+	$qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
 	$qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
 	$qb->where('e.globalOption = :config');
 	$qb->setParameter('config', $global);
@@ -205,7 +205,7 @@ class BusinessPurchaseRepository extends EntityRepository
         }
 
 		$qb = $this->_em->createQueryBuilder();
-		$qb->from('AccountingBundle:AccountPurchase','e');
+		$qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
 		$qb->join('e.transactionMethod','t');
 		$qb->select('t.name as transactionName , sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
 		$qb->where('e.globalOption = :config');
@@ -287,7 +287,7 @@ class BusinessPurchaseRepository extends EntityRepository
 
 		$global =  $user->getGlobalOption()->getId();
 		$qb = $this->_em->createQueryBuilder();
-		$qb->from('AccountingBundle:AccountPurchase','e');
+		$qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
 		$qb->join('e.accountVendor','t');
 		$qb->select('t.companyName as companyName ,t.name as vendorName ,t.mobile as vendorMobile , sum(e.purchaseAmount) as total ,sum(e.payment) as payment');
 		$qb->where('e.globalOption = :config');
@@ -312,10 +312,10 @@ class BusinessPurchaseRepository extends EntityRepository
 
         foreach ($invoice->getBusinessInvoiceParticulars() as $rows){
             if($rows->getVendor()){
-                $em->getRepository('BusinessBundle:BusinessVendorStockItem')->insertStockSalesItems($rows);
+                $em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->insertStockSalesItems($rows);
                 /*$exist = $this->checkInstantPurchaseToday($rows->getVendor());
                 if($exist['status'] == 'valid'){
-                    $purchase = $em->getRepository('BusinessBundle:BusinessPurchase')->find($exist['purchase']);
+                    $purchase = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->find($exist['purchase']);
                 }else{
                     $purchase = $this->purchaseCommissionInvoiceGenerate($invoice,$rows->getVendor());
                 }
@@ -324,10 +324,10 @@ class BusinessPurchaseRepository extends EntityRepository
                 $quantity       = $rows->getTotalQuantity();
                 if($invoice->getBusinessConfig()->getBusinessModel() == 'commission'){
                     $invoiceItems = array('particularId' => $particularId , 'quantity' => $quantity,'price' => $price);
-                    $em->getRepository('BusinessBundle:BusinessPurchaseItem')->insertPurchaseItems($purchase,$invoiceItems);
-                    $em->getRepository('BusinessBundle:BusinessVendorStockItem')->insertStockSalesItems($rows);
+                    $em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertPurchaseItems($purchase,$invoiceItems);
+                    $em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->insertStockSalesItems($rows);
                 }
-                $em->getRepository('BusinessBundle:BusinessPurchase')->updatePurchaseTotalPrice($purchase);*/
+                $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($purchase);*/
             }
 
         }
@@ -348,7 +348,7 @@ class BusinessPurchaseRepository extends EntityRepository
         $entity->setVendor($vendorStock->getVendor());
         $entity->setProcess('Commission');
         $entity->setCommissionInvoice(true);
-        $transactionMethod = $em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+        $transactionMethod = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         $entity->setTransactionMethod($transactionMethod);
         $em->persist($entity);
         $em->flush();
@@ -362,12 +362,12 @@ class BusinessPurchaseRepository extends EntityRepository
                 if($row->getVendor()){
                     $price = ($row->getPrice() - $vendorStock->getCommission());
                     $invoiceItems = ['particularId' => $row->getBusinessParticular()->getId() , 'quantity' => $row->getQuantity(),'price' => $price];
-                    $em->getRepository('BusinessBundle:BusinessPurchaseItem')->insertPurchaseItems($entity,$invoiceItems);
+                    $em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->insertPurchaseItems($entity,$invoiceItems);
 
                 }
             }
         }
-        $em->getRepository('BusinessBundle:BusinessPurchase')->updatePurchaseTotalPrice($entity);
+        $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->updatePurchaseTotalPrice($entity);
 
     }
 
@@ -381,7 +381,7 @@ class BusinessPurchaseRepository extends EntityRepository
         $entity->setReceiveDate($invoice->getUpdated());
         $entity->setProcess('Commission');
         $entity->setCommissionInvoice(true);
-        $transactionMethod = $em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+        $transactionMethod = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         $entity->setTransactionMethod($transactionMethod);
         $em->persist($entity);
         $em->flush();
@@ -424,12 +424,12 @@ class BusinessPurchaseRepository extends EntityRepository
         if($return->getInvoiceReturnItems()){
             $entity = new BusinessPurchase();
             $entity->setBusinessConfig($return->getBusinessConfig());
-            $vendor = $em->getRepository('AccountingBundle:AccountVendor')->insertSalesReturnVendor($return->getBusinessConfig()->getGlobalOption());
+            $vendor = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->insertSalesReturnVendor($return->getBusinessConfig()->getGlobalOption());
             $entity->setBusinessConfig($return->getBusinessConfig());
             $entity->setVendor($vendor);
             $entity->setMode('Sales-Return');
             $entity->setMemo($return->getInvoice());
-            $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>'cash']);
+            $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>'cash']);
             $entity->setTransactionMethod($method);
             $entity->setSubTotal($return->getPayment());
             $entity->setNetTotal($return->getPayment());

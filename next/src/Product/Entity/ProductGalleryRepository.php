@@ -44,7 +44,7 @@ class ProductGalleryRepository extends EntityRepository
     {
         $em = $this->_em;
         foreach ($posts as $post ){
-           $entity = $em->getRepository('ProductProductBundle:ProductGallery')->find($post);
+           $entity = $em->getRepository(\App\Product\Entity\ProductGallery::class)->find($post);
            $em->remove($entity);
         }
         $em->flush();

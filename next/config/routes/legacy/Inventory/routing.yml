@@ -1,0 +1,216 @@
+inventory_report:
+    resource: 'routing/report.yml'
+    prefix:   /report
+
+inventory_branch_report:
+    resource: 'routing/branchreport.yml'
+    prefix:   /branch-report
+
+app_setting_bank:
+    resource: 'routing/appsetting/bankaccount.yml'
+    prefix:   /appsetting/bank-account
+
+app_setting_mobile:
+    resource: 'routing/appsetting/mobileaccount.yml'
+    prefix:   /appsetting/mobile-account
+
+inventory_stock_adjustment:
+    resource: 'routing/adjustment.yml'
+    prefix:   /stock-adjustment
+
+app_setting_barnch_shop:
+    resource: 'routing/appsetting/branchshop.yml'
+    prefix:   /branch-shop
+
+inventory_excelimproter:
+    resource: 'routing/excelimporter.yml'
+    prefix:   /excelimproter
+
+inventory_delivery:
+    resource: 'routing/delivery.yml'
+    prefix:   /delivery
+
+inventory_branch_invoice:
+    resource: 'routing/branchinvoice.yml'
+    prefix:   /branch-invoice
+
+inventory_salesimport:
+    resource: 'routing/salesimport.yml'
+    prefix:   /sales-improt
+
+inventory_food_product:
+    resource: 'routing/foodproduct.yml'
+    prefix:   /food/product
+
+inventory_goods:
+    resource: 'routing/goods.yml'
+    prefix:   /ecommerce/product
+
+inventory_purchasevendoritem:
+    resource: 'routing/purchasevendoritem.yml'
+    prefix:   /purchasevendoritem
+
+inventory_salesreturn:
+    resource: 'routing/salesreturn.yml'
+    prefix:   /salesreturn
+
+inventory_purchasereturn:
+    resource: 'routing/purchasereturn.yml'
+    prefix:   /purchase/return
+
+inventory_itemattribute:
+    resource: 'routing/itemattribute.yml'
+    prefix:    /item-attribute
+
+inventory_itembrand:
+    resource: 'routing/itembrand.yml'
+    prefix:    /brand
+
+inventory_colorsize:
+    resource: 'routing/colorsize.yml'
+    prefix:    /colorsize
+
+inventory_itemsize:
+    resource: 'routing/itemsize.yml'
+    prefix:    /item-size
+
+inventory_prepurchaseitem:
+    resource: 'routing/prepurchaseitem.yml'
+    prefix:    /pre-purchase-item
+
+inventory_itemunit:
+    resource: 'routing/itemunit.yml'
+    prefix:    /item-unit
+
+inventory_itemcolor:
+    resource: 'routing/itemcolor.yml'
+    prefix:    /item-color
+
+inventory_inventory_product:
+    resource: 'routing/product.yml'
+    prefix:    /product
+
+inventory_sales:
+    resource: 'routing/sales.yml'
+    prefix:    /sales
+
+inventory_manual:
+    resource: 'routing/salesmanual.yml'
+    prefix:    /sales-manual
+
+inventory_salesgeneral:
+    resource: 'routing/salesgeneral.yml'
+    prefix:   /sales-general
+
+inventory_salescustomer:
+    resource: 'routing/salesonline.yml'
+    prefix:   /sales-online
+
+inventory_stockitem:
+    resource: 'routing/stockitem.yml'
+    prefix:   /stockitem
+
+inventory_delivery_return:
+    resource: 'routing/deliveryreturn.yml'
+    prefix:   /delivery-return
+
+inventory_damage:
+    resource: 'routing/damage.yml'
+    prefix:   /damage
+
+inventory_purchaseitem:
+    resource: 'routing/purchaseitem.yml'
+    prefix:   /purchaseitem
+
+inventory_category:
+    resource: 'routing/category.yml'
+    prefix:   /category
+
+inventory_purchaseorder:
+    resource: 'routing/purchaseorder.yml'
+    prefix:   /purchaseorder
+
+inventory_purchase:
+    resource: 'routing/purchase.yml'
+    prefix:   /purchase
+
+inventory_purchasesimple:
+    resource: 'routing/purchasesimple.yml'
+    prefix:   /purchase-simple
+
+inventory_vendor:
+    resource: 'routing/vendor.yml'
+    prefix:   /vendor
+
+inventory_warehouse:
+    resource: 'routing/warehouse.yml'
+    prefix:   /warehouse
+
+inventory_item:
+    resource: 'routing/item.yml'
+    prefix:   /item
+
+inventory_simple_item:
+    resource: 'routing/inventoy_simple_item.yml'
+    prefix:   /simple-stock
+
+inventory_barcode:
+    resource: 'routing/barcode.yml'
+    prefix:   /barcode
+
+inventory_itemtypegrouping:
+    resource: 'routing/itemtypegrouping.yml'
+    prefix:   /itemtypegrouping
+
+inventory_inventoryconfig:
+    resource: 'routing/inventoryconfig.yml'
+    prefix:   /config
+
+stockitem_results:
+    path:     /results
+    defaults: { _controller: 'App\Inventory\Controller\StockItemController::indexResultsAction' }
+
+inventory_reverse:
+    resource: 'routing/reverse.yml'
+    prefix:   /reverse
+
+inventory_sales_user:
+    resource: 'routing/salesuser.yml'
+    prefix:   /sales-user
+
+inventory_homepage:
+    path:     /dashoard
+    defaults: { _controller: App\Inventory\Controller\DefaultController::indexAction }
+
+
+inventory_stock_reset:
+    path:     /stock-reset
+    defaults: { _controller: App\Inventory\Controller\DefaultController::stockResetAction }
+
+inventory_sales_reset:
+    path:     /sales-reset
+    defaults: { _controller: App\Inventory\Controller\DefaultController::salesResetAction }
+
+inventory_group_approved:
+    path:      /group/invoice/approved
+    defaults: { _controller: 'App\Inventory\Controller\SalesOnlineController::invoiceGroupApprovedAction' }
+
+inventory_group_revised:
+    path:     /group/invoice/revised
+    defaults: { _controller: 'App\Inventory\Controller\SalesOnlineController::invoiceGroupReverseAction' }
+
+inventory_item_to_ecommerce:
+    path:     /master/item-to-ecommerce
+    defaults: { _controller: App\Inventory\Controller\DefaultController::itemToecommerceAction }
+
+inventory_category_master_delete:
+    path:     /master/master-category
+    defaults: { _controller: App\Inventory\Controller\DefaultController::categoryDeleteAction }
+
+inventory_master_delete:
+    path:     /master-item-delete
+    defaults: { _controller: App\Inventory\Controller\DefaultController::masterItemDeleteAction }
+
+inventory_stock_delete:
+    path:     /master-stock-deleete
+    defaults: { _controller: App\Inventory\Controller\DefaultController::stockItemDeleteAction }

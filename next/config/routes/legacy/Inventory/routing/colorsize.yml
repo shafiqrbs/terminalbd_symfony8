@@ -1,0 +1,30 @@
+colorsize:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ColorSizeController::indexAction' }
+
+colorsize_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\ColorSizeController::showAction' }
+
+colorsize_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\ColorSizeController::newAction' }
+
+colorsize_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\ColorSizeController::createAction' }
+    methods:  POST
+
+colorsize_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\ColorSizeController::editAction' }
+
+colorsize_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\ColorSizeController::updateAction' }
+    methods:  [POST, PUT]
+
+colorsize_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\ColorSizeController::deleteAction' }
+

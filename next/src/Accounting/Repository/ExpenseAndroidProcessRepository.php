@@ -32,7 +32,7 @@ class ExpenseAndroidProcessRepository extends EntityRepository
     {
         $em =  $this->_em;
 
-        $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(['globalOption'=> $option,'id' => $device]);
+        $device = $em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->findOneBy(['globalOption'=> $option,'id' => $device]);
 
         $entity = new ExpenseAndroidProcess();
         $entity->setGlobalOption($option);

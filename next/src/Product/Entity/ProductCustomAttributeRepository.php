@@ -25,7 +25,7 @@ class ProductCustomAttributeRepository extends EntityRepository
         foreach($attributeName as $val ){
             if($data['attributeId'][$i] > 0 ){
                 $id = $data['attributeId'][$i];
-                $entity = $em->getRepository('ProductProductBundle:ProductCustomAttribute')->find($id);
+                $entity = $em->getRepository(\App\Product\Entity\ProductCustomAttribute::class)->find($id);
             }else{
                 $entity = New ProductCustomAttribute();
             }
@@ -48,7 +48,7 @@ class ProductCustomAttributeRepository extends EntityRepository
         $em = $this->_em;
 
             foreach ($posts as $post ){
-                $entity = $em->getRepository('ProductProductBundle:ProductCustomAttribute')->find($post);
+                $entity = $em->getRepository(\App\Product\Entity\ProductCustomAttribute::class)->find($post);
                 $em->remove($entity);
             }
             $em->flush();

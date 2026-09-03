@@ -1,0 +1,25 @@
+dps_diseases:
+    path:     /
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DiseasesController::indexAction' }
+
+dps_diseases_create:
+    path:     /create
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DiseasesController::createAction' }
+    methods:  POST
+
+dps_diseases_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DiseasesController::editAction' }
+
+dps_diseases_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DiseasesController::updateAction' }
+    methods:  [POST, PUT]
+
+dps_diseases_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DiseasesController::deleteAction' }
+
+dps_diseases_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DiseasesController::statusAction' }

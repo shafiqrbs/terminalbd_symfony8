@@ -316,9 +316,9 @@ class AccountPurchaseRepository extends EntityRepository
         $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
 
         $entity = new AccountPurchase();
-        $customer = $em->getRepository('MedicineBundle:MedicineVendor')->findOneBy(['medicineConfig'=> $option->getMedicineConfig(), 'id' => $vendor]);
-        $user = $em->getRepository('UserBundle:User')->find($userId);
-        $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($methodId);
+        $customer = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=> $option->getMedicineConfig(), 'id' => $vendor]);
+        $user = $em->getRepository(\App\User\Entity\User::class)->find($userId);
+        $bankAccount = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($methodId);
         $entity->setGlobalOption($option);
         $entity->setMedicineVendor($customer);
         $entity->setAccountRefNo(time());
@@ -349,7 +349,7 @@ class AccountPurchaseRepository extends EntityRepository
         $accountPurchase = $this->updateVendorBalance($entity);
         $accountPurchase->getId();
         if($entity->getPayment() > 0){
-            $em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
+            $em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseCash($accountPurchase);
         }
         return "success";
        // return $entities = $this->apiPurchase($option);
@@ -662,7 +662,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
     public function lastInsertPurchase($globalOption,$vendor)
     {
         $em = $this->_em;
-        $entity = $em->getRepository('AccountingBundle:AccountPurchase')->findOneBy(
+        $entity = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(
             ['globalOption' => $globalOption,'trader' => $vendor,'process'=>'approved'],
             ['id' => 'DESC']
         );
@@ -676,7 +676,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
     public function lastInsertHmsPurchase($globalOption,$vendor)
     {
         $em = $this->_em;
-        $entity = $em->getRepository('AccountingBundle:AccountPurchase')->findOneBy(
+        $entity = $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->findOneBy(
             ['globalOption' => $globalOption,'hmsVendor' => $vendor,'process'=>'approved'],
             ['id' => 'DESC']
         );
@@ -715,7 +715,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
         $em->persist($entity);
         $em->flush();
         $this->updateVendorBalance($entity);
-       // $this->_em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($entity);
+       // $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseCash($entity);
     }
 
 	public function insertAccountPurchase(Purchase $entity)
@@ -743,7 +743,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
         $em->flush();
         $this->updateVendorBalance($accountPurchase);
         if($accountPurchase->getTransactionMethod()){
-            $this->_em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
+            $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseCash($accountPurchase);
         }
 
         return $accountPurchase;
@@ -776,7 +776,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
         $em->flush();
 	    $this->updateVendorBalance($accountPurchase);
         if($accountPurchase->getPayment() > 0 ){
-            $this->_em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
+            $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseCash($accountPurchase);
         }
         return $accountPurchase;*/
 
@@ -844,7 +844,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
             $em->flush();
             $this->updateVendorBalance($accountPurchase);
             if($accountPurchase->getPayment() > 0 and !empty($accountPurchase->getTransactionMethod()) ){
-                $this->_em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
+                $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseCash($accountPurchase);
             }
             return $accountPurchase;
         }
@@ -897,7 +897,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
         $em->persist($accountPurchase);
         $em->flush();
         if($accountPurchase->getPayment() > 0 ){
-            $this->_em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
+            $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseCash($accountPurchase);
         }
         return $accountPurchase;
 
@@ -928,7 +928,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
         $em->flush();
         $this->updateVendorBalance($accountPurchase);
         if($accountPurchase->getPayment() > 0 ){
-            $this->_em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
+            $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseCash($accountPurchase);
         }
         return $accountPurchase;
 
@@ -961,7 +961,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
 		$em->flush();
 		$this->updateVendorBalance($accountPurchase);
 		if($accountPurchase->getPayment() > 0 ){
-			$this->_em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($accountPurchase);
+			$this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseCash($accountPurchase);
 		}
 		return $accountPurchase;
 

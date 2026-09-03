@@ -1,0 +1,82 @@
+restaurant_tableinvoice:
+    path:     /
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::indexAction' }
+
+restaurant_tableinvoice_new:
+    path:     /new
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::newAction' }
+    options:
+            expose: true
+
+restaurant_invoice_load:
+    path:     /{id}/invoice-load
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::invoiceLoadAction' }
+    options:
+            expose: true
+
+restaurant_tableinvoice_create:
+    path:    /create
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::createAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_tableinvoice_update:
+    path:    /update
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::updateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+
+restaurant_tableinvoice_particular_search:
+    path:     /{id}/particular-search
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::particularSearchAction' }
+    methods:  GET
+    options:
+            expose: true
+
+restaurant_tableinvoice_kitchen_print:
+    path:     /{id}/kitchen-print
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::kitchenPrintAction' }
+    methods:  GET
+    options:
+            expose: true
+
+
+restaurant_tableinvoice_process:
+    path:     /{id}/invoice-prcess
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::invoiceProcessAction' }
+    methods:  GET
+    options:
+            expose: true
+
+
+restaurant_tableinvoice_product_add:
+    path:     /{product}/product-add
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::addProductAction' }
+
+
+restaurant_tableinvoice_product_update:
+    path:     /{product}/product-update
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::updateProductAction' }
+
+
+restaurant_tableinvoice_discount_update:
+    path:     /dicount-update
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::invoiceDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_tableinvoice_discount_coupon:
+    path:     /dicount-coupon
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::invoiceDiscountCouponAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_tableinvoice_particular_delete:
+    path:    /{invoice}/{id}/particular-delete
+    defaults: { _controller: 'App\Restaurant\Controller\TableInvoiceController::invoiceParticularDeleteAction' }
+

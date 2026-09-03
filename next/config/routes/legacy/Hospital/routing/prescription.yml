@@ -1,0 +1,70 @@
+hms_prescription:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::indexAction' }
+
+hms_appoionment:
+    path:     /appoionment
+    defaults: { _controller: 'App\Hospital\Controller\DoctorAppointmentController::appointmentInvoiceAction' }
+
+hms_prescription_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::showAction' }
+
+hms_prescription_new:
+    path:     /new
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::newAction' }
+
+hms_prescription_old_patient:
+    path:     /old-patient
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::oldPatientAction' }
+    methods:  [POST, PUT]
+
+
+hms_prescription_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::editAction' }
+
+hms_prescription_generate:
+    path:     /{id}/generate
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::generateAction' }
+
+hms_prescription_particular_search:
+    path:     /particular-search
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::particularSearchAction' }
+    methods:  GET
+    options:
+        expose: true
+
+hms_prescription_inline_update:
+    path:     /inline-update
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::inlineUpdateAction' }
+    methods:  [POST, PUT]
+    options:
+        expose: true
+
+hms_prescription_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_prescription_approve:
+    path:     /{id}/invoice-approve
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::invoiceApproveAction' }
+
+hms_prescription_reverse:
+    path:     /{id}/prescription-reverse
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::prescriptionReverseAction' }
+
+hms_prescription_print:
+    path:     /{id}/invoice-print
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::printAction' }
+
+hms_prescription_doctor_print:
+    path:     /{id}/doctor-print
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::doctorPrescriptionPrintAction' }
+
+hms_prescription_delete:
+    path:     /delete
+    defaults: { _controller: 'App\Hospital\Controller\PrescriptionController::deleteAction' }
+
+

@@ -324,7 +324,7 @@ class AppsApiRepository extends EntityRepository
         $config = $option->getMedicineConfig();
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
-        $qb->from('MedicineBundle:MedicineStock','e');
+        $qb->from(\App\Medicine\Entity\MedicineStock::class,'e');
         $qb->leftJoin('e.unit','u');
         $qb->leftJoin('e.category','c');
         $qb->select('e.id as stockId','e.barcode as barcode','e.name as name','e.remainingQuantity as remainingQuantity','e.salesPrice as salesPrice','e.purchasePrice as purchasePrice','e.printHide as printHidden','e.path as path');
@@ -373,7 +373,7 @@ class AppsApiRepository extends EntityRepository
     {
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
-        $qb->from('MedicineBundle:MedicineStock','e');
+        $qb->from(\App\Medicine\Entity\MedicineStock::class,'e');
         $qb->leftJoin('e.category','category');
         $qb->leftJoin('e.unit','u');
         $qb->select('e.id as stockId','e.barcode as barcode','e.name as name','e.remainingQuantity as remainingQuantity','e.salesPrice as salesPrice','e.purchasePrice as purchasePrice','e.printHide as printHidden','e.path as path');
@@ -436,7 +436,7 @@ class AppsApiRepository extends EntityRepository
     public function getApiCustomerOutstanding($globalOption)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb ->from('DomainUserBundle:Customer','customer');
+        $qb ->from(\App\DomainUser\Entity\Customer::class,'customer');
         $qb->select('customer.id as customerId ,customer.name as name ,customer.email as email , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
         $qb->leftJoin('customer.accountSales','e');
         $qb->where("customer.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
@@ -463,7 +463,7 @@ class AppsApiRepository extends EntityRepository
     public function apiApiVendorOutstanding($globalOption)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb ->from('MedicineBundle:MedicineVendor','vendor');
+        $qb ->from(\App\Medicine\Entity\MedicineVendor::class,'vendor');
         $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.email as email,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
         $qb->join('vendor.accountPurchases','e');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
@@ -837,22 +837,22 @@ class AppsApiRepository extends EntityRepository
         $sales->setGlobalOption($option);
         $sales->setAmount($amount);
         if($method){
-            $bank = $em->getRepository('AccountingBundle:AccountBank')->find($method);
+            $bank = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($method);
             $sales->setAccountBank($bank);
-            $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>'bank']);
+            $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>'bank']);
             $sales->setTransactionMethod($method);
         }
-        $category = $em->getRepository('AccountingBundle:ExpenseCategory')->find($category);
+        $category = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->find($category);
         if($category){
             $sales->setExpenseCategory($category);
             $sales->setAccountHead($sales->getExpenseCategory()->getAccountHead());
         }
         if($touser){
-            $touser = $em->getRepository('UserBundle:User')->find($touser);
+            $touser = $em->getRepository(\App\User\Entity\User::class)->find($touser);
             $sales->setToUser($touser);
         }
         if($createdBy){
-            $createdBy = $em->getRepository('UserBundle:User')->find($createdBy);
+            $createdBy = $em->getRepository(\App\User\Entity\User::class)->find($createdBy);
             $sales->setCreatedBy($createdBy);
         }
         $sales->setRemark($description);
@@ -880,7 +880,7 @@ class AppsApiRepository extends EntityRepository
                 $expenditure->setUpdated($datetime);
             }
             $em->flush();
-            $em->getRepository('AccountingBundle:AccountCash')->insertExpenditureCash($expenditure);
+            $em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertExpenditureCash($expenditure);
             return 'success';
         } else {
             return 'failed';
@@ -1327,8 +1327,8 @@ class AppsApiRepository extends EntityRepository
             $purchase->setTransactionMethod(NULL);
         }
         $em->flush();
-        $em->getRepository('MedicineBundle:MedicineStock')->getSalesUpdateQnt($purchase);
-        $em->getRepository('AccountingBundle:AccountSales')->insertMedicineAccountInvoice($purchase);
+        $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getSalesUpdateQnt($purchase);
+        $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountInvoice($purchase);
     }
 
     public function apiInsertSalesReceive(GlobalOption $option, $data)
@@ -1343,9 +1343,9 @@ class AppsApiRepository extends EntityRepository
         $remark = (isset($data['remark']) and $data['remark']) ? trim($data['remark']):'';
         $isApprove = (isset($data['is_approve']) and $data['is_approve']) ? $data['is_approve'] : 0;
         $entity = new AccountSales();
-        $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption'=>$option, 'id' => $customer]);
-        $user = $em->getRepository('UserBundle:User')->find($userId);
-        $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($methodId);
+        $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$option, 'id' => $customer]);
+        $user = $em->getRepository(\App\User\Entity\User::class)->find($userId);
+        $bankAccount = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($methodId);
         $entity->setGlobalOption($option);
         $entity->setCustomer($customer);
         $entity->setAccountRefNo(time());
@@ -1399,7 +1399,7 @@ class AppsApiRepository extends EntityRepository
             }
             $em->flush();
             $em->getRepository(AccountSales::class)->updateCustomerBalance($entity);
-            $em->getRepository('AccountingBundle:AccountCash')->insertSalesCash($entity);
+            $em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($entity);
             return 'success';
         } else {
             return 'failed';
@@ -1418,7 +1418,7 @@ class AppsApiRepository extends EntityRepository
         $endEnd = (isset($data['end_date']) and $data['end_date'])? $data['end_date'] : '';
         $keyword = $data['keyword'] ?? '';
         $qb = $em->createQueryBuilder();
-        $qb->from('MedicineBundle:MedicinePurchase','s');
+        $qb->from(\App\Medicine\Entity\MedicinePurchase::class,'s');
         $qb->select('s');
         $qb->where('s.medicineConfig = :config')->setParameter('config', $config) ;
         $qb->andWhere('s.medicineVendor IS NOT NULL');
@@ -1495,10 +1495,10 @@ class AppsApiRepository extends EntityRepository
         $isApprove = (isset($data['is_approve']) and $data['is_approve']) ? trim($data['is_approve']):'';
 
         $entity = new AccountPurchase();
-        $customer = $em->getRepository('MedicineBundle:MedicineVendor')->findOneBy(['medicineConfig'=> $option->getMedicineConfig(), 'id' => $vendor]);
-        $user = $em->getRepository('UserBundle:User')->find($userId);
+        $customer = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=> $option->getMedicineConfig(), 'id' => $vendor]);
+        $user = $em->getRepository(\App\User\Entity\User::class)->find($userId);
         /* @var $bankAccount AccountBank */
-        $bankAccount = $em->getRepository('AccountingBundle:AccountBank')->find($methodId);
+        $bankAccount = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($methodId);
         $entity->setGlobalOption($option);
         if($customer){
             $entity->setMedicineVendor($customer);
@@ -1565,7 +1565,7 @@ class AppsApiRepository extends EntityRepository
             }
             $em->flush();
             $em->getRepository(AccountPurchase::class)->updateVendorBalance($entity);
-            $em->getRepository('AccountingBundle:AccountCash')->insertPurchaseCash($entity);
+            $em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertPurchaseCash($entity);
             return 'success';
         } else {
             return 'failed';
@@ -1700,7 +1700,7 @@ class AppsApiRepository extends EntityRepository
         $amount = (isset($data['amount']) and $data['amount']) ? $data['amount'] : '';
         $totalInvoice = (isset($data['total_invoice']) and $data['total_invoice']) ? $data['total_invoice'] : '';
 
-        $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(['globalOption'=> $option,'id' => $device]);
+        $device = $em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->findOneBy(['globalOption'=> $option,'id' => $device]);
         $entity = new MedicineAndroidProcess();
         $entity->setMedicineConfig($option->getMedicineConfig());
         $entity->setAndroidDevice($device);
@@ -1839,7 +1839,7 @@ class AppsApiRepository extends EntityRepository
                 $salesItem = new MedicineSalesItem();
                 $salesItem->setAndroidProcess($purchase->getAndroidProcess());
                 $salesItem->setMedicineSales($purchase);
-                $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($sub->stock_id);
+                $stockId = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($sub->stock_id);
                 if ($stockId) {
                     $salesItem->setMedicineStock($stockId);
                     $salesItem->setMrpPrice(floatval($stockId->getSalesPrice()));
@@ -1907,10 +1907,10 @@ class AppsApiRepository extends EntityRepository
                     $this->insertSalesReturnItem($entity,$sales_item);
                 }
                 if($entity->getAdjustment() > 0){
-                    $em->getRepository('AccountingBundle:AccountSales')->insertMedicineAccountSalesReturnInvoice($entity);
+                    $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertMedicineAccountSalesReturnInvoice($entity);
                 }
                 if($entity->getPayment() > 0){
-                    $em->getRepository('AccountingBundle:AccountJournal')->insertMedicineAccountSalesReturnInvoice($entity);
+                    $em->getRepository(\App\Accounting\Entity\AccountJournal::class)->insertMedicineAccountSalesReturnInvoice($entity);
                 }
                 $entity->setProcess('approved');
             endforeach;
@@ -1945,7 +1945,7 @@ class AppsApiRepository extends EntityRepository
                 $entity->setProcess('approved');
                 $em->persist($entity);
                 $em->flush();
-                $em->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales-return');
+                $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'sales-return');
             }
         endforeach;
         $em->flush();
@@ -2036,7 +2036,7 @@ class AppsApiRepository extends EntityRepository
                 $salesItem = new MedicinePurchaseItem();
                 $salesItem->setAndroidProcess($purchase->getAndroidProcess());
                 $salesItem->setMedicinePurchase($purchase);
-                $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($sub->stock_id);
+                $stockId = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($sub->stock_id);
                 if ($stockId) {
                     $salesItem->setMedicineStock($stockId);
                 }
@@ -2072,9 +2072,9 @@ class AppsApiRepository extends EntityRepository
             $purchase->setTransactionMethod(NULL);
         }
         $em->flush();
-        $em->getRepository('MedicineBundle:MedicinePurchaseItem')->updatePurchaseItemPrice($purchase);
-        $em->getRepository('MedicineBundle:MedicineStock')->getPurchaseUpdateQnt($purchase);
-        $em->getRepository('AccountingBundle:AccountPurchase')->insertMedicineAccountPurchase($purchase);
+        $em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updatePurchaseItemPrice($purchase);
+        $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getPurchaseUpdateQnt($purchase);
+        $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->insertMedicineAccountPurchase($purchase);
     }
 
 
@@ -2096,18 +2096,18 @@ class AppsApiRepository extends EntityRepository
             $entity->setMedicineConfig($config);
             $entity->setName($data['name']);
             if($data['unit_id']){
-                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(['id' => $data['unit_id']]);
+                $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->findOneBy(['id' => $data['unit_id']]);
                 $entity->setUnit($unit);
             }else{
-                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(['name'=>'Pcs']);
+                $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->findOneBy(['name'=>'Pcs']);
                 $entity->setUnit($unit);
             }
             if($data['category_id']){
-                $category = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(['medicineConfig'=>$config,'id' => $data['category_id']]);
+                $category = $em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findOneBy(['medicineConfig'=>$config,'id' => $data['category_id']]);
                 $entity->setCategory($category);
             }
             if($data['brand_id']){
-                $brand = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(['medicineConfig'=>$config,'id' => $data['brand_id']]);
+                $brand = $em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findOneBy(['medicineConfig'=>$config,'id' => $data['brand_id']]);
                if($brand){
                    $entity->setAccessoriesBrand($brand);
                    $entity->setBrandName($brand->getName());
@@ -2145,19 +2145,19 @@ class AppsApiRepository extends EntityRepository
         if($entity){
             $entity->setName($data['name']);
             if($data['brand_id']){
-                $brand = $em->getRepository('MedicineBundle:MedicineParticular')->find($data['brand_id']);
+                $brand = $em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['brand_id']);
                 $entity->setAccessoriesBrand($brand);
                 $entity->setBrandName($brand->getName());
             }
             if($data['category_id']){
-                $category = $em->getRepository('MedicineBundle:MedicineParticular')->find($data['category_id']);
+                $category = $em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['category_id']);
                 $entity->setCategory($category);
             }
             if($data['unit_id']){
-                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(['id' => $data['unit_id']]);
+                $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->findOneBy(['id' => $data['unit_id']]);
                 $entity->setUnit($unit);
             }else{
-                $unit = $em->getRepository('SettingToolBundle:ProductUnit')->findOneBy(['name'=>'Pcs']);
+                $unit = $em->getRepository(\App\Tool\Entity\ProductUnit::class)->findOneBy(['name'=>'Pcs']);
                 $entity->setUnit($unit);
             }
             $entity->setSalesPrice($data['sales_price']);

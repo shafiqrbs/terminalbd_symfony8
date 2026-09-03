@@ -1,0 +1,39 @@
+account_paymentsalary_employee:
+    path:     /salaery-employee
+    defaults: { _controller: 'App\Accounting\Controller\PaymentSalaryController::salaryEmployeeAction' }
+
+account_paymentsalary:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\PaymentSalaryController::indexAction' }
+
+account_paymentsalary_show:
+    path:     /{user}/show
+    defaults: { _controller: 'App\Accounting\Controller\PaymentSalaryController::showAction' }
+
+account_paymentsalary_new:
+    path:     /{user}/new
+    defaults: { _controller: 'App\Accounting\Controller\PaymentSalaryController::newAction' }
+
+account_paymentsalary_create:
+    path:     /{user}/create
+    defaults: { _controller: 'App\Accounting\Controller\PaymentSalaryController::createAction' }
+    methods:  POST
+
+account_paymentsalary_edit:
+    path:     /{user}/edit
+    defaults: { _controller: 'App\Accounting\Controller\PaymentSalaryController::editAction' }
+
+account_paymentsalary_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\PaymentSalaryController::updateAction' }
+    methods:  [POST, PUT]
+
+account_paymentsalary_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\PaymentSalaryController::deleteAction' }
+
+account_paymentsalary_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\PaymentSalaryController::approveAction' }
+    options:
+           expose: true

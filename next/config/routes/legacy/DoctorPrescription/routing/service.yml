@@ -1,0 +1,30 @@
+dps_service:
+    path:     /
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ServiceController::indexAction' }
+
+dps_service_create:
+    path:     /create
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ServiceController::createAction' }
+    methods:  POST
+
+dps_service_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ServiceController::editAction' }
+
+dps_service_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ServiceController::updateAction' }
+    methods:  [POST, PUT]
+
+dps_service_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ServiceController::deleteAction' }
+
+dps_service_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ServiceController::statusAction' }
+
+dps_service_sorted:
+    path:     /{fieldName}/service-sorted
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ServiceController::sortedAction' }
+

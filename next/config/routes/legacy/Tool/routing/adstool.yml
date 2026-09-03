@@ -1,0 +1,30 @@
+adstool:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\AdsToolController::indexAction' }
+
+adstool_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\AdsToolController::showAction' }
+
+adstool_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\AdsToolController::newAction' }
+
+adstool_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\AdsToolController::createAction' }
+    methods:  POST
+
+adstool_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\AdsToolController::editAction' }
+
+adstool_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\AdsToolController::updateAction' }
+    methods:  [POST, PUT]
+
+adstool_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\AdsToolController::deleteAction' }
+    methods:  [POST, DELETE]

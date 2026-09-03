@@ -1,0 +1,27 @@
+payroll:
+    path:     /
+    defaults: { _controller: 'App\HumanResource\Controller\PayrollController::indexAction' }
+
+payroll_new:
+    path:     /new
+    defaults: { _controller: 'App\HumanResource\Controller\PayrollController::newAction' }
+
+payroll_sheet:
+    path:     /{id}/sheet
+    defaults: { _controller: 'App\HumanResource\Controller\PayrollController::sheetAction' }
+
+payroll_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\HumanResource\Controller\PayrollController::deleteAction' }
+
+payroll_sheet_edit:
+    path:     /{id}/employee-sheet
+    defaults: { _controller: 'App\HumanResource\Controller\PayrollController::deleteAction' }
+
+payroll_create:
+    path:     /create
+    defaults: { _controller: 'App\HumanResource\Controller\PayrollController::createAction' }
+    methods:  [POST]
+
+
+

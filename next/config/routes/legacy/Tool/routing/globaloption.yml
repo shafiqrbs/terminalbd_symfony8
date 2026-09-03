@@ -1,0 +1,59 @@
+globaloption:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::indexAction' }
+
+tools_option_hard_reset:
+    path:     /{id}/option-hard-reset
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::hardResetSystemDataAction' }
+
+globaloption_vendor_search:
+    path:     /vendor/search
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::vendorSearchAction' }
+    options:
+            expose: true
+
+globaloption_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::showAction' }
+
+globaloption_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::newAction' }
+
+globaloption_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::createAction' }
+    requirements: { _method: post }
+
+globaloption_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::editAction' }
+
+globaloption_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::updateAction' }
+    requirements: { _method: post|put }
+
+globaloption_modify_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::updateAction' }
+    requirements: { _method: post|put }
+
+globaloption_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::deleteAction' }
+
+globaloption_reset_logo:
+    path:     /{id}/reset-logo
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::resetLogoAction' }
+
+globaloption_modify:
+    path:     /modify
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::modifyAction' }
+
+
+globaloption_webmail:
+    path:     /webmail
+    defaults: { _controller: 'App\Tool\Controller\GlobalOptionController::webmailAction' }
+
+

@@ -17,21 +17,21 @@ class PettyCashRepository extends EntityRepository
         $em = $this->_em;
         if( $entity->getTransactionMethod()->getId() == 2 ){
 
-            $entity = $em->getRepository('AccountingBundle:PettyCash')->findOneBy(
+            $entity = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->findOneBy(
                 ['globalOption'=>$entity->getGlobalOption(),'toUser' => $entity->getToUser(),'transactionMethod' => $entity->getTransactionMethod(),'process'=>'approved'],
                 ['id' => 'DESC']
             );
 
         }elseif( $entity->getTransactionMethod()->getId() == 3 ) {
 
-            $entity = $em->getRepository('AccountingBundle:PettyCash')->findOneBy(
+            $entity = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->findOneBy(
                 ['globalOption'=>$entity->getGlobalOption(),'toUser' => $entity->getToUser(),'transactionMethod' => $entity->getTransactionMethod(),'process'=>'approved'],
                 ['id' => 'DESC']
             );
 
         }else{
 
-            $entity = $em->getRepository('AccountingBundle:PettyCash')->findOneBy(
+            $entity = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->findOneBy(
                 ['globalOption'=>$entity->getGlobalOption(),'toUser' => $entity->getToUser(),'transactionMethod' => $entity->getTransactionMethod(),'process'=>'approved'],
                 ['id' => 'DESC']
             );

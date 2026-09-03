@@ -1,0 +1,51 @@
+business_purchase_return:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::indexAction' }
+
+business_purchase_return_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::showAction' }
+
+business_purchase_return_new:
+    path:     /new
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::newAction' }
+
+business_purchase_return_create:
+    path:     /create
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::createAction' }
+    methods:  [POST]
+
+business_purchase_return_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::editAction' }
+
+business_purchase_return_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::updateAction' }
+    methods:  [POST]
+
+business_purchase_return_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::editAction' }
+
+business_purchase_return_approved:
+    path:     /{id}/approved
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::approvedAction' }
+
+business_purchase_return_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::deleteAction' }
+
+business_purchase_vendor_select:
+    path:     /vendor-selection
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::vendorSelectAction' }
+    options:
+           expose: true
+
+business_purchase_vendor_update:
+    path:     /{id}/vendor-purchase-return-update
+    defaults: { _controller: 'App\Business\Controller\PurchaseReturnController::vendorUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+

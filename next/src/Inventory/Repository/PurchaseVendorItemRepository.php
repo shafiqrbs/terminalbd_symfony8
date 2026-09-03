@@ -221,7 +221,7 @@ class PurchaseVendorItemRepository extends EntityRepository
         $em = $this->_em;
         $db = $em->createQueryBuilder();
         $db->select('e');
-        $db->from('InventoryBundle:PurchaseVendorItem','e');
+        $db->from(\App\Inventory\Entity\PurchaseVendorItem::class,'e');
         $db->where($db->expr()->andX(
             $db->expr()->eq('e.isWeb',1),
             $db->expr()->eq('e.status',1),
@@ -380,7 +380,7 @@ class PurchaseVendorItemRepository extends EntityRepository
 
         $masterItem = $purchaseItem->getItem()->getMasterItem();
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:PurchaseItem','e');
+        $qb->from(\App\Inventory\Entity\PurchaseItem::class,'e');
         $qb->select('sum(pi.quantity) AS quantity , sum(pi.purchasePrice) AS purchasePrice, sum(pi.salesPrice) AS salesPrice');
         $qb->where("e.purchase = :purchase");
         $qb->setParameter('purchase', $purchase);
@@ -470,7 +470,7 @@ class PurchaseVendorItemRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('sum(e.quantity)');
-        $qb->from('InventoryBundle:PurchaseVendorItem','e');
+        $qb->from(\App\Inventory\Entity\PurchaseVendorItem::class,'e');
         $qb->where("e.purchase = :purchase");
         $qb->setParameter('purchase', $purchase->getId());
         $sum = $qb->getQuery()->getSingleScalarResult();
@@ -481,7 +481,7 @@ class PurchaseVendorItemRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('sum(e.quantity)  as totalQnt' , 'count(e.id)  as totalItem');
-        $qb->from('InventoryBundle:PurchaseVendorItem','e');
+        $qb->from(\App\Inventory\Entity\PurchaseVendorItem::class,'e');
         $qb->where("e.purchase = :purchase");
         $qb->setParameter('purchase', $purchase->getId());
         $query = $qb->getQuery()->getSingleResult();

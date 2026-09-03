@@ -35,10 +35,10 @@ class AdmissionPatientParticularRepository extends EntityRepository
 
     public function insertInvoiceItems($transaction, $data)
     {
-        $particular = $this->_em->getRepository('HospitalBundle:Particular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
         $em = $this->_em;
         $entity = new AdmissionPatientParticular();
-        $invoiceParticular = $this->_em->getRepository('HospitalBundle:AdmissionPatientParticular')->findOneBy(['invoiceTransaction' => $transaction ,'particular' => $particular]);
+        $invoiceParticular = $this->_em->getRepository(\App\Hospital\Entity\AdmissionPatientParticular::class)->findOneBy(['invoiceTransaction' => $transaction ,'particular' => $particular]);
         if(!empty($invoiceParticular)) {
             $entity = $invoiceParticular;
             if ($particular->getService()->getHasQuantity() == 1){
@@ -118,7 +118,7 @@ class AdmissionPatientParticularRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('HospitalBundle:AdmissionPatientParticular','si')
+            ->from(\App\Hospital\Entity\AdmissionPatientParticular::class,'si')
             ->select('sum(si.subTotal) as subTotal')
             ->where('si.invoiceTransaction = :invoice')
             ->setParameter('invoice', $transaction ->getId())

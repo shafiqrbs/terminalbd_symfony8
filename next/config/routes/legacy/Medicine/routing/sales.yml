@@ -1,0 +1,149 @@
+medicine_sales:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::indexAction' }
+
+medicine_sales_hold:
+    path:     /hold
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::holdAction' }
+
+medicine_sales_copy:
+    path:     /{id}/copy
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::copyAction' }
+
+
+medicine_sales_android:
+    path:     /android
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::androidSalesAction' }
+
+medicine_sales_android_duplicate_delete:
+    path:     /{android}/android-duplicate-delete
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::androidDuplicateSalesDeleteAction' }
+
+medicine_sales_android_delete:
+    path:     /{android}/android-delete
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::androidDeleteAction' }
+
+medicine_sales_android_view:
+    path:     /android
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::androidSalesAction' }
+
+medicine_sales_android_reprocess:
+    path:     /{device}/android-process
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::androidSalesProcessAction' }
+    options:
+            expose: true
+
+medicine_sales_android_process:
+    path:     /{device}/android-process
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::androidSalesProcessAction' }
+    options:
+            expose: true
+
+medicine_sales_android_process_salesItem:
+    path:     /{id}/android-process-sales-item
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::androidItemSalesProcessAction' }
+    options:
+            expose: true
+
+medicine_device_sales_import:
+    path:      /device-sales-delete-import/{android}
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::insertGroupApiSalesImportAction' }
+
+medicine_sales_item:
+    path:     /sales-item
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::salesItemAction' }
+
+
+medicine_sales_item_update:
+    path:     /sales-item-update
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::salesItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_sales_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::showAction' }
+
+medicine_sales_print:
+    path:     /{id}/print
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::posPrintAction' }
+
+medicine_sales_posprint:
+    path:     /{id}/{mode}/posprint
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::posPrintUltraAction' }
+
+medicine_sales_new:
+    path:     /new
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::newAction' }
+
+medicine_sales_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::editAction' }
+
+medicine_sales_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::updateAction' }
+    methods:  [POST, PUT]
+
+medicine_sales_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::editAction' }
+
+
+medicine_sales_approve:
+    path:     /{id}/approve
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::approveAction' }
+
+medicine_sales_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::deleteAction' }
+
+medicine_sales_stock_search:
+    path:     /{id}/medicine-stock-search
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::stockSearchAction' }
+    options:
+            expose: true
+
+
+medicine_sales_item_add:
+    path:     /{invoice}/medicine-add
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::addMedicineAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_sales_instant_item:
+    path:     /{sales}/{item}/medicine-instant-sales
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::instantPurchaseSalesAction' }
+    methods:  POST
+    options:
+            expose: true
+
+
+medicine_sales_discount_update:
+    path:     /dicount-update
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::invoiceDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_sales_approved:
+    path:     /{id}/invoice-approved
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::approvedAction' }
+
+
+medicine_sales_item_delete:
+    path:     /{invoice}/{id}/sales-item-delete
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::salesItemDeleteAction' }
+
+medicine_sales_print_invoice:
+    path:     /{id}/print
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::invoicePrintAction' }
+
+medicine_sales_inline_update:
+    path:     /sales-created-inline-update
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::inlineUpdateAction' }
+    methods:  POST
+    options:
+        expose: true

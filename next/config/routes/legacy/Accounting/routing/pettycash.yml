@@ -1,0 +1,40 @@
+account_pettycash:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\PettyCashController::indexAction' }
+
+account_pettycash_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\PettyCashController::showAction' }
+
+account_pettycash_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\PettyCashController::newAction' }
+
+account_pettycash_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\PettyCashController::createAction' }
+    methods:  POST
+
+account_pettycash_payment_return:
+    path:     /payment-return
+    defaults: { _controller: 'App\Accounting\Controller\PettyCashController::paymentAction' }
+    methods:  POST
+    options:
+           expose: true
+
+account_pettycash_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\PettyCashController::approveAction' }
+    options:
+           expose: true
+
+account_pettycash_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Accounting\Controller\PettyCashController::inlineUpdateAction' }
+
+
+account_pettycash_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\PettyCashController::deleteAction' }
+    options:
+           expose: true

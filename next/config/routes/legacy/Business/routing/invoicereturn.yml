@@ -1,0 +1,39 @@
+business_invoice_return:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\InvoiceReturnController::indexAction' }
+
+business_invoice_return_item:
+    path:     /sales-return-item
+    defaults: { _controller: 'App\Business\Controller\InvoiceReturnController::salesReturnAction' }
+
+business_invoice_return_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Business\Controller\InvoiceReturnController::showAction' }
+
+business_invoice_return_new:
+    path:     /new
+    defaults: { _controller: 'App\Business\Controller\InvoiceReturnController::newAction' }
+
+business_invoice_return_create:
+    path:     /create
+    defaults: { _controller: 'App\Business\Controller\InvoiceReturnController::createAction' }
+    methods:  [POST]
+
+business_invoice_return_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Business\Controller\InvoiceReturnController::editAction' }
+
+business_invoice_return_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Business\Controller\InvoiceReturnController::updateAction' }
+    methods:  [POST]
+
+business_invoice_return_approved:
+    path:     /{id}/approved
+    defaults: { _controller: 'App\Business\Controller\InvoiceReturnController::approvedAction' }
+
+business_invoice_return_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\InvoiceReturnController::deleteAction' }
+
+

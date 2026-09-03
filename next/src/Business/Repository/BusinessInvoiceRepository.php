@@ -458,14 +458,14 @@ class BusinessInvoiceRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('BusinessBundle:BusinessInvoiceParticular','si')
+            ->from(\App\Business\Entity\BusinessInvoiceParticular::class,'si')
             ->select('sum(si.subTotal) as subTotal')
             ->where('si.businessInvoice = :invoice')
             ->setParameter('invoice', $invoice ->getId())
             ->getQuery()->getOneOrNullResult();
 
         $qb1 = $em->createQueryBuilder();
-        $qb1->from('BusinessBundle:BusinessInvoiceReturnItem','si')
+        $qb1->from(\App\Business\Entity\BusinessInvoiceReturnItem::class,'si')
             ->select("sum(si.subTotal) as subTotal")
             ->where('si.invoice = :invoice')
             ->setParameter('invoice', $invoice ->getId());
@@ -507,7 +507,7 @@ class BusinessInvoiceRepository extends EntityRepository
     {
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
-        $qb->from('BusinessBundle:BusinessInvoiceParticular','si')
+        $qb->from(\App\Business\Entity\BusinessInvoiceParticular::class,'si')
             ->select("sum(si.subTotal) as subTotal","sum(si.tloPrice * si.totalQuantity) as tloPrice","sum(si.quantity) as salesQnt","sum(si.returnQnt) as returnQnt","sum(si.damageQnt) as damageQnt","sum(si.spoilQnt) as spoilQnt","sum(si.totalQuantity) as totalQnt","sum(si.bonusQnt) as bonusQnt")
             ->where('si.businessInvoice = :invoice')
             ->setParameter('invoice', $invoice ->getId());
@@ -520,14 +520,14 @@ class BusinessInvoiceRepository extends EntityRepository
     {
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
-        $qb->from('BusinessBundle:BusinessInvoiceParticular','si')
+        $qb->from(\App\Business\Entity\BusinessInvoiceParticular::class,'si')
         ->select("sum(si.subTotal) as subTotal","sum(si.tloTotal) as tloPrice","sum(si.srCommissionTotal) as srCommission","sum(si.quantity) as salesQnt","sum(si.returnQnt) as returnQnt","sum(si.damageQnt) as damageQnt","sum(si.spoilQnt) as spoilQnt","sum(si.totalQuantity) as totalQnt","sum(si.bonusQnt) as bonusQnt")
         ->where('si.businessInvoice = :invoice')
         ->setParameter('invoice', $invoice ->getId());
         $result = $qb->getQuery()->getOneOrNullResult();
 
         $qb1 = $em->createQueryBuilder();
-        $qb1->from('BusinessBundle:BusinessInvoiceReturnItem','si')
+        $qb1->from(\App\Business\Entity\BusinessInvoiceReturnItem::class,'si')
             ->select("sum(si.subTotal) as subTotal")
             ->where('si.invoice = :invoice')
             ->setParameter('invoice', $invoice ->getId());
@@ -682,17 +682,17 @@ class BusinessInvoiceRepository extends EntityRepository
         $sales = new BusinessInvoice();
         $sales->setBusinessConfig($option->getBusinessConfig());
         if($data['customerName'] and $data['customerMobile']){
-            $customer = $em->getRepository('DomainUserBundle:Customer')->newExistingCustomerForSales($option,$data['customerMobile'],$data);
+            $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option,$data['customerMobile'],$data);
             $sales->setCustomer($customer);
         }elseif($data['customerId']){
-            $customer = $em->getRepository('DomainUserBundle:Customer')->find($data['customerId']);
+            $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->find($data['customerId']);
             $sales->setCustomer($customer);
         }elseif(empty($data['customerId']) and empty($data['customerName']) ) {
-            $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $option, 'name' => 'Default']);
+            $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $option, 'name' => 'Default']);
             $sales->setCustomer($customer);
         }
         if($data['createdBy']){
-            $createdBy = $em->getRepository('UserBundle:User')->find($data['createdBy']);
+            $createdBy = $em->getRepository(\App\User\Entity\User::class)->find($data['createdBy']);
             $sales->setCreatedBy($createdBy);
         }
         $sales->setComment($data['counterNo']);
@@ -1135,9 +1135,9 @@ class BusinessInvoiceRepository extends EntityRepository
         $entity->setBusinessConfig($config);
         $entity->setCreatedBy($particular->getSalesBy());
         $entity->setSalesBy($particular->getSalesBy());
-        $customer = $em->getRepository('DomainUserBundle:Customer')->defaultCustomer($config->getGlobalOption());
+        $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->defaultCustomer($config->getGlobalOption());
         $entity->setCustomer($customer);
-        $transactionMethod = $em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+        $transactionMethod = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         $entity->setTransactionMethod($transactionMethod);
         $entity->setPaymentStatus('Paid');
         $entity->setProcess("Delivered");
@@ -1160,10 +1160,10 @@ class BusinessInvoiceRepository extends EntityRepository
         $salesItem->setSubTotal($total);
         $em->persist($salesItem);
         $em->flush();
-        $em->getRepository('AccountingBundle:AccountSales')->insertBusinessAccountInvoice($entity);
-        $em->getRepository('BusinessBundle:BusinessParticular')->getSalesUpdateQnt($salesItem);
+        $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessAccountInvoice($entity);
+        $em->getRepository(\App\Business\Entity\BusinessParticular::class)->getSalesUpdateQnt($salesItem);
         if($entity->getBusinessConfig()->isStockHistory() == 1 ){
-            $em->getRepository('BusinessBundle:BusinessStockHistory')->processInsertSalesItem($entity);
+            $em->getRepository(\App\Business\Entity\BusinessStockHistory::class)->processInsertSalesItem($entity);
         }
 
     }

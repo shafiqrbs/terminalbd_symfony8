@@ -1,0 +1,55 @@
+setting_tool_templatecustomize:
+    resource: 'routing/templatecustomize.yml'
+    prefix:   /appearance/templatecustomize
+
+setting_appearance_feature:
+    resource: 'routing/appearancefeature.yml'
+    prefix:   /appearance/feature
+
+setting_appearance_featurewidget:
+    resource: 'routing/appearancefeaturewidget.yml'
+    prefix:   /appearance/feature-widget
+
+setting_appearance_menuwidget:
+    resource: 'routing/appearancewebsitewidget.yml'
+    prefix:   /appearance/website-widget
+
+setting_appearance_featurewidgetitem:
+    resource: 'routing/appearancefeaturewidgetitem.yml'
+    prefix:   /appearance/sidebar-widget-item
+
+setting_appearance_sidebarwidget:
+    resource: 'routing/sidebarwidget.yml'
+    prefix:   /appearance/sidebar-widget
+
+setting_appearance_appearancecategory:
+    resource: 'routing/featurecategory.yml'
+    prefix:   /e-commerce/feature-category
+
+setting_appearance_appearancebrand:
+    resource: 'routing/featurebrand.yml'
+    prefix:   /e-commerce/feature-brand
+
+setting_appearance_ecommercemenu:
+    resource: 'routing/ecommercemenu.yml'
+    prefix:   /appearance/ecommerce-menu
+
+setting_appearance_megamenu:
+    resource: 'routing/megamenu.yml'
+    prefix:   /appearance/mega-menu
+
+SettingAppearanceBundle_menu:
+    resource: 'routing/menu.yml'
+    prefix:   /appearance/menu
+
+SettingAppearanceBundle_menugroup:
+    resource: 'routing/menugroup.yml'
+    prefix:   /appearance/menugroup
+
+SettingAppearanceBundle_menugrouping:
+    resource: 'routing/menugrouping.yml'
+    prefix:   /appearance/menugrouping
+
+setting_appearance_menucustom:
+    resource: 'routing/menucustom.yml'
+    prefix:   /admin/menucustom

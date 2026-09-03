@@ -22,7 +22,7 @@ class ItemKeyValueRepository extends EntityRepository
         if(isset($data['metaKey']) OR isset($data['metaValue']) ){
             foreach ($data['metaKey'] as $value) {
                 $metaId = $data['metaId'][$i] ?? 0 ;
-                $itemKeyValue = $this->_em->getRepository('InventoryBundle:ItemKeyValue')->findOneBy(['purchaseVendorItem'=>$reEntity,'id' => $metaId]);
+                $itemKeyValue = $this->_em->getRepository(\App\Inventory\Entity\ItemKeyValue::class)->findOneBy(['purchaseVendorItem'=>$reEntity,'id' => $metaId]);
                 if(!empty($metaId) and !empty($itemKeyValue)){
                     $this->updateMetaAttribute($itemKeyValue,$data['metaKey'][$i],$data['metaValue'][$i]);
                 }else{
@@ -81,7 +81,7 @@ class ItemKeyValueRepository extends EntityRepository
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
         foreach ($data as $key => $value){
-            $qb->update('InventoryBundle:ItemKeyValue', 'mg')
+            $qb->update(\App\Inventory\Entity\ItemKeyValue::class, 'mg')
                 ->set('mg.sorting', $i)
                 ->where('mg.id = :id')
                 ->setParameter('id', $key)

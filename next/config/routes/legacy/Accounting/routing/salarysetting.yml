@@ -1,0 +1,51 @@
+account_salarysetting:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::indexAction' }
+
+account_salarysetting_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::showAction' }
+
+account_salarysetting_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::newAction' }
+
+account_salarysetting_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::createAction' }
+    methods:  POST
+
+account_salarysetting_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::editAction' }
+
+account_salarysetting_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::updateAction' }
+    methods:  [POST, PUT]
+
+account_salarysetting_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::deleteAction' }
+
+account_salarysetting_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::inlineUpdateAction' }
+
+account_salarysetting_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::approveAction' }
+    options:
+           expose: true
+
+account_salarysetting_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::statusAction' }
+    options:
+           expose: true
+
+account_salarysetting_salaryAmount:
+    path:     /salary-amount
+    defaults: { _controller: 'App\Accounting\Controller\SalarySettingController::salaryAmountAction' }
+    options:
+           expose: true

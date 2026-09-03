@@ -15,7 +15,7 @@ class ProductColorRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(cs)');
-        $qb->from('InventoryBundle:ItemColor','e');
+        $qb->from(\App\Inventory\Entity\ItemColor::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory);
         $count = $qb->getQuery()->getSingleScalarResult();

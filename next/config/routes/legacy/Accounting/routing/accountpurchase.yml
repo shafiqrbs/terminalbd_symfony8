@@ -1,0 +1,78 @@
+account_purchase:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::indexAction' }
+
+account_purchase_outstanding:
+    path:     /vendor-outstanding
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::vendorOutstandingAction' }
+
+account_purchase_return:
+    path:     /purchase-return
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::purchaseReturnAction' }
+
+account_purchase_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::showAction' }
+
+account_purchase_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::newAction' }
+
+account_purchase_payment:
+    path:     /payment
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::paymentAction' }
+
+account_purchase_payment_create:
+    path:     /payment-create
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::paymentCreateAction' }
+    methods:  POST
+
+account_purchase_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::createAction' }
+    methods:  POST
+
+account_purchase_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::editAction' }
+
+account_purchase_reverse:
+    path:     /{id}/reverse
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::purchaseReverseAction' }
+
+
+account_purchase_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::updateAction' }
+    methods:  [POST, PUT]
+
+account_purchase_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::approveAction' }
+    options:
+           expose: true
+
+account_purchase_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::inlineUpdateAction' }
+
+
+account_purchase_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::deleteAction' }
+    options:
+           expose: true
+
+account_purchase_vendor_search:
+    path:     /search
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::autoSearchAction' }
+    options:
+            expose: true
+
+account_purchase_vendor_name:
+    path:      /{vendor}/vendor-name
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseController::searchVendorNameAction' }
+    options:
+            expose: true
+
+

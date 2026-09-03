@@ -1,0 +1,11 @@
+pos_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: App\Pos\Controller\DefaultController::indexAction }
+
+pos_android:
+    resource: 'routing/android.yml'
+    prefix:   /android
+
+pos_desktop:
+    resource: 'routing/pos.yml'
+    prefix:   /desktop

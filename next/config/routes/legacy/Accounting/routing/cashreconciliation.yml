@@ -1,0 +1,61 @@
+account_cashreconciliation:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::indexAction' }
+
+account_cashreconciliation_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::newAction' }
+
+account_cashreconciliation_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::createAction' }
+    methods:  POST
+
+account_cashreconciliation_add:
+    path:     /{id}/add
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::addAction' }
+    methods:  GET
+    options:
+           expose: true
+
+account_cashreconciliation_meta_update:
+    path:     /{id}/meta-update
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::metaUpdateAction' }
+    methods:  GET
+    options:
+           expose: true
+
+account_cashreconciliation_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::editAction' }
+
+account_cashreconciliation_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::showAction' }
+
+account_cashreconciliation_reverse:
+    path:     /{id}/reverse
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::journalReverseAction' }
+
+
+account_cashreconciliation_pdf:
+    path:     /{id}/pdf-download
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::reportDownloadAction' }
+
+account_cashreconciliation_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::deleteAction' }
+    options:
+           expose: true
+
+account_cashreconciliation_meta_delete:
+    path:     /{id}/meta-delete
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::metaDeleteAction' }
+    options:
+           expose: true
+
+account_cashreconciliation_approve_delete:
+    path:     /{id}/approve-delete
+    defaults: { _controller: 'App\Accounting\Controller\CashReconciliationController::approveDeleteAction' }
+    options:
+           expose: true

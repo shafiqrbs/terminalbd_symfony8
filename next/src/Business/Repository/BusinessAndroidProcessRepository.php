@@ -36,7 +36,7 @@ class BusinessAndroidProcessRepository extends EntityRepository
     {
         $em =  $this->_em;
 
-        $device = $em->getRepository('SettingToolBundle:AndroidDeviceSetup')->findOneBy(['globalOption'=> $option,'id' => $device]);
+        $device = $em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->findOneBy(['globalOption'=> $option,'id' => $device]);
         $entity = new BusinessAndroidProcess();
         $entity->setBusinessConfig($option->getBusinessConfig());
         $entity->setAndroidDevice($device);
@@ -118,7 +118,7 @@ class BusinessAndroidProcessRepository extends EntityRepository
                 if(isset($item['customerName'])  and $item['customerName'] == 'Default'){
                     $customer = $default->getId();
                 }elseif(isset($item['customerName']) and $item['customerName'] and isset($item['customerMobile']) and $item['customerMobile']){
-                    $customer = $em->getRepository('DomainUserBundle:Customer')->newExistingCustomerForMedicineSales($option,$item['customerMobile'],$item)->getId();
+                    $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForMedicineSales($option,$item['customerMobile'],$item)->getId();
                 }else{
                     $customer = $default->getId();
                 }
@@ -135,12 +135,12 @@ class BusinessAndroidProcessRepository extends EntityRepository
             if($subItems  and $numSubItems > 0 ) {
                 foreach ($subItems as $sub):
                     $deviceSalesId = $sub['salesId'];
-                    $sales = $em->getRepository('BusinessBundle:BusinessInvoice')->findOneBy(['businessConfig' => $config, 'deviceSalesId' => $deviceSalesId]);
+                    $sales = $em->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(['businessConfig' => $config, 'deviceSalesId' => $deviceSalesId]);
                     if ($sales) {
                         $salesItem = new BusinessInvoiceParticular();
                         $salesItem->setAndroidProcess($process);
                         $salesItem->setBusinessInvoice($sales);
-                        $stockId = $em->getRepository('BusinessBundle:BusinessParticular')->find($sub['stockId']);
+                        $stockId = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($sub['stockId']);
                         if ($stockId) {
                             $salesItem->setBusinessParticular($stockId);
                             $salesItem->setParticular($stockId->getName());
@@ -156,7 +156,7 @@ class BusinessAndroidProcessRepository extends EntityRepository
                 $em->flush();
             }
             $total = $em->createQueryBuilder()
-                ->from('BusinessBundle:BusinessInvoice','si')
+                ->from(\App\Business\Entity\BusinessInvoice::class,'si')
                 ->select('count(si.id) as totalCount')
                 ->where("si.androidProcess={$androidProcess_id}")
                 ->getQuery()->getSingleResult();

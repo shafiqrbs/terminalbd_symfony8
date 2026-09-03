@@ -1,0 +1,104 @@
+dps_report_cash:
+    path:     /report-cash
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::cashAction' }
+
+dps_report_cash_pdf:
+    path:     /report-cash-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::cashPdfAction' }
+
+dps_report_expenditure:
+    path:     /expenditure
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::expenditureAction' }
+
+dps_report_expenditure_pdf:
+    path:     /expenditure-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::expenditurePdfAction' }
+
+dps_report_income:
+    path:     /report-income
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::incomeAction' }
+
+dps_report_income_pdf:
+    path:     /report-income-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::incomePdfAction' }
+
+dps_report_balance_sheet:
+    path:     /sales-summary
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::salesSummaryAction' }
+
+dps_report_stock:
+    path:     /report-stock
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::stockAction' }
+
+dps_report_stock_pdf:
+    path:     /report-stock-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::stockPdfAction' }
+
+dps_report_stock_out:
+    path:     /report-stock-out
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::stockOutAction' }
+
+dps_report_stock_out_pdf:
+    path:     /report-stock-out-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::stockOutPdfAction' }
+
+dps_report_today_sales_summary_pdf:
+    path:     /daily-sales-summary-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\DefaultController::pdfTodaySalesAction' }
+
+dps_report_sales_summary:
+    path:     /sales-summary
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::salesSummaryAction' }
+
+dps_report_sales_summary_pdf:
+    path:     /sales-summary-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::salesSummaryPdfAction' }
+
+dps_report_sales:
+    path:     /sales-details
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::salesAction' }
+
+dps_report_sales_pdf:
+    path:     /sales-details-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::salesPdfAction' }
+
+dps_report_sales_monthly:
+    path:     /monthly-sales-summary
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::monthlySalesAction' }
+
+dps_report_sales_monthly_pdf:
+    path:     /monthly-sales-summary-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::monthlySalesPdfAction' }
+
+dps_report_sales_all_yearly:
+    path:     /all-year-sales-summary
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::allYearSalesAction' }
+
+dps_report_sales_all_yearly_pdf:
+    path:     /all-year-sales-summary-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::allYearSalesPdfAction' }
+
+dps_report_sales_yearly:
+    path:     /yearly-sales-summary
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::yearlySalesAction' }
+
+dps_report_sales_yearly_pdf:
+    path:     /yearly-sales-summary-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::yearlySalesPdfAction' }
+
+dps_report_sales_treatment:
+    path:     /treatment-wise-sales
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::treatmentWiseSalesAction' }
+
+dps_report_sales_treatment_pdf:
+    path:     /treatment-wise-sales-pdf
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::treatmentWiseSalesPdfAction' }
+
+dps_report_purchase_summary:
+    path:     /purchase-summary
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::purchaseSummaryAction' }
+
+dps_report_purchase:
+    path:     /purchase-summary
+    defaults: { _controller: 'App\DoctorPrescription\Controller\ReportController::purchaseSummaryAction' }
+

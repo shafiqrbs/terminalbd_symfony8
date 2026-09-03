@@ -171,7 +171,7 @@ class PurchaseItemRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(pi.id)');
-        $qb->from('InventoryBundle:PurchaseItem','pi');
+        $qb->from(\App\Inventory\Entity\PurchaseItem::class,'pi');
         $qb->where("pi.item = :item");
         $qb->setParameter('item', $item->getId());
         $count = $qb->getQuery()->getSingleScalarResult();
@@ -188,7 +188,7 @@ class PurchaseItemRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('sum(e.quantity)  as totalQnt', 'count(e.id)  as totalItem');
-        $qb->from('InventoryBundle:PurchaseItem', 'e');
+        $qb->from(\App\Inventory\Entity\PurchaseItem::class, 'e');
         $qb->where("e.purchase = :purchase");
         $qb->setParameter('purchase', $purchase->getId());
         if ($purchaseVendorItem > 0){
@@ -340,12 +340,12 @@ class PurchaseItemRepository extends EntityRepository
         $data = $qb->getQuery()->getArrayResult();
         foreach ($data as $row){
 
-           $purchaseVendorItem = $this->_em->getRepository('InventoryBundle:PurchaseVendorItem')->findOneBy(['purchase' => $purchase ,'masterItem' => $row['productId']]);
+           $purchaseVendorItem = $this->_em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->findOneBy(['purchase' => $purchase ,'masterItem' => $row['productId']]);
            $entity = new PurchaseVendorItem();
            if(!empty($purchaseVendorItem)){
                $entity = $purchaseVendorItem;
            }
-           $product = $this->_em->getRepository('InventoryBundle:Product')->find($row['productId']);
+           $product = $this->_em->getRepository(\App\Inventory\Entity\Product::class)->find($row['productId']);
            $entity->setPurchase($purchase);
            $entity->setInventoryConfig($purchase->getInventoryConfig());
            $entity->setMasterItem($product);
@@ -365,7 +365,7 @@ class PurchaseItemRepository extends EntityRepository
         foreach ($purchase->getPurchaseItems() as $item){
 
             $masterItem = $item->getItem()->getMasterItem();
-            $purchaseVendorItem = $this->_em->getRepository('InventoryBundle:PurchaseVendorItem')->findOneBy(['purchase' => $purchase ,'masterItem' => $masterItem]);
+            $purchaseVendorItem = $this->_em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->findOneBy(['purchase' => $purchase ,'masterItem' => $masterItem]);
             $item->setPurchaseVendorItem($purchaseVendorItem);
             $this->_em->persist($item);
             $this->_em->flush($item);

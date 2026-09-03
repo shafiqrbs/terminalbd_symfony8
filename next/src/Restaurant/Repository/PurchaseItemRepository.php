@@ -20,7 +20,7 @@ class PurchaseItemRepository extends EntityRepository
     {
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('RestaurantBundle:PurchaseItem','e');
+        $qb->from(\App\Restaurant\Entity\PurchaseItem::class,'e');
         $qb->select('AVG(e.purchasePrice) AS avgPurchasePrice');
         $qb->where('e.particular = :particular')->setParameter('particular', $particular) ;
         $res = $qb->getQuery()->getOneOrNullResult();
@@ -33,7 +33,7 @@ class PurchaseItemRepository extends EntityRepository
 
     public function insertPurchaseItems($invoice, $data)
     {
-        $particular = $this->_em->getRepository('RestaurantBundle:Particular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
         $em = $this->_em;
         $entity = new PurchaseItem();
         $entity->setPurchase($invoice);

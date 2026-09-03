@@ -306,22 +306,22 @@ class ParticularRepository extends EntityRepository
 
         $em = $this->_em;
         if($fieldName == 'sales'){
-            $qnt = $em->getRepository('RestaurantBundle:InvoiceParticular')->salesStockItemUpdate($stock);
+            $qnt = $em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->salesStockItemUpdate($stock);
             $stock->setSalesQuantity($qnt);
         }elseif($fieldName == 'purchase-return'){
-           // $qnt = $em->getRepository('BusinessBundle:BusinessPurchaseReturnItem')->purchaseReturnStockUpdate($stock);
+           // $qnt = $em->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->purchaseReturnStockUpdate($stock);
           // $stock->setPurchaseReturnQuantity($qnt);
         }elseif($fieldName == 'damage'){
-             $quantity = $em->getRepository('RestaurantBundle:RestaurantDamage')->damageStockItemUpdate($stock);
+             $quantity = $em->getRepository(\App\Restaurant\Entity\RestaurantDamage::class)->damageStockItemUpdate($stock);
             $stock->setDamageQuantity($quantity);
         }elseif($fieldName == 'production'){
-            $quantity = $em->getRepository('RestaurantBundle:ProductionExpense')->productionExpenseStockItemUpdate($stock);
+            $quantity = $em->getRepository(\App\Restaurant\Entity\ProductionExpense::class)->productionExpenseStockItemUpdate($stock);
             $stock->setProductionQuantity($quantity);
         }elseif($fieldName == 'production-in'){
-            $quantity = $em->getRepository('RestaurantBundle:ProductionBatch')->productionBatchItemUpdate($stock);
+            $quantity = $em->getRepository(\App\Restaurant\Entity\ProductionBatch::class)->productionBatchItemUpdate($stock);
             $stock->setPurchaseQuantity($quantity);
         }else{
-            $qnt = $em->getRepository('RestaurantBundle:PurchaseItem')->purchaseStockItemUpdate($stock);
+            $qnt = $em->getRepository(\App\Restaurant\Entity\PurchaseItem::class)->purchaseStockItemUpdate($stock);
             $stock->setPurchaseQuantity($qnt);
         }
         $em->persist($stock);
@@ -380,7 +380,7 @@ class ParticularRepository extends EntityRepository
 
         $em = $this->_em;
 
-        $invoiceParticulars = $em->getRepository('RestaurantBundle:InvoiceParticular')->findBy(['invoice'=> $invoice ->getId()]);
+        $invoiceParticulars = $em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->findBy(['invoice'=> $invoice ->getId()]);
 
         /** @var InvoiceParticular $item */
 
@@ -397,7 +397,7 @@ class ParticularRepository extends EntityRepository
                 }elseif (!empty($particular) and !empty($particular->getService()) and $particular->getService()->getSlug() == 'product' and $particular->getProductionType() == "pre-production"){
                     $this->updateRemoveStockQuantity($particular,'sales');
                 }elseif (!empty($particular) and !empty($particular->getService()) and $particular->getService()->getSlug() == 'product' and $particular->getProductionType() == "post-production"){
-                    $em->getRepository('RestaurantBundle:ProductionExpense')->salesProductionElementExpense($item);
+                    $em->getRepository(\App\Restaurant\Entity\ProductionExpense::class)->salesProductionElementExpense($item);
                 }
             }
         }

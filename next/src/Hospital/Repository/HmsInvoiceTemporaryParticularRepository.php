@@ -29,10 +29,10 @@ class HmsInvoiceTemporaryParticularRepository extends EntityRepository
 
     public function insertInvoiceItems(User $user, $data)
     {
-        $particular = $this->_em->getRepository('HospitalBundle:Particular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
         $em = $this->_em;
         $entity = new HmsInvoiceTemporaryParticular();
-        $invoiceParticular = $this->_em->getRepository('HospitalBundle:HmsInvoiceTemporaryParticular')->findOneBy(['user' => $user ,'particular' => $particular]);
+        $invoiceParticular = $this->_em->getRepository(\App\Hospital\Entity\HmsInvoiceTemporaryParticular::class)->findOneBy(['user' => $user ,'particular' => $particular]);
 
         if(!empty($invoiceParticular)) {
             $entity = $invoiceParticular;

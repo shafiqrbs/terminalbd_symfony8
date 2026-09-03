@@ -1,0 +1,36 @@
+domain_notepad:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\NotepadController::indexAction' }
+
+domain_notepad_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\DomainUser\Controller\NotepadController::showAction' }
+
+domain_notepad_new:
+    path:     /new
+    defaults: { _controller: 'App\DomainUser\Controller\NotepadController::newAction' }
+
+domain_notepad_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\NotepadController::createAction' }
+    methods:  POST
+
+domain_notepad_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DomainUser\Controller\NotepadController::editAction' }
+
+domain_notepad_insert:
+    path:     /{id}/insert
+    defaults: { _controller: 'App\DomainUser\Controller\NotepadController::insertAction' }
+    options:
+            expose: true
+
+domain_notepad_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DomainUser\Controller\NotepadController::updateAction' }
+    methods:  [POST, PUT]
+
+domain_notepad_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DomainUser\Controller\NotepadController::deleteAction' }
+

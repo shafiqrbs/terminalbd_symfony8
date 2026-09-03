@@ -1,0 +1,7 @@
+account_receive_print:
+    path:     /{id}/sales-receive-print
+    defaults: { _controller: 'App\Accounting\Controller\AccountPrintController::salesPrintAction' }
+
+account_payment_print:
+    path:     /{id}/sales-payment-print
+    defaults: { _controller: 'App\Accounting\Controller\AccountPrintController::purchasePrintAction' }

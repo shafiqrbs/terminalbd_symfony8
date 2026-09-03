@@ -1,0 +1,37 @@
+location:
+    path:     /
+    defaults: { _controller: 'App\Location\Controller\LocationController::indexAction' }
+
+location_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Location\Controller\LocationController::showAction' }
+
+location_new:
+    path:     /new
+    defaults: { _controller: 'App\Location\Controller\LocationController::newAction' }
+
+location_create:
+    path:     /create
+    defaults: { _controller: 'App\Location\Controller\LocationController::createAction' }
+    methods:  POST
+
+location_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Location\Controller\LocationController::editAction' }
+
+location_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Location\Controller\LocationController::updateAction' }
+    methods:  [POST, PUT]
+
+location_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Location\Controller\LocationController::deleteAction' }
+    methods:  [POST, DELETE]
+
+location_search:
+    path:     /location-auto-search
+    defaults: { _controller: 'App\Location\Controller\LocationController::autoSearchAction' }
+    options:
+           expose: true
+

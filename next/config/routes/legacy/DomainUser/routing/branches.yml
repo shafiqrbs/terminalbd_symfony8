@@ -1,0 +1,46 @@
+domain_branches:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::indexAction' }
+
+domain_branches_employee:
+    path:     /{id}/branches-employee
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::branchesEmployeeAction' }
+
+domain_branches_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::showAction' }
+
+domain_branches_new:
+    path:     /new
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::newAction' }
+
+domain_branches_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::createAction' }
+    methods:  POST
+
+domain_branches_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::editAction' }
+
+domain_branches_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::updateAction' }
+    methods:  [POST, PUT]
+
+domain_branches_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::deleteAction' }
+
+domain_branches_search:
+    path:     /search
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::autoSearchAction' }
+    options:
+            expose: true
+
+domain_branches_name:
+    path:      /{branch}/branch-name
+    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::searchBranchNameAction' }
+    options:
+            expose: true
+

@@ -1,0 +1,79 @@
+medicine_sales_temporary_new:
+    path:     /new
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::newAction' }
+    options:
+            expose: true
+
+medicine_sales_temporary_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::createAction' }
+    methods:  POST
+
+
+medicine_sales_temporary_item_add:
+    path:     /medicine-add
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::addParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_sales_temporary_item_ajax:
+    path:     /{id}/medicine-add-ajax
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::addAjaxLiveAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_stock_item_sales_create:
+    path:     /medicine-stock-create
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::stockItemCreateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_sales_barcode_search:
+    path:     /barcode-add
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::addBarcodeAction' }
+    methods:  GET
+    options:
+            expose: true
+
+medicine_sales_temporary_search:
+    path:     /live-search-add-stock
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::liveSearchSalesAction' }
+    options:
+            expose: true
+
+medicine_sales_generic_stock:
+    path:     /{id}/generic-stock-item
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::addGenericStockAction' }
+    methods:  GET
+    options:
+            expose: true
+
+medicine_sales_temporary_generic_item:
+    path:     /{id}/generic-stock-item-add
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::addGenericStockItemAction' }
+    methods:  POST
+    options:
+            expose: true
+
+
+medicine_sales_temporary_discount_update:
+    path:     /dicount-update
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::invoiceDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_sales_temporary_item_update:
+    path:     /sales-item-update
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::invoiceItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_sales_temporary_item_delete:
+    path:     /{id}/item-delete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineSalesTemporaryController::invoiceParticularDeleteAction' }
+

@@ -68,7 +68,7 @@ class BusinessPurchaseReturnItemRepository extends EntityRepository
 
             if($quantity[$key] > 0 ){
 
-                $product = $em->getRepository('BusinessBundle:BusinessParticular')->find($itemId);
+                $product = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($itemId);
                 $item = new BusinessPurchaseReturnItem();
                 $item->setBusinessPurchaseReturn($entity);
                 $item->setBusinessParticular($product);
@@ -103,7 +103,7 @@ class BusinessPurchaseReturnItemRepository extends EntityRepository
            if($entity){
                $em->remove($entity);
                $em->flush();
-               $em->getRepository('BusinessBundle:BusinessParticular')->updateRemoveStockQuantity($invoiceParticular->getBusinessParticular(), "purchase-return");
+               $em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($invoiceParticular->getBusinessParticular(), "purchase-return");
            }
        }
 

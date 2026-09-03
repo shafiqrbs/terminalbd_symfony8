@@ -1,0 +1,34 @@
+restaurant_product:
+    path:     /
+    defaults: { _controller: 'App\Restaurant\Controller\ProductController::indexAction' }
+
+restaurant_product_create:
+    path:     /create
+    defaults: { _controller: 'App\Restaurant\Controller\ProductController::createAction' }
+    methods:  POST
+
+restaurant_product_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Restaurant\Controller\ProductController::editAction' }
+
+restaurant_product_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Restaurant\Controller\ProductController::updateAction' }
+    methods:  [POST, PUT]
+
+restaurant_product_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Restaurant\Controller\ProductController::deleteAction' }
+
+restaurant_product_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Restaurant\Controller\ProductController::statusAction' }
+
+restaurant_product_sorting:
+    path:     /product-sorting
+    defaults: { _controller: 'App\Restaurant\Controller\ProductController::sortingAction' }
+
+restaurant_product_sorted:
+    path:     /product-sorted
+    defaults: { _controller: 'App\Restaurant\Controller\ProductController::sortedAction' }
+

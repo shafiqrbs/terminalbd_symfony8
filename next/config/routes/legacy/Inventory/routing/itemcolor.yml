@@ -1,0 +1,42 @@
+itemcolor:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ItemColorController::indexAction' }
+
+inventory_itemcolor_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\ItemColorController::autoSearchAction' }
+    options:
+            expose: true
+
+inventory_itemcolor_name:
+    path:      /{color}/color-name
+    defaults: { _controller: 'App\Inventory\Controller\ItemColorController::searchItemColorNameAction' }
+    options:
+            expose: true
+
+itemcolor_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\ItemColorController::showAction' }
+
+itemcolor_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\ItemColorController::newAction' }
+
+itemcolor_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\ItemColorController::createAction' }
+    methods:  POST
+
+itemcolor_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\ItemColorController::editAction' }
+
+itemcolor_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\ItemColorController::updateAction' }
+    methods:  [POST, PUT]
+
+itemcolor_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\ItemColorController::deleteAction' }
+

@@ -1,0 +1,20 @@
+medicine_reverse:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\MedicineReverseController::indexAction' }
+
+medicine_purchase_reverse:
+    path:     /{id}/reverse
+    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::reverseAction' }
+
+medicine_reverse_purchase_show:
+    path:     /{id}/purchase
+    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::reverseShowAction' }
+
+medicine_sales_reverse:
+    path:     /{id}/
+    defaults: { _controller: 'App\Medicine\Controller\SalesController::reverseAction' }
+
+medicine_reverse_sales_show:
+    path:     /{id}/sales
+    defaults: { _controller: 'App\Medicine\Controller\MedicineReverseController::reverseSalesAction' }
+

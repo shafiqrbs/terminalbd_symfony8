@@ -1,0 +1,33 @@
+theme:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\ThemeController::indexAction' }
+
+theme_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\ThemeController::showAction' }
+
+theme_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\ThemeController::newAction' }
+
+theme_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\ThemeController::createAction' }
+    methods:  POST
+
+theme_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\ThemeController::statusAction' }
+
+theme_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\ThemeController::editAction' }
+
+theme_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\ThemeController::updateAction' }
+    methods:  [POST, PUT]
+
+theme_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\ThemeController::deleteAction' }

@@ -91,7 +91,7 @@ class RestaurantConfigRepository extends EntityRepository
         $purchase->execute();
 
         $ids = $this->createQueryBuilder('')
-            ->from('RestaurantBundle::Invoice','e')
+            ->from(\App\Restaurant\Entity\Invoice::class,'e')
             ->where("e.restaurantConfig={$config}")
             ->select('e.id')
             ->getQuery()->getResult();

@@ -1,0 +1,38 @@
+product:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\ProductController::indexAction' }
+
+product_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\ProductController::showAction' }
+
+product_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\ProductController::newAction' }
+
+product_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\ProductController::createAction' }
+    methods:  POST
+
+product_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\ProductController::editAction' }
+
+product_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Content\Controller\ProductController::statusAction' }
+
+product_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\ProductController::updateAction' }
+    methods:  [POST, PUT]
+
+product_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\ProductController::deleteAction' }
+
+product_copy:
+    path:     /{id}/product-copy
+    defaults: { _controller: 'App\Content\Controller\ProductController::copyAction' }
+

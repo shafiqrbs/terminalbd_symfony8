@@ -17,7 +17,7 @@ class InvoiceSmsEmailRepository extends EntityRepository
 
         $qb = $this->_em->createQueryBuilder();
         $qb->select('SUM(ii.amount) as amount , SUM(ii.quantity) as smsQuantity');
-        $qb->from('SettingToolBundle:InvoiceSmsEmailItem','i');
+        $qb->from(\App\Tool\Entity\InvoiceSmsEmailItem::class,'i');
         $qb->join('i.smsEmailPricing','ii' );
         $qb->where("i.invoiceSmsEmail = :invoice");
         $qb->setParameter('invoice', $invoice->getId());

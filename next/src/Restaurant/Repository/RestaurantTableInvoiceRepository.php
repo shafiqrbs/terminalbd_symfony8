@@ -66,7 +66,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
                 $entity = new RestaurantTableInvoice();
                 $entity->setRestaurantConfig($config);
                 $entity->setTable($table);
-                $mode = $em->getRepository("SettingToolBundle:TransactionMethod")->findOneBy(['name'=>"Cash"]);
+                $mode = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['name'=>"Cash"]);
                 $entity->setTransactionMethod($mode);
                 if($i == 0 ){
                     $entity->setIsActive(1);
@@ -87,7 +87,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
         $i = 0;
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
-        $qb->update('RestaurantBundle:RestaurantTableInvoiceItem', 'mg')
+        $qb->update(\App\Restaurant\Entity\RestaurantTableInvoiceItem::class, 'mg')
             ->set('mg.isPrint',0)
             ->where('mg.tableInvoice = :id')
             ->setParameter('id', $invoice->getId())
@@ -95,7 +95,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
             ->execute();
 
         foreach ($tables as $key => $value):
-            $entity = $em->getRepository('RestaurantBundle:RestaurantTableInvoiceItem')->find($value);
+            $entity = $em->getRepository(\App\Restaurant\Entity\RestaurantTableInvoiceItem::class)->find($value);
             $entity->setIsPrint(true);
             $em->persist($entity);
             $em->flush();
@@ -106,7 +106,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('RestaurantBundle:RestaurantTableInvoiceItem','si')
+            ->from(\App\Restaurant\Entity\RestaurantTableInvoiceItem::class,'si')
             ->select('sum(si.subTotal) as subTotal')
             ->where('si.tableInvoice = :invoice')
             ->setParameter('invoice', $invoice ->getId())
@@ -199,10 +199,10 @@ class RestaurantTableInvoiceRepository extends EntityRepository
 
     public function insertInvoiceItems(RestaurantTableInvoice $invoice, $data)
     {
-        $particular = $this->_em->getRepository('RestaurantBundle:Particular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
         $em = $this->_em;
         $entity = new RestaurantTableInvoiceItem();
-        $invoiceParticular = $em->getRepository('RestaurantBundle:RestaurantTableInvoiceItem')->findOneBy(['tableInvoice' => $invoice ,'particular' => $particular]);
+        $invoiceParticular = $em->getRepository(\App\Restaurant\Entity\RestaurantTableInvoiceItem::class)->findOneBy(['tableInvoice' => $invoice ,'particular' => $particular]);
         if(!empty($invoiceParticular) and $data['process'] == 'update') {
             $entity = $invoiceParticular;
             $entity->setQuantity((float)$data['quantity']);

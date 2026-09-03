@@ -1,0 +1,45 @@
+hms_pathology:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::indexAction' }
+
+hms_pathology_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::showAction' }
+
+hms_pathology_new:
+    path:     /new
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::newAction' }
+
+hms_pathology_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::createAction' }
+    methods:  POST
+
+hms_pathology_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::editAction' }
+
+hms_pathology_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_pathology_inline_update:
+    path:     /inline-update
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::inlineUpdateAction' }
+
+hms_pathology_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::deleteAction' }
+
+hms_pathology_reset_report:
+    path:     /reset-pathology-report
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::resetPathologyTestWithReportAction' }
+
+hms_pathology_copy_report:
+    path:     /copy-pathology-report
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::resetPathologyTestWithReportAction' }
+
+hms_pathology_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\PathologyController::statusAction' }

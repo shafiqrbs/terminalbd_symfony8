@@ -45,9 +45,9 @@ class ProductionExpenseRepository extends EntityRepository
             $expense->setQuantity($elm->getQuantity()  * $batch->getQuantity());
             $em->persist($expense);
             $em->flush();
-            $em->getRepository('RestaurantBundle:Particular')->updateRemoveStockQuantity($expense->getParticular(),"production");
+            $em->getRepository(\App\Restaurant\Entity\Particular::class)->updateRemoveStockQuantity($expense->getParticular(),"production");
             if($elm->getMaterial()->getRestaurantConfig()->isStockHistory() == 1 ) {
-                $em->getRepository('RestaurantBundle:RestaurantStockHistory')->processInsertProductionItem($expense);
+                $em->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertProductionItem($expense);
             }
 
         endforeach;
@@ -72,9 +72,9 @@ class ProductionExpenseRepository extends EntityRepository
             $expense->setQuantity($elm->getQuantity()  * $batch->getQuantity());
             $em->persist($expense);
             $em->flush();
-            $em->getRepository('RestaurantBundle:Particular')->updateRemoveStockQuantity($expense->getParticular(),"production");
+            $em->getRepository(\App\Restaurant\Entity\Particular::class)->updateRemoveStockQuantity($expense->getParticular(),"production");
             if($elm->getMaterial()->getRestaurantConfig()->isStockHistory() == 1 ) {
-                $em->getRepository('RestaurantBundle:RestaurantStockHistory')->processInsertProductionItem($expense);
+                $em->getRepository(\App\Restaurant\Entity\RestaurantStockHistory::class)->processInsertProductionItem($expense);
             }
 
         endforeach;

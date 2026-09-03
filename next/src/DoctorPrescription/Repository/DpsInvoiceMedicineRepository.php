@@ -62,7 +62,7 @@ class DpsInvoiceMedicineRepository extends EntityRepository
 
         $entity->setDpsInvoice($invoice);
         if(!empty($data['medicineId'])) {
-            $medicine = $this->_em->getRepository('MedicineBundle:MedicineBrand')->find($data['medicineId']);
+            $medicine = $this->_em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
             $entity->setMedicine($medicine);
         }elseif($data['medicine']){
             $entity->setMedicineName($data['medicine']);

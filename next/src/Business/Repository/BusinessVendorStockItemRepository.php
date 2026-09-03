@@ -55,7 +55,7 @@ class BusinessVendorStockItemRepository extends EntityRepository
     public function insertVendorStockItems($invoice, $data)
     {
 
-    	$particular = $this->_em->getRepository('BusinessBundle:BusinessParticular')->find($data['particularId']);
+    	$particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
         $em = $this->_em;
 	    $price = (isset($data['price']) and !empty($data['price']))? $data['price']:0;
         $entity = new BusinessVendorStockItem();
@@ -150,7 +150,7 @@ class BusinessVendorStockItemRepository extends EntityRepository
         /* @var $vendorStock BusinessVendorStockItem */
         $vendorStock = $invoiceParticular->getVendorStockItem();
         if($invoiceParticular->getVendorStockItem()){
-            $totalQnt = $em->getRepository('BusinessBundle:BusinessInvoiceParticular')->getTotalSalesQnt($invoiceParticular);
+            $totalQnt = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getTotalSalesQnt($invoiceParticular);
             $vendorStock->setSalesQuantity($totalQnt);
             $em->persist($vendorStock);
             $em->flush();

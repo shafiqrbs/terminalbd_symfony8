@@ -1,0 +1,47 @@
+medicine_vendor:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::indexAction' }
+
+medicine_vendor_search:
+    path:     /autocomplete-search
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::autoSearchAutoCompleteAction' }
+    options:
+            expose: true
+
+medicine_vendor_company_search:
+    path:     /search
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::autoSearchAction' }
+    options:
+            expose: true
+
+medicine_vendor_name:
+    path:      /{vendor}/vendor-name
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::searchVendorNameAction' }
+    options:
+            expose: true
+
+medicine_vendor_new:
+    path:     /new
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::newAction' }
+
+medicine_vendor_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::createAction' }
+    methods:  POST
+
+medicine_vendor_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::editAction' }
+
+medicine_vendor_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::updateAction' }
+    methods:  [POST, PUT]
+
+medicine_vendor_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::statusAction' }
+
+medicine_vendor_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\VendorController::deleteAction' }

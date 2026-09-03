@@ -1,0 +1,56 @@
+account_condition:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::indexAction' }
+
+account_condition_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::newAction' }
+
+account_condition_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::createAction' }
+    methods:  POST
+
+account_condition_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::editAction' }
+
+account_condition_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::updateAction' }
+    methods:  [POST, PUT]
+
+account_condition_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::deleteAction' }
+    options:
+           expose: true
+
+account_condition_ledger:
+    path:     /ledger
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::ledgerAction' }
+
+account_condition_ledger_new:
+    path:     /ledger/new
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::ledgerNewAction' }
+
+account_condition_ledger_create:
+    path:     /ledger/create
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::createLedgerAction' }
+    methods:  POST
+
+account_condition_ledger_approve:
+    path:     /{id}/ledger/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::approveAction' }
+    options:
+        expose: true
+
+account_condition_ledger_inline:
+    path:     /ledger/inline-update
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::inlineUpdateAction' }
+
+account_condition_ledger_delete:
+    path:     /{id}/ledger/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountConditionController::deleteLedgerAction' }
+    options:
+        expose: true

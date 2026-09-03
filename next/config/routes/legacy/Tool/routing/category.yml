@@ -1,0 +1,46 @@
+hms_category:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::indexAction' }
+
+hms_category_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::showAction' }
+
+hms_category_new:
+    path:     /new
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::newAction' }
+
+hms_category_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::createAction' }
+    requirements: { _method: post }
+
+hms_category_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::editAction' }
+
+hms_category_sorting:
+    path:     /sorting
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::sortingAction' }
+
+hms_category_sorted:
+    path:     /sorted
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::sortedAction' }
+
+hms_category_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::updateAction' }
+    requirements: { _method: post|put }
+
+hms_category_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::deleteAction' }
+
+hms_category_feature:
+   path:     /feature
+   defaults: { _controller: 'App\Hospital\Controller\CategoryController::featureAction' }
+   requirements: { _method: post }
+
+hms_category_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\CategoryController::statusAction' }

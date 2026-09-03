@@ -1,0 +1,41 @@
+ecommercetemplate:
+    path:     /
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::indexAction' }
+
+ecommercetemplate_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::showAction' }
+
+ecommercetemplate_new:
+    path:     /new
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::newAction' }
+
+ecommercetemplate_create:
+    path:     /create
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::createAction' }
+    methods:  POST
+
+ecommercetemplate_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::editAction' }
+
+ecommercetemplate_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::updateAction' }
+    methods:  [POST, PUT]
+
+ecommercetemplate_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::deleteAction' }
+
+ecommercetemplate_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::statusAction' }
+
+ecommercetemplate_resizing:
+    path:     /resizing
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::resizeAction' }
+
+ecommercetemplate_sorted:
+    path:     /sorted
+    defaults: { _controller: 'App\Appearance\Controller\TemplateController::sortedAction' }

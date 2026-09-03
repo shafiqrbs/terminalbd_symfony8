@@ -35,11 +35,11 @@ class MedicineSalesTemporaryRepository extends EntityRepository
         $isShort = empty($data['isShort']) ? 0 : 1;
         $purchaseItem = (isset($data['purchaseItem']) and !empty($data['purchaseItem'])) ? $data['purchaseItem'] : '';
         /* @var $stockItem MedicineStock */
-        $stockItem = $this->_em->getRepository('MedicineBundle:MedicineStock')->find($data['stockName']);
-        $purchaseStockItem = $this->_em->getRepository('MedicineBundle:MedicinePurchaseItem')->find($purchaseItem);
+        $stockItem = $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['stockName']);
+        $purchaseStockItem = $this->_em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($purchaseItem);
         $em = $this->_em;
         $entity = new MedicineSalesTemporary();
-        $invoiceParticular = $this->_em->getRepository('MedicineBundle:MedicineSalesTemporary')->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
+        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
         if(empty($invoiceParticular)) {
 	        $entity->setQuantity($quantity);
             if($data['itemPercent'] > 0){
@@ -77,7 +77,7 @@ class MedicineSalesTemporaryRepository extends EntityRepository
     {
         $em = $this->_em;
         $entity = new MedicineSalesTemporary();
-        $invoiceParticular = $this->_em->getRepository('MedicineBundle:MedicineSalesTemporary')->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
+        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
         if(empty($invoiceParticular)) {
 	        $entity->setQuantity(1);
             $entity->setSalesPrice($stockItem->getSalesprice());
@@ -101,7 +101,7 @@ class MedicineSalesTemporaryRepository extends EntityRepository
     {
         $em = $this->_em;
         $entity = new MedicineSalesTemporary();
-        $invoiceParticular = $this->_em->getRepository('MedicineBundle:MedicineSalesTemporary')->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
+        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
         if(empty($invoiceParticular)) {
             $quantity = $data['quantity'] ?: 1;
             $price = $data['price'] ?: 0;
@@ -142,7 +142,7 @@ class MedicineSalesTemporaryRepository extends EntityRepository
         $em = $this->_em;
         $quantity = empty($data['quantity']) or $data['quantity'] == 'NaN'  ? 1 : $data['quantity'];
         $entity = new MedicineSalesTemporary();
-        $invoiceParticular = $this->_em->getRepository('MedicineBundle:MedicineSalesTemporary')->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
+        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
         if(empty($invoiceParticular)) {
             $entity->setQuantity($quantity);
             if($data['itemPercent'] > 0){
@@ -179,7 +179,7 @@ class MedicineSalesTemporaryRepository extends EntityRepository
         $entity = new MedicineSalesTemporary();
         /* @var $invoiceParticular MedicineSalesTemporary*/
         $salesId = (isset($data['salesItemId']) and $data['salesItemId']) ? $data['salesItemId']:0;
-        $invoiceParticular = $this->_em->getRepository('MedicineBundle:MedicineSalesTemporary')->find($salesId);
+        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->find($salesId);
         if(!empty($invoiceParticular) and $salesId > 0) {
             $entity = $invoiceParticular;
             $qnt = (isset($data['quantity']) and $data['quantity']) ? $data['quantity']:0;

@@ -1,0 +1,51 @@
+medicine_sales_return:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::indexAction' }
+
+medicine_sales_customer_item:
+    path:     /customer-sales-item
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::customerItemAction' }
+
+medicine_sales_customer_return_invoice:
+    path:     /sales-return-invoice
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::salesReturnInvoiceAction' }
+
+
+medicine_sales_return_group_item:
+    path:     /group-item-new
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::groupItemNewAction' }
+    methods:  POST
+
+medicine_sales_return_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::createAction' }
+    methods:  POST
+
+medicine_sales_return_new:
+    path:     /{id}/new
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::newAction' }
+
+
+medicine_sales_return_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::deleteAction' }
+
+medicine_sales_return_approve:
+    path:     /{id}/approve
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::approveAction' }
+
+medicine_sales_return_invoice_show:
+    path:     /{id}/show-invoice
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::showInvoiceAction' }
+
+medicine_sales_return_invoice_print:
+    path:     /{id}/print-invoice
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::printInvoiceAction' }
+
+medicine_sales_return_invoice_delete:
+    path:     /{id}/delete-invoice
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::deleteInvoiceAction' }
+
+medicine_sales_return_invoice_approve:
+    path:     /{id}/approve-invoice
+    defaults: { _controller: 'App\Medicine\Controller\SalesReturnController::approveInvoiceAction' }

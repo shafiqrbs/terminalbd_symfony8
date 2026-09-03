@@ -1,0 +1,36 @@
+syndicatemodule:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\SyndicateModuleController::indexAction' }
+
+syndicatemodule_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\SyndicateModuleController::showAction' }
+
+syndicatemodule_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\SyndicateModuleController::newAction' }
+
+syndicatemodule_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\SyndicateModuleController::createAction' }
+    requirements: { _method: post }
+
+syndicatemodule_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\SyndicateModuleController::editAction' }
+
+syndicatemodule_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\SyndicateModuleController::updateAction' }
+    requirements: { _method: post|put }
+
+syndicatemodule_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\SyndicateModuleController::deleteAction' }
+    requirements: { _method: post|delete }
+
+syndicatemodule_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\SyndicateModuleController::statusAction' }
+
+

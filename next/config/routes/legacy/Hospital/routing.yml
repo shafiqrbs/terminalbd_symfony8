@@ -1,0 +1,131 @@
+hospital_report:
+    resource: 'routing/report.yml'
+    prefix:   /report
+
+hospital_prescription:
+    resource: 'routing/prescription.yml'
+    prefix:   /prescription
+
+hospital_purchase:
+    resource: 'routing/purchase.yml'
+    prefix:   /purchase
+
+hospital_stockout:
+    resource: 'routing/stockout.yml'
+    prefix:   /stock-out
+
+hospital_accessories_purchase:
+    resource: 'routing/accessoriesPurchase.yml'
+    prefix:   /accessories-purchase
+
+hospital_accessories:
+    resource: 'routing/accessories.yml'
+    prefix:   /accessories
+
+hospital_commission:
+    resource: 'routing/commission.yml'
+    prefix:   /commission
+
+hospital_invoice_return:
+    resource: 'routing/invoicereturn.yml'
+    prefix:   /invoice-return
+
+hospital_vendor:
+    resource: 'routing/vendor.yml'
+    prefix:   /vendor
+
+hospital_invoice:
+    resource: 'routing/invoice.yml'
+    prefix:   /invoice
+
+hospital_invoice_temporary:
+    resource: 'routing/invoicetemporary.yml'
+    prefix:   /invoice-temporary
+
+hospital_doctor_invoice:
+    resource: 'routing/doctorinvoice.yml'
+    prefix:   /doctor-invoice
+
+hospital_invoice_admission:
+    resource: 'routing/invoiceadmission.yml'
+    prefix:   /invoice-admission
+
+hospital_admission_patient:
+    resource: 'routing/patient.yml'
+    prefix:   /patient
+
+hospital_invoice_particular:
+    resource: 'routing/invoiceparticular.yml'
+    prefix:   /report-process
+
+hospital_particular:
+    resource: 'routing/particular.yml'
+    prefix:   /particular
+
+hospital_pathology:
+    resource: 'routing/pathology.yml'
+    prefix:   /pathology
+
+hospital_pathologicalreport:
+    resource: 'routing/pathologicalreport.yml'
+    prefix:    /pathological-report
+
+hospital_doctor:
+    resource: 'routing/doctor.yml'
+    prefix:   /doctor
+
+hospital_marketing_executive:
+    resource: 'routing/marketing_executive.yml'
+    prefix:   /marketing-executive
+
+hospital_labuser:
+    resource: 'routing/labuser.yml'
+    prefix:   /lab-user
+
+hospital_cabin:
+    resource: 'routing/cabin.yml'
+    prefix:   /cabin-ward
+
+hospital_servicegroup:
+    resource: 'routing/servicegroup.yml'
+    prefix:   /service-group
+
+hospital_surgery:
+    resource: 'routing/surgery.yml'
+    prefix:   /surgery-operation
+
+hospital_stock:
+    resource: 'routing/stock.yml'
+    prefix:   /stock
+
+hospital_other_service:
+    resource: 'routing/otherservice.yml'
+    prefix:   /other-service
+
+hospital_referred_doctor:
+    resource: 'routing/referreddoctor.yml'
+    prefix:   /referred-doctor
+
+hospital_config:
+    resource: 'routing/config.yml'
+    prefix:   /config
+
+hospital_homepage:
+    path:     /
+    defaults: { _controller: App\Hospital\Controller\DefaultController::indexAction }
+
+hospital_patient_idcard:
+    path:     /{id}/patient/idcard
+    defaults: { _controller: 'App\Hospital\Controller\DefaultController::idcardAction' }
+
+hospital_group_approved:
+    path:      /group/invoice/approved
+    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoiceGroupApprovedAction' }
+
+hospital_group_revised:
+    path:     /group/invoice/revised
+    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoiceGroupReverseAction' }
+
+hospital_group_commission_approved:
+    path:     /group/doctor/commission
+    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::doctorInvoiceGroupApprovedAction' }

@@ -17,7 +17,7 @@ class ContactMessageRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $user = $em->getRepository('UserBundle:User')->find($data['user']);
+        $user = $em->getRepository(\App\User\Entity\User::class)->find($data['user']);
 
         if($data){
             $entity = new ContactMessage();
@@ -43,7 +43,7 @@ class ContactMessageRepository extends EntityRepository
                $this->remove($data['remove'][$i]);
             }
 
-            $entity = $em->getRepository('SettingContentBundle:ContactMessage')->find($id);
+            $entity = $em->getRepository(\App\Content\Entity\ContactMessage::class)->find($id);
             if(!empty($entity) AND !empty($data['reply'][$i])){
 
                 $entity->setReply($data['reply'][$i]);
@@ -61,7 +61,7 @@ class ContactMessageRepository extends EntityRepository
     private function remove($id){
 
         $em = $this->_em;
-        $entity = $em->getRepository('SettingContentBundle:ContactMessage')->find($id);
+        $entity = $em->getRepository(\App\Content\Entity\ContactMessage::class)->find($id);
         $em->remove($entity);
         $em->flush();
     }

@@ -1,0 +1,34 @@
+medicinestock_import:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\MedicineImportController::indexAction' }
+
+medicinestock_import_migration:
+    path:     /{id}/data-migration
+    defaults: { _controller: 'App\Medicine\Controller\MedicineImportController::excelDataImportAction' }
+
+medicinestock_import_stock_migration:
+    path:     /{id}/data-stock-migration
+    defaults: { _controller: 'App\Medicine\Controller\MedicineImportController::excelDataImportStockAction' }
+
+medicinestock_import_new:
+    path:     /new
+    defaults: { _controller: 'App\Medicine\Controller\MedicineImportController::newAction' }
+
+medicinestock_import_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\MedicineImportController::createAction' }
+    methods:  POST
+
+medicinestock_import_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineImportController::deleteAction' }
+
+
+medicinestock_file_upload:
+    path:     /medicine/upload
+    defaults: { _controller: 'App\Medicine\Controller\MedicineImportController::uploadAction' }
+
+medicinestock_upload_create:
+    path:     /medicine/upload/create
+    defaults: { _controller: 'App\Medicine\Controller\MedicineImportController::uploadCreateAction' }
+

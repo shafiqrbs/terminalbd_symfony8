@@ -1,0 +1,39 @@
+megamenu:
+    path:     /
+    defaults: { _controller: 'App\Appearance\Controller\MegaMenuController::indexAction' }
+
+megamenu_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Appearance\Controller\MegaMenuController::showAction' }
+
+megamenu_new:
+    path:     /new
+    defaults: { _controller: 'App\Appearance\Controller\MegaMenuController::newAction' }
+
+megamenu_create:
+    path:     /create
+    defaults: { _controller: 'App\Appearance\Controller\MegaMenuController::createAction' }
+    methods:  POST
+
+megamenu_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Appearance\Controller\MegaMenuController::editAction' }
+
+megamenu_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Appearance\Controller\MegaMenuController::updateAction' }
+    methods:  [POST, PUT]
+
+megamenu_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Appearance\Controller\MegaMenuController::deleteAction' }
+
+
+megamenu_sorted:
+    path:     /sorted
+    defaults: { _controller: 'App\Appearance\Controller\MegaMenuController::sortedAction' }
+
+megamenu_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Appearance\Controller\MegaMenuController::statusAction' }
+

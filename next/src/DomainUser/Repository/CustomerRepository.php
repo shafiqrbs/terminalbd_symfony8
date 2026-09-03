@@ -22,7 +22,7 @@ class CustomerRepository extends EntityRepository
     public function checkDuplicateCustomer(GlobalOption $globalOption, $mobile)
     {
         $em = $this->_em;
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption,'mobile' => $mobile]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption,'mobile' => $mobile]);
         if($entity) {
             return false;
         }else{
@@ -36,7 +36,7 @@ class CustomerRepository extends EntityRepository
 
         $mobile = $global->getMobile();
         $em = $this->_em;
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $global ,'mobile' => $mobile]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $global ,'mobile' => $mobile]);
         if($entity){
             return $entity;
         }else{
@@ -57,11 +57,11 @@ class CustomerRepository extends EntityRepository
         $name = $data['sales_online']['customer']['name'];
         $location = $data['sales_online']['customer']['location'];
         $address = $data['sales_online']['customer']['address'];
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
         if($entity){
             return $entity;
         }else{
-            $location = $em->getRepository('SettingLocationBundle:Location')->find($location);
+            $location = $em->getRepository(\App\Location\Entity\Location::class)->find($location);
             $entity = new Customer();
             $entity->setMobile($mobile);
             $entity->setName($name);
@@ -82,7 +82,7 @@ class CustomerRepository extends EntityRepository
         $location = $data['location'];
         $address = $data['address'];
         $email = $data['email'];
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $user->getGlobalOption() ,'mobile' => $user->getId()]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $user->getGlobalOption() ,'mobile' => $user->getId()]);
         if($entity){
             return $entity;
         }else{
@@ -92,7 +92,7 @@ class CustomerRepository extends EntityRepository
             $entity->setName($name);
             $entity->setEmail($email);
             if($location){
-                $location = $em->getRepository('SettingLocationBundle:Location')->find($location);
+                $location = $em->getRepository(\App\Location\Entity\Location::class)->find($location);
                 $entity->setLocation($location);
             }
             $entity->setAddress($address);
@@ -120,7 +120,7 @@ class CustomerRepository extends EntityRepository
             $name = $data['customerName'];
             $address = $data['customerAddress'] ?? '';
             $email = $data['customerEmail'] ?? '';
-            $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
+            $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
             if($entity){
                 $entity->setAddress($address);
                 if($email){ $entity->setEmail($email); }
@@ -149,7 +149,7 @@ class CustomerRepository extends EntityRepository
         $name = $data['customerName'];
         $address = $data['customerAddress'] ?? '';
         $email = $data['customerEmail'] ?? '';
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
         if($entity){
             $entity->setAddress($address);
             if($email){ $entity->setEmail($email); }
@@ -180,7 +180,7 @@ class CustomerRepository extends EntityRepository
         $organization = $data['organization'];
         $postalCode = $data['postalCode'];
         $remark = $data['remark'];
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
         if($entity){
             return $entity;
         }else{
@@ -198,7 +198,7 @@ class CustomerRepository extends EntityRepository
             $entity->setName($entity->getFirstName().' '.$entity->getLastName());
             $entity->setGlobalOption($globalOption);
             if(!empty($data['location'])){
-                $location = $em->getRepository('SettingLocationBundle:Location')->find($data['location']);
+                $location = $em->getRepository(\App\Location\Entity\Location::class)->find($data['location']);
                 $entity->setLocation($location);
             }
             $em->persist($entity);
@@ -211,7 +211,7 @@ class CustomerRepository extends EntityRepository
     public function newExistingRestaurantCustomer($globalOption,$mobile,$name)
     {
         $em = $this->_em;
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
         if($entity){
             $entity->setName($name);
             $em->flush($entity);
@@ -232,7 +232,7 @@ class CustomerRepository extends EntityRepository
     public function findExistingCustomer(Sales $sales, $mobile)
     {
         $em = $this->_em;
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $sales->getInventoryConfig()->getGlobalOption(),'mobile'=>$mobile]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $sales->getInventoryConfig()->getGlobalOption(),'mobile'=>$mobile]);
         if($entity){
             return $entity;
         }else{
@@ -249,7 +249,7 @@ class CustomerRepository extends EntityRepository
     public function findExistingEcommerceCustomer(GlobalOption $option , User $user)
     {
         $em = $this->_em;
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $option ,'mobile' => $user->getUsername()]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $option ,'mobile' => $user->getUsername()]);
         if($entity){
             return $entity;
         }else{
@@ -297,14 +297,14 @@ class CustomerRepository extends EntityRepository
         $alternativeContactPerson = $data['customer']['alternativeContactPerson'];
         $alternativeRelation = $data['customer']['alternativeRelation'];
         $alternativeContactMobile = $data['customer']['alternativeContactMobile'];
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption ,'name' => $name ,'mobile' => $mobile,'age' => $age,'gender' => $gender]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption ,'name' => $name ,'mobile' => $mobile,'age' => $age,'gender' => $gender]);
         if($entity){
             return $entity;
         }else{
 
             $entity = new Customer();
             if(!empty($location)){
-                $location = $em->getRepository('SettingLocationBundle:Location')->find($location);
+                $location = $em->getRepository(\App\Location\Entity\Location::class)->find($location);
                 $entity->setLocation($location);
             }
             $entity->setMobile($mobile);
@@ -346,8 +346,8 @@ class CustomerRepository extends EntityRepository
         $height = $customer['height'] ?? '';
         $width = $customer['width'] ?? '';
         $bloodPressure = $customer['bloodPressure'] ?? '';
-        $patient = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption ,'customerId' => $patientId]);
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption ,'name' => $name ,'mobile' => $mobile,'age' => $age,'gender' => $gender]);
+        $patient = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption ,'customerId' => $patientId]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption ,'name' => $name ,'mobile' => $mobile,'age' => $age,'gender' => $gender]);
         if($patient and $patientId > 0){
             return $entity = $patient;
         }elseif($entity){
@@ -393,7 +393,7 @@ class CustomerRepository extends EntityRepository
         $location   = $data['location'] ?? '';
         $address       = $data['address'] ?? '';
         if(!empty($location)){
-            $location = $em->getRepository('SettingLocationBundle:Location')->find($location);
+            $location = $em->getRepository(\App\Location\Entity\Location::class)->find($location);
             $entity->setLocation($location);
         }
         $entity->setMobile($mobile);
@@ -532,7 +532,7 @@ class CustomerRepository extends EntityRepository
     {
         $em = $this->_em;
         $user = $profile->getUser()->getId();
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $profile->getUser()->getGlobalOption(),'mobile'=> $profile->getUser()->getUsername()]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $profile->getUser()->getGlobalOption(),'mobile'=> $profile->getUser()->getUsername()]);
         if(empty($entity)){
             $entity = new Customer();
             $entity->setUser($user);
@@ -566,9 +566,9 @@ class CustomerRepository extends EntityRepository
         $entity  ='';
 
         if(!empty($mobile)){
-            $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption, 'mobile' => $mobile]);
+            $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption, 'mobile' => $mobile]);
         }elseif(isset($data['email']) && $data['email'] !=""){
-            $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' =>$globalOption, 'email' => $data['email']]);
+            $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' =>$globalOption, 'email' => $data['email']]);
         }
 
         if(!empty($entity)){
@@ -598,14 +598,14 @@ class CustomerRepository extends EntityRepository
     public function insertStudentMember(User $user,$data)
     {
         $em = $this->_em;
-        $exist = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $user->getGlobalOption(), 'user' => $user->getId()]);
+        $exist = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $user->getGlobalOption(), 'user' => $user->getId()]);
         if(empty($exist)){
 
             $code = empty($data['country']) ? $data['country'] : '';
             $entity = new Customer();
             $entity->setMobile($user->getUsername());
             if($code){
-                $country = $em->getRepository("SettingLocationBundle:Country")->find($code);
+                $country = $em->getRepository(\App\Location\Entity\Country::class)->find($code);
                 $entity->setCountry($country);
             }
             if(isset($data['name']) && $data['name'] !=""){
@@ -637,9 +637,9 @@ class CustomerRepository extends EntityRepository
         $entity  ='';
 
         if(!empty($mobile)){
-            $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $globalOption, 'mobile' => $mobile]);
+            $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption, 'mobile' => $mobile]);
         }elseif(isset($data['email']) && $data['email'] !=""){
-            $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' =>$globalOption, 'email' => $data['email']]);
+            $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' =>$globalOption, 'email' => $data['email']]);
         }
         if(!empty($entity)){
             return $entity;
@@ -663,12 +663,12 @@ class CustomerRepository extends EntityRepository
     public function insertSMSCustomer($data)
     {
         $em = $this->_em;
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption'=>$data['globalOption'],'mobile' => $data['mobile']]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$data['globalOption'],'mobile' => $data['mobile']]);
         if($entity){
             return $entity;
         }else{
             $entity = new Customer();
-            $globalOption = $this->_em->getRepository('SettingToolBundle:GlobalOption')->find($data['globalOption']);
+            $globalOption = $this->_em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($data['globalOption']);
             $entity->setMobile($data['mobile']);
             $entity->setName($data['name']);
             $entity->setGlobalOption($globalOption);
@@ -791,12 +791,12 @@ class CustomerRepository extends EntityRepository
         $patient = $data['patient'];
         $option = $invoice->getHospitalConfig()->getGlobalOption();
         if($patient){
-            $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption'=> $option ,'id' => $patient]);
+            $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=> $option ,'id' => $patient]);
         }else{
             $location = $customer['location'];
             $entity = new Customer();
             if(!empty($location)){
-                $location = $em->getRepository('SettingLocationBundle:Location')->find($location);
+                $location = $em->getRepository(\App\Location\Entity\Location::class)->find($location);
                 $entity->setLocation($location);
             }
             if($customer['mobile']){
@@ -860,7 +860,7 @@ class CustomerRepository extends EntityRepository
             $em->persist($entity);
             $em->flush($entity);
         }
-        $em->getRepository('HospitalBundle:Invoice')->updatePatientInfo($invoice, $entity);
+        $em->getRepository(\App\Hospital\Entity\Invoice::class)->updatePatientInfo($invoice, $entity);
         return $entity;
 
     }
@@ -1006,7 +1006,7 @@ class CustomerRepository extends EntityRepository
     public function customerOutstanding($globalOption)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb ->from('AccountingBundle:AccountSales','e');
+        $qb ->from(\App\Accounting\Entity\AccountSales::class,'e');
         $qb->select('customer.id as customerId ,customer.name as name ,customer.email as email , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
         $qb->join('e.customer','customer');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $globalOption->getId());
@@ -1056,7 +1056,7 @@ class CustomerRepository extends EntityRepository
         $email = ((isset($data['email']) and $data['email'])) ? $data['email']:'';
         $userId = ((isset($data['user_id']) and $data['user_id'])) ? floatval($data['user_id']):'';
         $openingBalance = (isset($data['opening_balance']) and $data['opening_balance']) ? floatval($data['opening_balance']):0;
-        $entity = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $global ,'mobile' => $mobile]);
+        $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $global ,'mobile' => $mobile]);
         $result = [];
         if(empty($entity)){
             $entity = new Customer();
@@ -1069,7 +1069,7 @@ class CustomerRepository extends EntityRepository
             $em->persist($entity);
             $em->flush();
             if ($entity->getOpeningBalance() > 0){
-                $em->getRepository("AccountingBundle:AccountSales")->apiInsertOpeningBalance($entity,$userId);
+                $em->getRepository(\App\Accounting\Entity\AccountSales::class)->apiInsertOpeningBalance($entity,$userId);
             }
         }
         $result['global_id']            = (int) $global->getId();

@@ -16,7 +16,7 @@ class MedicineMinimumStockRepository extends EntityRepository
     public function companyList($config){
 
         $query = $this->_em->createQueryBuilder();
-        $query->from('MedicineBundle:MedicineStock','e');
+        $query->from(\App\Medicine\Entity\MedicineStock::class,'e');
         $query->select('e.brandName as name');
         $query->where("e.medicineConfig = :config")->setParameter('config', $config);
         $query->andWhere('e.brandName IS NOT NULL');

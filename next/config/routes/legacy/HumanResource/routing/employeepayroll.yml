@@ -1,0 +1,43 @@
+employee_payroll:
+    path:     /
+    defaults: { _controller: 'App\HumanResource\Controller\EmployeePayrollController::indexAction' }
+
+employee_payroll_new:
+    path:     /new
+    defaults: { _controller: 'App\HumanResource\Controller\EmployeePayrollController::newAction' }
+
+employee_payroll_create:
+    path:     /create
+    defaults: { _controller: 'App\HumanResource\Controller\EmployeePayrollController::createAction' }
+    methods:  [POST]
+
+employee_payroll_edit:
+    path:     /{user}/edit
+    defaults: { _controller: 'App\HumanResource\Controller\EmployeePayrollController::editAction' }
+
+employee_payroll_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\HumanResource\Controller\EmployeePayrollController::updateAction' }
+    methods:  [POST, PUT]
+
+employee_payroll_setting:
+    path:     /{user}/payroll-setting
+    defaults: { _controller: 'App\HumanResource\Controller\EmployeePayrollController::payrollSettingAction' }
+
+employee_payroll_setting_update:
+    path:     /{id}/payroll-setting-update
+    defaults: { _controller: 'App\HumanResource\Controller\EmployeePayrollController::payrollSettingUpdateAction' }
+    methods:  [POST, PUT]
+
+employee_payroll_approve:
+    path:     /{id}/approve
+    defaults: { _controller: 'App\HumanResource\Controller\EmployeePayrollController::approveAction' }
+    options:
+        expose: true
+
+employee_payroll_particular_delete:
+    path:     /{id}/particular-delete
+    defaults: { _controller: 'App\HumanResource\Controller\EmployeePayrollController::particularDeleteAction' }
+    options:
+        expose: true
+

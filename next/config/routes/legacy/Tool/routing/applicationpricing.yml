@@ -1,0 +1,19 @@
+applicationpricing:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\ApplicationPricingController::indexAction' }
+
+applicationpricing_inline_app:
+    path:     /inline-app
+    defaults: { _controller: 'App\Tool\Controller\ApplicationPricingController::inlineAppAction' }
+    methods:  POST
+
+applicationpricing_inline_syndicate:
+    path:     /inline-syndicate
+    defaults: { _controller: 'App\Tool\Controller\ApplicationPricingController::inlineSyndicateAction' }
+    methods:  POST
+
+applicationpricing_inline_module:
+    path:     /inline-module
+    defaults: { _controller: 'App\Tool\Controller\ApplicationPricingController::inlineModuleAction' }
+    methods:  POST
+

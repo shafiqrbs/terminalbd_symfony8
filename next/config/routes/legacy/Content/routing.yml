@@ -1,0 +1,137 @@
+setting_content_sponsor:
+    resource: 'routing/sponsor.yml'
+    prefix:    /website/sponsor
+
+setting_content_client:
+    resource: 'routing/client.yml'
+    prefix:    /website/client
+
+setting_content_portfolio:
+    resource: 'routing/portfolio.yml'
+    prefix:    /website/portfolio
+
+setting_content_category:
+    resource: 'routing/modulecategory.yml'
+    prefix:    /website/category
+
+setting_content_service:
+    resource: 'routing/service.yml'
+    prefix:    /website/service
+
+setting_content_product:
+    resource: 'routing/product.yml'
+    prefix:    /website/product
+
+setting_content_mallconnect:
+    resource: 'routing/mallconnect.yml'
+    prefix:   /website/mallconnect
+
+setting_content_mallshop:
+    resource: 'routing/mallshop.yml'
+    prefix:   /website/mallshop
+
+setting_content_faq:
+    resource: 'routing/faq.yml'
+    prefix:   /website/faq
+
+setting_content_mail:
+    resource: 'routing/emailbox.yml'
+    prefix:   /website/mail
+
+setting_content_siteslider:
+    resource: 'routing/siteslider.yml'
+    prefix:   /admin/siteslider
+
+setting_content_sitecontent:
+    resource: 'routing/sitecontent.yml'
+    prefix:   /admin/sitecontent
+
+setting_content_sitetestimonial:
+    resource: 'routing/sitetestimonial.yml'
+    prefix:   /admin/site-testimonial
+
+setting_content_siteteam:
+    resource: 'routing/siteteam.yml'
+    prefix:   /admin/site-team
+
+SettingContentBundle_homeslider:
+    resource: 'routing/homeslider.yml'
+    prefix:   /website/homeslider
+
+
+SettingContentBundle_homepage:
+    resource: 'routing/homepage.yml'
+    prefix:   /website/homepage
+
+SettingContentBundle_contactpage:
+    resource: 'routing/contactpage.yml'
+    prefix:   /website/contactpage
+
+SettingContentBundle_page:
+    resource: 'routing/page.yml'
+    prefix:   /website/page
+
+SettingContentBundle_news:
+    resource: 'routing/news.yml'
+    prefix:   /website/news
+
+SettingContentBundle_blackout:
+    resource: 'routing/blackout.yml'
+    prefix:   /website/blackout
+
+SettingContentBundle_eventcalender:
+    resource: 'routing/eventcalender.yml'
+    prefix:   /website/eventcalender
+
+SettingContentBundle_classroutine:
+    resource: 'routing/classroutine.yml'
+    prefix:   /website/classroutine
+
+SettingContentBundle_blog:
+    resource: 'routing/blog.yml'
+    prefix:   /website/blog
+
+SettingContentBundle_team:
+    resource: 'routing/team.yml'
+    prefix:   /website/team
+
+SettingContentBundle_testimonial:
+    resource: 'routing/testimonial.yml'
+    prefix:   /website/testimonial
+
+SettingContentBundle_timeline:
+    resource: 'routing/timeline.yml'
+    prefix:   /website/timeline
+
+SettingContentBundle_branch:
+    resource: 'routing/branch.yml'
+    prefix:   /website/branch
+
+SettingContentBundle_syndicatecontent:
+    resource: 'routing/syndicatecontent.yml'
+    prefix:   /website/syndicatecontent
+
+SettingContentBundle_admission:
+    resource: 'routing/admission.yml'
+    prefix:   /website/admission
+
+SettingContentBundle_event:
+    resource: 'routing/event.yml'
+    prefix:   /website/event
+
+SettingContentBundle_noticeboard:
+    resource: 'routing/noticeboard.yml'
+    prefix:   /website/noticeboard
+
+SettingContentBundle_contactmessage:
+    resource: 'routing/contactmessage.yml'
+    prefix:   /website/contactmessage
+
+SettingContentBundle_admissioncomment:
+    resource: 'routing/admissioncomment.yml'
+    prefix:   /website/admissioncomment
+
+SettingContentBundle_blogcomment:
+    resource: 'routing/blogcomment.yml'
+    prefix:   /website/blogcomment
+

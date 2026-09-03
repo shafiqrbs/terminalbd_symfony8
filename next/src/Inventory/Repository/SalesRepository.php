@@ -443,7 +443,7 @@ class SalesRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('s.id');
-        $qb->from('InventoryBundle:Sales','s');
+        $qb->from(\App\Inventory\Entity\Sales::class,'s');
         $qb->where("s.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory->getId());
         $qb->orderBy('s.id','DESC');
@@ -461,7 +461,7 @@ class SalesRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('InventoryBundle:SalesItem','si')
+            ->from(\App\Inventory\Entity\SalesItem::class,'si')
             ->select('sum(si.subTotal) as total , sum(si.quantity) as totalItem')
             ->where('si.sales = :sales')
             ->setParameter('sales', $sales ->getId())
@@ -532,7 +532,7 @@ class SalesRepository extends EntityRepository
         $datetime = new DateTime("now");
         $today_startdatetime = $datetime->format('Y-m-d 00:00:00');
         $today_enddatetime = $datetime->format('Y-m-d 23:59:59');
-        $qb->from('InventoryBundle:Sales','s');
+        $qb->from(\App\Inventory\Entity\Sales::class,'s');
         $qb->select('sum(s.subTotal) as subTotal , sum(s.total) as total , count(s.id) as totalVoucher, sum(s.due) as totalDue, sum(s.discount) as totalDiscount, sum(s.vat) as totalVat');
         $qb->where('s.inventoryConfig = :inventory')
             ->andWhere('s.salesMode =:mode')
@@ -668,7 +668,7 @@ class SalesRepository extends EntityRepository
 
         $inventory =  $user->getGlobalOption()->getInventoryConfig()->getId();
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:SalesItem','si');
+        $qb->from(\App\Inventory\Entity\SalesItem::class,'si');
         $qb->join('si.sales','s');
         $qb->leftJoin('s.customer','customer');
         $qb->join('si.item','item');
@@ -702,7 +702,7 @@ class SalesRepository extends EntityRepository
 
         $inventory =  $user->getGlobalOption()->getInventoryConfig()->getId();
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:SalesItem','si');
+        $qb->from(\App\Inventory\Entity\SalesItem::class,'si');
         $qb->join('si.sales','s');
         $qb->leftJoin('s.customer','customer');
         $qb->join('si.item','item');
@@ -741,7 +741,7 @@ class SalesRepository extends EntityRepository
         $datetime = new DateTime("now");
         $today_startdatetime = $datetime->format('Y-m-d 00:00:00');
         $today_enddatetime = $datetime->format('Y-m-d 23:59:59');
-        $qb->from('InventoryBundle:Sales','s');
+        $qb->from(\App\Inventory\Entity\Sales::class,'s');
         $qb->select('s')
             ->where('s.inventoryConfig = :inventory')
             ->andWhere('s.salesMode =:mode')
@@ -820,7 +820,7 @@ class SalesRepository extends EntityRepository
         }else{
             $this->insertPosSalesItem($sales,$cart);
         }
-        $em->getRepository('AccountingBundle:AccountSales')->insertAccountSales($sales);
+        $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountSales($sales);
         return $sales->getId();
 
     }
@@ -858,7 +858,7 @@ class SalesRepository extends EntityRepository
         $em->persist($sales);
         $em->flush();
         $this->insertEcommerecSalesItem($sales,$order);
-        $em->getRepository('AccountingBundle:AccountSales')->insertAccountSales($sales);
+        $em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountSales($sales);
         return $sales->getId();
 
     }
@@ -925,8 +925,8 @@ class SalesRepository extends EntityRepository
             endforeach;
 
         }
-        $em->getRepository('InventoryBundle:StockItem')->insertSalesStockItem($sales);
-        $em->getRepository('InventoryBundle:Item')->getItemSalesUpdate($sales->getId());
+        $em->getRepository(\App\Inventory\Entity\StockItem::class)->insertSalesStockItem($sales);
+        $em->getRepository(\App\Inventory\Entity\Item::class)->getItemSalesUpdate($sales->getId());
     }
 
     private function insertPosSalesItem($sales,$cart)
@@ -937,7 +937,7 @@ class SalesRepository extends EntityRepository
 
                $salesItem = new SalesItem();
                $salesItem->setSales($sales);
-               $stockId = $em->getRepository('InventoryBundle:Item')->find($item['id']);
+               $stockId = $em->getRepository(\App\Inventory\Entity\Item::class)->find($item['id']);
                if ($stockId) {
                    /* @var Item $stockId */
                    $salesItem->setItem($stockId);
@@ -953,8 +953,8 @@ class SalesRepository extends EntityRepository
            endforeach;
 
         }
-        $em->getRepository('InventoryBundle:StockItem')->insertSalesStockItem($sales);
-        $em->getRepository('InventoryBundle:Item')->getItemSalesUpdate($sales->getId());
+        $em->getRepository(\App\Inventory\Entity\StockItem::class)->insertSalesStockItem($sales);
+        $em->getRepository(\App\Inventory\Entity\Item::class)->getItemSalesUpdate($sales->getId());
     }
 
     public function insertPosPurchaseItem($sales,$cart)
@@ -965,7 +965,7 @@ class SalesRepository extends EntityRepository
 
                 $salesItem = new SalesItem();
                 $salesItem->setSales($sales);
-                $purchaseItem = $em->getRepository('InventoryBundle:PurchaseItem')->find($item['purchaseItem']);
+                $purchaseItem = $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->find($item['purchaseItem']);
                 if ($purchaseItem) {
                     /* @var PurchaseItem $purchaseItem */
                     $salesItem->setItem($purchaseItem->getItem());
@@ -983,8 +983,8 @@ class SalesRepository extends EntityRepository
             endforeach;
 
         }
-        $em->getRepository('InventoryBundle:StockItem')->insertSalesStockItem($sales);
-        $em->getRepository('InventoryBundle:Item')->getItemSalesUpdate($sales->getId());
+        $em->getRepository(\App\Inventory\Entity\StockItem::class)->insertSalesStockItem($sales);
+        $em->getRepository(\App\Inventory\Entity\Item::class)->getItemSalesUpdate($sales->getId());
 
     }
 
@@ -1015,21 +1015,21 @@ class SalesRepository extends EntityRepository
                 }
                 $sales->setVat($item['vat']);
                 if(isset($item['transactionMethod']) and $item['transactionMethod']){
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>$item['transactionMethod']]);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>$item['transactionMethod']]);
                     if($method){
                         $sales->setTransactionMethod($method);
                     }
                 }elseif(isset($item['transactionMethod']) and empty($item['transactionMethod']) and $sales->getReceived() > 0){
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>'cash']);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>'cash']);
                     $sales->setTransactionMethod($method);
                 }
                 if(isset($item['bankAccount']) and $item['bankAccount'] > 0 ){
-                    $bank = $em->getRepository('AccountingBundle:AccountBank')->find($item['bankAccount']);
+                    $bank = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($item['bankAccount']);
                     if($bank){
                         $sales->setAccountBank($bank);
                     }
                     if(isset($item['paymentCard']) and $item['paymentCard']){
-                        $card = $em->getRepository('SettingToolBundle:PaymentCard')->find($item['paymentCard']);
+                        $card = $em->getRepository(\App\Tool\Entity\PaymentCard::class)->find($item['paymentCard']);
                         $sales->setPaymentCard($card);
                     }
                 }
@@ -1040,7 +1040,7 @@ class SalesRepository extends EntityRepository
                     $sales->setCardNo($item['transactionId']);
                 }
                 if(isset($item['mobileBankAccount']) and $item['mobileBankAccount'] > 0){
-                    $mobile = $em->getRepository('AccountingBundle:AccountMobileBank')->find($item['mobileBankAccount']);
+                    $mobile = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($item['mobileBankAccount']);
                     if($mobile){
                         $sales->setAccountMobileBank($mobile);
                     }
@@ -1049,21 +1049,21 @@ class SalesRepository extends EntityRepository
                     $sales->setPaymentMobile($item['paymentMobile']);
                 }
                 if(isset($item['customerName']) and $item['customerName'] and isset($item['customerMobile']) and $item['customerMobile']){
-                    $customer = $em->getRepository('DomainUserBundle:Customer')->newExistingCustomerForSales($option,$item['customerMobile'],$item);
+                    $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option,$item['customerMobile'],$item);
                     $sales->setCustomer($customer);
                 }elseif(($item['customerId']) and $item['customerId'] > 0 ){
-                    $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption'=>$option,'id'=>$item['customerId']]);
+                    $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$option,'id'=>$item['customerId']]);
                     $sales->setCustomer($customer);
                 }else{
-                    $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $option, 'mobile' => $option->getMobile()]);
+                    $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $option, 'mobile' => $option->getMobile()]);
                     $sales->setCustomer($customer);
                 }
                 if(($item['createdBy']) and $item['createdBy'] > 0){
-                    $createdBy = $em->getRepository('UserBundle:User')->find($item['createdBy']);
+                    $createdBy = $em->getRepository(\App\User\Entity\User::class)->find($item['createdBy']);
                     $sales->setCreatedBy($createdBy);
                 }
                 if(($item['salesBy']) and $item['salesBy'] > 0){
-                    $salesBy = $em->getRepository('UserBundle:User')->find($item['salesBy']);
+                    $salesBy = $em->getRepository(\App\User\Entity\User::class)->find($item['salesBy']);
                     $sales->setSalesBy($salesBy);
                 }
                 if($sales->getTransactionMethod() and $sales->getTransactionMethod()->getSlug() == 'mobile' and $sales->getAccountMobileBank() and $sales->getAccountMobileBank()->getServiceCharge() > 0){
@@ -1084,7 +1084,7 @@ class SalesRepository extends EntityRepository
                 $sales->setPaymentStatus("Paid");
                 $em->persist($sales);
                 $em->flush();
-                $em->getRepository("InventoryBundle:Item")->getItemSalesUpdate($sales);
+                $em->getRepository(\App\Inventory\Entity\Item::class)->getItemSalesUpdate($sales);
 
             endforeach;
             $this->insertApiSalesItem( $option, $process);
@@ -1099,12 +1099,12 @@ class SalesRepository extends EntityRepository
         if($items) {
             foreach ($items as $item):
                 $deviceSalesId = $item['salesId'];
-                $sales = $em->getRepository('InventoryBundle:Sales')->findOneBy(['inventoryConfig' => $conf, 'deviceSalesId' => $deviceSalesId]);
+                $sales = $em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(['inventoryConfig' => $conf, 'deviceSalesId' => $deviceSalesId]);
                 if ($sales) {
                     $salesItem = new SalesItem();
                     $salesItem->setAndroidProcess($process->getId());
                     $salesItem->setSales($sales);
-                    $stockId = $em->getRepository('InventoryBundle:Item')->find($item['stockId']);
+                    $stockId = $em->getRepository(\App\Inventory\Entity\Item::class)->find($item['stockId']);
                     if ($stockId) {
                         $salesItem->setItem($stockId);
                         $salesItem->setPurchasePrice($stockId->getAvgPurchasePrice());
@@ -1117,8 +1117,8 @@ class SalesRepository extends EntityRepository
                     $em->persist($salesItem);
                     $em->flush();
                 }
-                $em->getRepository('InventoryBundle:StockItem')->insertSalesStockItem($sales);
-                $em->getRepository('InventoryBundle:Item')->getItemSalesUpdate($sales->getId());
+                $em->getRepository(\App\Inventory\Entity\StockItem::class)->insertSalesStockItem($sales);
+                $em->getRepository(\App\Inventory\Entity\Item::class)->getItemSalesUpdate($sales->getId());
 
             endforeach;
         }
@@ -1162,7 +1162,7 @@ class SalesRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('MedicineBundle:MedicineSales','si')
+            ->from(\App\Medicine\Entity\MedicineSales::class,'si')
             ->select('count(si.id) as totalCount')
             ->where("si.androidProcess={$batch}")
             ->getQuery()->getOneOrNullResult();
@@ -1174,7 +1174,7 @@ class SalesRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('MedicineBundle:MedicineSalesItem','si')
+            ->from(\App\Medicine\Entity\MedicineSalesItem::class,'si')
             ->select('count(si.id) as totalCount')
             ->where("si.androidProcess={$batch}")
             ->getQuery()->getOneOrNullResult();

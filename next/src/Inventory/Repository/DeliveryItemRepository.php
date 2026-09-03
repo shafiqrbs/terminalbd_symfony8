@@ -18,10 +18,10 @@ class DeliveryItemRepository extends EntityRepository
     {
         $em = $this->_em;
 
-        $totalQnt = $em->getRepository('InventoryBundle:Delivery')->stockReceiveSingleItem($user, $purchaseItem->getItem(),$purchaseItem->getBarcode());
-        $stockSalesItemHistory =  $em->getRepository('InventoryBundle:Delivery')->stockSalesItemHistory($user,$purchaseItem->getItem(),$purchaseItem->getBarcode());
+        $totalQnt = $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockReceiveSingleItem($user, $purchaseItem->getItem(),$purchaseItem->getBarcode());
+        $stockSalesItemHistory =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockSalesItemHistory($user,$purchaseItem->getItem(),$purchaseItem->getBarcode());
         $salesQnt =  !empty($stockSalesItemHistory) ? $stockSalesItemHistory[0]['quantity']:0;
-        $stockSalesReturnItem =  $em->getRepository('InventoryBundle:Delivery')->stockSalesReturnItemHistory($user,$purchaseItem->getItem(),$purchaseItem->getBarcode());
+        $stockSalesReturnItem =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockSalesReturnItemHistory($user,$purchaseItem->getItem(),$purchaseItem->getBarcode());
         $salesReturnQnt =  !empty($stockSalesReturnItem) ? $stockSalesReturnItem[0]['quantity']:0;
         $stockDeliveryReturnItem =  $this->stockReturnBarcodeItem($user,$purchaseItem);
         $deliveryReturnQnt = !empty($stockDeliveryReturnItem) ? $stockDeliveryReturnItem : 0;
@@ -40,8 +40,8 @@ class DeliveryItemRepository extends EntityRepository
     {
         $em = $this->_em;
 
-        $receiveQnt = $em->getRepository('InventoryBundle:DeliveryItem')->stockReceiveSinglePurchaseItem($user, $purchaseItem->getId());
-        $returnQnt =  $em->getRepository('InventoryBundle:DeliveryItem')->stockReturnSinglePurchaseItem($user,$purchaseItem->getId());
+        $receiveQnt = $em->getRepository(\App\Inventory\Entity\DeliveryItem::class)->stockReceiveSinglePurchaseItem($user, $purchaseItem->getId());
+        $returnQnt =  $em->getRepository(\App\Inventory\Entity\DeliveryItem::class)->stockReturnSinglePurchaseItem($user,$purchaseItem->getId());
 
         $totalReceive = ($receiveQnt - $returnQnt);
         $totalItem = !empty($totalReceive) > 0 ? $totalReceive :0;
@@ -70,7 +70,7 @@ class DeliveryItemRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:DeliveryReturn','e');
+        $qb->from(\App\Inventory\Entity\DeliveryReturn::class,'e');
         $qb->select('SUM(e.quantity) AS returnQnt ');
         $qb->where("e.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory);
@@ -88,7 +88,7 @@ class DeliveryItemRepository extends EntityRepository
         $branch = $user->getProfile()->getBranches();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:DeliveryReturn','e');
+        $qb->from(\App\Inventory\Entity\DeliveryReturn::class,'e');
         $qb->join('e.purchaseItem','purchaseItem');
         $qb->select('SUM(e.quantity) AS returnQnt ');
         $qb->where("e.branch = :branch");

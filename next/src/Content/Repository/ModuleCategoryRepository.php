@@ -16,7 +16,7 @@ class ModuleCategoryRepository extends EntityRepository
     {
         $em = $this->_em;
 
-        $repository = $em->getRepository('SettingContentBundle:ModuleCategory');
+        $repository = $em->getRepository(\App\Content\Entity\ModuleCategory::class);
         $query = $repository->createQueryBuilder('mc')
             ->innerJoin('mc.module', 'module')
             ->where('mc.globalOption = :option')
@@ -33,7 +33,7 @@ class ModuleCategoryRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $repository = $em->getRepository('SettingContentBundle:ModuleCategory');
+        $repository = $em->getRepository(\App\Content\Entity\ModuleCategory::class);
         $query = $repository->createQueryBuilder('mc')
             ->where('mc.globalOption = :option')
             ->setParameter('option', $globalOption)

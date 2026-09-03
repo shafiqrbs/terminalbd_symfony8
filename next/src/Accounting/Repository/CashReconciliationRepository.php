@@ -44,7 +44,7 @@ class CashReconciliationRepository extends EntityRepository
     public function initialUpdate(User $user , CashReconciliation $entity)
     {
 
-        $transactionCashOverview = $this->_em->getRepository('AccountingBundle:AccountCash')->transactionWiseOverview($user);
+        $transactionCashOverview = $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview($user);
         foreach ($transactionCashOverview['result'] as $mod):
 
             if($mod['transactionName'] == 'Cash'){
@@ -76,7 +76,7 @@ class CashReconciliationRepository extends EntityRepository
     public function systemCashUpdate(User $user , CashReconciliation $entity)
     {
 
-        $transactionCashOverview = $this->_em->getRepository('AccountingBundle:AccountCash')->transactionWiseOverview($user);
+        $transactionCashOverview = $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview($user);
         foreach ($transactionCashOverview['result'] as $mod):
 
             if($mod['transactionName'] == 'Cash'){
@@ -152,7 +152,7 @@ class CashReconciliationRepository extends EntityRepository
     public function update(CashReconciliation $cash, $method)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('AccountingBundle:CashReconciliationMeta','e');
+        $qb->from(\App\Accounting\Entity\CashReconciliationMeta::class,'e');
         $qb->join('e.cashReconciliation','t');
         $qb->select('COALESCE(SUM(e.amount),0) AS amount');
         $qb->where("t.id = :reconciliation");

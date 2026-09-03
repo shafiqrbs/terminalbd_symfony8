@@ -1,0 +1,20 @@
+customerweb:
+    path:     /{module}/module
+    defaults: { _controller: 'App\Customer\Controller\CustomerController::moduleAction' }
+
+customerweb_payment:
+    path:     /payment
+    defaults: { _controller: 'App\Customer\Controller\WebContentController::paymentAction' }
+
+customerweb_ticket:
+    path:     /ticket
+    defaults: { _controller: 'App\Customer\Controller\WebContentController::ticketAction' }
+
+customerweb_report_ledger:
+    path:     /ledger
+    defaults: { _controller: 'App\Customer\Controller\WebContentController::createAction' }
+
+customerweb_report_cashoverview:
+    path:     /ledger
+    defaults: { _controller: 'App\Customer\Controller\WebContentController::createAction' }
+

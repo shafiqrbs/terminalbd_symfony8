@@ -21,7 +21,7 @@ class ProductImportRepository extends EntityRepository
         $qb = $this->_em->createQueryBuilder();
         $qb->select('e.category, e.name, e.unit');
         $qb->distinct();
-        $qb->from('InventoryBundle:ProductImport','e');
+        $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
         return $result = $qb->getQuery()->getResult();
     }
 
@@ -33,8 +33,8 @@ class ProductImportRepository extends EntityRepository
         if (!empty($result)) {
             foreach ($result as $data) {
 
-                $category = $em->getRepository('ProductProductBundle:Category')->findOneBy(['name'=>$data['category']]);
-                $lastCode = $em->getRepository('InventoryBundle:Product')->getLastId($inventory);
+                $category = $em->getRepository(\App\Product\Entity\Category::class)->findOneBy(['name'=>$data['category']]);
+                $lastCode = $em->getRepository(\App\Inventory\Entity\Product::class)->getLastId($inventory);
                 $code= str_pad($lastCode, 4 , "0", STR_PAD_LEFT);
                 $entity = new Product();
                 $entity->setName($data['name']);
@@ -53,7 +53,7 @@ class ProductImportRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select(" e.unit as name ");
-        $qb->from('InventoryBundle:ProductImport','e');
+        $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
         $qb->distinct();
         return $result = $qb->getQuery()->getResult();
     }
@@ -65,7 +65,7 @@ class ProductImportRepository extends EntityRepository
         if (!empty($result)) {
             foreach ($result as $data) {
 
-                $lastCode = $em->getRepository('InventoryBundle:ColorSize')->getLastId($inventory,$type);
+                $lastCode = $em->getRepository(\App\Inventory\Entity\ColorSize::class)->getLastId($inventory,$type);
                 $code= str_pad($lastCode, 3, "0", STR_PAD_LEFT);
                 $entity = new ColorSize();
                 $entity->setName($data['name']);
@@ -83,7 +83,7 @@ class ProductImportRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select(" e.color as name ");
-        $qb->from('InventoryBundle:ProductImport','e');
+        $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
         $qb->distinct();
         return $result = $qb->getQuery()->getResult();
     }
@@ -111,7 +111,7 @@ class ProductImportRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select(" e.dimension as name ");
-        $qb->from('InventoryBundle:ProductImport','e');
+        $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
         $qb->distinct();
         return $result = $qb->getQuery()->getResult();
     }
@@ -123,7 +123,7 @@ class ProductImportRepository extends EntityRepository
         if (!empty($result)) {
             foreach ($result as $data) {
 
-                $lastCode = $em->getRepository('InventoryBundle:ColorSize')->getLastId($inventory);
+                $lastCode = $em->getRepository(\App\Inventory\Entity\ColorSize::class)->getLastId($inventory);
                 $code= str_pad($lastCode, 3, "0", STR_PAD_LEFT);
                 $entity = new ColorSize();
                 $entity->setName($data['name']);
@@ -140,7 +140,7 @@ class ProductImportRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select(" e.vendorCode as name ");
-        $qb->from('InventoryBundle:ProductImport','e');
+        $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
         $qb->distinct();
         return $result = $qb->getQuery()->getResult();
     }
@@ -152,7 +152,7 @@ class ProductImportRepository extends EntityRepository
         if (!empty($result)) {
             foreach ($result as $data) {
                 if(!empty($data['name'])){
-                    $lastCode = $em->getRepository('InventoryBundle:Vendor')->getLastId($inventory);
+                    $lastCode = $em->getRepository(\App\Inventory\Entity\Vendor::class)->getLastId($inventory);
                     $code= str_pad($lastCode, 3, "0", STR_PAD_LEFT);
                     $entity = new Vendor();
                     $entity->setName($data['name']);

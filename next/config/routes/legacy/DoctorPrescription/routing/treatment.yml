@@ -1,0 +1,25 @@
+dps_treatment:
+    path:     /
+    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentController::indexAction' }
+
+dps_treatment_create:
+    path:     /create
+    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentController::createAction' }
+    methods:  POST
+
+dps_treatment_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentController::editAction' }
+
+dps_treatment_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentController::updateAction' }
+    methods:  [POST, PUT]
+
+dps_treatment_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentController::deleteAction' }
+
+dps_treatment_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentController::statusAction' }

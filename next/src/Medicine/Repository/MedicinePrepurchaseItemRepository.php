@@ -175,7 +175,7 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
     public function updatePurchaseItem($data)
     {
         $em = $this->_em;
-        $entity = $this->_em->getRepository('MedicineBundle:MedicinePrepurchaseItem')->find($data['purchaseItemId']);
+        $entity = $this->_em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->find($data['purchaseItemId']);
         $entity->setQuantity($data['quantity']);
         $entity->setSalesprice($data['salesPrice']);
         $entity->setSubtotal($data['salesPrice'] * $data['quantity']);
@@ -218,10 +218,10 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
 	public function checkInsertStockItem(MedicineConfig $config,$data){
 
         if(empty($data['medicineId'])) {
-            $checkStockMedicine = $this->_em->getRepository('MedicineBundle:MedicineStock')->checkDuplicateStockNonMedicine($config, $data['medicineBrand']);
+            $checkStockMedicine = $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config, $data['medicineBrand']);
         }else{
-            $medicine =  $this->_em->getRepository('MedicineBundle:MedicineBrand')->find($data['medicineId']);
-            $checkStockMedicine =  $this->_em->getRepository('MedicineBundle:MedicineStock')->checkDuplicateStockMedicine($config, $medicine);
+            $medicine =  $this->_em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
+            $checkStockMedicine =  $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
         }
 
         if (empty($checkStockMedicine)){
@@ -230,7 +230,7 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
             $entity->setMedicineConfig($config);
             if(empty($data['medicineId'])){
                 if($data['mode']){
-                    $brandName = $this->_em->getRepository('MedicineBundle:MedicineParticular')->find($data['mode']);
+                    $brandName = $this->_em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['mode']);
                     $entity->setMode($brandName->getParticularType()->getSlug());
                     $entity->setBrandName($brandName->getName());
                 }
@@ -243,7 +243,7 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
                 $entity->setMode('medicine');
             }
             if(!empty($data['rackNo'])){
-                $entity->setRackNo($this->_em->getRepository('MedicineBundle:MedicineParticular')->find($data['rackNo']));
+                $entity->setRackNo($this->_em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['rackNo']));
             }
             $entity->setSalesPrice($data['salesPrice']);
             $entity->setPurchasePrice($this->stockInstantPurchaseItemPrice($config->getInstantVendorPercentage(),$data['salesPrice']));

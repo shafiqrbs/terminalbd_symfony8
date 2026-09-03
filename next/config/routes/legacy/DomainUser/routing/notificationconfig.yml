@@ -1,0 +1,12 @@
+domain_notificationconfig:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\NotificationConfigController::indexAction' }
+
+domain_notificationconfig_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DomainUser\Controller\NotificationConfigController::updateAction' }
+    methods:  [POST, PUT]
+
+
+
+

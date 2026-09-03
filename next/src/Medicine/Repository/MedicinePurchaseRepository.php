@@ -96,7 +96,7 @@ class MedicinePurchaseRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $prepurchase = $em->getRepository('MedicineBundle:MedicinePrepurchase')->find($id);
+        $prepurchase = $em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->find($id);
         $purchase = new MedicinePurchase();
         $purchase->setMedicineConfig($prepurchase->getMedicineConfig());
         $purchase->setMedicineVendor($prepurchase->getMedicineVendor());
@@ -141,7 +141,7 @@ class MedicinePurchaseRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('MedicineBundle:MedicinePurchaseItem','si')
+            ->from(\App\Medicine\Entity\MedicinePurchaseItem::class,'si')
             ->select('sum(si.purchaseSubTotal) as total')
             ->where('si.medicinePurchase = :entity')
             ->setParameter('entity', $entity ->getId())
@@ -227,24 +227,24 @@ class MedicinePurchaseRepository extends EntityRepository
 	    $config = $user->getGlobalOption()->getMedicineConfig();
 	    $em = $this->_em;
 
-	    $vendor = $em->getRepository('MedicineBundle:MedicineVendor')->checkInInsert($config,$data['vendor']);
+	    $vendor = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->checkInInsert($config,$data['vendor']);
 	    $check = $this->checkInstantPurchaseToday($vendor);
 	    if($check['status'] == 'valid'){
-	    	return $entity = $em->getRepository('MedicineBundle:MedicinePurchase')->find($check['purchase']);
+	    	return $entity = $em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->find($check['purchase']);
 	    }else{
 		    $entity = new MedicinePurchase();
 	    	$entity->setMedicineConfig($config);
 		    $entity->setMedicineVendor($vendor);
 		    $entity->setInstantPurchase(1);
 		    if(!empty($data['purchasesBy'])){
-			    $purchaseBy = $em->getRepository('UserBundle:User')->findOneBy(['username' => $data['purchasesBy']]);
+			    $purchaseBy = $em->getRepository(\App\User\Entity\User::class)->findOneBy(['username' => $data['purchasesBy']]);
 			    $entity->setPurchaseBy($purchaseBy);
 		    }
 		    $entity->setProcess('In-progress');
 		    $entity->setMode('instant');
 		    $receiveDate = new DateTime('now');
 		    $entity->setReceiveDate($receiveDate);
-		    $transactionMethod = $em->getRepository('SettingToolBundle:TransactionMethod')->find(1);
+		    $transactionMethod = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
 		    $entity->setTransactionMethod($transactionMethod);
 		    $em->persist($entity);
 		    $em->flush();
@@ -268,7 +268,7 @@ class MedicinePurchaseRepository extends EntityRepository
         $global =  $user->getGlobalOption()->getId();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('AccountingBundle:AccountPurchase','e');
+        $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
         $qb->where('e.globalOption = :config');
         $qb->setParameter('config', $global);
@@ -320,7 +320,7 @@ class MedicinePurchaseRepository extends EntityRepository
         $global =  $user->getGlobalOption()->getId();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('AccountingBundle:AccountPurchase','e');
+        $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->join('e.transactionMethod','t');
         $qb->select('t.name as transactionName , sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
         $qb->where('e.globalOption = :config');
@@ -384,7 +384,7 @@ class MedicinePurchaseRepository extends EntityRepository
     {
         $global =  $user->getGlobalOption()->getId();
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('AccountingBundle:AccountPurchase','e');
+        $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->join('e.medicineVendor','t');
         $qb->select('t.companyName as companyName ,t.name as vendorName ,t.mobile as vendorMobile , sum(e.purchaseAmount) as total ,sum(e.payment) as payment');
         $qb->where('e.globalOption = :config');
@@ -404,7 +404,7 @@ class MedicinePurchaseRepository extends EntityRepository
 
         $global =  $user->getGlobalOption()->getId();
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('AccountingBundle:AccountPurchase','e');
+        $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->join('e.medicineVendor','t');
         $qb->join('t.customer','customer');
         $qb->select('customer.id as customerId ,t.companyName as companyName ,t.name as vendorName ,t.mobile as vendorMobile , sum(e.purchaseAmount) as total ,sum(e.payment) as payment');
@@ -528,7 +528,7 @@ class MedicinePurchaseRepository extends EntityRepository
         $vendors =  $user->getGlobalOption()->getMedicineConfig()->getMedicineVendors();
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('MedicineBundle:MedicineSalesItem','msi');
+        $qb->from(\App\Medicine\Entity\MedicineSalesItem::class,'msi');
         $qb->join('msi.medicineSales','e');
         $qb->join('msi.medicinePurchaseItem','mpi');
         $qb->join('mpi.medicinePurchase','mp');
@@ -591,7 +591,7 @@ class MedicinePurchaseRepository extends EntityRepository
 
     	$config =  $user->getGlobalOption()->getMedicineConfig()->getId();
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('MedicineBundle:MedicineSales','e');
+        $qb->from(\App\Medicine\Entity\MedicineSales::class,'e');
         $qb->join('e.medicineSalesItems','mpi');
         $qb->join('mpi.medicineStock','ms');
         $qb->select('ms.brandName as brandName , sum(mpi.discountPrice * mpi.quantity) as salesPrice, sum(mpi.purchasePrice*mpi.quantity) as purchasePrice');
@@ -641,7 +641,7 @@ class MedicinePurchaseRepository extends EntityRepository
 		}
 		$config =  $user->getGlobalOption()->getMedicineConfig()->getId();
 		$qb = $this->_em->createQueryBuilder();
-		$qb->from('MedicineBundle:MedicineSales','e');
+		$qb->from(\App\Medicine\Entity\MedicineSales::class,'e');
 		$qb->join('e.medicineSalesItems','mpi');
 		$qb->join('mpi.medicineStock','ms');
 		$qb->select('ms.name as name , sum(mpi.discountPrice * mpi.quantity) as salesPrice, sum(mpi.purchasePrice*mpi.quantity) as purchasePrice');
@@ -729,26 +729,26 @@ class MedicinePurchaseRepository extends EntityRepository
                 $sales->setInvoice($item['invoiceId']);
                 $sales->setDevicePurchaseId($item['invoiceId']);
                 if(isset($item['transactionMethod']) and $item['transactionMethod']){
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>$item['transactionMethod']]);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>$item['transactionMethod']]);
                     if($method){
                         $sales->setTransactionMethod($method);
                     }
                 }elseif(isset($item['transactionMethod']) and empty($item['transactionMethod']) and $sales->getPayment() > 0){
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>'cash']);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>'cash']);
                     $sales->setTransactionMethod($method);
                 }
                 if(isset($item['bankAccount']) and $item['bankAccount'] > 0 ){
-                    $bank = $em->getRepository('AccountingBundle:AccountBank')->find($item['bankAccount']);
+                    $bank = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($item['bankAccount']);
                     if($bank){ $sales->setAccountBank($bank); }
                 }
                 if(isset($item['mobileBankAccount']) and $item['mobileBankAccount'] > 0 ){
-                    $mobile = $em->getRepository('AccountingBundle:AccountMobileBank')->find($item['mobileBankAccount']);
+                    $mobile = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($item['mobileBankAccount']);
                     if($mobile){ $sales->setAccountMobileBank($mobile); }
                 }
-                $vendor = $em->getRepository('MedicineBundle:MedicineVendor')->find($item['vendorId']);
+                $vendor = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->find($item['vendorId']);
                 $sales->setMedicineVendor($vendor);
                 if(($item['receivedBy']) and $item['receivedBy'] > 0){
-                    $createdBy = $em->getRepository('UserBundle:User')->find($item['receivedBy']);
+                    $createdBy = $em->getRepository(\App\User\Entity\User::class)->find($item['receivedBy']);
                     $sales->setCreatedBy($createdBy);
                 }
                 $created = new DateTime($item['created']);
@@ -776,9 +776,9 @@ class MedicinePurchaseRepository extends EntityRepository
             foreach ($items as $item):
 
                 $deviceId = $item['purchaseId'];
-                $purchase = $em->getRepository('MedicineBundle:MedicinePurchase')->findOneBy(['medicineConfig' => $conf , 'devicePurchaseId' => $deviceId]);
-                $stockId = $em->getRepository('MedicineBundle:MedicineStock')->find($item['stockId']);
-                $exist = $em->getRepository("MedicineBundle:MedicinePurchaseItem")->findOneBy(['medicinePurchase'=>$purchase,'medicineStock'=>$stockId]);
+                $purchase = $em->getRepository(\App\Medicine\Entity\MedicinePurchase::class)->findOneBy(['medicineConfig' => $conf , 'devicePurchaseId' => $deviceId]);
+                $stockId = $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($item['stockId']);
+                $exist = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->findOneBy(['medicinePurchase'=>$purchase,'medicineStock'=>$stockId]);
                 if ($purchase and $stockId and empty($exist)) {
                     /* @var $stockId MedicineStock */
                     $salesItem = new MedicinePurchaseItem();
@@ -793,7 +793,7 @@ class MedicinePurchaseRepository extends EntityRepository
                     $em->persist($salesItem);
                     $em->flush();
                     if ($salesItem->getMedicineStock()) {
-                        $em->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'purchase');
+                        $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($salesItem->getMedicineStock(), 'purchase');
                     }
                     $this->updatePurchaseTotalPrice($purchase);
                 }

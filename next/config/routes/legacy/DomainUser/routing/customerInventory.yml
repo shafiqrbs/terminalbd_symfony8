@@ -1,0 +1,30 @@
+inventory_customer:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::indexAction' }
+
+inventory_customer_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::showAction' }
+
+inventory_customer_new:
+    path:     /new
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::newAction' }
+
+inventory_customer_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::createAction' }
+    methods:  POST
+
+inventory_customer_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::editAction' }
+
+inventory_customer_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_customer_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DomainUser\Controller\CustomerInventoryController::deleteAction' }
+    methods:  [POST, DELETE]

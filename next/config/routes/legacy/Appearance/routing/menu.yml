@@ -1,0 +1,40 @@
+menu:
+    path:     /
+    defaults: { _controller: 'App\Appearance\Controller\MenuController::menuManageAction' }
+
+menu_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Appearance\Controller\MenuController::updateAction' }
+    requirements: { _method: post|put }
+
+menu_new:
+    path:     /new
+    defaults: { _controller: 'App\Appearance\Controller\MenuController::newAction' }
+
+menu_create:
+    path:     /create
+    defaults: { _controller: 'App\Appearance\Controller\MenuController::createAction' }
+    methods:  POST
+
+menu_manage:
+    path:     /manage
+    defaults: { _controller: 'App\Appearance\Controller\MenuController::menuManageAction' }
+
+menu_modify:
+    path:     /modify
+    defaults: { _controller: 'App\Appearance\Controller\MenuController::modifyAction' }
+
+menu_stopMenu:
+    path:     /{id}/stopMenu
+    defaults: { _controller: 'App\Appearance\Controller\MenuController::stopMenuAction' }
+
+menu_status:
+    path:     /{globalOption}/{id}/status
+    defaults: { _controller: 'App\Appearance\Controller\MenuController::statusAction' }
+
+
+menu_reset:
+    path:     /reset-default-menu
+    defaults: { _controller: 'App\Appearance\Controller\MenuController::resetMenuAction' }
+
+

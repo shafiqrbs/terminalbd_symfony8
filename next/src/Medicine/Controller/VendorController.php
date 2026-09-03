@@ -1,0 +1,298 @@
+<?php
+
+namespace App\Medicine\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Exception;
+use Symfony\Component\Form\Form;
+use App\Medicine\Entity\MedicineVendor;
+use App\Medicine\Form\VendorType;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+
+/**
+ * Vendor controller.
+ *
+ */
+class VendorController extends AbstractController
+{
+
+    public function paginate($entities)
+    {
+        $paginator = $this->get('knp_paginator');
+        $pagination = $paginator->paginate(
+            $entities,
+            $this->get('request')->query->get('page', 1)/*page number*/,
+            25  /*limit per page*/
+        );
+        $pagination->setTemplate('Tool/Widget/pagination.html.twig');
+        return $pagination;
+    }
+
+    /**
+     * Lists all Vendor entities.
+     *
+     */
+    public function indexAction()
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $data = $_REQUEST;
+        $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
+        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findWithSearch($this->getUser(),$data);
+        $pagination = $this->paginate($entities);
+        return $this->render('Medicine/Vendor/index.html.twig', [
+            'entities' => $pagination,
+            'searchForm'   => $data,
+        ]);
+    }
+
+    /**
+     * Lists all Vendor entities.
+     *
+     */
+    public function newAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $entity = new MedicineVendor();
+        $form = $this->createCreateForm($entity);
+        $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
+        return $this->render('Medicine/Vendor/new.html.twig', [
+            'entity' => $entity,
+            'form'   => $form->createView(),
+        ]);
+    }
+
+    /**
+     * Creates a new Vendor entity.
+     *
+     */
+    public function createAction(Request $request)
+    {
+        $entity = new MedicineVendor();
+        $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
+        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findWithSearch($this->getUser());
+        $pagination = $this->paginate($entities);
+        $form = $this->createCreateForm($entity);
+        $form->handleRequest($request);
+        $data = $request->request->all();
+	    $company = $data['vendor']['companyName'];
+	    $exitVendor = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=>$config,'companyName'=>$company]);
+        if ($form->isValid() and empty($exitVendor)) {
+	        $em = $this->getDoctrine()->getManager();
+            $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
+            $entity->setMedicineConfig($config);
+            $em->persist($entity);
+            $em->flush();
+            $this->getDoctrine()->getRepository(\App\Accounting\Entity\AccountVendor::class)->insertVendor($entity);
+            $this->get('session')->getFlashBag()->add(
+                'success',"Data has been inserted successfully"
+            );
+            return $this->redirect($this->generateUrl('medicine_vendor'));
+        }
+
+	    $this->get('session')->getFlashBag()->add(
+		    'success',"User mobile no already exist,Please try again."
+	    );
+        return $this->render('Medicine/Vendor/new.html.twig', [
+            'entities' => $pagination,
+            'entity' => $entity,
+            'form'   => $form->createView(),
+        ]);
+    }
+
+    /**
+     * Creates a form to create a Vendor entity.
+     *
+     * @param Vendor $entity The entity
+     *
+     * @return Form The form
+     */
+    private function createCreateForm(MedicineVendor $entity)
+    {
+        $form = $this->createForm(new VendorType(), $entity, [
+            'action' => $this->generateUrl('medicine_vendor_create'),
+            'method' => 'POST',
+            'attr' => [
+                'class' => 'form-horizontal',
+                'novalidate' => 'novalidate',
+            ]
+        ]);
+        return $form;
+    }
+
+    /**
+     * Displays a form to edit an existing Vendor entity.
+     *
+     */
+    public function editAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
+        $entity = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=> $config,'id'=>$id]);
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Vendor entity.');
+        }
+        $editForm = $this->createEditForm($entity);
+        return $this->render('Medicine/Vendor/new.html.twig', [
+            'entity'      => $entity,
+            'form'   => $editForm->createView(),
+        ]);
+    }
+
+    /**
+     * Creates a form to edit a Vendor entity.
+     *
+     * @param Vendor $entity The entity
+     *
+     * @return Form The form
+     */
+    private function createEditForm(MedicineVendor $entity)
+    {
+        $form = $this->createForm(new VendorType(), $entity, [
+            'action' => $this->generateUrl('medicine_vendor_update', ['id' => $entity->getId()]),
+            'method' => 'PUT',
+            'attr' => [
+                'class' => 'form-horizontal',
+                'novalidate' => 'novalidate',
+            ]
+        ]);
+        return $form;
+    }
+    /**
+     * Edits an existing Vendor entity.
+     *
+     */
+    public function updateAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $global = $this->getUser()->getGlobalOption();
+        $config = $global->getMedicineConfig();
+        $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findWithSearch($this->getUser());
+        $pagination = $this->paginate($entities);
+
+        $entity = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->find($id);
+
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Vendor entity.');
+        }
+
+        $editForm = $this->createEditForm($entity);
+        $editForm->handleRequest($request);
+        $data = $request->request->all();
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $customer = $this->getDoctrine()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $global , 'mobile' => $data['customer']]);
+            if(!empty($customer)){
+                $entity->setCustomer($customer);
+            }
+            $em->flush();
+            $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->updateVendorCompanyName($entity);
+            $this->get('session')->getFlashBag()->add(
+                'success',"Data has been changed successfully"
+            );
+            return $this->redirect($this->generateUrl('medicine_vendor'));
+        }
+
+        return $this->render('Medicine/Vendor/index.html.twig', [
+            'entities'      => $pagination,
+            'entity'      => $entity,
+            'form'   => $editForm->createView(),
+        ]);
+    }
+    /**
+     * Deletes a Vendor entity.
+     *
+     */
+    public function deleteAction($id)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $entity = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->find($id);
+
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Vendor entity.');
+        }
+        try {
+
+            $em->remove($entity);
+            $em->flush();
+            $this->get('session')->getFlashBag()->add(
+                'error',"Data has been deleted successfully"
+            );
+
+        } catch (ForeignKeyConstraintViolationException) {
+            $this->get('session')->getFlashBag()->add(
+                'notice',"Data has been relation another Table"
+            );
+        }catch (Exception) {
+            $this->get('session')->getFlashBag()->add(
+                'notice', 'Please contact system administrator further notification.'
+            );
+        }
+
+        return $this->redirect($this->generateUrl('medicine_vendor'));
+    }
+
+
+    /**
+     * Status a Page entity.
+     *
+     */
+    public function statusAction(Request $request, $id)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $entity = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->find($id);
+
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find District entity.');
+        }
+
+        $status = $entity->isStatus();
+        if($status == 1){
+            $entity->setStatus(false);
+        } else{
+            $entity->setStatus(true);
+        }
+        $em->flush();
+        $this->get('session')->getFlashBag()->add(
+            'success',"Status has been changed successfully"
+        );
+        return $this->redirect($this->generateUrl('medicine_vendor'));
+    }
+
+	public function autoSearchAutoCompleteAction(Request $request)
+    {
+        $item = $_REQUEST['term'];
+        $items = [];
+        if ($item) {
+            $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
+            $entities = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchAutoComplete($inventory,$item);
+            foreach ($entities as $entity):
+                $items[] = ['id' => $entity['id'], 'value' => $entity['text']];
+            endforeach;
+        }
+        return new JsonResponse($items);
+    }
+
+    public function autoSearchAction(Request $request)
+    {
+        $item = $_REQUEST['q'];
+        if ($item) {
+            $inventory = $this->getUser()->getGlobalOption()->getMedicineConfig();
+            $item = $this->getDoctrine()->getRepository(\App\Medicine\Entity\MedicineVendor::class)->searchVendor($inventory,$item);
+        }
+        return new JsonResponse($item);
+    }
+
+    public function searchVendorNameAction($vendor)
+    {
+        return new JsonResponse([
+            'id'=>$vendor,
+            'text'=>$vendor
+        ]);
+    }
+
+
+}

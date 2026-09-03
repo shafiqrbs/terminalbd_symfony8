@@ -18,12 +18,12 @@ class MenuGroupingRepository extends EntityRepository
 
         $i = 1;
         $em = $this->_em;
-        $menuGroup = $em->getRepository('SettingAppearanceBundle:MenuGroup')->find($menuGroup);
+        $menuGroup = $em->getRepository(\App\Appearance\Entity\MenuGroup::class)->find($menuGroup);
         if(!empty($posts['menuid'])){
             foreach ($posts['menuid'] as $post ){
 
-                $menu = $em->getRepository('SettingAppearanceBundle:Menu')->find($post);
-                $menuGroups = $em->getRepository('SettingAppearanceBundle:MenuGrouping')->findBy(['globalOption'=>$globalOption,'menuGroup'=>$menuGroup,'menu'=>$post]);
+                $menu = $em->getRepository(\App\Appearance\Entity\Menu::class)->find($post);
+                $menuGroups = $em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->findBy(['globalOption'=>$globalOption,'menuGroup'=>$menuGroup,'menu'=>$post]);
                 if(empty($menuGroups)){
                     $entity = new MenuGrouping();
                     $entity ->setMenu($menu);
@@ -47,7 +47,7 @@ class MenuGroupingRepository extends EntityRepository
 
         if(!empty($posts['delete'])){
             foreach ($posts['delete'] as $post ){
-                $menu = $em->getRepository('SettingAppearanceBundle:MenuGrouping')->findOneBy(['globalOption' => $globalOption,'menuGroup' => $menuGroup->getId() ,'menu' => $post]);
+                $menu = $em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->findOneBy(['globalOption' => $globalOption,'menuGroup' => $menuGroup->getId() ,'menu' => $post]);
                 if(!empty($menu)) {
                     if(!empty($menu->getChildren())){
                         $this->childrenMenuRemove($menu);
@@ -83,7 +83,7 @@ class MenuGroupingRepository extends EntityRepository
         $qb = $em->createQueryBuilder();
         foreach ($data as $key => $value){
             $val = $value ?: 0 ;
-            $qb->update('SettingAppearanceBundle:MenuGrouping', 'mg')
+            $qb->update(\App\Appearance\Entity\MenuGrouping::class, 'mg')
                 ->set('mg.parent', $val)
                 ->set('mg.sorting', $i)
                 ->where('mg.id = :id')
@@ -131,7 +131,7 @@ class MenuGroupingRepository extends EntityRepository
     public function getFooterMenu(){
 
         $em = $this->_em;
-        $entity = $em->getRepository('SettingAppearanceBundle:MenuGrouping')->findBy(['menuGroup'=>3]);
+        $entity = $em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->findBy(['menuGroup'=>3]);
         if(!empty($entity)){
             return $entity;
         }

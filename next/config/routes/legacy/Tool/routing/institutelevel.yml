@@ -1,0 +1,34 @@
+institutelevel:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\InstituteLevelController::indexAction' }
+
+institutelevel_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\InstituteLevelController::showAction' }
+
+institutelevel_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\InstituteLevelController::newAction' }
+
+institutelevel_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\InstituteLevelController::createAction' }
+    methods:  POST
+
+institutelevel_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\InstituteLevelController::editAction' }
+
+institutelevel_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\InstituteLevelController::statusAction' }
+
+institutelevel_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\InstituteLevelController::updateAction' }
+    methods:  [POST, PUT]
+
+institutelevel_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\InstituteLevelController::deleteAction' }
+    methods:  [POST, DELETE]

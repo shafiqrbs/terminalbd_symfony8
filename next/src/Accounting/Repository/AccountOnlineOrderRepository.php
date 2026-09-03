@@ -127,7 +127,7 @@ class AccountOnlineOrderRepository extends EntityRepository
         $onlineOrder->setProcess('approved');
         $em->persist($onlineOrder);
         $em->flush();
-        $this->_em->getRepository('AccountingBundle:AccountCash')->insertOnlineOrderCash($onlineOrder);
+        $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertOnlineOrderCash($onlineOrder);
         return $onlineOrder;
 
     }
@@ -150,9 +150,9 @@ class AccountOnlineOrderRepository extends EntityRepository
         $qb->setParameter('globalOption', $globalOption);
         $this->handleSearchBetween($qb,$data);
         $result = $qb->getQuery()->getSingleResult();
-        $purchasePrice = $this->_em->getRepository('InventoryBundle:SalesItem')->reportPurchasePrice($globalOption,$data);
-        $Expenditures = $this->_em->getRepository('AccountingBundle:Expenditure')->reportExpenditure($globalOption,$data);
-        $revenues = $this->_em->getRepository('AccountingBundle:AccountJournal')->reportOperatingRevenue($globalOption,$data);
+        $purchasePrice = $this->_em->getRepository(\App\Inventory\Entity\SalesItem::class)->reportPurchasePrice($globalOption,$data);
+        $Expenditures = $this->_em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditure($globalOption,$data);
+        $revenues = $this->_em->getRepository(\App\Accounting\Entity\AccountJournal::class)->reportOperatingRevenue($globalOption,$data);
 
         $data =  ['salesAmount' => $result['salesAmount'],'purchasePrice' => $purchasePrice,'revenues' => $revenues ,'expenditures' => $Expenditures];
         return $data;

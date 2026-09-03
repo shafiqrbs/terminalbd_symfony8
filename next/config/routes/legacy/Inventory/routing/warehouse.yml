@@ -1,0 +1,30 @@
+inventory_warehouse:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\WareHouseController::indexAction' }
+
+inventory_warehouse_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\WareHouseController::showAction' }
+
+inventory_warehouse_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\WareHouseController::newAction' }
+
+inventory_warehouse_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\WareHouseController::createAction' }
+    methods:  POST
+
+inventory_warehouse_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\WareHouseController::editAction' }
+
+inventory_warehouse_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\WareHouseController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_warehouse_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\WareHouseController::deleteAction' }
+    methods:  [POST, DELETE]

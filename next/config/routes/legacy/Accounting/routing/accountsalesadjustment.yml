@@ -1,0 +1,34 @@
+account_salesadjustment:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesAdjustmentController::indexAction' }
+
+account_salesadjustment_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesAdjustmentController::newAction' }
+
+account_salesadjustment_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesAdjustmentController::createAction' }
+    methods:  POST
+
+account_salesadjustment_reverse:
+    path:     /{id}/reverse
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesAdjustmentController::reverseAction' }
+
+account_salesadjustment_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesAdjustmentController::approveAction' }
+    options:
+           expose: true
+
+account_salesadjustment_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesAdjustmentController::inlineUpdateAction' }
+
+account_salesadjustment_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesAdjustmentController::deleteAction' }
+    options:
+           expose: true
+
+

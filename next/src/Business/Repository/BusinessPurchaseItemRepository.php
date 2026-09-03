@@ -129,7 +129,7 @@ class BusinessPurchaseItemRepository extends EntityRepository
     {
 
        /* $qb = $this->_em->createQueryBuilder();
-        $qb->from('BusinessBundle:BusinessPurchaseItem','e');
+        $qb->from(\App\Business\Entity\BusinessPurchaseItem::class,'e');
         $qb->select('AVG(e.purchasePrice) AS avgPurchasePrice');
         $qb->where('e.businessParticular = :particular')->setParameter('particular', $particular) ;
         $res = $qb->getQuery()->getOneOrNullResult();
@@ -145,7 +145,7 @@ class BusinessPurchaseItemRepository extends EntityRepository
         $em = $this->_em;
 
         /* @var $particular BusinessParticular */
-        $particular = $this->_em->getRepository('BusinessBundle:BusinessParticular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
         $entity = new BusinessPurchaseItem();
         $entity->setBusinessPurchase($invoice);
         $entity->setBusinessParticular($particular);
@@ -154,7 +154,7 @@ class BusinessPurchaseItemRepository extends EntityRepository
         }
         $wearhouseId = (isset($data['wearhouse']) and !empty($data['wearhouse']))? $data['wearhouse']:'';
         if($wearhouseId){
-            $wearhouse = $this->_em->getRepository('BusinessBundle:WearHouse')->find($wearhouseId);
+            $wearhouse = $this->_em->getRepository(\App\Business\Entity\WearHouse::class)->find($wearhouseId);
             if($wearhouse){
                 $entity->setWearhouse($wearhouse);
             }
@@ -179,7 +179,7 @@ class BusinessPurchaseItemRepository extends EntityRepository
     public function insertPurchaseDistributionItems($invoice, $data)
     {
         /* @var $particular BusinessParticular */
-        $particular = $this->_em->getRepository('BusinessBundle:BusinessParticular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
         $em = $this->_em;
 
         $entity = new BusinessPurchaseItem();
@@ -207,7 +207,7 @@ class BusinessPurchaseItemRepository extends EntityRepository
 
     public function insertSawmillPurchaseItems($invoice, $data)
     {
-	    $particular = $this->_em->getRepository('BusinessBundle:BusinessParticular')->find($data['particularId']);
+	    $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
 	    $em = $this->_em;
 	    $entity = new BusinessPurchaseItem();
 	    $quantity = 0;
@@ -235,7 +235,7 @@ class BusinessPurchaseItemRepository extends EntityRepository
     public function insertSignPurchaseItems($invoice, $data)
     {
         /* @var $particular BusinessParticular */
-        $particular = $this->_em->getRepository('BusinessBundle:BusinessParticular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
         $em = $this->_em;
         $entity = new BusinessPurchaseItem();
         $quantity = 0;

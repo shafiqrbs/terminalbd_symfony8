@@ -1,0 +1,77 @@
+
+inventory_report_overview:
+    path:     /overview
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::overviewAction' }
+
+inventory_report_till_stock:
+    path:     /till-stock
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::tillStockAction' }
+
+inventory_report_periodic_stock:
+    path:     /periodic-stock
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::periodicStockAction' }
+
+inventory_report_operational_stock:
+    path:     /operational-stock
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::operationalStockAction' }
+
+inventory_report_group_stock:
+    path:     /group-stock
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::groupStockAction' }
+
+inventory_report_stock:
+    path:     /{group}/stock
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::stockAction' }
+
+inventory_report_stock_item:
+    path:     /stock-item
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::stockItemAction' }
+
+inventory_report_purchase:
+    path:     /purchase
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::purchaseAction' }
+
+inventory_report_purchase_overview:
+    path:     /purchase-overview
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::purchaseOverviewAction' }
+
+inventory_report_sales_item:
+    path:     /sales-item
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::salesStockItemAction' }
+
+inventory_report_sales_item_details:
+    path:     /sales-item-details
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::salesItemDetailsAction' }
+
+inventory_report_sales_user_target:
+    path:     /user-sales-mothly-target
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::monthlyUserSalesAction' }
+
+inventory_report_sales:
+    path:     /sales-transaction
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::salesTransactionAction' }
+
+inventory_report_monthly_sales:
+    path:     /monthly-sales
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::monthlySalesAction' }
+
+inventory_report_daily_sales:
+    path:     /daily-sales
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::dailySalesAction' }
+
+inventory_report_daily_sales_profit:
+    path:     /daily-sales-profit
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::dailySalesProfitAction' }
+
+inventory_report_monthly_sales_profit:
+    path:     /monthly-sales-profit
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::monthlySalesProfitAction' }
+
+inventory_report_sales_overview:
+    path:     /sales-transaction-overview
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::salesTransactionOverviewAction' }
+
+inventory_report_sales_user:
+    path:     /sales-user-overview
+    defaults: { _controller: 'App\Inventory\Controller\ReportController::salesUserAction' }
+

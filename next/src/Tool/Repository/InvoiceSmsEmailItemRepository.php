@@ -18,7 +18,7 @@ class InvoiceSmsEmailItemRepository extends EntityRepository
         $em = $this->_em;
         foreach($data['check'] as $row){
             $entity = new InvoiceSmsEmailItem();
-            $smsEmailPricing = $this->_em->getRepository('SettingToolBundle:SmsEmailPricing')->find($row);
+            $smsEmailPricing = $this->_em->getRepository(\App\Tool\Entity\SmsEmailPricing::class)->find($row);
             $entity->setInvoiceSmsEmail($invoice);
             $entity->setSmsEmailPricing($smsEmailPricing);
             $entity->setAmount($smsEmailPricing->getAmount());

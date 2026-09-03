@@ -1,0 +1,12 @@
+account_banktransaction:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\TransactionController::indexAction' }
+
+account_banktransaction_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\TransactionController::showAction' }
+
+account_banktransaction_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\transactionController::newAction' }
+

@@ -1,0 +1,30 @@
+blogcomment:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\BlogCommentController::indexAction' }
+
+blogcomment_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\BlogCommentController::showAction' }
+
+blogcomment_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\BlogCommentController::newAction' }
+
+blogcomment_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\BlogCommentController::createAction' }
+    requirements: { _method: post }
+
+blogcomment_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\BlogCommentController::editAction' }
+
+blogcomment_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\BlogCommentController::updateAction' }
+    requirements: { _method: post|put }
+
+blogcomment_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\BlogCommentController::deleteAction' }
+    requirements: { _method: post|delete }

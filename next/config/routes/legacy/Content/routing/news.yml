@@ -1,0 +1,43 @@
+newses:
+    path:     /listing
+    defaults: { _controller: 'App\Content\Controller\NewsController::listingAction' }
+
+newses_delete:
+    path:     listing/delete
+    defaults: { _controller: 'App\Content\Controller\NewsController::listingDeleteAction' }
+
+news:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\NewsController::indexAction' }
+
+news_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\NewsController::showAction' }
+
+news_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\NewsController::newAction' }
+
+news_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\NewsController::createAction' }
+    requirements: { _method: post }
+
+news_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\NewsController::editAction' }
+
+news_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\NewsController::updateAction' }
+    requirements: { _method: post|put }
+
+news_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\NewsController::deleteAction' }
+
+
+news_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Content\Controller\NewsController::statusAction' }
+

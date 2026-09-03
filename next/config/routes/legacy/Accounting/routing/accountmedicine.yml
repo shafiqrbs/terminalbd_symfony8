@@ -1,0 +1,63 @@
+account_sales_medicine:
+    path:     /sales
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::salesAction' }
+
+account_medicine_income:
+    path:     /medicine-income
+    defaults: { _controller: 'App\Accounting\Controller\MedicineReportController::incomeAction' }
+
+account_medicine_income_monthly:
+    path:     /medicine-income-monthly
+    defaults: { _controller: 'App\Accounting\Controller\MedicineReportController::monthlyIncomeAction' }
+
+account_sales_medicine_new:
+    path:     /sales-receive
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::salesNewAction' }
+
+account_sales_medicine_due:
+    path:     /{sales}/sales-receive
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::duePaymentAction' }
+
+account_sales_medicine_create:
+    path:     /sales-receive-create
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::salesCreateAction' }
+
+account_sales_medicine_update:
+    path:     /{id}/sales-receive-update
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::duePaymentUpdateAction' }
+
+account_purchase_medicine:
+    path:     /purchase
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::purchaseAction' }
+
+account_purchase_medicine_outstanding:
+    path:     /vendor-outstanding
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::vendorOutstandingAction' }
+
+account_sales_medicine_outstanding:
+    path:     /customer-outstanding
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::customerOutstandingAction' }
+
+account_purchase_medicine_new:
+    path:     /purchase-new
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::purchaseNewAction' }
+
+account_purchase_medicine_create:
+    path:     /purchase-create
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::purchaseCreateAction' }
+
+
+account_sales_medicine_approve:
+    path:     /{id}/medicine-payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::salesApproveAction' }
+    options:
+           expose: true
+
+account_sales_medicine_reverse:
+    path:     /{id}/sales-reverse
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::salesMedicineReverseAction' }
+
+
+account_purchase_medicine_reverse:
+    path:     /{id}/purchase-reverse
+    defaults: { _controller: 'App\Accounting\Controller\AccountMedicineController::purchaseMedicineReverseAction' }

@@ -48,7 +48,7 @@ class InvoiceModuleRepository extends EntityRepository
 
         $qb = $this->_em->createQueryBuilder();
         $qb->select('SUM(i.amount)');
-        $qb->from('SettingToolBundle:InvoiceModuleItem','i');
+        $qb->from(\App\Tool\Entity\InvoiceModuleItem::class,'i');
         $qb->where("i.invoiceModule = :invoice");
         $qb->setParameter('invoice', $invoice->getId());
         $sum = $qb->getQuery()->getSingleScalarResult();
@@ -124,7 +124,7 @@ class InvoiceModuleRepository extends EntityRepository
             foreach ($data['name'] as $row):
                 if (isset($data['name'][$i]) and !empty($data['amount'][$i])) {
                     if (!empty($data['name'][$i]) and !empty($data['amount'][$i]) and !empty($data['metaId'][$i])) {
-                        $entity = $em->getRepository('SettingToolBundle:InvoiceModuleItem')->find($data['metaId'][$i]);
+                        $entity = $em->getRepository(\App\Tool\Entity\InvoiceModuleItem::class)->find($data['metaId'][$i]);
                     }else{
                         $entity = new InvoiceModuleItem();
                         $entity->setInvoiceModule($invoiceModule);

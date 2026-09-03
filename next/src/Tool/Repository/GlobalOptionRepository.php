@@ -109,7 +109,7 @@ class GlobalOptionRepository extends EntityRepository
         $mobile = $data['mobile'] ?? '';
         $email = $data['email'] ?? '';
         $type = $data['shopType'] ?? '';
-        $mainApp = $em->getRepository('SettingToolBundle:AppModule')->find($type);
+        $mainApp = $em->getRepository(\App\Tool\Entity\AppModule::class)->find($type);
         $entity = new GlobalOption();
         if($store){
             $entity->setName($store);
@@ -362,7 +362,7 @@ class GlobalOptionRepository extends EntityRepository
         $slug = $options['lowercase'] ? mb_strtolower($str, 'UTF-8') : $str;
 
         $em = $this->_em;
-        $entity = $em->getRepository('SettingToolBundle:GlobalOption')->findOneBy(['slug'=>$slug]);
+        $entity = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['slug'=>$slug]);
         if (empty($entity)){
             return $slug;
         }else{
@@ -382,7 +382,7 @@ class GlobalOptionRepository extends EntityRepository
         for ($i = 1; $i < 100; $i++){
 
             $new = $slug.'-'.$i;
-            $existsSlug = $em->getRepository('SettingToolBundle:GlobalOption')->findOneBy(['slug'=>$new]);
+            $existsSlug = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['slug'=>$new]);
 
             if (empty($existsSlug) ){
                 $slugNew = $slug.'-'.$i;
@@ -516,9 +516,9 @@ class GlobalOptionRepository extends EntityRepository
         $mainApp = $data['domain']['globalOption']['mainApp'];
         $location = $data['domain']['globalOption']['location'];
         $name = $data['domain']['globalOption']['name'];
-        $syndicate = $em->getRepository('SettingToolBundle:Syndicate')->findOneBy(['id' => $syndicate]);
+        $syndicate = $em->getRepository(\App\Tool\Entity\Syndicate::class)->findOneBy(['id' => $syndicate]);
         $mainApp = $em->getRepository(AppModule::class)->find($mainApp);
-        $location = $em->getRepository('SettingLocationBundle:Location')->findOneBy(['id' => $location]);
+        $location = $em->getRepository(\App\Location\Entity\Location::class)->findOneBy(['id' => $location]);
         $globalOption = new GlobalOption();
         $globalOption->setStatus(1);
         $globalOption->setName($name);
@@ -566,49 +566,49 @@ class GlobalOptionRepository extends EntityRepository
 
     public function systemConfigUpdate(GlobalOption $globalOption )
     {
-        $accounting = $this->_em->getRepository('AccountingBundle:AccountingConfig')->findOneBy(['globalOption'=>$globalOption]);
+        $accounting = $this->_em->getRepository(\App\Accounting\Entity\AccountingConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($accounting)){
             $config = new AccountingConfig();
             $config->setGlobalOption($globalOption);
             $this->_em->persist($config);
         }
 
-        $inventory = $this->_em->getRepository('InventoryBundle:InventoryConfig')->findOneBy(['globalOption'=>$globalOption]);
+        $inventory = $this->_em->getRepository(\App\Inventory\Entity\InventoryConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($inventory)){
             $config = new InventoryConfig();
             $config->setGlobalOption($globalOption);
             $this->_em->persist($config);
         }
 
-        $hospital = $this->_em->getRepository('HospitalBundle:HospitalConfig')->findOneBy(['globalOption'=>$globalOption]);
+        $hospital = $this->_em->getRepository(\App\Hospital\Entity\HospitalConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($hospital)){
             $config = new HospitalConfig();
             $config->setGlobalOption($globalOption);
             $this->_em->persist($config);
         }
 
-        $restaurantConfig = $this->_em->getRepository('RestaurantBundle:RestaurantConfig')->findOneBy(['globalOption'=>$globalOption]);
+        $restaurantConfig = $this->_em->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($restaurantConfig)){
             $config = new RestaurantConfig();
             $config->setGlobalOption($globalOption);
             $this->_em->persist($config);
         }
 
-        $dpsConfig = $this->_em->getRepository('DoctorPrescriptionBundle:DpsConfig')->findOneBy(['globalOption'=>$globalOption]);
+        $dpsConfig = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($dpsConfig)){
             $config = new DpsConfig();
             $config->setGlobalOption($globalOption);
             $this->_em->persist($config);
         }
 
-        $medicineConfig = $this->_em->getRepository('MedicineBundle:MedicineConfig')->findOneBy(['globalOption'=>$globalOption]);
+        $medicineConfig = $this->_em->getRepository(\App\Medicine\Entity\MedicineConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($medicineConfig)){
             $config = new MedicineConfig();
             $config->setGlobalOption($globalOption);
             $this->_em->persist($config);
         }
 
-        $businessConfig = $this->_em->getRepository('BusinessBundle:BusinessConfig')->findOneBy(['globalOption'=>$globalOption]);
+        $businessConfig = $this->_em->getRepository(\App\Business\Entity\BusinessConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($businessConfig)){
             $config = new BusinessConfig();
             $config->setGlobalOption($globalOption);
@@ -655,7 +655,7 @@ class GlobalOptionRepository extends EntityRepository
 
     public function defaultMenuSetup($globalOption)
     {
-        $menus = $this->_em->getRepository('SettingAppearanceBundle:MenuCustom')->findBy(['status'=>1]);
+        $menus = $this->_em->getRepository(\App\Appearance\Entity\MenuCustom::class)->findBy(['status'=>1]);
         $em = $this->_em;
         foreach( $menus as $custom){
 
@@ -675,14 +675,14 @@ class GlobalOptionRepository extends EntityRepository
     public function initialMenuSetup($globalOption)
     {
 
-        $menus = $this->_em->getRepository('SettingAppearanceBundle:Menu')->findBy(['globalOption'=>$globalOption,'status'=>1]);
+        $menus = $this->_em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['globalOption'=>$globalOption,'status'=>1]);
         $em = $this->_em;
         foreach( $menus as $menu){
 
             $menuGrouping = new MenuGrouping();
             $menuGrouping->setGlobalOption($globalOption);
             $menuGrouping->setMenu($menu);
-            $menuGrouping->setMenuGroup($em->getRepository('SettingAppearanceBundle:MenuGroup')->find(1));
+            $menuGrouping->setMenuGroup($em->getRepository(\App\Appearance\Entity\MenuGroup::class)->find(1));
             $em->persist($menuGrouping);
 
         }
@@ -691,7 +691,7 @@ class GlobalOptionRepository extends EntityRepository
             $menuGrouping = new MenuGrouping();
             $menuGrouping->setGlobalOption($globalOption);
             $menuGrouping->setMenu($menu);
-            $menuGrouping->setMenuGroup($em->getRepository('SettingAppearanceBundle:MenuGroup')->find(6));
+            $menuGrouping->setMenuGroup($em->getRepository(\App\Appearance\Entity\MenuGroup::class)->find(6));
             $em->persist($menuGrouping);
 
         }
@@ -1034,7 +1034,7 @@ class GlobalOptionRepository extends EntityRepository
         $em = $this->_em;
         $db = $em->createQueryBuilder();
         $db->select('g');
-        $db->from('SettingToolBundle:GlobalOption','g');
+        $db->from(\App\Tool\Entity\GlobalOption::class,'g');
         $db->where($db->expr()->andX(
          $db->expr()->eq('g.status',1),
          $db->expr()->eq('g.syndicate',$entity->getSyndicate()->getId())
@@ -1058,7 +1058,7 @@ class GlobalOptionRepository extends EntityRepository
                 $em = $this->_em;
                 $db = $em->createQueryBuilder();
                 $db->select('g');
-                $db->from('SettingToolBundle:GlobalOption', 'g');
+                $db->from(\App\Tool\Entity\GlobalOption::class, 'g');
                 $db->innerJoin('g.user', 'u');
                 $db->innerJoin('u.' . strtolower($entityName), 'e');
                 $db->where($db->expr()->andX(
@@ -1077,14 +1077,14 @@ class GlobalOptionRepository extends EntityRepository
         /**
          * @var Syndicate $syndicate
          */
-        $syndicate = $this->_em->getRepository('SettingToolBundle:Syndicate')->find($syndicate);
+        $syndicate = $this->_em->getRepository(\App\Tool\Entity\Syndicate::class)->find($syndicate);
         //$level = $this->_em->getRepository('SettingToolBundle:InstituteLevel')->findOneBy(array('slug'=>$level));
         $entityName = $syndicate->getEntityName();
         if ($entityName) {
                 $em = $this->_em;
                 $db = $em->createQueryBuilder();
                 $db->select('g');
-                $db->from('SettingToolBundle:GlobalOption', 'g');
+                $db->from(\App\Tool\Entity\GlobalOption::class, 'g');
                 $db->innerJoin('g.user', 'u');
                 $db->innerJoin('u.' . strtolower($entityName), 'e');
                 $db->where($db->expr()->andX(

@@ -105,11 +105,11 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
         if($mode == 'stock-return'){
             $arrs = ["damage-return",'stock-return'];
             $returnQuantity = $this->returnSalesReturnQuantity($store->getBusinessParticular(),$arrs);
-            $em->getRepository("BusinessBundle:BusinessParticular")->updateSalesReturnQuantity($store->getBusinessParticular(),$returnQuantity);
+            $em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateSalesReturnQuantity($store->getBusinessParticular(),$returnQuantity);
         }elseif($mode == "damage-return"){
-            $em->getRepository("BusinessBundle:BusinessDistributionReturnItem")->insertSalesDamageReturnItem($store);
+            $em->getRepository(\App\Business\Entity\BusinessDistributionReturnItem::class)->insertSalesDamageReturnItem($store);
         }elseif($mode == "damage"){
-            $em->getRepository("BusinessBundle:BusinessDamage")->insertSalesReturn($store);
+            $em->getRepository(\App\Business\Entity\BusinessDamage::class)->insertSalesReturn($store);
         }
     }
 
@@ -122,11 +122,11 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
         if($mode == 'stock-return'){
             $arrs = ["damage-return",'stock-return'];
             $returnQuantity = $this->returnSalesReturnQuantity($store->getBusinessParticular(),$arrs);
-            $em->getRepository("BusinessBundle:BusinessParticular")->updateSalesReturnQuantity($store->getBusinessParticular(),$returnQuantity);
+            $em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateSalesReturnQuantity($store->getBusinessParticular(),$returnQuantity);
         }elseif($mode == "damage-return"){
-            $em->getRepository("BusinessBundle:BusinessDistributionReturnItem")->deleteSalesDamageReturnItem($store);
+            $em->getRepository(\App\Business\Entity\BusinessDistributionReturnItem::class)->deleteSalesDamageReturnItem($store);
         }elseif($mode == "damage"){
-            $em->getRepository("BusinessBundle:BusinessDamage")->insertSalesReturn($store);
+            $em->getRepository(\App\Business\Entity\BusinessDamage::class)->insertSalesReturn($store);
         }
     }
 
@@ -154,7 +154,7 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
         $itemProcess = $data['itemProcess'];
         $wearhouse = (isset($data['wearhouse']) and $data['wearhouse']) ? $data['wearhouse'] : '';
         foreach ($itemIds as $key  => $itemId):
-            $exist = $em->getRepository('BusinessBundle:BusinessInvoiceReturnItem')->findOneBy(['invoiceReturn'=>$entity,'businessParticular'=>$itemId]);
+            $exist = $em->getRepository(\App\Business\Entity\BusinessInvoiceReturnItem::class)->findOneBy(['invoiceReturn'=>$entity,'businessParticular'=>$itemId]);
             if($exist and $quantity[$key] > 0){
                 $exist->setQuantity($quantity[$key]);
                 $exist->setBonusQuantity($bonusQuantity[$key]);
@@ -168,7 +168,7 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
                 $em->persist($exist);
                 $em->flush();
             }elseif($quantity[$key] > 0 ){
-                $product = $em->getRepository('BusinessBundle:BusinessParticular')->find($itemId);
+                $product = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($itemId);
                 $item = new BusinessInvoiceReturnItem();
                 $item->setInvoiceReturn($entity);
                 if($wearhouse){

@@ -16,7 +16,7 @@ class PurchaseReturnRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(e.id)');
-        $qb->from('InventoryBundle:PurchaseReturn','e');
+        $qb->from(\App\Inventory\Entity\PurchaseReturn::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory->getId());
         $count = $qb->getQuery()->getSingleScalarResult();
@@ -39,7 +39,7 @@ class PurchaseReturnRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('InventoryBundle:PurchaseReturnItem','e')
+            ->from(\App\Inventory\Entity\PurchaseReturnItem::class,'e')
             ->select('sum(e.subTotal) as total , count(e.id) as totalItem, sum(e.quantity) as totalQuantity')
             ->where('e.purchaseReturn = :purchaseReturn')
             ->setParameter('purchaseReturn', $purchaseReturn ->getId())
@@ -60,7 +60,7 @@ class PurchaseReturnRepository extends EntityRepository
         $datetime = new DateTime("now");
         $today_startdatetime = $datetime->format('Y-m-d 00:00:00');
         $today_enddatetime = $datetime->format('Y-m-d 23:59:59');
-        $qb->from('InventoryBundle:PurchaseReturn','s');
+        $qb->from(\App\Inventory\Entity\PurchaseReturn::class,'s');
         $qb->select('s')
             ->where('s.inventoryConfig = :inventory')
             ->andWhere('s.updated >= :today_startdatetime')

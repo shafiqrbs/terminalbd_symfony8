@@ -17,7 +17,7 @@ class GalleryImageRepository extends EntityRepository
     public function insertGalleryImage($data,$galleryId)
     {
         $em = $this->_em;
-        $galleryEnt = $em->getRepository('SettingMediaBundle:PhotoGallery')->find($galleryId);
+        $galleryEnt = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->find($galleryId);
         if($galleryEnt){
             $i=0;
             foreach ($data as $key => $value) {
@@ -60,7 +60,7 @@ class GalleryImageRepository extends EntityRepository
             $status = $data['status'][$i] ?? 0 ;
             $sorting = $data['sorting'][$i] ?: 0 ;
 
-            $entity = $em->getRepository('SettingMediaBundle:GalleryImage')->findOneBy(['id'=>$key]);
+            $entity = $em->getRepository(\App\Media\Entity\GalleryImage::class)->findOneBy(['id'=>$key]);
             if (!empty($entity)) {
 
                 $entity->setCaption($caption);
@@ -85,7 +85,7 @@ class GalleryImageRepository extends EntityRepository
         if(!empty($data)){
 
             foreach ($data as $key ){
-                $entity = $em->getRepository('SettingMediaBundle:GalleryImage')->find($key);
+                $entity = $em->getRepository(\App\Media\Entity\GalleryImage::class)->find($key);
                 if(!empty($entity)){
                     $entity->removeUpload($entity->getPhotoGallery()->getGlobalOption()->getId(),$entity->getPhotoGallery()->getId());
                     $em->remove($entity);

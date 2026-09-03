@@ -1,0 +1,15 @@
+mobile_home:
+    path:     /{subdomain}
+    defaults: { _controller: App\Bindu\Controller\MobileController::indexAction }
+
+mobile_contact:
+    path:     /{subdomain}/contact
+    defaults: { _controller: App\Bindu\Controller\MobileController::contactAction }
+
+mobile_email_receive:
+    path:     /{subdomain}/email-receive
+    defaults: { _controller: App\Bindu\Controller\MobileController::contactAction }
+
+mobile_content_page:
+    path:     /{subdomain}/{slug}
+    defaults: { _controller: App\Bindu\Controller\MobileController::contentAction }

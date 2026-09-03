@@ -46,7 +46,7 @@ class BusinessProductionRepository extends EntityRepository
         $em = $this->_em;
 	    $entity = new BusinessProduction();
 	    $entity->setBusinessParticular($particular);
-	    $particular = $this->_em->getRepository('BusinessBundle:BusinessParticular')->find($data['particularId']);
+	    $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
 	    $entity->setBusinessParticular($particular);
 	    $entity->setPurchasePrice($data['purchasePrice']);
 	    $entity->setSalesPrice($data['salesPrice']);
@@ -103,7 +103,7 @@ class BusinessProductionRepository extends EntityRepository
         $particular->setPurchaseQuantity($productionQnt);
         $em->persist($particular);
         $em->flush();
-		$this->_em->getRepository('BusinessBundle:BusinessParticular')->remainingQnt($particular);
+		$this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->remainingQnt($particular);
 	    $this->productionExpense($production,$particular);
     }
 
@@ -130,7 +130,7 @@ class BusinessProductionRepository extends EntityRepository
 					$entity->setQuantity($element->getQuantity() * $production->getQuantity());
 					$this->_em->persist($entity);
 					$this->_em->flush();
-					$this->_em->getRepository('BusinessBundle:BusinessParticular')->salesProductionQnt($element);
+					$this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->salesProductionQnt($element);
 				}
 			}
 		}

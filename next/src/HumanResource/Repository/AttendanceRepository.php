@@ -43,7 +43,7 @@ class AttendanceRepository extends EntityRepository
                 $entity->setYear($year);
                 $entity->setMonth($month);
                 $entity->setGlobalOption($globalOption);
-                $entity->setEmployee($this->_em->getRepository('UserBundle:User')->find($employee['id']));
+                $entity->setEmployee($this->_em->getRepository(\App\User\Entity\User::class)->find($employee['id']));
                 $entity->setTotalDay($totalNumberOfDays);
                 $entity->setWeekend($monthWeekend);
                 $this->_em->persist($entity);
@@ -62,7 +62,7 @@ class AttendanceRepository extends EntityRepository
                 $datetime->modify('+' . 1 . ' day');
             }
             $attendance = $this->findLeaveMonth($leave,$datetime,$weekend);
-            $this->_em->getRepository('HumanResourceBundle:DailyAttendance')->dailyLeaveAttendance($leave,$attendance,$datetime);
+            $this->_em->getRepository(\App\HumanResource\Entity\DailyAttendance::class)->dailyLeaveAttendance($leave,$attendance,$datetime);
          }
     }
 
@@ -125,7 +125,7 @@ class AttendanceRepository extends EntityRepository
     public function employeeTotalPresentDay(Attendance $attendance)
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('HumanResourceBundle:DailyAttendance','e');
+        $qb->from(\App\HumanResource\Entity\DailyAttendance::class,'e');
         $qb->select('sum(e.present) AS present');
         $qb->where('e.attendance = :attendance')->setParameter('attendance', $attendance->getId());
         $qb->andWhere('e.present = :present')->setParameter('present', 1);

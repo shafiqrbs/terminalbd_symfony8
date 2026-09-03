@@ -1,0 +1,36 @@
+event:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\EventController::indexAction' }
+
+event_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\EventController::showAction' }
+
+event_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\EventController::newAction' }
+
+event_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\EventController::createAction' }
+    requirements: { _method: post }
+
+event_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\EventController::editAction' }
+
+event_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\EventController::updateAction' }
+    requirements: { _method: post|put }
+
+event_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\EventController::deleteAction' }
+
+event_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Content\Controller\EventController::statusAction' }
+    
+
+

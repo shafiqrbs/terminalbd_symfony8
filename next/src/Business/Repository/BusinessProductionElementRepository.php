@@ -17,11 +17,11 @@ class BusinessProductionElementRepository extends EntityRepository
     public function insertProductionElement($particular, $data)
     {
         $em = $this->_em;
-	    $existParticular = $this->_em->getRepository('BusinessBundle:BusinessProductionElement')->findBy(['businessParticular'=>$particular,'particular' => $data['particularId']]);
+	    $existParticular = $this->_em->getRepository(\App\Business\Entity\BusinessProductionElement::class)->findBy(['businessParticular'=>$particular,'particular' => $data['particularId']]);
 	    if(empty($existParticular)){
 		    $entity = new BusinessProductionElement();
 		    $entity->setBusinessParticular($particular);
-		    $particular = $this->_em->getRepository('BusinessBundle:BusinessParticular')->find($data['particularId']);
+		    $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
 		    $entity->setParticular($particular);
 		    $entity->setPurchasePrice($particular->getPurchasePrice());
 		    $entity->setSalesPrice($data['price']);

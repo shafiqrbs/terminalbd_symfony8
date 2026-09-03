@@ -207,9 +207,9 @@ class MedicineSalesItemRepository extends EntityRepository
 
             $em->persist($entity);
             if($item->getMedicinePurchaseItem()) {
-                $em->getRepository( 'MedicineBundle:MedicinePurchaseItem' )->updateRemovePurchaseItemQuantity( $item->getMedicinePurchaseItem(), 'sales' );
+                $em->getRepository( \App\Medicine\Entity\MedicinePurchaseItem::class )->updateRemovePurchaseItemQuantity( $item->getMedicinePurchaseItem(), 'sales' );
             }
-            //$em->getRepository( 'MedicineBundle:MedicineStock' )->updateRemovePurchaseQuantity( $item->getMedicineStock(), 'sales' );
+            //$em->getRepository( \App\Medicine\Entity\MedicineStock::class )->updateRemovePurchaseQuantity( $item->getMedicineStock(), 'sales' );
         }
         $em->flush();
         $array = implode(",",$stockIds);
@@ -291,8 +291,8 @@ class MedicineSalesItemRepository extends EntityRepository
         $entity->setDiscountPrice($this->itemDiscountPrice($sales,$item->getSalesPrice()));
         $em->persist($entity);
         $em->flush();
-        $em->getRepository('MedicineBundle:MedicinePurchaseItem')->updateRemovePurchaseItemQuantity($item->getMedicinePurchaseItem(),'sales');
-        $em->getRepository('MedicineBundle:MedicineStock')->updateRemovePurchaseQuantity($item->getMedicineStock(),'sales');
+        $em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->updateRemovePurchaseItemQuantity($item->getMedicinePurchaseItem(),'sales');
+        $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->updateRemovePurchaseQuantity($item->getMedicineStock(),'sales');
 
     }
 

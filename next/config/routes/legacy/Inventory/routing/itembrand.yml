@@ -1,0 +1,41 @@
+itembrand:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ItemBrandController::indexAction' }
+
+inventory_itembrand_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\ItemBrandController::autoSearchAction' }
+    options:
+            expose: true
+
+inventory_itembrand_name:
+    path:      /{brand}/brand-name
+    defaults: { _controller: 'App\Inventory\Controller\ItemBrandController::searchItemBrandNameAction' }
+    options:
+            expose: true
+
+itembrand_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\ItemBrandController::showAction' }
+
+itembrand_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\ItemBrandController::newAction' }
+
+itembrand_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\ItemBrandController::createAction' }
+    methods:  POST
+
+itembrand_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\ItemBrandController::editAction' }
+
+itembrand_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\ItemBrandController::updateAction' }
+    methods:  [POST, PUT]
+
+itembrand_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\ItemBrandController::deleteAction' }

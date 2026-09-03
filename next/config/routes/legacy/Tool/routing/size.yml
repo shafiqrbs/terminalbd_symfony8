@@ -1,0 +1,32 @@
+size:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\SizeController::indexAction' }
+
+size_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\SizeController::showAction' }
+
+size_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\SizeController::newAction' }
+
+size_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\SizeController::createAction' }
+    methods:  POST
+
+size_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\SizeController::editAction' }
+
+size_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\SizeController::updateAction' }
+    methods:  [POST, PUT]
+
+size_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\SizeController::deleteAction' }
+    methods:  [POST, DELETE]
+
+

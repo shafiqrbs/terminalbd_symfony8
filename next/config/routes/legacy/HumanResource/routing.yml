@@ -1,0 +1,43 @@
+human_resource_leavepolicy:
+    resource: 'routing/leavepolicy.yml'
+    prefix:   /leave-policy
+
+human_resource_leave:
+    resource: 'routing/leave.yml'
+    prefix:   /leave
+
+human_resource_blackout:
+    resource: 'routing/weekend.yml'
+    prefix:   /weekend-leave
+
+human_resource_attendance:
+    resource: 'routing/attendance.yml'
+    prefix:   /attendance
+
+human_resource_daily_attendance:
+    resource: 'routing/dailyattendance.yml'
+    prefix:   /daily-attendance
+
+human_resource_leave_setup:
+    resource: 'routing/leavesetup.yml'
+    prefix:   /leave-setup
+
+human_resource_payroll_setting:
+    resource: 'routing/payrollsetting.yml'
+    prefix:   /payroll-setting
+
+human_resource_payroll_department:
+    resource: 'routing/hrdepartment.yml'
+    prefix:   /payroll-department
+
+human_resource_employee_payroll:
+    resource: 'routing/employeepayroll.yml'
+    prefix:   /employee-payroll
+
+human_resource_payroll:
+    resource: 'routing/payroll.yml'
+    prefix:   /payroll-generate
+
+human_resource_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: App\HumanResource\Controller\DefaultController::indexAction }

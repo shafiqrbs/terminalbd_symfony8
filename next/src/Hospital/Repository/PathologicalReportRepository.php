@@ -21,7 +21,7 @@ class PathologicalReportRepository extends EntityRepository
 
         foreach ($data as $key => $value){
 
-            $qb->update('HospitalBundle:PathologicalReport', 'mg')
+            $qb->update(\App\Hospital\Entity\PathologicalReport::class, 'mg')
                 ->set('mg.sorting', $i)
                 ->where('mg.id = :id')
                 ->setParameter('id', $value)

@@ -18,11 +18,11 @@ class ProductionElementRepository extends EntityRepository
     public function insertProductionElement($particular, $data)
     {
         $em = $this->_em;
-        $existParticular = $this->_em->getRepository('RestaurantBundle:ProductionElement')->findOneBy(['item'=> $particular,'material' => $data['particularId']]);
+        $existParticular = $this->_em->getRepository(\App\Restaurant\Entity\ProductionElement::class)->findOneBy(['item'=> $particular,'material' => $data['particularId']]);
         if(empty($existParticular)){
             $entity = new ProductionElement();
             $entity->setItem($particular);
-            $material = $this->_em->getRepository('RestaurantBundle:Particular')->find($data['particularId']);
+            $material = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
             $entity->setMaterial($material);
             $entity->setPrice($data['price']);
             $entity->setQuantity($data['quantity']);

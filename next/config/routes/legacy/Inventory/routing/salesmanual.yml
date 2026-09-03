@@ -1,0 +1,83 @@
+inventory_salesmanual:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::indexAction' }
+
+inventory_salesmanual_customer:
+    path:     /customer
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::customerAction' }
+
+inventory_salesmanual_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::showAction' }
+
+
+inventory_salesmanual_insert_item:
+    path:    /{sales}/insert-sales-item
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::insertManualSalesItemAction' }
+    methods:  [POST]
+
+
+inventory_salesmanual_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::newAction' }
+
+inventory_salesmanual_item_barcode_search:
+    path:     /add-barcode-item
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::searchBarcodeAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_salesmanual_item_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::searchAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_salesmanual_discount_update:
+    path:     /sales/discount-update
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::salesDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_salesmanual_edit:
+    path:     /{code}/manual-sales
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::editAction' }
+
+inventory_salesmanual_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_salesmanual_salesitem_delete:
+    path:     /{sales}/{salesItem}/manual-item-delete
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::itemDeleteAction' }
+
+inventory_salesmanual_print_invoice:
+    path:     /{invoice}/invoice
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::invoicePrintAction' }
+
+inventory_salesmanual_empty_delete:
+    path:     /delete/empty-manual-invoice
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::deleteEmptyInvoiceAction' }
+
+inventory_salesmanual_item_update:
+    path:     /manual-sales/item/update
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::salesItemUpdateAction' }
+    options:
+           expose: true
+
+inventory_salesmanual_inline_process_update:
+    path:     /manual-sales/inline-process-update
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::salesInlineProcessUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_salesmanual_inline_status_select:
+    path:     /manual-sales/inline-status-select
+    defaults: { _controller: 'App\Inventory\Controller\SalesManualController::salesSelectAction' }
+    options:
+           expose: true

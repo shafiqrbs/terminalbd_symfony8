@@ -1,0 +1,100 @@
+purchase:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::indexAction' }
+
+purchase_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::showAction' }
+
+purchase_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::newAction' }
+
+purchase_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::createAction' }
+    methods:  POST
+
+purchase_check_item_quantity:
+    path:     /check-item-quantity
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::checkItemQuantityAction' }
+    methods:  POST
+
+purchase_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::editAction' }
+
+purchase_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::updateAction' }
+    methods:  [POST, PUT]
+
+purchase_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::editAction' }
+
+inventory_grn_search:
+    path:     /purchase-auto-search
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::autoSearchAction' }
+    options:
+           expose: true
+
+inventory_grn_name:
+    path:     /{grn}/purchase-search-name
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::searchNameAction' }
+    options:
+           expose: true
+
+purchase_approve:
+    path:     /{id}/approve
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::approveAction' }
+
+purchase_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::deleteAction' }
+
+approved_purchase_deleted:
+    path:     /{id}/approved-purchase-deleted
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::approvedPurchaseDeletedAction' }
+
+purchase_vendor_item_delete:
+    path:     /{id}/vendor-item-delete
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::deleteVendorAction' }
+
+purchase_item_delete:
+    path:     /{id}/purchase-item-delete
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::deleteItemAction' }
+
+purchase_edit_approve:
+    path:     /{id}/edit-approve
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::editApproveAction' }
+
+
+purchase_update_approve:
+    path:      /{id}/update-approve
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::updateApproveAction' }
+    methods:  [POST, PUT]
+
+purchase_vendoritem_inline_update:
+    path:     /inline-purchase-vendor-item-update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::inlinePurchaseVendorItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+purchase_purchaseitem_inline_update:
+    path:     /inline-purchase-item-update
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::inlinePurchaseItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+purchase_vendoritem_delete:
+    path:     /{purchase}/{id}/purchase-delete-vendoritem
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::purchaseVendorItemDeleteAction' }
+
+purchase_purchaseitem_delete:
+    path:     /{purchase}/{id}/purchase-delete-item
+    defaults: { _controller: 'App\Inventory\Controller\PurchaseController::purchaseItemDeleteAction' }
+
+

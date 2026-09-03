@@ -1,0 +1,33 @@
+hms_particular:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\ParticularController::indexAction' }
+
+hms_particular_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Hospital\Controller\ParticularController::showAction' }
+
+hms_particular_new:
+    path:     /new
+    defaults: { _controller: 'App\Hospital\Controller\ParticularController::newAction' }
+
+hms_particular_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\ParticularController::createAction' }
+    methods:  POST
+
+hms_particular_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\ParticularController::editAction' }
+
+hms_particular_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\ParticularController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_particular_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\ParticularController::deleteAction' }
+
+hms_particular_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\ParticularController::statusAction' }

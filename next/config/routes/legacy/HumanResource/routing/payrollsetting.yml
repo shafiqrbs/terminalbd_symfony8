@@ -1,0 +1,22 @@
+payrollsetting:
+    path:     /
+    defaults: { _controller: 'App\HumanResource\Controller\SettingController::indexAction' }
+
+payrollsetting_create:
+    path:     /create
+    defaults: { _controller: 'App\HumanResource\Controller\SettingController::createAction' }
+    methods:  POST
+
+payrollsetting_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\HumanResource\Controller\SettingController::editAction' }
+
+payrollsetting_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\HumanResource\Controller\SettingController::updateAction' }
+    methods:  [POST, PUT]
+
+payrollsetting_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\HumanResource\Controller\SettingController::deleteAction' }
+    methods:  [POST, DELETE]

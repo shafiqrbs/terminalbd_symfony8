@@ -1,0 +1,31 @@
+business_marketing:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\MarketingController::indexAction' }
+
+business_marketing_create:
+    path:     /create
+    defaults: { _controller: 'App\Business\Controller\MarketingController::createAction' }
+    methods:  POST
+
+business_marketing_sales_target:
+    path:     /sales-target
+    defaults: { _controller: 'App\Business\Controller\MarketingController::updateSalesTargetAction' }
+    methods:  [POST, PUT]
+
+business_marketing_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Business\Controller\MarketingController::editAction' }
+
+business_marketing_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Business\Controller\MarketingController::updateAction' }
+    methods:  [POST, PUT]
+
+business_marketing_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\MarketingController::deleteAction' }
+
+business_marketing_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Business\Controller\BusinessAreaController::statusAction' }
+

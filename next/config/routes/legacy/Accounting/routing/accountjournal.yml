@@ -1,0 +1,52 @@
+account_journal:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::indexAction' }
+
+account_journal_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::showAction' }
+
+account_journal_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::newAction' }
+
+account_journal_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::createAction' }
+    methods:  POST
+
+account_journal_reverse:
+    path:     /{id}/reverse
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::journalReverseAction' }
+
+account_journal_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::approveAction' }
+    options:
+           expose: true
+
+account_journal_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::inlineUpdateAction' }
+
+
+account_journal_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::deleteAction' }
+    options:
+           expose: true
+
+account_journal_approve_delete:
+    path:     /{id}/approve-delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::approveDeleteAction' }
+    options:
+           expose: true
+
+account_journal_pdf:
+    path:     /report-pdf
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::journalPdfAction' }
+
+account_journal_excel:
+    path:     /report-excel
+    defaults: { _controller: 'App\Accounting\Controller\AccountJournalController::journalExcelAction' }
+

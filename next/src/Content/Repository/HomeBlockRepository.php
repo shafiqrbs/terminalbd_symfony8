@@ -18,7 +18,7 @@ class HomeBlockRepository extends EntityRepository
 
 
         $em =$this->_em;
-        $entity = $em->getRepository('SettingAppearanceBundle:Menu')->findBy(['globalOption'=>$globalOption,'status'=>1],['menu'=>'asc']);
+        $entity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['globalOption'=>$globalOption,'status'=>1],['menu'=>'asc']);
         if($entity){
             return $entity;
         }else{
@@ -36,12 +36,12 @@ class HomeBlockRepository extends EntityRepository
 
                 $menuId = $data['menu'][$i];
                 $icon = $data['icon'][$i];
-                $menu = $em->getRepository('SettingAppearanceBundle:Menu')->findOneBy(['id'=>$menuId]);
-                $icon = $em->getRepository('SettingToolBundle:Icon')->findOneBy(['id'=>$icon]);
+                $menu = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['id'=>$menuId]);
+                $icon = $em->getRepository(\App\Tool\Entity\Icon::class)->findOneBy(['id'=>$icon]);
 
                 if( $data['blockId'][$i] > 0 and isset($data['blockName'][$i]) and !empty( $data['blockName'][$i])){
                     $id= $data['blockId'][$i];
-                    $entity = $em->getRepository('SettingContentBundle:HomeBlock')->findOneBy(['id'=>$id]);
+                    $entity = $em->getRepository(\App\Content\Entity\HomeBlock::class)->findOneBy(['id'=>$id]);
                     $entity->setHomePage($homePage);
                     $entity->setName($block);
                     $entity->setMenu($menu);

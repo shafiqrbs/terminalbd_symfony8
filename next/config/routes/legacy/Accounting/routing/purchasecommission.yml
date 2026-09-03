@@ -1,0 +1,38 @@
+account_purchasecommission:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseCommissionController::indexAction' }
+
+account_purchasecommission_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseCommissionController::newAction' }
+
+account_purchasecommission_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseCommissionController::createAction' }
+    methods:  POST
+
+account_purchasecommission_reverse:
+    path:     /{id}/reverse
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseCommissionController::journalReverseAction' }
+
+account_purchasecommission_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseCommissionController::approveAction' }
+    options:
+           expose: true
+
+account_purchasecommission_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseCommissionController::inlineUpdateAction' }
+
+account_purchasecommission_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseCommissionController::deleteAction' }
+    options:
+           expose: true
+
+account_purchasecommission_approve_delete:
+    path:     /{id}/approve-delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountPurchaseCommissionController::approveDeleteAction' }
+    options:
+           expose: true

@@ -1,0 +1,43 @@
+medicine_stockhouse:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::indexAction' }
+
+medicine_stockhouse_details:
+    path:     /stock-house-details
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::stockDetailsAction' }
+
+medicine_stockhouse_search:
+    path:     /search
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::autoSearchAction' }
+    options:
+            expose: true
+
+medicine_stockhouse_in:
+    path:     /stock-in
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::stockInAction' }
+
+medicine_stockhouse_out:
+    path:     /stock-out
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::stockOutAction' }
+
+medicine_stockhouse_in_create:
+    path:     /create-stock-in
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::createInAction' }
+    methods:  POST
+
+medicine_stockhouse_out_create:
+    path:     /create-stock-out
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::createOutAction' }
+    methods:  POST
+
+medicine_stockhouse_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::showAction' }
+
+medicine_stockhouse_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::statusAction' }
+
+medicine_stockhouse_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\StockHouseController::deleteAction' }

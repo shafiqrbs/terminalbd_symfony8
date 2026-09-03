@@ -1,0 +1,63 @@
+invoicemodule:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::indexAction' }
+
+invoicemodule_domain:
+    path:     /domain-invoice
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::domainAction' }
+
+invoicemodule_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::showAction' }
+
+invoicemodule_add:
+    path:      /add-invoice
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::addInvoiceAction' }
+
+invoicemodule_new:
+    path:      /{option}/new
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::newAction' }
+
+
+invoicemodule_edit:
+    path:     /{invoice}/edit
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::editAction' }
+
+invoicemodule_modify:
+    path:     /{id}/modify
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::modifyAction' }
+
+invoicemodule_print:
+    path:     /{id}/print
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::printAction' }
+
+invoicemodule_generate:
+    path:     /{invoice}/generate-invoice
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::generateInvoiceAction' }
+
+invoicemodule_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::updateAction' }
+    methods:  [POST, PUT]
+
+invoicemodule_ajax_payment:
+    path:     /{id}/payment
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::paymentAction' }
+    methods:  [POST, PUT]
+
+invoicemodule_delete:
+    path:     /{invoice}/delete
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::deleteAction' }
+
+invoicemodule_item_delete:
+    path:     /{invoice}/{item}/delete
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::deleteItemAction' }
+
+invoicemodule_approve:
+    path:     /{id}/invoice-approve
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::approveAction' }
+
+invoicemodule_inline_upate:
+    path:     /inline-invoice-module
+    defaults: { _controller: 'App\Tool\Controller\InvoiceModuleController::inlineUpdateAction' }
+    methods:  POST

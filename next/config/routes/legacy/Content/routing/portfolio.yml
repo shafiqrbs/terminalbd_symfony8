@@ -1,0 +1,34 @@
+portfolio:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\PortfolioController::indexAction' }
+
+portfolio_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\PortfolioController::showAction' }
+
+portfolio_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\PortfolioController::newAction' }
+
+portfolio_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\PortfolioController::createAction' }
+    methods:  POST
+
+portfolio_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\PortfolioController::editAction' }
+
+portfolio_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Content\Controller\PortfolioController::statusAction' }
+
+portfolio_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\PortfolioController::updateAction' }
+    methods:  [POST, PUT]
+
+portfolio_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\PortfolioController::deleteAction' }
+

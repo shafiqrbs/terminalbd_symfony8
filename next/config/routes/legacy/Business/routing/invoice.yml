@@ -1,0 +1,181 @@
+business_invoice:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::indexAction' }
+
+business_invoice_condition:
+    path:     /condition
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceConditionAction' }
+
+business_invoice_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::showAction' }
+
+business_invoice_new:
+    path:     /new
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::newAction' }
+
+business_invoice_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::editAction' }
+
+business_invoice_customer_update:
+    path:     /invoice-customer-update
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::customerUpdateAction' }
+    options:
+            expose: true
+
+business_invoice_customermobile_update:
+    path:     /invoice-customer-mobile-update
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::customerMobileUpdateAction' }
+    options:
+            expose: true
+
+business_particular_search:
+    path:     /{id}/particular-search
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::particularSearchAction' }
+    options:
+            expose: true
+
+business_invoice_particular_search:
+    path:     /invoice-particular-search
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::autoParticularSearchAction' }
+    options:
+            expose: true
+
+business_invoice_particular_barcode:
+    path:     /invoice-particular-barcode
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::addBarcodeProductAction' }
+    options:
+            expose: true
+
+business_item_unit_search:
+    path:     /item-unit-search
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::autoUnitSearchAction' }
+    options:
+            expose: true
+
+business_item_wearhouse_update:
+    path:     /{id}/item-wearhouse-update
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::wearhouseUpdateAction' }
+    options:
+            expose: true
+
+business_item_batchitem_update:
+    path:     /{id}/item-batch-update
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::batchItemUpdateAction' }
+    options:
+            expose: true
+
+business_invoice_event:
+    path:     /{id}/event
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::addEventAction' }
+    methods:  POST
+    options:
+            expose: true
+
+
+business_invoice_particular_add:
+    path:     /{invoice}/particular-add
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::addParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_invoice_discount_update:
+    path:     /dicount-update
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_invoice_accessories_add:
+    path:     /{invoice}/stock-accessories
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::addAccessoriesAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_invoice_commission_add:
+    path:     /{invoice}/sales-commission
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::addParticularCommissionAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_invoice_banner_sign:
+    path:     /{invoice}/stock-banner-sign
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::bannerSignAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_invoice_approved:
+    path:     /{id}/invoice-approved
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::approveAction' }
+
+business_invoice_received:
+    path:     /{id}/invoice-received
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::receivedAction' }
+
+business_invoice_returned:
+    path:     /{id}/invoice-returned
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::returnedAction' }
+
+
+business_invoice_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::updateAction' }
+    methods:  [POST, PUT]
+
+business_invoice_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::deleteAction' }
+
+
+business_invoice_particular_delete:
+    path:     /{invoice}/{id}/particular-delete
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceParticularDeleteAction' }
+
+business_invoice_print:
+    path:     /{id}/print
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoicePrintAction' }
+
+business_invoice_posprint:
+    path:     /{id}/pos-print
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::posPrintAction' }
+
+business_invoice_chalan:
+    path:     /{id}/chalan
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceChalanAction' }
+
+
+business_invoice_empty_delete:
+    path:     /delete/empty-invoice
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::deleteEmptyInvoiceAction' }
+
+business_invoice_commission_process:
+    path:     /commission-process
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::commissionProcessAction' }
+
+
+business_invoice_item_update:
+    path:     /sales-item-update
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceItemUpdateAction' }
+    methods:  POST
+    options:
+        expose: true
+
+business_invoice_customer_search:
+    path:     /invoice-customer-search
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceCustomerSelectAction' }
+    methods:  GET
+    options:
+        expose: true
+
+business_invoice_customer_inline_update:
+    path:     /invoice-customer-inline-update
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceCustomerInlineUpdateAction' }
+    methods:  POST
+    options:
+        expose: true
+

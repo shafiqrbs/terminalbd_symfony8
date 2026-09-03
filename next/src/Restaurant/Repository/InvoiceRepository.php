@@ -240,7 +240,7 @@ class InvoiceRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('RestaurantBundle:InvoiceParticular','si')
+            ->from(\App\Restaurant\Entity\InvoiceParticular::class,'si')
             ->select('sum(si.subTotal) as subTotal')
             ->addSelect('sum(si.purchasePrice * si.quantity) as purchasePrice')
             ->where('si.invoice = :invoice')
@@ -285,7 +285,7 @@ class InvoiceRepository extends EntityRepository
 
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
-        $qb->from('RestaurantBundle:InvoiceParticular','ip');
+        $qb->from(\App\Restaurant\Entity\InvoiceParticular::class,'ip');
         $qb->innerJoin('ip.particular','particular');
         $qb->where('si.invoice = :invoice');
         $qb->setParameter('invoice', $invoice ->getId());
@@ -296,7 +296,7 @@ class InvoiceRepository extends EntityRepository
     public function updatePatientInfo($invoice,Customer $patient)
     {
         $em = $this->_em;
-        $invoice = $this->_em->getRepository('RestaurantBundle:Invoice')->find($invoice);
+        $invoice = $this->_em->getRepository(\App\Restaurant\Entity\Invoice::class)->find($invoice);
         $invoice->setCustomer($patient);
         $invoice->setMobile($patient->getMobile());
         $em->persist($invoice);
@@ -309,11 +309,11 @@ class InvoiceRepository extends EntityRepository
         $em = $this->_em;
         $invoiceInfo = $data['appstore_bundle_configbundle_invoice'];
         if($invoiceInfo['cabin']){
-            $cabin = $em->getRepository('RestaurantBundle:Particular')->find($invoiceInfo['cabin']);
+            $cabin = $em->getRepository(\App\Restaurant\Entity\Particular::class)->find($invoiceInfo['cabin']);
             $entity->setCabin($cabin);
         }
         if($invoiceInfo['assignDoctor']){
-            $assignDoctor = $em->getRepository('RestaurantBundle:Particular')->find($invoiceInfo['assignDoctor']);
+            $assignDoctor = $em->getRepository(\App\Restaurant\Entity\Particular::class)->find($invoiceInfo['assignDoctor']);
             $entity->setAssignDoctor($assignDoctor);
         }
         if($invoiceInfo['department']){
@@ -333,8 +333,8 @@ class InvoiceRepository extends EntityRepository
 
     public function checkTokenBooking($invoice , $tokenNo)
     {
-        $invoice = $this->_em->getRepository('RestaurantBundle:Invoice')->find($invoice);
-        $cabin = $this->_em->getRepository('RestaurantBundle:Particular')->find($tokenNo);
+        $invoice = $this->_em->getRepository(\App\Restaurant\Entity\Invoice::class)->find($invoice);
+        $cabin = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($tokenNo);
         $qb = $this->createQueryBuilder('e');
         $qb->select('COUNT(e.tokenNo) AS cabinCount');
         $qb->where('e.restaurantConfig = :config')->setParameter('config', $invoice ->getRestaurantConfig()->getId());
@@ -585,21 +585,21 @@ class InvoiceRepository extends EntityRepository
                 }
                 $sales->setVat($item['vat']);
                 if(isset($item['transactionMethod']) and $item['transactionMethod']){
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>$item['transactionMethod']]);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>$item['transactionMethod']]);
                     if($method){
                         $sales->setTransactionMethod($method);
                     }
                 }elseif(isset($item['transactionMethod']) and empty($item['transactionMethod']) and $sales->getPayment() > 0){
-                    $method = $em->getRepository('SettingToolBundle:TransactionMethod')->findOneBy(['slug'=>'cash']);
+                    $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(['slug'=>'cash']);
                     $sales->setTransactionMethod($method);
                 }
                 if(isset($item['bankAccount']) and $item['bankAccount'] > 0 ){
-                    $bank = $em->getRepository('AccountingBundle:AccountBank')->find($item['bankAccount']);
+                    $bank = $em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($item['bankAccount']);
                     if($bank){
                         $sales->setAccountBank($bank);
                     }
                     if(isset($item['paymentCard']) and $item['paymentCard']){
-                        $card = $em->getRepository('SettingToolBundle:PaymentCard')->find($item['paymentCard']);
+                        $card = $em->getRepository(\App\Tool\Entity\PaymentCard::class)->find($item['paymentCard']);
                         $sales->setPaymentCard($card);
                     }
                 }
@@ -610,7 +610,7 @@ class InvoiceRepository extends EntityRepository
                     $sales->setCardNo($item['transactionId']);
                 }
                 if(isset($item['mobileBankAccount']) and $item['mobileBankAccount'] > 0){
-                    $mobile = $em->getRepository('AccountingBundle:AccountMobileBank')->find($item['mobileBankAccount']);
+                    $mobile = $em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($item['mobileBankAccount']);
                     if($mobile){
                         $sales->setAccountMobileBank($mobile);
                     }
@@ -619,21 +619,21 @@ class InvoiceRepository extends EntityRepository
                     $sales->setPaymentMobile($item['paymentMobile']);
                 }
                 if(isset($item['customerName']) and $item['customerName'] and isset($item['customerMobile']) and $item['customerMobile']){
-                    $customer = $em->getRepository('DomainUserBundle:Customer')->newExistingCustomerForSales($option,$item['customerMobile'],$item);
+                    $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($option,$item['customerMobile'],$item);
                     $sales->setCustomer($customer);
                 }elseif(($item['customerId']) and $item['customerId'] > 0 ){
-                    $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption'=>$option,'id'=>$item['customerId']]);
+                    $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$option,'id'=>$item['customerId']]);
                     $sales->setCustomer($customer);
                 }else{
-                    $customer = $em->getRepository('DomainUserBundle:Customer')->findOneBy(['globalOption' => $option, 'mobile' => $option->getMobile()]);
+                    $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $option, 'mobile' => $option->getMobile()]);
                     $sales->setCustomer($customer);
                 }
                 if(($item['createdBy']) and $item['createdBy'] > 0){
-                    $createdBy = $em->getRepository('UserBundle:User')->find($item['createdBy']);
+                    $createdBy = $em->getRepository(\App\User\Entity\User::class)->find($item['createdBy']);
                     $sales->setCreatedBy($createdBy);
                 }
                 if(($item['salesBy']) and $item['salesBy'] > 0){
-                    $salesBy = $em->getRepository('UserBundle:User')->find($item['salesBy']);
+                    $salesBy = $em->getRepository(\App\User\Entity\User::class)->find($item['salesBy']);
                     $sales->setSalesBy($salesBy);
                 }
                 if($sales->getTransactionMethod() and $sales->getTransactionMethod()->getSlug() == 'mobile' and $sales->getAccountMobileBank() and $sales->getAccountMobileBank()->getServiceCharge() > 0){
@@ -671,11 +671,11 @@ class InvoiceRepository extends EntityRepository
             foreach ($items as $item):
 
                 $deviceSalesId = $item['salesId'];
-                $sales = $em->getRepository('RestaurantBundle:Invoice')->findOneBy(['restaurantConfig' => $conf, 'deviceSalesId' => $deviceSalesId]);
+                $sales = $em->getRepository(\App\Restaurant\Entity\Invoice::class)->findOneBy(['restaurantConfig' => $conf, 'deviceSalesId' => $deviceSalesId]);
                 if ($sales) {
                     $salesItem = new InvoiceParticular();
                     $salesItem->setInvoice($sales);
-                    $stockId = $em->getRepository('RestaurantBundle:Particular')->find($item['stockId']);
+                    $stockId = $em->getRepository(\App\Restaurant\Entity\Particular::class)->find($item['stockId']);
                     if ($stockId) {
                         $salesItem->setParticular($stockId);
                         $salesItem->setPurchasePrice($stockId->getPurchasePrice());
@@ -693,7 +693,7 @@ class InvoiceRepository extends EntityRepository
                     $em->persist($salesItem);
                     $em->flush();
                     if ($salesItem->getParticular()) {
-                        $em->getRepository('RestaurantBundle:Particular')->updateRemoveStockQuantity($salesItem->getParticular(), 'sales');
+                        $em->getRepository(\App\Restaurant\Entity\Particular::class)->updateRemoveStockQuantity($salesItem->getParticular(), 'sales');
                     }
                 }
             endforeach;

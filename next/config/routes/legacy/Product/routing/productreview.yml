@@ -1,0 +1,30 @@
+productreview:
+    path:     /
+    defaults: { _controller: 'App\Product\Controller\ProductReviewController::indexAction' }
+
+productreview_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Product\Controller\ProductReviewController::showAction' }
+
+productreview_new:
+    path:     /new
+    defaults: { _controller: 'App\Product\Controller\ProductReviewController::newAction' }
+
+productreview_create:
+    path:     /create
+    defaults: { _controller: 'App\Product\Controller\ProductReviewController::createAction' }
+    methods:  POST
+
+productreview_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Product\Controller\ProductReviewController::editAction' }
+
+productreview_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Product\Controller\ProductReviewController::updateAction' }
+    methods:  [POST, PUT]
+
+productreview_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Product\Controller\ProductReviewController::deleteAction' }
+    methods:  [POST, DELETE]

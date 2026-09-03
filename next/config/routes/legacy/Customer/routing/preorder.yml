@@ -1,0 +1,68 @@
+preorder:
+    path:     /
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::indexAction' }
+
+preorder_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::showAction' }
+
+preorder_new:
+    path:     /new
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::newAction' }
+
+preorder_create:
+    path:     /create
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::createAction' }
+    methods:  POST
+
+preorder_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::editAction' }
+
+preorder_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::updateAction' }
+    methods:  [POST, PUT]
+
+preorder_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::deleteAction' }
+
+preorder_item:
+    path:     /{id}/add-item
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::itemAction' }
+
+preorder_item_create:
+    path:      /{id}/create-item
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::createItemAction' }
+    methods:  POST
+
+preorder_approve:
+    path:      /{id}/pre-order-process
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::approveAction' }
+
+preorder_process:
+    path:      /{id}/order-process
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::processAction' }
+    methods:  [GET, PUT]
+
+preorder_item_delete:
+    path:     /{preOrder}/{id}/delete-item
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::deleteItemAction' }
+
+preorder_item_confirm:
+    path:     /{preOrder}/{id}/confirm-item
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::confirmItemAction' }
+
+preorder_ajax_payment:
+    path:      /{id}/pre-order-payment
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::paymentAction' }
+    methods:  [POST]
+
+preorder_payment_delete:
+    path:     /{id}/payment-delete
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::paymentDeleteAction' }
+
+preorder_invoice:
+    path:      /{id}/preorder-invoice
+    defaults: { _controller: 'App\Customer\Controller\PreOrderController::invoiceAction' }

@@ -91,7 +91,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
     {
         $em = $this->_em;
         return $total = $em->createQueryBuilder()
-            ->from('BusinessBundle:BusinessInvoiceParticular','si')
+            ->from(\App\Business\Entity\BusinessInvoiceParticular::class,'si')
             ->select('sum(si.damageQnt) as damageQnt')
             ->where('si.businessInvoice = :invoice')
             ->setParameter('invoice', $invoice)
@@ -102,7 +102,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
     {
         $em = $this->_em;
         $result = $em->createQueryBuilder()
-            ->from('BusinessBundle:BusinessPurchaseReturnItem','si')
+            ->from(\App\Business\Entity\BusinessPurchaseReturnItem::class,'si')
             ->select('sum(si.subTotal) as total','sum(si.damageQnt) as damageQuantity','sum(si.spoilQnt) as spoilQuantity','sum(si.quantity) as quantity')
             ->where('si.businessPurchaseReturn = :entity')
             ->setParameter('entity', $entity ->getId())
@@ -136,7 +136,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
             $em = $this->_em;
             $config = $user->getGlobalOption()->getBusinessConfig();
             if(!empty($data['vendor']) and !empty($data['grandTotal'])){
-                $vendor = $em->getRepository('AccountingBundle:AccountVendor')->find($data['vendor']);
+                $vendor = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($data['vendor']);
                 $entity = new BusinessPurchaseReturn();
                 $entity->setBusinessConfig($config);
                 $entity->setVendor($vendor);
@@ -161,7 +161,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
 
             /* @var $distribution BusinessDistributionReturnItem */
 
-            $distribution = $em->getRepository('BusinessBundle:BusinessDistributionReturnItem')->find($item);
+            $distribution = $em->getRepository(\App\Business\Entity\BusinessDistributionReturnItem::class)->find($item);
 
             /* @var $purchaseItem BusinessPurchaseReturnItem */
 
@@ -175,8 +175,8 @@ class BusinessPurchaseReturnRepository extends EntityRepository
             $purchaseItem->setSubTotal($quantity * $distribution->getPurchasePrice());
             $em->persist($purchaseItem);
             $em->flush();
-            $em->getRepository('BusinessBundle:BusinessParticular')->updateRemoveStockQuantity($distribution->getBusinessParticular(), "purchase-return");
-            $em->getRepository('BusinessBundle:BusinessPurchaseReturnItem')->updatReturnQuantity($distribution);
+            $em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($distribution->getBusinessParticular(), "purchase-return");
+            $em->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->updatReturnQuantity($distribution);
         endforeach;
     }
 
@@ -190,7 +190,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
             if($quantity > 0 ){
 
                 /* @var  $particular BusinessParticular */
-                $particular = $em->getRepository('BusinessBundle:BusinessParticular')->find($item);
+                $particular = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($item);
                 $purchaseItem = new BusinessPurchaseReturnItem();
                 $purchaseItem->setBusinessPurchaseReturn($entity);
                 $purchaseItem->setBusinessParticular($particular);
@@ -201,8 +201,8 @@ class BusinessPurchaseReturnRepository extends EntityRepository
                 $em->flush();
             }
 
-           // $em->getRepository('BusinessBundle:BusinessParticular')->updateRemoveStockQuantity($distribution->getBusinessParticular(), "purchase-return");
-           // $em->getRepository('BusinessBundle:BusinessPurchaseReturnItem')->updatReturnQuantity($distribution);
+           // $em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($distribution->getBusinessParticular(), "purchase-return");
+           // $em->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->updatReturnQuantity($distribution);
         endforeach;
     }
 }

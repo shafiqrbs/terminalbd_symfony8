@@ -1,0 +1,37 @@
+medicine_particular:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\ParticularController::indexAction' }
+
+medicine_particular_search:
+    path:     /search
+    defaults: { _controller: 'App\Medicine\Controller\ParticularController::autoSearchAction' }
+    options:
+            expose: true
+
+medicine_particular_name:
+    path:      /{particular}/particular-name
+    defaults: { _controller: 'App\Medicine\Controller\ParticularController::searchParticularNameAction' }
+    options:
+            expose: true
+
+medicine_particular_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\ParticularController::createAction' }
+    methods:  POST
+
+medicine_particular_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\ParticularController::editAction' }
+
+medicine_particular_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\ParticularController::updateAction' }
+    methods:  [POST, PUT]
+
+medicine_particular_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Medicine\Controller\ParticularController::statusAction' }
+
+medicine_particular_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\ParticularController::deleteAction' }

@@ -1,0 +1,18 @@
+medicine_config_manage:
+    path:     /manage
+    defaults: { _controller: 'App\Medicine\Controller\MedicineConfigController::manageAction' }
+
+medicine_config_update:
+    path:     /update
+    defaults: { _controller: 'App\Medicine\Controller\MedicineConfigController::updateAction' }
+    methods:  [POST, PUT]
+
+medicine_user_search:
+    path:     /search
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::autoSearchAction' }
+    options:
+            expose: true
+
+
+
+

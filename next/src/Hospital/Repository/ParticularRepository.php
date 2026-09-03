@@ -207,12 +207,12 @@ class ParticularRepository extends EntityRepository
         $name = $data['referredDoctor']['name'];
         $doctorSignature = $data['referredDoctor']['doctorSignature'];
         $isDoctor = isset($data['referredDoctor']['isDoctor']) ? 1 : 0;
-        $entity = $em->getRepository('HospitalBundle:Particular')->findOneBy(['hospitalConfig' => $hospital, 'service' => 6, 'mobile' => $mobile]);
+        $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(['hospitalConfig' => $hospital, 'service' => 6, 'mobile' => $mobile]);
         if ($entity) {
             return $entity;
         } else {
             $entity = new Particular();
-            $entity->setService($em->getRepository('HospitalBundle:Service')->find(6));
+            $entity->setService($em->getRepository(\App\Hospital\Entity\Service::class)->find(6));
             $entity->setMobile($mobile);
             $entity->setName($name);
             $entity->setDoctorSignature($doctorSignature);
@@ -231,12 +231,12 @@ class ParticularRepository extends EntityRepository
         $name = $data['referredDoctor']['name'];
         $doctorSignature = $data['referredDoctor']['doctorSignature'];
         $isDoctor = isset($data['referredDoctor']['isDoctor']) ? 1 : 0;
-        $entity = $em->getRepository('HospitalBundle:Particular')->findOneBy(['hospitalConfig' => $hospital, 'service' => 6, 'mobile' => $mobile]);
+        $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(['hospitalConfig' => $hospital, 'service' => 6, 'mobile' => $mobile]);
         if ($entity) {
             return $entity;
         } else {
             $entity = new Particular();
-            $entity->setService($em->getRepository('HospitalBundle:Service')->find(6));
+            $entity->setService($em->getRepository(\App\Hospital\Entity\Service::class)->find(6));
             $entity->setMobile($mobile);
             $entity->setName($name);
             $entity->setDoctorSignature($doctorSignature);
@@ -257,12 +257,12 @@ class ParticularRepository extends EntityRepository
         $doctorSignatureBangla = $data['assignDoctor']['doctorSignatureBangla'];
         $specialist = $data['assignDoctor']['specialist'];
         $account = isset($data['assignDoctor']['sendToAccount']) ? 1 : 0;
-        $entity = $em->getRepository('HospitalBundle:Particular')->findOneBy(['hospitalConfig' => $hospital, 'service' => 5, 'name' => $name]);
+        $entity = $em->getRepository(\App\Hospital\Entity\Particular::class)->findOneBy(['hospitalConfig' => $hospital, 'service' => 5, 'name' => $name]);
         if ($entity) {
             return $entity;
         } else {
             $entity = new Particular();
-            $entity->setService($em->getRepository('HospitalBundle:Service')->find(5));
+            $entity->setService($em->getRepository(\App\Hospital\Entity\Service::class)->find(5));
             $entity->setMobile($mobile);
             $entity->setName($name);
             $entity->setDoctorSignature($doctorSignature);

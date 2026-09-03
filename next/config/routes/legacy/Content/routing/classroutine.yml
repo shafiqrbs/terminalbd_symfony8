@@ -1,0 +1,30 @@
+classroutine:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\ClassRoutineController::indexAction' }
+
+classroutine_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\ClassRoutineController::showAction' }
+
+classroutine_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\ClassRoutineController::newAction' }
+
+classroutine_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\ClassRoutineController::createAction' }
+    requirements: { _method: post }
+
+classroutine_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\ClassRoutineController::editAction' }
+
+classroutine_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\ClassRoutineController::updateAction' }
+    requirements: { _method: post|put }
+
+classroutine_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\ClassRoutineController::deleteAction' }
+    requirements: { _method: post|delete }

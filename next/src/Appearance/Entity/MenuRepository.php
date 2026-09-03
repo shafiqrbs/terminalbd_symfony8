@@ -72,7 +72,7 @@ class MenuRepository extends EntityRepository
 
         $em = $this->_em;
 
-        $menu = $em->getRepository('SettingAppearanceBundle:Menu')->findOneBy(['category' => $entity]);
+        $menu = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['category' => $entity]);
         if(!empty($menu)){
             $slug = 'category/'.$entity->getModule()->getSlug().'/'.$entity->getSlug();
             $menu->setMenu($entity->getName());

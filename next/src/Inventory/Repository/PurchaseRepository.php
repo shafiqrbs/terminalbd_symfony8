@@ -207,7 +207,7 @@ class PurchaseRepository extends EntityRepository
             $entity->setTotalItem($row['item']);
             $entity->setTotalAmount($row['total']);
             $entity->setPaymentAmount($row['total']);
-            $entity->setTransactionMethod($this->_em->getRepository('SettingToolBundle:TransactionMethod')->find(1));
+            $entity->setTransactionMethod($this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
             $this->_em->persist($entity);
 
         }
@@ -226,7 +226,7 @@ class PurchaseRepository extends EntityRepository
 		$global =  $user->getGlobalOption()->getId();
 
 		$qb = $this->_em->createQueryBuilder();
-		$qb->from('AccountingBundle:AccountPurchase','e');
+		$qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
 		$qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
 		$qb->where('e.globalOption = :config');
 		$qb->setParameter('config', $global);
@@ -286,7 +286,7 @@ class PurchaseRepository extends EntityRepository
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('count(e.id)');
-        $qb->from('InventoryBundle:Purchase','e');
+        $qb->from(\App\Inventory\Entity\Purchase::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory->getId());
         $count = $qb->getQuery()->getSingleScalarResult();

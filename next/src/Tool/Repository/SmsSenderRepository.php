@@ -329,7 +329,7 @@ class SmsSenderRepository extends EntityRepository {
 
     public function totalSendSms($globalOption){
 
-        $totalSms = $this->_em->getRepository('SettingToolBundle:SmsSenderTotal')->findOneBy(['globalOption' => $globalOption]);
+        $totalSms = $this->_em->getRepository(\App\Tool\Entity\SmsSenderTotal::class)->findOneBy(['globalOption' => $globalOption]);
         if($totalSms and $totalSms->getRemaining()){
             $totalSms->setRemaining($totalSms->getRemaining()-1);
             $totalSms->setSending($totalSms->getSending()+1);

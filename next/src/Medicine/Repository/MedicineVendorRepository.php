@@ -50,7 +50,7 @@ class MedicineVendorRepository extends EntityRepository
     public function getExistVendor($config,$name)
     {
         $em = $this->_em;
-        $exist = $em->getRepository('MedicineBundle:MedicineVendor')->findOneBy(['medicineConfig'=>$config,'companyName'=>$name]);
+        $exist = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=>$config,'companyName'=>$name]);
         if($exist){
             return $exist;
         }else{
@@ -171,7 +171,7 @@ class MedicineVendorRepository extends EntityRepository
             $em->persist($entity);
             $em->flush();
             if ($openingBalance > 0) {
-                $em->getRepository("AccountingBundle:AccountPurchase")->apiInsertOpeningBalance($entity,$user_id, $openingBalance);
+                $em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->apiInsertOpeningBalance($entity,$user_id, $openingBalance);
             }
             $result['global_id']            = (int) $option->getId();
             $result['vendor_id']            = (int) $entity->getId();
@@ -195,7 +195,7 @@ class MedicineVendorRepository extends EntityRepository
         $com = $vendor->getCompanyName();
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
-        $qb->update('AccountingBundle:AccountPurchase', 'mg')
+        $qb->update(\App\Accounting\Entity\AccountPurchase::class, 'mg')
             ->set('mg.companyName', ':companyName')
             ->where('mg.medicineVendor = :id')
             ->setParameter('companyName',$com)

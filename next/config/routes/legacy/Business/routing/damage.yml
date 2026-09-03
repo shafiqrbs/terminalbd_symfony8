@@ -1,0 +1,30 @@
+business_damage:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\BusinessDamageController::indexAction' }
+
+business_damage_new:
+    path:     /new
+    defaults: { _controller: 'App\Business\Controller\BusinessDamageController::newAction' }
+
+
+business_damage_create:
+    path:     /create
+    defaults: { _controller: 'App\Business\Controller\BusinessDamageController::createAction' }
+    methods:  POST
+
+business_damage_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Business\Controller\BusinessDamageController::editAction' }
+
+business_damage_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Business\Controller\BusinessDamageController::updateAction' }
+    methods:  [POST, PUT]
+
+business_damage_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\BusinessDamageController::deleteAction' }
+
+business_damage_approved:
+    path:     /{id}/approved
+    defaults: { _controller: 'App\Business\Controller\BusinessDamageController::approvedAction' }

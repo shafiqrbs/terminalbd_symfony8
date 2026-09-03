@@ -1,0 +1,30 @@
+footersetting:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\FooterSettingController::indexAction' }
+
+footersetting_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\FooterSettingController::showAction' }
+
+footersetting_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\FooterSettingController::newAction' }
+
+footersetting_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\FooterSettingController::createAction' }
+    methods:  POST
+
+footersetting_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\FooterSettingController::editAction' }
+
+footersetting_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\FooterSettingController::updateAction' }
+    methods:  [POST, PUT]
+
+footersetting_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\FooterSettingController::deleteAction' }
+    methods:  [POST, DELETE]

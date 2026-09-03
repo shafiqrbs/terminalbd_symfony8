@@ -1,0 +1,46 @@
+branding:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::indexAction' }
+
+branding_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::showAction' }
+
+branding_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::newAction' }
+
+branding_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::createAction' }
+    methods:  POST
+
+branding_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::editAction' }
+
+branding_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::statusAction' }
+
+branding_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::updateAction' }
+    methods:  [POST, PUT]
+
+branding_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::deleteAction' }
+    methods:  [POST, DELETE]
+
+branding_search:
+    path:     /search
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::autoSearchAction' }
+    options:
+            expose: true
+
+branding_search_name:
+    path:      /{brand}/brand-name
+    defaults: { _controller: 'App\Tool\Controller\BrandingController::searchBrandNameAction' }
+    options:
+            expose: true

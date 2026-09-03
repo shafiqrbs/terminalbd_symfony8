@@ -1,0 +1,19 @@
+domain_gp_customer_import:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\GpCustomerImportController::indexAction' }
+
+domain_gp_customer_import_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\GpCustomerImportController::createAction' }
+    methods:  POST
+
+domain_gp_customer_import_migration:
+    path:     /{id}/customer-migration
+    defaults: { _controller: 'App\DomainUser\Controller\GpCustomerImportController::excelDataImportAction' }
+
+
+domain_gp_customer_import_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DomainUser\Controller\GpCustomerImportController::deleteAction' }
+
+

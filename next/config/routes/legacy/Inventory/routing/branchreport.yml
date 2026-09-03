@@ -1,0 +1,60 @@
+
+inventory_branch_report_overview:
+    path:     /branch-overview
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::overviewAction' }
+
+inventory_branch_report_stock:
+    path:     /branch-stock
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::stockAction' }
+
+inventory_branch_report_item_view:
+    path:     /{item}/branch-item-view-details
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::branchItemDetailsAction' }
+
+inventory_branch_report_item:
+    path:     /branch-item-view
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::stockItemAction' }
+
+inventory_branch_report_barcode_item:
+    path:     /branch-barcode-wise-item
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::stockBarcodeAction' }
+
+inventory_branch_sales_item_view:
+    path:     /{item}/branch-item-sales
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::branchItemSalesAction' }
+    methods:  GET
+    options:
+            expose: true
+
+inventory_branch_report_item_search:
+    path:     /{item}/branch-stock-item-search
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::branchStockItemDetailsAction' }
+    methods:  GET
+    options:
+            expose: true
+
+inventory_branch_report_sales:
+    path:     /branch-stock-sales-item
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::branchSalesItemAction' }
+
+
+inventory_branch_report_sales_item_search:
+    path:     /{item}/branch-stock-sales-item-search
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::branchSalesItemSearchAction' }
+    methods:  GET
+    options:
+            expose: true
+
+inventory_branch_report_sales_item_barcode_search:
+    path:     /{barcode}/branch-stock-sales-item-barcode-search
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::branchSalesItemBarcodeAction' }
+    methods:  GET
+    options:
+            expose: true
+
+inventory_branch_wise_barcode_product_stock:
+    path:     /{id}/branch-wise-barcode-product-stock
+    defaults: { _controller: 'App\Inventory\Controller\BranchReportController::branchWiseBarcodeProductStockAction' }
+    methods:  GET
+    options:
+            expose: true

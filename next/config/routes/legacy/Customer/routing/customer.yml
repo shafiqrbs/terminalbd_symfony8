@@ -1,0 +1,33 @@
+customer_self:
+    path:     /
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::indexAction' }
+
+customer_self_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::showAction' }
+
+customer_self_new:
+    path:     /new
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::newAction' }
+
+customer_self_create:
+    path:     /create
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::createAction' }
+    methods:  POST
+
+customer_self_edit_profile:
+    path:     /edit-profile
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::editAction' }
+
+customer_self_update_profile:
+    path:     /update-profile
+    defaults: { _controller: 'App\Customer\Controller\AgentClientController::profileUpdateAction' }
+    methods:  [POST, PUT]
+
+customer_self_change_password:
+    path:     /change-password
+    defaults: { _controller: 'App\User\Controller\ChangePasswordController::customerChangePasswordAction' }
+
+customer_self_forget_password:
+    path:     /{id}/forget-user-password
+    defaults: { _controller: 'App\DomainUser\Controller\DomainUserController::forgetPasswordAction' }

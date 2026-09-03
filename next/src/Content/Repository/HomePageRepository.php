@@ -18,7 +18,7 @@ class HomePageRepository extends EntityRepository
     {
         $em = $this->_em;
 
-        $reEntity = $em->getRepository('SettingContentBundle:HomePage')->findOneBy(['user'=>$user]);
+        $reEntity = $em->getRepository(\App\Content\Entity\HomePage::class)->findOneBy(['user'=>$user]);
         if(empty($reEntity) && $user){
 
             $entity = New HomePage();

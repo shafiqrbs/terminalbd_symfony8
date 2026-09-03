@@ -1,0 +1,96 @@
+inventory_goods:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::indexAction' }
+
+inventory_goods_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::showAction' }
+
+inventory_goods_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::newAction' }
+
+inventory_goods_create:
+    path:      /create
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::createAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_goods_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::editAction' }
+
+inventory_goods_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_goods_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::deleteAction' }
+
+inventory_goods_status:
+    path:     /{id}/product-status
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::webStatusAction' }
+
+inventory_goods_copy:
+    path:     /{id}/item-copy
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::itemCopyAction' }
+
+inventory_product_inline_discount_search:
+    path:     /inline-discount-search
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::discountSelectAction' }
+    options:
+           expose: true
+
+inventory_product_inline_tag_search:
+    path:     /inline-tag-search
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::tagSelectAction' }
+    options:
+           expose: true
+
+inventory_goods_inline_update:
+    path:     /inline-goods-update
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::inlineItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_goods_inline_subitem_update:
+    path:     /inline-goods-subitem-update
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::inlineSubItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_vendoritem_subproduct:
+    path:     /{id}/sub-product
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::addSubProductAction' }
+    methods:  POST
+
+inventory_goods_subItem_update:
+    path:     /{id}/sub-product-update
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::updateSubProductAction' }
+    methods:  POST
+
+inventory_vendoritem_gallery:
+    path:     /{item}/upload
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::uploadItemImageAction' }
+    options:
+           expose: true
+
+inventory_goods_subItem_delete:
+    path:     /{id}/sub-item-delete
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::subItemDeleteAction' }
+
+inventory_goods_itemkeyvalue_delete:
+    path:     /{id}/item-key-value-delete
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::keyValueDeleteAction' }
+
+inventory_goods_attribute_sorted:
+    path:     /{id}/item-key-value-sorted
+    defaults: { _controller: 'App\Inventory\Controller\GoodsController::keyValueSortedAction' }
+    methods:  POST
+    options:
+           expose: true

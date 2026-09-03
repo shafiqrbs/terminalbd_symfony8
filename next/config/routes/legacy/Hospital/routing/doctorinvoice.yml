@@ -1,0 +1,40 @@
+hms_doctor_commission_invoice:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\DoctorInvoiceController::indexAction' }
+
+hms_doctor_invoice:
+    path:     /doctor
+    defaults: { _controller: 'App\Hospital\Controller\DoctorInvoiceController::doctorInvoiceAction' }
+
+hms_doctor_invoice_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Hospital\Controller\DoctorInvoiceController::showAction' }
+
+hms_doctor_invoice_new:
+    path:     /{id}/new
+    defaults: { _controller: 'App\Hospital\Controller\DoctorInvoiceController::newAction' }
+
+
+hms_doctor_invoice_create:
+    path:     /{id}/create
+    defaults: { _controller: 'App\Hospital\Controller\DoctorInvoiceController::createAction' }
+    methods:  [POST]
+
+hms_doctor_invoice_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\DoctorInvoiceController::deleteAction' }
+
+hms_doctor_invoice_pay:
+    path:     /{id}/pay
+    defaults: { _controller: 'App\Hospital\Controller\DoctorInvoiceController::payAction' }
+
+hms_doctor_invoice_confirm:
+    path:     /{id}/invoice-confirm
+    defaults: { _controller: 'App\Hospital\Controller\DoctorInvoiceController::confirmAction' }
+
+hms_doctor_invoice_print:
+    path:     /{id}/invoice-print
+    defaults: { _controller: 'App\Hospital\Controller\DoctorInvoiceController::printAction' }
+
+
+

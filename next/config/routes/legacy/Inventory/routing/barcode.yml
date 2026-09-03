@@ -1,0 +1,38 @@
+inventory_barcode:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::indexAction' }
+
+barcode_add:
+    path:     /add
+    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::addAction' }
+
+barcode_item_add:
+    path:     /item-barcode
+    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::addItemBarcodeAction' }
+
+barcode_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::addAction' }
+
+
+barcode_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::createAction' }
+    options:
+           expose: true
+
+barcode_item_create:
+    path:     /item-barcode-create
+    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::createItemBarcodeAction' }
+    options:
+           expose: true
+
+barcode_added:
+    path:     /added
+    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::addedAction' }
+    options:
+           expose: true
+
+barcode_print:
+    path:     /print
+    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::printAction' }

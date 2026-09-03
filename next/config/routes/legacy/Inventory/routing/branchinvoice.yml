@@ -1,0 +1,41 @@
+inventory_branchinvoice:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::indexAction' }
+
+inventory_branchinvoice_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::showAction' }
+
+inventory_branchinvoice_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::newAction' }
+
+inventory_branchinvoice_edit:
+    path:     /{code}/edit
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::editAction' }
+
+
+inventory_branchinvoice_print:
+    path:     /{id}/print
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::invoicePrintAction' }
+
+inventory_branchinvoice_pdf:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::pdfAction' }
+
+inventory_branchinvoice_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_branchinvoice_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::deleteAction' }
+
+inventory_branchinvoice_item_delete:
+    path:     /{id}/item-delete
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::itemDeleteAction' }
+
+inventory_branchinvoice_item_approved:
+    path:     /{id}/approved
+    defaults: { _controller: 'App\Inventory\Controller\BranchInvoiceController::approveAction' }

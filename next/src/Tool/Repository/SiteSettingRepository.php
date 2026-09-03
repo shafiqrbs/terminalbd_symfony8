@@ -39,7 +39,7 @@ class SiteSettingRepository extends EntityRepository
 
             $modules = [];
             foreach($data['module'] as $sid ){
-                $modules[] = $em->getRepository('SettingToolBundle:Module')->find($sid);
+                $modules[] = $em->getRepository(\App\Tool\Entity\Module::class)->find($sid);
             }
             if (!empty($modules)) {
                 $entity->setModules($modules);
@@ -51,7 +51,7 @@ class SiteSettingRepository extends EntityRepository
         if(!empty($data['syndicateModule'])){
             $synarr = [];
             foreach($data['syndicateModule'] as $sid ){
-                $synarr[] = $em->getRepository('SettingToolBundle:SyndicateModule')->find($sid);
+                $synarr[] = $em->getRepository(\App\Tool\Entity\SyndicateModule::class)->find($sid);
             }
             if (!empty($synarr)) {
                 $entity->setSyndicateModules($synarr);
@@ -61,7 +61,7 @@ class SiteSettingRepository extends EntityRepository
         if(!empty($data['appModule'])){
             $synarr = [];
             foreach($data['appModule'] as $sid ){
-                $synarr[] = $em->getRepository('SettingToolBundle:AppModule')->find($sid);
+                $synarr[] = $em->getRepository(\App\Tool\Entity\AppModule::class)->find($sid);
             }
             if (!empty($synarr)) {
                 $entity->setAppModules($synarr);
@@ -76,7 +76,7 @@ class SiteSettingRepository extends EntityRepository
     public function removeModuleMenu($globalOption)
     {
             $em = $this->_em;
-            $remove = $em->getRepository('SettingAppearanceBundle:Menu')->findOneBy(['siteSetting' => $globalOption->getSiteSetting()]);
+            $remove = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['siteSetting' => $globalOption->getSiteSetting()]);
             if(!empty($remove)){
                 $em->remove($remove);
             }
@@ -112,7 +112,7 @@ class SiteSettingRepository extends EntityRepository
 
         $em = $this->_em;
         $globalOption = $user->getGlobalOption();
-        $reEntity = $em->getRepository('SettingToolBundle:SiteSetting')->findOneBy(['globalOption'=>$globalOption]);
+        $reEntity = $em->getRepository(\App\Tool\Entity\SiteSetting::class)->findOneBy(['globalOption'=>$globalOption]);
 
         if($reEntity){
             $syndicates = $reEntity->getSyndicates();
@@ -164,7 +164,7 @@ class SiteSettingRepository extends EntityRepository
         if(!empty($entity)){
             $synarr = [];
             foreach($syndicates as $sid ){
-                $synarr[] = $em->getRepository('SettingToolBundle:Syndicate')->findOneBy(['id'=>$sid]);
+                $synarr[] = $em->getRepository(\App\Tool\Entity\Syndicate::class)->findOneBy(['id'=>$sid]);
             }
             if (!empty($synarr)) {
 
@@ -183,7 +183,7 @@ class SiteSettingRepository extends EntityRepository
 
         $syndicates = $reEntity->getSyndicates();
 
-        $checkEntity = $em->getRepository('SettingAppearanceBundle:Menu')->findBy(['siteSetting'=>$reEntity]);
+        $checkEntity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['siteSetting'=>$reEntity]);
 
         $insData=[];
         $dbData=[];
@@ -207,7 +207,7 @@ class SiteSettingRepository extends EntityRepository
         foreach($insertData as $syndicate ){
 
 
-            $synEntity = $em->getRepository('SettingToolBundle:Syndicate')->find($syndicate);
+            $synEntity = $em->getRepository(\App\Tool\Entity\Syndicate::class)->find($syndicate);
             if(!empty($synEntity)){
 
                 $menu = $synEntity->getName();
@@ -232,7 +232,7 @@ class SiteSettingRepository extends EntityRepository
         $em = $this->_em;
 
         $modules = $reEntity->getModules();
-        $checkEntity = $em->getRepository('SettingAppearanceBundle:Menu')->findBy(['siteSetting'=>$reEntity]);
+        $checkEntity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['siteSetting'=>$reEntity]);
 
         $insData=[];
         $dbData=[];
@@ -255,7 +255,7 @@ class SiteSettingRepository extends EntityRepository
 
         foreach($insertData as $module ){
 
-            $modEntity = $em->getRepository('SettingToolBundle:Module')->find($module);
+            $modEntity = $em->getRepository(\App\Tool\Entity\Module::class)->find($module);
             if(!empty($modEntity)){
 
                 $menu = $modEntity->getMenu();
@@ -279,7 +279,7 @@ class SiteSettingRepository extends EntityRepository
 
         $syndicateModule = $reEntity->getSyndicateModules();
 
-        $checkEntity = $em->getRepository('SettingAppearanceBundle:Menu')->findBy(['siteSetting'=>$reEntity]);
+        $checkEntity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['siteSetting'=>$reEntity]);
 
         $insData=[];
         $dbData=[];
@@ -302,7 +302,7 @@ class SiteSettingRepository extends EntityRepository
 
         foreach($insertData as $syndicateModule ){
 
-            $synEntity = $em->getRepository('SettingToolBundle:SyndicateModule')->find($syndicateModule);
+            $synEntity = $em->getRepository(\App\Tool\Entity\SyndicateModule::class)->find($syndicateModule);
             if(!empty($synEntity)){
 
                 $entity = New Menu();
@@ -329,7 +329,7 @@ class SiteSettingRepository extends EntityRepository
         $em =$this->_em;
 
         foreach($removeData as $data){
-            $menuEntity = $em->getRepository('SettingAppearanceBundle:Menu')->findOneBy([$field => $data ,'siteSetting'=> $reEntity ]);
+            $menuEntity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy([$field => $data ,'siteSetting'=> $reEntity ]);
             if(!empty($menuEntity)){
 
                 $id = $menuEntity->getId();
@@ -339,10 +339,10 @@ class SiteSettingRepository extends EntityRepository
                 * Menu grouping remove syndicate related.
                 * **/
 
-                $groupingEntity = $em->getRepository('SettingAppearanceBundle:MenuGrouping')->findBy(['menu' => $id]);
+                $groupingEntity = $em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->findBy(['menu' => $id]);
                 if(!$groupingEntity){
                     foreach($groupingEntity as $remove){
-                        $groupingEntity = $em->getRepository('SettingAppearanceBundle:MenuGrouping')->find($remove);
+                        $groupingEntity = $em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->find($remove);
                         if (!empty($groupingEntity)) {
                             $em->remove($groupingEntity);
                         }

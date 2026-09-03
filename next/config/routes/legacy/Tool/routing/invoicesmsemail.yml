@@ -1,0 +1,42 @@
+invoicesmsemail:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::indexAction' }
+
+invoicesmsemail_domain:
+    path:     /domain-invoice
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::domainAction' }
+
+invoicesmsemail_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::showAction' }
+
+invoicesmsemail_new:
+    path:      /{option}/new
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::newAction' }
+
+invoicesmsemail_edit:
+    path:     /{invoice}/edit
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::editAction' }
+
+invoicesmsemail_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::updateAction' }
+    methods:  [POST, PUT]
+
+invoicesmsemail_ajax_payment:
+    path:     /{id}/payment
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::paymentAction' }
+    methods:  [POST, PUT]
+
+invoicesmsemail_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::deleteAction' }
+
+invoicesmsemail_item_delete:
+    path:     /{invoice}/{package}/item-delete
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::deleteItemAction' }
+
+invoicesmsemail_approve:
+    path:     /{id}/invoice-approve
+    defaults: { _controller: 'App\Tool\Controller\InvoiceSmsEmailController::approveAction' }
+

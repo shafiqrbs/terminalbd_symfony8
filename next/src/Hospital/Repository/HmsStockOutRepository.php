@@ -18,7 +18,7 @@ class HmsStockOutRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('HospitalBundle:HmsStockOutItem','si')
+            ->from(\App\Hospital\Entity\HmsStockOutItem::class,'si')
             ->select('sum(si.salesSubTotal) as total')
             ->where('si.stockOut = :entity')
             ->setParameter('entity', $entity ->getId())

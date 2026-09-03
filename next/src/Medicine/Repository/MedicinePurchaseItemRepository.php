@@ -324,7 +324,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
         $qb = $this->createQueryBuilder('e');
         if($fieldName == 'sales'){
-            $quantity = $this->_em->getRepository('MedicineBundle:MedicineSalesItem')->salesPurchaseStockItemUpdate($item);
+            $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesPurchaseStockItemUpdate($item);
             $qb->select('e.salesQuantity AS quantity');
         }elseif($fieldName == 'sales-return'){
             $qb->select('e.quantity AS quantity');
@@ -347,16 +347,16 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
         $em = $this->_em;
         if($fieldName == 'sales'){
-	        $quantity = $this->_em->getRepository('MedicineBundle:MedicineSalesItem')->salesPurchaseStockItemUpdate($item);
+	        $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesPurchaseStockItemUpdate($item);
             $item->setSalesQuantity($quantity);
         }elseif($fieldName == 'sales-return'){
-	        $quantity = $this->_em->getRepository('MedicineBundle:MedicineSalesReturn')->salesReturnStockItemUpdate($item);
+	        $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesReturn::class)->salesReturnStockItemUpdate($item);
             $item->setSalesReturnQuantity($quantity);
         }elseif($fieldName == 'purchase-return'){
-            $quantity = $this->_em->getRepository('MedicineBundle:MedicinePurchaseReturnItem')->purchaseReturnStockItemUpdate($item);
+            $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturnItem::class)->purchaseReturnStockItemUpdate($item);
             $item->setPurchaseReturnQuantity($quantity);
         }elseif($fieldName == 'damage'){
-            $quantity = $this->_em->getRepository('MedicineBundle:MedicineDamage')->damagePurchaseStockItemUpdate($item);
+            $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->damagePurchaseStockItemUpdate($item);
             $item->setDamageQuantity($quantity);
         }
         $em->persist($item);
@@ -450,7 +450,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $entity = $this->_em->getRepository('MedicineBundle:MedicinePurchaseItem')->find($data['purchaseItemId']);
+        $entity = $this->_em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($data['purchaseItemId']);
         $quantity = (float)$data['quantity'] ?: 0;
         $salesPrice = (float)$data['salesPrice'] ?: 0;
         $bonusQuantity = (float)$data['bonusQuantity'] ?: 0;
@@ -514,10 +514,10 @@ class MedicinePurchaseItemRepository extends EntityRepository
     public function checkInsertStockItem(MedicineConfig $config,$data){
 
         if(empty($data['medicineId'])) {
-            $checkStockMedicine = $this->_em->getRepository('MedicineBundle:MedicineStock')->checkDuplicateStockNonMedicine($config, $data['medicineBrand']);
+            $checkStockMedicine = $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config, $data['medicineBrand']);
         }else{
-            $medicine =  $this->_em->getRepository('MedicineBundle:MedicineBrand')->find($data['medicineId']);
-            $checkStockMedicine =  $this->_em->getRepository('MedicineBundle:MedicineStock')->checkDuplicateStockMedicine($config, $medicine);
+            $medicine =  $this->_em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
+            $checkStockMedicine =  $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
         }
 
         if (empty($checkStockMedicine)){
@@ -545,11 +545,11 @@ class MedicinePurchaseItemRepository extends EntityRepository
                 $entity->setSlug(strtolower($slug));
             }
             if(!empty($data['rackNo'])){
-                $rack = $em->getRepository('MedicineBundle:MedicineParticular')->findOneBy(['medicineConfig'=>$config,'name'=>$data['rackNo']]);
+                $rack = $em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findOneBy(['medicineConfig'=>$config,'name'=>$data['rackNo']]);
                 if($rack){
                     $entity->setRackNo($rack);
                 }else{
-                    $rack = $em->getRepository('MedicineBundle:MedicineParticular')->createRack($config,$data['rackNo']);
+                    $rack = $em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->createRack($config,$data['rackNo']);
                     $entity->setRackNo($rack);
                 }
             }

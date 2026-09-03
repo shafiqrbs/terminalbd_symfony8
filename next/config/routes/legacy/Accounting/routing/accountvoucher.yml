@@ -1,0 +1,49 @@
+account_voucher:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::indexAction' }
+
+account_voucher_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::newAction' }
+
+account_voucher_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::editAction' }
+
+account_voucher_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::showAction' }
+
+account_voucher_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::updateAction' }
+    methods:  [POST, PUT]
+
+account_voucher_particular_add:
+    path:     /{invoice}/particular-add
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::addParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+account_voucher_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::statusAction' }
+
+account_voucher_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::deleteAction' }
+
+
+account_voucher_approved:
+    path:     /{id}/invoice-approved
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::approvedAction' }
+
+account_voucher_item_approve:
+    path:     /{id}/item-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::itemApproveAction' }
+
+account_voucher_particular_delete:
+    path:     /{invoice}/{id}/item-delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountVoucherController::invoiceParticularDeleteAction' }
+

@@ -1,0 +1,42 @@
+restaurant_itemimporter:
+    path:     /
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::indexAction' }
+
+restaurant_itemimporter_migration:
+    path:     /{id}/data-migration
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::excelDataImportAction' }
+
+restaurant_itemimporter_new:
+    path:     /new
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::newAction' }
+
+restaurant_itemimporter_create:
+    path:     /create
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::createAction' }
+    methods:  POST
+
+restaurant_itemimporter_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::editAction' }
+
+restaurant_itemimporter_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::updateAction' }
+    methods:  [POST, PUT]
+
+restaurant_itemimporter_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::deleteAction' }
+
+
+restaurant_itemimporter_updated:
+    path:     /{id}/data-updated
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::updatedAction' }
+
+restaurant_itemimporter_reset:
+    path:     /{ic}/data-reseted
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::resetedAction' }
+
+restaurant_itemimporter_restore:
+    path:     /{ic}/data-restored
+    defaults: { _controller: 'App\Restaurant\Controller\ItemImporterController::restoredAction' }

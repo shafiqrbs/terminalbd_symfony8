@@ -1,0 +1,73 @@
+account_sales:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::indexAction' }
+
+account_sales_outstanding:
+    path:     /customer-outstanding
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::customerOutstandingAction' }
+
+account_sales_customer_summary:
+    path:     /customer-summary
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::customerSummaryAction' }
+
+account_sales_user_summary:
+    path:     /user-outstanding
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::userSummaryAction' }
+
+account_sales_return:
+    path:     /return
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::salesReturnAction' }
+
+account_sales_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::newAction' }
+
+account_sales_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::createAction' }
+    methods:  POST
+
+account_sales_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::editAction' }
+
+account_sales_reverse:
+    path:     /{id}/reverse
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::salesReverseAction' }
+
+account_sales_due:
+    path:     /{sales}/due-payment
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::duePaymentAction' }
+
+account_sales_print:
+    path:     /{id}/print-payment
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::printAction' }
+
+account_sales_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::updateAction' }
+    methods:  [POST, PUT]
+
+account_sales_approve:
+    path:     /{id}/payment-approve
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::approveAction' }
+    options:
+           expose: true
+
+account_sales_inline:
+    path:     /inline-update
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::inlineUpdateAction' }
+
+account_sales_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::deleteAction' }
+    options:
+           expose: true
+
+business_receive_print:
+    path:     /{id}/sales-receive-print
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::salesPrintAction' }
+
+business_payment_print:
+    path:     /{id}/sales-payment-print
+    defaults: { _controller: 'App\Accounting\Controller\AccountSalesController::purchasePrintAction' }

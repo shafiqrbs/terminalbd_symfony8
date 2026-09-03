@@ -1,0 +1,90 @@
+product:
+    path:     /
+    defaults: { _controller: 'App\Product\Controller\ProductController::indexAction' }
+
+product_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Product\Controller\ProductController::showAction' }
+
+product_new:
+    path:     /new
+    defaults: { _controller: 'App\Product\Controller\ProductController::newAction' }
+
+product_upload:
+    path:     /upload
+    defaults: { _controller: 'App\Product\Controller\ProductController::uploadProductAction' }
+    requirements: { _method: post }
+
+product_create:
+    path:     /create
+    defaults: { _controller: 'App\Product\Controller\ProductController::createAction' }
+    requirements: { _method: post }
+
+product_insert:
+    path:     /insert
+    defaults: { _controller: 'App\Product\Controller\ProductController::insertAction' }
+
+product_multiinsert:
+    path:     /multiinsert
+    defaults: { _controller: 'App\Product\Controller\ProductController::multiinsertAction' }
+    requirements: { _method: post|put }
+
+product_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Product\Controller\ProductController::editAction' }
+
+product_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Product\Controller\ProductController::updateAction' }
+    requirements: { _method: post|put }
+
+product_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Product\Controller\ProductController::deleteAction' }
+    requirements: { _method: post|delete }
+
+product_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Product\Controller\ProductController::statusAction' }
+
+product_duplicate:
+    path:     /{id}/duplicate
+    defaults: { _controller: 'App\Product\Controller\ProductController::duplicateAction' }
+
+product_discount:
+    path:     /{user}/discount
+    defaults: { _controller: 'App\Product\Controller\ProductController::discountAction' }
+    requirements: { _method: post }
+
+product_print_list:
+    path:     /print-list
+    defaults: { _controller: 'App\Content\Controller\ProductController::printListAction' }
+
+product_pdf_list:
+    path:     /pdf-list
+    defaults: { _controller: 'App\Content\Controller\ProductController::pdfListAction' }
+
+product_export_list:
+    path:     /export-list
+    defaults: { _controller: 'App\Content\Controller\ProductController::exportListAction' }
+
+product_print:
+    path:     /{id}/print-details
+    defaults: { _controller: 'App\Content\Controller\ProductController::printDetailsAction' }
+
+product_pdf:
+    path:     /{id}/pdf-details
+    defaults: { _controller: 'App\Content\Controller\ProductController::pdfDetailsAction' }
+
+product_import:
+    path:     /import
+    defaults: { _controller: 'App\Content\Controller\ProductController::importAction' }
+
+product_export:
+    path:     /{id}/export-details
+    defaults: { _controller: 'App\Content\Controller\ProductController::exportDetailsAction' }
+
+
+
+
+

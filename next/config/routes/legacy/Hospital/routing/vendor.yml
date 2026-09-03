@@ -1,0 +1,41 @@
+hms_vendor:
+    path:     /
+    defaults: { _controller: 'App\Hospital\Controller\VendorController::indexAction' }
+
+hms_vendor_search:
+    path:     /search
+    defaults: { _controller: 'App\Hospital\Controller\VendorController::autoSearchAction' }
+    options:
+            expose: true
+
+hms_vendor_name:
+    path:      /{vendor}/vendor-name
+    defaults: { _controller: 'App\Hospital\Controller\VendorController::searchVendorNameAction' }
+    options:
+            expose: true
+
+hms_vendor_new:
+    path:     /new
+    defaults: { _controller: 'App\Hospital\Controller\VendorController::newAction' }
+
+hms_vendor_create:
+    path:     /create
+    defaults: { _controller: 'App\Hospital\Controller\VendorController::createAction' }
+    methods:  POST
+
+hms_vendor_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Hospital\Controller\VendorController::editAction' }
+
+hms_vendor_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Hospital\Controller\VendorController::updateAction' }
+    methods:  [POST, PUT]
+
+hms_vendor_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Hospital\Controller\VendorController::statusAction' }
+
+hms_vendor_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Hospital\Controller\VendorController::deleteAction' }

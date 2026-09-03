@@ -1,0 +1,33 @@
+modulecategory:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\ModuleCategoryController::indexAction' }
+
+modulecategory_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\ModuleCategoryController::showAction' }
+
+modulecategory_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\ModuleCategoryController::newAction' }
+
+modulecategory_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\ModuleCategoryController::createAction' }
+    methods:  POST
+
+modulecategory_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\ModuleCategoryController::editAction' }
+
+modulecategory_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Content\Controller\ModuleCategoryController::statusAction' }
+
+modulecategory_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\ModuleCategoryController::updateAction' }
+    methods:  [POST, PUT]
+
+modulecategory_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\ModuleCategoryController::deleteAction' }

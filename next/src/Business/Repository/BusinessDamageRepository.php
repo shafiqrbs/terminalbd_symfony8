@@ -39,8 +39,8 @@ class BusinessDamageRepository extends EntityRepository
         $entity->setCreatedBy($item->getInvoiceReturn()->getCreatedBy());
         $em->persist($entity);
         $em->flush();
-        $em->getRepository('BusinessBundle:BusinessParticular')->updateRemoveStockQuantity($entity->getBusinessParticular(),'damage');
-        $em->getRepository('AccountingBundle:Transaction')->insertGlobalDamageTransaction($item->getInvoiceReturn()->getBusinessConfig()->getGlobalOption(),$entity);
+        $em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($entity->getBusinessParticular(),'damage');
+        $em->getRepository(\App\Accounting\Entity\Transaction::class)->insertGlobalDamageTransaction($item->getInvoiceReturn()->getBusinessConfig()->getGlobalOption(),$entity);
     }
 
 }

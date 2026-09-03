@@ -1,0 +1,39 @@
+wishlist:
+    path:     /
+    defaults: { _controller: 'App\Customer\Controller\OrderController::indexAction' }
+
+wishlist_to_cart:
+    path:     /cart-to-order
+    defaults: { _controller: 'App\Customer\Controller\OrderController::cartToOrderAction' }
+
+wishlist_checkout:
+    path:     /cart-to-order
+    defaults: { _controller: 'App\Customer\Controller\OrderController::cartToOrderAction' }
+
+wishlist_cart:
+    path:     /order-cart
+    defaults: { _controller: 'App\Customer\Controller\OrderController::cartAction' }
+
+wishlist_payment:
+    path:     /payment/{id}
+    defaults: { _controller: 'App\Customer\Controller\OrderController::paymentAction' }
+
+wishlist_process:
+    path:      /{id}/order-process
+    defaults: { _controller: 'App\Customer\Controller\OrderController::processAction' }
+
+wishlist_show:
+    path:      /{id}/order-show
+    defaults: { _controller: 'App\Customer\Controller\OrderController::showAction' }
+
+wishlist_delete:
+    path:      /{id}/order-delete
+    defaults: { _controller: 'App\Customer\Controller\OrderController::deleteAction' }
+
+wishlist_item_delete:
+    path:      /{id}/order-item-delete
+    defaults: { _controller: 'App\Customer\Controller\OrderController::itemDeleteAction' }
+
+wishlist_print_invoice:
+    path:     /{invoice}/invoice-print
+    defaults: { _controller: 'App\Customer\Controller\OrderController::printAction' }

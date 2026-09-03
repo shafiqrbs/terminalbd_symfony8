@@ -1,0 +1,36 @@
+menugroup:
+    path:     /
+    defaults: { _controller: 'App\Appearance\Controller\MenuGroupController::indexAction' }
+
+menugroup_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Appearance\Controller\MenuGroupController::showAction' }
+
+menugroup_new:
+    path:     /new
+    defaults: { _controller: 'App\Appearance\Controller\MenuGroupController::newAction' }
+
+menugroup_create:
+    path:     /create
+    defaults: { _controller: 'App\Appearance\Controller\MenuGroupController::createAction' }
+    requirements: { _method: post }
+
+menugroup_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Appearance\Controller\MenuGroupController::editAction' }
+
+menugroup_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Appearance\Controller\MenuGroupController::updateAction' }
+    requirements: { _method: post|put }
+
+menugroup_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Appearance\Controller\MenuGroupController::deleteAction' }
+    requirements: { _method: post|delete }
+
+menugroup_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Appearance\Controller\MenuGroupController::statusAction' }
+
+

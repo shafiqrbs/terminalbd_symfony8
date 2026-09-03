@@ -40,7 +40,7 @@ class PayrollSheetRepository extends EntityRepository
     {
         $em = $this->_em;
 
-        $employees = $em->getRepository('HumanResourceBundle:EmployeePayroll')->getPayrollEmployeeGroup($payroll);
+        $employees = $em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->getPayrollEmployeeGroup($payroll);
 
         /* @var $employee EmployeePayroll */
 
@@ -48,11 +48,11 @@ class PayrollSheetRepository extends EntityRepository
 
             if(!empty($employee)){
 
-                $allowance = $em->getRepository('HumanResourceBundle:EmployeePayroll')->getAllowanceDeductionParticular($employee->getId(),'allowance');
-                $deduction = $em->getRepository('HumanResourceBundle:EmployeePayroll')->getAllowanceDeductionParticular($employee->getId(),'deduction');
+                $allowance = $em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->getAllowanceDeductionParticular($employee->getId(),'allowance');
+                $deduction = $em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->getAllowanceDeductionParticular($employee->getId(),'deduction');
 
-                $allowanceAmount = $em->getRepository('HumanResourceBundle:EmployeePayroll')->getAllowanceDeduction($employee->getId(),'allowance');
-                $deductionAmount = $em->getRepository('HumanResourceBundle:EmployeePayroll')->getAllowanceDeduction($employee->getId(),'deduction');
+                $allowanceAmount = $em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->getAllowanceDeduction($employee->getId(),'allowance');
+                $deductionAmount = $em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->getAllowanceDeduction($employee->getId(),'deduction');
 
 
 

@@ -27,9 +27,9 @@ class ProductionValueAddedRepository extends EntityRepository
     private function initialValueAdded(Particular $item){
 
         $em = $this->_em;
-        $values = $em->getRepository('RestaurantBundle:Particular')->findWithSearch($item->getRestaurantConfig(),['value-added']);
+        $values = $em->getRepository(\App\Restaurant\Entity\Particular::class)->findWithSearch($item->getRestaurantConfig(),['value-added']);
         foreach ($values as $value){
-           //$valueAdded = $em->getRepository('RestaurantBundle:Particular')->find($value['id']);
+           //$valueAdded = $em->getRepository(\App\Restaurant\Entity\Particular::class)->find($value['id']);
             if($value->getStatus() == 1){
                 $entity = new ProductionValueAdded();
                 $entity->setValueAdded($value);

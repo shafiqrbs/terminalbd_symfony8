@@ -1,0 +1,42 @@
+siteslider:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::indexAction' }
+
+siteslider_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::showAction' }
+
+siteslider_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::newAction' }
+
+siteslider_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::createAction' }
+    methods:  POST
+
+siteslider_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::editAction' }
+
+siteslider_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::statusAction' }
+
+siteslider_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::updateAction' }
+    methods:  [POST, PUT]
+
+siteslider_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::deleteAction' }
+    methods:  [POST, DELETE]
+
+siteslider_sorting:
+    path:     /sorting
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::sortingAction' }
+siteslider_sorted:
+    path:     /sorted
+    defaults: { _controller: 'App\Content\Controller\SiteSliderController::sortedAction' }
+

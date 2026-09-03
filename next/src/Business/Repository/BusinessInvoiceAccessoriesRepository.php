@@ -54,7 +54,7 @@ class BusinessInvoiceAccessoriesRepository extends EntityRepository
         $entity = new BusinessInvoiceParticular();
         $quantity = !empty($data['quantity']) ? $data['quantity'] :1;
         $accessoriesId = $data['accessories'];
-        $accessories = $em->getRepository('BusinessBundle:BusinessParticular')->find($accessoriesId);
+        $accessories = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($accessoriesId);
         $entity->setBusinessParticular($accessories);
         $entity->setParticular($accessories->getName());
         $entity->setPrice($accessories->getPurchasePrice());

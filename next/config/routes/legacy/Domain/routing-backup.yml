@@ -1,0 +1,55 @@
+_www_main_domain:
+    prefix: /
+    name_prefix: "main_"
+    resource: '../Bindu/main.yml'
+    host: "{domain_name}"
+    requirements:
+      domain_name: www.%domain.main%|%domain.main%
+
+#_xiidea_main_domain_app:
+#    prefix: /
+#    host: "{subdomain}.%domain.main%"
+#    resource: "@FrontendBundle/Resources/config/routing/ecommercesubdomain.yml"   # superseded by config/routes/auth.yaml
+#    name_prefix: "main_app_"
+#    defaults:
+#        subdomain: ""
+
+_xiidea_ecommerce_domain:
+    prefix: /
+    name_prefix: "ecom_"
+    host: "{domain_name}"
+    resource: '../Bindu/main.yml'
+    requirements:
+        domain_name: www.%domain.ecommerce%|%domain.ecommerce%
+
+#_xiidea_ecommerce_domain_app:
+#    prefix:     /
+#    name_prefix: "ecom_app_"
+#    host: "{subdomain}.%domain.ecommerce%"
+#    resource: "@FrontendBundle/Resources/config/routing/ecommercesubdomain.yml"   # superseded by config/routes/auth.yaml
+#    defaults:
+#        subdomain: ""
+
+
+#xiidea_education_domain_homepage:
+#    path:     /
+#    defaults: { _controller: App\Domain\Controller\DefaultController::educationHomeAction }
+#    host: "www.%education_domain%"
+#
+#xiidea_education_domain_app_homepage:
+#    path:     /
+#    host: "{subdomain}.%education_domain%"
+#    defaults:
+#            _controller: App\Domain\Controller\DefaultController::educationAppHomeAction
+#            subdomain: ""
+#
+#xiidea_education_domain_app_mobile_homepage:
+#    path:     /
+#    host: "m.{subdomain}.%education_domain%"
+#    defaults:
+#            _controller: App\Domain\Controller\DefaultController::educationAppMobileHomeAction
+#            subdomain: ""
+#
+#xiidea_domain_error_page:
+#    path:     /
+#    defaults: { _controller: App\Domain\Controller\DefaultController::errorAction }

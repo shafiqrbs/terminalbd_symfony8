@@ -1,0 +1,33 @@
+sidebarwidget:
+    path:     /
+    defaults: { _controller: 'App\Appearance\Controller\SidebarWidgetController::indexAction' }
+
+sidebarwidget_new:
+    path:     /new
+    defaults: { _controller: 'App\Appearance\Controller\SidebarWidgetController::newAction' }
+
+sidebarwidget_create:
+    path:     /create
+    defaults: { _controller: 'App\Appearance\Controller\SidebarWidgetController::createAction' }
+    methods:  POST
+
+sidebarwidget_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Appearance\Controller\SidebarWidgetController::editAction' }
+
+sidebarwidget_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Appearance\Controller\SidebarWidgetController::updateAction' }
+    methods:  [POST, PUT]
+
+sidebarwidget_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Appearance\Controller\SidebarWidgetController::deleteAction' }
+
+sidebarwidget_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Appearance\Controller\SidebarWidgetController::statusAction' }
+
+sidebarwidget_sorted:
+    path:     /sorted
+    defaults: { _controller: 'App\Appearance\Controller\SidebarWidgetController::sortedAction' }

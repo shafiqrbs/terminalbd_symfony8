@@ -73,7 +73,7 @@ class BusinessVendorStockRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('BusinessBundle:BusinessVendorStockItem','si')
+            ->from(\App\Business\Entity\BusinessVendorStockItem::class,'si')
             ->select('sum(si.subTotal) as total, SUM(si.quantity) as quantity ')
             ->where('si.businessVendorStock = :entity')
             ->setParameter('entity', $entity ->getId())

@@ -20,7 +20,7 @@ class HmsPurchaseItemRepository extends EntityRepository
     {
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('HospitalBundle:HmsPurchaseItem','e');
+        $qb->from(\App\Hospital\Entity\HmsPurchaseItem::class,'e');
         $qb->select('AVG(e.purchasePrice) AS avgPurchasePrice');
         $qb->where('e.particular = :particular')->setParameter('particular', $particular) ;
         $res = $qb->getQuery()->getOneOrNullResult();
@@ -33,7 +33,7 @@ class HmsPurchaseItemRepository extends EntityRepository
 
     public function insertPurchaseItems($invoice, $data)
     {
-        $particular = $this->_em->getRepository('HospitalBundle:Particular')->find($data['particularId']);
+        $particular = $this->_em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
         $em = $this->_em;
         $entity = new HmsPurchaseItem();
         $entity->setPurchase($invoice);

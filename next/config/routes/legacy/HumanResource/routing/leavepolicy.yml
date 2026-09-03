@@ -1,0 +1,30 @@
+leavepolicy:
+    path:     /
+    defaults: { _controller: 'App\HumanResource\Controller\LeavePolicyController::indexAction' }
+
+leavepolicy_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\HumanResource\Controller\LeavePolicyController::showAction' }
+
+leavepolicy_new:
+    path:     /new
+    defaults: { _controller: 'App\HumanResource\Controller\LeavePolicyController::newAction' }
+
+leavepolicy_create:
+    path:     /create
+    defaults: { _controller: 'App\HumanResource\Controller\LeavePolicyController::createAction' }
+    methods:  POST
+
+leavepolicy_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\HumanResource\Controller\LeavePolicyController::editAction' }
+
+leavepolicy_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\HumanResource\Controller\LeavePolicyController::updateAction' }
+    methods:  [POST, PUT]
+
+leavepolicy_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\HumanResource\Controller\LeavePolicyController::deleteAction' }
+    methods:  [POST, DELETE]

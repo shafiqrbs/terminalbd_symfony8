@@ -81,7 +81,7 @@ class MedicinePrepurchaseRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('MedicineBundle:MedicinePrepurchaseItem','si')
+            ->from(\App\Medicine\Entity\MedicinePrepurchaseItem::class,'si')
             ->select('sum(si.subTotal) as total')
             ->where('si.medicinePrepurchase = :entity')
             ->setParameter('entity', $entity ->getId())
@@ -114,7 +114,7 @@ class MedicinePrepurchaseRepository extends EntityRepository
         $global =  $user->getGlobalOption()->getId();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('AccountingBundle:AccountPurchase','e');
+        $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
         $qb->where('e.globalOption = :config');
         $qb->setParameter('config', $global);

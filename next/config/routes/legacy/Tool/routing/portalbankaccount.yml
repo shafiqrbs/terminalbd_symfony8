@@ -1,0 +1,34 @@
+bankaccount:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\PortalBankAccountController::indexAction' }
+
+bankaccount_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\PortalBankAccountController::showAction' }
+
+bankaccount_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\PortalBankAccountController::newAction' }
+
+bankaccount_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\PortalBankAccountController::createAction' }
+    methods:  POST
+
+bankaccount_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\PortalBankAccountController::editAction' }
+
+bankaccount_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\PortalBankAccountController::statusAction' }
+
+bankaccount_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\PortalBankAccountController::updateAction' }
+    methods:  [POST, PUT]
+
+bankaccount_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\PortalBankAccountController::deleteAction' }
+

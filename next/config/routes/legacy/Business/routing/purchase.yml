@@ -1,0 +1,109 @@
+business_purchase:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::indexAction' }
+
+business_purchase_item:
+    path:     /purchase-item
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::purchaseItemAction' }
+
+business_purchase_opening:
+    path:     /opening
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::vendorOpeningAction' }
+
+business_purchase_opening_create:
+    path:     /opening/create
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::openingCreateAction' }
+    methods:  [POST, PUT]
+
+business_purchase_particular_barcode:
+    path:     /purchase-particular-barcode
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::addBarcodeProductAction' }
+    options:
+        expose: true
+
+business_purchase_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::showAction' }
+
+business_purchase_new:
+    path:     /new
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::newAction' }
+
+business_purchase_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::editAction' }
+
+business_purchase_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::updateAction' }
+    methods:  [POST, PUT]
+
+business_purchase_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::editAction' }
+
+business_purchase_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::deleteAction' }
+
+business_purchase_particular_search:
+    path:     /{id}/particular-search
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::particularSearchAction' }
+
+business_purchase_particular_add:
+    path:     /{invoice}/particular-add
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::addParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_purchase_item_update:
+    path:     /purchase-item-update
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::updateItemAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_purchase_particular_distribution:
+    path:     /{invoice}/particular-distribution
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::insertPurchaseDistributionItemsAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_purchase_particular_sawmill:
+    path:     /{invoice}/particular-sawmill
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::sawmillParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_purchase_particular_sign:
+    path:     /{invoice}/particular-digital-sign
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::signParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_purchase_discount_update:
+    path:     /purchase/dicount-update
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::invoiceDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+business_purchase_approved:
+    path:     /{id}/invoice-approved
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::approvedAction' }
+
+business_purchase_item_approve:
+    path:     /{id}/item-approve
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::itemApproveAction' }
+
+business_purchase_particular_delete:
+    path:     /{invoice}/{id}/particular-delete
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::invoiceParticularDeleteAction' }
+
+business_purchase_print_invoice:
+    path:     /{id}/print
+    defaults: { _controller: 'App\Business\Controller\PurchaseController::printAction' }

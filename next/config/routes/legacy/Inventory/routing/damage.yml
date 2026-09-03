@@ -1,0 +1,68 @@
+inventory_damage:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::indexAction' }
+
+inventory_damage_item_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::searchAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_damage_item_purchase:
+    path:     /item-purchase-details
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::itemPurchaseDetailsAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_damage_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::showAction' }
+
+inventory_damage_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::newAction' }
+
+inventory_damage_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::createAction' }
+    methods:  POST
+
+inventory_damage_edit:
+    path:     /{code}/pos
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::editAction' }
+
+inventory_damage_print:
+    path:     /{code}/print
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::printAction' }
+
+inventory_damage_due:
+    path:     /{code}/due-payment
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::duePaymentAction' }
+
+inventory_damage_item_update:
+    path:     /Damage/item/update
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::DamageItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+inventory_damage_approve:
+    path:     /{id}/approve
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::approveAction' }
+    options:
+           expose: true
+
+inventory_damage_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_damage_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::deleteAction' }
+
+inventory_damageitem_delete:
+    path:     /{Damage}/{DamageItem}/delete
+    defaults: { _controller: 'App\Inventory\Controller\DamageController::itemDeleteAction' }

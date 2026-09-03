@@ -1,0 +1,114 @@
+item:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::indexAction' }
+
+inventory_item:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::indexAction' }
+
+item_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::showAction' }
+
+item_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::newAction' }
+
+item_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::createAction' }
+    methods:  POST
+
+item_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::editAction' }
+
+
+item_edit_web:
+    path:     /{id}/edit-web
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::editWebAction' }
+
+item_web_status:
+    path:     /{id}/item-web-status
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::webStatusAction' }
+
+inventory_item_web_price:
+    path:     /update-web-price
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::updateWebPriceAction' }
+    methods:  POST
+    options:
+            expose: true
+
+item_gallery:
+    path:     /{item}/upload
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::uploadItemImageAction' }
+    options:
+           expose: true
+
+item_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::statusAction' }
+
+item_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::updateAction' }
+    methods:  [POST, PUT]
+
+item_web_update:
+    path:     /{id}/web-update
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::updateWebAction' }
+    methods:  [POST, PUT]
+
+item_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::deleteAction' }
+
+item_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::autoSearchAction' }
+    options:
+           expose: true
+
+inventory_itembarcode_search:
+    path:     /barcode-search
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::autoBarcodeSearchAction' }
+    options:
+           expose: true
+
+item_search_all:
+    path:     /all-search
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::autoSearchItemAllAction' }
+    options:
+           expose: true
+
+inventory_item_inline_update:
+    path:     /{vendor}/vendor-item
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::vendorItemAction' }
+    options:
+           expose: true
+
+inventory_item_sku_update:
+    path:     /{item}/sku-update
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::skuUpdateAction' }
+
+item_price:
+    path:      /price
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::priceAction' }
+    methods:  [POST]
+
+item_purcahse_quantity_update:
+    path:      /stock-purcahse-quantity-update
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::updatePurchaseQuantityAction' }
+
+item_purcahse_stock_update:
+    path:      /stock-remaining-quantity-update
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::updateStockQuantityAction' }
+
+item_stock_export_csv:
+    path:      /item-stock-export-to-csv
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::itemExportToCsvAction' }
+
+item_stock_export_excel:
+    path:      /item-stock-export-to-excel
+    defaults: { _controller: 'App\Inventory\Controller\ItemController::itemExportToExcelAction' }
+

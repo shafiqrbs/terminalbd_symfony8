@@ -1,0 +1,16 @@
+account_sales_restaurant:
+    path:     /sales
+    defaults: { _controller: 'App\Accounting\Controller\AccountRestaurantController::salesAction' }
+
+account_purchase_restaurant:
+    path:     /purchase
+    defaults: { _controller: 'App\Accounting\Controller\AccountRestaurantController::purchaseAction' }
+
+account_purchase_restaurant_new:
+    path:     /purchase-new
+    defaults: { _controller: 'App\Accounting\Controller\AccountRestaurantController::purchaseNewAction' }
+
+account_purchase_restaurant_create:
+    path:     /purchase-create
+    defaults: { _controller: 'App\Accounting\Controller\AccountRestaurantController::purchaseCreateAction' }
+

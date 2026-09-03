@@ -1,0 +1,224 @@
+<?php
+
+namespace App\Tool\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
+use App\Tool\Entity\MedicineImport;
+use App\Tool\Form\MedicineImportType;
+use Symfony\Component\HttpFoundation\Request;
+
+/**
+ * ItemColor controller.
+ *
+ */
+class MedicineImportController extends AbstractController
+{
+
+
+    public function paginate($entities)
+    {
+        $paginator = $this->get('knp_paginator');
+        $pagination = $paginator->paginate(
+            $entities,
+            $this->get('request')->query->get('page', 1)/*page number*/,
+            25  /*limit per page*/
+        );
+        $pagination->setTemplate('Tool/Widget/pagination.html.twig');
+        return $pagination;
+    }
+
+
+
+    /**
+	 * Lists all MedicineImport entities.
+	 *
+	 */
+	public function indexAction()
+	{
+		$em = $this->getDoctrine()->getManager();
+		$entities = $em->getRepository(\App\Tool\Entity\MedicineImport::class)->findBy([],['updated'=>'DESC']);
+		return $this->render('Tool/MedicineImport/index.html.twig', [
+			'entities' => $entities,
+		]);
+	}
+
+
+
+	/**
+	 * Creates a new MedicineImport entity.
+	 *
+	 */
+	public function createAction(Request $request)
+	{
+		$entity = new MedicineImport();
+		$form = $this->createCreateForm($entity);
+		$form->handleRequest($request);
+		$data = $request->request->all();
+		if ($form->isSubmitted() && $form->isValid()) {
+
+			$em = $this->getDoctrine()->getManager();
+
+			/** @var $file UploadedFile */
+
+			$file = $entity->getFile();
+			$fileName = $file->getClientOriginalName();
+			$imgName =  uniqid(). '.' .$fileName;
+			// moves the file to the directory where brochures are stored
+			$file->move(
+				$entity->getUploadDir(),
+				$imgName
+			);
+			$entity->setPath($imgName);
+			$em->persist($entity);
+			$em->flush();
+			$this->get('session')->getFlashBag()->add(
+				'success',"Data has been added successfully"
+			);
+		//	$this->getDoctrine()->getRepository(\App\Tool\Entity\MedicineImport::class)->fileUpload($entity,$data);
+			return $this->redirect($this->generateUrl('medicine_import'));
+		}
+
+		return $this->render('Tool/MedicineImport/new.html.twig', [
+			'entity' => $entity,
+			'form'   => $form->createView(),
+		]);
+	}
+
+	/**
+     * Creates a form to create a MedicineImport entity.
+     *
+     * @param MedicineImport $entity The entity
+     *
+     * @return Form The form
+     */
+    private function createCreateForm(MedicineImport $entity)
+	{
+		$form = $this->createForm(new MedicineImportType(), $entity, [
+			'action' => $this->generateUrl('medicine_import_create'),
+			'method' => 'POST',
+		]);
+		return $form;
+	}
+
+	/**
+	 * Displays a form to create a new MedicineImport entity.
+	 *
+	 */
+	public function newAction()
+	{
+		$entity = new MedicineImport();
+		$form   = $this->createCreateForm($entity);
+
+		return $this->render('Tool/MedicineImport/new.html.twig', [
+			'entity' => $entity,
+			'form'   => $form->createView(),
+		]);
+	}
+
+
+
+
+
+	public function excelDataImportAction(MedicineImport $excelImporter)
+	{
+
+		//set_time_limit(0);
+		ini_set('max_execution_time', 0);
+		ignore_user_abort(true);
+		$em = $this->getDoctrine()->getManager();
+		$importer = $this->get('appstore_medicine_importer_excel');
+		$reader = $this->get('appstore_medicine.importer.excel_data_reader');
+		$file =  realpath($excelImporter->getAbsolutePath());
+		$data = $reader->getData($file);
+		if($importer->isValid($data)) {
+			$importer->import($data);
+			$excelImporter->setProgress('migrated');
+			$this->get('session')->getFlashBag()->add(
+				'success',"Data has been migration successfully"
+			);
+			$em->flush();
+		}else{
+			$this->get('session')->getFlashBag()->add(
+				'error',"Excel File memo no null or exist in your system"
+			);
+			$em->flush();
+		}
+		return $this->redirect($this->generateUrl('medicine_import'));
+	}
+
+
+	public function deleteAction(MedicineImport $excelImporter)
+	{
+		$em = $this->getDoctrine()->getManager();
+		if ($excelImporter) {
+			$excelImporter->removeUpload();
+			$em->remove($excelImporter);
+			$em->flush();
+		}
+		return $this->redirect($this->generateUrl('medicine_import'));
+	}
+
+
+
+    /**
+     * Creates a new Vendor entity.
+     *
+     */
+    public function uploadAction(Request $request) {
+
+        $data = explode( ',', $request->cookies->get( 'barcodes' ) );
+        $em = $this->getDoctrine()->getManager();
+        if ( is_null( $data ) ) {
+            return $this->redirect( $this->generateUrl( 'medicine_stock_short_item' ) );
+        }
+        $medicines = [];
+
+        foreach ($data as $key => $value ){
+            $medicine = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($value);
+            if($medicine){
+                $medicines[$value] = $medicine;
+            }
+        }
+        return $this->render('Tool/MedicineImport/upload.html.twig', [
+            'medicines' => $medicines,
+        ]);
+    }
+
+    /**
+     * Creates a new Vendor entity.
+     *
+     */
+    public function uploadCreateAction(Request $request) {
+
+        $data = explode( ',', $request->cookies->get( 'barcodes' ) );
+        $em = $this->getDoctrine()->getManager();
+        if ( is_null( $data ) ) {
+            return $this->redirect( $this->generateUrl( 'medicinebrand'));
+        }
+        $file = $request->files->get('file');
+        if($file){
+            foreach ($data as $key => $value ){
+                $entity = $em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($value);
+                if($entity){
+                    if($entity->getWebPath()){
+                        $entity->removeUpload();
+                    }
+                    $img = $file;
+                    $fileName = $img->getClientOriginalName();
+                    $imgName = uniqid() . '.' . $fileName;
+                    $path = $entity->getUploadDir() . $imgName;
+                    if (!file_exists($entity->getUploadDir())) {
+                        mkdir($entity->getUploadDir(), 0777, true);
+                    }
+                    $this->get('helper.imageresizer')->resizeImage(480, $path, $img);
+                    $entity->setPath($imgName);
+                    $em->persist($entity);
+                    $em->flush();
+                }
+            }
+        }
+        return $this->redirect( $this->generateUrl( 'medicinebrand'));
+    }
+
+}

@@ -20,7 +20,7 @@ class SyndicateModuleRepository extends EntityRepository
             $em = $this->_em;
             $db = $em->createQueryBuilder();
             $db->select('sm');
-            $db->from('SettingToolBundle:SyndicateModule', 'sm');
+            $db->from(\App\Tool\Entity\SyndicateModule::class, 'sm');
             $db->innerJoin('sm.syndicates', 's');
             $db->where($db->expr()->andX(
                 $db->expr()->eq('sm.status', 1),

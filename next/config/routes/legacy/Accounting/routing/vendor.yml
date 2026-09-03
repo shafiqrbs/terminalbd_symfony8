@@ -1,0 +1,47 @@
+account_vendor:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::indexAction' }
+
+account_vendor_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::newAction' }
+
+account_vendor_create:
+    path:     /create
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::createAction' }
+    methods:  POST
+
+account_vendor_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::editAction' }
+
+account_vendor_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::updateAction' }
+    methods:  [POST, PUT]
+
+account_single_vendor_ledger:
+    path:      /vendor-ledger
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::ledgerAction' }
+    options:
+            expose: true
+
+account_vendor_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::statusAction' }
+
+account_vendor_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::deleteAction' }
+
+account_vendor_search:
+    path:     /search
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::autoSearchAction' }
+    options:
+            expose: true
+
+account_vendor_name:
+    path:      /{name}/vendor-name
+    defaults: { _controller: 'App\Accounting\Controller\VendorController::searchVendorNameAction' }
+    options:
+            expose: true

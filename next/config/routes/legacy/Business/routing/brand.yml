@@ -1,0 +1,26 @@
+business_brand:
+    path:     /
+    defaults: { _controller: 'App\Business\Controller\BusinessBrandController::indexAction' }
+
+business_brand_create:
+    path:     /create
+    defaults: { _controller: 'App\Business\Controller\BusinessBrandController::createAction' }
+    methods:  POST
+
+business_brand_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Business\Controller\BusinessBrandController::editAction' }
+
+business_brand_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Business\Controller\BusinessBrandController::updateAction' }
+    methods:  [POST, PUT]
+
+business_brand_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Business\Controller\BusinessBrandController::deleteAction' }
+
+business_brand_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Business\Controller\BusinessBrandController::statusAction' }
+

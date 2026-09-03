@@ -1,0 +1,99 @@
+medicine:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\MedicineController::indexAction' }
+
+medicine_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\MedicineController::createAction' }
+    methods:  POST
+
+medicine_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\MedicineController::editAction' }
+
+medicine_copy:
+    path:     /{id}/copy
+    defaults: { _controller: 'App\Medicine\Controller\MedicineController::copyAction' }
+
+medicine_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\MedicineController::updateAction' }
+    methods:  [POST, PUT]
+
+medicine_select_search:
+    path:     /select-medicine-search
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::selectSearchMedicineAction' }
+    options:
+            expose: true
+
+medicine_search:
+    path:     /medicine-search
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::autoSearchMedicineAction' }
+    options:
+            expose: true
+
+medicine_details:
+    path:     /medicine-details
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::medicineDetailsAction' }
+    options:
+            expose: true
+
+generic_search:
+    path:     /generic-search
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::autoSearchGenericAction' }
+    options:
+            expose: true
+
+medicine_name:
+    path:      /{medicine}/medicine-name
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::searchProductNameAction' }
+    options:
+            expose: true
+
+medicine_user:
+    path:     /medicine-user
+    defaults: { _controller: 'App\Medicine\Controller\MedicineController::indexAction' }
+
+medicine_search_brand_name_complete:
+    path:     /search-brand-name-auto-complete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::searchBrandNameAutoCompleteAction' }
+    options:
+            expose: true
+
+medicine_search_company_name_complete:
+    path:     /search-company-name-auto-complete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::searchCompanyNameAutoCompleteAction' }
+    options:
+            expose: true
+
+medicine_search_generic_name_complete:
+    path:     /search-generic-name-auto-complete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::searchGenericNameAutoCompleteAction' }
+    options:
+            expose: true
+
+medicine_search_pack_size_name_complete:
+    path:     /search-pack-size-name-auto-complete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::searchPackSizeAutoCompleteAction' }
+    options:
+            expose: true
+
+medicine_search_strength_name_complete:
+    path:     /search-strength-name-auto-complete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::searchStrengthAutoCompleteAction' }
+    options:
+            expose: true
+
+medicine_search_form_name_complete:
+    path:     /search-form-name-auto-complete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::searchMedicineFormAutoCompleteAction' }
+    options:
+            expose: true
+
+medicine_search_medicine_generic_complete:
+    path:     /search-generic-medicine-auto-complete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineBrandController::searchMedicineGenericNameAutoCompleteAction' }
+    options:
+            expose: true
+
+

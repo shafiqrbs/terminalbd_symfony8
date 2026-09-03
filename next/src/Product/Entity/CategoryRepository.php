@@ -118,7 +118,7 @@ class CategoryRepository extends MaterializedPathRepository
         array_push($exclude, 0);	// Put a starting value in it
         $tempTree="";
 
-        $childData = $em->getRepository('ProductProductBundle:Category')->findBy(['parent' => $oldID ],['name'=>'asc']);
+        $childData = $em->getRepository(\App\Product\Entity\Category::class)->findBy(['parent' => $oldID ],['name'=>'asc']);
 
         foreach ( $childData as $child ){
 
@@ -502,7 +502,7 @@ class CategoryRepository extends MaterializedPathRepository
 
         foreach ($data as $key => $value){
             $val = $value ?: 0 ;
-            $q = $qb->update('ProductProductBundle:Category', 'mg')
+            $q = $qb->update(\App\Product\Entity\Category::class, 'mg')
                 ->set('mg.sorting', $i)
                 ->where('mg.id = :id')
                 ->setParameter('id', $key)
@@ -524,7 +524,7 @@ class CategoryRepository extends MaterializedPathRepository
         foreach ($catIDs as $value){
 
             $val = in_array($value , $isFeatures ) ? 1 : 0 ;
-            $q = $qb->update('ProductProductBundle:Category', 'mg')
+            $q = $qb->update(\App\Product\Entity\Category::class, 'mg')
                 ->set('mg.feature', $val)
                 ->where('mg.id = :id')
                 ->setParameter('id', $value)
@@ -627,7 +627,7 @@ class CategoryRepository extends MaterializedPathRepository
 
         $ret = [];
         $em = $this->_em;
-        $categories = $em->getRepository('ProductProductBundle:Category')->findBy(['status'=>1],['name'=>'asc']);
+        $categories = $em->getRepository(\App\Product\Entity\Category::class)->findBy(['status'=>1],['name'=>'asc']);
 
         foreach( $categories as $cat ){
             if( !$cat->getParent() ){

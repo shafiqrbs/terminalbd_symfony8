@@ -1,0 +1,30 @@
+inventory_category:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\CustomCategoryController::indexAction' }
+
+inventory_category_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\CustomCategoryController::showAction' }
+
+inventory_category_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\CustomCategoryController::newAction' }
+
+inventory_category_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\CustomCategoryController::createAction' }
+    methods:  POST
+
+inventory_category_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\CustomCategoryController::editAction' }
+
+inventory_category_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\CustomCategoryController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_category_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\CustomCategoryController::deleteAction' }
+

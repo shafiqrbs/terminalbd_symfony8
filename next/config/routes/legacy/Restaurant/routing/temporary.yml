@@ -1,0 +1,57 @@
+restaurant_temporary_new:
+    path:     /new
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantTemporaryController::newAction' }
+    options:
+            expose: true
+
+restaurant_temporary_create:
+    path:     /create
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantTemporaryController::createAction' }
+    methods:  POST
+    options:
+            expose: true
+
+
+restaurant_temporary_particular_search:
+    path:     /{id}/particular-search
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantTemporaryController::particularSearchAction' }
+    methods:  GET
+    options:
+            expose: true
+
+
+restaurant_temporary_particular_add:
+    path:     /particular-add
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantTemporaryController::addParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_temporary_product_add:
+    path:     /{product}/product-add
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantTemporaryController::addProductAction' }
+
+
+restaurant_temporary_product_update:
+    path:     /{product}/product-update
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantTemporaryController::updateProductAction' }
+
+
+restaurant_temporary_discount_update:
+    path:     /dicount-update
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantTemporaryController::invoiceDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_temporary_discount_coupon:
+    path:     /dicount-coupon
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantTemporaryController::invoiceDiscountCouponAction' }
+    methods:  POST
+    options:
+            expose: true
+
+restaurant_temporary_particular_delete:
+    path:     /{id}/particular-delete
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantTemporaryController::invoiceParticularDeleteAction' }
+

@@ -96,7 +96,7 @@ class DailyAttendanceRepository extends EntityRepository
         $entity->setYear($year);
         $em->persist($entity);
         $em->flush();
-        $this->_em->getRepository('HumanResourceBundle:Attendance')->employeeTotalPresentDay($attendance);
+        $this->_em->getRepository(\App\HumanResource\Entity\Attendance::class)->employeeTotalPresentDay($attendance);
     }
 
 

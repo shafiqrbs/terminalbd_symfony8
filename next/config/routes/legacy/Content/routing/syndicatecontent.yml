@@ -1,0 +1,30 @@
+syndicatecontent:
+    path:     /
+    defaults: { _controller: 'App\Content\Controller\SyndicateContentController::indexAction' }
+
+syndicatecontent_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Content\Controller\SyndicateContentController::showAction' }
+
+syndicatecontent_new:
+    path:     /new
+    defaults: { _controller: 'App\Content\Controller\SyndicateContentController::newAction' }
+
+syndicatecontent_create:
+    path:     /create
+    defaults: { _controller: 'App\Content\Controller\SyndicateContentController::createAction' }
+    requirements: { _method: post }
+
+syndicatecontent_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Content\Controller\SyndicateContentController::editAction' }
+
+syndicatecontent_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Content\Controller\SyndicateContentController::updateAction' }
+    requirements: { _method: post|put }
+
+syndicatecontent_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Content\Controller\SyndicateContentController::deleteAction' }
+    requirements: { _method: post|delete }

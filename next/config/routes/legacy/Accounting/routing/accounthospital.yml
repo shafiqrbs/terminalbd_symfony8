@@ -1,0 +1,20 @@
+account_sales_hospital:
+    path:     /sales
+    defaults: { _controller: 'App\Accounting\Controller\AccountHospitalController::salesAction' }
+
+account_sales_hospital_new:
+    path:     /sales-new
+    defaults: { _controller: 'App\Accounting\Controller\AccountHospitalController::purchaseNewAction' }
+
+account_purchase_hospital:
+    path:     /purchase
+    defaults: { _controller: 'App\Accounting\Controller\AccountHospitalController::purchaseAction' }
+
+account_purchase_hospital_new:
+    path:     /purchase-new
+    defaults: { _controller: 'App\Accounting\Controller\AccountHospitalController::purchaseNewAction' }
+
+account_purchase_hospital_create:
+    path:     /purchase-create
+    defaults: { _controller: 'App\Accounting\Controller\AccountHospitalController::purchaseCreateAction' }
+

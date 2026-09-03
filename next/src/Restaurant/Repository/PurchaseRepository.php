@@ -39,7 +39,7 @@ class PurchaseRepository extends EntityRepository
     {
         $em = $this->_em;
         $total = $em->createQueryBuilder()
-            ->from('RestaurantBundle:PurchaseItem','si')
+            ->from(\App\Restaurant\Entity\PurchaseItem::class,'si')
             ->select('sum(si.purchaseSubTotal) as total')
             ->where('si.purchase = :entity')
             ->setParameter('entity', $entity ->getId())
@@ -88,7 +88,7 @@ class PurchaseRepository extends EntityRepository
             $particular->setPurchaseQuantity($qnt);
             $em->persist($particular);
             $em->flush();
-            $em->getRepository('RestaurantBundle:Particular')->remainingQnt($particular);
+            $em->getRepository(\App\Restaurant\Entity\Particular::class)->remainingQnt($particular);
         }
     }
 

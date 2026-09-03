@@ -49,7 +49,7 @@ class CollectionRepository extends EntityRepository
         $slug = $options['lowercase'] ? mb_strtolower($str, 'UTF-8') : $str;
 
         $em = $this->_em;
-        $entity = $em->getRepository('ProductProductBundle:Collection')->findOneBy(['slug'=>$slug]);
+        $entity = $em->getRepository(\App\Product\Entity\Collection::class)->findOneBy(['slug'=>$slug]);
         if (empty($entity)){
             return $slug;
         }else{
@@ -69,7 +69,7 @@ class CollectionRepository extends EntityRepository
         for ($i = 1; $i < 100; $i++){
 
             $new = $productSlug.'-'.$i;
-            $existsSlug = $em->getRepository('ProductProductBundle:Collection')->findOneBy(['slug'=>$new]);
+            $existsSlug = $em->getRepository(\App\Product\Entity\Collection::class)->findOneBy(['slug'=>$new]);
 
             if (empty($existsSlug) ){
                 $productSlugNew = $productSlug.'-'.$i;
@@ -128,7 +128,7 @@ class CollectionRepository extends EntityRepository
     public function getCollections()
     {
         $em =$this->_em;
-        $existsSlug = $em->getRepository('ProductProductBundle:Collection')->findOneBy(['slug'=>$new]);
+        $existsSlug = $em->getRepository(\App\Product\Entity\Collection::class)->findOneBy(['slug'=>$new]);
     }
 
 }

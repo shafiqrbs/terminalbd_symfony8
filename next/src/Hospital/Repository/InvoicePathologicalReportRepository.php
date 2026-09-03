@@ -51,7 +51,7 @@ class InvoicePathologicalReportRepository extends EntityRepository
                 if (isset($data['metaValue'][$i]) and !empty($data['metaValue'][$i])) {
 
                     if (!empty($data['metaValue'][$i]) and !empty($data['metaId'][$i])) {
-                        $entity = $em->getRepository('HospitalBundle:InvoicePathologicalReport')->find($data['metaId'][$i]);
+                        $entity = $em->getRepository(\App\Hospital\Entity\InvoicePathologicalReport::class)->find($data['metaId'][$i]);
                     } elseif (!empty($data['metaValue'][$i])) {
                         $entity = new InvoicePathologicalReport();
                         $entity->setInvoiceParticular($invoiceParticular);
@@ -76,9 +76,9 @@ class InvoicePathologicalReportRepository extends EntityRepository
             $i = 0;
             foreach ($data['pathologicalReportId'] as $key => $row):
                 $pathologicalReportId = $data['pathologicalReportId'][$key];
-                $entity = $em->getRepository('HospitalBundle:InvoicePathologicalReport')->findOneBy(['invoiceParticular' => $invoiceParticular ,'pathologicalReport' => $pathologicalReportId ]);
+                $entity = $em->getRepository(\App\Hospital\Entity\InvoicePathologicalReport::class)->findOneBy(['invoiceParticular' => $invoiceParticular ,'pathologicalReport' => $pathologicalReportId ]);
                 if(empty($entity)){
-                    $pathologicalReport = $em->getRepository('HospitalBundle:PathologicalReport')->find($pathologicalReportId);
+                    $pathologicalReport = $em->getRepository(\App\Hospital\Entity\PathologicalReport::class)->find($pathologicalReportId);
                     $entity = new InvoicePathologicalReport();
                     $entity->setPathologicalReport($pathologicalReport);
                 }

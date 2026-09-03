@@ -1,0 +1,154 @@
+{% extends '::base.html.twig' %}
+{% block body %}
+    <div class="container-fluid">
+        <!-- BEGIN PAGE HEADER-->
+        <div class="row-fluid">
+            <div class="span12">
+                <h3 class="page-title">
+                   Manage Fuel Station Meter Reading Process
+                </h3>
+                <ul class="breadcrumb">
+                    <li>
+                        <i class="icon-home"></i>
+                        <a href="{{ path('homepage') }}">Home</a>
+                        <span class="icon-angle-right"></span>
+                    </li>
+                     <li><a href="#">Fuel Station Meter Reading Process</a></li>
+                    <li class="pull-right btn blue disabled mini">
+                        <i class="fa fa-calendar"></i>
+                        {{ "now"|date("d-F-Y") }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- END PAGE HEADER-->
+        <!-- BEGIN PAGE CONTENT-->
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="portlet box green tabbable">
+                    <div class="portlet-title">
+                        <div class="caption"><i class="icon-reorder"></i>Manage Fuel Station Meter Reading Process</div>
+                        <div class="actions">
+                            <div class="btn-group">
+                                <a class="btn red" href="{{ path('business_fuelstation') }}"><i class="icon-plus-sign"></i> Sales Batch</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="portlet-body flip-scroll">
+                            <div class="row-fluid" >
+                                {{ form_start(form) }}
+                                {{ form_row(form._token) }}
+                                    <div class="row-fluid" style="margin-bottom: 10px">
+                                        <div class="span3">
+                                            {{ form_widget(form.salesBy) }}
+                                            {{ form_errors(form.salesBy) }}
+                                        </div>
+                                        <div class="span3">
+                                            {{ form_widget(form.wearhouse) }}
+                                            {{ form_errors(form.wearhouse) }}
+                                        </div>
+                                        <div class="span3">
+                                            {{ form_widget(form.businessParticular) }}
+                                            {{ form_errors(form.businessParticular) }}
+                                        </div>
+                                        <div class="span3">
+                                            <div class="input-append span12">
+                                                {{ form_widget(form.startMeterReading) }}
+                                                {{ form_errors(form.startMeterReading) }}
+                                                <div class="btn-group">
+                                                    <button class="btn blue" type="submit"><i class="icon-plus"></i> Add</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                {{ form_end(form) }}
+                            </div>
+                            <table class="table table-bordered table-striped table-condensed flip-content ">
+                                <thead class="flip-content ">
+                                <tr class="head-green">
+                                    <th class="numeric" >S/N</th>
+                                    <th class="numeric" >Sales By</th>
+                                    <th class="numeric" >Station Name</th>
+                                    <th class="numeric" >Particular Name</th>
+                                    <th class="numeric" >Start Reading</th>
+                                    <th class="numeric" >End Reading</th>
+                                    <th class="numeric" >Rate</th>
+                                    <th class="numeric" >Quantity</th>
+                                    <th class="numeric" >Customer Quantity</th>
+                                    <th class="numeric" >Remain QTY</th>
+                                    <th class="numeric" >Amount</th>
+                                    <th class="numeric" >Customer Amount</th>
+                                    <th class="numeric" >Remain Balance</th>
+                                    <th class="numeric" >Process</th>
+                                    <th class="numeric" >Action</th>
+                                </tr>
+                                </thead>
+                                <tbody id="invoiceParticulars">
+                                {% if entity %}
+                                    {% set totalQuantity = 0 %}
+                                    {% set customerQuantity = 0 %}
+                                    {% set totalAmount = 0 %}
+                                    {% set customerAmount = 0 %}
+                                    {% for item in entity.businessBatchParticulars %}
+                                        {% set totalQuantity = totalQuantity + item.quantity %}
+                                        {% set customerQuantity = customerQuantity + item.customerSalesQuantity %}
+                                        {% set totalAmount = totalAmount + item.subTotal %}
+                                        {% set customerAmount = customerAmount + item.customerSalesAmount %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+                                            <td>{{ item.salesBy.profile.name }}</td>
+                                            <td>{{ item.wearhouse.name }}</td>
+                                            <td>{{ item.businessParticular.name }}</td>
+                                            <td>{{ item.startMeterReading }}</td>
+                                            <td class="">
+                                                {% if item.process == 'Created' %}
+                                                    <input type="text" style="width:100px!important;" class="numeric number td-inline-input batchItemUpdate" data-id="{{ item.id }}" autocomplete = "off" data-url="{{ path('business_fuelstation_item_update',{'id':item.id}) }}"  id="endMeterReading-{{ item.id }}" name="endMeterReading[]" value="{{ item.endMeterReading }}" >
+                                                {% else %}
+                                                    {{ item.endMeterReading }}
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ item.price }}</td>
+                                            <td id="quantity-{{ item.id }}">{{ item.quantity }}</td>
+                                            <td>{% if customerSales is defined and customerSales[item.id] is defined and customerSales[item.id] is not empty %}{{ customerSales[item.id].quantity }}{% endif %}</td>
+                                            <td id="reaminQuantity-{{ item.id }}">{{ item.quantity - item.customerSalesQuantity }}</td>
+                                            <td id="subTotal-{{ item.id }}">{{ item.quantity * item.price  }}</td>
+                                            <td>{% if customerSales is defined and customerSales[item.id] is defined and customerSales[item.id] is not empty %}{{ customerSales[item.id].amount }}{% endif %}</td>
+                                            <td id="remainAmount-{{ item.id }}">{{ item.subTotal - item.customerSalesAmount }}</td>
+                                            <td>{{ item.process|capitalize }}</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    {% if item.process == 'Created' %}
+                                                        <a data-id="{{ item.id }}" data-url="{{ path('business_fuelstation_item_delete', {'id': item.id }) }}" href="javascript:" class="btn red mini item-delete" data-trigger = "hover" data-original-title = "Delete" ><i class="icon-trash"></i> Delete</a>
+                                                        <a data-id="{{ item.id }}" data-url="{{ path('business_fuelstation_item_approve', {'id': item.id }) }}" href="javascript:" class="btn blue mini approve"><i class="icon-refresh"></i> Approve</a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr><th colspan="7">Grand Total </th><th>{{ totalQuantity }}</th><th>{{ customerQuantity }}</th><th>{{ totalQuantity-customerQuantity }}</th><th>{{ (customerAmount+totalAmount)|number_format }}</th><th>{{ customerAmount|number_format }}</th><th>{{ totalAmount|number_format }}</th><th></th><th></th></tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascriptBlock %}
+    {{ parent() }}
+    {% javascripts
+        '@BusinessBundle/Resources/public/js/business-batch.js'
+        '@BusinessBundle/Resources/public/js/approveProcess.js'
+    %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock  %}
+{% block documentready %}
+    {{ parent() }}
+{% endblock %}

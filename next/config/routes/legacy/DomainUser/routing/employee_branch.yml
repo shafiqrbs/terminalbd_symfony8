@@ -1,0 +1,32 @@
+domain_employee_branch:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\EmployeeBranchController::indexAction' }
+
+domain_employee_branch_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\DomainUser\Controller\EmployeeBranchController::showAction' }
+
+domain_employee_branch_new:
+    path:     /new
+    defaults: { _controller: 'App\DomainUser\Controller\EmployeeBranchController::newAction' }
+
+domain_employee_branch_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\EmployeeBranchController::createAction' }
+    methods:  POST
+
+domain_employee_branch_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\DomainUser\Controller\EmployeeBranchController::editAction' }
+
+domain_employee_branch_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\DomainUser\Controller\EmployeeBranchController::updateAction' }
+    methods:  [POST, PUT]
+
+domain_employee_branch_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\DomainUser\Controller\EmployeeBranchController::deleteAction' }
+
+
+

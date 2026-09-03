@@ -1,0 +1,9 @@
+weekend:
+    path:     /
+    defaults: { _controller: 'App\HumanResource\Controller\WeekendController::indexAction' }
+
+weekend_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\HumanResource\Controller\WeekendController::updateAction' }
+    methods:  [POST, PUT]
+

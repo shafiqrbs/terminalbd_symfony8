@@ -1,0 +1,85 @@
+inventory_product:
+    path:     /
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::indexAction' }
+
+inventory_product_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::showAction' }
+
+
+inventory_product_new:
+    path:     /new
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::newAction' }
+
+inventory_product_create:
+    path:     /create
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::createAction' }
+    methods:  POST
+
+inventory_product_masteritem_create:
+    path:     /master-product-create
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::createMasterProductAction' }
+    options:
+           expose: true
+
+inventory_product_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::editAction' }
+
+inventory_product_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::updateAction' }
+    methods:  [POST, PUT]
+
+inventory_product_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::deleteAction' }
+
+inventory_product_inline_search:
+    path:     /inline-product-search
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::masterItemSelectAction' }
+    options:
+           expose: true
+
+inventory_product_masteritem_search:
+    path:     /master-product-search
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::masterItemAction' }
+    options:
+           expose: true
+
+inventory_product_search:
+    path:     /search
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::autoSearchAction' }
+    options:
+            expose: true
+
+inventory_product_name:
+    path:      /{product}/product-name
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::searchProductNameAction' }
+    options:
+            expose: true
+
+
+inventory_unit_search:
+    path:     /search-unit
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::autoUnitSearchAction' }
+    options:
+            expose: true
+
+inventory_unit_name:
+    path:      /{unit}/unit-name
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::searchUnitNameAction' }
+    options:
+            expose: true
+
+inventory_category_search:
+    path:     /search-category
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::autoCategorySearchAction' }
+    options:
+            expose: true
+
+inventory_category_name:
+    path:      /{category}/category-name
+    defaults: { _controller: 'App\Inventory\Controller\ProductController::searchCategoryNameAction' }
+    options:
+            expose: true

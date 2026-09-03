@@ -1,0 +1,53 @@
+appearancewebsitewidget:
+    path:     /
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::indexAction' }
+
+appearancewebsitewidget_sorting:
+    path:     /sorting
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::sortingAction' }
+
+appearancewebsitewidget_list_sorted:
+    path:     /sorted-list
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::sortedListAction' }
+
+appearancewebsitewidget_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::showAction' }
+
+appearancewebsitewidget_new:
+    path:     /new
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::newAction' }
+
+appearancewebsitewidget_create:
+    path:     /create
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::createAction' }
+    methods:  POST
+
+appearancewebsitewidget_feature:
+    path:     /{id}/feature
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::featureAction' }
+
+appearancewebsitewidget_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::editAction' }
+
+appearancewebsitewidget_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::updateAction' }
+    methods:  [POST, PUT]
+
+appearancewebsitewidget_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::deleteAction' }
+
+appearancewebsitewidget_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::statusAction' }
+
+appearancewebsitewidget_resizing:
+    path:     /resizing
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::resizeAction' }
+
+appearancewebsitewidget_sorted:
+    path:     /sorted
+    defaults: { _controller: 'App\Appearance\Controller\WebsiteWidgetController::sortedAction' }

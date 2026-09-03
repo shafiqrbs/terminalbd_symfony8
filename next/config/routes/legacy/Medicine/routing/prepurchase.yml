@@ -1,0 +1,100 @@
+medicine_prepurchase:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::indexAction' }
+
+
+medicine_prepurchase_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::showAction' }
+
+medicine_prepurchase_new:
+    path:     /new
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::newAction' }
+
+medicine_prepurchase_create:
+    path:     /short-list-to-pre-purchase
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::createAction' }
+
+medicine_prepurchase_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::editAction' }
+
+medicine_prepurchase_process:
+    path:     /{id}/purchase-process
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::processAction' }
+
+medicine_prepurchase_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::updateAction' }
+    methods:  [POST, PUT]
+
+medicine_prepurchase_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::editAction' }
+
+
+medicine_prepurchase_approve:
+    path:     /{id}/approve
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::approvedAction' }
+
+medicine_prepurchase_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::deleteAction' }
+
+medicine_prepurchase_particular_search:
+    path:     /{id}/medicine-stock-search
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::particularSearchAction' }
+    options:
+            expose: true
+
+
+
+
+medicine_prestock_item_create:
+    path:     /{id}/pre-stock-item-create
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::stockItemCreateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_prepurchase_discount_update:
+    path:     /purchase/dicount-update
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::invoiceDiscountUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+
+medicine_prepurchase_particular_delete:
+    path:     /{invoice}/{id}/particular-delete
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::invoiceParticularDeleteAction' }
+
+medicine_prepurchase_item_update:
+    path:     /item-update
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::purchaseItemUpdateAction' }
+    methods:  POST
+    options:
+            expose: true
+
+medicine_prepurchase_approved:
+    path:     /{id}/invoice-approved
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::approvedAction' }
+
+medicine_prepurchase_download:
+    path:     /{id}/pdf-download
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::downloadPdfAction' }
+
+
+medicine_prepurchase_update_brand:
+    path:     /{id}/invoice-update-brand
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::updateBrandAction' }
+    options:
+        expose: true
+
+medicine_prepurchase_stock_item_search:
+    path:     /medicine-stock-item-search
+    defaults: { _controller: 'App\Medicine\Controller\PrepurchaseController::autoPurchaseStockItemSearchAction' }
+    options:
+        expose: true
+
+

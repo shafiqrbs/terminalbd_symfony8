@@ -1,0 +1,30 @@
+medicine_company:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\MedicineCompanyController::indexAction' }
+
+medicine_company_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Medicine\Controller\MedicineCompanyController::showAction' }
+
+medicine_company_new:
+    path:     /new
+    defaults: { _controller: 'App\Medicine\Controller\MedicineCompanyController::newAction' }
+
+medicine_company_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\MedicineCompanyController::createAction' }
+    methods:  POST
+
+medicine_company_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\MedicineCompanyController::editAction' }
+
+medicine_company_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\MedicineCompanyController::updateAction' }
+    methods:  [POST, PUT]
+
+medicine_company_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\MedicineCompanyController::deleteAction' }
+    methods:  [POST, DELETE]

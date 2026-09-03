@@ -1,0 +1,50 @@
+account_expense_purchase:
+    path:     /
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::indexAction' }
+
+account_expense_purchase_new:
+    path:     /new
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::newAction' }
+
+account_expense_purchase_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::editAction' }
+
+account_expense_purchase_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::showAction' }
+
+account_expense_purchase_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::updateAction' }
+    methods:  [POST, PUT]
+
+account_expense_purchase_particular_add:
+    path:     /{invoice}/particular-add
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::addParticularAction' }
+    methods:  POST
+    options:
+            expose: true
+
+
+account_expense_purchase_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::statusAction' }
+
+account_expense_purchase_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::deleteAction' }
+
+
+account_expense_purchase_approved:
+    path:     /{id}/invoice-approved
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::approvedAction' }
+
+account_expense_purchase_item_approve:
+    path:     /{id}/item-approve
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::itemApproveAction' }
+
+account_expense_purchase_particular_delete:
+    path:     /{invoice}/{id}/particular-delete
+    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::invoiceParticularDeleteAction' }
+

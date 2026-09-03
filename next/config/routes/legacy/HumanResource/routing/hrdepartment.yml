@@ -1,0 +1,22 @@
+hrdepartment:
+    path:     /
+    defaults: { _controller: 'App\HumanResource\Controller\DepartmentController::indexAction' }
+
+hrdepartment_create:
+    path:     /create
+    defaults: { _controller: 'App\HumanResource\Controller\DepartmentController::createAction' }
+    methods:  POST
+
+hrdepartment_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\HumanResource\Controller\DepartmentController::editAction' }
+
+hrdepartment_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\HumanResource\Controller\DepartmentController::updateAction' }
+    methods:  [POST, PUT]
+
+hrdepartment_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\HumanResource\Controller\DepartmentController::deleteAction' }
+    methods:  [POST, DELETE]

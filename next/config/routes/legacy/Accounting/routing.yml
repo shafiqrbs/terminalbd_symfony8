@@ -1,0 +1,206 @@
+accounting_account_sales_hotel:
+    resource: 'routing/accounthotel.yml'
+    prefix:   /hotel
+
+accounting_account_sales_hospital:
+    resource: 'routing/accounthospital.yml'
+    prefix:   /hms
+
+accounting_account_medicine:
+    resource: 'routing/accountmedicine.yml'
+    prefix:   /medicine
+
+accounting_account_sales_restaurant:
+    resource: 'routing/accountrestaurant.yml'
+    prefix:   /restaurant
+
+accounting_double_entry:
+    resource: 'routing/doubleentry.yml'
+    prefix:   /double-entry-journal
+
+accounting_voucher_entry:
+    resource: 'routing/journalvoucher.yml'
+    prefix:   /journal-voucher
+
+accounting_profit_withdrawal:
+    resource: 'routing/profitwithdrawal.yml'
+    prefix:   /profit-withdrawal
+
+accounting_customer:
+    resource: 'routing/accountcustomer.yml'
+    prefix:   /account-customer
+
+accounting_condition:
+    resource: 'routing/condition.yml'
+    prefix:   /account-condition
+
+accounting_user:
+    resource: 'routing/accountuser.yml'
+    prefix:   /account-user
+
+accounting_account_sales_adjustment:
+    resource: 'routing/accountsalesadjustment.yml'
+    prefix:   /sales-adjustment
+
+accounting_account_profit:
+    resource: 'routing/profit.yml'
+    prefix:   /profit-loss
+
+accounting_account_purchase_commission:
+    resource: 'routing/purchasecommission.yml'
+    prefix:   /purchase-commission
+
+accounting_cash_reconciliation:
+    resource: 'routing/cashreconciliation.yml'
+    prefix:   /cash-reconciliation
+
+accounting_account_business:
+    resource: 'routing/accountbusiness.yml'
+    prefix:   /business
+
+accounting_report:
+    resource: 'routing/accountreport.yml'
+    prefix:   /report
+
+accounting_hms_report:
+    resource: 'routing/hmsaccountreport.yml'
+    prefix:   /report-hms
+
+accounting_expensecategory:
+    resource: 'routing/expensecategory.yml'
+    prefix:   /expense-category
+
+accounting_paymentsalary:
+    resource: 'routing/paymentsalary.yml'
+    prefix:   /payment-salary
+
+accounting_salarysetting:
+    resource: 'routing/salarysetting.yml'
+    prefix:   /salary-invoice
+
+accounting_journal:
+    resource: 'routing/accountjournal.yml'
+    prefix:   /journal
+
+accounting_loan:
+    resource: 'routing/accountloan.yml'
+    prefix:   /loan
+
+accounting_balancetransfer:
+    resource: 'routing/accountbalancetransfer.yml'
+    prefix:   /balance-transfer
+
+accounting_expenditure:
+    resource: 'routing/expenditure.yml'
+    prefix:   /expenditure
+
+accounting_bank:
+    resource: 'routing/accountbank.yml'
+    prefix:   /bank
+
+accounting_pettycash:
+    resource: 'routing/pettycash.yml'
+    prefix:   /pettycash
+
+accounting_transaction:
+    resource: 'routing/transaction.yml'
+    prefix:   /transaction
+
+accounting_accounthead:
+    resource: 'routing/accounthead.yml'
+    prefix:   /accounthead
+
+accounting_accountbank:
+    resource: 'routing/accountbank.yml'
+    prefix:   /bank-account
+
+accounting_accountmobilebank:
+    resource: 'routing/accountmobilebank.yml'
+    prefix:   /mobile-bank-account
+
+accounting_account_purchase:
+    resource: 'routing/accountpurchase.yml'
+    prefix:   /purchase
+
+accounting_account_voucher:
+    resource: 'routing/accountvoucher.yml'
+    prefix:   /voucher
+
+
+accounting_account_sales:
+    resource: 'routing/accountsales.yml'
+    prefix:   /sales
+
+accounting_account_online_order:
+    resource: 'routing/accountonlineorder.yml'
+    prefix:   /online-order
+
+accounting_account_config:
+    resource: 'routing/config.yml'
+    prefix:   /manage-config
+
+accounting_expense_purchase:
+    resource: 'routing/expensepurchase.yml'
+    prefix:   /expense-purchase
+
+accounting_account_report:
+    resource: 'routing/report.yml'
+    prefix:   /report
+
+accounting_vendor:
+    resource: 'routing/vendor.yml'
+    prefix:   /vendor
+
+accounting_print:
+    resource: 'routing/print.yml'
+    prefix:   /print
+
+accounting_migration_sales:
+    defaults: { _controller: 'App\Accounting\Controller\DefaultController::salesMigrationAction' }
+    path:   /migration-sales
+
+accounting_migration_vendor:
+    defaults: { _controller: 'App\Accounting\Controller\DefaultController::vendorMigrationAction' }
+    path:   /migration-vendor
+
+accounting_migration_account_purchase:
+    defaults: { _controller: 'App\Accounting\Controller\DefaultController::purchaseMigrationAction' }
+    path:   /migration-purchase
+
+report_vendor_outstanding:
+    path:     /vendor/outstanding
+    defaults: { _controller: 'App\Accounting\Controller\ReportController::vendorOutstandingAction' }
+
+report_vendor_summary:
+    path:     /vendor/summary
+    defaults: { _controller: 'App\Accounting\Controller\ReportController::vendorSummaryAction' }
+
+report_vendor_outstanding_pdf:
+    path:     /vendor/outstanding-pdf
+    defaults: { _controller: 'App\Accounting\Controller\ReportController::vendorOutstandingPdfAction' }
+
+report_vendor_ledger:
+    path:     /vendor/ledger
+    defaults: { _controller: 'App\Accounting\Controller\ReportController::vendorLedgerAction' }
+
+report_customer_outstanding:
+    path:     /customer/outstanding
+    defaults: { _controller: 'App\Accounting\Controller\ReportController::customerOutstandingAction' }
+
+report_customer_summary:
+    path:     /customer/summary
+    defaults: { _controller: 'App\Accounting\Controller\ReportController::customerSummaryAction' }
+
+report_customer_outstanding_pdf:
+    path:     /customer/outstanding-pdf
+    defaults: { _controller: 'App\Accounting\Controller\ReportController::customerOutstandingPdfAction' }
+
+report_customer_ledger:
+    path:     /customer/ledger
+    defaults: { _controller: 'App\Accounting\Controller\ReportController::customerLedgerAction' }
+
+report_customer_ledger_print:
+    path:     /customer/oustanding-print
+    defaults: { _controller: 'App\Accounting\Controller\ReportController::customerOutstandingPrintAction' }
+
+

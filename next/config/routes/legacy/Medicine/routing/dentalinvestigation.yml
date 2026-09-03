@@ -1,0 +1,25 @@
+dental_investigation:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\DentalInvestigationController::indexAction' }
+
+dental_investigation_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\DentalInvestigationController::createAction' }
+    methods:  POST
+
+dental_investigation_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\DentalInvestigationController::editAction' }
+
+dental_investigation_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\DentalInvestigationController::updateAction' }
+    methods:  [POST, PUT]
+
+dental_investigation_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\DentalInvestigationController::deleteAction' }
+
+dental_investigation_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Medicine\Controller\DentalInvestigationController::statusAction' }

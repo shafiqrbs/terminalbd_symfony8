@@ -1,0 +1,35 @@
+mobiletheme:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\MobileThemeController::indexAction' }
+
+mobiletheme_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\MobileThemeController::showAction' }
+
+mobiletheme_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\MobileThemeController::newAction' }
+
+mobiletheme_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\MobileThemeController::createAction' }
+    requirements: { _method: post }
+
+mobiletheme_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\MobileThemeController::editAction' }
+
+mobiletheme_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\MobileThemeController::updateAction' }
+    requirements: { _method: post|put }
+
+mobiletheme_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\MobileThemeController::deleteAction' }
+    requirements: { _method: post|delete }
+
+mobiletheme_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\MobileThemeController::statusAction' }
+

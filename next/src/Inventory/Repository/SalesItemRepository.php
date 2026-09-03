@@ -567,7 +567,7 @@ class SalesItemRepository extends EntityRepository
         $branch = $user->getProfile()->getBranches();
 
         $qb = $this->_em->createQueryBuilder();
-        $qb->from('InventoryBundle:Sales','sales');
+        $qb->from(\App\Inventory\Entity\Sales::class,'sales');
         $qb->select('SUM(sales.vat) AS salesVat');
         $qb->where("sales.inventoryConfig = :inventoryConfig");
         $qb->setParameter('inventoryConfig', $globalOption->getInventoryConfig());

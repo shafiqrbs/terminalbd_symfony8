@@ -46,7 +46,7 @@ class MedicineConfigRepository extends EntityRepository
         $android->execute();
 
         $qb = $this->_em->createQueryBuilder();
-        $q = $qb->update('MedicineBundle:MedicineStock', 's')
+        $q = $qb->update(\App\Medicine\Entity\MedicineStock::class, 's')
             ->set('s.remainingQuantity', '?1')
             ->set('s.purchaseQuantity', '?2')
             ->set('s.purchaseReturnQuantity', '?3')
@@ -169,7 +169,7 @@ class MedicineConfigRepository extends EntityRepository
         $config = $fromOption->getMedicineConfig();
         if($option and $config){
             $existConfig = $option->getMedicineConfig();
-            $entities = $em->getRepository('MedicineBundle:MedicineParticular')->findBy(['medicineConfig'=> $config]);
+            $entities = $em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(['medicineConfig'=> $config]);
             /* @var $entity MedicineParticular */
             if($entities){
                 foreach ($entities as $entity){
@@ -185,8 +185,8 @@ class MedicineConfigRepository extends EntityRepository
             }
             $fromConfig = $config->getId();
             $toConfig = $em->getRepository(MedicineConfig::class)->findOneBy(['globalOption' => $option]);
-            $em->getRepository('MedicineBundle:MedicineStock')->processStockMigration($fromConfig,$toConfig->getId());
-            $em->getRepository('MedicineBundle:MedicineVendor')->copyToMedicineVendor($fromConfig,$toConfig->getId());
+            $em->getRepository(\App\Medicine\Entity\MedicineStock::class)->processStockMigration($fromConfig,$toConfig->getId());
+            $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->copyToMedicineVendor($fromConfig,$toConfig->getId());
         }
     }
 }

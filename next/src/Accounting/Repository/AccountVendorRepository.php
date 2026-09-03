@@ -190,7 +190,7 @@ class AccountVendorRepository extends EntityRepository
         $com = $vendor->getCompanyName();
         $em = $this->_em;
         $qb = $em->createQueryBuilder();
-        $qb->update('AccountingBundle:AccountPurchase', 'mg')
+        $qb->update(\App\Accounting\Entity\AccountPurchase::class, 'mg')
             ->set('mg.companyName', ':companyName')
             ->where('mg.accountVendor = :id')
             ->setParameter('companyName',$com)

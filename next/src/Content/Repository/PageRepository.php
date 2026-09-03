@@ -68,7 +68,7 @@ class PageRepository extends EntityRepository
 
         $em = $this->_em;
 
-            $entity = $em->getRepository('SettingAppearanceBundle:Menu')->findOneBy(['page' => $page->getId()]);
+            $entity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['page' => $page->getId()]);
             if(!empty($entity)){
 
                 $entity->setMenu($page->getMenu());
@@ -111,7 +111,7 @@ class PageRepository extends EntityRepository
 
         $em = $this->_em;
 
-        $repository = $em->getRepository('SettingContentBundle:Page');
+        $repository = $em->getRepository(\App\Content\Entity\Page::class);
         $query = $repository->createQueryBuilder('p')
             ->innerJoin('p.moduleCategory', 'moduleCategory')
             ->where('p.globalOption = :option')
@@ -129,7 +129,7 @@ class PageRepository extends EntityRepository
     {
 
         $em = $this->_em;
-        $repository = $em->getRepository('SettingContentBundle:Page');
+        $repository = $em->getRepository(\App\Content\Entity\Page::class);
         $query = $repository->createQueryBuilder('p')
             ->where('p.status = 1')
             ->andWhere('p.globalOption = :option')->setParameter('option', $doamin)
@@ -148,7 +148,7 @@ class PageRepository extends EntityRepository
         foreach ($page->getPageModules() as $mod){
             $modArr[] = $mod->getModule()->getId();
         }
-        $repository = $em->getRepository('SettingContentBundle:Page');
+        $repository = $em->getRepository(\App\Content\Entity\Page::class);
         $query = $repository->createQueryBuilder('p')
             ->where('p.globalOption = :option')
             ->setParameter('option', $globalOption->getId())

@@ -88,7 +88,7 @@ class ProductRepository extends EntityRepository
     public function insertProduct($data,$user)
     {
         $em = $this->_em;
-        $user = $em->getRepository('UserBundle:User')->find($user);
+        $user = $em->getRepository(\App\User\Entity\User::class)->find($user);
         if($user){
 
 
@@ -141,13 +141,13 @@ class ProductRepository extends EntityRepository
             $unit       = $data['unit'][$i] ?: null ;
 
 
-            $entity = $em->getRepository('ProductProductBundle:Product')->findOneBy(['id'=>$key]);
+            $entity = $em->getRepository(\App\Product\Entity\Product::class)->findOneBy(['id'=>$key]);
             $cat = [];
 
             if(!empty($category)){
 
-                $cat[] = $em->getRepository('ProductProductBundle:Category')->findOneBy(['id'=>$category]);
-                $parentCat = $em->getRepository('ProductProductBundle:Category')->find($category);
+                $cat[] = $em->getRepository(\App\Product\Entity\Category::class)->findOneBy(['id'=>$category]);
+                $parentCat = $em->getRepository(\App\Product\Entity\Category::class)->find($category);
                 $entity->setParentCategory($parentCat);
                 $entity->setCategories($cat);
             }
@@ -206,7 +206,7 @@ class ProductRepository extends EntityRepository
         $insertData = array_diff($insData,$dbData);
 
         foreach($insertData as $id ){
-            $cat[] = $em->getRepository('ProductProductBundle:Category')->findOneBy(['id'=>$id]);
+            $cat[] = $em->getRepository(\App\Product\Entity\Category::class)->findOneBy(['id'=>$id]);
         }
 
         if (!empty($cat)) {
@@ -224,7 +224,7 @@ class ProductRepository extends EntityRepository
 
             foreach ($data as $key ){
 
-                $entity = $em->getRepository('ProductProductBundle:Product')->find($key);
+                $entity = $em->getRepository(\App\Product\Entity\Product::class)->find($key);
                 if(!empty($entity)){
                     $em->remove($entity);
                 }
@@ -238,7 +238,7 @@ class ProductRepository extends EntityRepository
     public function getLatestProduct(){
 
         $em = $this->_em;
-        $entity = $em->getRepository('ProductProductBundle:Product')->findBy(['status'=>1,'isFeature'=>1],['created'=>'desc']);
+        $entity = $em->getRepository(\App\Product\Entity\Product::class)->findBy(['status'=>1,'isFeature'=>1],['created'=>'desc']);
         if(!empty($entity)){
 
           return $entity;
@@ -250,7 +250,7 @@ class ProductRepository extends EntityRepository
     public function getRelatedProduct($cat){
 
         $em = $this->_em;
-        $entity = $em->getRepository('ProductProductBundle:Product')->findBy(['status'=>1,'isFeature'=>1],['created'=>'desc']);
+        $entity = $em->getRepository(\App\Product\Entity\Product::class)->findBy(['status'=>1,'isFeature'=>1],['created'=>'desc']);
         if(!empty($entity)){
 
             return $entity;
@@ -319,7 +319,7 @@ class ProductRepository extends EntityRepository
         $slug = $options['lowercase'] ? mb_strtolower($str, 'UTF-8') : $str;
 
         $em = $this->_em;
-        $entity = $em->getRepository('ProductProductBundle:Product')->findOneBy(['slug'=>$slug]);
+        $entity = $em->getRepository(\App\Product\Entity\Product::class)->findOneBy(['slug'=>$slug]);
         if (empty($entity)){
             return $slug;
         }else{
@@ -339,7 +339,7 @@ class ProductRepository extends EntityRepository
         for ($i = 1; $i < 100; $i++){
 
             $new = $productSlug.'-'.$i;
-            $existsSlug = $em->getRepository('ProductProductBundle:Product')->findOneBy(['slug'=>$new]);
+            $existsSlug = $em->getRepository(\App\Product\Entity\Product::class)->findOneBy(['slug'=>$new]);
 
             if (empty($existsSlug) ){
                 $productSlugNew = $productSlug.'-'.$i;
@@ -364,12 +364,12 @@ class ProductRepository extends EntityRepository
         $i=0;
         foreach( $products as $product ){
 
-            $entity  = $em->getRepository('ProductProductBundle:Product')->find($product);
+            $entity  = $em->getRepository(\App\Product\Entity\Product::class)->find($product);
             $collection = $data['collection'][$i];
 
             if($collection > 0){
 
-                $collection     = $em->getRepository('ProductProductBundle:Collection')->find($collection);
+                $collection     = $em->getRepository(\App\Product\Entity\Collection::class)->find($collection);
                 $discount = $collection->getDiscountPercentage();
                 if($discount > 0 ){
                     $entity->setSalesPrice($this->discountPercentage($discount,$data['price'][$i]));
@@ -379,12 +379,12 @@ class ProductRepository extends EntityRepository
             }
 
             if(!empty($data['categories'][$i])){
-                $category     = $em->getRepository('ProductProductBundle:Category')->find($data['categories'][$i]);
+                $category     = $em->getRepository(\App\Product\Entity\Category::class)->find($data['categories'][$i]);
                 $entity->setParentCategory($category);
             }
 
             if(!empty($data['brand'][$i])){
-                $brand     = $em->getRepository('SettingToolBundle:Branding')->find($data['brand'][$i]);
+                $brand     = $em->getRepository(\App\Tool\Entity\Branding::class)->find($data['brand'][$i]);
                 $entity->setBrand($brand);
             }
 
@@ -422,7 +422,7 @@ class ProductRepository extends EntityRepository
         $collection = $data['collection'];
         if(!empty($collection)){
 
-            $collection     = $em->getRepository('ProductProductBundle:Collection')->find($collection);
+            $collection     = $em->getRepository(\App\Product\Entity\Collection::class)->find($collection);
             $discount = $collection->getDiscountPercentage();
             $price = $entity->getPrice();
             if($discount > 0 ){

@@ -1,0 +1,34 @@
+collection:
+    path:     /
+    defaults: { _controller: 'App\Product\Controller\CollectionController::indexAction' }
+
+collection_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Product\Controller\CollectionController::showAction' }
+
+collection_new:
+    path:     /new
+    defaults: { _controller: 'App\Product\Controller\CollectionController::newAction' }
+
+collection_create:
+    path:     /create
+    defaults: { _controller: 'App\Product\Controller\CollectionController::createAction' }
+    methods:  POST
+
+collection_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Product\Controller\CollectionController::editAction' }
+
+collection_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Product\Controller\CollectionController::statusAction' }
+
+collection_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Product\Controller\CollectionController::updateAction' }
+    methods:  [POST, PUT]
+
+collection_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Product\Controller\CollectionController::deleteAction' }
+    methods:  [POST, DELETE]

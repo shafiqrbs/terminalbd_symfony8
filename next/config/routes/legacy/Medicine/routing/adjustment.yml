@@ -1,0 +1,33 @@
+stock_adjustment:
+    path:     /
+    defaults: { _controller: 'App\Medicine\Controller\StockAdjustmentController::indexAction' }
+
+stock_adjustment_summary:
+    path:     /summary
+    defaults: { _controller: 'App\Medicine\Controller\StockAdjustmentController::stockSummaryAction' }
+
+stock_adjustment_new:
+    path:     /new
+    defaults: { _controller: 'App\Medicine\Controller\StockAdjustmentController::newAction' }
+
+stock_adjustment_create:
+    path:     /create
+    defaults: { _controller: 'App\Medicine\Controller\StockAdjustmentController::createAction' }
+    methods:  POST
+
+stock_adjustment_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Medicine\Controller\StockAdjustmentController::editAction' }
+
+stock_adjustment_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Medicine\Controller\StockAdjustmentController::updateAction' }
+    methods:  [POST, PUT]
+
+stock_adjustment_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Medicine\Controller\StockAdjustmentController::deleteAction' }
+
+stock_adjustment_approved:
+    path:     /{id}/approved
+    defaults: { _controller: 'App\Medicine\Controller\StockAdjustmentController::approvedAction' }

@@ -1,0 +1,9 @@
+restaurant_config_manage:
+    path:     /manage
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantConfigController::manageAction' }
+
+restaurant_config_update:
+    path:     /update
+    defaults: { _controller: 'App\Restaurant\Controller\RestaurantConfigController::updateAction' }
+    methods:  [POST, PUT]
+

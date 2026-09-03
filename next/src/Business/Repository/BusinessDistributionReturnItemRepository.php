@@ -73,7 +73,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
         $qb->having('quantity > 0');
         $qb->groupBy('s.id');
         $result = $qb->getQuery()->getArrayResult();
-        $remains = $em->getRepository('BusinessBundle:BusinessPurchaseReturnItem')->remainingStock($config);
+        $remains = $em->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->remainingStock($config);
         $data = [];
         foreach ($result as $row){
             if($remains and isset($remains[$row['id']]) and $remains[$row['id']]['quantity'] > 0){
@@ -95,7 +95,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
         $qb->where('e.businessConfig = :config')->setParameter('config', $config);
         $qb->andWhere('e.businessParticular = :item')->setParameter('item', $item);
         $row = $qb->getQuery()->getSingleScalarResult();
-        $remains = $em->getRepository('BusinessBundle:BusinessPurchaseReturnItem')->remainingStockItem($config,$item);
+        $remains = $em->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->remainingStockItem($config,$item);
         if($remains  > 0){
             $quantity = (int) ($row - $remains);
         }else{
@@ -125,7 +125,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
 
             if($quantity[$key] > 0 ){
 
-                $product = $em->getRepository('BusinessBundle:BusinessParticular')->find($itemId);
+                $product = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($itemId);
                 $item = new BusinessPurchaseReturnItem();
                 $item->setBusinessPurchaseReturn($entity);
                 $item->setBusinessParticular($product);
@@ -143,7 +143,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
     public function insertSalesDamageReturnItem(BusinessInvoiceReturnItem $entity)
     {
         $em = $this->_em;
-        $exist = $em->getRepository('BusinessBundle:BusinessDistributionReturnItem')->findOneBy(['invoiceReturnItem' => $entity]);
+        $exist = $em->getRepository(\App\Business\Entity\BusinessDistributionReturnItem::class)->findOneBy(['invoiceReturnItem' => $entity]);
         if(empty($exist)){
             $item = new BusinessDistributionReturnItem();
             $item->setBusinessConfig($entity->getParticular()->getBusinessConfig());
@@ -177,7 +177,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
        if($entity){
            $em->remove($entity);
            $em->flush();
-           $em->getRepository('BusinessBundle:BusinessParticular')->updateRemoveStockQuantity($invoiceParticular->getBusinessParticular(), "purchase-return");
+           $em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($invoiceParticular->getBusinessParticular(), "purchase-return");
        }
 
     }
@@ -188,7 +188,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
         foreach ($entity->getBusinessInvoiceParticulars() as $particular){
             $this->deletePurchaseReturnItem($particular);
         }
-        $entity = $em->getRepository('BusinessBundle:BusinessPurchaseReturn')->findOneBy(['businessConfig' => $entity->getBusinessConfig(),'salesInvoice' => $entity->getInvoice()]);
+        $entity = $em->getRepository(\App\Business\Entity\BusinessPurchaseReturn::class)->findOneBy(['businessConfig' => $entity->getBusinessConfig(),'salesInvoice' => $entity->getInvoice()]);
         if($entity){
             $em->remove($entity);
             $em->flush();
@@ -204,7 +204,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
         foreach ($invoice->getBusinessInvoiceParticulars() as $item):
 
             $item->getId();
-            $exist = $em->getRepository('BusinessBundle:BusinessDistributionReturnItem')->findOneBy(['businessConfig' => $invoice->getId(),'salesInvoice'=>$invoice->getId(), 'salesInvoiceItem' => $item->getId()]);
+            $exist = $em->getRepository(\App\Business\Entity\BusinessDistributionReturnItem::class)->findOneBy(['businessConfig' => $invoice->getId(),'salesInvoice'=>$invoice->getId(), 'salesInvoiceItem' => $item->getId()]);
 
             /* @var $purchaseItem BusinessPurchaseReturnItem */
 
@@ -222,7 +222,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
                 $purchaseItem->setSubTotal($item->getBusinessParticular()->getPurchasePrice() * $purchaseItem->getQuantity());
                 $em->persist($purchaseItem);
                 $em->flush();
-                $em->getRepository('BusinessBundle:BusinessParticular')->updateRemoveStockQuantity($item->getBusinessParticular(),"purchase-return");
+                $em->getRepository(\App\Business\Entity\BusinessParticular::class)->updateRemoveStockQuantity($item->getBusinessParticular(),"purchase-return");
             }elseif($item->getDamageQnt() > 0 or $item->getSpoilQnt() ) {
                 $purchaseItem = new BusinessDistributionReturnItem();
                 $purchaseItem->setBusinessConfig($invoice->getBusinessConfig());

@@ -1,0 +1,10 @@
+inventory_sales_user:
+    path:     /
+    defaults: { _controller: 'App\DomainUser\Controller\SalesUserController::indexAction' }
+
+inventory_sales_user_create:
+    path:     /create
+    defaults: { _controller: 'App\DomainUser\Controller\SalesUserController::createAction' }
+
+
+

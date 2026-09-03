@@ -1,0 +1,34 @@
+course:
+    path:     /
+    defaults: { _controller: 'App\Tool\Controller\CourseController::indexAction' }
+
+course_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Tool\Controller\CourseController::showAction' }
+
+course_new:
+    path:     /new
+    defaults: { _controller: 'App\Tool\Controller\CourseController::newAction' }
+
+course_create:
+    path:     /create
+    defaults: { _controller: 'App\Tool\Controller\CourseController::createAction' }
+    methods:  POST
+
+course_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Tool\Controller\CourseController::editAction' }
+
+course_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Tool\Controller\CourseController::statusAction' }
+
+course_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Tool\Controller\CourseController::updateAction' }
+    methods:  [POST, PUT]
+
+course_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Tool\Controller\CourseController::deleteAction' }
+    methods:  [POST, DELETE]

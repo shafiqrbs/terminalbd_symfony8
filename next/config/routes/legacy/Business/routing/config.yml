@@ -1,0 +1,10 @@
+business_config_manage:
+    path:     /manage
+    defaults: { _controller: 'App\Business\Controller\BusinessConfigController::manageAction' }
+
+
+business_config_update:
+    path:     /update
+    defaults: { _controller: 'App\Business\Controller\BusinessConfigController::updateAction' }
+    methods:  [POST, PUT]
+

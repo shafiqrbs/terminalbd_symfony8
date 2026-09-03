@@ -1,0 +1,37 @@
+featurebrand:
+    path:     /
+    defaults: { _controller: 'App\Appearance\Controller\FeatureBrandController::indexAction' }
+
+featurebrand_sorting:
+    path:     /sorting
+    defaults: { _controller: 'App\Appearance\Controller\FeatureBrandController::sortingAction' }
+
+featurebrand_show:
+    path:     /{id}/show
+    defaults: { _controller: 'App\Appearance\Controller\FeatureBrandController::showAction' }
+
+featurebrand_new:
+    path:     /new
+    defaults: { _controller: 'App\Appearance\Controller\FeatureBrandController::newAction' }
+
+featurebrand_create:
+    path:     /create
+    defaults: { _controller: 'App\Appearance\Controller\FeatureBrandController::createAction' }
+    methods:  POST
+
+featurebrand_edit:
+    path:     /{id}/edit
+    defaults: { _controller: 'App\Appearance\Controller\FeatureBrandController::editAction' }
+
+featurebrand_update:
+    path:     /{id}/update
+    defaults: { _controller: 'App\Appearance\Controller\FeatureBrandController::updateAction' }
+    methods:  [POST, PUT]
+
+featurebrand_delete:
+    path:     /{id}/delete
+    defaults: { _controller: 'App\Appearance\Controller\FeatureBrandController::deleteAction' }
+
+featurebrand_status:
+    path:     /{id}/status
+    defaults: { _controller: 'App\Appearance\Controller\FeatureBrandController::statusAction' }
