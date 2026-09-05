@@ -91,7 +91,7 @@ class AccountSalesController extends AbstractController
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
-        return $this->render('AccountingBundle:AccountSales/Report:customerReport.html.twig', array(
+        return $this->render('Accounting/AccountSales/Report/customerReport.html.twig', array(
             'entities' => $entities,
             'option' => $globalOption,
             'searchForm' => $data,
@@ -108,13 +108,13 @@ class AccountSalesController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->userSummary($globalOption,$data);
         if(isset($data['submit']) and $data['submit'] == 'print' and isset($data['employee']) and $data['employee']){
-            return $this->render('AccountingBundle:AccountSales/Report:userSummary.html.twig', array(
+            return $this->render('Accounting/AccountSales/Report/userSummary.html.twig', array(
                 'entities' => $entities,
                 'option' => $globalOption,
                 'searchForm' => $data,
             ));
         }else{
-            return $this->render('AccountingBundle:AccountSales/Report:userSummary.html.twig', array(
+            return $this->render('Accounting/AccountSales/Report/userSummary.html.twig', array(
                 'entities' => $entities,
                 'option' => $globalOption,
                 'searchForm' => $data,

@@ -890,7 +890,7 @@ class AppsApiRepository extends EntityRepository
     public function apiDeleteExpense(GlobalOption $option,$id)
     {
         $em = $this->getEntityManager();
-        $entity = $em->createQuery("DELETE AccountingBundle:Expenditure e WHERE e.id = {$id}");
+        $entity = $em->createQuery("DELETE App\\Accounting\\Entity\\Expenditure e WHERE e.id = {$id}");
         if(!empty($entity)){
             $entity->execute();
             return 'success';
@@ -1376,7 +1376,7 @@ class AppsApiRepository extends EntityRepository
     public function apiDeleteSales($id)
     {
         $em = $this->getEntityManager();
-        $entity = $em->createQuery("DELETE AccountingBundle:AccountSales e WHERE e.id = {$id}");
+        $entity = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountSales e WHERE e.id = {$id}");
         if(!empty($entity)){
             $entity->execute();
         }
@@ -1541,7 +1541,7 @@ class AppsApiRepository extends EntityRepository
     public function apiDeleteAccountPurchase($id)
     {
         $em = $this->getEntityManager();
-        $entity = $em->createQuery("DELETE AccountingBundle:AccountPurchase e WHERE e.id = {$id}");
+        $entity = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountPurchase e WHERE e.id = {$id}");
         if(!empty($entity)){
             $entity->execute();
             return "success";
@@ -1640,7 +1640,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiPurchaseInvoiceDelete(MedicinePurchase $purchase){
         $em = $this->getEntityManager();
-        $remove = $em->createQuery("DELETE MedicineBundle:MedicinePurchase e WHERE e.id = {$purchase->getId()}");
+        $remove = $em->createQuery("DELETE App\\Medicine\\Entity\\MedicinePurchase e WHERE e.id = {$purchase->getId()}");
         if(!empty($remove)){
             $remove->execute();
             return 'success';

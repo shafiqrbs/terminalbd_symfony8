@@ -24,7 +24,7 @@ class BusinessReportController extends AbstractController
 		$overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessMonthlyIncome($this->getUser(),$data);
 		$accountHeads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent'=>1],['sorting'=>'ASC']);
 		$accountHeads = $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->findBy(['isParent'=>1],['sorting'=>'ASC']);
-		return $this->render('AccountingBundle:Report/Business:balanceSheet.html.twig', [
+		return $this->render('Accounting/Report/Business/balanceSheet.html.twig', [
 			'overview' => $overview,
 			'accountHeads' => $accountHeads,
 			'searchForm' => $data,
@@ -50,7 +50,7 @@ class BusinessReportController extends AbstractController
         $data = $_REQUEST;
         $user = $this->getUser();
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessIncome($user,$data);
-        return $this->render('AccountingBundle:Report/Business:income.html.twig', [
+        return $this->render('Accounting/Report/Business/income.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
         ]);
@@ -62,7 +62,7 @@ class BusinessReportController extends AbstractController
         $data = $_REQUEST;
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessIncome($globalOption,$data);
         $html = $this->renderView(
-            'AccountingBundle:Report/Hms:incomePdf.html.twig', [
+            'Accounting/Report/Hms/incomePdf.html.twig', [
                 'overview' => $overview,
                 'print' => ''
             ]
@@ -83,7 +83,7 @@ class BusinessReportController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportBusinessIncome($globalOption,$data);
-        return $this->render('AccountingBundle:Report/Hms:incomePdf.html.twig', [
+        return $this->render('Accounting/Report/Hms/incomePdf.html.twig', [
             'overview' => $overview,
             'print' => '<script>window.print();</script>'
         ]);
@@ -124,13 +124,13 @@ class BusinessReportController extends AbstractController
             $dateRange =  $compareTo->format('F,Y');
         }
         if(empty($data['pdf'])){
-            return $this->render('AccountingBundle:Report/Medicine:monthlyIncome.html.twig', [
+            return $this->render('Accounting/Report/Medicine/monthlyIncome.html.twig', [
                 'overview' => $overview,
                 'searchForm' => $data,
             ]);
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Report/Medicine:monthlyIncomePdf.html.twig', [
+                'Accounting/Report/Medicine/monthlyIncomePdf.html.twig', [
                     'overview' => $overview,
                     'globalOption' => $this->getUser()->getGlobalOption(),
                     'dateRange' => $dateRange,

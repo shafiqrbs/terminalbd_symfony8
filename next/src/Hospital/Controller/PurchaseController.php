@@ -719,7 +719,7 @@ class PurchaseController extends AbstractController
             $this->em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturn::class)->removePurchaseAdjustment($entity->getMedicinePurchaseReturn());
         }
         $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getPurchaseUpdateQnt($entity);
-        $em->createQuery("DELETE MedicineBundle:MedicinePurchaseItem e WHERE e.medicinePurchase ={$entity->getId()}");
+        $em->createQuery("DELETE App\\Medicine\\Entity\\MedicinePurchaseItem e WHERE e.medicinePurchase ={$entity->getId()}");
         $em->remove($entity);
         $em->flush();
         return new Response('success');

@@ -83,14 +83,14 @@ class PurchaseController extends AbstractController
         $pagination = $this->paginate($entities);
 	    $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'index';
         if(empty($data['pdf'])){
-            return $this->render("BusinessBundle:Purchase/PurchaseItem:{$view}.html.twig", array(
+            return $this->render("Business/Purchase/PurchaseItem/{$view}.html.twig", array(
                 'entities' => $pagination,
                 'searchForm' => $data,
             ));
 
         }else{
             $html = $this->renderView(
-                'BusinessBundle:Purchase/PurchaseItem:signPdf.html.twig', array(
+                'Business/Purchase/PurchaseItem/signPdf.html.twig', array(
                     'globalOption'          => $this->getUser()->getGlobalOption(),
                     'entities' => $pagination,
                     'searchForm' => $data,
@@ -199,7 +199,7 @@ class PurchaseController extends AbstractController
         $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'new';
 
         $html = $this->renderView(
-            "BusinessBundle:Purchase/item:{$view}.html.twig", array(
+            "Business/Purchase/item/{$view}.html.twig", array(
                 'entity' => $invoice,
             )
         );

@@ -6,8 +6,8 @@ today. The pipeline removes them from the generated routing with `--prune`;
 this file is the record of what was removed, for whoever restores a controller.
 
 - routes examined: **3485**
-- resolve to a real controller and action: **3078**
-- controller class absent: **217**
+- resolve to a real controller and action: **3066**
+- controller class absent: **229**
 - action absent: **190**
 
 ## Controller class absent
@@ -171,6 +171,18 @@ tarrif_upload_new                                    /admin/tariff-upload/new   
 tarrif_upload_create                                 /admin/tariff-upload/create                                App\Tool\Controller\TaxUploadController
 tarrif_upload_delete                                 /admin/tariff-upload/{id}/delete                           App\Tool\Controller\TaxUploadController
 tarrif_upload_migration                              /admin/tariff-upload/{id}/migration                        App\Tool\Controller\TaxUploadController
+taxtariff                                            /admin/tax-tariff/                                         TallyBundle:TaxTariff:index
+taxtariff_show                                       /admin/tax-tariff/{id}/show                                TallyBundle:TaxTariff:show
+taxtariff_new                                        /admin/tax-tariff/new                                      TallyBundle:TaxTariff:new
+taxtariff_create                                     /admin/tax-tariff/create                                   TallyBundle:TaxTariff:create
+taxtariff_edit                                       /admin/tax-tariff/{id}/edit                                TallyBundle:TaxTariff:edit
+taxtariff_update                                     /admin/tax-tariff/{id}/update                              TallyBundle:TaxTariff:update
+taxtariff_inline_update                              /admin/tax-tariff/{id}/inline-update                       TallyBundle:TaxTariff:inlineUpdate
+taxtariff_delete                                     /admin/tax-tariff/{id}/delete                              TallyBundle:TaxTariff:delete
+taxtariff_status                                     /admin/tax-tariff/{id}/status                              TallyBundle:TaxTariff:status
+tallyitem_item_search                                /admin/tax-tariff/search-tariff                            TallyBundle:TaxTariff:autoSearch
+tallyitem_item_name                                  /admin/tax-tariff/{name}/tariff-name                       TallyBundle:TaxTariff:searchName
+branch_print_list                                    /website/branch/print-list                                 SettingContentBundle::printList
 appearancefeature                                    /appearance/feature/                                       App\Appearance\Controller\FeatureController
 appearancefeature_show                               /appearance/feature/{id}/show                              App\Appearance\Controller\FeatureController
 appearancefeature_new                                /appearance/feature/new                                    App\Appearance\Controller\FeatureController

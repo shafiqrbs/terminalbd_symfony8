@@ -38,7 +38,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
         $invoice->setSubTable([]);
         $em->persist($invoice);
         $em->flush();
-        $history = $em->createQuery("DELETE RestaurantBundle:RestaurantTableInvoiceItem e WHERE e.tableInvoice ={$invoice->getId()}");
+        $history = $em->createQuery("DELETE App\\Restaurant\\Entity\\RestaurantTableInvoiceItem e WHERE e.tableInvoice ={$invoice->getId()}");
         $history->execute();
 
     }
@@ -254,7 +254,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
     {
         $em = $this->getEntityManager();
         $config = $user->getGlobalOption()->getRestaurantConfig()->getId();
-        $entity = $em->createQuery('DELETE RestaurantBundle:RestaurantTemporary e WHERE e.restaurantConfig = '.$config.' and e.user = '.$user->getId());
+        $entity = $em->createQuery('DELETE App\Restaurant\Entity\RestaurantTemporary e WHERE e.restaurantConfig = '.$config.' and e.user = '.$user->getId());
         $entity->execute();
     }
 

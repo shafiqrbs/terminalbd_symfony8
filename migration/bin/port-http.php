@@ -118,7 +118,9 @@ $rewriteTemplateRefs = static function (string $s) use ($bundleToModule, &$stats
     );
 
     return preg_replace_callback(
-        '/\b([A-Za-z]+Bundle):([A-Za-z0-9_]*):([A-Za-z0-9_.\/\-{}$]+\.twig)\b/',
+        // The middle segment can itself be a path - "AccountingBundle:Report/Hms:income.html.twig"
+        // is a real name in this application, and 160 references use that shape.
+        '/\b([A-Za-z]+Bundle):([A-Za-z0-9_\/]*):([A-Za-z0-9_.\/\-{}$]+\.twig)\b/',
         static function (array $m) use ($bundleToModule, &$stats): string {
             $module = $bundleToModule[$m[1]] ?? null;
             if ($module === null) return $m[0];

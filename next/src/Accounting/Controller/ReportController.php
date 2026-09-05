@@ -186,14 +186,14 @@ class ReportController extends AbstractController
         $parent = [23,37];
         $expenditureHead = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->parentsExpenseAccountHead($user->getGlobalOption(),$parent,$data);
         if(empty($data['pdf'])){
-            return $this->render('AccountingBundle:Report/Expenditure:accountHead.html.twig', [
+            return $this->render('Accounting/Report/Expenditure/accountHead.html.twig', [
                 'overview' => $overview,
                 'expenditureHead' => $expenditureHead,
                 'searchForm' => $data,
             ]);
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Report/Expenditure:accountHeadPdf.html.twig', [
+                'Accounting/Report/Expenditure/accountHeadPdf.html.twig', [
                     'overview' => $overview,
                     'globalOption' => $user->getGlobalOption(),
                     'expenditureHead' => $expenditureHead,
@@ -221,13 +221,13 @@ class ReportController extends AbstractController
         $user = $this->getUser();
         $expenditureOverview = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportForExpenditure($user->getGlobalOption(),$data);
         if(empty($data['pdf'])) {
-            return $this->render('AccountingBundle:Report/Expenditure:category.html.twig', [
+            return $this->render('Accounting/Report/Expenditure/category.html.twig', [
                 'expenditureOverview' => $expenditureOverview,
                 'searchForm' => $data,
             ]);
         }else {
             $html = $this->renderView(
-                'AccountingBundle:Report/Expenditure:categoryPdf.html.twig', [
+                'Accounting/Report/Expenditure/categoryPdf.html.twig', [
                     'globalOption' => $user->getGlobalOption(),
                     'expenditureOverview' => $expenditureOverview,
                     'searchForm' => $data,
@@ -261,7 +261,7 @@ class ReportController extends AbstractController
 
         if(empty($data['pdf'])) {
 
-            return $this->render('AccountingBundle:Report/Expenditure:expenditure.html.twig', [
+            return $this->render('Accounting/Report/Expenditure/expenditure.html.twig', [
             'overview' => $overview,
             'entities' => $pagination,
             'transactionMethods' => $transactionMethods,
@@ -275,7 +275,7 @@ class ReportController extends AbstractController
             $entities = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->findWithSearch( $this->getUser(),$data);
             $pagination = $entities->getResult();
             $html = $this->renderView(
-                'AccountingBundle:Report/Expenditure:expenditurePdf.html.twig', [
+                'Accounting/Report/Expenditure/expenditurePdf.html.twig', [
                     'globalOption' => $option,
                     'entities' => $pagination,
                     'searchForm' => $data,
@@ -303,14 +303,14 @@ class ReportController extends AbstractController
         $parent = [23,37];
         $expenditureHead = $em->getRepository(\App\Accounting\Entity\Transaction::class)->parentsAccountHead($user->getGlobalOption(),$parent,$data);
         if(empty($data['pdf'])){
-            return $this->render('AccountingBundle:Report/Expenditure:accountHead.html.twig', [
+            return $this->render('Accounting/Report/Expenditure/accountHead.html.twig', [
                 'overview' => $overview,
                 'expenditureHead' => $expenditureHead,
                 'searchForm' => $data,
             ]);
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Report/Expenditure:accountHeadPdf.html.twig', [
+                'Accounting/Report/Expenditure/accountHeadPdf.html.twig', [
                     'overview' => $overview,
                     'globalOption' => $user->getGlobalOption(),
                     'expenditureHead' => $expenditureHead,
@@ -344,7 +344,7 @@ class ReportController extends AbstractController
         $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getExpenseAccountHead();
         if(empty($data['pdf'])) {
 
-            return $this->render('AccountingBundle:Report/Expenditure:expenditure.html.twig', [
+            return $this->render('Accounting/Report/Expenditure/expenditure.html.twig', [
                 'overview' => $overview,
                 'entities' => $pagination,
                 'transactionMethods' => $transactionMethods,
@@ -356,7 +356,7 @@ class ReportController extends AbstractController
             $entities = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->findWithSearch( $this->getUser(),$data);
             $pagination = $entities->getResult();
             $html = $this->renderView(
-                'AccountingBundle:Report/Expenditure:expenditurePdf.html.twig', [
+                'Accounting/Report/Expenditure/expenditurePdf.html.twig', [
                     'globalOption' => $option,
                     'entities' => $pagination,
                     'searchForm' => $data,
@@ -390,7 +390,7 @@ class ReportController extends AbstractController
 		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
 		$pagination = $this->paginate($entities);
 		$summary = $this->em->getRepository(AccountSales::class)->customerOutstandingSummary($globalOption);
-		return $this->render('AccountingBundle:Report/Outstanding:customerOutstanding.html.twig', [
+		return $this->render('Accounting/Report/Outstanding/customerOutstanding.html.twig', [
 			'global' => $globalOption,
 			'entities' => $pagination,
 			'summary' => $summary,
@@ -468,7 +468,7 @@ class ReportController extends AbstractController
 		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
 		$pagination = $this->paginate($entities);
         $summary = $this->em->getRepository(AccountSales::class)->customerOutstandingSummary($globalOption);
-        return $this->render('AccountingBundle:Report/Outstanding:customerSummary.html.twig', [
+        return $this->render('Accounting/Report/Outstanding/customerSummary.html.twig', [
 			'entities' => $pagination,
 			'summary' => $summary,
 			'searchForm' => $data,
@@ -483,7 +483,7 @@ class ReportController extends AbstractController
 		$globalOption = $this->getUser()->getGlobalOption();
 		$entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
         $html = $this->renderView(
-		    'AccountingBundle:Report/Outstanding:customerOutstandingPdf.html.twig', [
+		    'Accounting/Report/Outstanding/customerOutstandingPdf.html.twig', [
 			'globalOption'  => $globalOption,
 			'entities'      => $entities,
 			'searchForm'    => $data,
@@ -516,7 +516,7 @@ class ReportController extends AbstractController
 		$entities = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerLedger($user,$data);
         if(empty($data['pdf'])) {
 
-            return $this->render('AccountingBundle:Report/Outstanding:customerLedger.html.twig', [
+            return $this->render('Accounting/Report/Outstanding/customerLedger.html.twig', [
                 'entities' => $entities,
                 'globalOption' => $this->getUser()->getGlobalOption(),
                 'overview' => $overview,
@@ -527,7 +527,7 @@ class ReportController extends AbstractController
         }else{
 
             $html = $this->renderView(
-                'AccountingBundle:Report/Outstanding:customerLedgerPdf.html.twig', [
+                'Accounting/Report/Outstanding/customerLedgerPdf.html.twig', [
                     'globalOption' => $this->getUser()->getGlobalOption(),
                     'entities' => $entities,
                     'overview' => $overview,
@@ -561,7 +561,7 @@ class ReportController extends AbstractController
 			$overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($user,$data);
 		}
         $entities = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerLedger($user,$data);
-        $print = $this->renderView('AccountingBundle:Report/Outstanding:customerOutstandingPrint.html.twig', [
+        $print = $this->renderView('Accounting/Report/Outstanding/customerOutstandingPrint.html.twig', [
             'globalOption' => $this->getUser()->getGlobalOption(),
             'overview' => $overview,
             'customer' => $customer,
@@ -589,7 +589,7 @@ class ReportController extends AbstractController
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorLedgerOutstanding($globalOption,$data);
         $pagination = $this->paginate($entities);
         $summary = $this->em->getRepository(AccountPurchase::class)->vendorOutstandingSummary($globalOption);
-        return $this->render('AccountingBundle:Report/Outstanding:vendorOutstanding.html.twig', [
+        return $this->render('Accounting/Report/Outstanding/vendorOutstanding.html.twig', [
             'option' => $globalOption,
             'entities' => $pagination,
             'summary' => $summary,
@@ -609,7 +609,7 @@ class ReportController extends AbstractController
         $pagination = $this->paginate($entities);
         $summary = $this->em->getRepository(AccountPurchase::class)->vendorOutstandingSummary($globalOption);
 
-        return $this->render('AccountingBundle:Report/Outstanding:vendorSummary.html.twig', [
+        return $this->render('Accounting/Report/Outstanding/vendorSummary.html.twig', [
             'option' => $globalOption,
             'entities' => $pagination,
             'summary' => $summary,
@@ -627,7 +627,7 @@ class ReportController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->vendorLedgerOutstanding($globalOption,$data);
         $html = $this->renderView(
-            'AccountingBundle:Report/Outstanding:vendorOutstandingPdf.html.twig', [
+            'Accounting/Report/Outstanding/vendorOutstandingPdf.html.twig', [
             'globalOption'  => $globalOption,
             'entities'      => $entities,
 			'searchForm'    => $data,
@@ -664,7 +664,7 @@ class ReportController extends AbstractController
 		}
 		if(isset($data['pdf']) and $data['pdf']){
             $html = $this->renderView(
-                'AccountingBundle:Report/Outstanding:vendorLedgerPdf.html.twig', [
+                'Accounting/Report/Outstanding/vendorLedgerPdf.html.twig', [
                     'globalOption' => $globalOption,
                     'vendor' => $vendor,
                     'entities' => $entities,
@@ -677,7 +677,7 @@ class ReportController extends AbstractController
 
         }else{
 
-            return $this->render('AccountingBundle:Report/Outstanding:vendorLedger.html.twig', [
+            return $this->render('Accounting/Report/Outstanding/vendorLedger.html.twig', [
                 'globalOption' => $globalOption,
                 'vendor' => $vendor,
                 'entities' => $entities,
@@ -699,7 +699,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
-        return $this->render('AccountingBundle:Report/Sales:customerSummary.html.twig', [
+        return $this->render('Accounting/Report/Sales/customerSummary.html.twig', [
             'entities' => $entities,
             'option' => $globalOption,
             'searchForm' => $data,
@@ -716,7 +716,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
-        return $this->render('AccountingBundle:Report/Sales:salesBoard.html.twig', [
+        return $this->render('Accounting/Report/Sales/salesBoard.html.twig', [
             'entities' => $entities,
             'option' => $globalOption,
             'searchForm' => $data,
@@ -733,7 +733,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->userSummary($globalOption,$data);
-        return $this->render('AccountingBundle:Report/Sales:userSummary.html.twig', [
+        return $this->render('Accounting/Report/Sales/userSummary.html.twig', [
             'entities' => $entities,
             'option' => $globalOption,
             'searchForm' => $data,

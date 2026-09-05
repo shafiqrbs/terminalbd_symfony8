@@ -42,8 +42,8 @@ class  GlobalOptionModifyType extends AbstractType
 
                 ->add('name', TextType::class, array('attr'=>array('class'=>'m-wrap span12 tooltips','placeholder'=>'Enter Name' , 'data-original-title' =>'Please enter name of organization' , 'data-trigger' => 'hover'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please input required')),
-                        new Length(array('max'=>200))
+                        new NotBlank(message: 'Please input required'),
+                        new Length(max: 200)
                     )
                 ))
                 ->add('address', TextareaType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Enter address')
@@ -58,8 +58,8 @@ class  GlobalOptionModifyType extends AbstractType
                 ))
                 ->add('mobile', TextType::class, array('attr'=>array('class'=>'m-wrap span12 tooltips','readonly'=> 'readonly','placeholder'=>'Please enter public relational mobile no' , 'data-original-title' =>'Please enter public relational mobile no' , 'data-trigger' => 'hover'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please input required')),
-                        new Length(array('max'=>200))
+                        new NotBlank(message: 'Please input required'),
+                        new Length(max: 200)
                     )
                 ))
                 ->add('hotline', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Enter Hotline no')
@@ -70,7 +70,7 @@ class  GlobalOptionModifyType extends AbstractType
                     'required'    => true,
                     'class' => 'App\Tool\Entity\AppModule',
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please select main application')),
+                        new NotBlank(message: 'Please select main application'),
                     ),
                     'placeholder' => '---Select Main Application ---',
                     'choice_label' => 'name',
@@ -111,7 +111,7 @@ class  GlobalOptionModifyType extends AbstractType
 
                 ->add('domain', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Enter domain name'),
                     'constraints' =>array(
-	                    new Length(array('max'=>200))
+	                    new Length(max: 200)
                     )
                 ))
 	            ->add('domainType', ChoiceType::class, array(
@@ -121,8 +121,8 @@ class  GlobalOptionModifyType extends AbstractType
                 ->add('file', FileType::class, array('attr'=>array('class'=>'default')))
                 ->add('subDomain', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Enter sub-domain name'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please input required')),
-                        new Length(array('max'=>200))
+                        new NotBlank(message: 'Please input required'),
+                        new Length(max: 200)
                     )
                 ))
                 ->add('email', TextType::class, array('attr'=>array('class'=>'m-wrap span12')))
@@ -169,8 +169,8 @@ class  GlobalOptionModifyType extends AbstractType
 
                 ->add('name', TextType::class, array('attr'=>array('class'=>'m-wrap tooltips','placeholder'=>'Enter Name' , 'data-original-title' =>'Please enter name of organization' , 'data-trigger' => 'hover'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please input required')),
-                        new Length(array('max'=>200))
+                        new NotBlank(message: 'Please input required'),
+                        new Length(max: 200)
                     )
                 ))
 

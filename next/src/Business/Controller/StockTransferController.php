@@ -151,7 +151,7 @@ class StockTransferController extends AbstractController
             $entity->setProcess('Created');
             $entity->setApprovedBy($this->getUser());
             $em->flush();
-            $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.itemTransfer = '{$entity->getId()}'")->execute();
+            $em->createQuery("DELETE App\\Business\\Entity\\BusinessStockHistory e WHERE e.itemTransfer = '{$entity->getId()}'")->execute();
             return new Response('success');
         } else {
             return new Response('failed');

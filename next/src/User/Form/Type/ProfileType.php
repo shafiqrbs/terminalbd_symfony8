@@ -50,7 +50,7 @@ class ProfileType extends AbstractType
                    'attr'=>array('class'=>'select-location span12 m-wrap form-control'),
                    'class' => 'App\Location\Entity\Location',
                    'constraints' =>array(
-                       new NotBlank(array('message'=>'Select user location'))
+                       new NotBlank(message: 'Select user location')
                    ),
                    'choices'=> $this->LocationChoiceList(),
                    'choice_label' => 'nestedLabel',

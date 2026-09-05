@@ -333,11 +333,11 @@ class ExpenditureRepository extends EntityRepository
     public function accountReverse(Expenditure $entity)
     {
         $em = $this->getEntityManager();
-        $transaction = $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = ".$entity->getGlobalOption()->getId() ." AND e.accountRefNo =".$entity->getAccountRefNo()." AND e.processHead = 'Expenditure'");
+        $transaction = $em->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.globalOption = ".$entity->getGlobalOption()->getId() ." AND e.accountRefNo =".$entity->getAccountRefNo()." AND e.processHead = 'Expenditure'");
         if($transaction){
             $transaction->execute();
         }
-        $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId() } AND e.expenditure ={$entity->getId()} AND e.processHead = 'Expenditure'");
+        $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId() } AND e.expenditure ={$entity->getId()} AND e.processHead = 'Expenditure'");
         if($accountCash){
             $accountCash->execute();
         }
@@ -383,7 +383,7 @@ class ExpenditureRepository extends EntityRepository
     public function removeDoctorExpenditure(DoctorInvoice $entity)
     {
         $em = $this->getEntityManager();
-        $transaction = $em->createQuery("DELETE AccountingBundle:Expenditure e WHERE  e.doctorInvoice ={$entity->getId()}");
+        $transaction = $em->createQuery("DELETE App\\Accounting\\Entity\\Expenditure e WHERE  e.doctorInvoice ={$entity->getId()}");
         if($transaction){
             $transaction->execute();
         }

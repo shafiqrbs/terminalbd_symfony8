@@ -88,11 +88,11 @@ class PurchaseType extends AbstractType
             /*
             ->add('totalQnt', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'No of Qnt'),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Please add total qnt'))
+                    new NotBlank(message: 'Please add total qnt')
                 )))
             ->add('totalItem', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'No of item'),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Please add total item'))
+                    new NotBlank(message: 'Please add total item')
                 )))
             ->add('purchaseTo', ChoiceType::class, array(
                 'required'    => false,

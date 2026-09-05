@@ -52,7 +52,7 @@ class DomainSignType extends AbstractType
                     'attr'=>array('class'=>'category form-control'),
                     'required'=>true,
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please input required'))
+                        new NotBlank(message: 'Please input required')
                     ),
                     'multiple'    => true,
                     'empty_data'  => null,
@@ -69,8 +69,8 @@ class DomainSignType extends AbstractType
 
             ->add('username', TextType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off' ,'placeholder'=>'Enter your user name'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please enter your user name')),
-                        new Length(array('max'=>200))
+                        new NotBlank(message: 'Please enter your user name'),
+                        new Length(max: 200)
                     ))
             )
             ->add('enabled')
@@ -78,7 +78,7 @@ class DomainSignType extends AbstractType
                 'attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off'),
                 'type' => PasswordType::class,
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Please enter user password'))),
+                    new NotBlank(message: 'Please enter user password')),
                 'options' => array('translation_domain' => 'FOSUserBundle'),
                 'first_options' => array('label' => 'form.password'),
                 'second_options' => array('label' => 'form.password_confirmation'),
@@ -86,8 +86,8 @@ class DomainSignType extends AbstractType
             ))
             ->add('email', TextType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter your valid email address'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please enter user email address')),
-                        new Length(array('max'=>200))
+                        new NotBlank(message: 'Please enter user email address'),
+                        new Length(max: 200)
             ))
             );
             $builder->add('profile', DomainProfileType::class, ['globalOption' => $this->globalOption, 'location' => $this->location, 'designation' => $this->designation]);

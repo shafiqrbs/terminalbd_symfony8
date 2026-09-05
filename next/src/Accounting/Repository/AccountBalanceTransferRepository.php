@@ -271,11 +271,11 @@ class AccountBalanceTransferRepository extends EntityRepository
                 $globalOption = $journal->getGlobalOption()->getId();
                 $accountRefNo = $journal->getAccountRefNo();
 
-                $transaction = $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Journal'");
+                $transaction = $em->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Journal'");
                 $transaction->execute();
-                $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Journal'");
+                $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Journal'");
                 $accountCash->execute();
-                $journalRemove = $em->createQuery('DELETE AccountingBundle:AccountJournal e WHERE e.id = '.$journal->getId());
+                $journalRemove = $em->createQuery('DELETE App\Accounting\Entity\AccountJournal e WHERE e.id = '.$journal->getId());
                 if(!empty($journalRemove)){
                     $journalRemove->execute();
                 }
@@ -397,11 +397,11 @@ class AccountBalanceTransferRepository extends EntityRepository
 			$globalOption = $journal->getGlobalOption()->getId();
 			$accountRefNo = $journal->getAccountRefNo();
 
-			$transaction = $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Journal'");
+			$transaction = $em->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Journal'");
 			$transaction->execute();
-			$accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Journal'");
+			$accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Journal'");
 			$accountCash->execute();
-			$journalRemove = $em->createQuery('DELETE AccountingBundle:AccountJournal e WHERE e.id = '.$journal->getId());
+			$journalRemove = $em->createQuery('DELETE App\Accounting\Entity\AccountJournal e WHERE e.id = '.$journal->getId());
 			if(!empty($journalRemove)){
 				$journalRemove->execute();
 			}

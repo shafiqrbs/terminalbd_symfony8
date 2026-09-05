@@ -92,7 +92,7 @@ class TransactionController extends AbstractController
         }else{
             $entities = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->findWithSearch($user,$transactionMethods,$data)->getResult();
             $html = $this->renderView(
-                'AccountingBundle:Transaction/Report:allsCashDetailsPdf.html.twig', [
+                'Accounting/Transaction/Report/allsCashDetailsPdf.html.twig', [
                     'globalOption'                  => $this->getUser()->getGlobalOption(),
                     'entities'                      => $entities,
                     'overview'                      => $overview,
@@ -294,7 +294,7 @@ class TransactionController extends AbstractController
 
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Transaction/Report:cashDetailsPdf.html.twig', [
+                'Accounting/Transaction/Report/cashDetailsPdf.html.twig', [
                     'globalOption'                  => $this->getUser()->getGlobalOption(),
                     'entities' => $entities->getResult(),
                     'overview' => $overview,
@@ -384,7 +384,7 @@ class TransactionController extends AbstractController
 
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Transaction/Report:purchaseExpensePdf.html.twig', [
+                'Accounting/Transaction/Report/purchaseExpensePdf.html.twig', [
                     'globalOption'                  => $globalOption,
                     'entities'                      => $entities,
                     'searchForm'                    => $data,
@@ -429,7 +429,7 @@ class TransactionController extends AbstractController
 
         if(empty($data['pdf'])){
 
-            return $this->render('AccountingBundle:Transaction/Report:monthly.html.twig',[
+            return $this->render('Accounting/Transaction/Report/monthly.html.twig',[
                 'globalOption'                  => $this->getUser()->getGlobalOption(),
                 'openingBalanceTrans'           => $openingBalance,
                 'salesTrans'                    => $sales,
@@ -441,7 +441,7 @@ class TransactionController extends AbstractController
             ]);
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Transaction/Report:monthlyPdf.html.twig', [
+                'Accounting/Transaction/Report/monthlyPdf.html.twig', [
                     'globalOption'                  => $this->getUser()->getGlobalOption(),
                     'openingBalanceTrans'           => $openingBalance,
                     'salesTrans'                    => $sales,
@@ -486,7 +486,7 @@ class TransactionController extends AbstractController
         $journal = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->monthlyProcessHead($user,'Journal',$data);
         if(empty($data['pdf'])){
 
-            return $this->render('AccountingBundle:Transaction/Report:yearly.html.twig',[
+            return $this->render('Accounting/Transaction/Report/yearly.html.twig',[
                 'globalOption'                  => $this->getUser()->getGlobalOption(),
                 'openingBalanceTrans'           => $openingBalance,
                 'salesTrans'                    => $sales,
@@ -498,7 +498,7 @@ class TransactionController extends AbstractController
             ]);
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Transaction/Report:yearlyPdf.html.twig', [
+                'Accounting/Transaction/Report/yearlyPdf.html.twig', [
                     'globalOption'                  => $this->getUser()->getGlobalOption(),
                     'openingBalanceTrans'           => $openingBalance,
                     'salesTrans'                    => $sales,
@@ -685,13 +685,13 @@ class TransactionController extends AbstractController
         $user = $this->getUser();
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineIncome($user,$data);
         if(empty($data['pdf'])){
-            return $this->render('AccountingBundle:Report/Medicine:income.html.twig', [
+            return $this->render('Accounting/Report/Medicine/income.html.twig', [
                 'overview' => $overview,
                 'searchForm' => $data,
             ]);
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Report/Medicine:incomePdf.html.twig', [
+                'Accounting/Report/Medicine/incomePdf.html.twig', [
                     'overview' => $overview,
                     'globalOption' => $this->getUser()->getGlobalOption(),
                     'searchForm' => $data,

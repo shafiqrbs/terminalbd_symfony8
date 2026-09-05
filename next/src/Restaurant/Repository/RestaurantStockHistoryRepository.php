@@ -136,7 +136,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
         if($entity->getPurchaseItems()){
 
             foreach($entity->getPurchaseItems() as $item ){
-                $em->createQuery("DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Restaurant\\Entity\\RestaurantStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
                 $this->processStockQuantity($item,"purchase");
             }
         }
@@ -145,7 +145,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
     public function processInsertDamageItem(RestaurantDamage $entity){
 
         $em = $this->getEntityManager();
-        $em->createQuery("DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.damage = '{$entity->getId()}'")->execute();
+        $em->createQuery("DELETE App\\Restaurant\\Entity\\RestaurantStockHistory e WHERE e.damage = '{$entity->getId()}'")->execute();
         $this->processStockQuantity($entity,"damage");
     }
 
@@ -157,7 +157,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
 
         if($entity->getPurchaseItems()){
             foreach($entity->getPurchaseItems() as $item ){
-                $em->createQuery("DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Restaurant\\Entity\\RestaurantStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
             }
         }
     }
@@ -188,7 +188,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
         if($entity->getInvoiceParticulars()){
 
             foreach($entity->getInvoiceParticulars() as $item ){
-                $em->createQuery("DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.salesItem = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Restaurant\\Entity\\RestaurantStockHistory e WHERE e.salesItem = '{$item->getId()}'")->execute();
                 if( $item->getParticular()->getService()->getSlug() == 'stockable' and $item->getQuantity() > 0 ){
                     $this->processStockQuantity($item,"sales");
                 }
@@ -199,7 +199,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
     public function processInsertProductionItem(ProductionExpense $entity){
 
         $em = $this->getEntityManager();
-        $em->createQuery("DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.productionExpense = '{$entity->getId()}'")->execute();
+        $em->createQuery("DELETE App\\Restaurant\\Entity\\RestaurantStockHistory e WHERE e.productionExpense = '{$entity->getId()}'")->execute();
         $this->processStockQuantity($entity,"production");
 
     }
@@ -210,7 +210,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
         /** @var $item InvoiceParticular  */
         if($entity->getInvoiceParticulars()){
             foreach($entity->getInvoiceParticulars() as $item ){
-                $em->createQuery("DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.salesItem = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Restaurant\\Entity\\RestaurantStockHistory e WHERE e.salesItem = '{$item->getId()}'")->execute();
             }
         }
     }

@@ -42,7 +42,7 @@ class PurchaseVendorItemType extends AbstractType
                 'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 select2'),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Please input required'))
+                    new NotBlank(message: 'Please input required')
                 ),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('p')

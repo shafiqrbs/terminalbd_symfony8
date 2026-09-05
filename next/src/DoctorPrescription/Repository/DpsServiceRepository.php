@@ -68,7 +68,7 @@ class DpsServiceRepository extends EntityRepository
     public function removeServicePreviousCheck(DpsConfig $config)
     {
         $em = $this->getEntityManager();
-        $update = $em->createQuery("UPDATE DoctorPrescriptionBundle:DpsService e SET e.serviceShow = 'NULL' , e.serviceHeight = 'NULL' , e.servicePosition = 'NULL' , e.serviceHeaderShow = 'NULL' WHERE e.status = 1 AND e.dpsConfig=".$config->getId());
+        $update = $em->createQuery("UPDATE App\\DoctorPrescription\\Entity\\DpsService e SET e.serviceShow = 'NULL' , e.serviceHeight = 'NULL' , e.servicePosition = 'NULL' , e.serviceHeaderShow = 'NULL' WHERE e.status = 1 AND e.dpsConfig=".$config->getId());
         $update->execute();
     }
 

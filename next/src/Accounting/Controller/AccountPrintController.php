@@ -47,7 +47,7 @@ class AccountPrintController extends AbstractController
 	    $balance = empty($result) ? 0 :$result[0]['customerBalance'];
 	    $amountInWords = $this->toolManager->intToWords($sales->getAmount());
 	    $barcode = $this->getBarcode($sales->getAccountRefNo());
-	    return  $this->render("AccountingBundle:Print/sales:print.html.twig",
+	    return  $this->render("Accounting/Print/sales/print.html.twig",
 		    [
 			    'amountInWords' => $amountInWords,
 			    'barcode' => $barcode,
@@ -66,7 +66,7 @@ class AccountPrintController extends AbstractController
 		$balance = empty($result) ? 0 :$result[0]['customerBalance'];
 		$amountInWords = $this->toolManager->intToWords($sales->getPayment());
 		$barcode = $this->getBarcode($sales->getAccountRefNo());
-		return  $this->render("AccountingBundle:Print/purchase:print.html.twig",
+		return  $this->render("Accounting/Print/purchase/print.html.twig",
 			[
 				'amountInWords' => $amountInWords,
 				'barcode' => $barcode,

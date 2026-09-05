@@ -51,7 +51,7 @@ class PayrollType extends AbstractType
             /*->add('employeeType', ChoiceType::class, array(
                 'attr'=>array('class'=>'span8 m-wrap'),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Select Employee Type'))
+                    new NotBlank(message: 'Select Employee Type')
                 ),
                 'placeholder' => '---Select Employee Type---',
                 'choices' => array('Full Time' => 'Full Time', 'Half Time' => 'Half Time', 'Contractual' => 'Contractual', 'Hourly' => 'Hourly'),

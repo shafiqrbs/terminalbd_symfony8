@@ -690,9 +690,9 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
 	public function accountReverse(AccountPurchase $entity)
 	{
 		$em = $this->getEntityManager();
-		$transaction = $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = ".$entity->getGlobalOption()->getId() ." AND e.accountRefNo =".$entity->getAccountRefNo()." AND e.processHead = 'Purchase'");
+		$transaction = $em->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.globalOption = ".$entity->getGlobalOption()->getId() ." AND e.accountRefNo =".$entity->getAccountRefNo()." AND e.processHead = 'Purchase'");
 		$transaction->execute();
-        $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountRefNo ={$entity->getAccountRefNo()} AND e.accountPurchase ={$entity->getId()} AND e.processHead = 'Purchase'");
+        $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountRefNo ={$entity->getAccountRefNo()} AND e.accountPurchase ={$entity->getId()} AND e.processHead = 'Purchase'");
         $accountCash->execute();
 	}
 
@@ -1001,7 +1001,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
     public function accountPurchaseReverse(Purchase $entity)
     {
         $em = $this->getEntityManager();
-        $remove = $em->createQuery("DELETE AccountingBundle:AccountPurchase e WHERE e.purchase ={$entity->getId()}");
+        $remove = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountPurchase e WHERE e.purchase ={$entity->getId()}");
         if($remove){
             $remove->execute();
         }
@@ -1010,7 +1010,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
     public function accountMedicinePurchaseReverse(MedicinePurchase $entity)
     {
         $em = $this->getEntityManager();
-        $removeAccountPurchase = $em->createQuery('DELETE AccountingBundle:AccountPurchase e WHERE e.medicinePurchase = '.$entity->getId());
+        $removeAccountPurchase = $em->createQuery('DELETE App\Accounting\Entity\AccountPurchase e WHERE e.medicinePurchase = '.$entity->getId());
         if(!empty($removeAccountPurchase)){
             $removeAccountPurchase->execute();
         }
@@ -1019,7 +1019,7 @@ HAVING customerBalance > 0 ORDER BY vendor.`companyName` ASC";
 	public function accountBusinessPurchaseReverse(BusinessPurchase $entity)
 	{
 		$em = $this->getEntityManager();
-		$accountCash = $em->createQuery('DELETE AccountingBundle:AccountPurchase e WHERE e.businessPurchase = '.$entity->getId());
+		$accountCash = $em->createQuery('DELETE App\Accounting\Entity\AccountPurchase e WHERE e.businessPurchase = '.$entity->getId());
 		if(!empty($accountCash)){
 			$accountCash->execute();
 		}

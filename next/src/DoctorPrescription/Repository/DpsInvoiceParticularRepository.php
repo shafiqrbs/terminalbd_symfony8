@@ -179,14 +179,14 @@ class DpsInvoiceParticularRepository extends EntityRepository
     public function removeInvoiceParticularPreviousCheck(DpsInvoice $invoice)
     {
         $em = $this->getEntityManager();
-        $update = $em->createQuery("UPDATE DoctorPrescriptionBundle:DpsInvoiceParticular e SET e.metaCheck = 0 WHERE e.dpsService IS NULL and  e.dpsInvoice = ".$invoice->getId());
+        $update = $em->createQuery("UPDATE App\\DoctorPrescription\\Entity\\DpsInvoiceParticular e SET e.metaCheck = 0 WHERE e.dpsService IS NULL and  e.dpsInvoice = ".$invoice->getId());
         $update->execute();
     }
 
     public function removeInvoiceParticularCheckItem(DpsInvoice $invoice)
     {
         $em = $this->getEntityManager();
-        $remove = $em->createQuery("DELETE DoctorPrescriptionBundle:DpsInvoiceParticular e WHERE e.dpsService IS NULL and  e.dpsInvoice = ".$invoice->getId());
+        $remove = $em->createQuery("DELETE App\\DoctorPrescription\\Entity\\DpsInvoiceParticular e WHERE e.dpsService IS NULL and  e.dpsInvoice = ".$invoice->getId());
         $remove->execute();
     }
 

@@ -69,6 +69,53 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, File
         $src
     );
 
+    // Second pass: aliases embedded in a DQL string rather than standing alone,
+    //   $em->createQuery("DELETE AccountingBundle:Transaction e WHERE ...")
+    // 311 of these across 68 files, almost all DELETE or UPDATE - so a
+    // read-only smoke test never reaches them, and ORM 3 rejects the alias
+    // outright. Rewritten through the tokenizer, because a backslash inside a
+    // double-quoted string is an escape: "App\Tool\Entity\X" would embed a tab.
+    $tokens = token_get_all($out);
+    $rebuilt = '';
+
+    foreach ($tokens as $token) {
+        if (!is_array($token) || !in_array($token[0], [T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE], true)) {
+            $rebuilt .= is_array($token) ? $token[1] : $token;
+            continue;
+        }
+
+        $text = $token[1];
+        $doubleQuoted = $token[0] === T_ENCAPSED_AND_WHITESPACE || str_starts_with($text, '"');
+
+        $text = preg_replace_callback(
+            '/\b(DELETE|UPDATE|FROM|JOIN)\s+([A-Za-z]+Bundle):([A-Za-z0-9_]+)\b/',
+            static function (array $m) use ($bundleToModule, $known, &$converted, &$unresolved, $path, $doubleQuoted): string {
+                $module = $bundleToModule[$m[2]] ?? null;
+
+                if ($module === null) {
+                    $unresolved[] = "$path: unknown bundle {$m[2]} in DQL";
+                    return $m[0];
+                }
+
+                $fqcn = "App\\$module\\Entity\\{$m[3]}";
+
+                if (!isset($known[$fqcn])) {
+                    $unresolved[] = "$path: {$m[2]}:{$m[3]} -> $fqcn (class not found, in DQL)";
+                    return $m[0];
+                }
+
+                $converted++;
+
+                return $m[1] . ' ' . ($doubleQuoted ? str_replace('\\', '\\\\', $fqcn) : $fqcn);
+            },
+            $text
+        );
+
+        $rebuilt .= $text;
+    }
+
+    $out = $rebuilt;
+
     if ($out === $src) continue;
     $files++;
     if (!$dryRun) file_put_contents($path, $out);

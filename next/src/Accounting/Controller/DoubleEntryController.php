@@ -447,8 +447,8 @@ class DoubleEntryController extends AbstractController
 
         foreach ( $pagination as $entity ){
             if (!empty($entity) and $entity->getProcess() == 'approved') {
-                $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
-                $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
+                $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
+                $em->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
                 $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->resetDoubleEntryTransaction($entity);
             } else {
                 return new Response('failed');

@@ -101,7 +101,7 @@ class SalesGeneralType extends AbstractType
                 'attr'=>array('class'=>'span8 m-wrap inputs'),
                 'placeholder' => '---Choose current process---',
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Select current process'))
+                    new NotBlank(message: 'Select current process')
                 ),
                 'choices' => array('In-progress' => 'In-progress', 'Courier' => 'Courier', 'Delivered' => 'Delivered', 'Cancel' => 'Cancel', 'Returned' => 'Returned', 'Done' => 'Done'),
             ))

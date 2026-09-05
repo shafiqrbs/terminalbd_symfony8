@@ -48,12 +48,12 @@ class InvoicePatientType extends AbstractType
             ->add('paymentMobile', TextType::class, array('attr'=>array('class'=>'m-wrap span12 mobile','placeholder'=>'Add payment mobile no','data-original-title'=>'Add payment mobile no','autocomplete'=>'off')))
             ->add('deliveryDateTime', TextType::class, array('attr'=>array('class'=>'m-wrap span10 tooltips','data-trigger' => 'hover','placeholder'=>'Report delivery date','data-original-title'=>'Report delivery date','autocomplete'=>'off'),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Add delivery date time')),
+                    new NotBlank(message: 'Add delivery date time'),
                 )
             ))
             ->add('payment', TextType::class, array('attr'=>array('class'=>'tooltips','data-trigger' => 'hover','placeholder'=>'Receive amount','data-original-title'=>'Enter received amount','autocomplete'=>'off'),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Add receive amount')),
+                    new NotBlank(message: 'Add receive amount'),
                 )
             ))
             ->add('comment', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add remarks','autocomplete'=>'off')))

@@ -366,7 +366,7 @@ class PrepurchaseController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vendor entity.');
         }
-        $em->createQuery('DELETE MedicineBundle:MedicinePrepurchaseItem e WHERE e.medicinePurchase = '.$entity->getId());
+        $em->createQuery('DELETE App\Medicine\Entity\MedicinePrepurchaseItem e WHERE e.medicinePurchase = '.$entity->getId());
         $em->remove($entity);
         $em->flush();
         return $this->redirect($this->generateUrl('medicine_prepurchase'));

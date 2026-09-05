@@ -69,7 +69,7 @@ class PurchaseRepository extends EntityRepository
     public function purchaseTransactionReverse(Purchase $entity){
 
         $em = $this->getEntityManager();
-        $accountCash = $em->createQuery("DELETE AccountingBundle:AccountPurchase e WHERE e.restaurantPurchase = {$entity->getId()}");
+        $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountPurchase e WHERE e.restaurantPurchase = {$entity->getId()}");
         if(!empty($accountCash)){
             $accountCash->execute();
         }

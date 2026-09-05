@@ -548,7 +548,7 @@ class InvoiceController extends AbstractController
        // $invoiceParticulars = $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getSalesItems($entity);
         $wearhouses = $this->em->getRepository(WearHouse::class)->findBy(array('businessConfig' => $entity->getBusinessConfig(),'status'=>1),array('name'=>'ASC'));
         $batchItems = $this->em->getRepository(BusinessBatchParticular::class)->getFindBatchParticular( $entity->getBusinessConfig()->getId());
-        $html =  $this->renderView("BusinessBundle:Invoice/item:data.html.twig", array(
+        $html =  $this->renderView("Business/Invoice/item/data.html.twig", array(
             'config' => $entity->getBusinessConfig(),
             'entity' => $entity,
             'wearhouses' => $wearhouses,

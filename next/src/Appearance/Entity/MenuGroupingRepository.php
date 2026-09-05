@@ -52,7 +52,7 @@ class MenuGroupingRepository extends EntityRepository
                     if(!empty($menu->getChildren())){
                         $this->childrenMenuRemove($menu);
                     }
-                    $remove = $em->createQuery('DELETE SettingAppearanceBundle:MenuGrouping e WHERE e.id = '.$menu->getId() );
+                    $remove = $em->createQuery('DELETE App\Appearance\Entity\MenuGrouping e WHERE e.id = '.$menu->getId() );
                     $remove->execute();
                 }
             }
@@ -66,10 +66,10 @@ class MenuGroupingRepository extends EntityRepository
             $child = $val->getChildren();
             if(!empty($child)){
                  $this->childrenMenuRemove($val);
-                 $childRemove = $em->createQuery('DELETE SettingAppearanceBundle:MenuGrouping e WHERE e.id = '.$val->getId() );
+                 $childRemove = $em->createQuery('DELETE App\Appearance\Entity\MenuGrouping e WHERE e.id = '.$val->getId() );
                  $childRemove->execute();
             } else {
-               $childRemove = $em->createQuery('DELETE SettingAppearanceBundle:MenuGrouping e WHERE e.id = '.$val->getId() );
+               $childRemove = $em->createQuery('DELETE App\Appearance\Entity\MenuGrouping e WHERE e.id = '.$val->getId() );
                $childRemove->execute();
             }
         }

@@ -244,14 +244,14 @@ class AccountConditionLedgerRepository extends EntityRepository
     public function accountLedgerReverse(AccountConditionLedger $entity)
     {
         $em = $this->getEntityManager();
-        $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.conditionLedger = {$entity->getId()}");
+        $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.conditionLedger = {$entity->getId()}");
         $accountCash->execute();
     }
 
     public function accountInvoiceReverse(BusinessInvoice $entity)
     {
         $em = $this->getEntityManager();
-        $accountCash = $em->createQuery("DELETE AccountingBundle:AccountConditionLedger e WHERE e.invoice = {$entity->getId()}");
+        $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountConditionLedger e WHERE e.invoice = {$entity->getId()}");
         $accountCash->execute();
     }
 

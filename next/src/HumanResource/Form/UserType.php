@@ -44,12 +44,12 @@ class UserType extends AbstractType
         $builder
             ->add('username', TextType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Customer name'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please enter customer name'))
+                        new NotBlank(message: 'Please enter customer name')
                     ))
             )
             ->add('email', EmailType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Mobile no'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please enter email address'))
+                        new NotBlank(message: 'Please enter email address')
                     ))
             )
             ->add('enabled')

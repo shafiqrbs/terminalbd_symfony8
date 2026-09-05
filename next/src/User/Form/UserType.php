@@ -31,20 +31,20 @@ class UserType extends AbstractType
         $builder
         ->add('name', TextType::class, array('attr'=>array('class'=>'m-wrap placeholder-no-fix','placeholder'=>'Enter your full name'),
         'constraints' =>array(
-            new NotBlank(array('message'=>'Please input required')),
-            new Length(array('max'=>200))
+            new NotBlank(message: 'Please input required'),
+            new Length(max: 200)
         )))
         ->add('email', EmailType::class, array('attr'=>array('label' => 'form.email', 'translation_domain' => 'FOSUserBundle' , 'class'=>'m-wrap placeholder-no-fix','placeholder'=>'Enter your email address' , 'autocomplete' => 'off'),
                                         'constraints' =>array(
-                                            new NotBlank(array('message'=>'Please input required')),
-                                            new Length(array('max'=>200))
+                                            new NotBlank(message: 'Please input required'),
+                                            new Length(max: 200)
                                         )));
 
         if($userID == 0){
             $builder->add('username', TextType::class, array('attr'=>array('label' => 'form.username', 'translation_domain' => 'FOSUserBundle' , 'class'=>'m-wrap placeholder-no-fix','placeholder'=>'Enter your user name', 'autocomplete' => 'off'),
                                                    'constraints' =>array(
-                                                       new NotBlank(array('message'=>'Please input required')),
-                                                       new Length(array('max'=>200))
+                                                       new NotBlank(message: 'Please input required'),
+                                                       new Length(max: 200)
                                                    )))
                 ->add('plainPassword', RepeatedType::class, array(
                     'type' => PasswordType::class,

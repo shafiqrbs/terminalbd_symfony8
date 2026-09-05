@@ -241,7 +241,7 @@ class ReportController extends AbstractController
         $commissionSummary = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommissionSummary($hospital, $entities);
         $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommission($hospital, $entities);
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [5, 6]);
-        return $this->render('HospitalBundle:Report/Sales:details.html.twig', [
+        return $this->render('Hospital/Report/Sales/details.html.twig', [
             'entities' => $pagination,
             'commissions' => $commissions,
             'commissionSummary' => $commissionSummary,
@@ -271,7 +271,7 @@ class ReportController extends AbstractController
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [6]);
         $commissionSummary = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommissionSummary($hospital, $entities);
         $html = $this->renderView(
-            'HospitalBundle:Report/Sales:detailsPdf.html.twig', [
+            'Hospital/Report/Sales/detailsPdf.html.twig', [
                 'globalOption' => $user->getGlobalOption(),
                 'entities' => $pagination,
                 'commissionSummary' => $commissionSummary,

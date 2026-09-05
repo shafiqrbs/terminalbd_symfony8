@@ -342,7 +342,7 @@ class SmsSenderRepository extends EntityRepository {
     public function smsHistoryDelete(){
 
         $em = $this->getEntityManager();
-        $accountCash = $em->createQuery("DELETE SettingToolBundle:SmsSender e WHERE e.status='success'");
+        $accountCash = $em->createQuery("DELETE App\\Tool\\Entity\\SmsSender e WHERE e.status='success'");
         if(!empty($accountCash)){
             $accountCash->execute();
         }

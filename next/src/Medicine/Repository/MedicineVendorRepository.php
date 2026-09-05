@@ -229,7 +229,7 @@ class MedicineVendorRepository extends EntityRepository
     {
 
         $em = $this->getEntityManager();
-        $stock = $em->createQuery("DELETE MedicineBundle:MedicineVendor e WHERE e.medicineConfig = {$to}");
+        $stock = $em->createQuery("DELETE App\\Medicine\\Entity\\MedicineVendor e WHERE e.medicineConfig = {$to}");
         if($stock){
             $stock->execute();
         }

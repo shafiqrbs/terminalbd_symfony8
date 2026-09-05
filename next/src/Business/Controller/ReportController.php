@@ -951,7 +951,7 @@ class ReportController extends AbstractController
         }
         $particulars = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->getProducts($config->getId());
         if(empty($data['pdf'])){
-            return $this->render('BusinessBundle:Report/stock:productLedger.html.twig', [
+            return $this->render('Business/Report/stock/productLedger.html.twig', [
                 'entity' => $entity,
                 'pagination' => $pagination,
                 'particulars' => $particulars,
@@ -959,7 +959,7 @@ class ReportController extends AbstractController
             ]);
         }else{
             $html = $this->renderView(
-                'BusinessBundle:Report/stock:productLedgerPdf.html.twig', [
+                'Business/Report/stock/productLedgerPdf.html.twig', [
                     'option' => $this->getUser()->getGlobalOption(),
                     'entity' => $entity,
                     'pagination' => $pagination,

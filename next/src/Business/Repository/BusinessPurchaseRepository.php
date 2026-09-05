@@ -414,7 +414,7 @@ class BusinessPurchaseRepository extends EntityRepository
         $compare = new DateTime();
         $today =  $compare->format('Y-m-d');
         $em = $this->getEntityManager();
-        $purchase = $em->createQuery("DELETE BusinessBundle:BusinessPurchase e WHERE e.businessConfig = {$config} AND e.process = 'Commission' AND e.created LIKE '%{$today}%' ");
+        $purchase = $em->createQuery("DELETE App\\Business\\Entity\\BusinessPurchase e WHERE e.businessConfig = {$config} AND e.process = 'Commission' AND e.created LIKE '%{$today}%' ");
         $purchase->execute();
     }
 

@@ -1195,22 +1195,22 @@ class AccountCashRepository extends EntityRepository
     {
         $em = $this->getEntityManager();
         if($process == "BalanceTransfer"){
-            $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.balanceTransfer ={$entity->getId()}");
+            $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.balanceTransfer ={$entity->getId()}");
             $accountCash->execute();
         }elseif($process == "Sales"){
-            $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountSales ={$entity->getId()}");
+            $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountSales ={$entity->getId()}");
             $accountCash->execute();
         }elseif($process == "Purchase"){
-            $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountPurchase ={$entity->getId()}");
+            $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountPurchase ={$entity->getId()}");
             $accountCash->execute();
         }elseif($process == "Expenditure"){
-            $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.expenditure ={$entity->getId()}");
+            $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.expenditure ={$entity->getId()}");
             $accountCash->execute();
         }elseif($process == "Loan"){
-            $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountLoan ={$entity->getId()}");
+            $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountLoan ={$entity->getId()}");
             $accountCash->execute();
          }elseif($process == "Journal"){
-            $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}");
+            $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}");
             $accountCash->execute();
         }
 

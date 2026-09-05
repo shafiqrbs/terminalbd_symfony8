@@ -122,7 +122,7 @@ class SalesOnlineType extends AbstractType
                 'attr'=>array('class'=>'span9 m-wrap inputs'),
                 'placeholder' => '---Choose current process---',
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Select current process'))
+                    new NotBlank(message: 'Select current process')
                 ),
                 'choices' => array('In-progress' => 'In-progress', 'Done' => 'Done', 'Delivered' => 'Delivered', 'Courier' => 'Courier', 'Cancel' => 'Cancel', 'Returned' => 'Returned'),
             ))

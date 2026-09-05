@@ -1,55 +1,68 @@
+# 11 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 taxtariff:
-    path:     /
-    defaults: { _controller: "TallyBundle:TaxTariff:index" }
-
+    path: /
+    defaults:
+        missing: 'TallyBundle:TaxTariff:index'
+    controller: App\Migration\Controller\UnresolvableRouteController
 taxtariff_show:
-    path:     /{id}/show
-    defaults: { _controller: "TallyBundle:TaxTariff:show" }
-
+    path: '/{id}/show'
+    defaults:
+        missing: 'TallyBundle:TaxTariff:show'
+    controller: App\Migration\Controller\UnresolvableRouteController
 taxtariff_new:
-    path:     /new
-    defaults: { _controller: "TallyBundle:TaxTariff:new" }
-
+    path: /new
+    defaults:
+        missing: 'TallyBundle:TaxTariff:new'
+    controller: App\Migration\Controller\UnresolvableRouteController
 taxtariff_create:
-    path:     /create
-    defaults: { _controller: "TallyBundle:TaxTariff:create" }
-    methods:  POST
-
+    path: /create
+    defaults:
+        missing: 'TallyBundle:TaxTariff:create'
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
 taxtariff_edit:
-    path:     /{id}/edit
-    defaults: { _controller: "TallyBundle:TaxTariff:edit" }
-
-
+    path: '/{id}/edit'
+    defaults:
+        missing: 'TallyBundle:TaxTariff:edit'
+    controller: App\Migration\Controller\UnresolvableRouteController
 taxtariff_update:
-    path:     /{id}/update
-    defaults: { _controller: "TallyBundle:TaxTariff:update" }
-    methods:  [POST, PUT]
-
-
+    path: '/{id}/update'
+    defaults:
+        missing: 'TallyBundle:TaxTariff:update'
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
 taxtariff_inline_update:
-    path:     /{id}/inline-update
-    defaults: { _controller: "TallyBundle:TaxTariff:inlineUpdate" }
-    methods:  POST
+    path: '/{id}/inline-update'
+    defaults:
+        missing: 'TallyBundle:TaxTariff:inlineUpdate'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 taxtariff_delete:
-    path:     /{id}/delete
-    defaults: { _controller: "TallyBundle:TaxTariff:delete" }
-
+    path: '/{id}/delete'
+    defaults:
+        missing: 'TallyBundle:TaxTariff:delete'
+    controller: App\Migration\Controller\UnresolvableRouteController
 taxtariff_status:
-    path:     /{id}/status
-    defaults: { _controller: "TallyBundle:TaxTariff:status" }
-
-
+    path: '/{id}/status'
+    defaults:
+        missing: 'TallyBundle:TaxTariff:status'
+    controller: App\Migration\Controller\UnresolvableRouteController
 tallyitem_item_search:
-    path:     /search-tariff
-    defaults: { _controller: "TallyBundle:TaxTariff:autoSearch" }
+    path: /search-tariff
+    defaults:
+        missing: 'TallyBundle:TaxTariff:autoSearch'
     options:
-            expose: true
-
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 tallyitem_item_name:
-    path:      /{name}/tariff-name
-    defaults: { _controller: "TallyBundle:TaxTariff:searchName" }
+    path: '/{name}/tariff-name'
+    defaults:
+        missing: 'TallyBundle:TaxTariff:searchName'
     options:
-            expose: true
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController

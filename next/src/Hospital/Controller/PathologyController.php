@@ -303,7 +303,7 @@ class PathologyController extends AbstractController
         $toConfig = $option->getHospitalConfig();
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
         if($option and !empty($config)) {
-            $stock = $em->createQuery("DELETE HospitalBundle:Particular e WHERE e.hospitalConfig={$config->getId()}");
+            $stock = $em->createQuery("DELETE App\\Hospital\\Entity\\Particular e WHERE e.hospitalConfig={$config->getId()}");
             if($stock){
                 $stock->execute();
             }

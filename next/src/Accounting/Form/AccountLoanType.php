@@ -52,7 +52,7 @@ class AccountLoanType extends AbstractType
             ])
             /*->add('customer', TextType::class, array('attr'=>array('class'=>'m-wrap span11 select2Customer leftMargin','placeholder'=>'Select customer name','focus' => true),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Search the customer name/mobile'))
+                    new NotBlank(message: 'Search the customer name/mobile')
             )))*/
             ->add('employee', EntityType::class, [
                 'required'    => true,

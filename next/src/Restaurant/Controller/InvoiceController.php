@@ -397,7 +397,7 @@ class InvoiceController extends AbstractController
     {
 
         $em = $this->em;
-        $Invoice = $em->createQuery("DELETE RestaurantBundle:Invoice e WHERE e.id = {$id}");
+        $Invoice = $em->createQuery("DELETE App\\Restaurant\\Entity\\Invoice e WHERE e.id = {$id}");
         $Invoice->execute();
         return new Response(json_encode(array('success' => 'success')));
 
@@ -620,7 +620,7 @@ class InvoiceController extends AbstractController
         $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
 
-        $removeSales = $em->createQuery("DELETE RestaurantBundle:Invoice e WHERE e.androidProcess= {$android->getId()}");
+        $removeSales = $em->createQuery("DELETE App\\Restaurant\\Entity\\Invoice e WHERE e.androidProcess= {$android->getId()}");
         if(!empty($removeSales)){
             $removeSales->execute();
         }

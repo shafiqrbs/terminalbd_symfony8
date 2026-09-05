@@ -338,7 +338,7 @@ class AccountProfitRepository extends EntityRepository
 
     public function removeExistingTransaction(AccountProfit $profit){
         $em = $this->getEntityManager();
-        $transaction = $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.accountProfit = {$profit->getId()}");
+        $transaction = $em->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.accountProfit = {$profit->getId()}");
         $transaction->execute();
     }
 

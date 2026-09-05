@@ -89,7 +89,7 @@ class PageRepository extends EntityRepository
         $user = $entity->getUser()->getId();
         $limit = $entity->getUser()->getHomePage()->getShowingListing();
         return $this->getEntityManager()
-            ->createQuery('SELECT n FROM SettingContentBundle:Page n WHERE n.status = 1 AND n.user = '.$user.' ORDER BY n.name DESC')
+            ->createQuery('SELECT n FROM App\Content\Entity\Page n WHERE n.status = 1 AND n.user = '.$user.' ORDER BY n.name DESC')
             ->setMaxResults($limit)
             ->getResult();
     }

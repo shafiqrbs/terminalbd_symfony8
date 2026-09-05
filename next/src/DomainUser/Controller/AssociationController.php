@@ -485,7 +485,7 @@ class AssociationController extends AbstractController
         $editForm = $this->createInvoiceCreateForm($entity,$customer);
         $outstanding = 0;
 
-        return $this->render("DomainUserBundle:Association/Invoice:new.html.twig", array(
+        return $this->render("DomainUser/Association/Invoice/new.html.twig", array(
 
             'globalOption'      => $this->getUser()->getGlobalOption(),
             'lastInvoice'       => $lastInvoice,
@@ -569,7 +569,7 @@ class AssociationController extends AbstractController
         $this->requestStack->getSession()->getFlashBag()->add(
             'warning', "Payment information does not valid"
         );
-        return $this->render("DomainUserBundle:Association/Invoice:new.html.twig", array(
+        return $this->render("DomainUser/Association/Invoice/new.html.twig", array(
             'globalOption' => $user->getGlobalOption(),
             'customer' => $customer,
             'lastInvoice'       => $lastInvoice,
@@ -587,7 +587,7 @@ class AssociationController extends AbstractController
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entities = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->invoiceLists( $config->getId(),$data);
         $pagination = $this->paginate($entities);
-        return $this->render("DomainUserBundle:Association/Invoice:index.html.twig", array(
+        return $this->render("DomainUser/Association/Invoice/index.html.twig", array(
             'entities' => $pagination,
             'searchForm' => $data,
         ));
@@ -599,7 +599,7 @@ class AssociationController extends AbstractController
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
-        return $this->render("DomainUserBundle:Association/Invoice:show.html.twig", array(
+        return $this->render("DomainUser/Association/Invoice/show.html.twig", array(
             'entity' => $entity,
         ));
 
@@ -611,7 +611,7 @@ class AssociationController extends AbstractController
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $entity = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->findOneBy(array('businessConfig' => $config,'id' => $id));
         $form = $this->editInvoiceCreateForm($entity);
-        return $this->render("DomainUserBundle:Association/Invoice:edit.html.twig", array(
+        return $this->render("DomainUser/Association/Invoice/edit.html.twig", array(
             'entity' => $entity,
             'globalOption' => $entity->getCustomer()->getGlobalOption(),
             'form' => $form->createView(),
@@ -669,7 +669,7 @@ class AssociationController extends AbstractController
         $this->requestStack->getSession()->getFlashBag()->add(
             'warning', "Payment information does not valid"
         );
-        return $this->render("DomainUserBundle:Association/Invoice:edit.html.twig", array(
+        return $this->render("DomainUser/Association/Invoice/edit.html.twig", array(
             'globalOption' => $entity->getCustomer()->getGlobalOption(),
             'entity' => $entity,
             'form' => $form->createView(),

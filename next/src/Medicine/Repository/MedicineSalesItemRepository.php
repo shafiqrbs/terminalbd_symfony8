@@ -226,7 +226,7 @@ class MedicineSalesItemRepository extends EntityRepository
         $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
         $qb5 = $qb5->executeQuery();
 
-        $DoctorInvoice = $em->createQuery('DELETE MedicineBundle:MedicineSalesTemporary e WHERE e.user = '.$user->getId());
+        $DoctorInvoice = $em->createQuery('DELETE App\Medicine\Entity\MedicineSalesTemporary e WHERE e.user = '.$user->getId());
         $DoctorInvoice->execute();
 
     }
@@ -237,7 +237,7 @@ class MedicineSalesItemRepository extends EntityRepository
         $salesId = $sales->getId();
         $userId = $user->getId();
 
-        $stock = $em->createQuery('DELETE MedicineBundle:MedicineSalesItem e WHERE e.medicineSales = '.$salesId);
+        $stock = $em->createQuery('DELETE App\Medicine\Entity\MedicineSalesItem e WHERE e.medicineSales = '.$salesId);
         if($stock){
             $stock->execute();
         }
@@ -263,7 +263,7 @@ class MedicineSalesItemRepository extends EntityRepository
         $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
         $qb5 = $qb5->executeQuery();
 
-        $DoctorInvoice = $em->createQuery('DELETE MedicineBundle:MedicineSalesTemporary e WHERE e.user = '.$user->getId());
+        $DoctorInvoice = $em->createQuery('DELETE App\Medicine\Entity\MedicineSalesTemporary e WHERE e.user = '.$user->getId());
         $DoctorInvoice->execute();
 
     }

@@ -26,13 +26,13 @@ class MedicineReportController extends AbstractController
         $user = $this->getUser();
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportMedicineIncome($user,$data);
         if(empty($data['pdf'])){
-            return $this->render('AccountingBundle:Report/Medicine:income.html.twig', [
+            return $this->render('Accounting/Report/Medicine/income.html.twig', [
                 'overview' => $overview,
                 'searchForm' => $data,
             ]);
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Report/Medicine:incomePdf.html.twig', [
+                'Accounting/Report/Medicine/incomePdf.html.twig', [
                     'overview' => $overview,
                     'globalOption' => $this->getUser()->getGlobalOption(),
                     'searchForm' => $data,
@@ -88,13 +88,13 @@ class MedicineReportController extends AbstractController
             $dateRange =  $compareTo->format('F,Y');
         }
         if(empty($data['pdf'])){
-            return $this->render('AccountingBundle:Report/Medicine:monthlyIncome.html.twig', [
+            return $this->render('Accounting/Report/Medicine/monthlyIncome.html.twig', [
                 'overview' => $overview,
                 'searchForm' => $data,
             ]);
         }else{
             $html = $this->renderView(
-                'AccountingBundle:Report/Medicine:monthlyIncomePdf.html.twig', [
+                'Accounting/Report/Medicine/monthlyIncomePdf.html.twig', [
                     'overview' => $overview,
                     'globalOption' => $this->getUser()->getGlobalOption(),
                     'dateRange' => $dateRange,

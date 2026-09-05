@@ -151,7 +151,7 @@ class RestaurantTemporaryRepository extends EntityRepository
     {
         $em = $this->getEntityManager();
         $config = $user->getGlobalOption()->getRestaurantConfig()->getId();
-        $entity = $em->createQuery('DELETE RestaurantBundle:RestaurantTemporary e WHERE e.restaurantConfig = '.$config.' and e.user = '.$user->getId());
+        $entity = $em->createQuery('DELETE App\Restaurant\Entity\RestaurantTemporary e WHERE e.restaurantConfig = '.$config.' and e.user = '.$user->getId());
         $entity->execute();
     }
 

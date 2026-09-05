@@ -27,7 +27,7 @@ class PurchaseItemSerialRepository extends EntityRepository
         foreach ($purchase->getPurchaseItems() as $item ){
             if($item->getSerialNo()){
                 $id = $item->getId();
-                $stock = $em->createQuery("DELETE InventoryBundle:PurchaseItemSerial e WHERE e.purchaseItem = $id");
+                $stock = $em->createQuery("DELETE App\\Inventory\\Entity\\PurchaseItemSerial e WHERE e.purchaseItem = $id");
                 if($stock){ $stock->execute(); }
             }
         }
@@ -62,7 +62,7 @@ class PurchaseItemSerialRepository extends EntityRepository
 
         if($item->getSerialNo()){
             $id = $item->getId();
-            $stock = $em->createQuery("DELETE InventoryBundle:PurchaseItemSerial e WHERE  e.status != 1 AND  e.purchaseItem = $id");
+            $stock = $em->createQuery("DELETE App\\Inventory\\Entity\\PurchaseItemSerial e WHERE  e.status != 1 AND  e.purchaseItem = $id");
             if($stock){ $stock->execute(); }
         }
 
@@ -98,7 +98,7 @@ class PurchaseItemSerialRepository extends EntityRepository
 
         if($item->getSerialNo()){
             $id = $item->getId();
-            $stock = $em->createQuery("DELETE InventoryBundle:PurchaseItemSerial e WHERE  e.status != 1 AND  e.purchaseItem = $id");
+            $stock = $em->createQuery("DELETE App\\Inventory\\Entity\\PurchaseItemSerial e WHERE  e.status != 1 AND  e.purchaseItem = $id");
             if($stock){ $stock->execute(); }
         }
 
@@ -156,7 +156,7 @@ class PurchaseItemSerialRepository extends EntityRepository
         foreach ($purchase->getPurchaseItems() as $item ){
             if($item->getSerialNo()){
                 $id = $item->getId();
-                $stock = $em->createQuery("DELETE InventoryBundle:PurchaseItemSerial e WHERE e.purchaseItem = $id");
+                $stock = $em->createQuery("DELETE App\\Inventory\\Entity\\PurchaseItemSerial e WHERE e.purchaseItem = $id");
                 if($stock){ $stock->execute(); }
             }
         }

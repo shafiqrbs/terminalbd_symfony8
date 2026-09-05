@@ -806,7 +806,7 @@ class MedicinePurchaseRepository extends EntityRepository
     public function emptyDelete($config)
     {
         $em = $this->getEntityManager();
-        $purchase = $em->createQuery("DELETE MedicineBundle:MedicinePurchase e WHERE e.medicineConfig = {$config} AND e.subTotal IS NULL OR  e.subTotal=0");
+        $purchase = $em->createQuery("DELETE App\\Medicine\\Entity\\MedicinePurchase e WHERE e.medicineConfig = {$config} AND e.subTotal IS NULL OR  e.subTotal=0");
         $purchase->execute();
     }
 

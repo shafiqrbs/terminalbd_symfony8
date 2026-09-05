@@ -32,7 +32,7 @@ class HmsReportController extends AbstractController
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
-        return $this->render('AccountingBundle:Report/Hms:income.html.twig', [
+        return $this->render('Accounting/Report/Hms/income.html.twig', [
             'overview' => $overview,
             'searchForm' => $data,
         ]);
@@ -44,7 +44,7 @@ class HmsReportController extends AbstractController
         $data = $_REQUEST;
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
         $html = $this->renderView(
-            'AccountingBundle:Report/Hms:incomePdf.html.twig', [
+            'Accounting/Report/Hms/incomePdf.html.twig', [
                 'globalOption' => $globalOption,
                 'overview' => $overview,
                 'searchForm' => $data,
@@ -67,7 +67,7 @@ class HmsReportController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $data = $_REQUEST;
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsIncome($globalOption,$data);
-        return $this->render('AccountingBundle:Report/Hms:incomePdf.html.twig', [
+        return $this->render('Accounting/Report/Hms/incomePdf.html.twig', [
             'globalOption' => $globalOption,
             'overview' => $overview,
             'searchForm' => $data,
@@ -93,7 +93,7 @@ class HmsReportController extends AbstractController
             $compareTo = new DateTime("now");
             $dateRange =  $compareTo->format('F,Y');
         }
-        return $this->render('AccountingBundle:Report/Hms:monthlyIncome.html.twig', [
+        return $this->render('Accounting/Report/Hms/monthlyIncome.html.twig', [
             'overview' => $overview,
             'dateRange' => $dateRange,
             'searchForm' => $data,
@@ -118,7 +118,7 @@ class HmsReportController extends AbstractController
             $dateRange =  $compareTo->format('F,Y');
         }
         $html = $this->renderView(
-            'AccountingBundle:Report/Hms:monthlyIncomePdf.html.twig', [
+            'Accounting/Report/Hms/monthlyIncomePdf.html.twig', [
                 'globalOption' => $globalOption,
                 'dateRange' => $dateRange,
                 'overview' => $overview,
@@ -143,7 +143,7 @@ class HmsReportController extends AbstractController
         $data = $_REQUEST;
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportHmsMonthlyIncome( $this->getUser(),$data);
         exit;
-        return $this->render('AccountingBundle:Report/Hms:monthlyIncomePdf.html.twig', [
+        return $this->render('Accounting/Report/Hms/monthlyIncomePdf.html.twig', [
             'globalOption' => $globalOption,
             'overview' => $overview,
             'searchForm' => $data,

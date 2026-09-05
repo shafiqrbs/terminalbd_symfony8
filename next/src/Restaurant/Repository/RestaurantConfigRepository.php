@@ -20,16 +20,16 @@ class RestaurantConfigRepository extends EntityRepository
         $em = $this->getEntityManager();
         $config = $option->getRestaurantConfig()->getId();
 
-        $history = $em->createQuery('DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.restaurantConfig = '.$config);
+        $history = $em->createQuery('DELETE App\Restaurant\Entity\RestaurantStockHistory e WHERE e.restaurantConfig = '.$config);
         $history->execute();
 
-        $batch = $em->createQuery('DELETE RestaurantBundle:ProductionBatch e WHERE e.restaurantConfig = '.$config);
+        $batch = $em->createQuery('DELETE App\Restaurant\Entity\ProductionBatch e WHERE e.restaurantConfig = '.$config);
         $batch->execute();
 
-        $invoice = $em->createQuery('DELETE RestaurantBundle:Invoice e WHERE e.restaurantConfig = '.$config);
+        $invoice = $em->createQuery('DELETE App\Restaurant\Entity\Invoice e WHERE e.restaurantConfig = '.$config);
         $invoice->execute();
 
-        $purchase = $em->createQuery('DELETE RestaurantBundle:Purchase e WHERE e.restaurantConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Restaurant\Entity\Purchase e WHERE e.restaurantConfig = '.$config);
         $purchase->execute();
 
         $elem = "UPDATE `restaurant_particular` as sub
@@ -47,25 +47,25 @@ class RestaurantConfigRepository extends EntityRepository
         $em = $this->getEntityManager();
         $config = $option->getRestaurantConfig()->getId();
 
-        $history = $em->createQuery('DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.restaurantConfig = '.$config);
+        $history = $em->createQuery('DELETE App\Restaurant\Entity\RestaurantStockHistory e WHERE e.restaurantConfig = '.$config);
         $history->execute();
 
-        $batch = $em->createQuery('DELETE RestaurantBundle:ProductionBatch e WHERE e.restaurantConfig = '.$config);
+        $batch = $em->createQuery('DELETE App\Restaurant\Entity\ProductionBatch e WHERE e.restaurantConfig = '.$config);
         $batch->execute();
 
-        $invoice = $em->createQuery('DELETE RestaurantBundle:Invoice e WHERE e.restaurantConfig = '.$config);
+        $invoice = $em->createQuery('DELETE App\Restaurant\Entity\Invoice e WHERE e.restaurantConfig = '.$config);
         $invoice->execute();
 
-        $purchase = $em->createQuery('DELETE RestaurantBundle:Purchase e WHERE e.restaurantConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Restaurant\Entity\Purchase e WHERE e.restaurantConfig = '.$config);
         $purchase->execute();
 
-        $purchase = $em->createQuery('DELETE RestaurantBundle:ItemImport e WHERE e.restaurantConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Restaurant\Entity\ItemImport e WHERE e.restaurantConfig = '.$config);
         $purchase->execute();
 
-        $Particular = $em->createQuery('DELETE RestaurantBundle:Particular e WHERE e.restaurantConfig = '.$config);
+        $Particular = $em->createQuery('DELETE App\Restaurant\Entity\Particular e WHERE e.restaurantConfig = '.$config);
         $Particular->execute();
 
-        $purchase = $em->createQuery('DELETE RestaurantBundle:Category e WHERE e.restaurantConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Restaurant\Entity\Category e WHERE e.restaurantConfig = '.$config);
         $purchase->execute();
 
 
@@ -78,16 +78,16 @@ class RestaurantConfigRepository extends EntityRepository
         $em = $this->getEntityManager();
         $config = $option->getRestaurantConfig ()->getId();
 
-        $history = $em->createQuery('DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.restaurantConfig = '.$config);
+        $history = $em->createQuery('DELETE App\Restaurant\Entity\RestaurantStockHistory e WHERE e.restaurantConfig = '.$config);
         $history->execute();
 
-        $batch = $em->createQuery('DELETE RestaurantBundle:ProductionBatch e WHERE e.restaurantConfig = '.$config);
+        $batch = $em->createQuery('DELETE App\Restaurant\Entity\ProductionBatch e WHERE e.restaurantConfig = '.$config);
         $batch->execute();
 
-        $invoice = $em->createQuery('DELETE RestaurantBundle:Invoice e WHERE e.restaurantConfig = '.$config);
+        $invoice = $em->createQuery('DELETE App\Restaurant\Entity\Invoice e WHERE e.restaurantConfig = '.$config);
         $invoice->execute();
 
-        $purchase = $em->createQuery('DELETE RestaurantBundle:Purchase e WHERE e.restaurantConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Restaurant\Entity\Purchase e WHERE e.restaurantConfig = '.$config);
         $purchase->execute();
 
         $ids = $this->createQueryBuilder('')
@@ -119,7 +119,7 @@ class RestaurantConfigRepository extends EntityRepository
     {
         $em = $this->getEntityManager();
         $cid = $config->getId();
-        $Invoice = $em->createQuery("DELETE RestaurantBundle:Invoice e WHERE  e.process = 'Created' and e.restaurantConfig = ".$cid);
+        $Invoice = $em->createQuery("DELETE App\\Restaurant\\Entity\\Invoice e WHERE  e.process = 'Created' and e.restaurantConfig = ".$cid);
         $Invoice->execute();
 
     }

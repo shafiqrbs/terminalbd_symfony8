@@ -162,7 +162,7 @@ class DefaultController extends AbstractController
     {
         $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig()->getId();
-        $StockItem = $em->createQuery('DELETE ProductProductBundle:Category e WHERE e.inventoryConfig = '.$config);
+        $StockItem = $em->createQuery('DELETE App\Product\Entity\Category e WHERE e.inventoryConfig = '.$config);
         $StockItem->execute();
         return $this->redirect($this->generateUrl('item'));
     }
@@ -182,7 +182,7 @@ class DefaultController extends AbstractController
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig()->getId();
         $em = $this->em;
-        $StockItem = $em->createQuery('DELETE InventoryBundle:Product e WHERE e.inventoryConfig = '.$config);
+        $StockItem = $em->createQuery('DELETE App\Inventory\Entity\Product e WHERE e.inventoryConfig = '.$config);
         $StockItem->execute();
         return $this->redirect($this->generateUrl('item'));
     }
@@ -190,7 +190,7 @@ class DefaultController extends AbstractController
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig()->getId();
         $em = $this->em;
-        $StockItem = $em->createQuery('DELETE InventoryBundle:Item e WHERE e.inventoryConfig = '.$config);
+        $StockItem = $em->createQuery('DELETE App\Inventory\Entity\Item e WHERE e.inventoryConfig = '.$config);
         $StockItem->execute();
         return $this->redirect($this->generateUrl('item'));
 

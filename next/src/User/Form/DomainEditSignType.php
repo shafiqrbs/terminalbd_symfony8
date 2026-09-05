@@ -39,8 +39,8 @@ class DomainEditSignType extends AbstractType
         $builder
             ->add('email', TextType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter your valid email address'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please enter your email address')),
-                        new Length(array('max'=>200))
+                        new NotBlank(message: 'Please enter your email address'),
+                        new Length(max: 200)
                     ))
             );
             $builder->add('profile', MyProfileType::class, ['globalOption' => $this->globalOption, 'location' => $this->location, 'designation' => $this->designation]);

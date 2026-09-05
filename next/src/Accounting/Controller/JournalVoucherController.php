@@ -452,8 +452,8 @@ class JournalVoucherController extends AbstractController
 
         foreach ( $pagination as $entity ){
             if (!empty($entity) and $entity->getProcess() == 'approved') {
-                $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
-                $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
+                $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
+                $em->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.accountJournal ={$entity->getId()}")->execute();
                 $this->em->getRepository(\App\Accounting\Entity\Transaction::class)->resetDoubleEntryTransaction($entity);
             } else {
                 return new Response('failed');
@@ -476,7 +476,7 @@ class JournalVoucherController extends AbstractController
         }
         $template = ($entity->getGlobalOption()->getAccountingConfig()->isCustomPrint() == 1) ? $entity->getGlobalOption()->getSubDomain():'print';
         $amountInWord = $this->toolManager->intToWords($entity->getAmount());
-        return $this->render("AccountingBundle:JournalVoucher/print:{$template}.html.twig", [
+        return $this->render("Accounting/JournalVoucher/print/{$template}.html.twig", [
             'entity'           => $entity,
             'config'           => $entity->getGlobalOption()->getAccountingConfig(),
             'amountInWord'     => $amountInWord,

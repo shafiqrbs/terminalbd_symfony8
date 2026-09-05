@@ -108,7 +108,7 @@ class ExpenditureType extends AbstractType
                 'placeholder' => '---Choose a user---',
                 'choice_label' => 'userFullName',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'constraints' =>array(new NotBlank(array('message'=>'Please select to user name'))),
+                'constraints' =>array(new NotBlank(message: 'Please select to user name')),
                 'query_builder' => function(EntityRepository $er){
 	                return $er->createQueryBuilder('u')
 	                          ->where("u.isDelete != 1")

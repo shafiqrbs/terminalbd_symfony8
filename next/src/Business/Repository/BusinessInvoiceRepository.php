@@ -746,7 +746,7 @@ class BusinessInvoiceRepository extends EntityRepository
     public function deleteAssociationInvoice(Customer $customer)
     {
         $em = $this->getEntityManager();
-        $sales = $em->createQuery('DELETE BusinessBundle:BusinessInvoice e WHERE e.customer = '.$customer->getId());
+        $sales = $em->createQuery('DELETE App\Business\Entity\BusinessInvoice e WHERE e.customer = '.$customer->getId());
         if($sales){
             $sales->execute();
         }

@@ -210,12 +210,12 @@ class GlobalOptionController extends AbstractController
             $this->em->getRepository(\App\Accounting\Entity\AccountingConfig::class)->accountingDeleteReset($option);
         }
 
-        $account = $em->createQuery("DELETE UserBundle:User e WHERE e.globalOption = {$option->getId()} and e.domainOwner !=1 and e.username != {$option->getMobile()}");
+        $account = $em->createQuery("DELETE App\\User\\Entity\\User e WHERE e.globalOption = {$option->getId()} and e.domainOwner !=1 and e.username != {$option->getMobile()}");
         if($account){
             $account->execute();
         }
 
-        $deletecustomer = $em->createQuery("DELETE DomainUserBundle:Customer a WHERE a.globalOption = {$option->getId()} and a.name != 'Default' and a.mobile != {$option->getMobile()}");
+        $deletecustomer = $em->createQuery("DELETE App\\DomainUser\\Entity\\Customer a WHERE a.globalOption = {$option->getId()} and a.name != 'Default' and a.mobile != {$option->getMobile()}");
         if($deletecustomer){
             $deletecustomer->execute();
         }

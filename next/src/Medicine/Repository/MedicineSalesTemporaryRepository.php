@@ -294,7 +294,7 @@ class MedicineSalesTemporaryRepository extends EntityRepository
     {
         $em = $this->getEntityManager();
         $config = $user->getGlobalOption()->getMedicineConfig()->getId();
-        $DoctorInvoice = $em->createQuery('DELETE MedicineBundle:MedicineSalesTemporary e WHERE e.medicineConfig = '.$config.' and e.user = '.$user->getId());
+        $DoctorInvoice = $em->createQuery('DELETE App\Medicine\Entity\MedicineSalesTemporary e WHERE e.medicineConfig = '.$config.' and e.user = '.$user->getId());
         $DoctorInvoice->execute();
     }
 

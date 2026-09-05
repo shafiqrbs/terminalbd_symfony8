@@ -400,7 +400,7 @@ class ParticularRepository extends EntityRepository
     {
 
         $em = $this->getEntityManager();
-        $stock = $em->createQuery("DELETE HospitalBundle:Particular e WHERE e.hospitalConfig={$to}");
+        $stock = $em->createQuery("DELETE App\\Hospital\\Entity\\Particular e WHERE e.hospitalConfig={$to}");
         if ($stock) {
             $stock->execute();
         }

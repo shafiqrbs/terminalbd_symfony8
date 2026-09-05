@@ -52,7 +52,7 @@ class AccountJournalType extends AbstractType
                 'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                /* 'constraints' =>array(
-                    new NotBlank(array('message'=>'Please input required'))
+                    new NotBlank(message: 'Please input required')
                 ),*/
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")

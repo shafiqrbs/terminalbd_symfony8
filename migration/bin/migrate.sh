@@ -66,6 +66,8 @@ $PHP migration/bin/port-forms.php
 $PHP migration/bin/port-form-options.php
 $PHP migration/bin/port-form-instances.php
 $PHP migration/bin/port-form-types.php
+# Symfony 7 removed the array-of-options constructor for validator constraints.
+$PHP migration/bin/port-constraint-options.php
 
 echo
 echo "############ 12. Symfony 2 controller idioms ############"

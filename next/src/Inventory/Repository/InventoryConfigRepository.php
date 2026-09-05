@@ -20,51 +20,51 @@ class InventoryConfigRepository extends EntityRepository
         $em = $this->getEntityManager();
         $config = $option->getInventoryConfig()->getId();
 
-        $StockItem = $em->createQuery('DELETE InventoryBundle:StockItem e WHERE e.inventoryConfig = '.$config);
+        $StockItem = $em->createQuery('DELETE App\Inventory\Entity\StockItem e WHERE e.inventoryConfig = '.$config);
         $StockItem->execute();
 
-        $Damage = $em->createQuery('DELETE InventoryBundle:Damage e WHERE e.inventoryConfig = '.$config);
+        $Damage = $em->createQuery('DELETE App\Inventory\Entity\Damage e WHERE e.inventoryConfig = '.$config);
         $Damage->execute();
 
-        $ExcelImporter = $em->createQuery('DELETE InventoryBundle:ExcelImporter e WHERE e.inventoryConfig = '.$config);
+        $ExcelImporter = $em->createQuery('DELETE App\Inventory\Entity\ExcelImporter e WHERE e.inventoryConfig = '.$config);
         $ExcelImporter->execute();
 
-        $SalesReturn = $em->createQuery('DELETE InventoryBundle:SalesReturn e WHERE e.inventoryConfig = '.$config);
+        $SalesReturn = $em->createQuery('DELETE App\Inventory\Entity\SalesReturn e WHERE e.inventoryConfig = '.$config);
         $SalesReturn->execute();
 
-        $Delivery = $em->createQuery('DELETE InventoryBundle:Delivery e WHERE e.inventoryConfig = '.$config);
+        $Delivery = $em->createQuery('DELETE App\Inventory\Entity\Delivery e WHERE e.inventoryConfig = '.$config);
         $Delivery->execute();
 
-        $Sales = $em->createQuery('DELETE InventoryBundle:Sales e WHERE e.inventoryConfig = '.$config);
+        $Sales = $em->createQuery('DELETE App\Inventory\Entity\Sales e WHERE e.inventoryConfig = '.$config);
         $Sales->execute();
 
-        $android = $em->createQuery('DELETE InventoryBundle:InventoryAndroidProcess e WHERE e.inventoryConfig = '.$config);
+        $android = $em->createQuery('DELETE App\Inventory\Entity\InventoryAndroidProcess e WHERE e.inventoryConfig = '.$config);
         $android->execute();
 
-        $SalesImport = $em->createQuery('DELETE InventoryBundle:SalesImport e WHERE e.inventoryConfig = '.$config);
+        $SalesImport = $em->createQuery('DELETE App\Inventory\Entity\SalesImport e WHERE e.inventoryConfig = '.$config);
         $SalesImport->execute();
 
-        $PurchaseReturn = $em->createQuery('DELETE InventoryBundle:PurchaseReturn e WHERE e.inventoryConfig = '.$config);
+        $PurchaseReturn = $em->createQuery('DELETE App\Inventory\Entity\PurchaseReturn e WHERE e.inventoryConfig = '.$config);
         $PurchaseReturn->execute();
 
-        $PurchaseVendorItem = $em->createQuery('DELETE InventoryBundle:PurchaseVendorItem e WHERE e.inventoryConfig = '.$config);
+        $PurchaseVendorItem = $em->createQuery('DELETE App\Inventory\Entity\PurchaseVendorItem e WHERE e.inventoryConfig = '.$config);
         $PurchaseVendorItem->execute();
 
-        $Purchase = $em->createQuery('DELETE InventoryBundle:Purchase e WHERE e.inventoryConfig = '.$config);
+        $Purchase = $em->createQuery('DELETE App\Inventory\Entity\Purchase e WHERE e.inventoryConfig = '.$config);
         $Purchase->execute();
 
 
-        $stockAdjustment = $em->createQuery('DELETE InventoryBundle:ItemStockAdjustment e WHERE e.config = '.$config);
+        $stockAdjustment = $em->createQuery('DELETE App\Inventory\Entity\ItemStockAdjustment e WHERE e.config = '.$config);
         $stockAdjustment->execute();
 
 
-        $Item = $em->createQuery('DELETE InventoryBundle:Item e WHERE e.inventoryConfig = '.$config);
+        $Item = $em->createQuery('DELETE App\Inventory\Entity\Item e WHERE e.inventoryConfig = '.$config);
        // $Item->execute();
 
-        $Purchase = $em->createQuery('DELETE InventoryBundle:Product e WHERE e.inventoryConfig = '.$config);
+        $Purchase = $em->createQuery('DELETE App\Inventory\Entity\Product e WHERE e.inventoryConfig = '.$config);
        // $Purchase->execute();
 
-        $ItemBrand = $em->createQuery('DELETE InventoryBundle:ItemBrand e WHERE e.inventoryConfig = '.$config);
+        $ItemBrand = $em->createQuery('DELETE App\Inventory\Entity\ItemBrand e WHERE e.inventoryConfig = '.$config);
       //  $ItemBrand->execute();
 
         $qb = $this->getEntityManager()->createQueryBuilder();
@@ -109,51 +109,51 @@ class InventoryConfigRepository extends EntityRepository
         $em = $this->getEntityManager();
         $config = $option->getInventoryConfig()->getId();
 
-        $StockItem = $em->createQuery('DELETE InventoryBundle:StockItem e WHERE e.inventoryConfig = '.$config);
+        $StockItem = $em->createQuery('DELETE App\Inventory\Entity\StockItem e WHERE e.inventoryConfig = '.$config);
         $StockItem->execute();
 
-        $Damage = $em->createQuery('DELETE InventoryBundle:Damage e WHERE e.inventoryConfig = '.$config);
+        $Damage = $em->createQuery('DELETE App\Inventory\Entity\Damage e WHERE e.inventoryConfig = '.$config);
         $Damage->execute();
 
-        $ExcelImporter = $em->createQuery('DELETE InventoryBundle:ExcelImporter e WHERE e.inventoryConfig = '.$config);
+        $ExcelImporter = $em->createQuery('DELETE App\Inventory\Entity\ExcelImporter e WHERE e.inventoryConfig = '.$config);
         $ExcelImporter->execute();
 
-        $SalesReturn = $em->createQuery('DELETE InventoryBundle:SalesReturn e WHERE e.inventoryConfig = '.$config);
+        $SalesReturn = $em->createQuery('DELETE App\Inventory\Entity\SalesReturn e WHERE e.inventoryConfig = '.$config);
         $SalesReturn->execute();
 
-        $Delivery = $em->createQuery('DELETE InventoryBundle:Delivery e WHERE e.inventoryConfig = '.$config);
+        $Delivery = $em->createQuery('DELETE App\Inventory\Entity\Delivery e WHERE e.inventoryConfig = '.$config);
         $Delivery->execute();
 
-        $Sales = $em->createQuery('DELETE InventoryBundle:Sales e WHERE e.inventoryConfig = '.$config);
+        $Sales = $em->createQuery('DELETE App\Inventory\Entity\Sales e WHERE e.inventoryConfig = '.$config);
         $Sales->execute();
 
-        $android = $em->createQuery('DELETE InventoryBundle:InventoryAndroidProcess e WHERE e.inventoryConfig = '.$config);
+        $android = $em->createQuery('DELETE App\Inventory\Entity\InventoryAndroidProcess e WHERE e.inventoryConfig = '.$config);
         $android->execute();
 
-        $SalesImport = $em->createQuery('DELETE InventoryBundle:SalesImport e WHERE e.inventoryConfig = '.$config);
+        $SalesImport = $em->createQuery('DELETE App\Inventory\Entity\SalesImport e WHERE e.inventoryConfig = '.$config);
         $SalesImport->execute();
 
-        $PurchaseReturn = $em->createQuery('DELETE InventoryBundle:PurchaseReturn e WHERE e.inventoryConfig = '.$config);
+        $PurchaseReturn = $em->createQuery('DELETE App\Inventory\Entity\PurchaseReturn e WHERE e.inventoryConfig = '.$config);
         $PurchaseReturn->execute();
 
-        $PurchaseVendorItem = $em->createQuery('DELETE InventoryBundle:PurchaseVendorItem e WHERE e.inventoryConfig = '.$config);
+        $PurchaseVendorItem = $em->createQuery('DELETE App\Inventory\Entity\PurchaseVendorItem e WHERE e.inventoryConfig = '.$config);
         $PurchaseVendorItem->execute();
 
-        $Purchase = $em->createQuery('DELETE InventoryBundle:Purchase e WHERE e.inventoryConfig = '.$config);
+        $Purchase = $em->createQuery('DELETE App\Inventory\Entity\Purchase e WHERE e.inventoryConfig = '.$config);
         $Purchase->execute();
 
 
-        $stockAdjustment = $em->createQuery('DELETE InventoryBundle:ItemStockAdjustment e WHERE e.config = '.$config);
+        $stockAdjustment = $em->createQuery('DELETE App\Inventory\Entity\ItemStockAdjustment e WHERE e.config = '.$config);
         $stockAdjustment->execute();
 
 
-        $Item = $em->createQuery('DELETE InventoryBundle:Item e WHERE e.inventoryConfig = '.$config);
+        $Item = $em->createQuery('DELETE App\Inventory\Entity\Item e WHERE e.inventoryConfig = '.$config);
         $Item->execute();
 
-        $Purchase = $em->createQuery('DELETE InventoryBundle:Product e WHERE e.inventoryConfig = '.$config);
+        $Purchase = $em->createQuery('DELETE App\Inventory\Entity\Product e WHERE e.inventoryConfig = '.$config);
         $Purchase->execute();
 
-        $ItemBrand = $em->createQuery('DELETE InventoryBundle:ItemBrand e WHERE e.inventoryConfig = '.$config);
+        $ItemBrand = $em->createQuery('DELETE App\Inventory\Entity\ItemBrand e WHERE e.inventoryConfig = '.$config);
         $ItemBrand->execute();
 
     }

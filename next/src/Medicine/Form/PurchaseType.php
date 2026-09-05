@@ -43,7 +43,7 @@ class PurchaseType extends AbstractType
                 'placeholder' => '---Choose a vendor/supplier ---',
                 'choice_label' => 'companyName',
                 'attr'=>array('class'=>'m-wrap span12 medicineVendor select2 inputs'),
-                'constraints' =>array( new NotBlank(array('message'=>'Please select your vendor name')) ),
+                'constraints' =>array( new NotBlank(message: 'Please select your vendor name') ),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
                         ->where("e.status = 1")

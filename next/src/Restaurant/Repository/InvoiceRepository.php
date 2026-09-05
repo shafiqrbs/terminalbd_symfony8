@@ -392,7 +392,7 @@ class InvoiceRepository extends EntityRepository
     public function salesTransactionReverse(Invoice $entity){
 
         $em = $this->getEntityManager();
-        $accountCash = $em->createQuery("DELETE AccountingBundle:AccountSales e WHERE e.restaurantInvoice = {$entity->getId()}");
+        $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountSales e WHERE e.restaurantInvoice = {$entity->getId()}");
         if(!empty($accountCash)){
             $accountCash->execute();
         }

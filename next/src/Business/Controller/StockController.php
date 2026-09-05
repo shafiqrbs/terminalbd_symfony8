@@ -479,7 +479,7 @@ class StockController extends AbstractController
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig()->getId();
         $em = $this->em;
-        $account = $em->createQuery('DELETE BusinessBundle:BusinessParticular e WHERE e.businessConfig = '.$config);
+        $account = $em->createQuery('DELETE App\Business\Entity\BusinessParticular e WHERE e.businessConfig = '.$config);
         if(!empty($account)){
             $account->execute();
         }

@@ -1095,7 +1095,7 @@ class AccountSalesRepository extends EntityRepository
 	public function accountSalesReverse(Sales $entity)
 	{
 		$em = $this->getEntityManager();
-		$accountCash = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.sales = '.$entity->getId());
+		$accountCash = $em->createQuery('DELETE App\Accounting\Entity\AccountSales e WHERE e.sales = '.$entity->getId());
 		if(!empty($accountCash)){
 			$accountCash->execute();
 		}
@@ -1374,7 +1374,7 @@ class AccountSalesRepository extends EntityRepository
     {
         $em = $this->getEntityManager();
         $option = $entity->getMedicineConfig()->getGlobalOption()->getId();
-        $accountCash = $em->createQuery("DELETE AccountingBundle:AccountSales e WHERE e.globalOption = '{$option}' AND e.sourceInvoice = '{$entity->getId()}' AND e.processHead = 'sales-return' ");
+        $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountSales e WHERE e.globalOption = '{$option}' AND e.sourceInvoice = '{$entity->getId()}' AND e.processHead = 'sales-return' ");
         if(!empty($accountCash)){
             $accountCash->execute();
         }
@@ -1383,7 +1383,7 @@ class AccountSalesRepository extends EntityRepository
 	public function accountMedicineSalesReverse(MedicineSales $entity)
 	{
 		$em = $this->getEntityManager();
-		$accountCash = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.medicineSales = '.$entity->getId());
+		$accountCash = $em->createQuery('DELETE App\Accounting\Entity\AccountSales e WHERE e.medicineSales = '.$entity->getId());
 		if(!empty($accountCash)){
 			$accountCash->execute();
 		}
@@ -1557,7 +1557,7 @@ class AccountSalesRepository extends EntityRepository
 	public function accountBusinessSalesReverse(BusinessInvoice $entity)
 	{
 		$em = $this->getEntityManager();
-		$accountCash = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.businessInvoice = '.$entity->getId());
+		$accountCash = $em->createQuery('DELETE App\Accounting\Entity\AccountSales e WHERE e.businessInvoice = '.$entity->getId());
 		if(!empty($accountCash)){
 			$accountCash->execute();
 		}
@@ -1568,7 +1568,7 @@ class AccountSalesRepository extends EntityRepository
 	public function accountReverse(AccountSales $entity)
 	{
 		$em = $this->getEntityManager();
-		$accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.accountSales = {$entity->getId()}");
+		$accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.accountSales = {$entity->getId()}");
 		$accountCash->execute();
 	}
 

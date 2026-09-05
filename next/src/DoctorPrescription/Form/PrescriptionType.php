@@ -60,7 +60,7 @@ class PrescriptionType extends AbstractType
                 'placeholder' => '---Select diseases profile---',
                 'attr'=>array('class'=>'span12 m-wrap invoiceProcess select2'),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Select diseases profile')),
+                    new NotBlank(message: 'Select diseases profile'),
                 ),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')

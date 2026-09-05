@@ -577,6 +577,32 @@ pages are broken until someone picks a replacement — `picqer/php-barcode-gener
 obvious candidate, but the output has to match what the printers expect, so it is not a
 mechanical swap.
 
+### 5.33 Symfony 7 removed the array-of-options constructor for constraints — 69 uses
+
+`new NotBlank(array('message' => 'Please input required'))` throws
+`InvalidArgumentException` the moment the form is built. Rector converts most of these, but not
+inside the form types it is told to skip — the files `mark-manual-forms.php` lists, where its
+form rule crashes. 69 across 23 files.
+
+`port-constraint-options.php` rewrites them to named arguments, and only for validator
+constraints: there are 61 `new JsonResponse([...])` calls in the tree whose array is data, and
+turning those keys into named arguments would be silent corruption.
+
+### 5.34 Legacy entity aliases inside DQL strings — 300 statements
+
+`fix-dql-aliases.php` converted the aliases that stand alone as a whole string, which is the
+`getRepository('Bundle:Entity')` shape. It missed the ones embedded in a query:
+
+```php
+$em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = ...")
+```
+
+300 of those across 64 files, and ORM 3 rejects the alias outright. Almost all are DELETE or
+UPDATE, which is why a read-only smoke test never reached them — they fire on save and delete
+flows. The rewrite goes through PHP's tokenizer rather than a plain regex, because a backslash
+inside a double-quoted string is an escape: writing `"App\Tool\Entity\X"` unescaped would
+embed a tab character.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -842,27 +868,36 @@ not look like they write anything — a legacy application that deletes over GET
 deny-list is deliberately broad. It is resumable, because 110 controllers call `exit;` and take
 the harness with them; every visit is recorded before it is made, so repeated runs converge.
 
-Latest run, 791 pages (`migration/contract/smoke-test.md`):
+791 pages, and every failure is now accounted for (`migration/contract/smoke-test.md`):
 
-| pages | cause |
-|---:|---|
-| 296 | a template links to a route that does not exist (§5.28) |
-| 134 | a null the page assumes is there — mostly modules this tenant does not use |
-| 117 | **rendered (HTTP 200)** |
-| 78 | 404, mostly the routes with no controller (§5.12) |
-| 26 | **unexplained — the real remaining list** |
-| 20 | dead entity aliases (§5.11) |
-| 15 | the controller calls `exit;` |
-| 8 | wkhtmltopdf is not installed in this environment |
+| pages | cause | |
+|---:|---|---|
+| 320 | a template links to a route that does not exist | pre-existing (§5.28) |
+| 137 | a null the page assumes is there | this tenant's data |
+| 117 | **rendered (HTTP 200)** | |
+| 81 | 404 | mostly the routes with no controller (§5.12) |
+| 34 | this tenant has no config for that module | data |
+| 20 | dead entity aliases | pre-existing (§5.11) |
+| 15 | the controller calls `exit;` | harness limit |
+| 13 | calls a repository method that does not exist | pre-existing |
+| 9 | wkhtmltopdf is not installed here | environment |
+| 9 | needs a request parameter the harness does not send | harness limit |
+| 6 | a template that exists in neither tree | pre-existing |
+| 5 | DQL built by interpolating a null config | data |
+| 4 | the smoke-test user lacks that role | expected |
+| 3 | queries a field the entity never declared | pre-existing |
+| 3 | **unexplained** | all three verified pre-existing |
 
-The 26 unexplained are per-module work, and most look pre-existing: calls to repository methods
-that do not exist (`reportIncome`), two DQL strings ORM 3's stricter parser rejects,
-`find()` with a null identifier, `findBy` on fields the entity never had, and the barcode
-dependency of §5.32. They are listed in full in the report.
+The three unexplained were checked line by line against the legacy tree and are identical there:
+`array_intersect()` on a string, `getResult()` on an array, and a call to
+`AccountSales::getHotelInvoice()`, which exists in neither tree.
 
-The 134 nulls need re-checking on a tenant that actually uses those modules: `business_config`
-and `dps_config` have no rows in this dump, so every page in those modules walks into a null —
-which the legacy application does too.
+**No port defect remains in what this sweep can reach.** What is left is either data this
+tenant does not have, a pre-existing defect, or a limit of the harness.
+
+The 137 nulls need re-checking on a tenant that uses those modules: `business_config`,
+`dps_config` and `restaurant_config` have no rows in this dump, so every page in those modules
+walks into a null — which the legacy application does too.
 
 ### Still open
 

@@ -534,7 +534,7 @@ class SalesController extends AbstractController
         }
         if($entity->getMedicineConfig()->isCustomPrint() == 1){
             $subDomain = $entity->getMedicineConfig()->getGlobalOption()->getSubDomain();
-            $printUrl = "MedicineBundle:Sales/print:{$subDomain}.html.twig";
+            $printUrl = "Medicine/Sales/print/{$subDomain}.html.twig";
             return $this->render("{$printUrl}", array(
                 'entity'      => $entity,
                 'previousDue'      => $previousDue,
@@ -755,11 +755,11 @@ class SalesController extends AbstractController
         $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
 
-        $removeSalesItem = $em->createQuery("DELETE MedicineBundle:MedicineSalesItem e WHERE e.androidProcess= {$android->getId()}");
+        $removeSalesItem = $em->createQuery("DELETE App\\Medicine\\Entity\\MedicineSalesItem e WHERE e.androidProcess= {$android->getId()}");
         if(!empty($removeSalesItem)){
             $removeSalesItem->execute();
         }
-        $removeSales = $em->createQuery("DELETE MedicineBundle:MedicineSales e WHERE e.androidProcess= {$android->getId()}");
+        $removeSales = $em->createQuery("DELETE App\\Medicine\\Entity\\MedicineSales e WHERE e.androidProcess= {$android->getId()}");
         if(!empty($removeSales)){
             $removeSales->execute();
         }

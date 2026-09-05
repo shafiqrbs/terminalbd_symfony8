@@ -92,7 +92,7 @@ class HmsInvoiceTemporaryParticularRepository extends EntityRepository
     {
         $em = $this->getEntityManager();
         $config = $user->getGlobalOption()->getHospitalConfig()->getId();
-        $DoctorInvoice = $em->createQuery('DELETE HospitalBundle:HmsInvoiceTemporaryParticular e WHERE e.hospitalConfig = '.$config.' and e.user = '.$user->getId());
+        $DoctorInvoice = $em->createQuery('DELETE App\Hospital\Entity\HmsInvoiceTemporaryParticular e WHERE e.hospitalConfig = '.$config.' and e.user = '.$user->getId());
         $DoctorInvoice->execute();
     }
 

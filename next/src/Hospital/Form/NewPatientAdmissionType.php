@@ -60,7 +60,7 @@ class NewPatientAdmissionType extends AbstractType
                 'attr'=>array('class'=>'span12 select2 invoiceCabinBooking m-wrap'),
                 'placeholder' => '---Select cabin/ward no---',
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Please select cabin/ward no'))
+                    new NotBlank(message: 'Please select cabin/ward no')
                 ),
                 'query_builder' => function(EntityRepository $er){
                     $qb = $er->createQueryBuilder('b');
@@ -81,7 +81,7 @@ class NewPatientAdmissionType extends AbstractType
                 'placeholder' => '---Choose a diseases profile---',
                 'attr'=>array('class'=>'span12 m-wrap select2'),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Select diseases profile')),
+                    new NotBlank(message: 'Select diseases profile'),
                 ),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
@@ -120,7 +120,7 @@ class NewPatientAdmissionType extends AbstractType
                 'class' => 'App\Hospital\Entity\Particular',
                 'choice_label' => 'doctor',
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Select Consultant/Doctor')),
+                    new NotBlank(message: 'Select Consultant/Doctor'),
                 ),
                 'attr'=>array('class'=>'span12 select2 m-wrap'),
                 'placeholder' => '--- Choose assign doctor ---',

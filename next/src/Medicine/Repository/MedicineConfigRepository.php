@@ -21,28 +21,28 @@ class MedicineConfigRepository extends EntityRepository
         $em = $this->getEntityManager();
         $config = $option->getMedicineConfig()->getId();
 
-        $sales = $em->createQuery('DELETE MedicineBundle:MedicineSales e WHERE e.medicineConfig = '.$config);
+        $sales = $em->createQuery('DELETE App\Medicine\Entity\MedicineSales e WHERE e.medicineConfig = '.$config);
         $sales->execute();
 
-        $purchase = $em->createQuery('DELETE MedicineBundle:MedicinePrepurchase e WHERE e.medicineConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Medicine\Entity\MedicinePrepurchase e WHERE e.medicineConfig = '.$config);
         $purchase->execute();
 
-        $purchase = $em->createQuery('DELETE MedicineBundle:MedicinePurchase e WHERE e.medicineConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Medicine\Entity\MedicinePurchase e WHERE e.medicineConfig = '.$config);
         $purchase->execute();
 
-        $house = $em->createQuery('DELETE MedicineBundle:MedicineStockHouse e WHERE e.medicineConfig = '.$config);
+        $house = $em->createQuery('DELETE App\Medicine\Entity\MedicineStockHouse e WHERE e.medicineConfig = '.$config);
         $house->execute();
 
-        $damage = $em->createQuery('DELETE MedicineBundle:MedicineDamage e WHERE e.medicineConfig = '.$config);
+        $damage = $em->createQuery('DELETE App\Medicine\Entity\MedicineDamage e WHERE e.medicineConfig = '.$config);
         $damage->execute();
 
-        $adjustment = $em->createQuery('DELETE MedicineBundle:MedicineStockAdjustment e WHERE e.medicineConfig = '.$config);
+        $adjustment = $em->createQuery('DELETE App\Medicine\Entity\MedicineStockAdjustment e WHERE e.medicineConfig = '.$config);
         $adjustment->execute();
 
-        $temporary = $em->createQuery('DELETE MedicineBundle:MedicineSalesTemporary e WHERE e.medicineConfig = '.$config);
+        $temporary = $em->createQuery('DELETE App\Medicine\Entity\MedicineSalesTemporary e WHERE e.medicineConfig = '.$config);
         $temporary->execute();
 
-        $android = $em->createQuery('DELETE MedicineBundle:MedicineAndroidProcess e WHERE e.medicineConfig = '.$config);
+        $android = $em->createQuery('DELETE App\Medicine\Entity\MedicineAndroidProcess e WHERE e.medicineConfig = '.$config);
         $android->execute();
 
         $qb = $this->getEntityManager()->createQueryBuilder();
@@ -81,46 +81,46 @@ class MedicineConfigRepository extends EntityRepository
         $em = $this->getEntityManager();
         $config = $option->getMedicineConfig()->getId();
 
-        $sales = $em->createQuery('DELETE MedicineBundle:MedicineSales e WHERE e.medicineConfig = '.$config);
+        $sales = $em->createQuery('DELETE App\Medicine\Entity\MedicineSales e WHERE e.medicineConfig = '.$config);
         $sales->execute();
 
-        $sales = $em->createQuery('DELETE MedicineBundle:MedicineSalesReturn e WHERE e.medicineConfig = '.$config);
+        $sales = $em->createQuery('DELETE App\Medicine\Entity\MedicineSalesReturn e WHERE e.medicineConfig = '.$config);
         $sales->execute();
 
-        $sales1 = $em->createQuery('DELETE MedicineBundle:MedicineImport e WHERE e.medicineConfig = '.$config);
+        $sales1 = $em->createQuery('DELETE App\Medicine\Entity\MedicineImport e WHERE e.medicineConfig = '.$config);
         $sales1->execute();
 
-        $sales = $em->createQuery('DELETE MedicineBundle:MedicineSalesReturnInvoice e WHERE e.medicineConfig = '.$config);
+        $sales = $em->createQuery('DELETE App\Medicine\Entity\MedicineSalesReturnInvoice e WHERE e.medicineConfig = '.$config);
         $sales->execute();
 
-        $purchase = $em->createQuery('DELETE MedicineBundle:MedicinePrepurchase e WHERE e.medicineConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Medicine\Entity\MedicinePrepurchase e WHERE e.medicineConfig = '.$config);
         $purchase->execute();
 
-        $purchase = $em->createQuery('DELETE MedicineBundle:MedicinePurchaseReturn e WHERE e.medicineConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Medicine\Entity\MedicinePurchaseReturn e WHERE e.medicineConfig = '.$config);
         $purchase->execute();
 
-        $purchase = $em->createQuery('DELETE MedicineBundle:MedicinePurchase e WHERE e.medicineConfig = '.$config);
+        $purchase = $em->createQuery('DELETE App\Medicine\Entity\MedicinePurchase e WHERE e.medicineConfig = '.$config);
         $purchase->execute();
 
-        $house = $em->createQuery('DELETE MedicineBundle:MedicineStockHouse e WHERE e.medicineConfig = '.$config);
+        $house = $em->createQuery('DELETE App\Medicine\Entity\MedicineStockHouse e WHERE e.medicineConfig = '.$config);
         $house->execute();
 
-        $house = $em->createQuery('DELETE MedicineBundle:MedicineStockHouse e WHERE e.medicineConfig = '.$config);
+        $house = $em->createQuery('DELETE App\Medicine\Entity\MedicineStockHouse e WHERE e.medicineConfig = '.$config);
         $house->execute();
 
-        $damage = $em->createQuery('DELETE MedicineBundle:MedicineDamage e WHERE e.medicineConfig = '.$config);
+        $damage = $em->createQuery('DELETE App\Medicine\Entity\MedicineDamage e WHERE e.medicineConfig = '.$config);
         $damage->execute();
 
-        $adjustment = $em->createQuery('DELETE MedicineBundle:MedicineStockAdjustment e WHERE e.medicineConfig = '.$config);
+        $adjustment = $em->createQuery('DELETE App\Medicine\Entity\MedicineStockAdjustment e WHERE e.medicineConfig = '.$config);
         $adjustment->execute();
 
-        $android = $em->createQuery('DELETE MedicineBundle:MedicineAndroidProcess e WHERE e.medicineConfig = '.$config);
+        $android = $em->createQuery('DELETE App\Medicine\Entity\MedicineAndroidProcess e WHERE e.medicineConfig = '.$config);
         $android->execute();
 
-        $MedicineStock = $em->createQuery('DELETE MedicineBundle:MedicineStock e WHERE e.medicineConfig = '.$config);
+        $MedicineStock = $em->createQuery('DELETE App\Medicine\Entity\MedicineStock e WHERE e.medicineConfig = '.$config);
         $MedicineStock->execute();
 
-        $MedicineVendor = $em->createQuery('DELETE MedicineBundle:MedicineVendor e WHERE e.medicineConfig = '.$config);
+        $MedicineVendor = $em->createQuery('DELETE App\Medicine\Entity\MedicineVendor e WHERE e.medicineConfig = '.$config);
         $MedicineVendor->execute();
 
     }

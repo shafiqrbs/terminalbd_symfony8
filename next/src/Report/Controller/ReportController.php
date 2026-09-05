@@ -100,7 +100,7 @@ class ReportController extends AbstractController
         $data =$_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $ajaxPath = $this->generateUrl('accounting_report_monthly_statement_ajax');
-        return $this->render('ReportBundle:Accounting/Financial:monthly-statement.html.twig', [
+        return $this->render('Report/Accounting/Financial/monthly-statement.html.twig', [
             'option' => $globalOption,
             'ajaxPath' => $ajaxPath,
             'searchForm' => $data,
@@ -147,7 +147,7 @@ class ReportController extends AbstractController
             $journal = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->dailyProcessHead($user,'Journal',$data);
 
             $htmlProcess = $this->renderView(
-                'ReportBundle:Accounting/Financial:monthly-statement-ajax.html.twig', [
+                'Report/Accounting/Financial/monthly-statement-ajax.html.twig', [
                     'searchForm' => $data,
                     'globalOption'                  => $this->getUser()->getGlobalOption(),
                     'openingBalanceTrans'           => $openingBalance,
@@ -176,7 +176,7 @@ class ReportController extends AbstractController
         $data =$_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerOutstanding($globalOption,$data);
-        return $this->render('ReportBundle:Accounting/Sales:customerOutstanding.html.twig', [
+        return $this->render('Report/Accounting/Sales/customerOutstanding.html.twig', [
             'option' => $globalOption,
             'entities' => $entities,
             'searchForm' => $data,
@@ -195,7 +195,7 @@ class ReportController extends AbstractController
         $data =$_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerGroupOutstanding($globalOption,$data);
-        return $this->render('ReportBundle:Accounting/Sales:customerGroupOutstanding.html.twig', [
+        return $this->render('Report/Accounting/Sales/customerGroupOutstanding.html.twig', [
             'option' => $globalOption,
             'customerGroup' => $entities['customerGroup'],
             'entities' => $entities['outstanding'],
@@ -215,7 +215,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSummary($globalOption,$data);
-        return $this->render('ReportBundle:Accounting/Sales:customerSummary.html.twig', [
+        return $this->render('Report/Accounting/Sales/customerSummary.html.twig', [
             'entities' => $entities,
             'option' => $globalOption,
             'searchForm' => $data,
@@ -241,7 +241,7 @@ class ReportController extends AbstractController
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
-        return $this->render('ReportBundle:Accounting/Cash:cashFlow.html.twig', [
+        return $this->render('Report/Accounting/Cash/cashFlow.html.twig', [
             'entities' => $pagination,
             'overview' => $overview,
             'employees' => $employees,
@@ -268,7 +268,7 @@ class ReportController extends AbstractController
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
-        return $this->render('ReportBundle:Accounting/Cash:cashFlow.html.twig', [
+        return $this->render('Report/Accounting/Cash/cashFlow.html.twig', [
             'entities' => $pagination,
             'overview' => $overview,
             'employees' => $employees,
@@ -295,7 +295,7 @@ class ReportController extends AbstractController
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
-        return $this->render('ReportBundle:Accounting/Cash:cashFlow.html.twig', [
+        return $this->render('Report/Accounting/Cash/cashFlow.html.twig', [
             'entities' => $pagination,
             'overview' => $overview,
             'employees' => $employees,
@@ -318,7 +318,7 @@ class ReportController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
         $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
-        return $this->render('ReportBundle:Accounting/Financial:account-head.html.twig', [
+        return $this->render('Report/Accounting/Financial/account-head.html.twig', [
             'accountHead' => $accountHead,
             'heads' => $heads,
             'option' => $globalOption,
@@ -342,7 +342,7 @@ class ReportController extends AbstractController
         if(isset($data['startDate']) and $data['startDate'] and isset($data['endDate']) and $data['endDate'] ) {
             $entities = $em->getRepository(Transaction::class)->reportAccountHead($globalOption,$data);
             $htmlProcess = $this->renderView(
-                'ReportBundle:Accounting/Financial:account-head-ajax.html.twig', [
+                'Report/Accounting/Financial/account-head-ajax.html.twig', [
                     'entities' => $entities,
                 ]
             );
@@ -364,7 +364,7 @@ class ReportController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $accountHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['isParent' => 1],['name'=>'ASC']);
         $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
-        return $this->render('ReportBundle:Accounting/Financial:account-subhead.html.twig', [
+        return $this->render('Report/Accounting/Financial/account-subhead.html.twig', [
             'accountHead' => $accountHead,
             'heads' => $heads,
             'option' => $globalOption,
@@ -388,7 +388,7 @@ class ReportController extends AbstractController
         if(isset($data['startDate']) and $data['startDate'] and isset($data['endDate']) and $data['endDate'] ) {
             $entities = $em->getRepository(Transaction::class)->reportAccountHead($globalOption,$data);
             $htmlProcess = $this->renderView(
-                'ReportBundle:Accounting/Financial:account-head-ajax.html.twig', [
+                'Report/Accounting/Financial/account-head-ajax.html.twig', [
                     'entities' => $entities,
                 ]
             );
@@ -410,7 +410,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $ajaxPath = $this->generateUrl('accounting_report_daily_profit_ajax');
-        return $this->render('ReportBundle:Accounting/Financial:income.html.twig', [
+        return $this->render('Report/Accounting/Financial/income.html.twig', [
             'option' => $globalOption,
             'ajaxPath' => $ajaxPath,
             'searchForm' => $data,
@@ -430,7 +430,7 @@ class ReportController extends AbstractController
         if(isset($data['startDate']) and $data['startDate'] and isset($data['endDate']) and $data['endDate'] ) {
             $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportSalesIncome($this->getUser(),$data);
             $htmlProcess = $this->renderView(
-                'ReportBundle:Accounting/Financial:income-ajax.html.twig', [
+                'Report/Accounting/Financial/income-ajax.html.twig', [
                     'overview' => $overview,
                     'searchForm' => $data,
                 ]
@@ -459,7 +459,7 @@ class ReportController extends AbstractController
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
-        return $this->render('ReportBundle:Accounting/Cash:cashFlow.html.twig', [
+        return $this->render('Report/Accounting/Cash/cashFlow.html.twig', [
             'entities' => $pagination,
             'overview' => $overview,
             'employees' => $employees,
@@ -486,7 +486,7 @@ class ReportController extends AbstractController
         $overview = $this->em->getRepository(\App\Accounting\Entity\AccountCash::class)->cashOverview($user,$transactionMethods,$data);
         $globalOption = $this->getUser()->getGlobalOption();
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
-        return $this->render('ReportBundle:Accounting/Cash:cashFlow.html.twig', [
+        return $this->render('Report/Accounting/Cash/cashFlow.html.twig', [
             'entities' => $pagination,
             'overview' => $overview,
             'employees' => $employees,
@@ -517,7 +517,7 @@ class ReportController extends AbstractController
         $accountSubHeads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->findBy(['globalOption' => $option],['name'=>'ASC']);
         $heads = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class)->getAllChildrenAccount( $this->getUser()->getGlobalOption()->getId());
 
-        return $this->render('ReportBundle:Accounting/Sales:ledger.html.twig', [
+        return $this->render('Report/Accounting/Sales/ledger.html.twig', [
             'accountHead' => $accountHead,
             'accountSubHeads' => $accountSubHeads,
             'heads' => $heads,
@@ -550,7 +550,7 @@ class ReportController extends AbstractController
             $overview = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->salesOverview($this->getUser(),$data);
 
         }
-        return $this->render('ReportBundle:Accounting/Sales:ledger.html.twig', [
+        return $this->render('Report/Accounting/Sales/ledger.html.twig', [
                 'entities' => $entities,
                 'overview' => $overview,
                 'customer' => $customer,
@@ -574,7 +574,7 @@ class ReportController extends AbstractController
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->userSummary($globalOption,$data);
-        return $this->render('ReportBundle:Accounting/Sales:userSummary.html.twig', [
+        return $this->render('Report/Accounting/Sales/userSummary.html.twig', [
                 'entities' => $entities,
                 'option' => $globalOption,
                 'searchForm' => $data,
@@ -599,7 +599,7 @@ class ReportController extends AbstractController
             $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->reportCustomerDetails($globalOption,$data);
         }
         $employees = $em->getRepository(\App\User\Entity\User::class)->getEmployees($globalOption);
-        return $this->render('ReportBundle:Accounting/Sales:customerDetails.html.twig', [
+        return $this->render('Report/Accounting/Sales/customerDetails.html.twig', [
             'entities' => $entities,
             'employees' => $employees,
             'option' => $globalOption,
@@ -624,7 +624,7 @@ class ReportController extends AbstractController
         $customers = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getSalesCustomers($globalOption);
         $groups = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getProcessModes($globalOption);
         $users = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getCreatedUsers($globalOption);
-        return $this->render('ReportBundle:Accounting/Sales:sales.html.twig', [
+        return $this->render('Report/Accounting/Sales/sales.html.twig', [
             'entities' => $entities,
             'transactionMethods' => $transactionMethods,
             'groups' => $groups,
@@ -655,7 +655,7 @@ class ReportController extends AbstractController
                 $salesBy = $this->em->getRepository(User::class)->find($data['user']);
             }
             $htmlProcess = $this->renderView(
-                'ReportBundle:Accounting/Sales:sales-data.html.twig', [
+                'Report/Accounting/Sales/sales-data.html.twig', [
                     'entities' => $entities,
                     'data' => $data,
                     'salesBy' => $salesBy,
@@ -690,7 +690,7 @@ class ReportController extends AbstractController
         $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(['status'=>1],['name'=>'asc']);
         $groups = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->getProcessModes($globalOption);
         $users = $this->em->getRepository(\App\Accounting\Entity\AccountPurchase::class)->getCreatedUsers($globalOption);
-        return $this->render('ReportBundle:Accounting/Sales:customerDetails.html.twig', [
+        return $this->render('Report/Accounting/Sales/customerDetails.html.twig', [
             'entities' => $entities,
             'transactionMethods' => $transactionMethods,
             'groups' => $groups,
@@ -789,7 +789,7 @@ class ReportController extends AbstractController
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getReferredDoctors($hospital);
         $marketingUsers = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getMarketingUser($hospital);
         $discountedUsers = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getDiscountedUsers($hospital);
-        return $this->render('ReportBundle:Hospital/Sales:invoice.html.twig', [
+        return $this->render('Report/Hospital/Sales/invoice.html.twig', [
             'employees' => $employees,
             'assignDoctors' => $assignDoctors,
             'anesthesiaDoctors' => $anesthesiaDoctors,
@@ -819,7 +819,7 @@ class ReportController extends AbstractController
         if(isset($data['startDate']) and $data['endDate']) {
             $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->reportHmsLists($user , $data);
             $htmlProcess = $this->renderView(
-                'ReportBundle:Hospital/Sales:invoice-ajax.html.twig', [
+                'Report/Hospital/Sales/invoice-ajax.html.twig', [
                     'entities' => $entities,
                     'option' => $user->getGlobalOption(),
                     'searchForm' => $data,
@@ -844,7 +844,7 @@ class ReportController extends AbstractController
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $employees = $this->em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->getFindEmployees($hospital);
         $discountedUsers = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getDiscountedUsers($hospital);
-        return $this->render('ReportBundle:Hospital/Sales:sales-collection.html.twig', [
+        return $this->render('Report/Hospital/Sales/sales-collection.html.twig', [
             'employees' => $employees,
             'discountedUsers' => $discountedUsers,
             'option' => $user->getGlobalOption(),
@@ -868,7 +868,7 @@ class ReportController extends AbstractController
         if(isset($data['startDate']) and $data['endDate']) {
             $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->hmsSalesCollectionReports($user,$data);
             $htmlProcess = $this->renderView(
-                'ReportBundle:Hospital/Sales:sales-collection-ajax.html.twig', [
+                'Report/Hospital/Sales/sales-collection-ajax.html.twig', [
                     'entities' => $entities,
                     'option' => $user->getGlobalOption(),
                     'searchForm' => $data,
@@ -894,7 +894,7 @@ class ReportController extends AbstractController
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [5,6]);
         $employees = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital);
-        return $this->render('ReportBundle:Hospital/Sales:sales-collection-commission.html.twig', [
+        return $this->render('Report/Hospital/Sales/sales-collection-commission.html.twig', [
             'referredDoctors' => $referredDoctors,
             'employees' => $employees,
             'option' => $user->getGlobalOption(),
@@ -921,7 +921,7 @@ class ReportController extends AbstractController
             $commissionSummary = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommissionSummary($hospital, $entities);
             $commissions = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->getInvoiceBaseCommission($hospital, $entities);
             $htmlProcess = $this->renderView(
-                'ReportBundle:Hospital/Sales:sales-collection-commission-ajax.html.twig', [
+                'Report/Hospital/Sales/sales-collection-commission-ajax.html.twig', [
                     'entities' => $pagination,
                     'commissions' => $commissions,
                     'commissionSummary' => $commissionSummary,
@@ -949,7 +949,7 @@ class ReportController extends AbstractController
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [5,6]);
         $employees = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital);
-        return $this->render('ReportBundle:Hospital/Sales:collection-commission-group.html.twig', [
+        return $this->render('Report/Hospital/Sales/collection-commission-group.html.twig', [
             'referredDoctors' => $referredDoctors,
             'employees' => $employees,
             'option' => $user->getGlobalOption(),
@@ -973,7 +973,7 @@ class ReportController extends AbstractController
         if(isset($data['startDate']) and $data['endDate']) {
             $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->hmsCommissionGroupReports($user,$data);
             $htmlProcess = $this->renderView(
-                'ReportBundle:Hospital/Sales:collection-commission-group-ajax.html.twig', [
+                'Report/Hospital/Sales/collection-commission-group-ajax.html.twig', [
                     'entities' => $entities,
                     'option' => $user->getGlobalOption(),
                     'searchForm' => $data,
@@ -1000,7 +1000,7 @@ class ReportController extends AbstractController
         $hospital = $user->getGlobalOption()->getHospitalConfig();
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [5,6]);
         $employees = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital);
-        return $this->render('ReportBundle:Hospital/Sales:sales-commission-details.html.twig', [
+        return $this->render('Report/Hospital/Sales/sales-commission-details.html.twig', [
             'referredDoctors' => $referredDoctors,
             'employees' => $employees,
             'option' => $user->getGlobalOption(),
@@ -1024,7 +1024,7 @@ class ReportController extends AbstractController
         if(isset($data['startDate']) and $data['endDate']) {
             $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->hmsCommissionReportDetails($user,$data);
             $htmlProcess = $this->renderView(
-                'ReportBundle:Hospital/Sales:sales-commission-details-ajax.html.twig', [
+                'Report/Hospital/Sales/sales-commission-details-ajax.html.twig', [
                     'entities' => $entities,
                     'option' => $user->getGlobalOption(),
                     'searchForm' => $data,
@@ -1124,7 +1124,7 @@ class ReportController extends AbstractController
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignDoctor($hospital,'referred-doctor');
 
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->reportInvoiceLists($user , $mode = 'diagnostic' , $data);
-        return $this->render('ReportBundle:Hospital/Sales:diagnostic-invoice.html.twig', [
+        return $this->render('Report/Hospital/Sales/diagnostic-invoice.html.twig', [
             'entities' => $entities,
             'assignDoctors'                     => $assignDoctors,
             'referredDoctors'                     => $referredDoctors,
@@ -1160,7 +1160,7 @@ class ReportController extends AbstractController
         $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignDoctor($hospital);
         $employees = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital);
         $processes = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAdmissionProcess($hospital,'visit',$data);
-        return $this->render('ReportBundle:Hospital/Sales:visit-invoice.html.twig', [
+        return $this->render('Report/Hospital/Sales/visit-invoice.html.twig', [
             'employees' => $employees,
             'assignDoctors' => $assignDoctors,
             'processes' => $processes,
@@ -1197,7 +1197,7 @@ class ReportController extends AbstractController
         $departments = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getDepartments($hospital);
         $employees = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getFindEmployees($hospital);
         $diseases = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getFindDiseases($hospital);
-        return $this->render('ReportBundle:Hospital/Sales:admission-invoice.html.twig', [
+        return $this->render('Report/Hospital/Sales/admission-invoice.html.twig', [
             'employees' => $employees,
             'anesthesiaDoctor' => $anesthesiaDoctor,
             'assignDoctors' => $assignDoctors,
@@ -1235,7 +1235,7 @@ class ReportController extends AbstractController
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->reportAdmissionService($user , $mode = 'admission' , $data);
         $categories = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(['parent'=>2],['name' =>'asc' ]);
         $departments = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class)->findBy(['parent'=>7],['name' =>'asc' ]);
-        return $this->render('ReportBundle:Hospital/Sales:service.html.twig', [
+        return $this->render('Report/Hospital/Sales/service.html.twig', [
             'entities' => $entities,
             'serviceGroups' => $serviceGroups,
             'departments' => $departments,
@@ -1269,7 +1269,7 @@ class ReportController extends AbstractController
         $serviceGroups = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getServiceGroups($hospital);
         $services = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getServices($hospital);
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->reportAdmissionDepartment($user , $mode = 'admission' , $data);
-        return $this->render('ReportBundle:Hospital/Sales:surgery-department.html.twig', [
+        return $this->render('Report/Hospital/Sales/surgery-department.html.twig', [
             'entities' => $entities,
             'searchForm' => $data,
             'option' => $globalOption,
@@ -1302,7 +1302,7 @@ class ReportController extends AbstractController
         $serviceGroups = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getServiceGroups($hospital);
         $particulars = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getParticulars($hospital);
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->reportAdmissionDepartmentDetails($user , $mode = 'admission' , $data);
-        return $this->render('ReportBundle:Hospital/Sales:surgery-department-details.html.twig', [
+        return $this->render('Report/Hospital/Sales/surgery-department-details.html.twig', [
             'entities' => $entities,
             'particulars' => $particulars,
             'serviceGroups' => $serviceGroups,
@@ -1336,7 +1336,7 @@ class ReportController extends AbstractController
         $hospital = $user->getGlobalOption()->getHospitalConfig()->getId();
         $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignDoctor($hospital);
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->reportDiseases($user , $mode = 'admission' , $data);
-        return $this->render('ReportBundle:Hospital/Sales:diseases.html.twig', [
+        return $this->render('Report/Hospital/Sales/diseases.html.twig', [
             'entities' => $entities,
             'assignDoctors' => $assignDoctors,
             'searchForm' => $data,
@@ -1367,7 +1367,7 @@ class ReportController extends AbstractController
         $assignDoctors = $this->em->getRepository(\App\Hospital\Entity\Invoice::class)->getAssignDoctor($hospital);
         $diseaseses = $this->em->getRepository(\App\Hospital\Entity\HmsServiceGroup::class)->findBy(['hospitalConfig'=>$hospital,'service'=>11],['name'=>'ASC']);
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->reportDiseasesDetails($user , $mode = 'admission' , $data);
-        return $this->render('ReportBundle:Hospital/Sales:diseases-details.html.twig', [
+        return $this->render('Report/Hospital/Sales/diseases-details.html.twig', [
             'entities' => $entities,
             'assignDoctors' => $assignDoctors,
             'diseaseses' => $diseaseses,
@@ -1391,7 +1391,7 @@ class ReportController extends AbstractController
         $user = $this->getUser();
         $data = $_REQUEST;
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($user->getGlobalOption()->getHospitalConfig(), [5, 6]);
-        return $this->render('ReportBundle:Hospital/Monthly:commission.html.twig', [
+        return $this->render('Report/Hospital/Monthly/commission.html.twig', [
             'referredDoctors' => $referredDoctors,
             'searchForm' => $data
         ]);
@@ -1416,7 +1416,7 @@ class ReportController extends AbstractController
             $monthlyReferredCommissionInvoice = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyReferredCommissionInvoice($user, $data);
             $commissionSummary = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->monthlyGroupBaseCommissionSummary($user, $data);
             $htmlProcess = $this->renderView(
-                'ReportBundle:Hospital/Monthly:commission-details.html.twig', [
+                'Report/Hospital/Monthly/commission-details.html.twig', [
                     'referredInvoice' => $monthlyReferredCommissionInvoice,
                     'commissions' => $commissions,
                     'commissionSummary' => $commissionSummary,
@@ -1472,7 +1472,7 @@ class ReportController extends AbstractController
         $priceOverview = $em->getRepository(\App\Report\Entity\Report::class)->invReportStockPriceOverview($inventory,$data);
         $stockOverview = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockOverview($inventory,$data);
 
-        return $this->render('ReportBundle:Inventory/Stock:stock.html.twig', [
+        return $this->render('Report/Inventory/Stock/stock.html.twig', [
             'searchForm' => $data,
             'priceOverview' => $priceOverview[0],
             'stockOverview' => $stockOverview,
@@ -1493,7 +1493,7 @@ class ReportController extends AbstractController
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Report\Entity\Report::class)->invReportStockItemPrice($inventory,$data);
         $htmlProcess = $this->renderView(
-            'ReportBundle:Inventory/Stock:stock-item-price-data.html.twig', [
+            'Report/Inventory/Stock/stock-item-price-data.html.twig', [
                 'entities' => $entities,
             ]
         );
@@ -1509,7 +1509,7 @@ class ReportController extends AbstractController
         $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        return $this->render('ReportBundle:Inventory/Stock:category-stock.html.twig', [
+        return $this->render('Report/Inventory/Stock/category-stock.html.twig', [
             'searchForm' => $data,
             'option' => $globalOption,
         ]);
@@ -1528,7 +1528,7 @@ class ReportController extends AbstractController
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Report\Entity\Report::class)->invReportCategoryStockItemPrice($inventory,$data);
         $htmlProcess = $this->renderView(
-            'ReportBundle:Inventory/Stock:category-stock-item-price-data.html.twig', [
+            'Report/Inventory/Stock/category-stock-item-price-data.html.twig', [
                 'entities' => $entities,
             ]
         );
@@ -1545,7 +1545,7 @@ class ReportController extends AbstractController
         $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        return $this->render('ReportBundle:Inventory/Stock:brand-stock.html.twig', [
+        return $this->render('Report/Inventory/Stock/brand-stock.html.twig', [
             'searchForm' => $data,
             'option' => $globalOption,
         ]);
@@ -1564,7 +1564,7 @@ class ReportController extends AbstractController
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Report\Entity\Report::class)->invReportBrandStockItemPrice($inventory,$data);
         $htmlProcess = $this->renderView(
-            'ReportBundle:Inventory/Stock:brand-stock-item-price-data.html.twig', [
+            'Report/Inventory/Stock/brand-stock-item-price-data.html.twig', [
                 'entities' => $entities,
             ]
         );
@@ -1583,7 +1583,7 @@ class ReportController extends AbstractController
         $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(['status'=>1],['name'=>'asc']);
         $customers = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getSalesCustomers($globalOption);
         $users = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getCreatedUsers($globalOption);
-        return $this->render('ReportBundle:Inventory/Sales:index.html.twig', [
+        return $this->render('Report/Inventory/Sales/index.html.twig', [
             'transactionMethods' => $transactionMethods,
             'customers' => $customers,
             'searchForm' => $data,
@@ -1605,7 +1605,7 @@ class ReportController extends AbstractController
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Report\Entity\Report::class)->invReportSales($inventory->getId(),$data);
         $htmlProcess = $this->renderView(
-            'ReportBundle:Inventory/Sales:ajax-data.html.twig', [
+            'Report/Inventory/Sales/ajax-data.html.twig', [
                 'entities' => $entities,
             ]
         );
@@ -1624,7 +1624,7 @@ class ReportController extends AbstractController
         $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(['status'=>1],['name'=>'asc']);
         $customers = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getSalesCustomers($globalOption);
         $users = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getCreatedUsers($globalOption);
-        return $this->render('ReportBundle:Inventory/SalesItem:index.html.twig', [
+        return $this->render('Report/Inventory/SalesItem/index.html.twig', [
             'transactionMethods' => $transactionMethods,
             'customers' => $customers,
             'searchForm' => $data,
@@ -1646,7 +1646,7 @@ class ReportController extends AbstractController
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Report\Entity\Report::class)->invReportSalesItem($inventory->getId(),$data);
         $htmlProcess = $this->renderView(
-            'ReportBundle:Inventory/SalesItem:ajax-data.html.twig', [
+            'Report/Inventory/SalesItem/ajax-data.html.twig', [
                 'entities' => $entities,
             ]
         );
@@ -1665,7 +1665,7 @@ class ReportController extends AbstractController
         $transactionMethods = $this->em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findBy(['status'=>1],['name'=>'asc']);
         $customers = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getSalesCustomers($globalOption);
         $users = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->getCreatedUsers($globalOption);
-        return $this->render('ReportBundle:Inventory/SalesItem:index.html.twig', [
+        return $this->render('Report/Inventory/SalesItem/index.html.twig', [
             'transactionMethods' => $transactionMethods,
             'customers' => $customers,
             'searchForm' => $data,
@@ -1683,7 +1683,7 @@ class ReportController extends AbstractController
         $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        return $this->render('ReportBundle:Medicine/Stock:stock.html.twig', [
+        return $this->render('Report/Medicine/Stock/stock.html.twig', [
             'option' => $globalOption,
         ]);
     }
@@ -1701,7 +1701,7 @@ class ReportController extends AbstractController
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $pagination = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->misRemainingStock($config);
         $htmlProcess = $this->renderView(
-            'ReportBundle:Medicine/Stock:stock-item-price-data.html.twig', [
+            'Report/Medicine/Stock/stock-item-price-data.html.twig', [
                 'entities' => $pagination,
             ]
         );
@@ -1755,7 +1755,7 @@ class ReportController extends AbstractController
         $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        return $this->render('ReportBundle:Business/Calendar/Day:index.html.twig', [
+        return $this->render('Report/Business/Calendar/Day/index.html.twig', [
             'option'                => $user->getGlobalOption(),
 
         ]);
@@ -1775,7 +1775,7 @@ class ReportController extends AbstractController
         $dailyPurchase = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->dailyPurchase($this->getUser(),$data);
         $dailySales = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->dailySales($this->getUser(),$data);
         $htmlProcess = $this->renderView(
-            'ReportBundle:Business/Calendar/Day:ajax-data.html.twig', [
+            'Report/Business/Calendar/Day/ajax-data.html.twig', [
                 'dailyPurchase' => $dailyPurchase,
                 'dailySales' => $dailySales,
                 'data' => $data,
@@ -1793,7 +1793,7 @@ class ReportController extends AbstractController
         $em = $this->em;
         $data = $_REQUEST;
         $user = $this->getUser();
-        return $this->render('ReportBundle:Business/Calendar/Day:index.html.twig', [
+        return $this->render('Report/Business/Calendar/Day/index.html.twig', [
             'option'                => $user->getGlobalOption(),
 
         ]);
@@ -1809,7 +1809,7 @@ class ReportController extends AbstractController
         $em = $this->em;
         $data = $_REQUEST;
         $globalOption = $this->getUser()->getGlobalOption();
-        return $this->render('ReportBundle:Business/MarketingExecutive:index.html.twig', [
+        return $this->render('Report/Business/MarketingExecutive/index.html.twig', [
             'option' => $globalOption,
         ]);
     }
@@ -1827,7 +1827,7 @@ class ReportController extends AbstractController
         $global = $this->getUser()->getGlobalOption();
         $pagination = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertBusinessExecutive($global,$data);
         $htmlProcess = $this->renderView(
-            'ReportBundle:Business/MarketingExecutive:ajax-data.html.twig', [
+            'Report/Business/MarketingExecutive/ajax-data.html.twig', [
                 'entities' => $pagination['result'],
                 'salesReturns' => $pagination['salesReturns'],
                 'data' => $data,
@@ -1852,7 +1852,7 @@ class ReportController extends AbstractController
             $executive = $this->em->getRepository(User::class)->find($marketing);
         }
         $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerInvoice($globalOption,$data);
-        return $this->render('ReportBundle:Default/Ledger:customer.html.twig', [
+        return $this->render('Report/Default/Ledger/customer.html.twig', [
             'option' => $globalOption,
             'executive' => $executive,
             'entities' => $entities['current'],
@@ -1882,7 +1882,7 @@ class ReportController extends AbstractController
              }
              $entities = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerLedgerDetails($globalOption,$data);
         }
-        return $this->render('ReportBundle:Default/Ledger:customerDetails.html.twig', [
+        return $this->render('Report/Default/Ledger/customerDetails.html.twig', [
             'option' => $globalOption,
             'customers' => $customers,
             'customer' => $customer,
@@ -1916,7 +1916,7 @@ class ReportController extends AbstractController
         $entities = $this->em->getRepository(BusinessInvoiceParticular::class)->getMarketingSalesProducts($globalOption,$data);
         $salesReturns = $this->em->getRepository(BusinessInvoiceReturnItem::class)->getMarketingSalesReturnProducts($globalOption,$data);
 
-        return $this->render('ReportBundle:Business/Stock:stock.html.twig', [
+        return $this->render('Report/Business/Stock/stock.html.twig', [
             'option' => $globalOption,
             'marketing' => $executive,
             'customer' => $customer,

@@ -1072,7 +1072,7 @@ class PurchaseController extends AbstractController
         }
         $entity->setProcess('Created');
         $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getPurchaseUpdateQnt($entity);
-        $em->createQuery("DELETE MedicineBundle:MedicinePurchaseItem e WHERE e.medicinePurchase ={$entity->getId()}");
+        $em->createQuery("DELETE App\\Medicine\\Entity\\MedicinePurchaseItem e WHERE e.medicinePurchase ={$entity->getId()}");
         $em->remove($entity);
         $em->flush();
         return new Response('success');
@@ -1332,7 +1332,7 @@ class PurchaseController extends AbstractController
         ignore_user_abort(true);
         $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        $removeSales = $em->createQuery("DELETE MedicineBundle:MedicinePurchase e WHERE e.androidProcess= {$android->getId()}");
+        $removeSales = $em->createQuery("DELETE App\\Medicine\\Entity\\MedicinePurchase e WHERE e.androidProcess= {$android->getId()}");
         if(!empty($removeSales)){
             $removeSales->execute();
         }

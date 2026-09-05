@@ -113,7 +113,7 @@ class BusinessPurchaseReturnItemRepository extends EntityRepository
     public function removePurchaseReturn(BusinessInvoice $entity)
     {
         $em = $this->getEntityManager();
-        $DistributionReturnItem = $em->createQuery("DELETE BusinessBundle:BusinessDistributionReturnItem e WHERE e.salesInvoice = {$entity->getId()}");
+        $DistributionReturnItem = $em->createQuery("DELETE App\\Business\\Entity\\BusinessDistributionReturnItem e WHERE e.salesInvoice = {$entity->getId()}");
         $DistributionReturnItem->execute();
         foreach ($entity->getBusinessInvoiceParticulars() as $particular){
             $this->deletePurchaseReturnItem($particular);

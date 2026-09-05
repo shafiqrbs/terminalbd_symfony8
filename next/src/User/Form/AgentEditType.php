@@ -40,7 +40,7 @@ class AgentEditType extends AbstractType
                 'attr'=>array('class'=>'m-wrap span12  check-list'),
                 'required'=>true,
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Please input required'))
+                    new NotBlank(message: 'Please input required')
                 ),
                 'multiple'    => true,
                 'expanded'  => true,
@@ -50,15 +50,15 @@ class AgentEditType extends AbstractType
 
             ->add('username', TextType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off' ,'placeholder'=>'Enter your user name'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please enter your user name')),
-                        new Length(array('max'=>200))
+                        new NotBlank(message: 'Please enter your user name'),
+                        new Length(max: 200)
                     ))
             )
             ->add('enabled')
             ->add('email', TextType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter your valid email address'),
                     'constraints' =>array(
-                        new NotBlank(array('message'=>'Please enter user email address')),
-                        new Length(array('max'=>200))
+                        new NotBlank(message: 'Please enter user email address'),
+                        new Length(max: 200)
             ))
             );
             $builder->add('profile', AgentProfileType::class, ['location' => $this->globalOption]);

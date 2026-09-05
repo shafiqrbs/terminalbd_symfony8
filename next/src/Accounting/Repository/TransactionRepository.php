@@ -78,7 +78,7 @@ class TransactionRepository extends EntityRepository
 
     public function removeTransaction($option,$process)
     {
-	    $transaction = $this->getEntityManager()->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = {$option->getId()} AND e.processHead ='{$process}'");
+	    $transaction = $this->getEntityManager()->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.globalOption = {$option->getId()} AND e.processHead ='{$process}'");
 	    $transaction->execute();
     }
 

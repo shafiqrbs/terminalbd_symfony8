@@ -34,7 +34,7 @@ class TestimonialRepository extends EntityRepository
         $user = $entity->getUser()->getId();
         $limit = $entity->getUser()->getHomePage()->getShowingListing();
         return $this->getEntityManager()
-            ->createQuery('SELECT n FROM SettingContentBundle:Testimonial n WHERE n.status = 1 AND n.user ='.$user.' ORDER BY n.created DESC')
+            ->createQuery('SELECT n FROM App\Content\Entity\Testimonial n WHERE n.status = 1 AND n.user ='.$user.' ORDER BY n.created DESC')
             ->setMaxResults($limit)
             ->getResult();
     }

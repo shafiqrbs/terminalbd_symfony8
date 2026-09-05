@@ -1031,7 +1031,7 @@ class MedicineStockRepository extends EntityRepository
         $em = $this->getEntityManager();
         $created = new DateTime();
         $data = $created->format('Y-m-d H:m:s');
-        $stock = $em->createQuery("DELETE MedicineBundle:MedicineStock e WHERE e.medicineConfig={$to}");
+        $stock = $em->createQuery("DELETE App\\Medicine\\Entity\\MedicineStock e WHERE e.medicineConfig={$to}");
         if($stock){
             $stock->execute();
         }
@@ -1171,7 +1171,7 @@ class MedicineStockRepository extends EntityRepository
     {
         $em = $this->getEntityManager();
         $config = $option->getMedicineConfig()->getId();
-        $stock = $em->createQuery("DELETE MedicineBundle:MedicineStock e WHERE e.medicineConfig = {$config} and id = {$id}");
+        $stock = $em->createQuery("DELETE App\\Medicine\\Entity\\MedicineStock e WHERE e.medicineConfig = {$config} and id = {$id}");
         $stock->execute();
         return 'success';
     }

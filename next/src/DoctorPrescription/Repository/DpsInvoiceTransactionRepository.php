@@ -282,14 +282,14 @@ class DpsInvoiceTransactionRepository extends EntityRepository
 
                 $globalOption = $sales->getGlobalOption()->getId();
                 $accountRefNo = $sales->getAccountRefNo();
-                $transaction = $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Sales'");
+                $transaction = $em->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Sales'");
                 $transaction->execute();
-                $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Sales'");
+                $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Sales'");
                 $accountCash->execute();
             }
         }
 
-        $accountCash = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.dmsInvoices = '.$entity->getId());
+        $accountCash = $em->createQuery('DELETE App\Accounting\Entity\AccountSales e WHERE e.dmsInvoices = '.$entity->getId());
         if(!empty($accountCash)){
             $accountCash->execute();
         }
@@ -311,14 +311,14 @@ class DpsInvoiceTransactionRepository extends EntityRepository
 
                 $globalOption = $sales->getGlobalOption()->getId();
                 $accountRefNo = $sales->getAccountRefNo();
-                $transaction = $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Sales'");
+                $transaction = $em->createQuery("DELETE App\\Accounting\\Entity\\Transaction e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Sales'");
                 $transaction->execute();
-                $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Sales'");
+                $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountCash e WHERE e.globalOption = ".$globalOption ." AND e.accountRefNo =".$accountRefNo." AND e.processHead = 'Sales'");
                 $accountCash->execute();
             }
         }
 
-        $accountCash = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.dmsInvoices = '.$entity->getId());
+        $accountCash = $em->createQuery('DELETE App\Accounting\Entity\AccountSales e WHERE e.dmsInvoices = '.$entity->getId());
         if(!empty($accountCash)){
             $accountCash->execute();
         }

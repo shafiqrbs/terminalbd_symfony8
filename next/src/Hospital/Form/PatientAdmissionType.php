@@ -73,7 +73,7 @@ class PatientAdmissionType extends AbstractType
                 'placeholder' => '---Select diseases profile---',
                 'attr'=>array('class'=>'span12 m-wrap select2'),
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Select diseases profile')),
+                    new NotBlank(message: 'Select diseases profile'),
                 ),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
@@ -90,7 +90,7 @@ class PatientAdmissionType extends AbstractType
                 'class' => 'App\Hospital\Entity\HmsCategory',
                 'choice_label' => 'nestedLabel',
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Select department')),
+                    new NotBlank(message: 'Select department'),
                 ),
                 'choices'=> $this->DepartmentChoiceList()
             ))
@@ -100,7 +100,7 @@ class PatientAdmissionType extends AbstractType
                 'class' => 'App\Hospital\Entity\Particular',
                 'choice_label' => 'doctor',
                 'constraints' =>array(
-                    new NotBlank(array('message'=>'Select Consultant/Doctor')),
+                    new NotBlank(message: 'Select Consultant/Doctor'),
                 ),
                 'attr'=>array('class'=>'span12 select2 m-wrap'),
                 'placeholder' => '--- Choose assign doctor ---',

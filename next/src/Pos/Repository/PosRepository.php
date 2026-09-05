@@ -20,7 +20,7 @@ class PosRepository extends EntityRepository
     {
         $em = $this->getEntityManager();
         $config = $option->getId();
-        $history = $em->createQuery("DELETE PosBundle:Pos e WHERE e.terminal = {$config}");
+        $history = $em->createQuery("DELETE App\\Pos\\Entity\\Pos e WHERE e.terminal = {$config}");
         $history->execute();
     }
 

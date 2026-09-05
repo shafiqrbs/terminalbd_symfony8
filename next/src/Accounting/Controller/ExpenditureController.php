@@ -260,7 +260,7 @@ class ExpenditureController extends AbstractController
         $em = $this->em;
         $config = $this->getUser()->getGlobalOption();
 
-        $removeSales = $em->createQuery("DELETE AccountingBundle:Expenditure e WHERE e.androidProcess= {$android->getId()}");
+        $removeSales = $em->createQuery("DELETE App\\Accounting\\Entity\\Expenditure e WHERE e.androidProcess= {$android->getId()}");
         if(!empty($removeSales)){
             $removeSales->execute();
         }

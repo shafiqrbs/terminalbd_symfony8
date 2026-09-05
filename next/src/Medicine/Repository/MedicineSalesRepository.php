@@ -961,7 +961,7 @@ class MedicineSalesRepository extends EntityRepository
         $countRecords = $this->countNumberSalesSubItem($process->getId());
         if( $countRecords > 0 and $process->getItemCount() != $countRecords){
             $batch = $process->getId();
-            $remove = $em->createQuery("DELETE MedicineBundle:MedicineSalesItem e WHERE e.androidProcess = {$batch}");
+            $remove = $em->createQuery("DELETE App\\Medicine\\Entity\\MedicineSalesItem e WHERE e.androidProcess = {$batch}");
             $remove->execute();
             return "failed";
         }elseif(empty($items) and $numSubItems == 0 ) {
@@ -1123,7 +1123,7 @@ class MedicineSalesRepository extends EntityRepository
             $qbPurchasePrice = $this->getEntityManager()->getConnection()->prepare($sqlPurchasePrice);
             $qbPurchasePrice = $qbPurchasePrice->executeQuery();
 
-            $accountCash = $em->createQuery("DELETE AccountingBundle:AccountSales e WHERE e.globalOption = '{$optionId}' AND e.androidProcessId = '{$androidProcess_id}' AND e.processHead = 'medicine' AND e.processType = 'sales' ");
+            $accountCash = $em->createQuery("DELETE App\\Accounting\\Entity\\AccountSales e WHERE e.globalOption = '{$optionId}' AND e.androidProcessId = '{$androidProcess_id}' AND e.processHead = 'medicine' AND e.processType = 'sales' ");
             if(!empty($accountCash)){
                 $accountCash->execute();
             }

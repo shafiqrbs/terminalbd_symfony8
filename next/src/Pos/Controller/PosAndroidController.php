@@ -82,7 +82,7 @@ class PosAndroidController extends AbstractController
         $em = $this->em;
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $android = $this->em->getRepository(\App\Inventory\Entity\InventoryAndroidProcess::class)->findOneBy(['inventoryConfig'=>$config,'id'=>$android]);
-        $removeSales = $em->createQuery("DELETE InventoryBundle:Sales e WHERE e.androidProcess= {$android->getId()}");
+        $removeSales = $em->createQuery("DELETE App\\Inventory\\Entity\\Sales e WHERE e.androidProcess= {$android->getId()}");
         if(!empty($removeSales)){
             $removeSales->execute();
         }

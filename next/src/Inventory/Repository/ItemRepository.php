@@ -948,7 +948,7 @@ class ItemRepository extends EntityRepository
     {
 
         $em = $this->getEntityManager();
-        $stock = $em->createQuery("DELETE InventoryBundle:Item e WHERE e.inventoryConfig={$to}");
+        $stock = $em->createQuery("DELETE App\\Inventory\\Entity\\Item e WHERE e.inventoryConfig={$to}");
         if($stock){
             $stock->execute();
         }

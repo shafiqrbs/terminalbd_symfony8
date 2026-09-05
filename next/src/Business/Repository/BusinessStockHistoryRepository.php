@@ -221,7 +221,7 @@ class BusinessStockHistoryRepository extends EntityRepository
     public function stockTransfer(ProductTransfer $entity){
 
         $em = $this->getEntityManager();
-        $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.itemTransfer = '{$entity->getId()}'")->execute();
+        $em->createQuery("DELETE App\\Business\\Entity\\BusinessStockHistory e WHERE e.itemTransfer = '{$entity->getId()}'")->execute();
         $this->processStockQuantity($entity,"from-transfer");
         $this->processStockQuantity($entity,"to-transfer");
     }
@@ -235,7 +235,7 @@ class BusinessStockHistoryRepository extends EntityRepository
         if($entity->getPurchaseItems()){
 
             foreach($entity->getPurchaseItems() as $item ){
-                $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Business\\Entity\\BusinessStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
                 $this->processStockQuantity($item,"purchase");
             }
         }
@@ -251,7 +251,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
             foreach($entity->getPurchaseItems() as $item ){
                 if($item->getBusinessParticular()){
-                    $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
+                    $em->createQuery("DELETE App\\Business\\Entity\\BusinessStockHistory e WHERE e.purchaseItem = '{$item->getId()}'")->execute();
                 }
             }
         }
@@ -267,7 +267,7 @@ class BusinessStockHistoryRepository extends EntityRepository
         if($entity->getBusinessPurchaseReturnItems()){
 
             foreach($entity->getBusinessPurchaseReturnItems() as $item ){
-                $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.purchaseReturnItem = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Business\\Entity\\BusinessStockHistory e WHERE e.purchaseReturnItem = '{$item->getId()}'")->execute();
                 if($item->getQuantity() > 0){
                     $this->processStockQuantity($item,"purchase-return");
                 }
@@ -284,7 +284,7 @@ class BusinessStockHistoryRepository extends EntityRepository
         if($entity->getBusinessInvoiceParticulars()){
 
             foreach($entity->getBusinessInvoiceParticulars() as $item ){
-                $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.salesItem = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Business\\Entity\\BusinessStockHistory e WHERE e.salesItem = '{$item->getId()}'")->execute();
                 if($item->getBusinessParticular() and $item->getTotalQuantity() > 0){
                     $this->processStockQuantity($item,"sales");
                 }
@@ -300,7 +300,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
         if($entity->getBusinessInvoiceParticulars()){
             foreach($entity->getBusinessInvoiceParticulars() as $item ){
-                $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.salesItem = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Business\\Entity\\BusinessStockHistory e WHERE e.salesItem = '{$item->getId()}'")->execute();
             }
         }
     }
@@ -313,7 +313,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
         if($entity->getInvoiceReturnItems()){
             foreach($entity->getInvoiceReturnItems() as $item ){
-                $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.salesReturnItem = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Business\\Entity\\BusinessStockHistory e WHERE e.salesReturnItem = '{$item->getId()}'")->execute();
                 if($item->getQuantity() > 0){
                     $this->processStockQuantity($item,"sales-return");
                 }
@@ -330,7 +330,7 @@ class BusinessStockHistoryRepository extends EntityRepository
         if($entity->getBusinessInvoiceParticulars()){
 
             foreach($entity->getBusinessInvoiceParticulars() as $item ){
-                $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.damage = '{$item->getId()}'")->execute();
+                $em->createQuery("DELETE App\\Business\\Entity\\BusinessStockHistory e WHERE e.damage = '{$item->getId()}'")->execute();
                 if($item->getQuantity() > 0){
                     $this->processStockQuantity($item,"damage");
                 }

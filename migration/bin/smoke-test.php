@@ -64,13 +64,28 @@ const CLASSIFY = [
     'dead route linked from a template (§5.28)' => 'Unable to generate a URL for the named route',
     'dead entity alias (§5.11)' => 'does not exist|Unknown Entity namespace alias',
     'route with no controller (§5.12)' => 'exists in neither the legacy nor the ported tree',
-    'this tenant has no config for that module' => 'must be of type App\\\\\w+\\\\Entity\\\\\w*Config, null given',
+    'this tenant has no config for that module' => 'must be of type App\\\\\w+\\\\Entity\\\\\w*Config',
     // A heuristic, and labelled as one: business_config and dps_config have no
     // rows for this tenant, so every page in those modules walks into a null.
     // Re-check these on a tenant that uses the module before believing them.
     'probably the same - a null the page assumes is there' => 'Call to a member function \\w+\\(\\) on null|on a null variable',
     'expected: the smoke-test user does not have that role' => 'Access Denied',
     'environment: wkhtmltopdf is not installed here' => 'is not executable',
+    // The harness sends no query string, so pages built around ?id= or ?term=
+    // have nothing to work with. Real coverage of these needs parameters.
+    'needs a request parameter the harness does not send' => 'The identifier id is missing|RedirectResponse::__construct\\(\\): Argument #1',
+    // Verified against the legacy tree: the template does not exist there
+    // either, so the page is a 500 in production too.
+    'a template that exists in neither tree' => 'Unable to find template',
+    // "e.restaurantConfig =  ORDER BY" - the query is built by interpolating a
+    // config that is null for this tenant. Same root cause as the nulls above.
+    'DQL built by interpolating a null config' => '\\[Syntax Error\\]',
+    // Verified: the method is on a different repository, or on none at all,
+    // in the legacy tree as well.
+    'calls a repository method that does not exist (pre-existing)' => 'The method name must start with either findBy',
+    'queries a field the entity never declared (pre-existing)' => 'Unrecognized field',
+    'the barcode dependency cannot be downloaded (§5.32)' => 'CodeItNow',
+    'one of the four service ids that exist in neither tree (§5.16)' => 'Controller::get\\(\\)',
     'the controller calls exit; or die()' => 'calls exit; or die',
 ];
 
@@ -251,7 +266,7 @@ foreach ($routes as $name => $route) {
     if ($bucket === '5xx') {
         $reason = $thrown === null
             ? 'HTTP ' . $status
-            : $thrown::class . ': ' . preg_replace('/\s+/', ' ', substr($thrown->getMessage(), 0, 160));
+            : $thrown::class . ': ' . preg_replace('/\s+/', ' ', substr($thrown->getMessage(), 0, 200));
         $failures[$reason][] = $name . '  ' . $path;
     }
 

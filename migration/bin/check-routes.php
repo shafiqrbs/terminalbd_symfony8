@@ -71,8 +71,15 @@ foreach ($routes as $name => $route) {
     [$class, $method] = array_pad(explode('::', $controller, 2), 2, '__invoke');
 
     // Framework routes point at a service id (error_controller), not a class.
+    // A legacy "SomeBundle::action" string is neither: Symfony 2 needed a
+    // controller segment, so those routes are broken in that tree too.
     if (!str_contains($class, '\\')) {
-        ++$ok;
+        if ($kernel->getContainer()->has($class)) {
+            ++$ok;
+            continue;
+        }
+
+        $missingClass[$name] = [$route->getPath(), $controller];
         continue;
     }
 

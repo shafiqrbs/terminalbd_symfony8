@@ -18,64 +18,64 @@ class AccountingConfigRepository extends EntityRepository
         $em = $this->getEntityManager();
         $option = $option->getId();
 
-        $transaction = $em->createQuery('DELETE AccountingBundle:Transaction e WHERE e.globalOption = '.$option);
+        $transaction = $em->createQuery('DELETE App\Accounting\Entity\Transaction e WHERE e.globalOption = '.$option);
         $transaction->execute();
 
-        $accountCash = $em->createQuery('DELETE AccountingBundle:AccountCash e WHERE e.globalOption = '.$option);
+        $accountCash = $em->createQuery('DELETE App\Accounting\Entity\AccountCash e WHERE e.globalOption = '.$option);
         $accountCash->execute();
 
-        $AccountJournal = $em->createQuery('DELETE AccountingBundle:AccountJournal e WHERE e.globalOption = '.$option);
+        $AccountJournal = $em->createQuery('DELETE App\Accounting\Entity\AccountJournal e WHERE e.globalOption = '.$option);
         $AccountJournal->execute();
 
-        $AccountPurchase = $em->createQuery('DELETE AccountingBundle:AccountPurchase e WHERE e.globalOption = '.$option);
+        $AccountPurchase = $em->createQuery('DELETE App\Accounting\Entity\AccountPurchase e WHERE e.globalOption = '.$option);
         $AccountPurchase->execute();
 
-        $AccountPurchaseReturn = $em->createQuery('DELETE AccountingBundle:AccountPurchaseReturn e WHERE e.globalOption = '.$option);
+        $AccountPurchaseReturn = $em->createQuery('DELETE App\Accounting\Entity\AccountPurchaseReturn e WHERE e.globalOption = '.$option);
         $AccountPurchaseReturn->execute();
 
-        $AccountSales = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.globalOption = '.$option);
+        $AccountSales = $em->createQuery('DELETE App\Accounting\Entity\AccountSales e WHERE e.globalOption = '.$option);
         $AccountSales->execute();
 
-        $AccountSalesReturn = $em->createQuery('DELETE AccountingBundle:AccountSalesReturn e WHERE e.globalOption = '.$option);
+        $AccountSalesReturn = $em->createQuery('DELETE App\Accounting\Entity\AccountSalesReturn e WHERE e.globalOption = '.$option);
         $AccountSalesReturn->execute();
 
-        $transfer = $em->createQuery('DELETE AccountingBundle:AccountBalanceTransfer e WHERE e.globalOption = '.$option);
+        $transfer = $em->createQuery('DELETE App\Accounting\Entity\AccountBalanceTransfer e WHERE e.globalOption = '.$option);
         $transfer->execute();
 
-        $PaymentSalary = $em->createQuery('DELETE AccountingBundle:PaymentSalary e WHERE e.globalOption = '.$option);
+        $PaymentSalary = $em->createQuery('DELETE App\Accounting\Entity\PaymentSalary e WHERE e.globalOption = '.$option);
         $PaymentSalary->execute();
 
-        $SalarySetting = $em->createQuery('DELETE AccountingBundle:SalarySetting e WHERE e.globalOption = '.$option);
+        $SalarySetting = $em->createQuery('DELETE App\Accounting\Entity\SalarySetting e WHERE e.globalOption = '.$option);
         $SalarySetting->execute();
 
-        $Expenditure = $em->createQuery('DELETE AccountingBundle:Expenditure e WHERE e.globalOption = '.$option);
+        $Expenditure = $em->createQuery('DELETE App\Accounting\Entity\Expenditure e WHERE e.globalOption = '.$option);
         $Expenditure->execute();
 
-        $android = $em->createQuery('DELETE AccountingBundle:ExpenseAndroidProcess e WHERE e.globalOption = '.$option);
+        $android = $em->createQuery('DELETE App\Accounting\Entity\ExpenseAndroidProcess e WHERE e.globalOption = '.$option);
         $android->execute();
 
-        $Reconciliation = $em->createQuery('DELETE AccountingBundle:CashReconciliation e WHERE e.globalOption = '.$option);
+        $Reconciliation = $em->createQuery('DELETE App\Accounting\Entity\CashReconciliation e WHERE e.globalOption = '.$option);
         $Reconciliation->execute();
 
-        $Commission = $em->createQuery('DELETE AccountingBundle:AccountPurchaseCommission e WHERE e.globalOption = '.$option);
+        $Commission = $em->createQuery('DELETE App\Accounting\Entity\AccountPurchaseCommission e WHERE e.globalOption = '.$option);
         $Commission->execute();
 
-        $Adjustment = $em->createQuery('DELETE AccountingBundle:AccountSalesAdjustment e WHERE e.globalOption = '.$option);
+        $Adjustment = $em->createQuery('DELETE App\Accounting\Entity\AccountSalesAdjustment e WHERE e.globalOption = '.$option);
         $Adjustment->execute();
 
-        $profit = $em->createQuery('DELETE AccountingBundle:AccountProfit e WHERE e.globalOption = '.$option);
+        $profit = $em->createQuery('DELETE App\Accounting\Entity\AccountProfit e WHERE e.globalOption = '.$option);
         $profit->execute();
 
-        $profit = $em->createQuery('DELETE AccountingBundle:AccountHead e WHERE e.globalOption = '.$option);
+        $profit = $em->createQuery('DELETE App\Accounting\Entity\AccountHead e WHERE e.globalOption = '.$option);
         $profit->execute();
 
-        $loanLedger = $em->createQuery('DELETE AccountingBundle:AccountLoanLedger e WHERE e.globalOption = '.$option);
+        $loanLedger = $em->createQuery('DELETE App\Accounting\Entity\AccountLoanLedger e WHERE e.globalOption = '.$option);
         $loanLedger->execute();
 
-        $loan = $em->createQuery('DELETE AccountingBundle:AccountLoan e WHERE e.globalOption = '.$option);
+        $loan = $em->createQuery('DELETE App\Accounting\Entity\AccountLoan e WHERE e.globalOption = '.$option);
         $loan->execute();
 
-        $condition = $em->createQuery('DELETE AccountingBundle:AccountConditionLedger e WHERE e.globalOption = '.$option);
+        $condition = $em->createQuery('DELETE App\Accounting\Entity\AccountConditionLedger e WHERE e.globalOption = '.$option);
         $condition->execute();
 
     }
@@ -88,70 +88,70 @@ class AccountingConfigRepository extends EntityRepository
         $em->flush();
 
         $option = $option->getId();
-        $transaction = $em->createQuery('DELETE AccountingBundle:Transaction e WHERE e.globalOption = '.$option);
+        $transaction = $em->createQuery('DELETE App\Accounting\Entity\Transaction e WHERE e.globalOption = '.$option);
         $transaction->execute();
 
-        $accountCash = $em->createQuery('DELETE AccountingBundle:AccountCash e WHERE e.globalOption = '.$option);
+        $accountCash = $em->createQuery('DELETE App\Accounting\Entity\AccountCash e WHERE e.globalOption = '.$option);
         $accountCash->execute();
 
-        $AccountJournal = $em->createQuery('DELETE AccountingBundle:AccountJournal e WHERE e.globalOption = '.$option);
+        $AccountJournal = $em->createQuery('DELETE App\Accounting\Entity\AccountJournal e WHERE e.globalOption = '.$option);
         $AccountJournal->execute();
 
-        $AccountPurchase = $em->createQuery('DELETE AccountingBundle:AccountPurchase e WHERE e.globalOption = '.$option);
+        $AccountPurchase = $em->createQuery('DELETE App\Accounting\Entity\AccountPurchase e WHERE e.globalOption = '.$option);
         $AccountPurchase->execute();
 
-        $AccountPurchaseReturn = $em->createQuery('DELETE AccountingBundle:AccountPurchaseReturn e WHERE e.globalOption = '.$option);
+        $AccountPurchaseReturn = $em->createQuery('DELETE App\Accounting\Entity\AccountPurchaseReturn e WHERE e.globalOption = '.$option);
         $AccountPurchaseReturn->execute();
 
-        $AccountSales = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.globalOption = '.$option);
+        $AccountSales = $em->createQuery('DELETE App\Accounting\Entity\AccountSales e WHERE e.globalOption = '.$option);
         $AccountSales->execute();
 
-        $AccountSalesReturn = $em->createQuery('DELETE AccountingBundle:AccountSalesReturn e WHERE e.globalOption = '.$option);
+        $AccountSalesReturn = $em->createQuery('DELETE App\Accounting\Entity\AccountSalesReturn e WHERE e.globalOption = '.$option);
         $AccountSalesReturn->execute();
 
-        $transfer = $em->createQuery('DELETE AccountingBundle:AccountBalanceTransfer e WHERE e.globalOption = '.$option);
+        $transfer = $em->createQuery('DELETE App\Accounting\Entity\AccountBalanceTransfer e WHERE e.globalOption = '.$option);
         $transfer->execute();
 
-        $PaymentSalary = $em->createQuery('DELETE AccountingBundle:PaymentSalary e WHERE e.globalOption = '.$option);
+        $PaymentSalary = $em->createQuery('DELETE App\Accounting\Entity\PaymentSalary e WHERE e.globalOption = '.$option);
         $PaymentSalary->execute();
 
-        $SalarySetting = $em->createQuery('DELETE AccountingBundle:SalarySetting e WHERE e.globalOption = '.$option);
+        $SalarySetting = $em->createQuery('DELETE App\Accounting\Entity\SalarySetting e WHERE e.globalOption = '.$option);
         $SalarySetting->execute();
 
-        $Expenditure = $em->createQuery('DELETE AccountingBundle:Expenditure e WHERE e.globalOption = '.$option);
+        $Expenditure = $em->createQuery('DELETE App\Accounting\Entity\Expenditure e WHERE e.globalOption = '.$option);
         $Expenditure->execute();
 
-        $android = $em->createQuery('DELETE AccountingBundle:ExpenseAndroidProcess e WHERE e.globalOption = '.$option);
+        $android = $em->createQuery('DELETE App\Accounting\Entity\ExpenseAndroidProcess e WHERE e.globalOption = '.$option);
         $android->execute();
 
-        $Reconciliation = $em->createQuery('DELETE AccountingBundle:CashReconciliation e WHERE e.globalOption = '.$option);
+        $Reconciliation = $em->createQuery('DELETE App\Accounting\Entity\CashReconciliation e WHERE e.globalOption = '.$option);
         $Reconciliation->execute();
 
-        $Commission = $em->createQuery('DELETE AccountingBundle:AccountPurchaseCommission e WHERE e.globalOption = '.$option);
+        $Commission = $em->createQuery('DELETE App\Accounting\Entity\AccountPurchaseCommission e WHERE e.globalOption = '.$option);
         $Commission->execute();
 
-        $Adjustment = $em->createQuery('DELETE AccountingBundle:AccountSalesAdjustment e WHERE e.globalOption = '.$option);
+        $Adjustment = $em->createQuery('DELETE App\Accounting\Entity\AccountSalesAdjustment e WHERE e.globalOption = '.$option);
         $Adjustment->execute();
 
-        $profit = $em->createQuery('DELETE AccountingBundle:AccountProfit e WHERE e.globalOption = '.$option);
+        $profit = $em->createQuery('DELETE App\Accounting\Entity\AccountProfit e WHERE e.globalOption = '.$option);
         $profit->execute();
 
-        $profit = $em->createQuery('DELETE AccountingBundle:AccountHead e WHERE e.globalOption = '.$option);
+        $profit = $em->createQuery('DELETE App\Accounting\Entity\AccountHead e WHERE e.globalOption = '.$option);
         $profit->execute();
 
-        $loanLedger = $em->createQuery('DELETE AccountingBundle:AccountLoanLedger e WHERE e.globalOption = '.$option);
+        $loanLedger = $em->createQuery('DELETE App\Accounting\Entity\AccountLoanLedger e WHERE e.globalOption = '.$option);
         $loanLedger->execute();
 
-        $loan = $em->createQuery('DELETE AccountingBundle:AccountLoan e WHERE e.globalOption = '.$option);
+        $loan = $em->createQuery('DELETE App\Accounting\Entity\AccountLoan e WHERE e.globalOption = '.$option);
         $loan->execute();
 
-        $condition = $em->createQuery('DELETE AccountingBundle:AccountConditionLedger e WHERE e.globalOption = '.$option);
+        $condition = $em->createQuery('DELETE App\Accounting\Entity\AccountConditionLedger e WHERE e.globalOption = '.$option);
         $condition->execute();
 
-        $bank = $em->createQuery('DELETE AccountingBundle:AccountBank e WHERE e.globalOption = '.$option);
+        $bank = $em->createQuery('DELETE App\Accounting\Entity\AccountBank e WHERE e.globalOption = '.$option);
         $bank->execute();
 
-        $mobile = $em->createQuery('DELETE AccountingBundle:AccountMobileBank e WHERE e.globalOption = '.$option);
+        $mobile = $em->createQuery('DELETE App\Accounting\Entity\AccountMobileBank e WHERE e.globalOption = '.$option);
         $mobile->execute();
     }
 
