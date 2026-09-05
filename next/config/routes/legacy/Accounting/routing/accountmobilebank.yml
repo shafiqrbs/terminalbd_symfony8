@@ -1,42 +1,36 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 accountmobilebank:
-    path:     /
-    defaults: { _controller: 'App\Accounting\Controller\AccountMobileBankController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountMobileBankController::indexAction'
 accountmobilebank_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Accounting\Controller\AccountMobileBankController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountMobileBankController::showAction'
 accountmobilebank_new:
-    path:     /new
-    defaults: { _controller: 'App\Accounting\Controller\AccountMobileBankController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountMobileBankController::newAction'
 accountmobilebank_create:
-    path:     /create
-    defaults: { _controller: 'App\Accounting\Controller\AccountMobileBankController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountMobileBankController::createAction'
+    methods: POST
 accountmobilebank_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Accounting\Controller\AccountMobileBankController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountMobileBankController::editAction'
 accountmobilebank_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Accounting\Controller\AccountMobileBankController::updateAction' }
-    methods:  [POST, PUT]
-
-accountmobilebank_approve:
-    path:     /{id}/payment-approve
-    defaults: { _controller: 'App\Accounting\Controller\AccountMobileBankController::approveAction' }
-    options:
-           expose: true
-
-accountmobilebank_inline:
-    path:     /inline-update
-    defaults: { _controller: 'App\Accounting\Controller\AccountMobileBankController::inlineUpdateAction' }
-
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountMobileBankController::updateAction'
+    methods:
+        - POST
+        - PUT
 accountmobilebank_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Accounting\Controller\AccountMobileBankController::deleteAction' }
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountMobileBankController::deleteAction'
     options:
-           expose: true
+        expose: true

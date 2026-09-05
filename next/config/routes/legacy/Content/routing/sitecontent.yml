@@ -1,34 +1,37 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 sitecontent:
-    path:     /
-    defaults: { _controller: 'App\Content\Controller\SiteContentController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Content\Controller\SiteContentController::indexAction'
 sitecontent_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Content\Controller\SiteContentController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Content\Controller\SiteContentController::showAction'
 sitecontent_new:
-    path:     /new
-    defaults: { _controller: 'App\Content\Controller\SiteContentController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Content\Controller\SiteContentController::newAction'
 sitecontent_create:
-    path:     /create
-    defaults: { _controller: 'App\Content\Controller\SiteContentController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Content\Controller\SiteContentController::createAction'
+    methods: POST
 sitecontent_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Content\Controller\SiteContentController::editAction' }
-
-sitecontent_status:
-    path:     /{id}/status
-    defaults: { _controller: 'App\Content\Controller\SiteContentController::statusAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Content\Controller\SiteContentController::editAction'
 sitecontent_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Content\Controller\SiteContentController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Content\Controller\SiteContentController::updateAction'
+    methods:
+        - POST
+        - PUT
 sitecontent_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Content\Controller\SiteContentController::deleteAction' }
-    methods:  [POST, DELETE]
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Content\Controller\SiteContentController::deleteAction'
+    methods:
+        - POST
+        - DELETE

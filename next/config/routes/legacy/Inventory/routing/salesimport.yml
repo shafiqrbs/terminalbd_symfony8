@@ -1,42 +1,38 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 inventory_salesimport:
-    path:     /
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Inventory\Controller\SalesImportController::indexAction'
 inventory_salesimport_migration:
-    path:     /{id}/data-migration
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::excelDataImportAction' }
-
+    path: '/{id}/data-migration'
+    defaults:
+        _controller: 'App\Inventory\Controller\SalesImportController::excelDataImportAction'
 inventory_salesimport_new:
-    path:     /new
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Inventory\Controller\SalesImportController::newAction'
 inventory_salesimport_create:
-    path:     /create
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Inventory\Controller\SalesImportController::createAction'
+    methods: POST
 inventory_salesimport_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Inventory\Controller\SalesImportController::editAction'
 inventory_salesimport_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Inventory\Controller\SalesImportController::updateAction'
+    methods:
+        - POST
+        - PUT
 inventory_salesimport_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::deleteAction' }
-
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Inventory\Controller\SalesImportController::deleteAction'
 inventory_salesimport_updated:
-    path:     /{id}/data-updated
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::updatedAction' }
-
-inventory_salesimport_reset:
-    path:     /{ic}/data-reseted
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::resetedAction' }
-
-inventory_salesimport_restore:
-    path:     /{ic}/data-restored
-    defaults: { _controller: 'App\Inventory\Controller\SalesImportController::restoredAction' }
+    path: '/{id}/data-updated'
+    defaults:
+        _controller: 'App\Inventory\Controller\SalesImportController::updatedAction'

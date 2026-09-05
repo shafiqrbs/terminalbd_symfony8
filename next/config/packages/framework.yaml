@@ -3,7 +3,16 @@ framework:
     secret: '%env(APP_SECRET)%'
 
     # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    #
+    # Both applications serve traffic during the migration, so the session has
+    # to live somewhere both PHP pools can reach: the shared database, not the
+    # file system of one of them. gc_maxlifetime and cookie_lifetime are the
+    # values app/config/config.yml set. The cookie name is PHP's default in
+    # both, so the browser sends the same one to either side of the proxy.
+    session:
+        handler_id: session.handler.shared
+        cookie_lifetime: 0
+        gc_maxlifetime: 3600
 
     #esi: true
     #fragments: true

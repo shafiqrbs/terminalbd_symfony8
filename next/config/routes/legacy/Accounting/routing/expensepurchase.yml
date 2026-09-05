@@ -1,50 +1,48 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 account_expense_purchase:
-    path:     /
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::indexAction'
 account_expense_purchase_new:
-    path:     /new
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::newAction'
 account_expense_purchase_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::editAction'
 account_expense_purchase_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::showAction'
 account_expense_purchase_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::updateAction'
+    methods:
+        - POST
+        - PUT
 account_expense_purchase_particular_add:
-    path:     /{invoice}/particular-add
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::addParticularAction' }
-    methods:  POST
+    path: '/{invoice}/particular-add'
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::addParticularAction'
+    methods: POST
     options:
-            expose: true
-
-
+        expose: true
 account_expense_purchase_status:
-    path:     /{id}/status
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::statusAction' }
-
+    path: '/{id}/status'
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::statusAction'
 account_expense_purchase_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::deleteAction' }
-
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::deleteAction'
 account_expense_purchase_approved:
-    path:     /{id}/invoice-approved
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::approvedAction' }
-
-account_expense_purchase_item_approve:
-    path:     /{id}/item-approve
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::itemApproveAction' }
-
+    path: '/{id}/invoice-approved'
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::approvedAction'
 account_expense_purchase_particular_delete:
-    path:     /{invoice}/{id}/particular-delete
-    defaults: { _controller: 'App\Accounting\Controller\PurchaseController::invoiceParticularDeleteAction' }
-
+    path: '/{invoice}/{id}/particular-delete'
+    defaults:
+        _controller: 'App\Accounting\Controller\PurchaseController::invoiceParticularDeleteAction'

@@ -34,6 +34,10 @@ security:
             pattern: ^/
             provider: app_users
             lazy: true
+            custom_authenticators:
+                # Picks up a session started by the legacy application; see
+                # App\Security\SharedSessionAuthenticator.
+                - App\Security\SharedSessionAuthenticator
             form_login:
                 # Route names come from the legacy XML (see port-auth-routes.php);
                 # templates across the app already link to these names.

@@ -1,16 +1,2 @@
-inventory_sales_barcode:
-    path:     /
-    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::salesAction' }
-
-inventory_sales_barcode_show:
-    path:     /{invoice}/sales/show
-    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::salesShowAction' }
-
-inventory_purchase_barcode:
-    path:     /
-    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::purchaseAction' }
-
-inventory_purchase_barcode_show:
-    path:     /
-    defaults: { _controller: 'App\Inventory\Controller\BarcodeController::purchaseShowAction' }
-
+# 4 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.

@@ -1,34 +1,33 @@
-transactionmethod:
-    path:     /
-    defaults: { _controller: 'App\Tool\Controller\TransactionMethodController::indexAction' }
-
-transactionmethod_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Tool\Controller\TransactionMethodController::showAction' }
-
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 transactionmethod_new:
-    path:     /new
-    defaults: { _controller: 'App\Tool\Controller\TransactionMethodController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Tool\Controller\TransactionMethodController::newAction'
 transactionmethod_create:
-    path:     /create
-    defaults: { _controller: 'App\Tool\Controller\TransactionMethodController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Tool\Controller\TransactionMethodController::createAction'
+    methods: POST
 transactionmethod_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Tool\Controller\TransactionMethodController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Tool\Controller\TransactionMethodController::editAction'
 transactionmethod_status:
-    path:     /{id}/status
-    defaults: { _controller: 'App\Tool\Controller\TransactionMethodController::statusAction' }
-
+    path: '/{id}/status'
+    defaults:
+        _controller: 'App\Tool\Controller\TransactionMethodController::statusAction'
 transactionmethod_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Tool\Controller\TransactionMethodController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Tool\Controller\TransactionMethodController::updateAction'
+    methods:
+        - POST
+        - PUT
 transactionmethod_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Tool\Controller\TransactionMethodController::deleteAction' }
-    methods:  [POST, DELETE]
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Tool\Controller\TransactionMethodController::deleteAction'
+    methods:
+        - POST
+        - DELETE

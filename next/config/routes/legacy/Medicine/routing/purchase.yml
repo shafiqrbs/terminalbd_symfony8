@@ -1,194 +1,189 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 medicine_purchase:
-    path:     /
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::indexAction'
 medicine_purchase_item:
-    path:     /stock-item-details
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::purchaseItemAction' }
-
+    path: /stock-item-details
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::purchaseItemAction'
 medicine_expiry_item:
-    path:     /medicine-expiration-item
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::medicineExpiryAction' }
-
+    path: /medicine-expiration-item
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::medicineExpiryAction'
 medicine_purchase_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::showAction'
 medicine_purchase_copy:
-    path:     /{id}/copy
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::copyAction' }
-
+    path: '/{id}/copy'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::copyAction'
 medicine_purchase_new:
-    path:     /new
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::newAction'
 medicine_purchase_opening:
-    path:     /opening
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::vendorOpeningAction' }
-
+    path: /opening
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::vendorOpeningAction'
 medicine_purchase_opening_create:
-    path:     /opening/create
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::openingCreateAction' }
-    methods:  [POST, PUT]
-
+    path: /opening/create
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::openingCreateAction'
+    methods:
+        - POST
+        - PUT
 medicine_purchase_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::editAction'
 medicine_purchase_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::updateAction'
+    methods:
+        - POST
+        - PUT
 medicine_purchase_status:
-    path:     /{id}/status
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::editAction' }
-
+    path: '/{id}/status'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::editAction'
 medicine_purchase_vendor_update:
-    path:     /vendor-update
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::vendorUpdateAction' }
-    methods:  [POST, PUT]
+    path: /vendor-update
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::vendorUpdateAction'
+    methods:
+        - POST
+        - PUT
     options:
         expose: true
-
 medicine_purchase_ajax_update:
-    path:     /ajax-update
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::ajaxUpdateAction' }
-    methods:  [POST, PUT]
+    path: /ajax-update
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::ajaxUpdateAction'
+    methods:
+        - POST
+        - PUT
     options:
         expose: true
-
-
-medicine_purchase_approve:
-    path:     /{id}/approve
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::approveAction' }
-
 medicine_purchase_emptyDelete:
-    path:     /empty/delete
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::emptyDeleteAction' }
-
+    path: /empty/delete
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::emptyDeleteAction'
 medicine_purchase_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::deleteAction' }
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::deleteAction'
 medicine_purchase_particular_search:
-    path:     /{id}/medicine-stock-search
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::particularSearchAction' }
+    path: '/{id}/medicine-stock-search'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::particularSearchAction'
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_stock_item_search:
-    path:     /medicine-stock-item-search
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::autoPurchaseStockItemSearchAction' }
+    path: /medicine-stock-item-search
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::autoPurchaseStockItemSearchAction'
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_particular_add:
-    path:     /{invoice}/particular-add
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::addParticularAction' }
-    methods:  POST
+    path: '/{invoice}/particular-add'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::addParticularAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_particular_add_manual:
-    path:     /{invoice}/particular-add-manual
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::addParticularManualAction' }
-    methods:  POST
+    path: '/{invoice}/particular-add-manual'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::addParticularManualAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_manual_item_update:
-    path:     /particular-add-manual
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::purchaseManulItemUpdateAction' }
-    methods:  POST
+    path: /particular-add-manual
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::purchaseManulItemUpdateAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_barcode_search:
-    path:     /{id}/barcode-stock-search
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::barcodeSearchAction' }
+    path: '/{id}/barcode-stock-search'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::barcodeSearchAction'
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_barcode_item:
-    path:     /{purchase}/create-barcode-item
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::addBarcodeItemAction' }
-    methods:  POST
+    path: '/{purchase}/create-barcode-item'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::addBarcodeItemAction'
+    methods: POST
     options:
-            expose: true
-
-
+        expose: true
 medicine_stock_item_create:
-    path:     /{id}/stock-item-create
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::stockItemCreateAction' }
-    methods:  POST
+    path: '/{id}/stock-item-create'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::stockItemCreateAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_discount_update:
-    path:     /discount-update
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::invoiceDiscountUpdateAction' }
-    methods:  POST
+    path: /discount-update
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::invoiceDiscountUpdateAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_item_update:
-    path:     /item-update
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::purchaseItemUpdateAction' }
-    methods:  POST
+    path: /item-update
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::purchaseItemUpdateAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_update_brand:
-    path:     /{id}/invoice-update-brand
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::updateBrandAction' }
+    path: '/{id}/invoice-update-brand'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::updateBrandAction'
     options:
-            expose: true
-
+        expose: true
 medicine_purchase_approved:
-    path:     /{id}/invoice-approved
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::approvedAction' }
-
+    path: '/{id}/invoice-approved'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::approvedAction'
 medicine_purchaseitem_status:
-    path:     /{id}/purchase-item-status
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::purchaseItemStatusAction' }
-
+    path: '/{id}/purchase-item-status'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::purchaseItemStatusAction'
 medicine_purchase_vendor_merge:
-    path:     /{id}/invoice-merge
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::vendorMergeAction' }
-
-
+    path: '/{id}/invoice-merge'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::vendorMergeAction'
 medicine_purchase_particular_delete:
-    path:     /{invoice}/{id}/particular-delete
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::invoiceParticularDeleteAction' }
-
+    path: '/{invoice}/{id}/particular-delete'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::invoiceParticularDeleteAction'
 medicine_purchaseitem_inline_update:
-    path:     /purchase-item-inline-update
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::inlineUpdateAction' }
-    methods:  POST
+    path: /purchase-item-inline-update
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::inlineUpdateAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 medicine_purchaseitem_inline_update_purchase_price:
-    path:     /purchase-item-inline-update-purchase-price
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::inlineUpdatePurchasePriceAction' }
-    methods:  POST
+    path: /purchase-item-inline-update-purchase-price
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::inlineUpdatePurchasePriceAction'
+    methods: POST
     options:
-            expose: true
-
-medicine_expiration_inline:
-    path:     /purchase-item-inline-update
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::inlineExpirationUpdateAction' }
-    methods:  POST
-    options:
-            expose: true
-
-
+        expose: true
 medicine_purchase_android:
-    path:     /android
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::androidPurchaseAction' }
-
-
+    path: /android
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::androidPurchaseAction'
 medicine_device_purchase_import:
-    path:      /device-sales-delete-import/{android}
-    defaults: { _controller: 'App\Medicine\Controller\PurchaseController::insertGroupApiPurchaseImportAction' }
+    path: '/device-sales-delete-import/{android}'
+    defaults:
+        _controller: 'App\Medicine\Controller\PurchaseController::insertGroupApiPurchaseImportAction'

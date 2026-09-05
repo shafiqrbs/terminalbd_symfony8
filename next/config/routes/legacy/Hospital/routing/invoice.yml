@@ -1,162 +1,160 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 hms_invoice:
-    path:     /
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::indexAction'
 hms_invoice_appointment:
-    path:     /appointment
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::appointmentInvoiceAction' }
-
+    path: /appointment
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::appointmentInvoiceAction'
 hms_invoice_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::showAction' }
-
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::showAction'
 hms_invoice_new:
-    path:     /new
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::newAction' }
-
-
+    path: /new
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::newAction'
 hms_invoice_old_patient_diagnostic:
-    path:     /old-patient-diagnostic
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::oldPatientDiagnosticAction' }
-    methods:  POST
+    path: /old-patient-diagnostic
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::oldPatientDiagnosticAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 hms_invoice_admission:
-    path:     /admission-new
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::newAction' }
-
+    path: /admission-new
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::newAction'
 hms_invoice_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::editAction'
 hms_invoice_particular_search:
-    path:     /{id}/particular-search
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::particularSearchAction' }
-
-
+    path: '/{id}/particular-search'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::particularSearchAction'
 hms_invoice_particular_add:
-    path:     /{invoice}/particular-add
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::addParticularAction' }
-    methods:  POST
+    path: '/{invoice}/particular-add'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::addParticularAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 hms_invoice_discount_update:
-    path:     /invoice/invoice-dicount-update
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoiceDiscountUpdateAction' }
-    methods:  POST
+    path: /invoice/invoice-dicount-update
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::invoiceDiscountUpdateAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 hms_add_invoice_payment:
-    path:     /{id}/add-invoice-payment
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::addPaymentAction' }
-    methods:  POST
+    path: '/{id}/add-invoice-payment'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::addPaymentAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 hms_invoice_approved:
-    path:     /{id}/invoice-approved
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoiceApproveAction' }
-
+    path: '/{id}/invoice-approved'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::invoiceApproveAction'
 hms_invoice_ready:
-    path:     /{id}/invoice-ready-report
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::readyReportAction' }
-
+    path: '/{id}/invoice-ready-report'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::readyReportAction'
 hms_invoice_commission_regenerate:
-    path:     /{id}/invoice-commission-regenerate
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::commissionRegenerateAction' }
-
-
+    path: '/{id}/invoice-commission-regenerate'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::commissionRegenerateAction'
 hms_invoice_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::updateAction'
+    methods:
+        - POST
+        - PUT
 hms_invoice_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::deleteAction' }
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::deleteAction'
 hms_invoice_reverse:
-    path:     /{invoice}/invoice-reverse-create
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::diagnoesticInvoiceReverseAction' }
-
-hms_invoice_return:
-    path:     /{invoice}/invoice-return
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoiceReturnAction' }
-
+    path: '/{invoice}/invoice-reverse-create'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::diagnoesticInvoiceReverseAction'
 hms_invoice_reverse_show:
-    path:     /{id}/invoice-reverse-show
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::InvoiceReverseShowAction' }
-
+    path: '/{id}/invoice-reverse-show'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::InvoiceReverseShowAction'
 hms_invoice_discount_delete:
-    path:     /{id}/discount-delete
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::discountDeleteAction' }
-
+    path: '/{id}/discount-delete'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::discountDeleteAction'
 hms_invoice_confirm:
-    path:     /{id}/invoice-confirm
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::confirmAction' }
-
+    path: '/{id}/invoice-confirm'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::confirmAction'
 hms_invoice_particular_delete:
-    path:     /{invoice}/{id}/particular-delete
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoiceParticularDeleteAction' }
-
+    path: '/{invoice}/{id}/particular-delete'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::invoiceParticularDeleteAction'
 hms_invoice_print_invoice:
-    path:     /{id}/print
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoicePrintAction' }
-
+    path: '/{id}/print'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::invoicePrintAction'
 hms_invoice_appointment_print:
-    path:     /{id}/appointment-print
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::appointmentPrintAction' }
-
+    path: '/{id}/appointment-print'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::appointmentPrintAction'
 hms_invoice_process_update:
-    path:     /hms-invoice/upadte-process
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoiceProcessUpdateAction' }
-    methods:  POST
+    path: /hms-invoice/upadte-process
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::invoiceProcessUpdateAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 hms_invoice_status_select:
-    path:     /invoice-status-select
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::statusSelectAction' }
+    path: /invoice-status-select
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::statusSelectAction'
     options:
-           expose: true
-
+        expose: true
 hms_invoice_empty_delete:
-    path:     /delete/empty-invoice
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::deleteEmptyInvoiceAction' }
-
+    path: /delete/empty-invoice
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::deleteEmptyInvoiceAction'
 hms_invoice_customer_details:
-    path:     /invoice-patient-details
-    defaults: { _controller: 'App\DomainUser\Controller\CustomerHmsController::detailsAction' }
-    methods:  POST
+    path: /invoice-patient-details
+    defaults:
+        _controller: 'App\DomainUser\Controller\CustomerHmsController::detailsAction'
+    methods: POST
     options:
-           expose: true
-
+        expose: true
 hms_invoice_add_patient:
-    path:     /{id}/invoice-patient-add
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::addPatientAction' }
-    methods:  [POST, PUT]
+    path: '/{id}/invoice-patient-add'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::addPatientAction'
+    methods:
+        - POST
+        - PUT
     options:
-            expose: true
-
+        expose: true
 hms_invoice_item_approve:
-    path:      /{id}/invoice-payment-approve
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoiceTransactionApproveAction' }
+    path: '/{id}/invoice-payment-approve'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::invoiceTransactionApproveAction'
     options:
-            expose: true
-
+        expose: true
 hms_invoice_appointment_approve:
-    path:      /{id}/invoice-appointment-close
-    defaults: { _controller: 'App\Hospital\Controller\InvoiceController::invoiceAppointmentApproveAction' }
+    path: '/{id}/invoice-appointment-close'
+    defaults:
+        _controller: 'App\Hospital\Controller\InvoiceController::invoiceAppointmentApproveAction'
     options:
-            expose: true
-
+        expose: true
 hms_invoice_item_delete:
-    path:      /{transaction}/{id}/invoice-payment-delete
-    defaults: { _controller: 'App\Hospital\Controller\AdmissionPatientParticularController::invoiceParticularDeleteAction' }
+    path: '/{transaction}/{id}/invoice-payment-delete'
+    defaults:
+        _controller: 'App\Hospital\Controller\AdmissionPatientParticularController::invoiceParticularDeleteAction'
     options:
-            expose: true
-
+        expose: true

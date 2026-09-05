@@ -1,27 +1,24 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 daily_attendance:
-    path:     /
-    defaults: { _controller: 'App\HumanResource\Controller\DailyAttendanceController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\HumanResource\Controller\DailyAttendanceController::indexAction'
 daily_attendance_show:
-    path:     /{month}/{year}/show
-    defaults: { _controller: 'App\HumanResource\Controller\DailyAttendanceController::showAction' }
-
+    path: '/{month}/{year}/show'
+    defaults:
+        _controller: 'App\HumanResource\Controller\DailyAttendanceController::showAction'
 daily_attendance_month:
-    path:     /current-month
-    defaults: { _controller: 'App\HumanResource\Controller\DailyAttendanceController::attendanceAction' }
-
+    path: /current-month
+    defaults:
+        _controller: 'App\HumanResource\Controller\DailyAttendanceController::attendanceAction'
 daily_attendance_menual:
-    path:     /attendance-menual
-    defaults: { _controller: 'App\HumanResource\Controller\DailyAttendanceController::manualAttendanceAction' }
-
-daily_attendance_menual_create:
-    path:     /attendance-menual-create
-    defaults: { _controller: 'App\HumanResource\Controller\DailyAttendanceController::manualAttendanceCreateAction' }
-    methods:  POST
-
+    path: /attendance-menual
+    defaults:
+        _controller: 'App\HumanResource\Controller\DailyAttendanceController::manualAttendanceAction'
 daily_attendance_add:
-    path:     /{id}/add
-    defaults: { _controller: 'App\HumanResource\Controller\DailyAttendanceController::addAttendanceAction' }
+    path: '/{id}/add'
+    defaults:
+        _controller: 'App\HumanResource\Controller\DailyAttendanceController::addAttendanceAction'
     options:
-           expose: true
-
+        expose: true

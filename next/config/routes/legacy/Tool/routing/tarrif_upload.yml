@@ -1,21 +1,2 @@
-tarrif_upload:
-    path:     /
-    defaults: { _controller: 'App\Tool\Controller\TaxUploadController::indexAction' }
-
-tarrif_upload_new:
-    path:     /new
-    defaults: { _controller: 'App\Tool\Controller\TaxUploadController::newAction' }
-
-tarrif_upload_create:
-    path:     /create
-    defaults: { _controller: 'App\Tool\Controller\TaxUploadController::createAction' }
-    requirements: { _method: post }
-
-tarrif_upload_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Tool\Controller\TaxUploadController::deleteAction' }
-
-tarrif_upload_migration:
-    path:     /{id}/migration
-    defaults: { _controller: 'App\Tool\Controller\TaxUploadController::excelDataImportAction' }
-
+# 5 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.

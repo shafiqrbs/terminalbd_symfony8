@@ -1,82 +1,82 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 business_vendor_stock:
-    path:     /
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::indexAction'
 business_vendor_stock_item:
-    path:     /item
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::vendorStockItemAction' }
-
+    path: /item
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::vendorStockItemAction'
 business_vendor_stock_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::showAction'
 business_vendor_stock_new:
-    path:     /new
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::newAction'
 business_vendor_stock_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::editAction'
 business_vendor_stock_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::updateAction'
+    methods:
+        - POST
+        - PUT
 business_vendor_stock_status:
-    path:     /{id}/status
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::editAction' }
-
+    path: '/{id}/status'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::editAction'
 business_vendor_stock_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::deleteAction' }
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::deleteAction'
 business_vendor_stock_particular_search:
-    path:     /{id}/particular-search
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::particularSearchAction' }
-
-
+    path: '/{id}/particular-search'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::particularSearchAction'
 business_vendor_stock_particular_add:
-    path:     /{invoice}/particular-add
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::addParticularAction' }
-    methods:  POST
+    path: '/{invoice}/particular-add'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::addParticularAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 business_vendor_stock_search:
-    path:     /{vendor}/vendor-grn
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::selectGrnAction' }
-    methods:  get
+    path: '/{vendor}/vendor-grn'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::selectGrnAction'
+    methods: get
     options:
-            expose: true
-
+        expose: true
 business_vendor_stock_qnt:
-    path:     /{id}/vendor-stck-qnt
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::selectVendorStockAction' }
-    methods:  get
+    path: '/{id}/vendor-stck-qnt'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::selectVendorStockAction'
+    methods: get
     options:
-            expose: true
-
+        expose: true
 business_vendor_stock_inline:
-    path:     /inline-update
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::inlineUpdateAction' }
-
+    path: /inline-update
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::inlineUpdateAction'
 business_vendor_stock_approved:
-    path:     /{id}/invoice-approved
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::approvedAction' }
-
+    path: '/{id}/invoice-approved'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::approvedAction'
 business_vendor_stock_purchase_process:
-    path:     /{id}/purchase-process
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::purchaseProcessAction' }
-
+    path: '/{id}/purchase-process'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::purchaseProcessAction'
 business_vendor_stock_item_approve:
-    path:     /{id}/item-approve
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::itemApproveAction' }
-
+    path: '/{id}/item-approve'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::itemApproveAction'
 business_vendor_stock_particular_delete:
-    path:     /{invoice}/{id}/particular-delete
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::invoiceParticularDeleteAction' }
-
-business_vendor_stock_print_invoice:
-    path:     /{id}/print
-    defaults: { _controller: 'App\Business\Controller\VendorStockController::invoicePrintAction' }
+    path: '/{invoice}/{id}/particular-delete'
+    defaults:
+        _controller: 'App\Business\Controller\VendorStockController::invoiceParticularDeleteAction'

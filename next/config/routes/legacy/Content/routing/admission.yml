@@ -1,62 +1,40 @@
+# 7 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 admission:
-    path:     /
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Content\Controller\AdmissionController::indexAction'
 admission_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Content\Controller\AdmissionController::showAction'
 admission_new:
-    path:     /new
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Content\Controller\AdmissionController::newAction'
 admission_create:
-    path:     /create
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::createAction' }
-    requirements: { _method: post }
-
+    path: /create
+    defaults:
+        _controller: 'App\Content\Controller\AdmissionController::createAction'
+    requirements:
+        _method: post
 admission_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Content\Controller\AdmissionController::editAction'
 admission_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::updateAction' }
-    requirements: { _method: post|put }
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Content\Controller\AdmissionController::updateAction'
+    requirements:
+        _method: post|put
 admission_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::deleteAction' }
-    requirements: { _method: post|delete }
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Content\Controller\AdmissionController::deleteAction'
+    requirements:
+        _method: post|delete
 admission_status:
-    path:     /{id}/status
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::statusAction' }
-
-admission_print_list:
-    path:     /print-list
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::printListAction' }
-
-admission_pdf_list:
-    path:     /pdf-list
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::pdfListAction' }
-
-admission_export_list:
-    path:     /export-list
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::exportListAction' }
-
-admission_print:
-    path:     /{id}/print-details
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::printDetailsAction' }
-
-admission_pdf:
-    path:     /{id}/pdf-details
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::pdfDetailsAction' }
-
-admission_import:
-    path:     /import
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::importAction' }
-
-admission_export:
-    path:     /{id}/export-details
-    defaults: { _controller: 'App\Content\Controller\AdmissionController::exportDetailsAction' }
+    path: '/{id}/status'
+    defaults:
+        _controller: 'App\Content\Controller\AdmissionController::statusAction'

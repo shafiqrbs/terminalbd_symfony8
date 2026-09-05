@@ -1,70 +1,67 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 account_double_entry:
-    path:     /
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::indexAction'
 account_double_entry_item:
-    path:     /entry-item
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::journalDetailsAction' }
-
+    path: /entry-item
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::journalDetailsAction'
 account_double_entry_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::showAction'
 account_double_entry_new:
-    path:     /new
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::newAction'
 account_double_entry_create:
-    path:     /create
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::createAction'
+    methods: POST
 account_double_entry_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::editAction'
 account_double_entry_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::updateAction' }
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::updateAction'
 account_double_entry_approve:
-    path:     /{id}/payment-approve
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::approveAction' }
+    path: '/{id}/payment-approve'
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::approveAction'
     options:
-           expose: true
-
+        expose: true
 account_double_entry_inline:
-    path:     /inline-update
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::inlineUpdateAction' }
-
-
+    path: /inline-update
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::inlineUpdateAction'
 account_double_entry_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::deleteAction' }
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::deleteAction'
     options:
-           expose: true
-
+        expose: true
 account_double_entry_approve_delete:
-    path:     /{id}/approve-delete
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::approveDeleteAction' }
+    path: '/{id}/approve-delete'
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::approveDeleteAction'
     options:
-           expose: true
-
+        expose: true
 account_double_entry_item_delete:
-    path:     /{id}/entry-item-delete
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::itemDeleteAction' }
+    path: '/{id}/entry-item-delete'
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::itemDeleteAction'
     options:
-           expose: true
-
+        expose: true
 account_double_entry_pdf:
-    path:     /report-pdf
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::journalPdfAction' }
-
-account_double_entry_excel:
-    path:     /report-pdf
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::journalExcelAction' }
-
+    path: /report-pdf
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::journalPdfAction'
 account_double_entry_approve_reset:
-    path:     /approve-journal-reset
-    defaults: { _controller: 'App\Accounting\Controller\DoubleEntryController::approveJournalResetAction' }
-
+    path: /approve-journal-reset
+    defaults:
+        _controller: 'App\Accounting\Controller\DoubleEntryController::approveJournalResetAction'

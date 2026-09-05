@@ -1,34 +1,30 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 appsetting_branchshop:
-    path:     /
-    defaults: { _controller: 'App\DomainUser\Controller\BranchShopController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchShopController::indexAction'
 appsetting_branchshop_employee:
-    path:     /{id}/branches-employee
-    defaults: { _controller: 'App\DomainUser\Controller\BranchShopController::branchesEmployeeAction' }
-
-
+    path: '/{id}/branches-employee'
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchShopController::branchesEmployeeAction'
 appsetting_branchshop_new:
-    path:     /new
-    defaults: { _controller: 'App\DomainUser\Controller\BranchShopController::newAction' }
-
-
+    path: /new
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchShopController::newAction'
 appsetting_branchshop_create:
-    path:     /create
-    defaults: { _controller: 'App\DomainUser\Controller\BranchShopController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchShopController::createAction'
+    methods: POST
 appsetting_branchshop_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\DomainUser\Controller\BranchShopController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchShopController::editAction'
 appsetting_branchshop_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\DomainUser\Controller\BranchShopController::updateAction' }
-    methods:  [POST, PUT]
-
-appsetting_branchshop_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\DomainUser\Controller\BranchShopController::deleteAction' }
-
-
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchShopController::updateAction'
+    methods:
+        - POST
+        - PUT

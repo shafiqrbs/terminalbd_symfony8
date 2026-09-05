@@ -1,107 +1,52 @@
+# 6 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 homepage:
-    path:     /backend
-    defaults: { _controller: 'App\User\Controller\DefaultController::landingAction' }
-
+    path: /backend
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::landingAction'
 admin:
     path: /admin
-    defaults: { _controller: App\User\Controller\DefaultController::adminAction }
-
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::adminAction'
 vendor:
     path: /vendor
-    defaults: { _controller: App\User\Controller\DefaultController::vendorAction }
-
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::vendorAction'
 domain:
     path: /domain
-    defaults: { _controller: App\User\Controller\DefaultController::domainAction }
-
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::domainAction'
 website:
     path: /website
-    defaults: { _controller: App\User\Controller\DefaultController::websiteAction }
-
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::websiteAction'
 customer:
     path: /customer
-    defaults:  { _controller: App\Customer\Controller\DomainController::indexAction }
-
-domain_pendig:
-    path: /domain-pendeing
-    defaults: { _controller: App\User\Controller\DefaultController::pendeingAction }
-
+    defaults:
+        _controller: 'App\Customer\Controller\DomainController::indexAction'
 domain_suspended:
     path: /domain-suspended
-    defaults: { _controller: App\User\Controller\DefaultController::suspendedAction }
-
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::suspendedAction'
 tutor:
     path: /tutor
-    defaults: { _controller: App\User\Controller\DefaultController::tutorAction }
-
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::tutorAction'
 general:
     path: /general
-    defaults: { _controller: App\User\Controller\DefaultController::generalAction }
-
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::generalAction'
 landing_page:
-     path: /user-admin
-     defaults: { _controller: App\User\Controller\DefaultController::landingAction }
-
-
-user_deactive:
-    path: /user/deactive/{id}
-    defaults: { _controller: App\User\Controller\UserController::userDeactiveAction }
-    requirements:
-          id: \d+
-
-user_active:
-    path: /user/active/{id}
-    defaults: { _controller: App\User\Controller\UserController::userActiveAction }
-    requirements:
-          id: \d+
-
-username_check:
-    path: /username/check
-    defaults: { _controller: App\User\Controller\UserController::usernameCheckAction }
-    options:
-            expose: true
-
-email_check:
-    path: /email/check
-    defaults: { _controller: App\User\Controller\UserController::emailCheckAction }
-    options:
-            expose: true
-
-user_auto_search:
-    path: /user/search
-    defaults: { _controller: App\User\Controller\UserController::autoSearchAction }
-    options:
-            expose: true
-
-#fos_user_security:
-#     resource: 'security.xml'   # superseded by config/routes/auth.yaml
-
-#fos_user_profile:
-#     resource: "@FOSUserBundle/Resources/config/routing/profile.xml"   # superseded by config/routes/auth.yaml
-#     prefix: /profile
-
-#fos_user_resetting:
-#     resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"   # superseded by config/routes/auth.yaml
-#     prefix: /resetting
-
-#fos_user_change_password:
-#     resource: "@FOSUserBundle/Resources/config/routing/change_password.xml"   # superseded by config/routes/auth.yaml
-#     prefix: /profile
-
+    path: /user-admin
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::landingAction'
 Core_user_group:
-    resource: 'user/user-manage.yml'
+    resource: user/user-manage.yml
     prefix: /system-users
-
 Core_system_user_group:
-    resource: 'user/system-user-manage.yml'
+    resource: user/system-user-manage.yml
     prefix: /users
-
-#fos_user_registration:
-#    resource: "@FOSUserBundle/Resources/config/routing/registration.xml"   # superseded by config/routes/auth.yaml
-#    prefix: /signup
-
 user_lock:
-     path: /lock
-     defaults: { _controller: App\User\Controller\DefaultController::lockAction }
-
-
+    path: /lock
+    defaults:
+        _controller: 'App\User\Controller\DefaultController::lockAction'

@@ -1,42 +1,42 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 business_itemimporter:
-    path:     /
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Business\Controller\ItemImporterController::indexAction'
 business_itemimporter_migration:
-    path:     /{id}/data-migration
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::excelDataImportAction' }
-
+    path: '/{id}/data-migration'
+    defaults:
+        _controller: 'App\Business\Controller\ItemImporterController::excelDataImportAction'
 business_itemimporter_new:
-    path:     /new
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Business\Controller\ItemImporterController::newAction'
 business_itemimporter_create:
-    path:     /create
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Business\Controller\ItemImporterController::createAction'
+    methods: POST
 business_itemimporter_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Business\Controller\ItemImporterController::editAction'
 business_itemimporter_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Business\Controller\ItemImporterController::updateAction'
+    methods:
+        - POST
+        - PUT
 business_itemimporter_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::deleteAction' }
-
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Business\Controller\ItemImporterController::deleteAction'
 business_itemimporter_updated:
-    path:     /{id}/data-updated
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::updatedAction' }
-
+    path: '/{id}/data-updated'
+    defaults:
+        _controller: 'App\Business\Controller\ItemImporterController::updatedAction'
 business_itemimporter_reset:
-    path:     /{ic}/data-reseted
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::resetedAction' }
-
-business_itemimporter_restore:
-    path:     /{ic}/data-restored
-    defaults: { _controller: 'App\Business\Controller\ItemImporterController::restoredAction' }
+    path: '/{ic}/data-reseted'
+    defaults:
+        _controller: 'App\Business\Controller\ItemImporterController::resetedAction'

@@ -1,42 +1,34 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 hms_hms_report_balance:
-    path:     /balance-sheet
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::balanceAction' }
-
+    path: /balance-sheet
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::balanceAction'
 hms_report_balance_pdf:
-    path:     /balance-sheet
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::balanceAction' }
-
+    path: /balance-sheet
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::balanceAction'
 hms_report_income:
-    path:     /income
-    defaults: { _controller: 'App\Accounting\Controller\HmsReportController::incomeAction' }
-
+    path: /income
+    defaults:
+        _controller: 'App\Accounting\Controller\HmsReportController::incomeAction'
 hms_report_income_pdf:
-    path:     /income-pdf
-    defaults: { _controller: 'App\Accounting\Controller\HmsReportController::pdfIncomeAction' }
-
+    path: /income-pdf
+    defaults:
+        _controller: 'App\Accounting\Controller\HmsReportController::pdfIncomeAction'
 hms_report_income_print:
-    path:     /income-print
-    defaults: { _controller: 'App\Accounting\Controller\HmsReportController::printIncomeAction' }
-
+    path: /income-print
+    defaults:
+        _controller: 'App\Accounting\Controller\HmsReportController::printIncomeAction'
 hms_report_monthly_income:
-    path:     /monthly-income
-    defaults: { _controller: 'App\Accounting\Controller\HmsReportController::monthlyIncomeAction' }
-
+    path: /monthly-income
+    defaults:
+        _controller: 'App\Accounting\Controller\HmsReportController::monthlyIncomeAction'
 hms_report_monthly_income_pdf:
-    path:     /monthly-income-pdf
-    defaults: { _controller: 'App\Accounting\Controller\HmsReportController::monthlyIncomePdfAction' }
-
+    path: /monthly-income-pdf
+    defaults:
+        _controller: 'App\Accounting\Controller\HmsReportController::monthlyIncomePdfAction'
 hms_report_monthly_income_print:
-    path:     /monthly-income-print
-    defaults: { _controller: 'App\Accounting\Controller\HmsReportController::monthlyIncomePrintAction' }
-
-
-hms_report_expenditure_details:
-    path:     /expenditure-details
-    defaults: { _controller: 'App\Accounting\Controller\HmsReportController::expenditureDetailsAction' }
-
-hms_report_expenditure_summary:
-    path:     /expenditure-summary
-    defaults: { _controller: 'App\Accounting\Controller\HmsReportController::expenditureSummaryAction' }
-
-
+    path: /monthly-income-print
+    defaults:
+        _controller: 'App\Accounting\Controller\HmsReportController::monthlyIncomePrintAction'

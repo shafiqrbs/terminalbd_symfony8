@@ -1,11 +1,2 @@
-inbox:
-    path:     /
-    defaults: { _controller: 'App\Customer\Controller\OrderController::indexAction' }
-
-inbox_sms:
-    path:     /customer-sms
-    defaults: { _controller: 'App\Customer\Controller\NotificationController::smsAction' }
-
-inbox_email:
-    path:     /customer-email
-    defaults: { _controller: 'App\Customer\Controller\NotificationController::emailAction' }
+# 3 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.

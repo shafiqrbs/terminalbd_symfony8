@@ -1,17 +1,2 @@
-dps_treatment_accessories:
-    path:     /
-    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentAccessoriesController::indexAction' }
-
-dps_treatment_accessories_create:
-    path:     /create
-    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentAccessoriesController::createAction' }
-    methods:  POST
-
-dps_treatment_accessories_delete:
-    path:     /{id}/treatment-accessories-delete
-    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentAccessoriesController::deleteAccessoriesAction' }
-
-dps_treatment_accessories_approved:
-    path:     /{id}/treatment-accessories-approved
-    defaults: { _controller: 'App\DoctorPrescription\Controller\TreatmentAccessoriesController::approvedAccessoriesAction' }
-
+# 4 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.

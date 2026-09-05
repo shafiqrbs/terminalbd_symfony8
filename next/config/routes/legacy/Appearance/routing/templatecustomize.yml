@@ -1,43 +1,45 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 templatecustomize:
-    path:     /
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Appearance\Controller\TemplateCustomizeController::indexAction'
 templatecustomize_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Appearance\Controller\TemplateCustomizeController::showAction'
 templatecustomize_new:
-    path:     /new
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Appearance\Controller\TemplateCustomizeController::newAction'
 templatecustomize_create:
-    path:     /create
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Appearance\Controller\TemplateCustomizeController::createAction'
+    methods: POST
 templatecustomize_edit:
-    path:     /edit
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::editAction' }
-
+    path: /edit
+    defaults:
+        _controller: 'App\Appearance\Controller\TemplateCustomizeController::editAction'
 templatecustomize_ecommerce_edit:
-    path:     /ecommerce-edit
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::ecommerceEditAction' }
-
+    path: /ecommerce-edit
+    defaults:
+        _controller: 'App\Appearance\Controller\TemplateCustomizeController::ecommerceEditAction'
 templatecustomize_reset:
-    path:     /{id}/reset
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::resetAction' }
-
+    path: '/{id}/reset'
+    defaults:
+        _controller: 'App\Appearance\Controller\TemplateCustomizeController::resetAction'
 templatecustomize_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Appearance\Controller\TemplateCustomizeController::updateAction'
+    methods:
+        - POST
+        - PUT
 templatecustomize_ecommerce_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::ecommerceUpdateAction' }
-    methods:  [POST, PUT]
-
-templatecustomize_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Appearance\Controller\TemplateCustomizeController::deleteAction' }
-    methods:  [POST, DELETE]
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Appearance\Controller\TemplateCustomizeController::ecommerceUpdateAction'
+    methods:
+        - POST
+        - PUT

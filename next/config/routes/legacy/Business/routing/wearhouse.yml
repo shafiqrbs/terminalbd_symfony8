@@ -1,30 +1,30 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 business_wearhouse:
-    path:     /
-    defaults: { _controller: 'App\Business\Controller\BusinessWearHouseController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Business\Controller\BusinessWearHouseController::indexAction'
 business_wearhouse_create:
-    path:     /create
-    defaults: { _controller: 'App\Business\Controller\BusinessWearHouseController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Business\Controller\BusinessWearHouseController::createAction'
+    methods: POST
 business_wearhouse_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Business\Controller\BusinessWearHouseController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Business\Controller\BusinessWearHouseController::editAction'
 business_wearhouse_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Business\Controller\BusinessWearHouseController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Business\Controller\BusinessWearHouseController::updateAction'
+    methods:
+        - POST
+        - PUT
 business_wearhouse_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Business\Controller\BusinessWearHouseController::deleteAction' }
-
-business_wearhouse_status:
-    path:     /{id}/status
-    defaults: { _controller: 'App\Business\Controller\BusinessWearHouseController::statusAction' }
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Business\Controller\BusinessWearHouseController::deleteAction'
 business_wearhouse_sorted:
-    path:     /category-sorted
-    defaults: { _controller: 'App\Business\Controller\BusinessWearHouseController::sortedAction' }
-
+    path: /category-sorted
+    defaults:
+        _controller: 'App\Business\Controller\BusinessWearHouseController::sortedAction'

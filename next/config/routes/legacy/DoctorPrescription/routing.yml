@@ -1,52 +1,36 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 dps_expense:
-    resource: 'routing/expenditure.yml'
-    prefix:   /dps-expense
-
+    resource: routing/expenditure.yml
+    prefix: /dps-expense
 dps_expensecategory:
-    resource: 'routing/expensecategory.yml'
-    prefix:   /dps-expense-category
-
+    resource: routing/expensecategory.yml
+    prefix: /dps-expense-category
 dps_report:
-    resource: 'routing/report.yml'
-    prefix:   /report
-
-dps_treatment_accessories:
-    resource: 'routing/treatmentaccessories.yml'
-    prefix:   /treatment-accessories
-
-
+    resource: routing/report.yml
+    prefix: /report
 dps_invoice:
-    resource: 'routing/invoice.yml'
-    prefix:   /invoice
-
+    resource: routing/invoice.yml
+    prefix: /invoice
 dps_prescription:
-    resource: 'routing/prescription.yml'
-    prefix:   /prescription
-
+    resource: routing/prescription.yml
+    prefix: /prescription
 dps_particular:
-    resource: 'routing/particular.yml'
-    prefix:   /particular
-
+    resource: routing/particular.yml
+    prefix: /particular
 dps_service:
-    resource: 'routing/service.yml'
-    prefix:   /service
-
-dps_treatment:
-    resource: 'routing/treatment.yml'
-    prefix:   /treatment-plan
-
+    resource: routing/service.yml
+    prefix: /service
 dps_doctor:
-    resource: 'routing/doctor.yml'
-    prefix:   /doctor
-
+    resource: routing/doctor.yml
+    prefix: /doctor
 dps_diseases:
-    resource: 'routing/diseases.yml'
-    prefix:   /diseases
-
+    resource: routing/diseases.yml
+    prefix: /diseases
 dps_config:
-    resource: 'routing/config.yml'
-    prefix:   /config
-
+    resource: routing/config.yml
+    prefix: /config
 dps_homepage:
-    path:     /dashoard
-    defaults: { _controller: App\DoctorPrescription\Controller\DefaultController::indexAction }
+    path: /dashoard
+    defaults:
+        _controller: 'App\DoctorPrescription\Controller\DefaultController::indexAction'

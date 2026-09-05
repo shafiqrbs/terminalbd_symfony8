@@ -1,39 +1,34 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 menugrouping:
-    path:     /
-    defaults: { _controller: 'App\Appearance\Controller\MenuGroupingController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Appearance\Controller\MenuGroupingController::indexAction'
 menugrouping_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Appearance\Controller\MenuGroupingController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Appearance\Controller\MenuGroupingController::showAction'
 menugrouping_new:
-    path:     /new/{id}/
-    defaults: { _controller: 'App\Appearance\Controller\MenuGroupingController::newAction' }
-
+    path: '/new/{id}/'
+    defaults:
+        _controller: 'App\Appearance\Controller\MenuGroupingController::newAction'
 menugrouping_create:
-    path:     /create
-    defaults: { _controller: 'App\Appearance\Controller\MenuGroupingController::createAction' }
-    requirements: { _method: post }
-
+    path: /create
+    defaults:
+        _controller: 'App\Appearance\Controller\MenuGroupingController::createAction'
+    requirements:
+        _method: post
 menugrouping_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Appearance\Controller\MenuGroupingController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Appearance\Controller\MenuGroupingController::editAction'
 menugrouping_sorting:
-    path:     /{menuGroup}/sorting
-    defaults: { _controller: 'App\Appearance\Controller\MenuGroupingController::sortingAction' }
-
-menugrouping_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Appearance\Controller\MenuGroupingController::updateAction' }
-    requirements: { _method: post|put }
-
+    path: '/{menuGroup}/sorting'
+    defaults:
+        _controller: 'App\Appearance\Controller\MenuGroupingController::sortingAction'
 menugrouping_sorted:
-    path:     /sorted
-    defaults: { _controller: 'App\Appearance\Controller\MenuGroupingController::sortedAction' }
-    requirements: { _method: post|put }
-
-menugrouping_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Appearance\Controller\MenuGroupingController::deleteAction' }
-    requirements: { _method: post|delete }
+    path: /sorted
+    defaults:
+        _controller: 'App\Appearance\Controller\MenuGroupingController::sortedAction'
+    requirements:
+        _method: post|put

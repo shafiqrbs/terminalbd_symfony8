@@ -1,45 +1,46 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 customerweb_invoice:
-    path:     /
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Customer\Controller\InvoiceController::indexAction'
 customerweb_invoice_new:
-    path:     /new
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Customer\Controller\InvoiceController::newAction'
 customerweb_invoice_create:
-    path:     /invoice-create
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::createAction' }
-    methods:  [POST]
-
-customerweb_invoice_delete:
-    path:     /{id}/invoice
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::invoiceDeleteAction' }
-
+    path: /invoice-create
+    defaults:
+        _controller: 'App\Customer\Controller\InvoiceController::createAction'
+    methods:
+        - POST
 customerweb_invoice_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Customer\Controller\InvoiceController::editAction'
 customer_invoice_inline_update:
-    path:     /invoice-inline-update
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::inlineOrderUpdateAction' }
-    methods:  POST
+    path: /invoice-inline-update
+    defaults:
+        _controller: 'App\Customer\Controller\InvoiceController::inlineOrderUpdateAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 customerweb_invoice_show:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::showAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Customer\Controller\InvoiceController::showAction'
 customerweb_invoice_update:
-    path:     /{id}/invoice-update
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::updateAction' }
-    methods:  [PUT,POST]
-
+    path: '/{id}/invoice-update'
+    defaults:
+        _controller: 'App\Customer\Controller\InvoiceController::updateAction'
+    methods:
+        - PUT
+        - POST
 customerweb_report_ledger:
-    path:     /ledger
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::createAction' }
-
+    path: /ledger
+    defaults:
+        _controller: 'App\Customer\Controller\InvoiceController::createAction'
 customerweb_report_cashoverview:
-    path:     /ledger
-    defaults: { _controller: 'App\Customer\Controller\InvoiceController::createAction' }
-
+    path: /ledger
+    defaults:
+        _controller: 'App\Customer\Controller\InvoiceController::createAction'

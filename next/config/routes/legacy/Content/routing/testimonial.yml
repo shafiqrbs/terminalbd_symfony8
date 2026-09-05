@@ -1,36 +1,34 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 testimonial:
-    path:     /
-    defaults: { _controller: 'App\Content\Controller\TestimonialController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Content\Controller\TestimonialController::indexAction'
 testimonial_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Content\Controller\TestimonialController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Content\Controller\TestimonialController::showAction'
 testimonial_new:
-    path:     /new
-    defaults: { _controller: 'App\Content\Controller\TestimonialController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Content\Controller\TestimonialController::newAction'
 testimonial_create:
-    path:     /create
-    defaults: { _controller: 'App\Content\Controller\TestimonialController::createAction' }
-    requirements: { _method: post }
-
+    path: /create
+    defaults:
+        _controller: 'App\Content\Controller\TestimonialController::createAction'
+    requirements:
+        _method: post
 testimonial_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Content\Controller\TestimonialController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Content\Controller\TestimonialController::editAction'
 testimonial_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Content\Controller\TestimonialController::updateAction' }
-    requirements: { _method: post|put }
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Content\Controller\TestimonialController::updateAction'
+    requirements:
+        _method: post|put
 testimonial_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Content\Controller\TestimonialController::deleteAction' }
-
-
-testimonial_status:
-    path:     /{id}/status
-    defaults: { _controller: 'App\Content\Controller\TestimonialController::statusAction' }
-
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Content\Controller\TestimonialController::deleteAction'

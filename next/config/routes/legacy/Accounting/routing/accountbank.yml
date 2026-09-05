@@ -1,42 +1,36 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 accountbank:
-    path:     /
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBankController::indexAction'
 accountbank_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBankController::showAction'
 accountbank_new:
-    path:     /new
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBankController::newAction'
 accountbank_create:
-    path:     /create
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBankController::createAction'
+    methods: POST
 accountbank_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBankController::editAction'
 accountbank_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::updateAction' }
-    methods:  [POST, PUT]
-
-accountbank_approve:
-    path:     /{id}/payment-approve
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::approveAction' }
-    options:
-           expose: true
-
-accountbank_inline:
-    path:     /inline-update
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::inlineUpdateAction' }
-
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBankController::updateAction'
+    methods:
+        - POST
+        - PUT
 accountbank_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::deleteAction' }
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBankController::deleteAction'
     options:
-           expose: true
+        expose: true

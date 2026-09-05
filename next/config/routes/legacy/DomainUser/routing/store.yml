@@ -1,36 +1,34 @@
-domain_store:
-    path:     /
-    defaults: { _controller: 'App\DomainUser\Controller\StoreController::indexAction' }
-
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 domain_store_employee:
-    path:     /{id}/branches-employee
-    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::branchesEmployeeAction' }
-
+    path: '/{id}/branches-employee'
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchesController::branchesEmployeeAction'
 domain_store_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchesController::showAction'
 domain_store_new:
-    path:     /new
-    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchesController::newAction'
 domain_store_create:
-    path:     /create
-    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchesController::createAction'
+    methods: POST
 domain_store_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchesController::editAction'
 domain_store_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchesController::updateAction'
+    methods:
+        - POST
+        - PUT
 domain_store_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\DomainUser\Controller\BranchesController::deleteAction' }
-
-
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\DomainUser\Controller\BranchesController::deleteAction'

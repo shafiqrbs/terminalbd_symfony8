@@ -1,34 +1,20 @@
+# 4 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 contactpage:
-    path:     /
-    defaults: { _controller: 'App\Content\Controller\ContactPageController::indexAction' }
-
-contactpage_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Content\Controller\ContactPageController::showAction' }
-
-contactpage_new:
-    path:     /new
-    defaults: { _controller: 'App\Content\Controller\ContactPageController::newAction' }
-
-contactpage_create:
-    path:     /create
-    defaults: { _controller: 'App\Content\Controller\ContactPageController::createAction' }
-    requirements: { _method: post }
-
+    path: /
+    defaults:
+        _controller: 'App\Content\Controller\ContactPageController::indexAction'
 contactpage_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Content\Controller\ContactPageController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Content\Controller\ContactPageController::editAction'
 contactpage_modify:
-    path:     /modify
-    defaults: { _controller: 'App\Content\Controller\ContactPageController::modifyAction' }
-
+    path: /modify
+    defaults:
+        _controller: 'App\Content\Controller\ContactPageController::modifyAction'
 contactpage_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Content\Controller\ContactPageController::updateAction' }
-    requirements: { _method: post|put }
-
-contactpage_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Content\Controller\ContactPageController::deleteAction' }
-    requirements: { _method: post|delete }
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Content\Controller\ContactPageController::updateAction'
+    requirements:
+        _method: post|put

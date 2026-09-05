@@ -1,74 +1,74 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 business_stock:
-    path:     /
-    defaults: { _controller: 'App\Business\Controller\StockController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Business\Controller\StockController::indexAction'
 business_allstock_delete:
-    path:     /all-stock-delete
-    defaults: { _controller: 'App\Business\Controller\StockController::allStockDeleteAction' }
-
+    path: /all-stock-delete
+    defaults:
+        _controller: 'App\Business\Controller\StockController::allStockDeleteAction'
 business_stock_shortlist:
-    path:     /short-list
-    defaults: { _controller: 'App\Business\Controller\StockController::shortListAction' }
-
+    path: /short-list
+    defaults:
+        _controller: 'App\Business\Controller\StockController::shortListAction'
 business_stock_history:
-    path:     /stock-history
-    defaults: { _controller: 'App\Business\Controller\StockController::stockItemHistoryAction' }
-
+    path: /stock-history
+    defaults:
+        _controller: 'App\Business\Controller\StockController::stockItemHistoryAction'
 business_stock_ledger:
-    path:     /stock-ledger
-    defaults: { _controller: 'App\Business\Controller\StockController::stockLedgerAction' }
-
+    path: /stock-ledger
+    defaults:
+        _controller: 'App\Business\Controller\StockController::stockLedgerAction'
 business_stock_new:
-    path:     /new
-    defaults: { _controller: 'App\Business\Controller\StockController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Business\Controller\StockController::newAction'
 business_stock_create:
-    path:     /create
-    defaults: { _controller: 'App\Business\Controller\StockController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Business\Controller\StockController::createAction'
+    methods: POST
 business_stock_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Business\Controller\StockController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Business\Controller\StockController::editAction'
 business_stock_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Business\Controller\StockController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Business\Controller\StockController::updateAction'
+    methods:
+        - POST
+        - PUT
 business_stock_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Business\Controller\StockController::deleteAction' }
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Business\Controller\StockController::deleteAction'
 business_stock_transfer:
-    path:     /{id}/transfer
-    defaults: { _controller: 'App\Business\Controller\StockController::transferAction' }
-
+    path: '/{id}/transfer'
+    defaults:
+        _controller: 'App\Business\Controller\StockController::transferAction'
 business_stock_status:
-    path:     /{id}/status
-    defaults: { _controller: 'App\Business\Controller\StockController::statusAction' }
-
+    path: '/{id}/status'
+    defaults:
+        _controller: 'App\Business\Controller\StockController::statusAction'
 business_stock_inline:
-    path:     /inline-update
-    defaults: { _controller: 'App\Business\Controller\StockController::inlineUpdateAction' }
-
-business_stock_production:
-    path:     /{id}/production
-    defaults: { _controller: 'App\Business\Controller\StockController::productionAction' }
-
+    path: /inline-update
+    defaults:
+        _controller: 'App\Business\Controller\StockController::inlineUpdateAction'
 business_stock_excel:
-    path:     /excel
-    defaults: { _controller: 'App\Business\Controller\StockController::stockExcelAction' }
-
-
+    path: /excel
+    defaults:
+        _controller: 'App\Business\Controller\StockController::stockExcelAction'
 business_stock_search:
-    path:     /search
-    defaults: { _controller: 'App\Business\Controller\StockController::autoSearchAction' }
+    path: /search
+    defaults:
+        _controller: 'App\Business\Controller\StockController::autoSearchAction'
     options:
-            expose: true
-
+        expose: true
 business_stock_name_search:
-    path:     /{stock}/search-name
-    defaults: { _controller: 'App\Business\Controller\StockController::searchNameAction' }
+    path: '/{stock}/search-name'
+    defaults:
+        _controller: 'App\Business\Controller\StockController::searchNameAction'
     options:
-            expose: true
+        expose: true

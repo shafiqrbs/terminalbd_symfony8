@@ -1,67 +1,55 @@
+# 4 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 account_loan:
-    path:     /
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanController::indexAction'
 account_loan_outstanding:
-    path:     /loan-outstanding
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanController::loanOutstandingAction' }
-
+    path: /loan-outstanding
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanController::loanOutstandingAction'
 account_loan_new:
-    path:     /new
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanController::newAction'
 account_loan_create:
-    path:     /create
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanController::createAction' }
-    methods:  POST
-
-account_loan_reverse:
-    path:     /{id}/reverse
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanController::loanReverseAction' }
-
-account_loan_print:
-    path:     /{id}/print-payment
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanController::printAction' }
-
+    path: /create
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanController::createAction'
+    methods: POST
 account_loan_approve:
-    path:     /{id}/loan-approve
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanController::approveAction' }
+    path: '/{id}/loan-approve'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanController::approveAction'
     options:
-           expose: true
-
+        expose: true
 account_loan_inline:
-    path:     /inline-update
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanController::inlineUpdateAction' }
-
+    path: /inline-update
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanController::inlineUpdateAction'
 account_loan_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanController::deleteAction' }
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanController::deleteAction'
     options:
-           expose: true
-
-
+        expose: true
 account_loanuser:
-    path:     /user
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanUserController::indexAction' }
-
+    path: /user
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanUserController::indexAction'
 account_loanuser_new:
-    path:     /user-new
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanUserController::newAction' }
-
+    path: /user-new
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanUserController::newAction'
 account_loanuser_create:
-    path:     /user-create
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanUserController::createAction' }
-    methods:  POST
-
-account_loanuser_edit:
-    path:     /{id}/user-edit
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanUserController::editAction' }
-
-account_loanuser_delete:
-    path:     /{id}/user-delete
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanUserController::deleteUserAction' }
-
+    path: /user-create
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanUserController::createAction'
+    methods: POST
 account_loanuser_update:
-    path:     /{id}/user-update
-    defaults: { _controller: 'App\Accounting\Controller\AccountLoanUserController::updateAction' }
-    methods:  [POST, PUT]
+    path: '/{id}/user-update'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountLoanUserController::updateAction'
+    methods:
+        - POST
+        - PUT

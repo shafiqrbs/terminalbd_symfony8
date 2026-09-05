@@ -1,419 +1,398 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 xapi_poskeeper_login:
-    path:     /poskeeper-otp-login
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::loginAction }
-
+    path: /poskeeper-otp-login
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::loginAction'
 api_portal_app:
-    path:     /poskeeper-onboard
-    defaults: { _controller: App\Bindu\Controller\ApiPortalController::onboardAction }
-
+    path: /poskeeper-onboard
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPortalController::onboardAction'
 api_poskeeper_shop_create:
-    path:     /poskeeper-shop-setup
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::shopSetupAction }
-    methods:  POST
+    path: /poskeeper-shop-setup
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::shopSetupAction'
+    methods: POST
     options:
         expose: true
-
 api_poskeeper_setup:
-    path:     /poskeeper-setup
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::setupAction }
-
+    path: /poskeeper-setup
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::setupAction'
 api_poskeeper_plate:
-    path:     /poskeeper-color-plate
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::colorPlateAction }
-    methods:  POST|GET
+    path: /poskeeper-color-plate
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::colorPlateAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_splash:
-    path:     /poskeeper-splash
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::splashAction }
-
+    path: /poskeeper-splash
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::splashAction'
 api_poskeeper_dashboard:
-    path:     /poskeeper-dashboard
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::dashboardAction }
-
+    path: /poskeeper-dashboard
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::dashboardAction'
 api_poskeeper_system_overview:
-    path:     /poskeeper-system-overview
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::systemOverviewAction }
-    methods:  POST|GET
+    path: /poskeeper-system-overview
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::systemOverviewAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_system_user_sales:
-    path:     /poskeeper-user-sales-overview
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::userSalesOverviewAction }
-    methods:  POST|GET
+    path: /poskeeper-user-sales-overview
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::userSalesOverviewAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_bank_account:
-    path:     /poskeeper-bank-account
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::bankAccountBalanceAction }
-    methods:  POST|GET
+    path: /poskeeper-bank-account
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::bankAccountBalanceAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_masterdata:
-    path:     /poskeeper-masterdata
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::masterdataAction }
-    methods:  POST|GET
+    path: /poskeeper-masterdata
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::masterdataAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_app:
-    path:     /poskeeper-shop-type
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::appsAction }
-
+    path: /poskeeper-shop-type
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::appsAction'
 api_poskeeper_register:
-    path:     /poskeeper-store-build
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::storeBuildAction }
-
+    path: /poskeeper-store-build
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::storeBuildAction'
 api_poskeeper_stock_item:
-    path:     /poskeeper-stock-item
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::stockItemAction }
-
+    path: /poskeeper-stock-item
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::stockItemAction'
 api_poskeeper_stock_create:
-    path:     /poskeeper-stock-create
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::createStockAction }
-    methods:  POST|GET
+    path: /poskeeper-stock-create
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::createStockAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_stock_edit:
-    path:     /poskeeper-stock-edit
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::editStockAction }
-    methods:  POST|GET
+    path: /poskeeper-stock-edit
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::editStockAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_stock_update:
-    path:     /poskeeper-stock-update
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::updateStockAction }
-    methods:  POST
+    path: /poskeeper-stock-update
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::updateStockAction'
+    methods: POST
     options:
         expose: true
-
 api_poskeeper_stock_delete:
-    path:     /poskeeper-stock-delete
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::deleteStockAction }
-
-
+    path: /poskeeper-stock-delete
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::deleteStockAction'
 api_poskeeper_order_process:
-    path:     /poskeeper-order-process
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOrderProcessAction }
-    methods:  POST|GET
+    path: /poskeeper-order-process
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiOrderProcessAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_sync_lists:
-    path:     /poskeeper-sync-list
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiSyncListAction }
-    methods:  POST|GET
+    path: /poskeeper-sync-list
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiSyncListAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_sync_process:
-    path:     /poskeeper-sync-process
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiSyncProcessAction }
-    methods:  POST|GET
+    path: /poskeeper-sync-process
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiSyncProcessAction'
+    methods: POST|GET
     options:
         expose: true
-
-
 api_poskeeper_online_sales_delete:
-    path:     /poskeeper-online-sales-delete
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesDeleteAction }
-    methods:  POST|GET
+    path: /poskeeper-online-sales-delete
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesDeleteAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_online_sales_list:
-    path:     /poskeeper-online-sales
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesAction }
-
+    path: /poskeeper-online-sales
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesAction'
 api_poskeeper_online_sales_return_list:
-    path:     /poskeeper-online-sales-return
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesReturnAction }
-
+    path: /poskeeper-online-sales-return
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesReturnAction'
 api_poskeeper_online_sales_details:
-    path:     /poskeeper-online-sales-details
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesDetailsAction }
-
+    path: /poskeeper-online-sales-details
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesDetailsAction'
 api_poskeeper_account_sales:
-    path:     /poskeeper-account-sales
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::accountSalesAction }
-    methods:  POST|GET
+    path: /poskeeper-account-sales
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::accountSalesAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_customer:
-    path:     /poskeeper-customer
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::customerAction }
-    methods:  POST|GET
+    path: /poskeeper-customer
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::customerAction'
+    methods: POST|GET
     options:
         expose: true
-
-
 api_poskeeper_customer_ledger:
-    path:     /poskeeper-customer-ledger
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::customerLedgerAction }
-    methods:  POST|GET
+    path: /poskeeper-customer-ledger
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::customerLedgerAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_customer_invoice_details:
-    path:     /poskeeper-customer-invoice-details
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::customerInvoiceAction }
-    methods:  POST|GET
+    path: /poskeeper-customer-invoice-details
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::customerInvoiceAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_account_sales_receive:
-    path:     /poskeeper-account-receive
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::salesReceiveAction }
-    methods:  POST|GET
+    path: /poskeeper-account-receive
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::salesReceiveAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_account_sales_delete:
-    path:     /poskeeper-account-sales-delete
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiAccountingSalesDeleteAction }
-    methods:  POST|GET
+    path: /poskeeper-account-sales-delete
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiAccountingSalesDeleteAction'
+    methods: POST|GET
     options:
         expose: true
-
-
 api_poskeeper_account_sales_approve:
-    path:     /poskeeper-account-sales-approve
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiAccountingSalesApproveAction }
-    methods:  POST|GET
+    path: /poskeeper-account-sales-approve
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiAccountingSalesApproveAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_customer_create:
-    path:     /poskeeper-customer-create
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::createCustomerAction }
-    methods:  POST|GET
+    path: /poskeeper-customer-create
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::createCustomerAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_customer_update:
-    path:     /poskeeper-customer-update
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::updateCustomerAction }
-    methods:  POST
-
-
-
+    path: /poskeeper-customer-update
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::updateCustomerAction'
+    methods: POST
 api_poskeeper_online_purchase:
-    path:     /poskeeper-online-purchase
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOnlinePurchaseAction }
-    methods:  POST|GET
+    path: /poskeeper-online-purchase
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiOnlinePurchaseAction'
+    methods: POST|GET
     options:
-       expose: true
-
+        expose: true
 api_poskeeper_online_purchase_details:
-    path:     /poskeeper-online-purchase-details
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOnlinePurchaseDetailsAction }
-    methods:  POST|GET
+    path: /poskeeper-online-purchase-details
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiOnlinePurchaseDetailsAction'
+    methods: POST|GET
     options:
         expose: true
-
-
-
 api_poskeeper_purchase_create:
-    path:     /poskeeper-purchase
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiCreatePurchaseAction }
-    methods:  POST|GET
+    path: /poskeeper-purchase
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiCreatePurchaseAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_online_purchase_delete:
-    path:     /poskeeper-online-purchase-delete
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOnlinePurchaseDeleteAction }
-    methods:  POST|GET
+    path: /poskeeper-online-purchase-delete
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiOnlinePurchaseDeleteAction'
+    methods: POST|GET
     options:
         expose: true
-
-
 api_poskeeper_vendor:
-    path:     /poskeeper-vendor
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::vendorOutstandingAction }
-    methods:  POST|GET
+    path: /poskeeper-vendor
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::vendorOutstandingAction'
+    methods: POST|GET
     options:
         expose: true
-
-
 api_poskeeper_account_payment:
-    path:     /poskeeper-account-payment
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::purchasePaymentAction }
-    methods:  POST|GET
+    path: /poskeeper-account-payment
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::purchasePaymentAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_account_purchase_delete:
-    path:     /poskeeper-account-purchase-delete
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiAccountingPurchaseDeleteAction }
-    methods:  POST|GET
+    path: /poskeeper-account-purchase-delete
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiAccountingPurchaseDeleteAction'
+    methods: POST|GET
     options:
         expose: true
-
-
 api_poskeeper_account_purchase_approve:
-    path:     /poskeeper-account-purchase-approve
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiAccountingPurchaseApproveAction }
-    methods:  POST|GET
+    path: /poskeeper-account-purchase-approve
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiAccountingPurchaseApproveAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_vendor_purchase:
-    path:     /poskeeper-account-purchase
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::vendorPurchaseAction }
-    methods:  POST|GET
+    path: /poskeeper-account-purchase
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::vendorPurchaseAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_vendor_ledger:
-    path:     /poskeeper-vendor-ledger
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::vendorLedgerAction }
-    methods:  POST|GET
+    path: /poskeeper-vendor-ledger
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::vendorLedgerAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_vendor_create:
-    path:     /poskeeper-vendor-create
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::createVendorAction }
-    methods:  POST|GET
+    path: /poskeeper-vendor-create
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::createVendorAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_vendor_update:
-    path:     /poskeeper-vendor-update
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::updateVendorAction }
-    methods:  POST
-
+    path: /poskeeper-vendor-update
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::updateVendorAction'
+    methods: POST
 api_poskeeper_vendor_payment:
-    path:     /poskeeper-payment
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::purchasePaymentAction }
-    methods:  POST|GET
+    path: /poskeeper-payment
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::purchasePaymentAction'
+    methods: POST|GET
     options:
         expose: true
-
-
 api_poskeeper_short_list:
-    path:     /poskeeper-purchase-short-list
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::purchaseShortListAction }
-
-api_poskeeper_instant_purchase:
-    path:     /poskeeper-instant-purchase-item
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::instantPurchaseAction }
-
+    path: /poskeeper-purchase-short-list
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::purchaseShortListAction'
 api_poskeeper_add_purchase_shortlist:
-    path:     /poskeeper-add-purchase-short-list
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::insertPurchaseShortItemAction }
-
-
+    path: /poskeeper-add-purchase-short-list
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::insertPurchaseShortItemAction'
 api_poskeeper_sales:
-    path:     /poskeeper-sales
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiSalesAction }
-    methods:  POST
+    path: /poskeeper-sales
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiSalesAction'
+    methods: POST
     options:
         expose: true
-
-api_poskeeper_sales_update:
-    path:     /poskeeper-sales-update
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesUpdateAction }
-    methods:  POST|GET
-    options:
-        expose: true
-
 api_poskeeper_sales_deletee:
-    path:     /poskeeper-sales-delete
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesDeleteAction }
-    methods:  POST|GET
+    path: /poskeeper-sales-delete
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesDeleteAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_expense:
-    path:     /poskeeper-account-expense
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiExpenseAction }
-    methods:  POST|GET
+    path: /poskeeper-account-expense
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiExpenseAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_expense_category:
-    path:     /poskeeper-expense-category
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiExpenseCategoryAction }
-    methods:  POST|GET
+    path: /poskeeper-expense-category
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiExpenseCategoryAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_expense_head:
-    path:     /poskeeper-expense-head
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiExpenseHeadAction }
-    methods:  POST|GET
+    path: /poskeeper-expense-head
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiExpenseHeadAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_expense_create:
-    path:     /poskeeper-expense-create
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiExpenseCreateAction }
-    methods:  POST|GET
+    path: /poskeeper-expense-create
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiExpenseCreateAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_expense_approve:
-    path:     /poskeeper-expense-approve
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiExpenseApproveAction }
-    methods:  POST|GET
+    path: /poskeeper-expense-approve
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiExpenseApproveAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_expense_delete:
-    path:     /poskeeper-expense-delete
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiExpenseDeleteAction }
-    methods:  POST|GET
+    path: /poskeeper-expense-delete
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiExpenseDeleteAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_table:
-    path:     /poskeeper-restaurant-table
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::tableAction }
-
+    path: /poskeeper-restaurant-table
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::tableAction'
 api_poskeeper_discount_coupon:
-    path:     /poskeeper-restaurant-discount-coupon
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::discountCouponAction }
-
+    path: /poskeeper-restaurant-discount-coupon
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::discountCouponAction'
 api_poskeeper_valid_coupon:
-    path:     /poskeeper-restaurant-valid-coupon
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::validCouponAction }
-    methods:  POST|GET
+    path: /poskeeper-restaurant-valid-coupon
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::validCouponAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_logs:
-    path:     /poskeeper-logs
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::apiLogsAction }
-    methods:  POST|GET
+    path: /poskeeper-logs
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::apiLogsAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_user_register:
-    path:     /poskeeper-user-create
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::userRegisterAction }
-    methods:  POST|GET
+    path: /poskeeper-user-create
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::userRegisterAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_masterdata_create:
-    path:     /poskeeper-masterdata-create
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::createMasterDataAction }
-    methods:  POST|GET
+    path: /poskeeper-masterdata-create
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::createMasterDataAction'
+    methods: POST|GET
     options:
         expose: true
-
 api_poskeeper_masterdata_update:
-    path:     /poskeeper-masterdata-update
-    defaults: { _controller: App\Bindu\Controller\ApiPoskeeperController::updateMasterDataAction }
-    methods:  POST|GET
+    path: /poskeeper-masterdata-update
+    defaults:
+        _controller: 'App\Bindu\Controller\ApiPoskeeperController::updateMasterDataAction'
+    methods: POST|GET
     options:
         expose: true

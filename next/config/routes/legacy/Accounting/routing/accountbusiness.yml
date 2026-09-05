@@ -1,53 +1,52 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 account_sales_business:
-    path:     /sales
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::salesAction' }
-
+    path: /sales
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBusinessController::salesAction'
 account_business_balancesheet:
-    path:     /balance-sheet
-    defaults: { _controller: 'App\Accounting\Controller\BusinessReportController::balanceSheetAction' }
-
+    path: /balance-sheet
+    defaults:
+        _controller: 'App\Accounting\Controller\BusinessReportController::balanceSheetAction'
 account_business_income:
-    path:     /income
-    defaults: { _controller: 'App\Accounting\Controller\BusinessReportController::incomeAction' }
-
+    path: /income
+    defaults:
+        _controller: 'App\Accounting\Controller\BusinessReportController::incomeAction'
 account_business_income_monthly:
-    path:     /income-monthly
-    defaults: { _controller: 'App\Accounting\Controller\BusinessReportController::monthlyIncomeAction' }
-
+    path: /income-monthly
+    defaults:
+        _controller: 'App\Accounting\Controller\BusinessReportController::monthlyIncomeAction'
 account_sales_business_new:
-    path:     /sales-receive
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::salesNewAction' }
-
+    path: /sales-receive
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBusinessController::salesNewAction'
 account_sales_business_due:
-    path:     /{sales}/sales-receive
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::duePaymentAction' }
-
+    path: '/{sales}/sales-receive'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBusinessController::duePaymentAction'
 account_sales_business_create:
-    path:     /sales-receive-create
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::salesCreateAction' }
-
+    path: /sales-receive-create
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBusinessController::salesCreateAction'
 account_sales_business_update:
-    path:     /{id}/sales-receive-update
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::duePaymentUpdateAction' }
-
+    path: '/{id}/sales-receive-update'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBusinessController::duePaymentUpdateAction'
 account_purchase_business:
-    path:     /purchase
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::purchaseAction' }
-
+    path: /purchase
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBusinessController::purchaseAction'
 account_purchase_business_new:
-    path:     /purchase-new
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::purchaseNewAction' }
-
-account_purchase_business_reverse:
-    path:     /purchase-reverse
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::purchaseReverseAction' }
-
+    path: /purchase-new
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBusinessController::purchaseNewAction'
 account_purchase_business_create:
-    path:     /purchase-create
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::purchaseCreateAction' }
-
+    path: /purchase-create
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBusinessController::purchaseCreateAction'
 account_sales_business_approve:
-    path:     /{id}/business-payment-approve
-    defaults: { _controller: 'App\Accounting\Controller\AccountBusinessController::salesApproveAction' }
+    path: '/{id}/business-payment-approve'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBusinessController::salesApproveAction'
     options:
-           expose: true
+        expose: true

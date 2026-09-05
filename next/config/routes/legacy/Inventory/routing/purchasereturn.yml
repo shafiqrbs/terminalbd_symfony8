@@ -1,64 +1,64 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 inventory_purchasereturn:
-    path:     /
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::indexAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::indexAction'
 inventory_purchasereturn_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::showAction'
 inventory_purchasereturn_new:
-    path:     /new
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::newAction'
 inventory_purchasereturn_create:
-    path:     /create
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::createAction'
+    methods: POST
 inventory_purchasereturn_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::editAction'
 inventory_purchasereturn_approve:
-    path:     /{id}/approve
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::approveAction' }
+    path: '/{id}/approve'
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::approveAction'
     options:
-           expose: true
-
+        expose: true
 inventory_purchasereturn_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::updateAction'
+    methods:
+        - POST
+        - PUT
 inventory_purchasereturn_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::deleteAction' }
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::deleteAction'
     options:
-            expose: true
-
+        expose: true
 inventory_purchasereturnitem_delete:
-    path:     /{purchaseReturn}/{purchaseReturnItem}/item-delete
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::deleteItemAction' }
+    path: '/{purchaseReturn}/{purchaseReturnItem}/item-delete'
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::deleteItemAction'
     options:
-            expose: true
-
-inventory_purchasereturn_item_replace:
-    path:     /replace
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::replaceAction' }
-    methods:  POST
-    options:
-            expose: true
-
+        expose: true
 inventory_purchasereturn_item_search:
-    path:     /search
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::searchAction' }
-    methods:  [POST, PUT]
+    path: /search
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::searchAction'
+    methods:
+        - POST
+        - PUT
     options:
-            expose: true
-
+        expose: true
 inventory_purchasereturn_item_update:
-    path:     /purchase-return-item-update
-    defaults: { _controller: 'App\Inventory\Controller\PurchaseReturnController::purchaseReturnItemUpdateAction' }
-    methods:  POST
+    path: /purchase-return-item-update
+    defaults:
+        _controller: 'App\Inventory\Controller\PurchaseReturnController::purchaseReturnItemUpdateAction'
+    methods: POST
     options:
-            expose: true
+        expose: true

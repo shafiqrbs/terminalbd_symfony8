@@ -1,29 +1,23 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 agentclient:
-    path:     /
-    defaults: { _controller: 'App\Customer\Controller\AgentClientController::indexAction' }
-
-agentclient_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Customer\Controller\AgentClientController::showAction' }
-
+    path: /
+    defaults:
+        _controller: 'App\Customer\Controller\AgentClientController::indexAction'
 agentclient_new:
-    path:     /new
-    defaults: { _controller: 'App\Customer\Controller\AgentClientController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Customer\Controller\AgentClientController::newAction'
 agentclient_create:
-    path:     /create
-    defaults: { _controller: 'App\Customer\Controller\AgentClientController::createAction' }
-    methods:  POST
-
+    path: /create
+    defaults:
+        _controller: 'App\Customer\Controller\AgentClientController::createAction'
+    methods: POST
 agentclient_edit:
-    path:     /{id}/edit
-    defaults: { _controller: 'App\Customer\Controller\AgentClientController::editAction' }
-
+    path: '/{id}/edit'
+    defaults:
+        _controller: 'App\Customer\Controller\AgentClientController::editAction'
 agentclient_invoice:
-    path:     /invoice
-    defaults: { _controller: 'App\Customer\Controller\AgentClientController::editAction' }
-
-agentclient_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Customer\Controller\AgentClientController::updateAction' }
-    methods:  [POST, PUT]
+    path: /invoice
+    defaults:
+        _controller: 'App\Customer\Controller\AgentClientController::editAction'

@@ -1,58 +1,55 @@
+# 1 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 inventory_delivery:
-    path:     /
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::indexAction' }
-
-inventory_delivery_item_purchase:
-    path:     /item-purchase-details
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::itemPurchaseDetailsAction' }
-    methods:  POST
-    options:
-            expose: true
-
+    path: /
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::indexAction'
 inventory_delivery_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::showAction'
 inventory_delivery_grn:
-    path:     /delivery-grn
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::initialProductBranchDeliveryAction' }
-    methods:  POST
-
+    path: /delivery-grn
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::initialProductBranchDeliveryAction'
+    methods: POST
 inventory_delivery_new:
-    path:     /new
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::newAction' }
-
+    path: /new
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::newAction'
 inventory_delivery_item:
-    path:     /create
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::createAction' }
-    methods:  POST
+    path: /create
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::createAction'
+    methods: POST
     options:
-            expose: true
-
+        expose: true
 inventory_delivery_edit:
-    path:     /{code}/invoice
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::editAction' }
-
+    path: '/{code}/invoice'
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::editAction'
 inventory_delivery_print:
-    path:     /{id}/print
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::printAction' }
-
+    path: '/{id}/print'
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::printAction'
 inventory_delivery_item_delete:
-    path:     /{delivery}/{id}/item/delete
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::DeliveryItemDeleteAction' }
-
+    path: '/{delivery}/{id}/item/delete'
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::DeliveryItemDeleteAction'
 inventory_delivery_approve:
-    path:     /{id}/approve
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::approveAction' }
+    path: '/{id}/approve'
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::approveAction'
     options:
-           expose: true
-
+        expose: true
 inventory_delivery_update:
-    path:     /{id}/update
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::updateAction' }
-    methods:  [POST, PUT]
-
+    path: '/{id}/update'
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::updateAction'
+    methods:
+        - POST
+        - PUT
 inventory_delivery_delete:
-    path:     /{id}/delete
-    defaults: { _controller: 'App\Inventory\Controller\DeliveryController::deleteAction' }
-
+    path: '/{id}/delete'
+    defaults:
+        _controller: 'App\Inventory\Controller\DeliveryController::deleteAction'

@@ -1,87 +1,82 @@
+# 2 route(s) removed by check-routes.php: no such controller or action.
+# See migration/contract/unresolvable-routes.md.
 report_balance:
-    path:     /balance-sheet
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::balanceAction' }
-
+    path: /balance-sheet
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::balanceAction'
 report_balance_pdf:
-    path:     /balance-sheet
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::balanceAction' }
-
+    path: /balance-sheet
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::balanceAction'
 report_income:
-    path:     /income
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::incomeAction' }
-
-report_income_hospital:
-    path:     /hms-income
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::hmsIncomeAction' }
-
+    path: /income
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::incomeAction'
 report_monthly_income:
-    path:     /monthly-income
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::monthlyIncomeAction' }
-
+    path: /monthly-income
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::monthlyIncomeAction'
 report_monthly_income_pdf:
-    path:     /monthly-income-pdf
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::monthlyIncomePdfAction' }
-
+    path: /monthly-income-pdf
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::monthlyIncomePdfAction'
 report_income_pdf:
-    path:     /income-pdf
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::pdfIncomeAction' }
-
+    path: /income-pdf
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::pdfIncomeAction'
 report_income_print:
-    path:     /income-print
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::printIncomeAction' }
-
+    path: /income-print
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::printIncomeAction'
 account_bank_show:
-    path:     /{id}/show
-    defaults: { _controller: 'App\Accounting\Controller\AccountBankController::showAction' }
-
+    path: '/{id}/show'
+    defaults:
+        _controller: 'App\Accounting\Controller\AccountBankController::showAction'
 report_journal_user_summary:
-    path:     /journal-user-base-dabit-credit
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::monthlyIncomeAction' }
-
+    path: /journal-user-base-dabit-credit
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::monthlyIncomeAction'
 report_journal_account_head_summary:
-    path:     /income-pdf
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::pdfIncomeAction' }
-
+    path: /income-pdf
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::pdfIncomeAction'
 report_journal_transaction_summary:
-    path:     /income-print
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::printIncomeAction' }
-
+    path: /income-print
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::printIncomeAction'
 report_expenditure_summary:
-    path:     /expenditure-account-head-summary
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::expenditureSummaryAction' }
-
+    path: /expenditure-account-head-summary
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::expenditureSummaryAction'
 report_expenditure_category:
-    path:     /expenditure-category
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::expenditureCategoryAction' }
-
+    path: /expenditure-category
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::expenditureCategoryAction'
 report_expenditure_details:
-    path:     /expenditure
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::expenditureDetailsAction' }
-
-report_purchase_expenditure_summary:
-    path:     /expenditure-purchase-head-summary
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::expenditurePurchaseSummaryAction' }
-
+    path: /expenditure
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::expenditureDetailsAction'
 report_purchase_expenditure_head:
-    path:     /expenditure-purchase-head
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::expenditurePurchaseHeadAction' }
-
+    path: /expenditure-purchase-head
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::expenditurePurchaseHeadAction'
 report_purchase_expenditure_details:
-    path:     /expenditure-purchase
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::expenditurePurchaseDetailsAction' }
-
+    path: /expenditure-purchase
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::expenditurePurchaseDetailsAction'
 report_sales_board:
-    path:     /sales-board
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::salesBoardAction' }
-
+    path: /sales-board
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::salesBoardAction'
 report_sales_customer_summary:
-    path:     /customer-summary
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::customerSalesAction' }
-
+    path: /customer-summary
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::customerSalesAction'
 report_sales_user_summary:
-    path:     /user-outstanding
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::userSummaryAction' }
-
+    path: /user-outstanding
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::userSummaryAction'
 report_sales_customer_sms:
-    path:     /{id}/customer-sms
-    defaults: { _controller: 'App\Accounting\Controller\ReportController::customerOutstandingSmsAction' }
+    path: '/{id}/customer-sms'
+    defaults:
+        _controller: 'App\Accounting\Controller\ReportController::customerOutstandingSmsAction'
