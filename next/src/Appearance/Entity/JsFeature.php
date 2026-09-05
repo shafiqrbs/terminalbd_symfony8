@@ -9,7 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * JsFeature
  */
 #[ORM\Table]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class JsFeature
 {
     /**

@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 account_sales_business:
     path: /sales
     defaults:
@@ -40,6 +40,11 @@ account_purchase_business_new:
     path: /purchase-new
     defaults:
         _controller: 'App\Accounting\Controller\AccountBusinessController::purchaseNewAction'
+account_purchase_business_reverse:
+    path: /purchase-reverse
+    defaults:
+        missing: 'App\Accounting\Controller\AccountBusinessController::purchaseReverseAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 account_purchase_business_create:
     path: /purchase-create
     defaults:

@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 medicine_sales:
     path: /
     defaults:
@@ -92,6 +92,11 @@ medicine_sales_status:
     path: '/{id}/status'
     defaults:
         _controller: 'App\Medicine\Controller\SalesController::editAction'
+medicine_sales_approve:
+    path: '/{id}/approve'
+    defaults:
+        missing: 'App\Medicine\Controller\SalesController::approveAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 medicine_sales_delete:
     path: '/{id}/delete'
     defaults:
@@ -131,6 +136,11 @@ medicine_sales_item_delete:
     path: '/{invoice}/{id}/sales-item-delete'
     defaults:
         _controller: 'App\Medicine\Controller\SalesController::salesItemDeleteAction'
+medicine_sales_print_invoice:
+    path: '/{id}/print'
+    defaults:
+        missing: 'App\Medicine\Controller\SalesController::invoicePrintAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 medicine_sales_inline_update:
     path: /sales-created-inline-update
     defaults:

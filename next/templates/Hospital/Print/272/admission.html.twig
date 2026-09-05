@@ -1,4 +1,4 @@
-{% extends '::hms-print.html.twig' %}
+{% extends 'hms-print.html.twig' %}
 {% block body %}
     <div>
         {% if entity.hospitalConfig.globalOption.webPath('file') is not empty %}<img style="max-height:100px" src="/{{ entity.hospitalConfig.globalOption.webPath('file') }}">{% endif %}

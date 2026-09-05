@@ -5,8 +5,8 @@ an action that exists in neither tree, so it is a 500 in the legacy application
 today. The pipeline removes them from the generated routing with `--prune`;
 this file is the record of what was removed, for whoever restores a controller.
 
-- routes examined: **3484**
-- resolve to a real controller and action: **3077**
+- routes examined: **3485**
+- resolve to a real controller and action: **3078**
 - controller class absent: **217**
 - action absent: **190**
 

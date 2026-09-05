@@ -1,2 +1,22 @@
-# 4 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 4 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+inventory_sales_barcode:
+    path: /
+    defaults:
+        missing: 'App\Inventory\Controller\BarcodeController::salesAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_sales_barcode_show:
+    path: '/{invoice}/sales/show'
+    defaults:
+        missing: 'App\Inventory\Controller\BarcodeController::salesShowAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_purchase_barcode:
+    path: /
+    defaults:
+        missing: 'App\Inventory\Controller\BarcodeController::purchaseAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_purchase_barcode_show:
+    path: /
+    defaults:
+        missing: 'App\Inventory\Controller\BarcodeController::purchaseShowAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

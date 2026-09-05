@@ -9,7 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * BusinessParticular
  */
 #[ORM\Table(name: 'business_particular_type')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class BusinessParticularType
 {
     /**

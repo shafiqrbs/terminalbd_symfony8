@@ -1,9 +1,26 @@
-# 4 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 4 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 contactpage:
     path: /
     defaults:
         _controller: 'App\Content\Controller\ContactPageController::indexAction'
+contactpage_show:
+    path: '/{id}/show'
+    defaults:
+        missing: 'App\Content\Controller\ContactPageController::showAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+contactpage_new:
+    path: /new
+    defaults:
+        missing: 'App\Content\Controller\ContactPageController::newAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+contactpage_create:
+    path: /create
+    defaults:
+        missing: 'App\Content\Controller\ContactPageController::createAction'
+    requirements:
+        _method: post
+    controller: App\Migration\Controller\UnresolvableRouteController
 contactpage_edit:
     path: '/{id}/edit'
     defaults:
@@ -18,3 +35,10 @@ contactpage_update:
         _controller: 'App\Content\Controller\ContactPageController::updateAction'
     requirements:
         _method: post|put
+contactpage_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: 'App\Content\Controller\ContactPageController::deleteAction'
+    requirements:
+        _method: post|delete
+    controller: App\Migration\Controller\UnresolvableRouteController

@@ -68,14 +68,14 @@ class ExcelImporter
     /**
      * @var string
      */
-    #[ORM\Column(name: 'progress', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'progress', type: 'string', length: 255, nullable: true)]
     private $progress = 'created';
 
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'mode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'mode', type: 'string', length: 255, nullable: true)]
     private $mode = 'stock';
 
 

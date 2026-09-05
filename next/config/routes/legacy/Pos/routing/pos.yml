@@ -1,5 +1,5 @@
-# 19 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 19 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 pos_desktop:
     path: /
     defaults:
@@ -117,7 +117,125 @@ pos_item_remove:
     path: '/{product}/remove-to-cart'
     defaults:
         _controller: 'App\Pos\Controller\PosController::productRemoveCartAction'
+pos_item:
+    path: /sales-item
+    defaults:
+        missing: 'App\Pos\Controller\PosController::salesItemAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_item_purchase:
+    path: /item-purchase-details
+    defaults:
+        missing: 'App\Pos\Controller\PosController::itemPurchaseDetailsAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_show:
+    path: '/{id}/show'
+    defaults:
+        missing: 'App\Pos\Controller\PosController::showAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_new:
+    path: /new
+    defaults:
+        missing: 'App\Pos\Controller\PosController::newAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_edit:
+    path: '/{code}/pos'
+    defaults:
+        missing: 'App\Pos\Controller\PosController::editAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_print_invoice:
+    path: '/{invoice}/invoice'
+    defaults:
+        missing: 'App\Pos\Controller\PosController::invoicePrintAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_print_chalan:
+    path: '/{invoice}/chalan'
+    defaults:
+        missing: 'App\Pos\Controller\PosController::chalanPrintAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_discount_update:
+    path: /sales/discount-update
+    defaults:
+        missing: 'App\Pos\Controller\PosController::salesDiscountUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_approve:
+    path: '/{id}/approve'
+    defaults:
+        missing: 'App\Pos\Controller\PosController::approveAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_reset:
+    path: '/{id}/reset'
+    defaults:
+        missing: 'App\Pos\Controller\PosController::resetAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 pos_delete:
     path: '/{id}/delete'
     defaults:
         _controller: 'App\Pos\Controller\PosController::deleteAction'
+pos_empty_delete:
+    path: /delete/empty-invoice
+    defaults:
+        missing: 'App\Pos\Controller\PosController::deleteEmptyInvoiceAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_desktopitem_delete:
+    path: '/{sales}/{salesItem}/delete'
+    defaults:
+        missing: 'App\Pos\Controller\PosController::itemDeleteAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_item_serial_update:
+    path: '/{salesItem}/update-serial-no'
+    defaults:
+        missing: 'App\Pos\Controller\PosController::itemSerialNoUpdateAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_inline_update:
+    path: /sales/inline-update
+    defaults:
+        missing: 'App\Pos\Controller\PosController::salesInlineUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_inline_process_update:
+    path: /sales/inline-process-update
+    defaults:
+        missing: 'App\Pos\Controller\PosController::salesInlineProcessUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_inline_status_select:
+    path: /inline-status-select
+    defaults:
+        missing: 'App\Pos\Controller\PosController::salesSelectAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_mobile_update:
+    path: /sales/mobile-update
+    defaults:
+        missing: 'App\Pos\Controller\PosController::salesInlineMobileUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_invoice_search:
+    path: /sales-invoice-sesrch
+    defaults:
+        missing: 'App\Pos\Controller\PosController::salesInvoiceSearchAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+pos_invoice_name:
+    path: '/{invoice}/sales-invoice'
+    defaults:
+        missing: 'App\Pos\Controller\PosController::searchSalesInvoiceNameAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController

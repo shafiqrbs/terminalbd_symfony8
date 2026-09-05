@@ -1,2 +1,56 @@
-# 10 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 10 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+ecommercetemplate:
+    path: /
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercetemplate_show:
+    path: '/{id}/show'
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercetemplate_new:
+    path: /new
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercetemplate_create:
+    path: /create
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercetemplate_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercetemplate_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercetemplate_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercetemplate_status:
+    path: '/{id}/status'
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercetemplate_resizing:
+    path: /resizing
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercetemplate_sorted:
+    path: /sorted
+    defaults:
+        missing: App\Appearance\Controller\TemplateController
+    controller: App\Migration\Controller\UnresolvableRouteController

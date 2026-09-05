@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * PayrollParticular
  */
 #[ORM\Table('hr_employee_payroll_particular')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class EmployeePayrollParticular
 {
     /**

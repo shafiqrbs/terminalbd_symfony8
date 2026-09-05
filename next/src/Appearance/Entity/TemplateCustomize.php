@@ -58,7 +58,7 @@ class TemplateCustomize
     /**
      * @var string
      */
-    #[ORM\Column(name: 'sidebarTitle', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'sidebarTitle', type: 'string', length: 255, nullable: true)]
     private $sidebarTitle = false;
 
     /**
@@ -83,26 +83,26 @@ class TemplateCustomize
     /**
      * @var string
      */
-    #[ORM\Column(name: 'contactNo', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'contactNo', type: 'string', length: 255, nullable: true)]
     private $contactNo;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'contactEmail', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'contactEmail', type: 'string', length: 255, nullable: true)]
     private $contactEmail;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'sidebarPosition', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'sidebarPosition', type: 'string', length: 255, nullable: true)]
     private $sidebarPosition = 'left';
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'pricePrefix', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'pricePrefix', type: 'string', length: 255, nullable: true)]
     private $pricePrefix = 'Tk.';
 
     /**
@@ -134,7 +134,7 @@ class TemplateCustomize
     /**
      * @var string
      */
-    #[ORM\Column(name: 'mobileFooter', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'mobileFooter', type: 'string', length: 255, nullable: true)]
     private $mobileFooter;
 
 
@@ -217,13 +217,13 @@ class TemplateCustomize
     /**
      * @var string
      */
-    #[ORM\Column(name: 'poweredBy', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'poweredBy', type: 'string', length: 255, nullable: true)]
     private $poweredBy;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'introTitle', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'introTitle', type: 'string', length: 255, nullable: true)]
     private $introTitle;
 
 
@@ -231,37 +231,37 @@ class TemplateCustomize
     /**
      * @var string
      */
-    #[ORM\Column(name: 'fbMessenger', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'fbMessenger', type: 'string', length: 255, nullable: true)]
     private $fbMessenger;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'playStore', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'playStore', type: 'string', length: 255, nullable: true)]
     private $playStore;
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'appleStore', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'appleStore', type: 'string', length: 255, nullable: true)]
     private $appleStore;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'tawk', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'tawk', type: 'string', length: 255, nullable: true)]
     private $tawk;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'powr', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'powr', type: 'string', length: 255, nullable: true)]
     private $powr;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'liveChat', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'liveChat', type: 'string', length: 255, nullable: true)]
     private $liveChat;
 
 
@@ -304,13 +304,13 @@ class TemplateCustomize
     /**
      * @var string
      */
-    #[ORM\Column(name: 'googleAnalytic', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'googleAnalytic', type: 'string', length: 255, nullable: true)]
     private $googleAnalytic;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'facebookPixel', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'facebookPixel', type: 'string', length: 255, nullable: true)]
     private $facebookPixel;
 
     /**

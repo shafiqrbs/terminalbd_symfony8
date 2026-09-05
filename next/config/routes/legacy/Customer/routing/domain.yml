@@ -1,5 +1,10 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+customer_dashboard:
+    path: /dashboard
+    defaults:
+        missing: 'App\Customer\Controller\DefaultController::dashboardAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 customer_domain:
     path: /domain
     defaults:
@@ -8,3 +13,8 @@ customer_domain_bookmark:
     path: /bookmark
     defaults:
         _controller: 'App\Customer\Controller\DomainController::domainBookmarkAction'
+allproduct:
+    path: /all-products
+    defaults:
+        missing: App\Customer\Controller\ProductController
+    controller: App\Migration\Controller\UnresolvableRouteController

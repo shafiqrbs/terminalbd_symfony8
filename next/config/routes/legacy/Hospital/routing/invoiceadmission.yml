@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 hms_invoice_admission:
     path: /
     defaults:
@@ -38,6 +38,11 @@ hms_invoice_admission_edit:
     path: '/{id}/edit'
     defaults:
         _controller: 'App\Hospital\Controller\InvoiceAdmissionController::editAction'
+hms_invoice_admission_return:
+    path: '/{id}/admission-return'
+    defaults:
+        missing: 'App\Hospital\Controller\InvoiceAdmissionController::admissionReturnAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 hms_invoice_admitted_patient:
     path: '/{id}/patient-admission'
     defaults:

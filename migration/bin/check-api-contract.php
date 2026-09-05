@@ -67,6 +67,13 @@ foreach ($contract as $endpoint) {
         continue;
     }
 
+    // A route repointed by check-routes.php answers 404: the endpoint exists in
+    // the routing table but has no implementation.
+    if (str_contains((string) $route->getDefault('_controller'), 'UnresolvableRouteController')) {
+        $dead[] = $endpoint;
+        continue;
+    }
+
     if ($route->getPath() !== $endpoint['url']) {
         // A duplicate route name: Symfony kept the last definition, as
         // Symfony 2 did, so this URL is unreachable in both applications.

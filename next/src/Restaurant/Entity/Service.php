@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * RestaurantService
  */
 #[ORM\Table(name: 'restaurant_service')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class Service
 {
     /**

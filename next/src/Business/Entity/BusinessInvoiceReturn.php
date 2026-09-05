@@ -75,13 +75,13 @@ class BusinessInvoiceReturn
      /**
      * @var string
      */
-    #[ORM\Column(name: 'invoice', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'invoice', type: 'string', length: 255, nullable: true)]
     private $invoice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'mode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'mode', type: 'string', length: 255, nullable: true)]
     private $mode = "adjustment";
 
     /**
@@ -105,7 +105,7 @@ class BusinessInvoiceReturn
     /**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'process', type: 'string', length: 255, nullable: true)]
     private $process = "created";
 
     /**

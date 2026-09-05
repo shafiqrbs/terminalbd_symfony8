@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 hms_hms_report_balance:
     path: /balance-sheet
     defaults:
@@ -32,3 +32,13 @@ hms_report_monthly_income_print:
     path: /monthly-income-print
     defaults:
         _controller: 'App\Accounting\Controller\HmsReportController::monthlyIncomePrintAction'
+hms_report_expenditure_details:
+    path: /expenditure-details
+    defaults:
+        missing: 'App\Accounting\Controller\HmsReportController::expenditureDetailsAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+hms_report_expenditure_summary:
+    path: /expenditure-summary
+    defaults:
+        missing: 'App\Accounting\Controller\HmsReportController::expenditureSummaryAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

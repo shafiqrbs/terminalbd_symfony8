@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 xapi_poskeeper_login:
     path: /poskeeper-otp-login
     defaults:
@@ -293,6 +293,11 @@ api_poskeeper_short_list:
     path: /poskeeper-purchase-short-list
     defaults:
         _controller: 'App\Bindu\Controller\ApiPoskeeperController::purchaseShortListAction'
+api_poskeeper_instant_purchase:
+    path: /poskeeper-instant-purchase-item
+    defaults:
+        missing: 'App\Bindu\Controller\ApiPoskeeperController::instantPurchaseAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 api_poskeeper_add_purchase_shortlist:
     path: /poskeeper-add-purchase-short-list
     defaults:
@@ -304,6 +309,14 @@ api_poskeeper_sales:
     methods: POST
     options:
         expose: true
+api_poskeeper_sales_update:
+    path: /poskeeper-sales-update
+    defaults:
+        missing: 'App\Bindu\Controller\ApiPoskeeperController::apiOnlineSalesUpdateAction'
+    methods: POST|GET
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 api_poskeeper_sales_deletee:
     path: /poskeeper-sales-delete
     defaults:

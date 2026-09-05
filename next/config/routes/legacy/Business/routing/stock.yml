@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 business_stock:
     path: /
     defaults:
@@ -56,6 +56,11 @@ business_stock_inline:
     path: /inline-update
     defaults:
         _controller: 'App\Business\Controller\StockController::inlineUpdateAction'
+business_stock_production:
+    path: '/{id}/production'
+    defaults:
+        missing: 'App\Business\Controller\StockController::productionAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 business_stock_excel:
     path: /excel
     defaults:

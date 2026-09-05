@@ -77,7 +77,7 @@ class BusinessInvoiceReturnItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'itemProcess', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'itemProcess', type: 'string', length: 255, nullable: true)]
     private $itemProcess;
 
 

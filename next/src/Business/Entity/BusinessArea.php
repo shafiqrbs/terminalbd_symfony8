@@ -9,7 +9,7 @@ use App\Location\Entity\Location;
  * BusinessWearHouse
  */
 #[ORM\Table(name: 'business_area')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class BusinessArea
 {
     /**

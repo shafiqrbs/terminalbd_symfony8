@@ -44,13 +44,13 @@ class DoctorInvoiceParticular
     /**
      * @var string
      */
-    #[ORM\Column(name: 'estimatePrice', type: 'decimal')]
+    #[ORM\Column(name: 'estimatePrice', type: 'decimal', precision: 10, scale: 0)]
     private $estimatePrice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'commission', type: 'decimal')]
+    #[ORM\Column(name: 'commission', type: 'decimal', precision: 10, scale: 0)]
     private $commission;
 
 

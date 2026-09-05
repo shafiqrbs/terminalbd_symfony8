@@ -1,5 +1,5 @@
-# 5 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 5 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 inventory_salesgeneral:
     path: /
     defaults:
@@ -8,7 +8,35 @@ inventory_salesgeneral_customer:
     path: /customer
     defaults:
         _controller: 'App\Inventory\Controller\SalesGeneralController::customerAction'
+inventory_salesgeneral_show:
+    path: '/{id}/show'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesGeneralController::showAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 inventory_salesgeneral_new:
     path: /new
     defaults:
         _controller: 'App\Inventory\Controller\SalesGeneralController::newAction'
+inventory_salesgeneral_edit:
+    path: '/{code}/pos'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesGeneralController::editAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesgeneral_update:
+    path: '/{id}/update'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesGeneralController::updateAction'
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesgeneral_print_invoice:
+    path: '/{invoice}/invoice'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesGeneralController::invoicePrintAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesgeneral_empty_delete:
+    path: /delete/empty-invoice
+    defaults:
+        missing: 'App\Inventory\Controller\SalesGeneralController::deleteEmptyInvoiceAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

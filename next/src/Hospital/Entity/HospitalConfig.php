@@ -94,7 +94,7 @@ class HospitalConfig
     /**
      * @var string
      */
-    #[ORM\Column(name: 'vatRegNo', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'vatRegNo', type: 'string', length: 255, nullable: true)]
     private $vatRegNo;
 
     /**

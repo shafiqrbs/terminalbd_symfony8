@@ -14,7 +14,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * Testimonial
  */
 #[ORM\Table('site_testimonial')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class Testimonial
 {
     /**

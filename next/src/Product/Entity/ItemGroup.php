@@ -64,7 +64,7 @@ class ItemGroup
     /**
      * @var int
      */
-    #[ORM\Column(name: 'permission', type: 'string')]
+    #[ORM\Column(name: 'permission', type: 'string', length: 255)]
     private $permission = 'public';
 
 

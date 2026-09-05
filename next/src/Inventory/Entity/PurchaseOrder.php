@@ -121,7 +121,7 @@ class PurchaseOrder
     /**
      * @var string
      */
-    #[ORM\Column(name: 'paymentMethod', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'paymentMethod', type: 'string', length: 255, nullable: true)]
     private $paymentMethod;
 
     /**

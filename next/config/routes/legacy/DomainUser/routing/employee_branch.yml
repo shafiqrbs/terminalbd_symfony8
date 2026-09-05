@@ -1,2 +1,41 @@
-# 7 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 7 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+domain_employee_branch:
+    path: /
+    defaults:
+        missing: App\DomainUser\Controller\EmployeeBranchController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_employee_branch_show:
+    path: '/{id}/show'
+    defaults:
+        missing: App\DomainUser\Controller\EmployeeBranchController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_employee_branch_new:
+    path: /new
+    defaults:
+        missing: App\DomainUser\Controller\EmployeeBranchController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_employee_branch_create:
+    path: /create
+    defaults:
+        missing: App\DomainUser\Controller\EmployeeBranchController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_employee_branch_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\DomainUser\Controller\EmployeeBranchController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_employee_branch_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\DomainUser\Controller\EmployeeBranchController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_employee_branch_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\DomainUser\Controller\EmployeeBranchController
+    controller: App\Migration\Controller\UnresolvableRouteController

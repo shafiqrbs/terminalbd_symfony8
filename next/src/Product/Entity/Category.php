@@ -150,13 +150,13 @@ class Category
     /**
      * @var int
      */
-    #[ORM\Column(name: 'permission', type: 'string')]
+    #[ORM\Column(name: 'permission', type: 'string', length: 255)]
     private $permission = 'public';
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'bgcolor', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'bgcolor', type: 'string', length: 255, nullable: true)]
     private $bgcolor;
 
 

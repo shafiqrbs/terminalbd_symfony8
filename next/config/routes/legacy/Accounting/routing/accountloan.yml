@@ -1,5 +1,5 @@
-# 4 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 4 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 account_loan:
     path: /
     defaults:
@@ -17,6 +17,16 @@ account_loan_create:
     defaults:
         _controller: 'App\Accounting\Controller\AccountLoanController::createAction'
     methods: POST
+account_loan_reverse:
+    path: '/{id}/reverse'
+    defaults:
+        missing: 'App\Accounting\Controller\AccountLoanController::loanReverseAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+account_loan_print:
+    path: '/{id}/print-payment'
+    defaults:
+        missing: 'App\Accounting\Controller\AccountLoanController::printAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 account_loan_approve:
     path: '/{id}/loan-approve'
     defaults:
@@ -46,6 +56,16 @@ account_loanuser_create:
     defaults:
         _controller: 'App\Accounting\Controller\AccountLoanUserController::createAction'
     methods: POST
+account_loanuser_edit:
+    path: '/{id}/user-edit'
+    defaults:
+        missing: 'App\Accounting\Controller\AccountLoanUserController::editAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+account_loanuser_delete:
+    path: '/{id}/user-delete'
+    defaults:
+        missing: 'App\Accounting\Controller\AccountLoanUserController::deleteUserAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 account_loanuser_update:
     path: '/{id}/user-update'
     defaults:

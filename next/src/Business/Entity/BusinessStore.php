@@ -59,7 +59,7 @@ class BusinessStore
     /**
      * @var string
      */
-    #[ORM\Column(name: 'address', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'address', type: 'string', length: 255, nullable: true)]
     private $address;
 
     /**

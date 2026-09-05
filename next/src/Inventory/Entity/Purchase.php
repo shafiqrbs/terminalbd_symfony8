@@ -202,7 +202,7 @@ class Purchase
     /**
      * @var string
      */
-    #[ORM\Column(name: 'paymentMethod', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'paymentMethod', type: 'string', length: 255, nullable: true)]
     private $paymentMethod;
 
     /**
@@ -232,13 +232,13 @@ class Purchase
     /**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'process', type: 'string', length: 255, nullable: true)]
     private $process = "created";
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'grn', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'grn', type: 'string', length: 255, nullable: true)]
     private $grn;
 
 

@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 expensecategory:
     path: /
     defaults:
@@ -22,6 +22,11 @@ expensecategory_edit:
     path: '/{id}/edit'
     defaults:
         _controller: 'App\Accounting\Controller\ExpenseCategoryController::editAction'
+expensecategory_status:
+    path: '/{id}/edit'
+    defaults:
+        missing: 'App\Accounting\Controller\ExpenseCategoryController::statusAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 expensecategory_sorting:
     path: /sorting
     defaults:

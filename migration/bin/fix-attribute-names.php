@@ -17,6 +17,14 @@ declare(strict_types=1);
  *    so this quietly evaluates to "Foo" and Doctrine cannot resolve it. The
  *    annotation meant a class in the entity's own namespace.
  *
+ * 3. `#[ORM\Entity(repositoryClass: '')]`, from `@ORM\Entity(repositoryClass="")`
+ *    in the legacy tree. Doctrine 2 read the empty string as falsy and used the
+ *    default repository; Doctrine 3 takes it literally and throws when the
+ *    entity is first queried - which no static check catches, because the
+ *    metadata itself loads. Dropping the option restores Doctrine 2's
+ *    behaviour. Pointing it at the similarly-named repository class that
+ *    happens to exist would not: that repository was never in use.
+ *
  * Idempotent. Usage: php8.5 migration/bin/fix-attribute-names.php [--dry-run]
  */
 
@@ -39,7 +47,7 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/
     }
 }
 
-$stats = ['attribute names' => 0, 'targetEntity' => 0, 'ambiguous' => 0, 'files' => 0];
+$stats = ['empty repositoryClass' => 0, 'attribute names' => 0, 'targetEntity' => 0, 'ambiguous' => 0, 'files' => 0];
 $ambiguous = [];
 
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/src')) as $file) {
@@ -66,6 +74,10 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/
             $code = preg_replace('/^(namespace [^;]+;\n)/m', "$1\nuse Doctrine\\ORM\\Mapping as ORM;\n", $code, 1);
         }
     }
+
+    // 3. Entity(repositoryClass: '') -> Entity()
+    $code = preg_replace('/#\[ORM\\\\Entity\(repositoryClass: \'\'\)\]/', '#[ORM\\Entity]', $code, -1, $n);
+    $stats['empty repositoryClass'] += $n;
 
     // 2. targetEntity: \Foo::class -> the class the annotation meant
     $code = preg_replace_callback(

@@ -35,7 +35,7 @@ class BranchInvoiceItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'barcode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'barcode', type: 'string', length: 255, nullable: true)]
     private $barcode;
 
     /**
@@ -47,14 +47,14 @@ class BranchInvoiceItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'salesPrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'salesPrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $salesPrice;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'subTotal', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'subTotal', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $subTotal;
 
 

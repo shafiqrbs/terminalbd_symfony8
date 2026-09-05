@@ -33,7 +33,7 @@ class BusinessProduction
 	/**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string')]
+    #[ORM\Column(name: 'process', type: 'string', length: 255)]
     private $process = 'created';
 
     /**

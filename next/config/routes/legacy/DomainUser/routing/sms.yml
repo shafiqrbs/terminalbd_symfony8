@@ -1,2 +1,87 @@
-# 15 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 15 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+domainuser_sms:
+    path: /
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_member_sms:
+    path: '/{id}/member'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_event_sms:
+    path: '/{id}/event'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_committee_sms:
+    path: '/{id}/committee'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_votecenter_sms:
+    path: '/{id}/vote-center'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_sms_new:
+    path: /new
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_sms_show:
+    path: '/{id}/show'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_sms_search:
+    path: /search
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_sms_name:
+    path: '/{particular}/particular-name'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_sms_create:
+    path: /create
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_sms_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_sms_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_sms_status:
+    path: '/{id}/status'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_sms_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domainuser_bulk_sms:
+    path: '/{id}/bluk'
+    defaults:
+        missing: App\DomainUser\Controller\CustomerSmsController
+    controller: App\Migration\Controller\UnresolvableRouteController

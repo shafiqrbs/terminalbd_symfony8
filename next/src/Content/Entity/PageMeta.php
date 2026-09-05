@@ -29,13 +29,13 @@ class PageMeta
     /**
      * @var string
      */
-    #[ORM\Column(name: 'metaKey', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'metaKey', type: 'string', length: 255, nullable: true)]
     private $metaKey;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'metaValue', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'metaValue', type: 'string', length: 255, nullable: true)]
     private $metaValue;
 
 

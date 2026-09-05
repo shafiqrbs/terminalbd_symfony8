@@ -58,13 +58,13 @@ class BusinessVendorStock
     /**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'process', type: 'string', length: 255, nullable: true)]
     private $process = "Created";
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'grn', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'grn', type: 'string', length: 255, nullable: true)]
     private $grn;
 
     /**

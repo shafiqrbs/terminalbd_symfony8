@@ -129,13 +129,13 @@ class DpsParticular
     /**
      * @var float
      */
-    #[ORM\Column(name: 'purchaseAverage', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'purchaseAverage', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $purchaseAverage;
 
     /**
      * @var float
      */
-    #[ORM\Column(name: 'purchasePrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'purchasePrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $purchasePrice;
 
     /**

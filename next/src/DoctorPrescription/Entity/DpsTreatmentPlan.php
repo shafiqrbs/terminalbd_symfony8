@@ -125,7 +125,7 @@ class DpsTreatmentPlan
     /**
      * @var string
      */
-    #[ORM\Column(name: 'appointmentTime', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'appointmentTime', type: 'string', length: 255, nullable: true)]
     private $appointmentTime;
 
 

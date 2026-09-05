@@ -89,6 +89,20 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/
     $original = $code;
     $isController = str_ends_with($path, 'Controller.php');
 
+    // Doctrine builds repositories itself, with (EntityManager, ClassMetadata):
+    // giving one a constructor breaks every query through it. The legacy code
+    // that calls $this->get() inside a repository was already fatal - an
+    // EntityRepository has no get() - so it is reported, not converted.
+    if (preg_match('/class\s+\w+\s+extends\s+\w*EntityRepository\b/', $code)) {
+        preg_match_all('/\$this->(?:container->)?get\(\s*[\'"]([^\'"]+)[\'"]\s*\)/', $code, $inRepository);
+
+        foreach (array_unique($inRepository[1]) as $id) {
+            $unknown['(in a Doctrine repository) ' . $id][] = str_replace($root . '/', '', $path);
+        }
+
+        continue;
+    }
+
     // ---- 1. things Symfony 8 exposes on AbstractController ----------------
     if ($isController) {
         $before = $code;

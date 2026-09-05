@@ -30,3 +30,6 @@ src/Tool/Image/ImageHandling.php           # gregwar/image-bundle
 src/Tool/Twig/ImageExtension.php           # gregwar/image-bundle
 src/Tool/Twig/TextExtension.php            # twig/extensions
 src/HumanResource/TwigExtension/DecodeExtension.php   # Twig 1 filter API
+
+# --- answers the routes with no controller (see check-routes.php) -----------
+src/Migration/Controller/UnresolvableRouteController.php

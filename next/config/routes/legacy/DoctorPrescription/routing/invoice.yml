@@ -1,5 +1,5 @@
-# 9 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 9 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 dps_invoice:
     path: /
     defaults:
@@ -95,6 +95,14 @@ dps_invoice_accessories_approved:
     path: '/{id}/accessories-approved'
     defaults:
         _controller: 'App\DoctorPrescription\Controller\InvoiceController::approvedAccessoriesAction'
+dps_invoice_approved:
+    path: '/{id}/invoice-approved'
+    defaults:
+        missing: 'App\DoctorPrescription\Controller\InvoiceController::approveAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 dps_invoice_update:
     path: '/{id}/update'
     defaults:
@@ -106,6 +114,16 @@ dps_invoice_delete:
     path: '/{id}/delete'
     defaults:
         _controller: 'App\DoctorPrescription\Controller\InvoiceController::deleteAction'
+dps_invoice_reverse_show:
+    path: '/{id}/invoice-reverse-show'
+    defaults:
+        missing: 'App\DoctorPrescription\Controller\InvoiceController::InvoiceReverseShowAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_invoice_confirm:
+    path: '/{id}/invoice-confirm'
+    defaults:
+        missing: 'App\DoctorPrescription\Controller\InvoiceController::confirmAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 dps_invoice_particular_delete:
     path: '/{invoice}/{id}/particular-delete'
     defaults:
@@ -146,6 +164,16 @@ dps_invoice_customer_details:
     methods: POST
     options:
         expose: true
+dps_invoice_add_patient:
+    path: '/{id}/invoice-patient-add'
+    defaults:
+        missing: 'App\DoctorPrescription\Controller\InvoiceController::addPatientAction'
+    methods:
+        - POST
+        - PUT
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 dps_treatment_inline_update:
     path: /inline-update
     defaults:
@@ -181,3 +209,36 @@ dps_invoice_investigation_procedure:
     methods: POST
     options:
         expose: true
+dps_treatment_plan:
+    path: /treatment-plan
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_appointment_schedule:
+    path: /treatment-appointment-date
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_invoice_appointment_schedule_time:
+    path: /treatment-appointment-free-time
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_date_wise_schedule:
+    path: /treatment-appointment-date-wise-schedule
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_plan_sms:
+    path: '/{patient}/{id}/send-sms'
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    controller: App\Migration\Controller\UnresolvableRouteController

@@ -70,19 +70,19 @@ class ItemStockAdjustment
     /**
      * @var string
      */
-    #[ORM\Column(name: 'notes', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'notes', type: 'string', length: 255, nullable: true)]
     private $notes;
 
 	/**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'process', type: 'string', length: 255, nullable: true)]
     private $process = "Created";
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'mode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'mode', type: 'string', length: 255, nullable: true)]
     private $mode = "Minus";
 
 

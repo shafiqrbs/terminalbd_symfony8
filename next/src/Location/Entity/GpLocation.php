@@ -14,7 +14,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 #[Gedmo\Tree(type: 'materializedPath')]
 #[ORM\Table(name: 'location_gp')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class GpLocation
 {
     /**
@@ -95,7 +95,7 @@ class GpLocation
     /**
      * @var int
      */
-    #[ORM\Column(name: 'permission', type: 'string')]
+    #[ORM\Column(name: 'permission', type: 'string', length: 255)]
     private $permission = 'public';
 
     /**

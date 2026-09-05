@@ -40,7 +40,7 @@ class GoodsItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'name', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private $name;
 
 
@@ -59,19 +59,19 @@ class GoodsItem
      /**
      * @var string
      */
-    #[ORM\Column(name: 'salesPrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'salesPrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $salesPrice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'purchasePrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'purchasePrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $purchasePrice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discountPrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'discountPrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $discountPrice;
 
     /**

@@ -54,6 +54,12 @@ run "container" \
 run "templates" \
     bash -c "cd next && $PHP bin/console lint:twig templates/ --excludes=_foscomment | tail -2"
 
+# Reports rather than gates: a link to a route that never existed is a product
+# decision, not a port defect. See migration/contract/template-route-links.md.
+echo
+echo "── template links to routes that do not exist (informational)"
+$PHP migration/bin/check-template-routes.php --report=migration/contract/template-route-links.md || true
+
 run "tests" \
     bash -c "cd next && $PHP vendor/bin/phpunit | tail -3"
 

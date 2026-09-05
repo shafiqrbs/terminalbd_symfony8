@@ -1,5 +1,5 @@
-# 3 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 3 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 siteslider:
     path: /
     defaults:
@@ -21,6 +21,11 @@ siteslider_edit:
     path: '/{id}/edit'
     defaults:
         _controller: 'App\Content\Controller\SiteSliderController::editAction'
+siteslider_status:
+    path: '/{id}/status'
+    defaults:
+        missing: 'App\Content\Controller\SiteSliderController::statusAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 siteslider_update:
     path: '/{id}/update'
     defaults:
@@ -35,3 +40,13 @@ siteslider_delete:
     methods:
         - POST
         - DELETE
+siteslider_sorting:
+    path: /sorting
+    defaults:
+        missing: 'App\Content\Controller\SiteSliderController::sortingAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+siteslider_sorted:
+    path: /sorted
+    defaults:
+        missing: 'App\Content\Controller\SiteSliderController::sortedAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

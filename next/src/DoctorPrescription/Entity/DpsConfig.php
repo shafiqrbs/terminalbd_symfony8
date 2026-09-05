@@ -63,7 +63,7 @@ class DpsConfig
     /**
      * @var string
      */
-    #[ORM\Column(name: 'vatRegNo', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'vatRegNo', type: 'string', length: 255, nullable: true)]
     private $vatRegNo;
 
     /**
@@ -113,14 +113,14 @@ class DpsConfig
     /**
      * @var string
      */
-    #[ORM\Column(name: 'headerLeftWidth', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'headerLeftWidth', type: 'string', length: 255, nullable: true)]
     private $headerLeftWidth = 0;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'headerRightWidth', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'headerRightWidth', type: 'string', length: 255, nullable: true)]
     private $headerRightWidth = 0;
 
     /**
@@ -269,13 +269,13 @@ class DpsConfig
     /**
      * @var string
      */
-    #[ORM\Column(name: 'sidebarWidth', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'sidebarWidth', type: 'string', length: 255, nullable: true)]
     private $sidebarWidth = 0;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'bodyWidth', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'bodyWidth', type: 'string', length: 255, nullable: true)]
     private $bodyWidth = 0;
 
 

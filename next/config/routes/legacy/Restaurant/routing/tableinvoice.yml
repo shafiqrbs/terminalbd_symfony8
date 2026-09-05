@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 restaurant_tableinvoice:
     path: /
     defaults:
@@ -59,6 +59,22 @@ restaurant_tableinvoice_product_update:
     path: '/{product}/product-update'
     defaults:
         _controller: 'App\Restaurant\Controller\TableInvoiceController::updateProductAction'
+restaurant_tableinvoice_discount_update:
+    path: /dicount-update
+    defaults:
+        missing: 'App\Restaurant\Controller\TableInvoiceController::invoiceDiscountUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+restaurant_tableinvoice_discount_coupon:
+    path: /dicount-coupon
+    defaults:
+        missing: 'App\Restaurant\Controller\TableInvoiceController::invoiceDiscountCouponAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 restaurant_tableinvoice_particular_delete:
     path: '/{invoice}/{id}/particular-delete'
     defaults:

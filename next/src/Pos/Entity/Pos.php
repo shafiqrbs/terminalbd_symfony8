@@ -242,7 +242,7 @@ class Pos
     /**
      * @var string
      */
-    #[ORM\Column(name: 'mobile', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'mobile', type: 'string', length: 255, nullable: true)]
     private $mobile;
 
 	/**

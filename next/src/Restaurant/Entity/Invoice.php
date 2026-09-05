@@ -199,7 +199,7 @@ class Invoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discount', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'discount', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $discount;
 
     /**
@@ -219,27 +219,27 @@ class Invoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'subTotal', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'subTotal', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $subTotal;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'vat', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'vat', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $vat;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'sd', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'sd', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $sd;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'total', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'total', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $total;
 
     /**
@@ -265,13 +265,13 @@ class Invoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'due', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'due', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $due;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'returnAmount', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'returnAmount', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $returnAmount;
 
     /**

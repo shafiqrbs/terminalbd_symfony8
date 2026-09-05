@@ -39,7 +39,7 @@ class ItemImport
     /**
      * @var string
      */
-    #[ORM\Column(name: 'name', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private $name;
 
     /**
@@ -67,7 +67,7 @@ class ItemImport
     /**
      * @var string
      */
-    #[ORM\Column(name: 'progress', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'progress', type: 'string', length: 255, nullable: true)]
     private $progress = 'created';
 
 

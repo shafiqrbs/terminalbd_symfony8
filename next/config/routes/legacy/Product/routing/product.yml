@@ -1,5 +1,5 @@
-# 7 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 7 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 product:
     path: /
     defaults:
@@ -64,3 +64,38 @@ product_discount:
         _controller: 'App\Product\Controller\ProductController::discountAction'
     requirements:
         _method: post
+product_print_list:
+    path: /print-list
+    defaults:
+        missing: 'App\Content\Controller\ProductController::printListAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+product_pdf_list:
+    path: /pdf-list
+    defaults:
+        missing: 'App\Content\Controller\ProductController::pdfListAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+product_export_list:
+    path: /export-list
+    defaults:
+        missing: 'App\Content\Controller\ProductController::exportListAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+product_print:
+    path: '/{id}/print-details'
+    defaults:
+        missing: 'App\Content\Controller\ProductController::printDetailsAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+product_pdf:
+    path: '/{id}/pdf-details'
+    defaults:
+        missing: 'App\Content\Controller\ProductController::pdfDetailsAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+product_import:
+    path: /import
+    defaults:
+        missing: 'App\Content\Controller\ProductController::importAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+product_export:
+    path: '/{id}/export-details'
+    defaults:
+        missing: 'App\Content\Controller\ProductController::exportDetailsAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

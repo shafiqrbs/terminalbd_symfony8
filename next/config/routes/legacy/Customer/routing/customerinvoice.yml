@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 customerweb_invoice:
     path: /
     defaults:
@@ -14,6 +14,11 @@ customerweb_invoice_create:
         _controller: 'App\Customer\Controller\InvoiceController::createAction'
     methods:
         - POST
+customerweb_invoice_delete:
+    path: '/{id}/invoice'
+    defaults:
+        missing: 'App\Customer\Controller\InvoiceController::invoiceDeleteAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 customerweb_invoice_edit:
     path: '/{id}/edit'
     defaults:

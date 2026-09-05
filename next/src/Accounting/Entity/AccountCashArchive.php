@@ -177,20 +177,20 @@ class AccountCashArchive
     /**
      * @var float
      */
-    #[ORM\Column(name: 'debit', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'debit', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $debit;
 
     /**
      * @var float
      */
-    #[ORM\Column(name: 'credit', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'credit', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $credit;
 
 
     /**
      * @var float
      */
-    #[ORM\Column(name: 'balance', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'balance', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $balance=0;
 
 

@@ -1,5 +1,5 @@
-# 6 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 6 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 homepage:
     path: /backend
     defaults:
@@ -24,6 +24,11 @@ customer:
     path: /customer
     defaults:
         _controller: 'App\Customer\Controller\DomainController::indexAction'
+domain_pendig:
+    path: /domain-pendeing
+    defaults:
+        missing: 'App\User\Controller\DefaultController::pendeingAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 domain_suspended:
     path: /domain-suspended
     defaults:
@@ -40,6 +45,41 @@ landing_page:
     path: /user-admin
     defaults:
         _controller: 'App\User\Controller\DefaultController::landingAction'
+user_deactive:
+    path: '/user/deactive/{id}'
+    defaults:
+        missing: App\User\Controller\UserController
+    requirements:
+        id: \d+
+    controller: App\Migration\Controller\UnresolvableRouteController
+user_active:
+    path: '/user/active/{id}'
+    defaults:
+        missing: App\User\Controller\UserController
+    requirements:
+        id: \d+
+    controller: App\Migration\Controller\UnresolvableRouteController
+username_check:
+    path: /username/check
+    defaults:
+        missing: App\User\Controller\UserController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+email_check:
+    path: /email/check
+    defaults:
+        missing: App\User\Controller\UserController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+user_auto_search:
+    path: /user/search
+    defaults:
+        missing: App\User\Controller\UserController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 Core_user_group:
     resource: user/user-manage.yml
     prefix: /system-users

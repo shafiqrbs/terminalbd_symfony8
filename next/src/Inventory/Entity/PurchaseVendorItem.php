@@ -128,44 +128,44 @@ class PurchaseVendorItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'purchasePrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'purchasePrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $purchasePrice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'subTotalPurchasePrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'subTotalPurchasePrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $subTotalPurchasePrice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'salesPrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'salesPrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $salesPrice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discountPrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'discountPrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $discountPrice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'subTotalSalesPrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'subTotalSalesPrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $subTotalSalesPrice;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'webPrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'webPrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $webPrice;
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'overHeadCost', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'overHeadCost', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $overHeadCost;
 
     /**
@@ -197,7 +197,7 @@ class PurchaseVendorItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'subTotalWebPrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'subTotalWebPrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $subTotalWebPrice;
 
     /**

@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 accountbank:
     path: /
     defaults:
@@ -28,6 +28,18 @@ accountbank_update:
     methods:
         - POST
         - PUT
+accountbank_approve:
+    path: '/{id}/payment-approve'
+    defaults:
+        missing: 'App\Accounting\Controller\AccountBankController::approveAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+accountbank_inline:
+    path: /inline-update
+    defaults:
+        missing: 'App\Accounting\Controller\AccountBankController::inlineUpdateAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 accountbank_delete:
     path: '/{id}/delete'
     defaults:

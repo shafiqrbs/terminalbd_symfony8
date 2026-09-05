@@ -1,5 +1,5 @@
-# 6 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 6 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 dps_prescription:
     path: /
     defaults:
@@ -91,6 +91,14 @@ dps_prescription_accessories_add:
     methods: POST
     options:
         expose: true
+dps_prescription_approved:
+    path: '/{id}/Prescription-approved'
+    defaults:
+        missing: 'App\DoctorPrescription\Controller\PrescriptionController::approveAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 dps_prescription_update:
     path: '/{id}/update'
     defaults:
@@ -154,3 +162,36 @@ dps_prescription_investigation_procedure:
     methods: POST
     options:
         expose: true
+dps_treatment_plan:
+    path: /treatment-plan
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_appointment_schedule:
+    path: /treatment-appointment-date
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_prescription_appointment_schedule_time:
+    path: /treatment-appointment-free-time
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_date_wise_schedule:
+    path: /treatment-appointment-date-wise-schedule
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_plan_sms:
+    path: '/{patient}/{id}/send-sms'
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentPlanController
+    controller: App\Migration\Controller\UnresolvableRouteController

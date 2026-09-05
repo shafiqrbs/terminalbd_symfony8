@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * HmsCommission
  */
 #[ORM\Table(name: 'hms_commission')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class HmsCommission
 {
     /**

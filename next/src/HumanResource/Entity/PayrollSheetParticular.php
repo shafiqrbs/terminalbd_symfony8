@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Payroll
  */
 #[ORM\Table('hr_payroll_sheet_particular')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class PayrollSheetParticular
 {
     /**
@@ -44,14 +44,14 @@ class PayrollSheetParticular
     /**
      * @var string
      */
-    #[ORM\Column(name: 'paymentMode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'paymentMode', type: 'string', length: 255, nullable: true)]
     private $paymentMode;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'particularName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'particularName', type: 'string', length: 255, nullable: true)]
     private $particularName;
 
 

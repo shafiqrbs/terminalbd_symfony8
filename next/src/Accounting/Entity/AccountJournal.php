@@ -136,7 +136,7 @@ class AccountJournal
      /**
      * @var string
      */
-    #[ORM\Column(name: 'voucherNo', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'voucherNo', type: 'string', length: 255, nullable: true)]
     private $voucherNo;
 
 

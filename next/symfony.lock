@@ -35,6 +35,9 @@
             "migrations/.gitignore"
         ]
     },
+    "friendsofsymfony/jsrouting-bundle": {
+        "version": "3.6.1"
+    },
     "knplabs/knp-paginator-bundle": {
         "version": "v6.10.0"
     },

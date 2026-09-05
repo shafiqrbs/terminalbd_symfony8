@@ -1,6 +1,21 @@
-# 3 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 3 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 barcode:
     path: /
     defaults:
         _controller: 'App\Tool\Controller\BarCodeController::barcodeAction'
+barcode_image:
+    path: '/{id}/barcode-image'
+    defaults:
+        missing: 'App\Tool\Controller\BarCodeController::barcodeImageAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+barcode_html:
+    path: '/{id}/barcode-html'
+    defaults:
+        missing: 'App\Tool\Controller\BarCodeController::barcodeHtmlAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+barcode_text:
+    path: '/{id}/barcode-text'
+    defaults:
+        missing: 'App\Tool\Controller\BarCodeController::barcodeTextAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

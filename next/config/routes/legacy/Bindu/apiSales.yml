@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 api_setup:
     path: /setup
     defaults:
@@ -79,6 +79,14 @@ api_system_sales:
     methods: POST
     options:
         expose: true
+api_system_sales_item:
+    path: /sales-item
+    defaults:
+        missing: 'App\Bindu\Controller\ApiController::apiSalesItemAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 api_system_purchase:
     path: /purchase
     defaults:
@@ -86,6 +94,14 @@ api_system_purchase:
     methods: POST
     options:
         expose: true
+api_system_purchase_item:
+    path: /purchase-item
+    defaults:
+        missing: 'App\Bindu\Controller\ApiController::apiPurchaseItemAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 api_system_expense:
     path: /expense
     defaults:

@@ -1,4 +1,4 @@
-{% extends '::hms-print.html.twig' %}
+{% extends 'hms-print.html.twig' %}
 {% block body %}
     {%  if entity.hospitalConfig.isPrintHeader == 1 %}
         <table class="table" style="margin-top:{{ entity.hospitalConfig.printTopMargin }}px;margin-left:{{ entity.hospitalConfig.printLeftMargin }}px;">

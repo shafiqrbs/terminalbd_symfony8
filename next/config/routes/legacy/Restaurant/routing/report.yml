@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 restaurant_report_sales_summary:
     path: /sales-summary
     defaults:
@@ -24,3 +24,13 @@ restaurant_report_sales_product:
     path: /product-wise-sales
     defaults:
         _controller: 'App\Restaurant\Controller\ReportController::productBaseSalesSummaryAction'
+restaurant_report_purchase_summary:
+    path: /purchase-summary
+    defaults:
+        missing: 'App\Restaurant\Controller\ReportController::purchaseSummaryAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+restaurant_report_stock:
+    path: /stock-summary
+    defaults:
+        missing: 'App\Restaurant\Controller\ReportController::stockAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

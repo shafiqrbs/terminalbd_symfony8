@@ -1,9 +1,14 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 pos_android_sales:
     path: /
     defaults:
         _controller: 'App\Pos\Controller\PosAndroidController::indexAction'
+pos_android_duplicate_delete:
+    path: '/{android}/android-duplicate-delete'
+    defaults:
+        missing: 'App\Pos\Controller\PosAndroidController::androidDuplicateSalesDeleteAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 pos_android_process:
     path: '/{android}/android-process'
     defaults:

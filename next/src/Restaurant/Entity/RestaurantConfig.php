@@ -114,20 +114,20 @@ class RestaurantConfig
     /**
      * @var string
      */
-    #[ORM\Column(name: 'vatRegNo', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'vatRegNo', type: 'string', length: 255, nullable: true)]
     private $vatRegNo;
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'vatMode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'vatMode', type: 'string', length: 255, nullable: true)]
     private $vatMode;
 
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'payFor', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'payFor', type: 'string', length: 255, nullable: true)]
     private $payFor;
 
      /**

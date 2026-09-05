@@ -20,10 +20,16 @@ Companion summary (charts, tables, roadmap): https://claude.ai/code/artifact/be6
 
 ## 1. Status
 
-**Every phase that can be finished without production access is finished.** The application
-builds on Symfony 8.1 / PHP 8.5, every route resolves to a real controller and action, every
+**Every phase that can be finished without production access is finished, and the application
+has now served real requests.** It builds on Symfony 8.1 / PHP 8.5, every route resolves, every
 entity's mapping validates, and the column names match what the legacy annotations produce —
 which is the property that matters most, because both applications write the same tables.
+
+A tenant dump was loaded into a scratch database and the application run against it: the login
+page renders, a user whose password is a Symfony 2 salted sha512 hash logs in through the form,
+and that hash is transparently upgraded to bcrypt on the way through (§11). Doing that found
+nine defects no static check could see — §5.20 to §5.28 — including one that made *every*
+authenticated request a fatal error.
 
 What is left needs a running system or a product decision, not more porting: the golden API
 capture (§11), the per-module behaviour checks before each proxy flip (§6, phase 5), the
@@ -43,14 +49,14 @@ leftover Types::ARRAY     0 files
 -- does it actually build? --
  [OK] Cache for the "dev" environment (debug=true) was successfully cleared.
  [OK] The container was linted successfully
-routes loaded: 3070
-controllers loadable: 336/336
+routes loaded: 3485
+controllers loadable: 337/337
 OK (26 tests, 42 assertions)
 
 -- is the mapping right? --
 339 entities valid, 0 with mapping errors
 legacy columns absent from the ported mapping: 0
-resolve:           3070      missing class: 0   missing action: 0
+resolve: 3078   answering 404: 407   missing class: 0   missing action: 0
 mobile endpoints resolving at the same path: 90 (6 dead in the legacy app too, 0 regressions)
 ```
 
@@ -58,9 +64,9 @@ mobile endpoints resolving at the same path: 90 (6 dead in the legacy app too, 0
 |---|---|
 | PHP files ported into `App\` | 1,561 |
 | Templates ported | 1,797 (including 42 vendored from the removed FOS bundles) |
-| Routes loading | **3,070** |
-| Routes resolving to a real controller + action | **3,070 / 3,070** |
-| Controllers that load | **336 / 336** |
+| Routes loading | **3,485** |
+| Routes resolving to a real controller + action | **3,078**; the other 407 answer 404 (§5.20) |
+| Controllers that load | **337 / 337** |
 | Doctrine metadata definitions | 339 (**339 validate clean**) |
 | Column names diverging from the legacy annotations | **0** (of 333 entities) |
 | Mobile endpoints resolving at their contract path | 90 of 96 (6 dead in the legacy app, §5.13) |
@@ -445,6 +451,104 @@ loaded it, so it was dead code in the legacy tree; but Symfony and Doctrine both
 directory rather than autoload it, which made `getAllMetadata()` a fatal redeclare. `port-http.php`
 now skips any legacy file whose class name does not match its file name, and reports it.
 
+### 5.20 Deleting a dead route breaks the pages that link to it
+
+The first pass removed the 419 routes whose controller or action does not exist. That was
+wrong: 93 of them are still linked from templates, and `path('order')` for a route that no
+longer exists throws while rendering — so removing them took down pages that otherwise worked.
+
+They keep their name and path now and are repointed at
+`App\Migration\Controller\UnresolvableRouteController`, which answers 404. That is better than
+both the original behaviour (a 500) and the deletion. `check-routes.php` re-derives the list on
+every run, so restoring a controller is what takes a route off it.
+
+### 5.21 DBAL 4 requires precision and length that Doctrine 2 defaulted
+
+67 columns declare `type="decimal"` with no precision, and 205 declare `type="string"` with no
+length. Doctrine 2 defaulted them to `(10,0)` and `255`; DBAL 4 throws
+"Column precision is not specified" and "requires the length of a VARCHAR column to be
+specified" instead. Every schema operation — validate, diff, migrations — fails at the first
+one, which is why this only surfaced when the application was pointed at a database.
+
+The live schema agrees with the defaults: every decimal column in the dump is `decimal(10,0)`,
+and of the 44 string columns that could be checked against it, all are `varchar(255)`.
+`fix-string-length.php` reads the real length from `information_schema` when a database is
+reachable and falls back to 255 when it is not.
+
+### 5.22 `@ORM\Entity(repositoryClass="")` — 24 entities
+
+An empty string, in the legacy annotations. Doctrine 2 read it as falsy and used the default
+repository; Doctrine 3 takes it literally and throws when the entity is first queried. Nothing
+static catches it — the metadata itself loads fine. Dropping the option restores Doctrine 2's
+behaviour. Pointing it at the similarly-named repository class that happens to exist would not:
+that repository was never in use.
+
+### 5.23 app/Resources/views was never ported — 1,435 references
+
+The 66 templates in `app/Resources/views` are the layouts every page extends: `base.html.twig`,
+`login.html.twig`, the print and POS bases, the customer and frontend trees. They had not been
+copied, and 1,435 references use Symfony 2's app-level name form — `::base.html.twig`, with the
+bundle and controller segments empty — which the reference rewriter did not handle. 1,262 of
+those references are to `::base.html.twig`, which is to say nearly every page in the
+application.
+
+Nothing reported it. The Flex skeleton ships its own `templates/base.html.twig`, so a page
+extending `base.html.twig` rendered — with no stylesheet, no menu and the wrong title — and
+Twig's linter does not resolve inheritance, so `lint:twig` stayed green throughout.
+
+### 5.24 Two dead backward-compatibility branches in the login controller
+
+```php
+if (class_exists('\Symfony\Component\Security\Core\Security')) { ... }
+else { ... SecurityContextInterface::AUTHENTICATION_ERROR ... }   // removed in Symfony 3
+
+if ($this->has('security.csrf.token_manager')) { ... }
+else { ... $this->has('form.csrf_provider') ... }                 // has() removed in Symfony 6
+```
+
+Symfony 8 moved that `Security` class to the SecurityBundle namespace, so `class_exists()` is
+false and the pre-2.6 branch runs. Both made `/login` a fatal error — the first page anyone
+would open.
+
+### 5.25 UserProvider::refreshUser() called a method the entity does not have
+
+The hand-written provider from phase 2 reloaded the user with
+`$this->em->getRepository(User::class)->find($user->getId())`. Neither `User` nor `BaseUser`
+defines `getId()`. `refreshUser()` runs on every request that carries a session, so **every
+authenticated request was a fatal error** — while the container linted, the mapping validated
+and the tests passed. It reloads by identifier now, and the smoke test covers it.
+
+### 5.26 The Flex skeleton's stateless CSRF is incompatible with the ported forms
+
+`config/packages/csrf.yaml` came from a recipe enabling Symfony 7.2's stateless CSRF: the form
+renders the literal placeholder `csrf-token` and a Stimulus controller swaps in the real value
+before submit. None of the 1,797 ported templates loads that JavaScript, so every form —
+including the login form — submitted the placeholder and was rejected with no diagnostic beyond
+"Invalid CSRF token". Switched back to session-based tokens.
+
+### 5.27 FOSJsRoutingBundle is not optional
+
+`base.html.twig` calls `path('fos_js_routing_js')` on every page and eight templates call
+`Routing.generate()` in JavaScript. The bundle had been dropped and its routing import commented
+out, so every page threw. It is reinstalled (it has a Symfony 8-compatible release) with its
+route declared in `config/routes/fos_js_routing.yaml` — the bundle still ships the Symfony 2
+`Resources/` layout, which Symfony 8's bundle path resolution no longer looks in.
+
+### 5.28 Templates link to 193 routes that do not exist
+
+`path('report_dashboard')` and 192 other names, in 396 references. None is defined in the legacy
+tree either, so those pages are 500s in production today — one dead link takes down the whole
+page. Catalogued in `migration/contract/template-route-links.md` by
+`check-template-routes.php`, which reports rather than gates: restoring a controller or removing
+a link is a product decision.
+
+### 5.29 The schema cannot be created from scratch on MySQL 8 defaults
+
+Loading the dump and running `doctrine:schema:update` both fail with "Row size too large
+(> 8126)" on the widest tables (`TemplateCustomize` and friends) unless `innodb_strict_mode` is
+off. Production is unaffected — those tables already exist — but provisioning a new tenant or a
+staging environment from the mapping needs that setting, or narrower columns.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -688,31 +792,46 @@ the legacy build is reproducible only from `composer.lock`, not from `composer.j
 
 ## 11. What still needs a running system
 
-The application has never served a request against real data. What that leaves open:
+The application has now been run against real data: `bm_db.sql.gz` loaded into a scratch
+database, the schema completed from the mapping, and requests served. What that proved, and what
+it cost, is in §5.20-§5.29 — nine defects that every static check had passed over, including one
+that made every authenticated request a fatal error.
+
+What works, end to end, against a real database:
+
+- `/login` renders (HTTP 200), from the application's own layout
+- a user whose password is a **Symfony 2 salted sha512 hash logs in through the form**, and the
+  hash is transparently rewritten to bcrypt on the way through — the row went from 88 characters
+  of base64 to `$2y$13$...` — with no forced reset. Logging in again with the upgraded hash works
+- `/profile` returns 200 for the authenticated user, `/logout` clears the session
+- `doctrine:schema:validate` reports **"The database schema is in sync with the mapping files"**
+- `create-session-table.php` creates the shared session table the bridge needs
+
+Still open, and why:
 
 - [ ] **Golden API capture** — `capture.php` needs a staging base URL and API credentials in
-      `migration/capture-config.json`. Until it runs, the mobile contract is verified
-      structurally (the endpoint resolves, at the same path) but not by response shape
-- [ ] **Per-module behaviour checks** before each proxy flip, in the order §8 gives
+      `migration/capture-config.json`. The contract is verified structurally (the endpoint
+      resolves, at the same path) but not by response shape
+- [ ] **Per-module behaviour checks** before each proxy flip, in the order §8 gives. The smoke
+      test covered authentication and a handful of pages, not 3,000 routes
 - [ ] **The session bridge deploy step** — `migration/session-bridge.md`
 - [ ] **Decommissioning** the PHP 7.4 pool and collapsing the proxy rules
+- [ ] **193 template links to routes that never existed** (§5.28) and **205 references to entities
+      that never existed** (phase 5) — both need a product decision per case
 
-Done since this section was first written:
+Verified against the dump while doing the above:
 
-- [x] **Schema diff** — `schema-diff.php` runs against `bm_db.sql.gz` (Adminer dump, 155 tables,
-      one tenant). 121 entities match a table in it; 74 mapped columns are absent from that dump
-      and 18 of its columns are unmapped. Those are the dump's age, not port defects —
-      `medicine_sales.is_online` and its neighbours do not exist in that database at all.
-      The authority on port correctness is `verify-columns.php`, which compares against the
-      legacy annotations rather than one tenant's snapshot, and reports **0** differences.
-      (The earlier `ammar_db.sql.gz` was unusable — `file` identified it as an HTML document.)
-- [x] **The serialized columns** — 9 of the 24 belong to tables this dump carries, and the one
-      that matters most has data to check: `fos_user.roles` holds
-      `a:1:{i:0;s:16:"ROLE_SUPER_ADMIN";}` — `serialize()` output, exactly what
-      `LegacyArrayType` expects and what §5.1 predicted. The other eight columns have no rows in
-      this tenant's database, so they stay unconfirmed; a dump from a tenant that uses those
-      modules would close it
-- [x] **`fos_user` column set** — the table in the dump has 25 columns and the ported mapping
-      declares the same 25: nothing mapped is missing from the table, and nothing in the table is
-      unmapped. The password column holds 88-character base64 with a 32-character salt beside it,
-      which is the format the migrating hasher is configured to verify
+- [x] **Schema diff** — `schema-diff.php` against `bm_db.sql.gz` (Adminer, 155 tables, one
+      tenant). 121 entities match a table in it; the 74 mapped columns absent from that dump are
+      its age, not port defects — `medicine_sales.is_online` and its neighbours do not exist in
+      that database at all. `verify-columns.php`, which compares against the legacy annotations
+      rather than one tenant's snapshot, reports **0** differences
+- [x] **The serialized columns** — `fos_user.roles` holds `a:1:{i:0;s:16:"ROLE_SUPER_ADMIN";}`,
+      `serialize()` output, exactly what `LegacyArrayType` expects. Eight of the 24 belong to
+      tables with no rows in this tenant's database and stay unconfirmed
+- [x] **`fos_user` column set** — the table has 25 columns and the ported mapping declares the
+      same 25, in both directions. Passwords are 88-character base64 beside a 32-character salt,
+      the format the migrating hasher verifies
+
+The scratch database (`terminalbd_migration_check`) and `next/.env.local` pointing at it are
+left in place for the next round of module verification; neither is committed.

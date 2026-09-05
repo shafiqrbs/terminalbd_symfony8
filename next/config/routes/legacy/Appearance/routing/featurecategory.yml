@@ -1,2 +1,51 @@
-# 9 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 9 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+featurecategory:
+    path: /
+    defaults:
+        missing: App\Appearance\Controller\FeatureCategoryController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurecategory_sorting:
+    path: /sorting
+    defaults:
+        missing: App\Appearance\Controller\FeatureCategoryController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurecategory_show:
+    path: '/{id}/show'
+    defaults:
+        missing: App\Appearance\Controller\FeatureCategoryController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurecategory_new:
+    path: /new
+    defaults:
+        missing: App\Appearance\Controller\FeatureCategoryController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurecategory_create:
+    path: /create
+    defaults:
+        missing: App\Appearance\Controller\FeatureCategoryController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurecategory_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\Appearance\Controller\FeatureCategoryController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurecategory_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\Appearance\Controller\FeatureCategoryController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurecategory_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Appearance\Controller\FeatureCategoryController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurecategory_status:
+    path: '/{id}/status'
+    defaults:
+        missing: App\Appearance\Controller\FeatureCategoryController
+    controller: App\Migration\Controller\UnresolvableRouteController

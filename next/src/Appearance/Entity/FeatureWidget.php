@@ -205,7 +205,7 @@ class FeatureWidget
     /**
      * @var string
      */
-    #[ORM\Column(name: 'featureFor', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'featureFor', type: 'string', length: 255, nullable: true)]
     private $featureFor;
 
     /**

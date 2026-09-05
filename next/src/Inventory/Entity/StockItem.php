@@ -103,43 +103,43 @@ class StockItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'productName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'productName', type: 'string', length: 255, nullable: true)]
     private $productName;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'VendorName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'VendorName', type: 'string', length: 255, nullable: true)]
     private $vendorName;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'brandName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'brandName', type: 'string', length: 255, nullable: true)]
     private $brandName;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'sizeName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'sizeName', type: 'string', length: 255, nullable: true)]
     private $sizeName;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'colorName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'colorName', type: 'string', length: 255, nullable: true)]
     private $colorName;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'unitName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'unitName', type: 'string', length: 255, nullable: true)]
     private $unitName;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'categoryName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'categoryName', type: 'string', length: 255, nullable: true)]
     private $categoryName;
 
 
@@ -158,7 +158,7 @@ class StockItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string')]
+    #[ORM\Column(name: 'process', type: 'string', length: 255)]
     private $process;
 
     /**

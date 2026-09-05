@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 stock_adjustment:
     path: /
     defaults:
@@ -17,6 +17,19 @@ stock_adjustment_create:
     defaults:
         _controller: 'App\Medicine\Controller\StockAdjustmentController::createAction'
     methods: POST
+stock_adjustment_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: 'App\Medicine\Controller\StockAdjustmentController::editAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+stock_adjustment_update:
+    path: '/{id}/update'
+    defaults:
+        missing: 'App\Medicine\Controller\StockAdjustmentController::updateAction'
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
 stock_adjustment_delete:
     path: '/{id}/delete'
     defaults:

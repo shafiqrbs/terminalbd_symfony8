@@ -48,14 +48,8 @@ class SecurityController extends AbstractController
         }
         /** @var $session \Symfony\Component\HttpFoundation\Session\Session */
         $session = $request->getSession();
-        if (class_exists('\Symfony\Component\Security\Core\Security')) {
             $authErrorKey = SecurityRequestAttributes::AUTHENTICATION_ERROR;
             $lastUsernameKey = SecurityRequestAttributes::LAST_USERNAME;
-        } else {
-            // BC for SF < 2.6
-            $authErrorKey = SecurityContextInterface::AUTHENTICATION_ERROR;
-            $lastUsernameKey = SecurityContextInterface::LAST_USERNAME;
-        }
 
         // get the error if any (works with forward and redirect -- see below)
         if ($request->attributes->has($authErrorKey)) {
@@ -73,14 +67,7 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
 
-        if ($this->has('security.csrf.token_manager')) {
             $csrfToken = $this->csrfTokenManager->getToken('authenticate')->getValue();
-        } else {
-            // BC for SF < 2.4
-            $csrfToken = $this->has('form.csrf_provider')
-                ? $this->csrfTokenManager->generateCsrfToken('authenticate')
-                : null;
-        }
         if ($error) {
             $error = $error->getMessage();
         }
@@ -121,14 +108,8 @@ class SecurityController extends AbstractController
 
         /** @var $session \Symfony\Component\HttpFoundation\Session\Session */
         $session = $request->getSession();
-        if (class_exists('\Symfony\Component\Security\Core\Security')) {
             $authErrorKey = SecurityRequestAttributes::AUTHENTICATION_ERROR;
             $lastUsernameKey = SecurityRequestAttributes::LAST_USERNAME;
-        } else {
-            // BC for SF < 2.6
-            $authErrorKey = SecurityContextInterface::AUTHENTICATION_ERROR;
-            $lastUsernameKey = SecurityContextInterface::LAST_USERNAME;
-        }
         // get the error if any (works with forward and redirect -- see below)
         if ($request->attributes->has($authErrorKey)) {
             $error = $request->attributes->get($authErrorKey);
@@ -146,14 +127,7 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
 
-        if ($this->has('security.csrf.token_manager')) {
             $csrfToken = $this->csrfTokenManager->getToken('authenticate')->getValue();
-        } else {
-            // BC for SF < 2.4
-            $csrfToken = $this->has('form.csrf_provider')
-                ? $this->csrfTokenManager->generateCsrfToken('authenticate')
-                : null;
-        }
         if ($error) {
             $error = $error->getMessage();
         }

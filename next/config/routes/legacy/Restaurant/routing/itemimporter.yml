@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 restaurant_itemimporter:
     path: /
     defaults:
@@ -40,3 +40,8 @@ restaurant_itemimporter_reset:
     path: '/{ic}/data-reseted'
     defaults:
         _controller: 'App\Restaurant\Controller\ItemImporterController::resetedAction'
+restaurant_itemimporter_restore:
+    path: '/{ic}/data-restored'
+    defaults:
+        missing: 'App\Restaurant\Controller\ItemImporterController::restoredAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

@@ -1,9 +1,14 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 blackout:
     path: /
     defaults:
         _controller: 'App\Content\Controller\BlackoutController::indexAction'
+blackout_show:
+    path: '/{id}/show'
+    defaults:
+        missing: 'App\Content\Controller\BlackoutController::showAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 blackout_new:
     path: /new
     defaults:
@@ -24,3 +29,10 @@ blackout_update:
         _controller: 'App\Content\Controller\BlackoutController::updateAction'
     requirements:
         _method: post|put
+blackout_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: 'App\Content\Controller\BlackoutController::deleteAction'
+    requirements:
+        _method: post|delete
+    controller: App\Migration\Controller\UnresolvableRouteController

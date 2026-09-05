@@ -140,14 +140,14 @@ class Invoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discountRequestedBy', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'discountRequestedBy', type: 'string', length: 255, nullable: true)]
     private $discountRequestedBy;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discountRequestedComment', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'discountRequestedComment', type: 'string', length: 255, nullable: true)]
     private $discountRequestedComment;
 
 
@@ -158,7 +158,7 @@ class Invoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'followUpId', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'followUpId', type: 'string', length: 255, nullable: true)]
     private $followUpId;
 
 
@@ -261,20 +261,20 @@ class Invoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'subTotal', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'subTotal', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $subTotal;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'referredCommission', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'referredCommission', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $referredCommission;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discount', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'discount', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $discount;
 
     /**
@@ -293,25 +293,25 @@ class Invoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'vat', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'vat', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $vat;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'total', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'total', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $total;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'receive', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'receive', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $receive;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'payment', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'payment', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $payment;
 
     /**
@@ -323,7 +323,7 @@ class Invoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'commission', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'commission', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $commission;
 
 
@@ -386,7 +386,7 @@ class Invoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'due', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'due', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $due;
 
     /**

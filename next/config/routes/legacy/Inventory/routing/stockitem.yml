@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 inventory_stockitem:
     path: /
     defaults:
@@ -14,6 +14,11 @@ inventory_stockitem_show:
     path: '/{item}/show'
     defaults:
         _controller: 'App\Inventory\Controller\StockItemController::showAction'
+inventory_stockitem_print:
+    path: /print
+    defaults:
+        missing: 'App\Inventory\Controller\StockItemController::printAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 inventory_barcode_branch_stock:
     path: /barcode-wise-branch-stock
     defaults:

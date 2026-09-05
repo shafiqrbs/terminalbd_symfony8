@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Service
  */
 #[ORM\Table(name: 'medicine_prescription_attribute')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class PrescriptionAttribute
 {
     /**

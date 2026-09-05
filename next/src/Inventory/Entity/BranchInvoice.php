@@ -83,7 +83,7 @@ class BranchInvoice
         /**
          * @var string
          */
-        #[ORM\Column(name: 'total', type: 'decimal', nullable: true)]
+        #[ORM\Column(name: 'total', type: 'decimal', precision: 10, scale: 0, nullable: true)]
         private $total;
 
 

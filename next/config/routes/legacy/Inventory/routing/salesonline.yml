@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 inventory_salesonline:
     path: /
     defaults:
@@ -59,6 +59,19 @@ inventory_online_invoice_group_approve:
     path: /invoice-group-approve
     defaults:
         _controller: 'App\Inventory\Controller\SalesOnlineController::invoiceGroupApprovedAction'
+inventory_salesonline_empty_delete:
+    path: /delete/empty-invoice
+    defaults:
+        missing: 'App\Inventory\Controller\SalesOnlineController::deleteEmptyInvoiceAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesonline_discount_update:
+    path: /sales/discount-update
+    defaults:
+        missing: 'App\Inventory\Controller\SalesOnlineController::salesDiscountUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 inventory_salesonline_item_create:
     path: '/{id}/create-item'
     defaults:

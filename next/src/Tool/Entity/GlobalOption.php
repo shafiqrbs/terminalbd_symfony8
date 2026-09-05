@@ -301,13 +301,13 @@ class GlobalOption
      /**
      * @var string
      */
-    #[ORM\Column(name: 'address', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'address', type: 'string', length: 255, nullable: true)]
     private $address;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'billingAddress', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'billingAddress', type: 'string', length: 255, nullable: true)]
     private $billingAddress;
 
     /**

@@ -12,7 +12,7 @@ use App\Tool\Entity\GlobalOption;
  * CustomerInbox
  */
 #[ORM\Table]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class CustomerInbox
 {
     /**

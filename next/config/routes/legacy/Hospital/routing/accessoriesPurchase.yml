@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 hms_accessories_purchase:
     path: /
     defaults:
@@ -27,6 +27,11 @@ hms_accessories_purchase_status:
     path: '/{id}/status'
     defaults:
         _controller: 'App\Hospital\Controller\AccessoriesPurchaseController::editAction'
+hms_accessories_purchase_approve:
+    path: '/{id}/approve'
+    defaults:
+        missing: 'App\Hospital\Controller\AccessoriesPurchaseController::approveAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 hms_accessories_purchase_delete:
     path: '/{id}/delete'
     defaults:
@@ -57,3 +62,8 @@ hms_accessories_purchase_particular_delete:
     path: '/{invoice}/{id}/particular-delete'
     defaults:
         _controller: 'App\Hospital\Controller\AccessoriesPurchaseController::invoiceParticularDeleteAction'
+hms_accessories_purchase_print_invoice:
+    path: '/{id}/print'
+    defaults:
+        missing: 'App\Hospital\Controller\AccessoriesPurchaseController::invoicePrintAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

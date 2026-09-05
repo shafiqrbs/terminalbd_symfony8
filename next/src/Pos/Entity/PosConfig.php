@@ -50,7 +50,7 @@ class PosConfig
     /**
      * @var string
      */
-    #[ORM\Column(name: 'currency', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'currency', type: 'string', length: 255, nullable: true)]
     private $currency;
 
     /**

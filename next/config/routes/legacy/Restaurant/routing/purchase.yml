@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 restaurant_purchase:
     path: /
     defaults:
@@ -27,6 +27,11 @@ restaurant_purchase_status:
     path: '/{id}/status'
     defaults:
         _controller: 'App\Restaurant\Controller\PurchaseController::editAction'
+restaurant_purchase_approve:
+    path: '/{id}/approve'
+    defaults:
+        missing: 'App\Restaurant\Controller\PurchaseController::approveAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 restaurant_purchase_reverse:
     path: '/{id}/reverse'
     defaults:
@@ -61,3 +66,8 @@ restaurant_purchase_particular_delete:
     path: '/{invoice}/{id}/particular-delete'
     defaults:
         _controller: 'App\Restaurant\Controller\PurchaseController::invoiceParticularDeleteAction'
+restaurant_purchase_print_invoice:
+    path: '/{id}/print'
+    defaults:
+        missing: 'App\Restaurant\Controller\PurchaseController::invoicePrintAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

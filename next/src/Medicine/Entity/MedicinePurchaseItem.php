@@ -52,7 +52,7 @@ class MedicinePurchaseItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'stockName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'stockName', type: 'string', length: 255, nullable: true)]
     private $stockName;
 
     /**
@@ -174,7 +174,7 @@ class MedicinePurchaseItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'barcode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'barcode', type: 'string', length: 255, nullable: true)]
     private $barcode;
 
     /**
@@ -198,7 +198,7 @@ class MedicinePurchaseItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'batchno', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'batchno', type: 'string', length: 255, nullable: true)]
     private $batchno;
 
     /**

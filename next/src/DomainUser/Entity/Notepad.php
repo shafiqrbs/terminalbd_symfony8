@@ -59,7 +59,7 @@ class Notepad
      *
      *
      */
-    #[ORM\Column(name: 'name', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private $name;
 
 

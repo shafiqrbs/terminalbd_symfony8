@@ -98,7 +98,7 @@ class Product
     /**
      * @var string
      */
-    #[ORM\Column(name: 'productCode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'productCode', type: 'string', length: 255, nullable: true)]
     private $productCode;
 
 

@@ -11,9 +11,17 @@ declare(strict_types=1);
  * (HotelReportController, EcommerceMenuController, ...) and the rest name an
  * action their controller never had. Each is a 500 in production today.
  *
- * With --prune the route is removed from the generated YAML. It runs after
- * port-routing.php in the pipeline, so re-running the whole migration
- * reproduces the same result; the catalogue keeps the record of what went.
+ * With --prune the route keeps its name and path and is repointed at
+ * App\Migration\Controller\UnresolvableRouteController, which answers 404.
+ *
+ * Deleting the routes outright is worse than leaving them: 93 of them are still
+ * linked from templates, and path('order') for a route that no longer exists
+ * throws while rendering a page that otherwise works. A 404 is also an
+ * improvement on the 500 the legacy application returns today.
+ *
+ * It runs after port-routing.php in the pipeline, so re-running the whole
+ * migration reproduces the same result, and restoring a controller is what
+ * takes a route off the list.
  *
  * usage: php8.5 migration/bin/check-routes.php [--prune] [--strict] [--report=path]
  *
@@ -50,6 +58,7 @@ $routes = $router->getRouteCollection();
 $missingClass = [];
 $missingAction = [];
 $ok = 0;
+$repointed = 0;
 
 foreach ($routes as $name => $route) {
     $controller = $route->getDefault('_controller');
@@ -64,6 +73,12 @@ foreach ($routes as $name => $route) {
     // Framework routes point at a service id (error_controller), not a class.
     if (!str_contains($class, '\\')) {
         ++$ok;
+        continue;
+    }
+
+    // Already repointed at the 404 controller by an earlier run.
+    if (str_contains($class, 'UnresolvableRouteController')) {
+        ++$repointed;
         continue;
     }
 
@@ -86,6 +101,7 @@ printf("routes:            %d\n", count($routes));
 printf("resolve:           %d\n", $ok);
 printf("missing class:     %d\n", count($missingClass));
 printf("missing action:    %d\n", count($missingAction));
+printf("answering 404:     %d (no controller in either tree)\n", $repointed);
 
 // ---- catalogue -------------------------------------------------------------
 
@@ -145,9 +161,11 @@ foreach ($routeFiles as $file) {
     $dropped = [];
 
     foreach ($parsed as $name => $definition) {
-        if (isset($dead[$name])) {
+        if (isset($dead[$name]) && is_array($definition) && isset($definition['path'])) {
+            $definition['controller'] = 'App\\Migration\\Controller\\UnresolvableRouteController';
+            $definition['defaults']['missing'] = $dead[$name][1];
+            unset($definition['defaults']['_controller']);
             $dropped[] = $name;
-            continue;
         }
 
         $kept[$name] = $definition;
@@ -169,10 +187,10 @@ foreach ($routeFiles as $file) {
         $header[] = rtrim($line, "\n");
     }
 
-    $header[] = sprintf('# %d route(s) removed by check-routes.php: no such controller or action.', count($dropped));
-    $header[] = '# See migration/contract/unresolvable-routes.md.';
+    $header[] = sprintf('# %d route(s) repointed by check-routes.php: no such controller or action,', count($dropped));
+    $header[] = '# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.';
 
     file_put_contents($file, implode("\n", $header) . "\n" . ($kept === [] ? '' : Yaml::dump($kept, 4, 4)));
 }
 
-printf("pruned:            %d route definitions\n", $removed);
+printf("repointed:         %d route definitions -> 404\n", $removed);

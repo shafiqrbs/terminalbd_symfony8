@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 medicine_purchase:
     path: /
     defaults:
@@ -68,6 +68,11 @@ medicine_purchase_ajax_update:
         - PUT
     options:
         expose: true
+medicine_purchase_approve:
+    path: '/{id}/approve'
+    defaults:
+        missing: 'App\Medicine\Controller\PurchaseController::approveAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 medicine_purchase_emptyDelete:
     path: /empty/delete
     defaults:
@@ -179,6 +184,14 @@ medicine_purchaseitem_inline_update_purchase_price:
     methods: POST
     options:
         expose: true
+medicine_expiration_inline:
+    path: /purchase-item-inline-update
+    defaults:
+        missing: 'App\Medicine\Controller\PurchaseController::inlineExpirationUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 medicine_purchase_android:
     path: /android
     defaults:

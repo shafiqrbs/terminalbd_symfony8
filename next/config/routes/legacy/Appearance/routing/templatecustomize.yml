@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 templatecustomize:
     path: /
     defaults:
@@ -43,3 +43,11 @@ templatecustomize_ecommerce_update:
     methods:
         - POST
         - PUT
+templatecustomize_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: 'App\Appearance\Controller\TemplateCustomizeController::deleteAction'
+    methods:
+        - POST
+        - DELETE
+    controller: App\Migration\Controller\UnresolvableRouteController

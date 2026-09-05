@@ -1,0 +1,17 @@
+# app/config/routing.yml imported FOSJsRoutingBundle's routing; port-routing.php
+# commented that import out because the bundle had been dropped. base.html.twig
+# calls path('fos_js_routing_js') on every page, and eight templates call
+# Routing.generate() in JavaScript, so the bundle is back.
+#
+# The route is declared here rather than imported from the bundle: it still
+# ships the Symfony 2 Resources/ layout, which Symfony 8's bundle path
+# resolution no longer looks in. This is the definition from the bundle's own
+# routing.php, verbatim.
+fos_js_routing_js:
+    path: /js/routing.{_format}
+    controller: 'fos_js_routing.controller::indexAction'
+    methods: [GET]
+    requirements:
+        _format: 'js|json'
+    defaults:
+        _format: 'js'

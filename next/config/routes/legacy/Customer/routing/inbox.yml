@@ -1,2 +1,17 @@
-# 3 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 3 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+inbox:
+    path: /
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+inbox_sms:
+    path: /customer-sms
+    defaults:
+        missing: App\Customer\Controller\NotificationController
+    controller: App\Migration\Controller\UnresolvableRouteController
+inbox_email:
+    path: /customer-email
+    defaults:
+        missing: App\Customer\Controller\NotificationController
+    controller: App\Migration\Controller\UnresolvableRouteController

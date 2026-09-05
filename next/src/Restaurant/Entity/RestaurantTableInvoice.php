@@ -194,7 +194,7 @@ class RestaurantTableInvoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discountCoupon', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'discountCoupon', type: 'string', length: 255, nullable: true)]
     private $discountCoupon;
 
 

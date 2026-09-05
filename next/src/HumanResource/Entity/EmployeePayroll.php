@@ -73,7 +73,7 @@ class EmployeePayroll
     /**
      * @var string
      */
-    #[ORM\Column(name: 'effectedMonth', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'effectedMonth', type: 'string', length: 255, nullable: true)]
     private $effectedMonth;
 
     /**

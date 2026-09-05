@@ -1,5 +1,5 @@
-# 7 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 7 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 admission:
     path: /
     defaults:
@@ -38,3 +38,38 @@ admission_status:
     path: '/{id}/status'
     defaults:
         _controller: 'App\Content\Controller\AdmissionController::statusAction'
+admission_print_list:
+    path: /print-list
+    defaults:
+        missing: 'App\Content\Controller\AdmissionController::printListAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+admission_pdf_list:
+    path: /pdf-list
+    defaults:
+        missing: 'App\Content\Controller\AdmissionController::pdfListAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+admission_export_list:
+    path: /export-list
+    defaults:
+        missing: 'App\Content\Controller\AdmissionController::exportListAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+admission_print:
+    path: '/{id}/print-details'
+    defaults:
+        missing: 'App\Content\Controller\AdmissionController::printDetailsAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+admission_pdf:
+    path: '/{id}/pdf-details'
+    defaults:
+        missing: 'App\Content\Controller\AdmissionController::pdfDetailsAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+admission_import:
+    path: /import
+    defaults:
+        missing: 'App\Content\Controller\AdmissionController::importAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+admission_export:
+    path: '/{id}/export-details'
+    defaults:
+        missing: 'App\Content\Controller\AdmissionController::exportDetailsAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

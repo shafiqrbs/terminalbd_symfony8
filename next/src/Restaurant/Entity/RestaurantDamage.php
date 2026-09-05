@@ -82,7 +82,7 @@ class RestaurantDamage
     /**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'process', type: 'string', length: 255, nullable: true)]
     private $process = "Created";
 
 

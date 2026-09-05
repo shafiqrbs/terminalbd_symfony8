@@ -48,7 +48,7 @@ class DeliveryItem
     /**
      * @var string
      */
-    #[ORM\Column(name: 'subTotal', type: 'decimal')]
+    #[ORM\Column(name: 'subTotal', type: 'decimal', precision: 10, scale: 0)]
     private $subTotal;
 
     /**

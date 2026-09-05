@@ -10,7 +10,7 @@ use App\Tool\Entity\GlobalOption;
  * Payroll
  */
 #[ORM\Table('hr_payroll_department')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class HrDepartment
 {
     /**
@@ -30,7 +30,7 @@ class HrDepartment
     /**
      * @var string
      */
-    #[ORM\Column(name: 'name', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private $name;
 
 

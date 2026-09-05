@@ -1,2 +1,106 @@
-# 19 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 19 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+order:
+    path: /
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+shoppingbag_to_order:
+    path: /shopping-bag-to-order
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_to_cart:
+    path: /wishlist-to-order
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_to_cart:
+    path: /inbox-to-order
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_checkout:
+    path: /cart-to-order
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_cart:
+    path: /order-cart
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_payment:
+    path: '/{id}/payment'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_process:
+    path: '/{id}/order-process'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_show:
+    path: '/{id}/order-show'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_delete:
+    path: '/{id}/order-delete'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_item_update:
+    path: '/{order}/{id}/order-item-update'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_item_delete:
+    path: '/{order}/{id}/order-item-delete'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_print_invoice:
+    path: '/{invoice}/invoice-print'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_ajax_payment:
+    path: '/{id}/order-payment'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    methods:
+        - POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_payment_delete:
+    path: '/{id}/order-payment-delete'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_attach_download:
+    path: '/{id}/attach-download'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+medicine_customer_order_stock_search:
+    path: /order-stock-product-search
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+order_item_stock_details:
+    path: /order-stock-item-search
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+medicine_order_item:
+    path: '/{id}/customer-order-item-add'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController

@@ -56,7 +56,7 @@ class AndroidTemplateCustomization
     /**
      * @var string
      */
-    #[ORM\Column(name: 'sidebarTitle', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'sidebarTitle', type: 'string', length: 255, nullable: true)]
     private $sidebarTitle = false;
 
     /**
@@ -81,13 +81,13 @@ class AndroidTemplateCustomization
     /**
      * @var string
      */
-    #[ORM\Column(name: 'sidebarPosition', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'sidebarPosition', type: 'string', length: 255, nullable: true)]
     private $sidebarPosition = 'left';
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'pricePrefix', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'pricePrefix', type: 'string', length: 255, nullable: true)]
     private $pricePrefix = 'Tk.';
 
     /**

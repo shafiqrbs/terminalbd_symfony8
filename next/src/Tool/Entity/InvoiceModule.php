@@ -103,7 +103,7 @@ class InvoiceModule
     /**
      * @var string
      */
-    #[ORM\Column(name: 'billMonth', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'billMonth', type: 'string', length: 255, nullable: true)]
     private $billMonth;
 
      /**
@@ -139,7 +139,7 @@ class InvoiceModule
     /**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'process', type: 'string', length: 255, nullable: true)]
     private $process = 'Pending';
 
     /**

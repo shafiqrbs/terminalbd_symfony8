@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 inventory_salesimport:
     path: /
     defaults:
@@ -36,3 +36,13 @@ inventory_salesimport_updated:
     path: '/{id}/data-updated'
     defaults:
         _controller: 'App\Inventory\Controller\SalesImportController::updatedAction'
+inventory_salesimport_reset:
+    path: '/{ic}/data-reseted'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesImportController::resetedAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesimport_restore:
+    path: '/{ic}/data-restored'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesImportController::restoredAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

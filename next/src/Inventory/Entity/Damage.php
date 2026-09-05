@@ -58,13 +58,13 @@ class Damage
     /**
      * @var string
      */
-    #[ORM\Column(name: 'unitPrice', type: 'decimal')]
+    #[ORM\Column(name: 'unitPrice', type: 'decimal', precision: 10, scale: 0)]
     private $unitPrice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'total', type: 'decimal')]
+    #[ORM\Column(name: 'total', type: 'decimal', precision: 10, scale: 0)]
     private $total;
 
     /**
@@ -84,7 +84,7 @@ class Damage
     /**
      * @var string
      */
-    #[ORM\Column(name: 'notes', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'notes', type: 'string', length: 255, nullable: true)]
     private $notes;
 
 

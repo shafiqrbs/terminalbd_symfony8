@@ -119,7 +119,7 @@ class DoctorInvoice
     /**
      * @var string
      */
-    #[ORM\Column(name: 'payment', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'payment', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $payment;
 
 

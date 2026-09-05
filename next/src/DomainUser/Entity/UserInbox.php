@@ -11,7 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * UserInbox
  */
 #[ORM\Table]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class UserInbox
 {
     /**
@@ -58,7 +58,7 @@ class UserInbox
      *
      *
      */
-    #[ORM\Column(name: 'subject', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'subject', type: 'string', length: 255, nullable: true)]
     private $subject;
 
     /**

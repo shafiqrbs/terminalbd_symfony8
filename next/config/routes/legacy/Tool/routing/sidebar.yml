@@ -1,2 +1,44 @@
-# 7 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 7 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+sidebar_widget:
+    path: /
+    defaults:
+        missing: App\Tool\Controller\SidebarWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+sidebar_widget_show:
+    path: '/{id}/show'
+    defaults:
+        missing: App\Tool\Controller\SidebarWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+sidebar_widget_new:
+    path: /new
+    defaults:
+        missing: App\Tool\Controller\SidebarWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+sidebar_widget_create:
+    path: /create
+    defaults:
+        missing: App\Tool\Controller\SidebarWidgetController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+sidebar_widget_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\Tool\Controller\SidebarWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+sidebar_widget_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\Tool\Controller\SidebarWidgetController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+sidebar_widget_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Tool\Controller\SidebarWidgetController
+    methods:
+        - POST
+        - DELETE
+    controller: App\Migration\Controller\UnresolvableRouteController

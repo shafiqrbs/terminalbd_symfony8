@@ -147,7 +147,7 @@ class Particular
     /**
      * @var string
      */
-    #[ORM\Column(name: 'purchaseAverage', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'purchaseAverage', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $purchaseAverage= 0;
 
     /**

@@ -1,5 +1,46 @@
-# 7 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 7 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+inventory_foodproduct:
+    path: /
+    defaults:
+        missing: App\Inventory\Controller\FoodProductController
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_foodproduct_show:
+    path: '/{id}/show'
+    defaults:
+        missing: App\Inventory\Controller\FoodProductController
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_foodproduct_new:
+    path: /new
+    defaults:
+        missing: App\Inventory\Controller\FoodProductController
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_foodproduct_create:
+    path: /create
+    defaults:
+        missing: App\Inventory\Controller\FoodProductController
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_foodproduct_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\Inventory\Controller\FoodProductController
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_foodproduct_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\Inventory\Controller\FoodProductController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_foodproduct_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Inventory\Controller\FoodProductController
+    controller: App\Migration\Controller\UnresolvableRouteController
 inventory_vendoritem_status:
     path: '/{id}/web-status'
     defaults:

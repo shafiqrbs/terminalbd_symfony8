@@ -1,9 +1,19 @@
-# 3 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 3 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 account_sales_hotel:
     path: /sales
     defaults:
         _controller: 'App\Accounting\Controller\AccountHotelController::salesAction'
+account_hotel_income:
+    path: /income
+    defaults:
+        missing: App\Accounting\Controller\HotelReportController
+    controller: App\Migration\Controller\UnresolvableRouteController
+account_hotel_income_monthly:
+    path: /income-monthly
+    defaults:
+        missing: App\Accounting\Controller\HotelReportController
+    controller: App\Migration\Controller\UnresolvableRouteController
 account_sales_hotel_new:
     path: /sales-receive
     defaults:
@@ -40,6 +50,11 @@ account_purchase_hotel_new:
     path: /purchase-new
     defaults:
         _controller: 'App\Accounting\Controller\AccountHotelController::purchaseNewAction'
+account_purchase_hotel_reverse:
+    path: /purchase-reverse
+    defaults:
+        missing: 'App\Accounting\Controller\AccountHotelController::purchaseReverseAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 account_purchase_hotel_create:
     path: /purchase-create
     defaults:

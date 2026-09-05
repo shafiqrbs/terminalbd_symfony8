@@ -1,9 +1,14 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 agentclient:
     path: /
     defaults:
         _controller: 'App\Customer\Controller\AgentClientController::indexAction'
+agentclient_show:
+    path: '/{id}/show'
+    defaults:
+        missing: 'App\Customer\Controller\AgentClientController::showAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 agentclient_new:
     path: /new
     defaults:
@@ -21,3 +26,11 @@ agentclient_invoice:
     path: /invoice
     defaults:
         _controller: 'App\Customer\Controller\AgentClientController::editAction'
+agentclient_update:
+    path: '/{id}/update'
+    defaults:
+        missing: 'App\Customer\Controller\AgentClientController::updateAction'
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController

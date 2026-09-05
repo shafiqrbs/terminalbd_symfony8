@@ -1,11 +1,13 @@
-# Enable stateless CSRF protection for forms and logins/logouts
+# Session-based CSRF tokens, which is what the ported templates expect.
+#
+# The Flex recipe enables Symfony 7.2's stateless CSRF: the form renders the
+# literal placeholder "csrf-token" and a Stimulus controller shipped with the
+# skeleton swaps in the real value from a cookie before submit. The 1,797
+# templates ported from the Symfony 2 application do not load that JavaScript,
+# so every form - including the login form - submitted the placeholder and was
+# rejected. Nothing reports it: the request simply comes back with "Invalid
+# CSRF token".
 framework:
+    csrf_protection: ~
     form:
-        csrf_protection:
-            token_id: submit
-
-    csrf_protection:
-        stateless_token_ids:
-            - submit
-            - authenticate
-            - logout
+        csrf_protection: true

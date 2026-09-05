@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 dps_report_cash:
     path: /report-cash
     defaults:
@@ -96,3 +96,13 @@ dps_report_sales_treatment_pdf:
     path: /treatment-wise-sales-pdf
     defaults:
         _controller: 'App\DoctorPrescription\Controller\ReportController::treatmentWiseSalesPdfAction'
+dps_report_purchase_summary:
+    path: /purchase-summary
+    defaults:
+        missing: 'App\DoctorPrescription\Controller\ReportController::purchaseSummaryAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_report_purchase:
+    path: /purchase-summary
+    defaults:
+        missing: 'App\DoctorPrescription\Controller\ReportController::purchaseSummaryAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

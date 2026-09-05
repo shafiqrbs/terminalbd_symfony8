@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 business_category:
     path: /
     defaults:
@@ -24,6 +24,11 @@ business_category_delete:
     path: '/{id}/delete'
     defaults:
         _controller: 'App\Business\Controller\BusinessCategoryController::deleteAction'
+business_category_status:
+    path: '/{id}/status'
+    defaults:
+        missing: 'App\Business\Controller\BusinessCategoryController::statusAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 business_category_sorted:
     path: /category-sorted
     defaults:

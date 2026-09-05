@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 homeslider:
     path: /
     defaults:
@@ -21,6 +21,11 @@ homeslider_edit:
     path: '/{id}/edit'
     defaults:
         _controller: 'App\Content\Controller\HomeSliderController::editAction'
+homeslider_modify:
+    path: /modify
+    defaults:
+        missing: 'App\Content\Controller\HomeSliderController::modifyAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 homeslider_update:
     path: '/{id}/update'
     defaults:

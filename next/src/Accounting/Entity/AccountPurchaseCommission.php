@@ -77,7 +77,7 @@ class AccountPurchaseCommission
     /**
      * @var string
      */
-    #[ORM\Column(name: 'companyName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'companyName', type: 'string', length: 255, nullable: true)]
     private $companyName;
 
     /**

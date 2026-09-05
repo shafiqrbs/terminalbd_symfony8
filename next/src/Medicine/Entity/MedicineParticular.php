@@ -53,7 +53,7 @@ class MedicineParticular
     /**
      * @var string
      */
-    #[ORM\Column(name: 'sku', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'sku', type: 'string', length: 255, nullable: true)]
     private $sku;
 
 

@@ -1,2 +1,46 @@
-# 8 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 8 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+ecommercemenu:
+    path: /
+    defaults:
+        missing: App\Appearance\Controller\EcommerceMenuController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercemenu_new:
+    path: /new
+    defaults:
+        missing: App\Appearance\Controller\EcommerceMenuController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercemenu_create:
+    path: /create
+    defaults:
+        missing: App\Appearance\Controller\EcommerceMenuController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercemenu_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\Appearance\Controller\EcommerceMenuController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercemenu_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\Appearance\Controller\EcommerceMenuController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercemenu_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Appearance\Controller\EcommerceMenuController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercemenu_sorted:
+    path: /sorted
+    defaults:
+        missing: App\Appearance\Controller\EcommerceMenuController
+    controller: App\Migration\Controller\UnresolvableRouteController
+ecommercemenu_status:
+    path: '/{id}/status'
+    defaults:
+        missing: App\Appearance\Controller\EcommerceMenuController
+    controller: App\Migration\Controller\UnresolvableRouteController

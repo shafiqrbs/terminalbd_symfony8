@@ -117,7 +117,7 @@ class InventoryConfig
     /**
      * @var string
      */
-    #[ORM\Column(name: 'shopName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'shopName', type: 'string', length: 255, nullable: true)]
     private $shopName;
 
 
@@ -181,14 +181,14 @@ class InventoryConfig
     /**
      * @var string
      */
-    #[ORM\Column(name: 'vatRegNo', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'vatRegNo', type: 'string', length: 255, nullable: true)]
     private $vatRegNo;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'deliveryProcess', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'deliveryProcess', type: 'string', length: 255, nullable: true)]
     private $deliveryProcess;
 
 

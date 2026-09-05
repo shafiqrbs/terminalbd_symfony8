@@ -1,2 +1,71 @@
-# 13 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 13 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+appearancefeaturewidget:
+    path: /
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_sorting:
+    path: /sorting
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_list_sorted:
+    path: /sorted-list
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_show:
+    path: '/{id}/show'
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_new:
+    path: /new
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_create:
+    path: /create
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_feature:
+    path: '/{id}/feature'
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_status:
+    path: '/{id}/status'
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_resizing:
+    path: /resizing
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController
+appearancefeaturewidget_sorted:
+    path: /sorted
+    defaults:
+        missing: App\Appearance\Controller\FeatureWidgetController
+    controller: App\Migration\Controller\UnresolvableRouteController

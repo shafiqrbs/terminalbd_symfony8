@@ -1,5 +1,15 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+transactionmethod:
+    path: /
+    defaults:
+        missing: 'App\Tool\Controller\TransactionMethodController::indexAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+transactionmethod_show:
+    path: '/{id}/show'
+    defaults:
+        missing: 'App\Tool\Controller\TransactionMethodController::showAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 transactionmethod_new:
     path: /new
     defaults:

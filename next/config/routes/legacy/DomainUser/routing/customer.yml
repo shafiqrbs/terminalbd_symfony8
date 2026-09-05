@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 domain_customer:
     path: /
     defaults:
@@ -94,6 +94,20 @@ domain_customer_code:
         _controller: 'App\DomainUser\Controller\CustomerController::searchCodeAction'
     options:
         expose: true
+domain_location_search:
+    path: /location-search
+    defaults:
+        missing: 'App\DomainUser\Controller\AgentController::autoLocationSearchAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_location_name:
+    path: '/{location}/location-name'
+    defaults:
+        missing: 'App\DomainUser\Controller\AgentController::searchLocationNameAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 domain_customer_auto_name_search:
     path: /customer-auto-name-search
     defaults:

@@ -1,122 +1,154 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
 business_report:
-    resource: routing/report.yml
-    prefix: /report
+    resource: 'routing/report.yml'
+    prefix:   /report
+
 business_purchase:
-    resource: routing/purchase.yml
-    prefix: /purchase
+    resource: 'routing/purchase.yml'
+    prefix:   /purchase
+
 business_distribution:
-    resource: routing/distributor.yml
-    prefix: /distributor-invoice
+    resource: 'routing/distributor.yml'
+    prefix:   /distributor-invoice
+
 business_importer:
-    resource: routing/itemimporter.yml
-    prefix: /item-import
+    resource: 'routing/itemimporter.yml'
+    prefix:   /item-import
+
 business_purchase_return:
-    resource: routing/purchasereturn.yml
-    prefix: /purchase-return
+    resource: 'routing/purchasereturn.yml'
+    prefix:   /purchase-return
+
 business_invoice_return:
-    resource: routing/invoicereturn.yml
-    prefix: /invoice-return
+    resource: 'routing/invoicereturn.yml'
+    prefix:   /invoice-return
+
 business_vendor_stock:
-    resource: routing/vendorstock.yml
-    prefix: /vendor-stock
+    resource: 'routing/vendorstock.yml'
+    prefix:   /vendor-stock
+
 business_stock_adjustment:
-    resource: routing/adjustment.yml
-    prefix: /stock-adjustment
+    resource: 'routing/adjustment.yml'
+    prefix:   /stock-adjustment
+
 business_area:
-    resource: routing/area.yml
-    prefix: /area
+    resource: 'routing/area.yml'
+    prefix:   /area
+
 business_store:
-    resource: routing/store.yml
-    prefix: /store
+    resource: 'routing/store.yml'
+    prefix:   /store
+
 business_brand:
-    resource: routing/brand.yml
-    prefix: /brand
+    resource: 'routing/brand.yml'
+    prefix:   /brand
+
 business_marketing:
-    resource: routing/marketing.yml
-    prefix: /marketing
+    resource: 'routing/marketing.yml'
+    prefix:   /marketing
+
 business_courier:
-    resource: routing/courier.yml
-    prefix: /courier
+    resource: 'routing/courier.yml'
+    prefix:   /courier
+
 business_vendor:
-    resource: routing/vendor.yml
-    prefix: /vendor
+    resource: 'routing/vendor.yml'
+    prefix:   /vendor
+
 business_distribution_return:
-    resource: routing/distributionreturn.yml
-    prefix: /distribution-return
+    resource: 'routing/distributionreturn.yml'
+    prefix:   /distribution-return
+
 business_invoice:
-    resource: routing/invoice.yml
-    prefix: /invoice
+    resource: 'routing/invoice.yml'
+    prefix:   /invoice
+
 business_invoice_association:
-    resource: routing/invoiceAssociation.yml
-    prefix: /invoice-association
+    resource: 'routing/invoiceAssociation.yml'
+    prefix:   /invoice-association
+
 business_stock:
-    resource: routing/stock.yml
-    prefix: /stock
+    resource: 'routing/stock.yml'
+    prefix:   /stock
+
+business_product:
+    resource: 'routing/product.yml'
+    prefix:   /product
+
 business_product_production:
-    resource: routing/production.yml
-    prefix: /product-production
+    resource: 'routing/production.yml'
+    prefix:   /product-production
+
 business_stock_transfer:
-    resource: routing/stock_transfer.yml
-    prefix: /stock-transfer
+    resource: 'routing/stock_transfer.yml'
+    prefix:   /stock-transfer
+
 business_damage:
-    resource: routing/damage.yml
-    prefix: /damage
+    resource: 'routing/damage.yml'
+    prefix:   /damage
+
 business_category:
-    resource: routing/category.yml
-    prefix: /category
+    resource: 'routing/category.yml'
+    prefix:   /category
+
 business_wearhouse:
-    resource: routing/wearhouse.yml
-    prefix: /wear-house
+    resource: 'routing/wearhouse.yml'
+    prefix:   /wear-house
+
 business_reverse:
-    resource: routing/reverse.yml
-    prefix: /reverse
+    resource: 'routing/reverse.yml'
+    prefix:   /reverse
+
 business_sales_user:
-    resource: routing/salesuser.yml
-    prefix: /sales-user
+    resource: 'routing/salesuser.yml'
+    prefix:   /sales-user
+
+
 business_store_ledger:
-    resource: routing/storeLedger.yml
-    prefix: /store-ledger
+    resource: 'routing/storeLedger.yml'
+    prefix:   /store-ledger
+
 business_config:
-    resource: routing/config.yml
-    prefix: /config
+    resource: 'routing/config.yml'
+    prefix:   /config
+
 business_invoice_fuelpump:
-    resource: routing/fuelstation.yml
-    prefix: /fuelpump
+    resource: 'routing/fuelstation.yml'
+    prefix:   /fuelpump
+
 business_homepage:
-    path: /dashboard
-    defaults:
-        _controller: 'App\Business\Controller\DefaultController::indexAction'
+    path:     /dashboard
+    defaults: { _controller: App\Business\Controller\DefaultController::indexAction }
+
 business_group_approved:
-    path: /group/invoice/approved
-    defaults:
-        _controller: 'App\Business\Controller\InvoiceController::invoiceGroupApprovedAction'
+    path:      /group/invoice/approved
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceGroupApprovedAction' }
+
 business_android_sales:
-    path: /android/sales
-    defaults:
-        _controller: 'App\Business\Controller\AndroidSalesController::indexAction'
+    path:      /android/sales
+    defaults: { _controller: 'App\Business\Controller\AndroidSalesController::indexAction' }
+
+
 business_android_sales_process:
-    path: '/{id}/android/sales-process'
-    defaults:
-        _controller: 'App\Business\Controller\AndroidSalesController::androidProcessMysqlAction'
+    path:      /{id}/android/sales-process
+    defaults: { _controller: 'App\Business\Controller\AndroidSalesController::androidProcessMysqlAction' }
     options:
         expose: true
+
 business_android_sales_delete:
-    path: '/{id}/android/sales-delete'
-    defaults:
-        _controller: 'App\Business\Controller\AndroidSalesController::deleteAction'
+    path:      /{id}/android/sales-delete
+    defaults: { _controller: 'App\Business\Controller\AndroidSalesController::deleteAction' }
     options:
         expose: true
+
 business_group_revised:
-    path: /group/invoice/revised
-    defaults:
-        _controller: 'App\Business\Controller\InvoiceController::invoiceGroupReverseAction'
+    path:     /group/invoice/revised
+    defaults: { _controller: 'App\Business\Controller\InvoiceController::invoiceGroupReverseAction' }
+
 business_stock_migration:
-    path: '/{id}/copy-stock-migration'
-    defaults:
-        _controller: 'App\Business\Controller\DefaultController::copyToBusinessParticularAction'
+    path:     /{id}/copy-stock-migration
+    defaults: { _controller: App\Business\Controller\DefaultController::copyToBusinessParticularAction }
+
 business_stock_reset:
-    path: /stock-reset
-    defaults:
-        _controller: 'App\Business\Controller\DefaultController::updateRemainingQuantityAction'
+    path:     /stock-reset
+    defaults: { _controller: App\Business\Controller\DefaultController::updateRemainingQuantityAction }
+

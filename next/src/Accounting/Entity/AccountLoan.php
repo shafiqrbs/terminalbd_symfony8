@@ -68,19 +68,19 @@ class AccountLoan
     /**
      * @var string
      */
-    #[ORM\Column(name: 'name', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private $name;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'mobile', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'mobile', type: 'string', length: 255, nullable: true)]
     private $mobile;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'address', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'address', type: 'string', length: 255, nullable: true)]
     private $address;
 
     /**

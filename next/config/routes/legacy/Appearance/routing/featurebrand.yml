@@ -1,2 +1,51 @@
-# 9 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 9 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+featurebrand:
+    path: /
+    defaults:
+        missing: App\Appearance\Controller\FeatureBrandController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurebrand_sorting:
+    path: /sorting
+    defaults:
+        missing: App\Appearance\Controller\FeatureBrandController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurebrand_show:
+    path: '/{id}/show'
+    defaults:
+        missing: App\Appearance\Controller\FeatureBrandController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurebrand_new:
+    path: /new
+    defaults:
+        missing: App\Appearance\Controller\FeatureBrandController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurebrand_create:
+    path: /create
+    defaults:
+        missing: App\Appearance\Controller\FeatureBrandController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurebrand_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\Appearance\Controller\FeatureBrandController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurebrand_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\Appearance\Controller\FeatureBrandController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurebrand_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Appearance\Controller\FeatureBrandController
+    controller: App\Migration\Controller\UnresolvableRouteController
+featurebrand_status:
+    path: '/{id}/status'
+    defaults:
+        missing: App\Appearance\Controller\FeatureBrandController
+    controller: App\Migration\Controller\UnresolvableRouteController

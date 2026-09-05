@@ -34,14 +34,14 @@ class PosItem
     /**
      * @var float
      */
-    #[ORM\Column(name: 'name', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private $name;
 
 
     /**
      * @var float
      */
-    #[ORM\Column(name: 'unit', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'unit', type: 'string', length: 255, nullable: true)]
     private $unit;
 
 

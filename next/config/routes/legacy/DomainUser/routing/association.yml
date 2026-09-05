@@ -1,5 +1,5 @@
-# 4 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 4 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 domain_association:
     path: /member
     defaults:
@@ -74,6 +74,13 @@ domain_association_inline_update:
         _controller: 'App\DomainUser\Controller\AssociationController::inlineUpdateAction'
     options:
         expose: true
+domain_association_name:
+    path: '/{association}/association-name'
+    defaults:
+        missing: 'App\DomainUser\Controller\AssociationController::searchAssociationNameAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 domain_association_code_search:
     path: /association-code-search
     defaults:
@@ -86,12 +93,33 @@ domain_association_code:
         _controller: 'App\DomainUser\Controller\AssociationController::searchCodeAction'
     options:
         expose: true
+domain_location_search:
+    path: /location-search
+    defaults:
+        missing: 'App\DomainUser\Controller\AgentController::autoLocationSearchAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_location_name:
+    path: '/{location}/location-name'
+    defaults:
+        missing: 'App\DomainUser\Controller\AgentController::searchLocationNameAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 domain_association_auto_name_search:
     path: /association-auto-name-search
     defaults:
         _controller: 'App\DomainUser\Controller\AssociationController::searchAutoCompleteNameAction'
     options:
         expose: true
+domain_association_ledger:
+    path: /association-ledger
+    defaults:
+        missing: 'App\Accounting\Controller\AccountSalesController::associationLedgerAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 domain_association_invoice:
     path: /invoice
     defaults:

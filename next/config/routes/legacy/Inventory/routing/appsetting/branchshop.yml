@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 appsetting_branchshop:
     path: /
     defaults:
@@ -28,3 +28,8 @@ appsetting_branchshop_update:
     methods:
         - POST
         - PUT
+appsetting_branchshop_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: 'App\DomainUser\Controller\BranchShopController::deleteAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

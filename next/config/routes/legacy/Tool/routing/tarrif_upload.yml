@@ -1,2 +1,29 @@
-# 5 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 5 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+tarrif_upload:
+    path: /
+    defaults:
+        missing: App\Tool\Controller\TaxUploadController
+    controller: App\Migration\Controller\UnresolvableRouteController
+tarrif_upload_new:
+    path: /new
+    defaults:
+        missing: App\Tool\Controller\TaxUploadController
+    controller: App\Migration\Controller\UnresolvableRouteController
+tarrif_upload_create:
+    path: /create
+    defaults:
+        missing: App\Tool\Controller\TaxUploadController
+    requirements:
+        _method: post
+    controller: App\Migration\Controller\UnresolvableRouteController
+tarrif_upload_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Tool\Controller\TaxUploadController
+    controller: App\Migration\Controller\UnresolvableRouteController
+tarrif_upload_migration:
+    path: '/{id}/migration'
+    defaults:
+        missing: App\Tool\Controller\TaxUploadController
+    controller: App\Migration\Controller\UnresolvableRouteController

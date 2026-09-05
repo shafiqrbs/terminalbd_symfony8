@@ -1,2 +1,41 @@
-# 7 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 7 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+business_product:
+    path: /
+    defaults:
+        missing: App\Business\Controller\ProductController
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_product_create:
+    path: /create
+    defaults:
+        missing: App\Business\Controller\ProductController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_product_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\Business\Controller\ProductController
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_product_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\Business\Controller\ProductController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_product_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Business\Controller\ProductController
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_product_status:
+    path: '/{id}/status'
+    defaults:
+        missing: App\Business\Controller\ProductController
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_product_inline:
+    path: /inline-update
+    defaults:
+        missing: App\Business\Controller\ProductController
+    controller: App\Migration\Controller\UnresolvableRouteController

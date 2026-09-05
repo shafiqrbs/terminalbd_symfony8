@@ -1,2 +1,52 @@
-# 10 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 10 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+wishlist:
+    path: /
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_to_cart:
+    path: /cart-to-order
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_checkout:
+    path: /cart-to-order
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_cart:
+    path: /order-cart
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_payment:
+    path: '/payment/{id}'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_process:
+    path: '/{id}/order-process'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_show:
+    path: '/{id}/order-show'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_delete:
+    path: '/{id}/order-delete'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_item_delete:
+    path: '/{id}/order-item-delete'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+wishlist_print_invoice:
+    path: '/{invoice}/invoice-print'
+    defaults:
+        missing: App\Customer\Controller\OrderController
+    controller: App\Migration\Controller\UnresolvableRouteController

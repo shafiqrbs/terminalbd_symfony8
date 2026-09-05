@@ -1,5 +1,15 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+newses:
+    path: /listing
+    defaults:
+        missing: 'App\Content\Controller\NewsController::listingAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+newses_delete:
+    path: listing/delete
+    defaults:
+        missing: 'App\Content\Controller\NewsController::listingDeleteAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 news:
     path: /
     defaults:

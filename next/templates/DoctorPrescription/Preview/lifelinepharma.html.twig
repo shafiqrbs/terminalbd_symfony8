@@ -1,4 +1,4 @@
-{% extends '::base-app.html.twig' %}
+{% extends 'base-app.html.twig' %}
 {% block body %}
     {% if entity.dpsConfig.isPrintHeader == 1 and entity.assignDoctor is defined and entity.assignDoctor.webPath is not empty  %}
         <div class="print-header-content" style="height: 220px">

@@ -39,7 +39,7 @@ class CustomerAddress
      /**
       * @var string
       */
-     #[ORM\Column(name: 'mode', type: 'string', nullable: true)]
+     #[ORM\Column(name: 'mode', type: 'string', length: 255, nullable: true)]
      private $mode;
 
     /**

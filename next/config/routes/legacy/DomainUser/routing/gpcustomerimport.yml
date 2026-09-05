@@ -1,2 +1,23 @@
-# 4 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 4 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+domain_gp_customer_import:
+    path: /
+    defaults:
+        missing: App\DomainUser\Controller\GpCustomerImportController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_gp_customer_import_create:
+    path: /create
+    defaults:
+        missing: App\DomainUser\Controller\GpCustomerImportController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_gp_customer_import_migration:
+    path: '/{id}/customer-migration'
+    defaults:
+        missing: App\DomainUser\Controller\GpCustomerImportController
+    controller: App\Migration\Controller\UnresolvableRouteController
+domain_gp_customer_import_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\DomainUser\Controller\GpCustomerImportController
+    controller: App\Migration\Controller\UnresolvableRouteController

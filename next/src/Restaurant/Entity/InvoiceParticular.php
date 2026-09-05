@@ -62,7 +62,7 @@ class InvoiceParticular
      /**
      * @var string
      */
-    #[ORM\Column(name: 'estimatePrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'estimatePrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $estimatePrice;
 
 

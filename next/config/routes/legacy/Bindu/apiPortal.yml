@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 api_portal_contact:
     path: /information
     defaults:
@@ -20,3 +20,11 @@ api_portal_app_customer:
     path: /app-customer
     defaults:
         _controller: 'App\Bindu\Controller\ApiPortalController::appWiseCustomerAction'
+api_portal_app_user_register:
+    path: /app-user-register
+    defaults:
+        missing: 'App\Bindu\Controller\ApiPortalController::userRegisterAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController

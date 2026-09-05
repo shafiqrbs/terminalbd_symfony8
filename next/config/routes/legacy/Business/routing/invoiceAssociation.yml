@@ -1,8 +1,13 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 association_invoice_create:
     path: /invoice-create
     defaults:
         _controller: 'App\Customer\Controller\BusinessController::createAction'
     methods:
         - POST
+association_invoice_new:
+    path: '/{customer}/invoice-create'
+    defaults:
+        missing: 'App\Customer\Controller\BusinessController::newAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

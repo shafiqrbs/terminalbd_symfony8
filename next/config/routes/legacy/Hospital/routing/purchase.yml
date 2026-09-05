@@ -1,5 +1,5 @@
-# 5 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 5 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 hms_purchase:
     path: /
     defaults:
@@ -55,6 +55,11 @@ hms_purchase_vendor_update:
         - PUT
     options:
         expose: true
+hms_purchase_approve:
+    path: '/{id}/approve'
+    defaults:
+        missing: 'App\Hospital\Controller\PurchaseController::approveAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 hms_purchase_delete:
     path: '/{id}/delete'
     defaults:
@@ -97,6 +102,11 @@ hms_purchase_approved:
     path: '/{id}/invoice-approved'
     defaults:
         _controller: 'App\Hospital\Controller\PurchaseController::approvedAction'
+hms_purchase_vendor_merge:
+    path: '/{id}/invoice-merge'
+    defaults:
+        missing: 'App\Hospital\Controller\PurchaseController::vendorMergeAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 hms_purchase_particular_delete:
     path: '/{invoice}/{id}/particular-delete'
     defaults:
@@ -115,3 +125,21 @@ hms_purchaseitem_inline_update_purchase_price:
     methods: POST
     options:
         expose: true
+hms_expiration_inline:
+    path: /purchase-item-inline-update
+    defaults:
+        missing: 'App\Hospital\Controller\PurchaseController::inlineExpirationUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+hms_purchase_android:
+    path: /android
+    defaults:
+        missing: 'App\Hospital\Controller\PurchaseController::androidPurchaseAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+hms_device_purchase_import:
+    path: '/device-sales-delete-import/{android}'
+    defaults:
+        missing: 'App\Hospital\Controller\PurchaseController::insertGroupApiPurchaseImportAction'
+    controller: App\Migration\Controller\UnresolvableRouteController

@@ -1,14 +1,100 @@
-# 13 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 13 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 inventory_salesmanual:
     path: /
     defaults:
         _controller: 'App\Inventory\Controller\SalesManualController::indexAction'
+inventory_salesmanual_customer:
+    path: /customer
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::customerAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_show:
+    path: '/{id}/show'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::showAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_insert_item:
+    path: '/{sales}/insert-sales-item'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::insertManualSalesItemAction'
+    methods:
+        - POST
+    controller: App\Migration\Controller\UnresolvableRouteController
 inventory_salesmanual_new:
     path: /new
     defaults:
         _controller: 'App\Inventory\Controller\SalesManualController::newAction'
+inventory_salesmanual_item_barcode_search:
+    path: /add-barcode-item
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::searchBarcodeAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_item_search:
+    path: /search
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::searchAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_discount_update:
+    path: /sales/discount-update
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::salesDiscountUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 inventory_salesmanual_edit:
     path: '/{code}/manual-sales'
     defaults:
         _controller: 'App\Inventory\Controller\SalesManualController::editAction'
+inventory_salesmanual_update:
+    path: '/{id}/update'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::updateAction'
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_salesitem_delete:
+    path: '/{sales}/{salesItem}/manual-item-delete'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::itemDeleteAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_print_invoice:
+    path: '/{invoice}/invoice'
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::invoicePrintAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_empty_delete:
+    path: /delete/empty-manual-invoice
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::deleteEmptyInvoiceAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_item_update:
+    path: /manual-sales/item/update
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::salesItemUpdateAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_inline_process_update:
+    path: /manual-sales/inline-process-update
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::salesInlineProcessUpdateAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+inventory_salesmanual_inline_status_select:
+    path: /manual-sales/inline-status-select
+    defaults:
+        missing: 'App\Inventory\Controller\SalesManualController::salesSelectAction'
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController

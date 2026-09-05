@@ -45,13 +45,13 @@ class PageModule
     /**
      * @var string
      */
-    #[ORM\Column(name: 'name', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private $name;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'contentPosition', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'contentPosition', type: 'string', length: 255, nullable: true)]
     private $contentPosition = 'Body';
 
     /**
@@ -76,7 +76,7 @@ class PageModule
     /**
      * @var string
      */
-    #[ORM\Column(name: 'showingType', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'showingType', type: 'string', length: 255, nullable: true)]
     private $showingType = 'list';
 
 

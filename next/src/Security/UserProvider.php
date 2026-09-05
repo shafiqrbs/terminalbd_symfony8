@@ -48,13 +48,10 @@ final class UserProvider implements UserProviderInterface, PasswordUpgraderInter
             throw new UnsupportedUserException(sprintf('Unsupported user class "%s".', $user::class));
         }
 
-        $refreshed = $this->em->getRepository(User::class)->find($user->getId());
-
-        if ($refreshed === null) {
-            throw new UserNotFoundException(sprintf('User with id %s no longer exists.', (string) $user->getId()));
-        }
-
-        return $refreshed;
+        // By identifier, not by id: neither User nor BaseUser defines getId(),
+        // and this runs on every request that has a session - so calling it was
+        // a fatal error on the first authenticated page load.
+        return $this->loadUserByIdentifier($user->getUserIdentifier());
     }
 
     public function supportsClass(string $class): bool

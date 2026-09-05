@@ -1,5 +1,5 @@
-# 7 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 7 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 business_report_system_overview:
     path: /system-overview
     defaults:
@@ -44,6 +44,36 @@ business_report_customer_monthly_sales_stock:
     path: /customer-monthly-item-sales
     defaults:
         _controller: 'App\Business\Controller\ReportController::customerMonthlyProductSalesAction'
+business_report_purchase_stock_price:
+    path: /purchase-stock-price
+    defaults:
+        missing: 'App\Business\Controller\ReportController::purchaseVendorSalesAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_report_item_stock_price:
+    path: /purchase-stock-price
+    defaults:
+        missing: 'App\Business\Controller\ReportController::purchaseVendorSalesAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_report_item_stock:
+    path: /purchase-stock-price
+    defaults:
+        missing: 'App\Business\Controller\ReportController::purchaseVendorSalesAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_report_sales_vendor_customer:
+    path: /vendor-base-sales
+    defaults:
+        missing: 'App\Business\Controller\ReportController::salesVendorCustomerAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_report_purchase_brand_sales:
+    path: /purchase-brand-sales
+    defaults:
+        missing: 'App\Business\Controller\ReportController::purchaseBrandSalesAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+business_report_purchase_brand_sales_details:
+    path: /purchase-brand-sales-details
+    defaults:
+        missing: 'App\Business\Controller\ReportController::purchaseBrandSalesDetailsAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 business_report_product_stock_sales:
     path: /product-vendor-stock-sales
     defaults:
@@ -112,6 +142,11 @@ business_report_vendor_commission_sales:
     path: /vendor-commission-sales
     defaults:
         _controller: 'App\Business\Controller\ReportController::vendorCommissionBaseSalesAction'
+business_report_customer_sales_item:
+    path: /customer-monthly-sales-item
+    defaults:
+        missing: 'App\Business\Controller\ReportController::customerMonthlySalesItemAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 business_report_product_commission_sales:
     path: /vendor-commission-sales
     defaults:

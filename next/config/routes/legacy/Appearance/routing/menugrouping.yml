@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 menugrouping:
     path: /
     defaults:
@@ -26,9 +26,23 @@ menugrouping_sorting:
     path: '/{menuGroup}/sorting'
     defaults:
         _controller: 'App\Appearance\Controller\MenuGroupingController::sortingAction'
+menugrouping_update:
+    path: '/{id}/update'
+    defaults:
+        missing: 'App\Appearance\Controller\MenuGroupingController::updateAction'
+    requirements:
+        _method: post|put
+    controller: App\Migration\Controller\UnresolvableRouteController
 menugrouping_sorted:
     path: /sorted
     defaults:
         _controller: 'App\Appearance\Controller\MenuGroupingController::sortedAction'
     requirements:
         _method: post|put
+menugrouping_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: 'App\Appearance\Controller\MenuGroupingController::deleteAction'
+    requirements:
+        _method: post|delete
+    controller: App\Migration\Controller\UnresolvableRouteController

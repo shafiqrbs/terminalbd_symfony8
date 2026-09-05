@@ -9,7 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * Product
  */
 #[ORM\Table(name: 'item_pre_purchase')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class PrePurchaseItem
 {
     /**

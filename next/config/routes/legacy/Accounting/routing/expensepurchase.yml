@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 account_expense_purchase:
     path: /
     defaults:
@@ -42,6 +42,11 @@ account_expense_purchase_approved:
     path: '/{id}/invoice-approved'
     defaults:
         _controller: 'App\Accounting\Controller\PurchaseController::approvedAction'
+account_expense_purchase_item_approve:
+    path: '/{id}/item-approve'
+    defaults:
+        missing: 'App\Accounting\Controller\PurchaseController::itemApproveAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 account_expense_purchase_particular_delete:
     path: '/{invoice}/{id}/particular-delete'
     defaults:

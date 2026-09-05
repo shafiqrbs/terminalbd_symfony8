@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * RestaurantTableInvoiceItem
  */
 #[ORM\Table(name: 'restaurant_table_invoice_item')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class RestaurantTableInvoiceItem
 {
     /**

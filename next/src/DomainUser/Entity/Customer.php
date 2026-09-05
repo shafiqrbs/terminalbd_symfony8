@@ -150,19 +150,19 @@ class Customer
     /**
      * @var string
      */
-    #[ORM\Column(name: 'customerId', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'customerId', type: 'string', length: 255, nullable: true)]
     private $customerId;
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'referenceId', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'referenceId', type: 'string', length: 255, nullable: true)]
     private $referenceId;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'patientId', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'patientId', type: 'string', length: 255, nullable: true)]
     private $patientId;
 
     /**
@@ -288,7 +288,7 @@ class Customer
     /**
      * @var string
      */
-    #[ORM\Column(name: 'email', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'email', type: 'string', length: 255, nullable: true)]
     private $email;
 
     /**
@@ -430,51 +430,51 @@ class Customer
     /**
      * @var string
      */
-    #[ORM\Column(name: 'higherEducation', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'higherEducation', type: 'string', length: 255, nullable: true)]
     private $higherEducation;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'spouseName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'spouseName', type: 'string', length: 255, nullable: true)]
     private $spouseName;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'spouseOccupation', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'spouseOccupation', type: 'string', length: 255, nullable: true)]
     private $spouseOccupation;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'spouseDesignation', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'spouseDesignation', type: 'string', length: 255, nullable: true)]
     private $spouseDesignation;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'memberDesignation', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'memberDesignation', type: 'string', length: 255, nullable: true)]
     private $memberDesignation;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'studentBatch', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'studentBatch', type: 'string', length: 255, nullable: true)]
     private $studentBatch;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'batchYear', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'batchYear', type: 'string', length: 255, nullable: true)]
     private $batchYear;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'additionalPhone', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'additionalPhone', type: 'string', length: 255, nullable: true)]
     private $additionalPhone;
 
 

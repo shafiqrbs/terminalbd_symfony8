@@ -121,7 +121,7 @@ function splitTopLevel(string $s): array
     return $out;
 }
 
-$stats = ['isSubmitted guards' => 0, 'dispatch order' => 0, 'template prefixes' => 0, 'files' => 0];
+$stats = ['security BC branches' => 0, 'isSubmitted guards' => 0, 'dispatch order' => 0, 'template prefixes' => 0, 'files' => 0];
 $unmapped = [];
 
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($next . '/src'));
@@ -187,7 +187,36 @@ foreach ($iterator as $file) {
         $offset = $pos + strlen($replacement);
     }
 
-    // 3. 'HospitalBundle:Report:' . $x . '.html.twig' -> 'Hospital/Report/' . ...
+    // 3 & 4. The two dead backward-compatibility branches in the login
+    // controller. Both test for something Symfony 8 always provides and fall
+    // back to something it removed:
+    //
+    //   if (class_exists('\Symfony\Component\Security\Core\Security')) { ... }
+    //       else { ... SecurityContextInterface::AUTHENTICATION_ERROR ... }
+    //   if ($this->has('security.csrf.token_manager')) { ... }
+    //       else { ... $this->has('form.csrf_provider') ... }
+    //
+    // Symfony 8 moved that Security class to the SecurityBundle namespace, so
+    // class_exists() is false and the else branch runs - referencing
+    // SecurityContextInterface, removed in Symfony 3. AbstractController::has()
+    // went with get() in Symfony 6. Either way the login page was a fatal
+    // error. The first branch is kept verbatim, whatever it happens to contain
+    // at this point in the pipeline.
+    foreach ([
+        "class_exists\\('\\\\?Symfony\\\\Component\\\\Security\\\\Core\\\\Security'\\)",
+        "\\\$this->(?:container->)?has\\('security\\.csrf\\.token_manager'\\)",
+    ] as $condition) {
+        $code = preg_replace(
+            '/[ \t]*if \(' . $condition . '\) \{\n(.*?)\n[ \t]*\} else \{.*?\n[ \t]*\}\n/s',
+            "$1\n",
+            $code,
+            -1,
+            $n,
+        );
+        $stats['security BC branches'] += $n;
+    }
+
+    // 5. 'HospitalBundle:Report:' . $x . '.html.twig' -> 'Hospital/Report/' . ...
     $code = preg_replace_callback(
         '/([\'"])([A-Za-z]+Bundle):([A-Za-z0-9_]*):/',
         static function (array $m) use ($bundleToModule, &$stats, &$unmapped, $path, $next): string {

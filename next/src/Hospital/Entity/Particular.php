@@ -184,20 +184,20 @@ class Particular
     /**
      * @var string
      */
-    #[ORM\Column(name: 'purchaseAverage', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'purchaseAverage', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $purchaseAverage;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'purchasePrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'purchasePrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $purchasePrice;
 
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'ipdVisitCharge', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'ipdVisitCharge', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $ipdVisitCharge;
 
 
@@ -237,26 +237,26 @@ class Particular
     /**
      * @var string
      */
-    #[ORM\Column(name: 'overHeadCost', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'overHeadCost', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $overHeadCost;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'price', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'price', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $price;
 
 
     /**
      * @var \string
      */
-    #[ORM\Column(name: 'minimumPrice', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'minimumPrice', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $minimumPrice;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'commission', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'commission', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $commission;
 
     /**

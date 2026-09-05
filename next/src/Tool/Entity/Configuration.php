@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Icon
  */
 #[ORM\Table]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class Configuration
 {
     /**

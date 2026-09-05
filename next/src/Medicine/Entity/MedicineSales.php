@@ -105,13 +105,13 @@ class MedicineSales
     /**
      * @var string
      */
-    #[ORM\Column(name: 'invoiceFor', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'invoiceFor', type: 'string', length: 255, nullable: true)]
     private $invoiceFor;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'hmsInvoice', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'hmsInvoice', type: 'string', length: 255, nullable: true)]
     private $hmsInvoice;
 
     /**

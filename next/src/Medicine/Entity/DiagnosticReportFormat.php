@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * DiagnosticReportFormat
  */
 #[ORM\Table(name: 'hms_master_diagnostic_report_format')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class DiagnosticReportFormat
 {
     /**

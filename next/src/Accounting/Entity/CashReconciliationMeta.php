@@ -29,7 +29,7 @@ class CashReconciliationMeta
     /**
      * @var string
      */
-    #[ORM\Column(name: 'metaKey', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'metaKey', type: 'string', length: 255, nullable: true)]
     private $metaKey;
 
     /**

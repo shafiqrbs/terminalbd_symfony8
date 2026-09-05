@@ -65,19 +65,19 @@ class Profile
     /**
      * @var string
      */
-    #[ORM\Column(name: 'name', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private $name;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'fatherName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'fatherName', type: 'string', length: 255, nullable: true)]
     private $fatherName;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'motherName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'motherName', type: 'string', length: 255, nullable: true)]
     private $motherName;
 
     /**
@@ -102,13 +102,13 @@ class Profile
     /**
      * @var string
      */
-    #[ORM\Column(name: 'email', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'email', type: 'string', length: 255, nullable: true)]
     private $email;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'facebookId', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'facebookId', type: 'string', length: 255, nullable: true)]
     private $facebookId;
 
 
@@ -140,32 +140,32 @@ class Profile
     /**
      * @var string
      */
-    #[ORM\Column(name: 'postalCode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'postalCode', type: 'string', length: 255, nullable: true)]
     private $postalCode;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'additionalPhone', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'additionalPhone', type: 'string', length: 255, nullable: true)]
     private $additionalPhone;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'occupation', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'occupation', type: 'string', length: 255, nullable: true)]
     private $occupation;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'nid', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'nid', type: 'string', length: 255, nullable: true)]
     private $nid;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'gender', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'gender', type: 'string', length: 255, nullable: true)]
     private $gender;
 
 
@@ -178,35 +178,35 @@ class Profile
     /**
      * @var string
      */
-    #[ORM\Column(name: 'bloodGroup', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'bloodGroup', type: 'string', length: 255, nullable: true)]
     private $bloodGroup;
 
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'religionStatus', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'religionStatus', type: 'string', length: 255, nullable: true)]
     private $religionStatus;
 
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'maritalStatus', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'maritalStatus', type: 'string', length: 255, nullable: true)]
     private $maritalStatus;
 
 
       /**
      * @var string
      */
-    #[ORM\Column(name: 'employeeType', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'employeeType', type: 'string', length: 255, nullable: true)]
     private $employeeType;
 
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'interest', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'interest', type: 'string', length: 255, nullable: true)]
     private $interest;
 
     /**

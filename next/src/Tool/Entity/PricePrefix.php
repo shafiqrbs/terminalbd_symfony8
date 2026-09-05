@@ -10,7 +10,7 @@ use App\Content\Entity\Page;
  * ProductUnit
  */
 #[ORM\Table('tools_price_prefix')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class PricePrefix
 {
     /**

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+
+<head>
+    <meta charset="utf-8"/>
+    <title>TERMINALBD | Admin Panel</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="" name="description"/>
+    <meta content="" name="author"/>
+    <meta name="MobileOptimized" content="320">
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('assets/img/favicon/apple-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('assets/img/favicon/apple-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('assets/img/favicon/apple-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('assets/img/favicon/apple-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ asset('assets/img/favicon/apple-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ asset('assets/img/favicon/apple-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ asset('assets/img/favicon/apple-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('assets/img/favicon/apple-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/img/favicon/apple-icon-180x180.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192"  href="{{ asset('assets/img/favicon/android-icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/img/favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('assets/img/favicon/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/img/favicon/favicon-16x16.png') }}">
+
+
+    <link rel="stylesheet" href="{{ asset('assets/plugins/bootstrap/css/bootstrap.min.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/plugins/bootstrap/css/bootstrap-responsive.min.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/plugins/font-awesome/css/font-awesome.min.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/css/style-metro.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/css/style-responsive.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/css/themes/default.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/plugins/uniform/css/uniform.default.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/plugins/select2/select2_metro.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/plugins/jquery-selectbox/css/jquery.selectbox.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/css/pages/lock.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('assets/css/pages/login.css') }}"/>
+    
+<style>
+    .login .content .input-icon .m-wrap {
+        margin: 0 !important;
+    }
+    .input-icon.left select {
+    }
+    .login .content .select2-container{
+        border-left:none!important;
+        padding-left: 33px !important;
+        width: 205px!important;
+    }
+    .login .content .select2-container .select2-choice{
+        width: 205px!important;
+    }
+</style>
+</head>
+<body class="login {{ app.request.locale }}{% block bodyClass %}{% endblock bodyClass %}">
+{% block body %}{% endblock %}
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/respond.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/excanvas.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-1.10.2.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-migrate-1.2.1.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-ui/jquery-ui-1.10.1.custom.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/bootstrap-hover-dropdown/twitter-bootstrap-hover-dropdown.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery.blockui.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery.cookie.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/uniform/jquery.uniform.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-inputmask/jquery.inputmask.bundle.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/backstretch/jquery.backstretch.min.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-selectbox/js/jquery.selectBox.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/scripts/app.js') }}"></script>
+
+
+<script type="text/javascript" src="{{ asset('assets/scripts/lock.js') }}"></script>
+
+
+<script>
+    jQuery(document).ready(function () {
+        App.init();
+        //FormValidation.init();
+        $('.selectbox').selectBox();
+        $(".mobile").inputmask("mask", {"mask": "99999 999-999"}); //specifying fn & options
+        $('.select2').select2({
+            placeholder: "Select an option",
+            allowClear: true
+        });
+    });
+</script>
+<style>
+    .fos_user_registration_register ul li{
+        color: #8b0000;
+    }
+    .tm-container .page-content .entry-container #respond #commentform p label.error {
+        line-height: 30px;
+    }
+
+</style>
+
+</body>
+
+</html>

@@ -1,9 +1,17 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 inventory_delivery:
     path: /
     defaults:
         _controller: 'App\Inventory\Controller\DeliveryController::indexAction'
+inventory_delivery_item_purchase:
+    path: /item-purchase-details
+    defaults:
+        missing: 'App\Inventory\Controller\DeliveryController::itemPurchaseDetailsAction'
+    methods: POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 inventory_delivery_show:
     path: '/{id}/show'
     defaults:

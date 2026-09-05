@@ -1,5 +1,5 @@
-# 3 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 3 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 system_user_manager:
     path: '/{page}'
     defaults:
@@ -7,6 +7,29 @@ system_user_manager:
         page: 1
     requirements:
         page: \d+
+system_user_manager_create:
+    path: /new
+    defaults:
+        missing: App\User\Controller\SystemUserController
+    controller: App\Migration\Controller\UnresolvableRouteController
+system_user_manager_update:
+    path: /account/update
+    defaults:
+        missing: App\User\Controller\SystemUserController
+    methods:
+        - POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
+system_user_manager_credential:
+    path: /account/credential
+    defaults:
+        missing: App\User\Controller\SystemUserController
+    methods:
+        - POST
+    options:
+        expose: true
+    controller: App\Migration\Controller\UnresolvableRouteController
 system_user_manager_change_password:
     path: '/change-password/{id}'
     defaults:

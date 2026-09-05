@@ -93,31 +93,31 @@ class InvoiceTransaction
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discount', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'discount', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $discount;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'payment', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'payment', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $payment;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'subTotal', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'subTotal', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $subTotal= 0;
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'total', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'total', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $total= 0;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'vat', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'vat', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $vat;
 
     /**
@@ -129,13 +129,13 @@ class InvoiceTransaction
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discountRequestedBy', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'discountRequestedBy', type: 'string', length: 255, nullable: true)]
     private $discountRequestedBy;
 
     /**
      * @var string
      */
-    #[ORM\Column(name: 'discountRequestedComment', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'discountRequestedComment', type: 'string', length: 255, nullable: true)]
     private $discountRequestedComment;
 
 

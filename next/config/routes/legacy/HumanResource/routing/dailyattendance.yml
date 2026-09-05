@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 daily_attendance:
     path: /
     defaults:
@@ -16,6 +16,12 @@ daily_attendance_menual:
     path: /attendance-menual
     defaults:
         _controller: 'App\HumanResource\Controller\DailyAttendanceController::manualAttendanceAction'
+daily_attendance_menual_create:
+    path: /attendance-menual-create
+    defaults:
+        missing: 'App\HumanResource\Controller\DailyAttendanceController::manualAttendanceCreateAction'
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
 daily_attendance_add:
     path: '/{id}/add'
     defaults:

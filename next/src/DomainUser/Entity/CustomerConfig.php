@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * CustomerConfig
  */
 #[ORM\Table('customer_config')]
-#[ORM\Entity(repositoryClass: '')]
+#[ORM\Entity]
 class CustomerConfig
 {
     /**

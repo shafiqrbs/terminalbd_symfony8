@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 domain_user:
     path: /
     defaults:
@@ -49,6 +49,14 @@ domain_forget_password:
     path: '/{id}/forget-user-password'
     defaults:
         _controller: 'App\DomainUser\Controller\DomainUserController::forgetPasswordAction'
+domain_reset_password:
+    path: '/{id}/reset-user-password'
+    defaults:
+        missing: App\DomainUser\Controller\ResettingController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
 domain_delete:
     path: '/{id}/delete'
     defaults:

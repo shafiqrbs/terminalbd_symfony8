@@ -1,9 +1,19 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 customerweb:
     path: '/{module}/module'
     defaults:
         _controller: 'App\Customer\Controller\CustomerController::moduleAction'
+customerweb_payment:
+    path: /payment
+    defaults:
+        missing: App\Customer\Controller\WebContentController
+    controller: App\Migration\Controller\UnresolvableRouteController
+customerweb_ticket:
+    path: /ticket
+    defaults:
+        missing: App\Customer\Controller\WebContentController
+    controller: App\Migration\Controller\UnresolvableRouteController
 customerweb_report_ledger:
     path: /ledger
     defaults:

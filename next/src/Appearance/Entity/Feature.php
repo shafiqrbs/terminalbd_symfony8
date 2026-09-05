@@ -98,7 +98,7 @@ class Feature
      /**
      * @var string
      */
-    #[ORM\Column(name: 'customUrl', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'customUrl', type: 'string', length: 255, nullable: true)]
     private $customUrl;
 
     /**

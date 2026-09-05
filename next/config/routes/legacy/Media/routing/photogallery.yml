@@ -1,9 +1,14 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 galleries:
     path: /
     defaults:
         _controller: 'App\Media\Controller\PhotoGalleryController::indexAction'
+galleries_delete_list:
+    path: /delete/lists
+    defaults:
+        missing: 'App\Media\Controller\PhotoGalleryController::galleriesDeleteAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 gallery:
     path: /
     defaults:

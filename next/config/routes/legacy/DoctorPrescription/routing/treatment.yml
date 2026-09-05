@@ -1,2 +1,36 @@
-# 6 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 6 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+dps_treatment:
+    path: /
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentController
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_create:
+    path: /create
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentController
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentController
+    controller: App\Migration\Controller\UnresolvableRouteController
+dps_treatment_status:
+    path: '/{id}/status'
+    defaults:
+        missing: App\DoctorPrescription\Controller\TreatmentController
+    controller: App\Migration\Controller\UnresolvableRouteController

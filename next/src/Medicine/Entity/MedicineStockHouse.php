@@ -47,7 +47,7 @@ class MedicineStockHouse
     /**
      * @var string
      */
-    #[ORM\Column(name: 'stockName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'stockName', type: 'string', length: 255, nullable: true)]
     private $stockName;
 
 

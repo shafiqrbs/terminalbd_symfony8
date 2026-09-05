@@ -113,7 +113,7 @@ class MedicineStock
     /**
      * @var string
      */
-    #[ORM\Column(name: 'description', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: true)]
     private $description;
 
 
@@ -198,7 +198,7 @@ class MedicineStock
     /**
      * @var string
      */
-    #[ORM\Column(name: 'barcode', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'barcode', type: 'string', length: 255, nullable: true)]
     private $barcode;
 
 

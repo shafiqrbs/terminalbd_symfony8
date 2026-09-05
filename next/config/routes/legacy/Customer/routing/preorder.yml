@@ -1,2 +1,92 @@
-# 16 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 16 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
+preorder:
+    path: /
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_show:
+    path: '/{id}/show'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_new:
+    path: /new
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_create:
+    path: /create
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_edit:
+    path: '/{id}/edit'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_update:
+    path: '/{id}/update'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_delete:
+    path: '/{id}/delete'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_item:
+    path: '/{id}/add-item'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_item_create:
+    path: '/{id}/create-item'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    methods: POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_approve:
+    path: '/{id}/pre-order-process'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_process:
+    path: '/{id}/order-process'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    methods:
+        - GET
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_item_delete:
+    path: '/{preOrder}/{id}/delete-item'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_item_confirm:
+    path: '/{preOrder}/{id}/confirm-item'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_ajax_payment:
+    path: '/{id}/pre-order-payment'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    methods:
+        - POST
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_payment_delete:
+    path: '/{id}/payment-delete'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController
+preorder_invoice:
+    path: '/{id}/preorder-invoice'
+    defaults:
+        missing: App\Customer\Controller\PreOrderController
+    controller: App\Migration\Controller\UnresolvableRouteController

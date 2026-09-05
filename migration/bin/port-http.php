@@ -71,8 +71,27 @@ $mismatched = [];
 
 $stats = ['tpl_refs' => 0, 'ctrl_refs' => 0];
 
-/** "SettingToolBundle:Widget:foo.html.twig" -> "Tool/Widget/foo.html.twig" */
+/**
+ * "SettingToolBundle:Widget:foo.html.twig" -> "Tool/Widget/foo.html.twig", and
+ * "::base.html.twig" -> "base.html.twig".
+ *
+ * The second form is Symfony 2's name for a template in app/Resources/views,
+ * with the bundle and controller segments left empty. 1,435 references use it,
+ * 1,262 of them to ::base.html.twig - which is to say nearly every page in the
+ * application. Twig's linter does not resolve inheritance, so nothing catches
+ * this until a page is actually rendered.
+ */
 $rewriteTemplateRefs = static function (string $s) use ($bundleToModule, &$stats): string {
+    $s = preg_replace_callback(
+        '/([\'"])::([A-Za-z0-9_.\/-]+\.twig)\1/',
+        static function (array $m) use (&$stats): string {
+            $stats['tpl_refs']++;
+
+            return $m[1] . $m[2] . $m[1];
+        },
+        $s
+    );
+
     return preg_replace_callback(
         '/\b([A-Za-z]+Bundle):([A-Za-z0-9_]*):([A-Za-z0-9_.\/\-{}$]+\.twig)\b/',
         static function (array $m) use ($bundleToModule, &$stats): string {
@@ -183,6 +202,34 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator("$root/src
     $tpl++;
 }
 printf("%s %d templates -> next/templates/\n", $dryRun ? 'would write' : 'wrote', $tpl);
+
+// ---- 3. the application's own templates ------------------------------------
+//
+// app/Resources/views holds the layouts every page extends - base.html.twig,
+// login.html.twig, the print and POS bases, the customer and frontend trees.
+// Symfony 2 resolved a bare "base.html.twig" there. Without them the Flex
+// skeleton's base.html.twig stands in silently: the page renders, with no
+// stylesheet, no menu and the wrong title.
+
+$app = 0;
+
+if (is_dir("$root/app/Resources/views")) {
+    foreach (new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator("$root/app/Resources/views", FilesystemIterator::SKIP_DOTS)
+    ) as $f) {
+        if ($f->getExtension() !== 'twig') continue;
+
+        $relative = substr($f->getPathname(), strlen("$root/app/Resources/views/"));
+        $body = $rewriteTemplateRefs((string) file_get_contents($f->getPathname()));
+
+        $target = "$root/next/templates/" . $relative;
+        if (!$dryRun) { @mkdir(dirname($target), 0775, true); file_put_contents($target, $body); }
+        $app++;
+    }
+}
+
+printf("%s %d app-level templates (app/Resources/views) -> next/templates/\n",
+    $dryRun ? 'would write' : 'wrote', $app);
 
 // Routing is handled by port-routing.php, which also walks nested
 // Resources/config directories and rewrites XML and import paths.

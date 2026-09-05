@@ -1,5 +1,5 @@
-# 2 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 2 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 account_paymentsalary_employee:
     path: /salaery-employee
     defaults:
@@ -21,6 +21,19 @@ account_paymentsalary_create:
     defaults:
         _controller: 'App\Accounting\Controller\PaymentSalaryController::createAction'
     methods: POST
+account_paymentsalary_edit:
+    path: '/{user}/edit'
+    defaults:
+        missing: 'App\Accounting\Controller\PaymentSalaryController::editAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
+account_paymentsalary_update:
+    path: '/{id}/update'
+    defaults:
+        missing: 'App\Accounting\Controller\PaymentSalaryController::updateAction'
+    methods:
+        - POST
+        - PUT
+    controller: App\Migration\Controller\UnresolvableRouteController
 account_paymentsalary_delete:
     path: '/{id}/delete'
     defaults:

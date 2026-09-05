@@ -1,5 +1,5 @@
-# 1 route(s) removed by check-routes.php: no such controller or action.
-# See migration/contract/unresolvable-routes.md.
+# 1 route(s) repointed by check-routes.php: no such controller or action,
+# so they answer 404 instead of a 500. See migration/contract/unresolvable-routes.md.
 account_double_entry:
     path: /
     defaults:
@@ -61,6 +61,11 @@ account_double_entry_pdf:
     path: /report-pdf
     defaults:
         _controller: 'App\Accounting\Controller\DoubleEntryController::journalPdfAction'
+account_double_entry_excel:
+    path: /report-pdf
+    defaults:
+        missing: 'App\Accounting\Controller\DoubleEntryController::journalExcelAction'
+    controller: App\Migration\Controller\UnresolvableRouteController
 account_double_entry_approve_reset:
     path: /approve-journal-reset
     defaults:

@@ -1,4 +1,4 @@
-{% extends '::hms-print.html.twig' %}
+{% extends 'hms-print.html.twig' %}
 {% block body %}
     {% if entity.hospitalConfig.isPrintHeader == 1 and entity.hospitalConfig.webHeaderPath is defined  and entity.hospitalConfig.webHeaderPath is not empty  %}
         <img style="max-height:100px;width: 100%!important;" src="/{{ entity.hospitalConfig.webHeaderPath }}">

@@ -86,7 +86,7 @@ class Transaction
     /**
      * @var float
      */
-    #[ORM\Column(name: 'balance', type: 'decimal', nullable: true)]
+    #[ORM\Column(name: 'balance', type: 'decimal', precision: 10, scale: 0, nullable: true)]
     private $balance = 0 ;
 
     /**

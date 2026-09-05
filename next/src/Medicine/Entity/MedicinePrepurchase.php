@@ -110,14 +110,14 @@ class MedicinePrepurchase
     /**
      * @var string
      */
-    #[ORM\Column(name: 'brandName', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'brandName', type: 'string', length: 255, nullable: true)]
     private $brandName = "";
 
 
      /**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'process', type: 'string', length: 255, nullable: true)]
     private $process = "Created";
 
 

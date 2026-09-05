@@ -67,7 +67,7 @@ class MedicineSalesReturn
     /**
      * @var string
      */
-    #[ORM\Column(name: 'process', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'process', type: 'string', length: 255, nullable: true)]
     private $process = "created";
 
 
@@ -114,7 +114,7 @@ class MedicineSalesReturn
     /**
      * @var string
      */
-    #[ORM\Column(name: 'notes', type: 'string', nullable: true)]
+    #[ORM\Column(name: 'notes', type: 'string', length: 255, nullable: true)]
     private $notes;
 
     /**
