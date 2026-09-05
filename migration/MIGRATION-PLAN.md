@@ -82,6 +82,68 @@ verification block above. Files that are hand-written rather than generated are 
 
 ---
 
+## Picking this up again
+
+The state that is not in this repository, and what to do first.
+
+### The verification environment
+
+Everything in §11 was done against a scratch database, not a fixture:
+
+```bash
+# the dump is gitignored (tenant data); the scratch database is local only
+zcat bm_db.sql.gz | sudo mysql terminalbd_migration_check
+```
+
+- `next/.env.local` (gitignored) points `DATABASE_URL` at
+  `terminalbd_migration_check` on the local MySQL. Recreate it there if it is gone.
+- Loading the dump, and `doctrine:schema:update`, need `innodb_strict_mode=0`
+  for the widest tables (§5.29). Set it back to 1 afterwards.
+- The schema in that database was completed from the mapping, so it is the
+  current code's schema with one tenant's real rows in it.
+- A user seeded for the smoke test - `migration_check` - has a password that
+  started as a Symfony 2 salted sha512 hash and was upgraded to bcrypt by
+  logging in. Its plaintext is in `next/.env.local`, not here.
+
+### The three commands
+
+```bash
+./migration/bin/migrate.sh      # rebuild everything from the legacy tree, then verify
+./migration/bin/ci-checks.sh    # the guards, no database needed
+php8.5 migration/bin/smoke-test.php   # request pages; needs the database
+```
+
+The smoke test has to be run in a loop until it reports `visited 0 pages this
+run`: 110 controllers call `exit;` and take the process with them, and each run
+resumes from `next/var/smoke-state.json`. Roughly 15 runs from a cold start.
+
+### Where to start, in order
+
+1. **Exercise writes.** Every sweep so far is read-only — GET, no parameters,
+   nothing whose name looks like it changes data. That is how 300 broken DELETE
+   and UPDATE statements (§5.34) survived to be found by reading rather than by
+   testing. There may be more of that class. A harness that submits the forms
+   it finds would be the single most valuable next step.
+2. **Pages with parameters.** 2,141 routes carry a `{placeholder}` and have
+   never been requested. Feeding real ids from the database would roughly
+   triple the coverage.
+3. **The 320 dead template links** (§5.28). One product decision per link:
+   restore the controller or remove the link. It is the largest single block of
+   failing pages.
+4. **A tenant that uses the other modules.** `business_config`, `dps_config`
+   and `restaurant_config` have no rows in this dump, so 137 pages walk into a
+   null that says nothing about the port.
+5. **Golden API capture**, once a staging URL and credentials exist (§11).
+
+### What is finished
+
+Phases 1, 2, 4 and 5's mechanical layer; phase 3 structurally. `migrate.sh`
+rebuilds the tree from the untouched Symfony 2.8 source and `git diff` comes
+back empty, so anything hand-edited under `next/src` will be overwritten unless
+it is listed in `migration/hand-written.txt`.
+
+---
+
 ## 2. Why strangler rather than in-place version hops
 
 Both were considered. The deciding facts:
