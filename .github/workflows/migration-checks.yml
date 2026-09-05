@@ -1,0 +1,116 @@
+# Guards for the Symfony 2.8 -> 8.1 migration.
+#
+# The `checks` job is the one that matters day to day: it runs the same script
+# a developer runs locally, and none of it needs a database. The `pipeline` job
+# proves the migration is still reproducible - that migrate.sh rebuilds the
+# tree from the untouched legacy source and produces exactly what is committed.
+name: migration checks
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'next/**'
+      - 'migration/**'
+      - 'src/**'
+      - '.github/workflows/migration-checks.yml'
+  pull_request:
+    paths:
+      - 'next/**'
+      - 'migration/**'
+      - 'src/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.5
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ctype, dom, gd, iconv, intl, mbstring, simplexml, xml, zip
+          coverage: none
+          ini-values: memory_limit=-1
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('next/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      # --no-scripts: the auto-scripts warm the cache and install assets, which
+      # the checks below do for themselves.
+      - name: Install dependencies
+        working-directory: next
+        run: composer install --no-interaction --no-progress --no-scripts
+
+      - name: Run the migration checks
+        env:
+          PHP: php
+        run: ./migration/bin/ci-checks.sh
+
+      # The checks rewrite their own reports; publishing them makes a failure
+      # readable without re-running anything locally.
+      - name: Upload the contract reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-contract
+          path: migration/contract/
+          retention-days: 30
+
+  pipeline:
+    name: pipeline reproduces the tree
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    # Slow (it re-runs Rector over the whole tree), so it does not gate every
+    # push to every branch.
+    if: github.ref_name == 'symfony8-migration' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.5
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ctype, dom, gd, iconv, intl, mbstring, simplexml, xml, zip
+          coverage: none
+          ini-values: memory_limit=-1
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('next/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install dependencies
+        working-directory: next
+        run: composer install --no-interaction --no-progress --no-scripts
+
+      - name: Rebuild everything from the legacy tree
+        env:
+          PHP: php
+        run: ./migration/bin/migrate.sh
+
+      # migration/contract/ holds generated reports, which legitimately change
+      # when a report gains a line; the generated application must not.
+      - name: The rebuild must match what is committed
+        run: |
+          git diff --exit-code -- next src || {
+            echo
+            echo "migrate.sh no longer reproduces the committed tree."
+            echo "Either a hand edit bypassed the pipeline, or a step is not idempotent."
+            exit 1
+          }

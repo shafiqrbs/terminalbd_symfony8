@@ -217,9 +217,20 @@ listed in `migration/hand-written.txt`, which the pipeline neither deletes nor o
 
 ```bash
 ./migration/bin/migrate.sh                   # the whole migration, then verify
+./migration/bin/ci-checks.sh                 # just the guards (what CI runs)
 cd next && php8.5 bin/validate-mapping.php   # mapping acceptance test on its own
 php8.5 migration/bin/verify-columns.php      # shared-database guard on its own
 ```
+
+`ci-checks.sh` runs every check that needs no database — column verification,
+mapping, route resolution, the mobile contract, container, templates, tests — reports all of
+them, and exits non-zero if any failed. `.github/workflows/migration-checks.yml` runs it on
+every push and pull request touching `next/`, `migration/` or `src/`, and on the migration
+branch additionally re-runs `migrate.sh` and fails if the rebuild no longer matches what is
+committed.
+
+(`.travis.yml` in the repository root is the legacy application's, targeting PHP 5.3. It is
+dead and unrelated.)
 
 > **Rector scope is load-bearing.** `rector.php` and `rector-http.php` must keep skipping
 > `src/Security`, `src/Comment`, `src/Doctrine` and the hand-written manifest. Without the skip
@@ -664,8 +675,8 @@ the legacy build is reproducible only from `composer.lock`, not from `composer.j
 
 | Risk | Mitigation |
 |---|---|
-| **No test suite** — nothing catches a regression in 700k lines | Four checks now run without a database and belong in CI: `verify-columns.php`, `check-routes.php`, `check-api-contract.php`, `validate-mapping.php`. They catch the class of defect that actually bit during this port — silent renames and dangling references. Extend record-and-diff to the highest-traffic HTML routes per module; cheaper than retrofitting unit tests |
-| **The shared database is the real contract** | `verify-columns.php` compares every ported column name against the legacy annotations and must stay at 0. It caught 782 divergences from one line of configuration (§5.13) |
+| **No test suite** — nothing catches a regression in 700k lines | Seven checks run in CI on every push, none needing a database (`migration/bin/ci-checks.sh`). They catch the class of defect that actually bit during this port — silent renames and dangling references. Extend record-and-diff to the highest-traffic HTML routes per module; cheaper than retrofitting unit tests |
+| **The shared database is the real contract** | `verify-columns.php` compares every ported column name against the legacy annotations and must stay at 0. It caught 782 divergences from one line of configuration (§5.13), and CI fails on it |
 | **Symfony 8.1 reaches EOL Jan 2027** — the migration will outlive it | Minor Symfony upgrades are BC-safe. Ride 8.2 → 8.3 → 8.4 (next LTS, Nov 2027). Budget a day per bump |
 | **Shared database, two writers** | Schema changes additive-only until decommission. The only additive change this migration needs is the `sessions` table |
 | **Serialized `array` columns** | Keep `LegacyArrayType` registered for the whole migration; convert per §7 |

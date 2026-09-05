@@ -15,7 +15,11 @@ declare(strict_types=1);
  * port-routing.php in the pipeline, so re-running the whole migration
  * reproduces the same result; the catalogue keeps the record of what went.
  *
- * usage: php8.5 migration/bin/check-routes.php [--prune] [--report=path]
+ * usage: php8.5 migration/bin/check-routes.php [--prune] [--strict] [--report=path]
+ *
+ * --strict exits non-zero when anything does not resolve, which is what CI
+ * gates on. Without it the script only reports, so the pipeline can print the
+ * count without failing the run.
  */
 
 require dirname(__DIR__, 2) . '/next/vendor/autoload.php';
@@ -26,6 +30,7 @@ use Symfony\Component\Yaml\Yaml;
 
 $root = dirname(__DIR__, 2);
 $prune = in_array('--prune', $argv, true);
+$strict = in_array('--strict', $argv, true);
 $report = null;
 
 foreach ($argv as $arg) {
@@ -113,7 +118,7 @@ if ($report !== null) {
 }
 
 if (!$prune || $dead === []) {
-    exit(0);
+    exit($strict && $dead !== [] ? 1 : 0);
 }
 
 // ---- prune -----------------------------------------------------------------
