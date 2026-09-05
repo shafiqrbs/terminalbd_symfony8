@@ -7,20 +7,32 @@
  */
 
 namespace App\Appearance\Menu;
+
+use Symfony\Component\Routing\RouterInterface;
+
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
+use Symfony\Bundle\SecurityBundle\Security;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use App\Appearance\Entity\EcommerceMenu;
 use App\Appearance\Entity\MegaMenu;
 use App\Tool\Entity\Branding;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
 
-class HorizontalBuilder extends ContainerAware
+class HorizontalBuilder
 {
+    public function __construct(
+        private readonly Security $security,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+        private readonly RouterInterface $router,
+    ) {
+    }
+
 
     public function mainMenu(FactoryInterface $factory, array $options)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $globalOption = $securityContext->getToken()->getUser()->getGlobalOption();
 
@@ -155,7 +167,7 @@ class HorizontalBuilder extends ContainerAware
 
     public function manageCustomerOrderMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $menu
             ->addChild('Inbox & Transaction')
             ->setAttribute('dropdown', true)
@@ -172,7 +184,7 @@ class HorizontalBuilder extends ContainerAware
     public function BusinessMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $menu
             ->addChild('Business Management')
@@ -258,11 +270,11 @@ class HorizontalBuilder extends ContainerAware
     public function WebsiteMenu($menu,$menuName)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
 
         if ($securityContext->isGranted('ROLE_DOMAIN_WEBSITE_MANAGER')) {
 
-            $option = $this->container->get('security.context')->getToken()->getUser()->getGlobalOption();
+            $option = $this->security->getToken()->getUser()->getGlobalOption();
             $menu
                 ->addChild('Manage Content')
                 ->setAttribute('icon', 'fa fa-book')
@@ -295,7 +307,7 @@ class HorizontalBuilder extends ContainerAware
         if ($securityContext->isGranted('ROLE_DOMAIN_WEBSITE_SETTING')) {
 
             $result = array_intersect($menuName, ['Ecommerce']);
-            $securityContext = $this->container->get('security.context');
+            $securityContext = $this->security;
             $globalOption = $securityContext->getToken()->getUser()->getGlobalOption();
             $menu
                 ->addChild('Manage Appearance')
@@ -334,7 +346,7 @@ class HorizontalBuilder extends ContainerAware
 
     public function AccountingMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $globalOption = $user->getGlobalOption();
         $modules = $user->getGlobalOption()->getSiteSetting()->getAppModules();
@@ -455,7 +467,7 @@ class HorizontalBuilder extends ContainerAware
     public function InventoryMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $menu
@@ -472,7 +484,7 @@ class HorizontalBuilder extends ContainerAware
 
                 if (in_array('Pos', $deliveryProcess)) {
 
-                    if ($this->container->get('security.authorization_checker')->isGranted('ROLE_DOMAIN_INVENTORY_SALES_POS')){
+                    if ($this->authorizationChecker->isGranted('ROLE_DOMAIN_INVENTORY_SALES_POS')){
 
                         $menu['Sales']->addChild('Point of Sales')
                             ->setAttribute('icon', 'fa fa-shopping-basket')
@@ -488,7 +500,7 @@ class HorizontalBuilder extends ContainerAware
 
                 if (in_array('OnlineSales', $deliveryProcess)) {
 
-                    if ($this->container->get('security.authorization_checker')->isGranted('ROLE_DOMAIN_INVENTORY_SALES_ONLINE')){
+                    if ($this->authorizationChecker->isGranted('ROLE_DOMAIN_INVENTORY_SALES_ONLINE')){
                         $menu['Sales']
                             ->addChild('Online Sales')
                             ->setAttribute('icon', 'icon icon-truck')
@@ -500,7 +512,7 @@ class HorizontalBuilder extends ContainerAware
                 }
 
                 if (in_array('GeneralSales', $deliveryProcess)) {
-                    if ($this->container->get('security.authorization_checker')->isGranted('ROLE_DOMAIN_INVENTORY_SALES_GENERAL')){
+                    if ($this->authorizationChecker->isGranted('ROLE_DOMAIN_INVENTORY_SALES_GENERAL')){
                         $menu['Sales']
                             ->addChild('General Sales')
                             ->setAttribute('icon', 'icon icon-truck')
@@ -515,7 +527,7 @@ class HorizontalBuilder extends ContainerAware
                 }
 
                 if (in_array('ManualSales', $deliveryProcess)) {
-                    if ($this->container->get('security.authorization_checker')->isGranted('ROLE_DOMAIN_INVENTORY_SALES_MANUAL')){
+                    if ($this->authorizationChecker->isGranted('ROLE_DOMAIN_INVENTORY_SALES_MANUAL')){
 
                         $menu['Sales']
                             ->addChild('Manual Sales')
@@ -531,7 +543,7 @@ class HorizontalBuilder extends ContainerAware
                 }
 
                 if (in_array('Order', $deliveryProcess)) {
-                    if ($this->container->get('security.authorization_checker')->isGranted('ROLE_DOMAIN_INVENTORY_SALES_ORDER')){
+                    if ($this->authorizationChecker->isGranted('ROLE_DOMAIN_INVENTORY_SALES_ORDER')){
                         $menu['Sales']
                             ->addChild('Online Order')
                             ->setAttribute('icon', 'icon icon-truck')
@@ -660,7 +672,7 @@ class HorizontalBuilder extends ContainerAware
 
     public function EcommerceMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $menu
             ->addChild('E-commerce')
             ->setAttribute('icon', 'icon  icon-shopping-cart')
@@ -704,7 +716,7 @@ class HorizontalBuilder extends ContainerAware
 
     public function applicationSettingMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
@@ -786,7 +798,7 @@ class HorizontalBuilder extends ContainerAware
     public function AnonymousProductSalesMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
@@ -828,7 +840,7 @@ class HorizontalBuilder extends ContainerAware
     public function HospitalMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $config = $user->getGlobalOption()->getHospitalConfig()->getInvoiceProcess();
         $menu
@@ -928,7 +940,7 @@ class HorizontalBuilder extends ContainerAware
     public function DmsMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $config = $user->getGlobalOption()->getHospitalConfig()->getInvoiceProcess();
         $menu
@@ -1036,7 +1048,7 @@ class HorizontalBuilder extends ContainerAware
     public function DpsMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $menu
             ->addChild('Doctor Prescription')
@@ -1073,7 +1085,7 @@ class HorizontalBuilder extends ContainerAware
 
     public function DrugMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $menu
             ->addChild('Drug')
             ->setAttribute('icon', 'fa fa-stethoscope')
@@ -1087,7 +1099,7 @@ class HorizontalBuilder extends ContainerAware
 
     public function medicineMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $globalOption = $securityContext->getToken()->getUser()->getGlobalOption();
         $menu
             ->addChild('Drug')
@@ -1111,7 +1123,7 @@ class HorizontalBuilder extends ContainerAware
     public function RestaurantMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $menu
             ->addChild('Restaurant')
@@ -1213,7 +1225,7 @@ class HorizontalBuilder extends ContainerAware
 
     public function PayrollMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $menu
             ->addChild('HR & Payroll')
             ->setAttribute('icon', 'fa fa-group')
@@ -1255,7 +1267,7 @@ class HorizontalBuilder extends ContainerAware
 
     public function manageDomainInvoiceMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $globalOption = $securityContext->getToken()->getUser()->getGlobalOption();
         $menu
             ->addChild('Invoice Sms & Email')
@@ -1404,7 +1416,7 @@ class HorizontalBuilder extends ContainerAware
 
         $menu = $factory->createItem('root');
         $menu->setChildrenAttribute('class', '');
-        $grouping = $this->container->get('doctrine')->getRepository(\App\Appearance\Entity\MenuGrouping::class)->getFooterMenu();
+        $grouping = $this->doctrine->getRepository(\App\Appearance\Entity\MenuGrouping::class)->getFooterMenu();
         if ($grouping) {
             foreach ($grouping as $row) {
 
@@ -1434,8 +1446,8 @@ class HorizontalBuilder extends ContainerAware
     public function megaMenu(FactoryInterface $factory, array $options)
     {
         $menu = $factory->createItem('root');
-        $menus = $this->container->get('doctrine')->getRepository('SettingAppearanceBundle:MegaMenu')->getActiveMenus();
-        $categoryRepository = $this->container->get('doctrine')->getRepository(\App\Product\Entity\Category::class);
+        $menus = $this->doctrine->getRepository('SettingAppearanceBundle:MegaMenu')->getActiveMenus();
+        $categoryRepository = $this->doctrine->getRepository(\App\Product\Entity\Category::class);
         foreach ($menus as $item) {
             /** @var MegaMenu $item */
             $menuName = $item->getName();
@@ -1453,11 +1465,11 @@ class HorizontalBuilder extends ContainerAware
     public function frontendEommerceMenu(FactoryInterface $factory, array $options)
     {
 
-        $subdomain = $this->container->get('router')->getContext()->getParameter('subdomain');
+        $subdomain = $this->router->getContext()->getParameter('subdomain');
         $menu = $factory->createItem('root');
-        $menus = $this->container->get('doctrine')->getRepository('SettingAppearanceBundle:EcommerceMenu')->getActiveMenus($subdomain);
+        $menus = $this->doctrine->getRepository('SettingAppearanceBundle:EcommerceMenu')->getActiveMenus($subdomain);
 
-        $categoryRepository = $this->container->get('doctrine')->getRepository(\App\Product\Entity\Category::class);
+        $categoryRepository = $this->doctrine->getRepository(\App\Product\Entity\Category::class);
         foreach ($menus as $item) {
 
             /** @var EcommerceMenu $item */
@@ -1667,7 +1679,7 @@ class HorizontalBuilder extends ContainerAware
 
     public function manageVendorMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
 
         $menu
             ->addChild('Manage Vendor')
@@ -1683,7 +1695,7 @@ class HorizontalBuilder extends ContainerAware
 
     protected function getCategoryList()
     {
-        $repo = $this->container->get('doctrine')->getRepository(\App\Product\Entity\Category::class);
+        $repo = $this->doctrine->getRepository(\App\Product\Entity\Category::class);
         $options = [
             'decorate' => false,
             'representationField' => 'slug',

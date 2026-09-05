@@ -2,6 +2,12 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\HttpKernel\KernelInterface;
+
+use App\User\Manager\UserManager;
+
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,6 +35,9 @@ class DomainController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly UserManager $userManager,
+        private readonly KernelInterface $kernel,
     ) {
     }
 
@@ -186,7 +195,7 @@ class DomainController extends AbstractController
         $em->flush();
 
         if($entity->getStatus() != 1){
-            $dispatcher = $this->container->get('event_dispatcher');
+            $dispatcher = $this->eventDispatcher;
             $dispatcher->dispatch(new DomainNotification($entity), 'setting_tool.post.domain_notification');
         }
         exit;
@@ -200,7 +209,7 @@ class DomainController extends AbstractController
             $a = '*148148#';
             $entity->setPlainPassword($a);
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $this->get('fos_user.user_manager')->updateUser($entity);
+            $this->userManager->updateUser($entity);
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Change password successfully"
             );
@@ -216,8 +225,8 @@ class DomainController extends AbstractController
             $a = $request->request->get('password');
             $entity->setPlainPassword($a);
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $this->get('fos_user.user_manager')->updateUser($entity);
-            $dispatcher = $this->container->get('event_dispatcher');
+            $this->userManager->updateUser($entity);
+            $dispatcher = $this->eventDispatcher;
             $dispatcher->dispatch(new PasswordChangeDomainSmsEvent($option,$entity->getUsername(),$a), 'setting_tool.post.change_domain_password');
         }
         exit;
@@ -386,7 +395,7 @@ class DomainController extends AbstractController
         exec("rm -rf app/cache/*");
         exec("rm -rf app/logs/*");
         // TODO(migration): AbstractController::get() was removed; inject this service.
-        $kernel = $this->get('kernel');
+        $kernel = $this->kernel;
         $application = new Application($kernel);
         $application->setAutoExit(false);
         $options = ['command' => 'cache:clear',"--env" => 'prod', '--no-warmup' => true];

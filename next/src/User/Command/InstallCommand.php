@@ -2,25 +2,27 @@
 
 namespace App\User\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class InstallCommand extends ContainerAwareCommand
+#[AsCommand(name: 'app:install', description: 'App installer.')]
+class InstallCommand extends Command
 {
     protected $pathToBeCreated = [
         'images',
         'uploads'
     ];
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('app:install')
              ->setDescription('App installer.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Installing Application.</info>');
         $output->writeln('');
@@ -28,6 +30,8 @@ class InstallCommand extends ContainerAwareCommand
         $this->setupStep($input, $output);
 
         $output->writeln('<info>Application has been successfully installed.</info>');
+    
+        return Command::SUCCESS;
     }
 
     protected function setupStep(InputInterface $input, OutputInterface $output)

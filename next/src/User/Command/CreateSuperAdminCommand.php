@@ -2,24 +2,35 @@
 
 namespace App\User\Command;
 
+use App\User\Manager\GroupManager;
+
 use Exception;
 use App\User\Manager\UserManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CreateSuperAdminCommand extends ContainerAwareCommand
+#[AsCommand(name: 'app:populate:user', description: 'Populate Core User account.')]
+class CreateSuperAdminCommand extends Command
 {
-    protected function configure()
+    public function __construct(
+        private readonly UserManager $userManager,
+        private readonly GroupManager $groupManager,
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
     {
         $this->setName('app:populate:user')
             ->setDescription('Populate Core User account.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $created = TRUE;
-        $userManager = $this->getContainer()->get('Core.user_manager');
+        $userManager = $this->userManager;
 
         $userName = $this->getNonEmptyInput($output, 'Enter user name for super admin:');
         $user = $userManager->findUserByUsername($userName);
@@ -45,6 +56,8 @@ class CreateSuperAdminCommand extends ContainerAwareCommand
         if ($created) {
             $output->writeln('<info>User has been created successfully.</info>');
         }
+    
+        return Command::SUCCESS;
     }
 
     protected function createUser(UserManager $userManager, OutputInterface $output, $userName)
@@ -65,7 +78,7 @@ class CreateSuperAdminCommand extends ContainerAwareCommand
 
     protected function getSuperAdminUserGroup($groupName = 'Super Administrator')
     {
-        $groupManager = $this->getContainer()->get('fos_user.group_manager');
+        $groupManager = $this->groupManager;
         $group = $groupManager->findGroupByName($groupName);
 
         if (!$group) {

@@ -2,6 +2,8 @@
 
 namespace App\User\Entity\Repository;
 
+use App\User\Manager\UserManager;
+
 use App\User\Entity\Profile;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityRepository;
@@ -15,6 +17,11 @@ use App\Tool\Entity\GlobalOption;
  */
 class UserRepository extends EntityRepository
 {
+    public function __construct(
+        private readonly UserManager $userManager,
+    ) {
+    }
+
     public function getAll()
     {
         return $this->findAll();
@@ -516,7 +523,7 @@ class UserRepository extends EntityRepository
         $a = mt_rand(1000,9999);
         $user->setPlainPassword($a);
         $user->setappPassword($a);
-        $this->get('fos_user.user_manager')->updateUser($user);
+        $this->userManager->updateUser($user);
         $data = [];
         return $data;
 

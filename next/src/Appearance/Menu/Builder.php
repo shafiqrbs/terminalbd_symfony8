@@ -7,19 +7,28 @@
  */
 
 namespace App\Appearance\Menu;
+
+use Symfony\Bundle\SecurityBundle\Security;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use App\Appearance\Entity\MegaMenu;
 use App\Tool\Entity\Branding;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
 
-class Builder extends ContainerAware
+class Builder
 {
+    public function __construct(
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly Security $security,
+    ) {
+    }
+
 
     public function mainMenu(FactoryInterface $factory, array $options)
     {
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
         $globalOption = $securityContext->getGlobalOption();
 
         $menu = $factory->createItem('root');
@@ -168,7 +177,7 @@ class Builder extends ContainerAware
 
 /*    public function manageCustomerOrderMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $menu
             ->addChild('Inbox & Transaction')
             ->setAttribute('dropdown', true)
@@ -185,7 +194,7 @@ class Builder extends ContainerAware
     public function businessMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
 
         /* @var $config BusinessConfig */
 
@@ -385,7 +394,7 @@ class Builder extends ContainerAware
     public function InstituteMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
 
         $config = $securityContext->getGlobalOption()->getEducationConfig();
 
@@ -409,7 +418,7 @@ class Builder extends ContainerAware
     public function WebsiteMenu($menu,$menuName)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
         $option = $securityContext->getGlobalOption();
 
         if ($securityContext->isGranted('ROLE_DOMAIN_WEBSITE_MANAGER')) {
@@ -477,7 +486,7 @@ class Builder extends ContainerAware
     public function AccountingMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
 
         /* @var  $globalOption GlobalOption */
 
@@ -685,7 +694,7 @@ class Builder extends ContainerAware
     public function AssetsMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
 
         $menu
@@ -770,7 +779,7 @@ class Builder extends ContainerAware
 
     public function InventorySalesMenu($menu)
     {
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
         $inventory = $securityContext->getGlobalOption()->getInventoryConfig();
         if ($securityContext->isGranted('ROLE_DOMAIN_INVENTORY_SALES')) {
 
@@ -818,7 +827,7 @@ class Builder extends ContainerAware
     public function InventoryMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
         $inventory = $securityContext->getGlobalOption()->getInventoryConfig();
         $menu
             ->addChild('Inventory')
@@ -906,7 +915,7 @@ class Builder extends ContainerAware
     public function AnonymousProductSalesMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
         $user = $securityContext->getToken()->getUser();
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
@@ -945,7 +954,7 @@ class Builder extends ContainerAware
     public function HospitalMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
         $config = $securityContext->getGlobalOption()->getHospitalConfig();
         $process = $securityContext->getGlobalOption()->getHospitalConfig()->getInvoiceProcess();
         $menu
@@ -1052,7 +1061,7 @@ class Builder extends ContainerAware
     public function DmsMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
 
         $config = $securityContext->getGlobalOption()->getHospitalConfig()->getInvoiceProcess();
         $menu
@@ -1160,7 +1169,7 @@ class Builder extends ContainerAware
     public function DpsMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
         $mainApp = $securityContext->getGlobalOption()->getMainApp()->getModuleClass();
         $menu
             ->addChild('Doctor Prescription')
@@ -1202,7 +1211,7 @@ class Builder extends ContainerAware
 
     public function DrugMenu($menu)
     {
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
 
         $menu
             ->addChild('Drug')
@@ -1218,7 +1227,7 @@ class Builder extends ContainerAware
 
     public function medicineMenu($menu)
     {
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
 
         $menu
             ->addChild('Medicine')
@@ -1374,7 +1383,7 @@ class Builder extends ContainerAware
     public function RestaurantMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
 
         $menu
             ->addChild('Restaurant')
@@ -1463,7 +1472,7 @@ class Builder extends ContainerAware
 	public function ReservationMenu($menu)
 	{
 
-	    $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+	    $securityContext = $this->tokenStorage->getToken()->getUser();
         $config = $securityContext->getGlobalOption()->getHotelConfig();
 
         $menu
@@ -1541,7 +1550,7 @@ class Builder extends ContainerAware
 	public function ElectionMenu($menu)
 	{
 
-		$securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+		$securityContext = $this->tokenStorage->getToken()->getUser();
 
 		$menu
 			->addChild('Election')
@@ -1599,7 +1608,7 @@ class Builder extends ContainerAware
     public function CommitteeMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
 
         $menu
             ->addChild('Committee')
@@ -1664,7 +1673,7 @@ class Builder extends ContainerAware
     public function PayrollMenu($menu)
     {
 
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
         $global = $securityContext->getGlobalOption();
         $menu
             ->addChild('HR & Payroll')
@@ -1716,7 +1725,7 @@ class Builder extends ContainerAware
 
     public function manageDomainInvoiceMenu($menu)
     {
-        $securityContext = $this->container->get('security.token_storage')->getToken()->getUser();
+        $securityContext = $this->tokenStorage->getToken()->getUser();
 
         $menu
             ->addChild('Invoice Sms & Email')
@@ -1882,7 +1891,7 @@ class Builder extends ContainerAware
 
         $menu = $factory->createItem('root');
         $menu->setChildrenAttribute('class', '');
-        $grouping = $this->container->get('doctrine')->getRepository(\App\Appearance\Entity\MenuGrouping::class)->getFooterMenu();
+        $grouping = $this->doctrine->getRepository(\App\Appearance\Entity\MenuGrouping::class)->getFooterMenu();
         if ($grouping) {
             foreach ($grouping as $row) {
 
@@ -1912,8 +1921,8 @@ class Builder extends ContainerAware
     public function megaMenu(FactoryInterface $factory, array $options)
     {
         $menu = $factory->createItem('root');
-        $menus = $this->container->get('doctrine')->getRepository('SettingAppearanceBundle:MegaMenu')->getActiveMenus();
-        $categoryRepository = $this->container->get('doctrine')->getRepository(\App\Product\Entity\Category::class);
+        $menus = $this->doctrine->getRepository('SettingAppearanceBundle:MegaMenu')->getActiveMenus();
+        $categoryRepository = $this->doctrine->getRepository(\App\Product\Entity\Category::class);
         foreach ($menus as $item) {
             /** @var MegaMenu $item */
             $menuName = $item->getName();
@@ -2104,7 +2113,7 @@ class Builder extends ContainerAware
 
     public function manageVendorMenu($menu)
     {
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->security;
 
         $menu
             ->addChild('Manage Vendor')
@@ -2120,7 +2129,7 @@ class Builder extends ContainerAware
 
     protected function getCategoryList()
     {
-        $repo = $this->container->get('doctrine')->getRepository(\App\Product\Entity\Category::class);
+        $repo = $this->doctrine->getRepository(\App\Product\Entity\Category::class);
         $options = [
             'decorate' => false,
             'representationField' => 'slug',

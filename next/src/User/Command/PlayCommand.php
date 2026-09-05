@@ -6,23 +6,30 @@ use Doctrine\DBAL\Connection;
 use Exception;
 use Doctrine\Common\Persistence\ObjectManager;
 use App\Product\Entity\Category;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PlayCommand extends ContainerAwareCommand
+#[AsCommand(name: 'app:play', description: 'Archive all expired documents!')]
+class PlayCommand extends Command
 {
-    private $connection;
+    public function __construct(
+        private readonly Connection $connection,
+    ) {
+        parent::__construct();
+    }
+
 
     private $parent = [];
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('app:play')
             ->setDescription('Archive all expired documents!');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Playing.</info>');
 
@@ -32,6 +39,8 @@ class PlayCommand extends ContainerAwareCommand
         $output->writeln('');
 
         $output->writeln('<info>Done.</info>');
+    
+        return Command::SUCCESS;
     }
 
     protected function tree(){
@@ -90,7 +99,7 @@ class PlayCommand extends ContainerAwareCommand
     protected function getConnection()
     {
         if (!$this->connection) {
-            $this->connection = $this->getContainer()->get('doctrine.dbal.default_connection');
+            $this->connection = $this->connection;
         }
 
         if (!$this->connection->isConnected()) {
@@ -106,7 +115,7 @@ class PlayCommand extends ContainerAwareCommand
      */
     protected function getEm()
     {
-        return $this->getContainer()->get('doctrine')->getManager();
+        return $this->doctrine->getManager();
     }
 
     /**

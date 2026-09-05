@@ -2,6 +2,8 @@
 
 namespace App\Tool\Controller;
 
+use App\Tool\Service\ImageResizer;
+
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,6 +31,7 @@ class MedicineController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
+        private readonly ImageResizer $imageResizer,
     ) {
     }
 
@@ -103,7 +106,7 @@ class MedicineController extends AbstractController
                 mkdir($entity->getUploadDir(), 0777, true);
             }
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $this->get('helper.imageresizer')->resizeImage(480, $path, $file);
+            $this->imageResizer->resizeImage(480, $path, $file);
             $entity->setPath($imgName);
             $em->persist($entity);
             $em->flush();

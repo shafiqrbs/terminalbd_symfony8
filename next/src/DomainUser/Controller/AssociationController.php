@@ -2,6 +2,8 @@
 
 namespace App\DomainUser\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Tool\Service\ToolManager;
@@ -34,6 +36,7 @@ class AssociationController extends AbstractController
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
         private readonly ToolManager $toolManager,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -170,7 +173,7 @@ class AssociationController extends AbstractController
             /* @var $global GlobalOption */
             $global = $this->getUser()->getGlobalOption();
             if($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $msg = "Dear Member, Your registration successfully done!";
                 $dispatcher->dispatch(new AssociationSmsEvent($entity,$msg), 'appstore.customer.post.member_sms');
             }
@@ -197,7 +200,7 @@ class AssociationController extends AbstractController
         if($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
             foreach ($entities as $entity){
                 $msg = "Congratulation! your registration has done.your member ID is {$entity->getCustomerId()}. Please click www.bhaws.org for give your monthly payment info. Thanks BHAWS";
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $dispatcher->dispatch(new AssociationSmsEvent($entity, $msg), 'appstore.customer.post.member_sms');
             }
         }
@@ -553,7 +556,7 @@ class AssociationController extends AbstractController
                 /* @var $global GlobalOption */
                 $global = $this->getUser()->getGlobalOption();
                 if($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
-                    $dispatcher = $this->container->get('event_dispatcher');
+                    $dispatcher = $this->eventDispatcher;
                     $dispatcher->dispatch(new \App\Tool\Event\AssociationInvoiceSmsEvent($entity), 'setting_tool.post.association_invoice');
                 }
             }

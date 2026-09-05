@@ -10,6 +10,8 @@
 
 namespace App\User\Controller;
 
+use App\User\Form\UserType;
+
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,6 +31,7 @@ class ManageUserController extends AbstractController
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
         private readonly UserManager $userManager,
+        private readonly UserType $userType,
     ) {
     }
 
@@ -62,7 +65,7 @@ class ManageUserController extends AbstractController
         $user = new User();//$userManager->createUser();
 
 	    // TODO(migration): AbstractController::get() was removed; inject this service.
-	    $service = $this->get('Core_user.registration.form.type');
+	    $service = $this->userType;
 
         $form = $this->createForm($service, $user);
 
@@ -92,7 +95,7 @@ class ManageUserController extends AbstractController
         $userManager = $this->getUserManager();
 
 	    // TODO(migration): AbstractController::get() was removed; inject this service.
-	    $service = $this->get('Core_user.registration.form.type');
+	    $service = $this->userType;
 	    $form = $this->createForm($service, $user);
 
         if ('POST' === $request->getMethod()) {
@@ -301,7 +304,7 @@ class ManageUserController extends AbstractController
 
     protected function getUserListUrl($page = 1)
     {
-        return $this->container->get('router')->generate(
+        return $this->generateUrl(
             'docudex_user_manager',
             ['page'=>$page]
         );

@@ -2,6 +2,8 @@
 
 namespace App\Inventory\Controller;
 
+use App\Tool\Service\SpreadsheetFactory;
+
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,6 +32,7 @@ class ItemController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
+        private readonly SpreadsheetFactory $spreadsheetFactory,
     ) {
     }
 
@@ -738,7 +741,7 @@ class ItemController extends AbstractController
 		$data = $_REQUEST;
 		$entities = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->gpProductWiseSales($global,$data);
 		// TODO(migration): AbstractController::get() was removed; inject this service.
-		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
+		$phpExcelObject = $this->spreadsheetFactory->createPHPExcelObject();
 
 		$phpExcelObject->setActiveSheetIndex(0)
 		               ->setCellValue('A1', 'Created')
@@ -787,10 +790,10 @@ class ItemController extends AbstractController
 
 		// create the writer
 		// TODO(migration): AbstractController::get() was removed; inject this service.
-		$writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
+		$writer = $this->spreadsheetFactory->createWriter($phpExcelObject, 'Excel2007');
 		// create the response
 		// TODO(migration): AbstractController::get() was removed; inject this service.
-		$response = $this->get('phpexcel')->createStreamedResponse($writer);
+		$response = $this->spreadsheetFactory->createStreamedResponse($writer);
 		// adding headers
 		$dispositionHeader = $response->headers->makeDisposition(
 			ResponseHeaderBag::DISPOSITION_ATTACHMENT,

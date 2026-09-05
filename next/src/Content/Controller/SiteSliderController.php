@@ -2,6 +2,8 @@
 
 namespace App\Content\Controller;
 
+use Stof\DoctrineExtensionsBundle\Uploadable\UploadableManager;
+
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +22,7 @@ class SiteSliderController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly UploadableManager $uploadableManager,
     ) {
     }
 
@@ -53,7 +56,7 @@ class SiteSliderController extends AbstractController
             $em->persist($entity);
 
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $uploadableManager = $this->get('stof_doctrine_extensions.uploadable.manager');
+            $uploadableManager = $this->uploadableManager;
 
             // Here, "getMyFile" returns the "UploadedFile" instance that the form bound in your $myFile property
             $uploadableManager->markEntityToUpload($entity, $entity->getFile());
@@ -183,7 +186,7 @@ class SiteSliderController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
 	        $entity->upload();
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            //$uploadableManager = $this->get('stof_doctrine_extensions.uploadable.manager');
+            //$uploadableManager = $this->uploadableManager;
             // Here, "getMyFile" returns the "UploadedFile" instance that the form bound in your $myFile property
             //$uploadableManager->markEntityToUpload($entity, $entity->getFile());
             $em->flush();

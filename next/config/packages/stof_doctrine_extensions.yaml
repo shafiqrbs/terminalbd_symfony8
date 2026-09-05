@@ -1,0 +1,22 @@
+# Ported from app/config/bundles/stof_doctrine.yml.
+#
+# Without this the Gedmo attributes on the entities are inert: 265
+# Timestampable, 75 Blameable, 49 Slug and the Tree mappings would all stop
+# firing, so rows would be written with null created/updated columns and empty
+# slugs. The bundle is in composer.json but was never registered in
+# config/bundles.php, so none of those listeners existed.
+stof_doctrine_extensions:
+    default_locale: en_US
+    uploadable: ~
+    class:
+        # Appends the basename to the returned file info; the entities read
+        # fileName after an upload.
+        uploadable: App\User\Listener\UploadableListener
+    orm:
+        default:
+            tree: true
+            timestampable: true
+            blameable: true
+            sluggable: true
+            softdeleteable: true
+            uploadable: true

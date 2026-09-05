@@ -2,6 +2,12 @@
 
 namespace App\Tool\Controller;
 
+use App\Tool\Service\ImageResizer;
+
+use App\Tool\Importer\ExcelDataReader;
+
+use App\Tool\Importer\Excel;
+
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +27,9 @@ class MedicineImportController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
+        private readonly Excel $excel,
+        private readonly ExcelDataReader $excelDataReader,
+        private readonly ImageResizer $imageResizer,
     ) {
     }
 
@@ -138,9 +147,9 @@ class MedicineImportController extends AbstractController
 		ignore_user_abort(true);
 		$em = $this->em;
 		// TODO(migration): AbstractController::get() was removed; inject this service.
-		$importer = $this->get('appstore_medicine_importer_excel');
+		$importer = $this->excel;
 		// TODO(migration): AbstractController::get() was removed; inject this service.
-		$reader = $this->get('appstore_medicine.importer.excel_data_reader');
+		$reader = $this->excelDataReader;
 		$file =  realpath($excelImporter->getAbsolutePath());
 		$data = $reader->getData($file);
 		if($importer->isValid($data)) {
@@ -224,7 +233,7 @@ class MedicineImportController extends AbstractController
                         mkdir($entity->getUploadDir(), 0777, true);
                     }
                     // TODO(migration): AbstractController::get() was removed; inject this service.
-                    $this->get('helper.imageresizer')->resizeImage(480, $path, $img);
+                    $this->imageResizer->resizeImage(480, $path, $img);
                     $entity->setPath($imgName);
                     $em->persist($entity);
                     $em->flush();

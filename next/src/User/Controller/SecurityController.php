@@ -11,6 +11,12 @@
 
 namespace App\User\Controller;
 
+use Symfony\Component\Routing\RouterInterface;
+
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,6 +33,9 @@ class SecurityController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly CsrfTokenManagerInterface $csrfTokenManager,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -66,12 +75,12 @@ class SecurityController extends AbstractController
 
         if ($this->has('security.csrf.token_manager')) {
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $csrfToken = $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue();
+            $csrfToken = $this->csrfTokenManager->getToken('authenticate')->getValue();
         } else {
             // BC for SF < 2.4
             $csrfToken = $this->has('form.csrf_provider')
                 // TODO(migration): AbstractController::get() was removed; inject this service.
-                ? $this->get('form.csrf_provider')->generateCsrfToken('authenticate')
+                ? $this->csrfTokenManager->generateCsrfToken('authenticate')
                 : null;
         }
         if ($error) {
@@ -141,20 +150,20 @@ class SecurityController extends AbstractController
 
         if ($this->has('security.csrf.token_manager')) {
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $csrfToken = $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue();
+            $csrfToken = $this->csrfTokenManager->getToken('authenticate')->getValue();
         } else {
             // BC for SF < 2.4
             $csrfToken = $this->has('form.csrf_provider')
                 // TODO(migration): AbstractController::get() was removed; inject this service.
-                ? $this->get('form.csrf_provider')->generateCsrfToken('authenticate')
+                ? $this->csrfTokenManager->generateCsrfToken('authenticate')
                 : null;
         }
         if ($error) {
             $error = $error->getMessage();
         }
 
-        $authChecker = $this->container->get('security.authorization_checker');
-        $router = $this->container->get('router');
+        $authChecker = $this->authorizationChecker;
+        $router = $this->router;
 
        if (!empty($authChecker)) {
             return $this->redirect($this->generateUrl('landing_page'));

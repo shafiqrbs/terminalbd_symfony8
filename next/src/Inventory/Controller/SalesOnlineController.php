@@ -2,6 +2,8 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Twig\Environment;
 use App\Tool\Service\ToolManager;
@@ -37,6 +39,7 @@ class SalesOnlineController extends AbstractController
         private readonly PaginatorInterface $paginator,
         private readonly ToolManager $toolManager,
         private readonly Environment $twig,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -863,7 +866,7 @@ class SalesOnlineController extends AbstractController
         if (in_array('OnlineSales', $entity->getInventoryConfig()->getDeliveryProcess())) {
 
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.posorder_sms');
             }
         }*/

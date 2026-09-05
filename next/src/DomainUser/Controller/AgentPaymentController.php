@@ -1,6 +1,8 @@
 <?php
 
 namespace App\DomainUser\Controller;
+
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use App\User\Form\AgentSignType;
@@ -27,6 +29,7 @@ class AgentPaymentController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
         private readonly UserManager $userManager,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -314,7 +317,7 @@ class AgentPaymentController extends AbstractController
             'success',"Password reset successfully"
         );
 
-        $dispatcher = $this->container->get('event_dispatcher');
+        $dispatcher = $this->eventDispatcher;
         $dispatcher->dispatch(new \App\Tool\Event\PasswordChangeSmsEvent($user,'123456'), 'setting_tool.post.change_password');
         return $this->redirect($this->generateUrl('domain_edit', array('id' => $user->getId())));
 

@@ -2,6 +2,14 @@
 
 namespace App\Inventory\Controller;
 
+use App\Inventory\Importer\ProductDataReader;
+
+use App\Inventory\Importer\ProductExcel;
+
+use App\Inventory\Importer\ExcelDataReader;
+
+use App\Inventory\Importer\Excel;
+
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +29,10 @@ class ExcelImporterController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
+        private readonly Excel $excel,
+        private readonly ExcelDataReader $excelDataReader,
+        private readonly ProductExcel $productExcel,
+        private readonly ProductDataReader $productDataReader,
     ) {
     }
 
@@ -112,16 +124,16 @@ class ExcelImporterController extends AbstractController
 
         if($excelImporter->getMode() == 'purchase'){
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $importer = $this->get('appstore_inventory_importer_excel');
+            $importer = $this->excel;
             $importer->setInventoryConfig($inventory->getId());
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $reader = $this->get('appstore_inventory.importer.excel_data_reader');
+            $reader = $this->excelDataReader;
         }else{
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $importer = $this->get('appstore_inventory_product_import');
+            $importer = $this->productExcel;
             $importer->setExcelImport($excelImporter);
             // TODO(migration): AbstractController::get() was removed; inject this service.
-            $reader = $this->get('appstore_inventory.importer.product_excel_data_reader');
+            $reader = $this->productDataReader;
         }
         $file =  realpath($excelImporter->getAbsolutePath());
         $data = $reader->getData($file);

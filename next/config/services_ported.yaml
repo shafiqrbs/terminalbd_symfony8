@@ -324,11 +324,20 @@ services:
     App\Tool\Service\EasyMailer:
         alias: setting_tool.easy_email
         public: true
+    App\Tool\Service\ImageResizer:
+        alias: helper.imageresizer
+        public: true
     App\Tool\Service\SmsGateWay:
         alias: setting_tool.sms_gateWay
         public: true
     App\Tool\Service\ToolManager:
         alias: settong.toolManageRepo
+        public: true
+    App\Tool\Twig\MyModuleTwigExtension:
+        alias: MyModule.twig_extension
+        public: true
+    App\Tool\Twig\TextExtension:
+        alias: twig.extension.text
         public: true
     App\User\EventListener\Redirect404ToHomepageListener:
         alias: app.listener.redirect_404_to_homepage
@@ -367,6 +376,14 @@ services:
         public: true
     GuzzleHttp\Client:
         alias: guzzle.client.api_crm
+        public: true
+    MyModule.twig_extension:
+        class: App\Tool\Twig\MyModuleTwigExtension
+        tags:
+            -
+                name: twig.extension
+        autowire: true
+        autoconfigure: false
         public: true
     app.listener.redirect_404_to_homepage:
         class: App\User\EventListener\Redirect404ToHomepageListener
@@ -997,6 +1014,11 @@ services:
                 base_uri: 'http://messaging.icombd.com:9000'
                 headers:
                     Accept: application/json
+    helper.imageresizer:
+        class: App\Tool\Service\ImageResizer
+        autowire: true
+        autoconfigure: false
+        public: true
     medicine_name.importer.excel_data_reader:
         class: App\Medicine\Importer\ExcelDataReader
         autowire: true
@@ -1293,6 +1315,14 @@ services:
         public: true
     settong_archive_db:
         class: App\Tool\Service\DatabaseArchive
+        autowire: true
+        autoconfigure: false
+        public: true
+    twig.extension.text:
+        class: App\Tool\Twig\TextExtension
+        tags:
+            -
+                name: twig.extension
         autowire: true
         autoconfigure: false
         public: true

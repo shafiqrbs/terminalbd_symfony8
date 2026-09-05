@@ -2,6 +2,16 @@
 
 namespace App\Medicine\Controller;
 
+use App\Tool\Service\ImageResizer;
+
+use App\Medicine\Importer\MedicineStockDataReader;
+
+use App\Medicine\Importer\MedicineStockImport;
+
+use App\Medicine\Importer\ExcelDataReader;
+
+use App\Medicine\Importer\Excel;
+
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +31,11 @@ class MedicineImportController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
+        private readonly Excel $excel,
+        private readonly ExcelDataReader $excelDataReader,
+        private readonly MedicineStockImport $medicineStockImport,
+        private readonly MedicineStockDataReader $medicineStockDataReader,
+        private readonly ImageResizer $imageResizer,
     ) {
     }
 
@@ -136,10 +151,10 @@ class MedicineImportController extends AbstractController
         ignore_user_abort(true);
         $em = $this->em;
         // TODO(migration): AbstractController::get() was removed; inject this service.
-        $importer = $this->get('medicine_name_importer_excel');
+        $importer = $this->excel;
         $importer->setMedicineImport($excelImporter);
         // TODO(migration): AbstractController::get() was removed; inject this service.
-        $reader = $this->get('medicine_name.importer.excel_data_reader');
+        $reader = $this->excelDataReader;
         $file =  realpath($excelImporter->getAbsolutePath());
         $data = $reader->getData($file);
         if($importer->isValid($data)) {
@@ -167,10 +182,10 @@ class MedicineImportController extends AbstractController
         ignore_user_abort(true);
         $em = $this->em;
         // TODO(migration): AbstractController::get() was removed; inject this service.
-        $importer = $this->get('medicine_stock_update_importer_excel');
+        $importer = $this->medicineStockImport;
         $importer->setMedicineImport($excelImporter);
         // TODO(migration): AbstractController::get() was removed; inject this service.
-        $reader = $this->get('medicine_stock_update.importer.excel_data_reader');
+        $reader = $this->medicineStockDataReader;
         $file =  realpath($excelImporter->getAbsolutePath());
         $data = $reader->getData($file);
         if($importer->isValid($data)) {
@@ -253,7 +268,7 @@ class MedicineImportController extends AbstractController
                         mkdir($entity->getUploadDir(), 0777, true);
                     }
                     // TODO(migration): AbstractController::get() was removed; inject this service.
-                    $this->get('helper.imageresizer')->resizeImage(480, $path, $img);
+                    $this->imageResizer->resizeImage(480, $path, $img);
                     $entity->setPath($imgName);
                     $em->persist($entity);
                     $em->flush();

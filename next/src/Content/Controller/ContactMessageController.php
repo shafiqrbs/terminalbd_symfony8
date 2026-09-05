@@ -2,6 +2,8 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,6 +22,7 @@ class ContactMessageController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -91,7 +94,7 @@ class ContactMessageController extends AbstractController
 
         $entity = $this->em->getRepository(\App\Content\Entity\ContactMessage::class)->findOneBy(['user' => $user,'id' => $id]);
 
-        $dispatcher = $this->container->get('event_dispatcher');
+        $dispatcher = $this->eventDispatcher;
         $dispatcher->dispatch(new SmsEvent($entity), 'setting_tool.post.sms_message');
         $dispatcher->dispatch(new EmailEvent($entity), 'setting_tool.post.email_message');
 

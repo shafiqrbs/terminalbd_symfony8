@@ -51,6 +51,12 @@ foreach (array_merge(
 uksort($nsMap, static fn (string $a, string $b): int => strlen($b) <=> strlen($a));
 
 /** Services that lived in bundles this migration removed. */
+const CLASS_MAP = [
+    // twig/extensions is abandoned and has no Twig 3 release; the one filter
+    // the templates use is reproduced in App\Tool\Twig\TextExtension.
+    'Twig_Extensions_Extension_Text' => 'App\Tool\Twig\TextExtension',
+];
+
 const ID_MAP = [
     'phpexcel' => 'App\Tool\Service\SpreadsheetFactory',
     'fos_user.user_manager' => 'App\User\Manager\UserManager',
@@ -98,6 +104,9 @@ foreach (glob("$root/src/*/*/Resources/config/services.yml") ?: [] as $path) {
     $files[] = $path;
 }
 
+// app/config/config.yml carries three service definitions of its own.
+$files[] = "$root/app/config/config.yml";
+
 foreach ($files ?? [] as $path) {
     $raw = (string) file_get_contents($path);
 
@@ -122,7 +131,7 @@ foreach ($files ?? [] as $path) {
             continue;
         }
 
-        $class = $rewriteClass($definition['class']);
+        $class = CLASS_MAP[$definition['class']] ?? $rewriteClass($definition['class']);
 
         if (!$classExists($class)) {
             $dropped[] = $id . ' (' . $definition['class'] . ' no longer exists)';

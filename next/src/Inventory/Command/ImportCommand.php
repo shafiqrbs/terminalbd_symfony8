@@ -6,7 +6,8 @@ use Exception;
 use Symfony\Component\Console\Helper\HelperInterface;
 use App\Inventory\Importer\ExcelDataReader;
 use App\Inventory\Importer\Excel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,14 +15,22 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class ImportCommand extends ContainerAwareCommand
+#[AsCommand(name: 'app-store:excel:import', description: 'Import data from excel')]
+class ImportCommand extends Command
 {
+    public function __construct(
+        private readonly ExcelDataReader $excelDataReader,
+        private readonly Excel $excel,
+    ) {
+        parent::__construct();
+    }
+
     protected $connection;
 
     /** @var  Excel */
     protected $importer;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('app-store:excel:import')
             ->setDefinition([
@@ -44,7 +53,7 @@ EOT
             ->setDescription('Import data from excel');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $question = $this->getQuestionHelper();
 
@@ -64,7 +73,7 @@ EOT
         $output->writeln('<info>Data has been successfully imported!</info>');
     }
 
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
         $output->writeln('<info>Welcome to the Excel Importer tool</info>');
         $output->writeln('');
@@ -129,7 +138,7 @@ EOT
      */
     protected function getDataReader()
     {
-        return $this->getContainer()->get('appstore_inventory.importer.excel_data_reader');
+        return $this->excelDataReader;
     }
 
 
@@ -138,6 +147,6 @@ EOT
      */
     protected function getImporter()
     {
-        return $this->getContainer()->get('appstore_inventory_importer_excel');
+        return $this->excel;
     }
 }

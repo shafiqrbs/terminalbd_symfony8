@@ -2,6 +2,8 @@
 
 namespace App\Customer\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 
 use App\Tool\Service\ToolManager;
 use Knp\Component\Pager\PaginatorInterface;
@@ -23,6 +25,7 @@ class AgentClientController extends AbstractController
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
         private readonly ToolManager $toolManager,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -86,7 +89,7 @@ class AgentClientController extends AbstractController
             $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->initialSetup($entity);
             $this->toolManager->createDirectory($entity->getGlobalOption()->getId());
 
-            $dispatcher = $this->container->get('event_dispatcher');
+            $dispatcher = $this->eventDispatcher;
             $dispatcher->dispatch(new \App\Tool\Event\UserSignup($entity), 'setting_tool.post.user_signup_msg');
             return $this->redirect($this->generateUrl('agentclient'));
         }

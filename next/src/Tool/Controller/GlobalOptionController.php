@@ -2,6 +2,8 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Tool\Service\ToolManager;
 use Knp\Component\Pager\PaginatorInterface;
@@ -29,6 +31,7 @@ class GlobalOptionController extends AbstractController
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
         private readonly ToolManager $toolManager,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -89,7 +92,7 @@ class GlobalOptionController extends AbstractController
             $em->flush();
             $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->initialSetup($entity);
             $this->toolManager->createDirectory($entity->getGlobalOption()->getId());
-          //  $dispatcher = $this->container->get('event_dispatcher');
+          //  $dispatcher = $this->eventDispatcher;
         //    $dispatcher->dispatch(new \App\Tool\Event\UserSignup($entity), 'setting_tool.post.user_signup_msg');
             return $this->redirect($this->generateUrl('globaloption_edit', array('id' => $globalOption->getId())));
         }

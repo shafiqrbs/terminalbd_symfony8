@@ -2,6 +2,8 @@
 
 namespace App\Hospital\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Twig\Environment;
@@ -38,6 +40,7 @@ class InvoiceController extends AbstractController
         private readonly PaginatorInterface $paginator,
         private readonly ToolManager $toolManager,
         private readonly Environment $twig,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -428,7 +431,7 @@ class InvoiceController extends AbstractController
                 $this->em->getRepository(\App\Hospital\Entity\Particular::class)->insertAccessories($entity);
             }
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $dispatcher->dispatch(new \App\Tool\Event\HmsInvoiceSmsEvent($entity), 'setting_tool.post.hms_invoice_sms');
             }
             return $this->redirect($this->generateUrl('hms_invoice_confirm', array('id' => $entity->getId())));

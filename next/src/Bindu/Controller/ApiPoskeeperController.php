@@ -2,6 +2,8 @@
 
 namespace App\Bindu\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 use App\Tool\Service\ToolManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +30,7 @@ class ApiPoskeeperController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly ToolManager $toolManager,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -532,7 +535,7 @@ class ApiPoskeeperController extends AbstractController
             $user = $this->em->getRepository(\App\User\Entity\User::class)->getAndroidOTP($mobile);
             if($user){
                 $login = $this->em->getRepository(\App\User\Entity\User::class)->find($user);
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $dispatcher->dispatch(new PasswordChangeSmsEvent($login, $login->getAppPassword()), 'setting_tool.post.change_password');
                 $data = ['status'=>'valid','otp' => $login->getAppPassword(),'apiSecret'=> $login->getGlobalOption()->getUniqueCode()];
             }else{
@@ -2830,7 +2833,7 @@ class ApiPoskeeperController extends AbstractController
 
             }
 
-         //   $dispatcher = $this->container->get('event_dispatcher');
+         //   $dispatcher = $this->eventDispatcher;
          //   $dispatcher->dispatch(new UserSignup($user), 'setting_tool.post.user_signup_msg');
 
 

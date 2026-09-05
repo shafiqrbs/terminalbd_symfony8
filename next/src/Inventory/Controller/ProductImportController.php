@@ -2,6 +2,10 @@
 
 namespace App\Inventory\Controller;
 
+use App\Inventory\Importer\SalesDataReader;
+
+use App\Inventory\Importer\SalesExcel;
+
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,6 +26,8 @@ class ProductImportController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
+        private readonly SalesExcel $salesExcel,
+        private readonly SalesDataReader $salesDataReader,
     ) {
     }
 
@@ -103,10 +109,10 @@ class ProductImportController extends AbstractController
         ignore_user_abort(true);
         $em = $this->em;
         // TODO(migration): AbstractController::get() was removed; inject this service.
-        $importer = $this->get('appstore_inventory_sales_import');
+        $importer = $this->salesExcel;
         $importer->setSalesImport($SalesImport);
         // TODO(migration): AbstractController::get() was removed; inject this service.
-        $reader = $this->get('appstore_inventory.importer.sales_excel_data_reader');
+        $reader = $this->salesDataReader;
         $file =  realpath($SalesImport->getAbsolutePath());
         $importer->import($reader->getData($file));
 

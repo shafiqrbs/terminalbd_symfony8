@@ -2,6 +2,10 @@
 
 namespace App\Restaurant\Controller;
 
+use App\Business\Importer\ProductDataReader;
+
+use App\Restaurant\Importer\ProductExcel;
+
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +25,8 @@ class ItemImporterController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
+        private readonly ProductExcel $productExcel,
+        private readonly ProductDataReader $productDataReader,
     ) {
     }
 
@@ -107,10 +113,10 @@ class ItemImporterController extends AbstractController
         ignore_user_abort(true);
         $em = $this->em;
         // TODO(migration): AbstractController::get() was removed; inject this service.
-        $importer = $this->get('appstore_restaurant_item_import');
+        $importer = $this->productExcel;
         $importer->setItemImport($ItemImporter);
         // TODO(migration): AbstractController::get() was removed; inject this service.
-        $reader = $this->get('appstore.business.item.import.event.listener');
+        $reader = $this->productDataReader;
         $file =  realpath($ItemImporter->getAbsolutePath());
         $data = $reader->getData($file);
         $importer->import($data);

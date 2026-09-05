@@ -2,6 +2,8 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +23,7 @@ class SmsBulkController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -293,7 +296,7 @@ class SmsBulkController extends AbstractController
         $global = $this->getUser()->getGlobalOption();
         if ($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
             if ($entity->getProcess() != "Complete") {
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $dispatcher->dispatch(new \App\Tool\Event\SmsBulkEvent($entity), 'setting_tool.post.bulk_sms');
                 $entity->setProcess('Complete');
                 $em->flush();

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\DomainUser\Controller;
+
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use App\User\Form\DomainEditUserType;
@@ -25,6 +27,7 @@ class DomainUserController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
         private readonly UserManager $userManager,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -363,7 +366,7 @@ class DomainUserController extends AbstractController
         $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Password reset successfully"
         );
-      //  $dispatcher = $this->container->get('event_dispatcher');
+      //  $dispatcher = $this->eventDispatcher;
       //  $dispatcher->dispatch(new \App\Tool\Event\PasswordChangeSmsEvent($user,$password), 'setting_tool.post.change_password');
         return $this->redirect($this->generateUrl('domain_user'));
     }

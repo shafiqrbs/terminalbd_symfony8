@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Business\Controller;
+
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Twig\Environment;
@@ -36,6 +38,7 @@ class InvoiceConditionController extends AbstractController
         private readonly PaginatorInterface $paginator,
         private readonly ToolManager $toolManager,
         private readonly Environment $twig,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -870,7 +873,7 @@ class InvoiceConditionController extends AbstractController
             /* @var $global GlobalOption */
             $global = $this->getUser()->getGlobalOption();
             if($entity->getBusinessConfig()->getBusinessModel() == 'association' and $global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $dispatcher->dispatch(new \App\Tool\Event\AssociationInvoiceSmsEvent($entity), 'setting_tool.post.association_invoice');
             }
             return new Response("Success");

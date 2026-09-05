@@ -2,6 +2,10 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Twig\Environment;
 use App\Tool\Service\ToolManager;
@@ -35,6 +39,8 @@ class SalesController extends AbstractController
         private readonly PaginatorInterface $paginator,
         private readonly ToolManager $toolManager,
         private readonly Environment $twig,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
     ) {
     }
 
@@ -500,7 +506,7 @@ class SalesController extends AbstractController
 
             if (in_array('CustomerSales', $entity->getInventoryConfig()->getDeliveryProcess())) {
                 if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
-                    $dispatcher = $this->container->get('event_dispatcher');
+                    $dispatcher = $this->eventDispatcher;
                     $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.posorder_sms');
                 }
             }
@@ -635,7 +641,7 @@ class SalesController extends AbstractController
 
     public function itemPurchaseDetailsAction(Request $request)
     {
-        $securityContext = $this->container->get('security.authorization_checker');
+        $securityContext = $this->authorizationChecker;
         $item = $request->request->get('item');
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $customer = isset($_REQUEST['customer']) ? $_REQUEST['customer'] : '';
@@ -701,19 +707,19 @@ class SalesController extends AbstractController
         $em->flush();
         if($entity->getProcess() == 'Courier'){
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.courier_sms');
             }
         }
         if($entity->getProcess() == 'Done' or $entity->getProcess() == 'Delivered' ){
             $this->approvedOrder($entity);
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.process_sms');
             }
         }elseif($entity->getProcess() == 'Returned'){
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
-                $dispatcher = $this->container->get('event_dispatcher');
+                $dispatcher = $this->eventDispatcher;
                 $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.process_sms');
             }
         }
