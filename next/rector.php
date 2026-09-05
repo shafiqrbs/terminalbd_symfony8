@@ -23,5 +23,15 @@ return RectorConfig::configure()
         __DIR__ . '/src/Security',
         __DIR__ . '/src/Comment',
         __DIR__ . '/src/Doctrine',
+        // ... and every other hand-written replacement. Rector rewrote the
+        // Twig extensions to attribute-based ones, which drops
+        // ExtensionInterface and breaks their twig.extension tag.
+        ...array_map(
+            static fn (string $line): string => dirname(__DIR__) . '/next/' . $line,
+            array_values(array_filter(array_map(
+                static fn (string $line): string => trim(explode('#', $line, 2)[0]),
+                file(dirname(__DIR__) . '/migration/hand-written.txt'),
+            ))),
+        ),
     ])
     ->withImportNames(removeUnusedImports: true);

@@ -80,7 +80,6 @@
 /home/sreejon/projects/personal/terminalbd/next/src/Customer/Controller/ProfileController.php
 /home/sreejon/projects/personal/terminalbd/next/src/Customer/Controller/DomainController.php
 /home/sreejon/projects/personal/terminalbd/next/src/User/Form/AgentEditType.php
-/home/sreejon/projects/personal/terminalbd/next/src/User/Form/DomainAdminType.php
 /home/sreejon/projects/personal/terminalbd/next/src/User/Form/DomainEditUserType.php
 /home/sreejon/projects/personal/terminalbd/next/src/User/Form/CustomerRegisterType.php
 /home/sreejon/projects/personal/terminalbd/next/src/User/Form/UserType.php
@@ -88,7 +87,6 @@
 /home/sreejon/projects/personal/terminalbd/next/src/User/Form/DomainEditSignType.php
 /home/sreejon/projects/personal/terminalbd/next/src/User/Form/AgentSignType.php
 /home/sreejon/projects/personal/terminalbd/next/src/User/Form/SignupType.php
-/home/sreejon/projects/personal/terminalbd/next/src/User/Controller/ProfileController.php
 /home/sreejon/projects/personal/terminalbd/next/src/Tool/Form/GlobalOptionModifyType.php
 /home/sreejon/projects/personal/terminalbd/next/src/Tool/Form/GlobalOptionType.php
 /home/sreejon/projects/personal/terminalbd/next/src/Tool/Controller/AppModuleController.php

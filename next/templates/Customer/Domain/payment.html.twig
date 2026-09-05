@@ -340,12 +340,7 @@
 
                     <div class="form-actions" >
                         {% set paymentID = entity.globalOption.id~'-ecommerce-payment-'~entity.id %}
-                        {# The comment widget needs FOSCommentBundle's REST API, which is not
-                           ported yet: async.html.twig calls path('fos_comment_get_threads').
-                           Guarded rather than deleted so the port is a one-line change. #}
-                        {% if comments_enabled %}
-                            {% include '_foscomment/Thread/async.html.twig' with {'id': paymentID } %}
-                        {% endif %}
+                        {% include '_foscomment/Thread/async.html.twig' with {'id': paymentID } %}
                     </div>
                 </div>
 

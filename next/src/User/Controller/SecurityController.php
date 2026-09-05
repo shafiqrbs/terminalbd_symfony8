@@ -74,12 +74,10 @@ class SecurityController extends AbstractController
         $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
 
         if ($this->has('security.csrf.token_manager')) {
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $csrfToken = $this->csrfTokenManager->getToken('authenticate')->getValue();
         } else {
             // BC for SF < 2.4
             $csrfToken = $this->has('form.csrf_provider')
-                // TODO(migration): AbstractController::get() was removed; inject this service.
                 ? $this->csrfTokenManager->generateCsrfToken('authenticate')
                 : null;
         }
@@ -149,12 +147,10 @@ class SecurityController extends AbstractController
         $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
 
         if ($this->has('security.csrf.token_manager')) {
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $csrfToken = $this->csrfTokenManager->getToken('authenticate')->getValue();
         } else {
             // BC for SF < 2.4
             $csrfToken = $this->has('form.csrf_provider')
-                // TODO(migration): AbstractController::get() was removed; inject this service.
                 ? $this->csrfTokenManager->generateCsrfToken('authenticate')
                 : null;
         }

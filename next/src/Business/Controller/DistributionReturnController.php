@@ -116,6 +116,8 @@ class DistributionReturnController extends AbstractController
     private function createCreateForm(BusinessDistributionReturn $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
+        // TODO(migration): SF3+ takes a form type class-string, not an instance.
+        // Move these constructor arguments into DistributionReturnType::configureOptions() and pass them as form options: $globalOption), $entity, array(
         $form = $this->createForm(new DistributionReturnType($globalOption), $entity, array(
             'action' => $this->generateUrl('business_purchase_return_create'),
             'method' => 'POST',

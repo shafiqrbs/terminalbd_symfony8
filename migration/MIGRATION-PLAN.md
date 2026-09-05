@@ -20,9 +20,15 @@ Companion summary (charts, tables, roadmap): https://claude.ai/code/artifact/be6
 
 ## 1. Status
 
-**The whole application now builds on Symfony 8.1 / PHP 8.5.** Every mechanically portable layer is
-ported and the result compiles, lints, routes and passes its tests. What remains is semantic work
-that cannot be automated — see §6.5 and §11.
+**Every phase that can be finished without production access is finished.** The application
+builds on Symfony 8.1 / PHP 8.5, every route resolves to a real controller and action, every
+entity's mapping validates, and the column names match what the legacy annotations produce —
+which is the property that matters most, because both applications write the same tables.
+
+What is left needs a running system or a product decision, not more porting: the golden API
+capture (§11), the per-module behaviour checks before each proxy flip (§6, phase 5), the
+session-bridge deploy step (`migration/session-bridge.md`), and decommissioning the PHP 7.4
+pool (§6, phase 6).
 
 ```
 $ ./migration/bin/migrate.sh
@@ -37,29 +43,36 @@ leftover Types::ARRAY     0 files
 -- does it actually build? --
  [OK] Cache for the "dev" environment (debug=true) was successfully cleared.
  [OK] The container was linted successfully
-routes loaded: 3484
-OK (20 tests, 33 assertions)
+routes loaded: 3070
+controllers loadable: 336/336
+OK (26 tests, 42 assertions)
+
+-- is the mapping right? --
+339 entities valid, 0 with mapping errors
+legacy columns absent from the ported mapping: 0
+resolve:           3070      missing class: 0   missing action: 0
+mobile endpoints resolving at the same path: 90 (6 dead in the legacy app too, 0 regressions)
 ```
 
 | Metric | Value |
 |---|---|
-| PHP files ported into `App\` | 1,562 |
-| Templates ported | 1,754 (+42 vendored from the removed FOS bundles) |
-| Routing files ported | 362, plus 18 regenerated auth routes |
-| Routes loading | **3,484** |
-| Doctrine metadata definitions | 339 (309 validate clean) |
-| `#[ORM\]` / `#[Gedmo\]` attributes | 8,388 / 432 |
-| `@Secure` → `#[IsGranted]` | 521 (184 single-role, 337 OR-expressions) |
-| Doctrine short-name aliases → FQCN | 6,507 |
-| Controllers that load | **333 / 336** |
-| Routes resolving to a real controller + action | **3,054 / 3,473** (419 are pre-existing dead routes) |
-| `$this->getDoctrine()` call sites converted | 5,838 |
-| Service-locator calls converted | 1,374 |
+| PHP files ported into `App\` | 1,561 |
+| Templates ported | 1,797 (including 42 vendored from the removed FOS bundles) |
+| Routes loading | **3,070** |
+| Routes resolving to a real controller + action | **3,070 / 3,070** |
+| Controllers that load | **336 / 336** |
+| Doctrine metadata definitions | 339 (**339 validate clean**) |
+| Column names diverging from the legacy annotations | **0** (of 333 entities) |
+| Mobile endpoints resolving at their contract path | 90 of 96 (6 dead in the legacy app, §5.13) |
+| Templates with valid Twig syntax | 1,795 / 1,797 |
 | Container lint | passes |
-| Test suite | 20 tests, 33 assertions, green |
-| PHP syntax errors | 0 |
+| Test suite | 26 tests, 42 assertions, green |
+| `TODO(migration)` markers left | 4 files (services that exist in neither tree) |
 
-The 30 remaining are legacy defects, not port artifacts — see §5.6.
+The whole pipeline is reproducible: `./migration/bin/migrate.sh` rebuilds `next/src`,
+`next/templates` and `next/config/routes/legacy` from the untouched legacy tree and ends in the
+verification block above. Files that are hand-written rather than generated are listed in
+`migration/hand-written.txt` and are neither deleted nor overwritten by a run.
 
 ---
 
@@ -105,68 +118,116 @@ foundation, ported once; the **HTTP layer** is what moves module by module on to
 
 ### `migration/bin/` — the pipeline
 
+`migrate.sh` is the whole migration: 16 idempotent steps from the untouched Symfony 2.8 tree to
+a building application, then a verification block (syntax, leftover-legacy greps, container
+compile and lint, route count, controller loadability, tests, mapping validation, column
+verification, route resolution, the mobile contract, Twig lint, and — when a dump is present —
+a schema diff).
+
 | File | Purpose |
 |---|---|
-| `migrate.sh` | **The whole migration.** 9 idempotent steps from the untouched SF2.8 tree to a building app, then verifies: syntax, leftover-legacy greps, container compile, container lint, route count, test suite. |
-| `port.sh` | Steps 1-7 of the entity graph, called by `migrate.sh` |
+| `migrate.sh` | The pipeline. `port.sh` is steps 1-7 of the entity graph, called from it |
 | `port-entities.php` | Copies 686 entity/repository files, rewrites legacy namespaces → `App\` |
 | `gedmo-to-attributes.php` | `@Gedmo` docblocks → attributes (Rector has no Gedmo rules) |
 | `fix-duplicate-attributes.php` | Collapses repeated non-repeatable ORM attributes, keeping the last |
 | `fix-joincolumns.php` | Drops `JoinColumn` from illegal association sides |
 | `fixups.php` | Targeted corrections for individually malformed legacy annotations |
-| `port-security.php` | Generates `next/config/packages/security_roles.yaml` from `app/config/security.yml` |
-| `port-http.php` | Lifts controllers, forms, services, listeners and all 1,754 templates |
-| `port-routing.php` | 362 routing files: `pattern:`→`path:`, `Bundle:C:a`→FQCN, relative imports, XML/dead-bundle imports commented, duplicate route names collapsed the way SF2 resolved them |
-| `port-auth-routes.php` | Regenerates the 18 routes that lived in FOSUserBundle's XML plus the app's own |
-| `port-security.php` | Role hierarchy + access control |
+| `port-http.php` | Lifts controllers, forms, services, listeners and all templates |
+| `port-routing.php` | 362 routing files: `pattern:`→`path:`, `Bundle:C:a`→FQCN, XML/dead-bundle imports commented, duplicate route names collapsed the way SF2 resolved them |
+| `port-auth-routes.php` | Regenerates the 18 routes that lived in FOSUserBundle's XML |
+| `port-security.php` | Role hierarchy + access control from `app/config/security.yml` |
 | `port-parameters.php` | `parameters.yml.dist` → container parameters backed by env vars |
-| `gen-service-excludes.php` | Excludes the 214 non-autowirable legacy form types from service registration |
-| `fix-dql-aliases.php` | Doctrine short-name aliases → FQCN |
+| `port-services.php` | The bundles' `Resources/config/services.yml` → `config/services_ported.yaml`, rebuilding arguments by reflection |
+| `gen-service-excludes.php` | Guard: any form type whose constructor takes runtime values (expected to be none) |
+| `mark-manual-forms.php` | Flags form instantiations Rector's rule crashes on, so it skips those files |
+| `port-fosuser.php` | The FOSUserBundle references in files that stay mechanically ported |
+| `port-forms.php` | String type names → FQCN, `property`→`choice_label`, `setDefaultOptions`→`configureOptions`, `getName`→`getBlockPrefix` |
+| `port-form-options.php` | `empty_value`→`placeholder`, `cascade_validation` dropped, **choices flipped** to Symfony 3 order |
+| `port-form-instances.php` | `new XType($deps)` call sites → `XType::class` plus options |
+| `port-form-types.php` | Form type constructors → form options |
+| `port-controllers.php` | `AbstractController` + constructor injection |
+| `port-controller-api.php` | `isSubmitted()` guards, `dispatch()` argument order, interpolated template prefixes |
+| `port-container-aware.php` | `ContainerAwareTrait`, `ContainerAware`, `ContainerAwareCommand` |
+| `port-service-locator.php` | The remaining `$this->get('id')` calls → constructor injection |
+| `prune-dead-imports.php` | `use` statements for bundles that were never part of this project |
+| `port-phpexcel.php` | PHPExcel + liuggio/excelbundle → PhpSpreadsheet |
+| `port-assetic.php` | `{% stylesheets %}`/`{% javascripts %}` → `asset()`, plus an `assets:install` equivalent |
+| `port-twig-legacy.php` | `form_enctype()`, `sameas` |
 | `fix-signatures.php` | Return types SF8/Doctrine 3 base classes require (class-aware) |
+| `fix-dql-aliases.php` | Doctrine short-name aliases → FQCN |
 | `secure-to-isgranted.php` | JMS `@Secure` → `#[IsGranted]`, preserving OR semantics |
-| `mark-manual-forms.php` | Flags the 317 form instantiations that cannot be converted mechanically |
-| `capture.php` | Records golden API responses from an app |
-| `compare.php` | Diffs response **shape** (keys + value types) and status; exit 1 on drift |
+| `fix-attribute-names.php` | Attributes written as an unqualified FQCN, and `targetEntity: \Foo::class` |
+| `fix-associations.php` | The broken bidirectional associations, driven off Doctrine's own validator |
+| `check-routes.php` | Reports and prunes routes with no controller or action |
+| `clean-generated.php` | Empties the generated module directories, keeping the hand-written files |
 
-### `migration/contract/` — extracted facts
+Verification, all runnable without a database:
+
+| File | Checks |
+|---|---|
+| `verify-columns.php` | Every ported column name against the legacy annotations, reproducing Doctrine 2's DefaultNamingStrategy. **This is the one that guards the shared database** |
+| `check-routes.php` | Every route resolves to a class and method that exist |
+| `check-api-contract.php` | The 96 wire-locked mobile endpoints still answer at their contract path |
+| `schema-diff.php` | The mapping against a real dump: tables, columns, serialized payloads |
+| `create-session-table.php` | Creates the shared `sessions` table (additive) |
+| `capture.php` / `compare.php` | Golden API responses: record, then diff shape and status. Needs a live system (§11) |
+
+### `migration/contract/` — extracted facts and verification output
 
 | File | Contents |
 |---|---|
 | `api-endpoints.json` | All 96 mobile endpoints: prefix, path, method, controller |
+| `api-contract.md` | Which of them resolve, regenerated by `check-api-contract.php` |
+| `dead-mobile-endpoints.md` | The six that are dead in the legacy application, with the evidence |
 | `entity-map.json` | 335 entities → table, repository, column count, association count |
 | `broken-associations.md` | The 48 broken `mappedBy`/`inversedBy` links, by entity |
+| `column-verification.md` | Ported column names vs the legacy annotations — the shared-database guard |
+| `schema-diff.md` | The mapping against a real dump: tables, columns, serialized payloads |
+| `unresolvable-routes.md` | Every route removed for having no controller or action |
+| `route-collisions.md` | Duplicate route names, and which definition Symfony keeps |
+| `unresolved-dql-aliases.txt` | References to entities that exist in neither tree |
+| `manual-form-files.txt` | Files Rector's form rule crashes on, so the pipeline skips them there |
 | `mapping-validation.txt` | Raw output of the last acceptance run |
 
 ### `next/` — the new application
 
-Hand-written (regenerated files are everything else under `next/src/<Module>/`):
+Everything under `next/src/<Module>/` is regenerated from the legacy tree except the files
+listed in `migration/hand-written.txt`, which the pipeline neither deletes nor overwrites.
 
 | File | Purpose |
 |---|---|
-| `rector.php` | PHP 8.5 + Doctrine/Symfony attribute sets. **Skips** `src/Security`, `src/Comment`, `src/Doctrine` |
+| `rector.php` | PHP 8.5 + Doctrine/Symfony attribute sets. **Skips** `src/Security`, `src/Comment`, `src/Doctrine` and everything in `migration/hand-written.txt` |
 | `bin/validate-mapping.php` | Acceptance test: loads all Doctrine metadata, no DB needed |
-| `config/packages/doctrine.yaml` | Single `App` mapping over `src/`; registers the legacy DBAL types |
-| `src/Doctrine/Type/LegacyArrayType.php` | Restores DBAL's removed `array` type |
-| `src/Doctrine/Type/LegacyJsonArrayType.php` | Restores the removed `json_array` type |
-| `src/Security/Model/BaseUser.php` | Replaces `FOS\UserBundle\Model\User`, column-for-column |
-| `src/Security/Model/BaseGroup.php` | Replaces `FOS\UserBundle\Model\Group` |
+| `config/packages/doctrine.yaml` | Single `App` mapping over `src/`, the legacy DBAL types, the **DefaultNamingStrategy** (§5.14) and the three custom DQL functions |
+| `config/services_ported.yaml` | Generated from the bundles' service definitions |
+| `src/Doctrine/Type/Legacy{Array,JsonArray}Type.php` | Restore DBAL's removed `array` / `json_array` types |
+| `src/Security/Model/Base{User,Group}.php` | Replace the FOSUserBundle superclasses, column-for-column |
+| `src/Security/UserProvider.php`, `Canonicalizer.php` | Replace `fos_user.user_provider.username` and FOSUser's canonicalizer |
+| `src/Security/SharedSession{Authenticator,Listener}.php` | The Symfony 8 half of the session bridge |
 | `src/Comment/Model/Base{Comment,Thread}.php` | Replace the FOSCommentBundle superclasses |
+| `src/User/Manager/{User,Group}Manager.php`, `Util/TokenGenerator.php`, `Mailer/ResettingMailer.php` | Replace the `fos_user.*` services |
+| `src/User/Form/Type/*FormType.php` | Replace the forms FOSUserBundle's factories built |
+| `src/User/Controller/{ChangePassword,Group,Profile,Registration,Resetting}Controller.php` | Reimplemented on `AbstractController` |
+| `src/Tool/Service/SpreadsheetFactory.php` | Replaces the `phpexcel` service over PhpSpreadsheet |
+| `src/Tool/Image/*`, `src/Tool/Twig/ImageExtension.php` | Replace gregwar/image-bundle |
+| `src/Tool/Twig/TextExtension.php` | Replaces twig/extensions' `truncate` |
+| `src/Form/ChoiceList.php` | Flips runtime choice lists to Symfony 3 order (§5.15) |
 
 ### Running it
 
 ```bash
-./migration/bin/port.sh                      # rebuild next/src/ from legacy (idempotent)
-cd next && php8.5 bin/validate-mapping.php   # acceptance test
+./migration/bin/migrate.sh                   # the whole migration, then verify
+cd next && php8.5 bin/validate-mapping.php   # mapping acceptance test on its own
+php8.5 migration/bin/verify-columns.php      # shared-database guard on its own
 ```
 
-`port.sh` deletes and regenerates the module directories under `next/src/` only. The
-hand-written compatibility layer above is never touched.
-
-> **Rector scope is load-bearing.** `rector.php` must keep skipping `src/Security`,
-> `src/Comment` and `src/Doctrine`. Without the skip it types the shim properties
-> (`protected ?string $username`), which then clash with the untyped properties the ported
-> subclasses redeclare, and it rewrites `type: 'array'` to `Types::ARRAY` — a constant DBAL 4
-> no longer defines. `port.sh`'s verify step greps for the latter and must report 0.
+> **Rector scope is load-bearing.** `rector.php` and `rector-http.php` must keep skipping
+> `src/Security`, `src/Comment`, `src/Doctrine` and the hand-written manifest. Without the skip
+> it types the shim properties (`protected ?string $username`), which then clash with the
+> untyped properties the ported subclasses redeclare; it rewrites `type: 'array'` to
+> `Types::ARRAY`, a constant DBAL 4 no longer defines; and it converts the hand-written Twig
+> extensions to attribute-based ones, which drops `ExtensionInterface` and silently unregisters
+> them. The verify block greps for the second and the container lint catches the third.
 
 ---
 
@@ -226,15 +287,19 @@ rejects the repeat outright. `fix-duplicate-attributes.php` keeps the last occur
 reproduces the ORM 2 outcome — meaning those four custom repository classes *were* in effect,
 and the live sort order *was* `name ASC`.
 
-### 5.6 Broken bidirectional associations — 48 refs across 30 entities
+### 5.6 Broken bidirectional associations — 48 refs across 30 entities ✅ fixed
 
 `inversedBy` / `mappedBy` pointing at fields that do not exist on the other entity, e.g.
 `GlobalOption#employeeTransaction`, `BusinessConfig#itemImports`, `BusinessInvoice#courier`.
 Confirmed absent from the legacy entities too. Doctrine only resolves the inverse side lazily,
 so they never surfaced at runtime.
 
-Catalogued in `migration/contract/broken-associations.md`. **Fix each as its module is
-ported** — add the missing inverse field, or make the relation unidirectional.
+Catalogued in `migration/contract/broken-associations.md`, and fixed by `fix-associations.php`
+with the second option — made unidirectional, which is what the code already did at runtime.
+54 `inversedBy` references that pointed nowhere were dropped (the owning side keeps its column
+and its foreign key) and 16 unusable `OneToMany` mappings became plain properties, so reading
+one returns an empty collection instead of throwing. Adding the missing owning side instead
+would have meant inventing foreign key columns the shared database does not have.
 
 ### 5.7 `parent::__construct()` in parentless classes — 3 cases
 
@@ -246,7 +311,7 @@ Removing the unreachable line preserves behaviour byte-for-byte. **The typo is d
 left in place**: correcting it would activate three constructors that have never executed,
 which initialise collections and set `status = true`.
 
-### 5.12 Routes pointing at controllers and actions that do not exist — 419
+### 5.12 Routes pointing at controllers and actions that do not exist — 419 ✅ removed
 
 229 name a controller class that is absent from the legacy tree too
 (`HotelReportController`, `EcommerceMenuController`, `FeatureController`,
@@ -285,6 +350,90 @@ normalised during the namespace rewrite.
 
 ---
 
+### 5.13 The ported configuration renamed 782 columns — highest severity of the port
+
+`next/config/packages/doctrine.yaml` carried Symfony Flex's default,
+`naming_strategy: underscore_number_aware`. The live schema was written by Doctrine 2's
+`DefaultNamingStrategy`, which `app/config` never overrode: an implicit column keeps the
+property's case, and an implicit join column is `<property>_id`. The production tables have
+`globalOption_id` and `receiveDate`; the ported application was looking for `global_option_id`
+and `receive_date`.
+
+Nothing fails loudly. Doctrine builds the SQL it was told to build, and the first query against
+an affected table errors on an unknown column — 782 of them across the graph.
+
+Fixed by using `doctrine.orm.naming_strategy.default`, and guarded from here on by
+`migration/bin/verify-columns.php`, which reproduces DefaultNamingStrategy over the legacy
+annotations and compares the result with the metadata the ported application loads. It reports
+782 divergences with the Flex strategy and **0** with the correct one. It needs no database, so
+it belongs in CI.
+
+### 5.14 Attributes written as an unqualified FQCN — 32 columns silently unmapped
+
+`@Doctrine\ORM\Mapping\Column` in a docblock is an absolute reference. Converted to
+`#[Doctrine\ORM\Mapping\Column]`, PHP resolves it *relative to the current namespace* —
+`App\Hospital\Entity\Doctrine\ORM\Mapping\Column`, which does not exist. Doctrine then sees
+no column at all and the property is simply unmapped.
+
+`HmsCategory::$slug` was one of the 32, which is why Gedmo failed with "Unable to find slug
+[slug] as mapped property" as soon as the listeners were registered (§5.17). A further 40
+`targetEntity: \Foo::class` references had the same shape of defect: `::class` does not require
+the class to exist, so they quietly evaluated to `"Foo"`.
+
+Both fixed by `fix-attribute-names.php`.
+
+### 5.15 Symfony 3 flipped the `choices` array — 214 lists
+
+Symfony 2 wrote `'choices' => ['top' => 'Top']` (value => label); Symfony 3 onwards reads
+label => value. Left alone, every choice field would have stored its label: `'Top'` instead of
+`'top'`, and `'Inventory'` instead of `'ROLE_INVENTORY'`.
+
+`port-form-options.php` flips the literal lists (214) and drops the `choices_as_values` option
+from the 28 that were already forward-compatible. The role lists are built at runtime by
+`UserRepository`, which non-form code also reads, so those are flipped at the call site through
+`App\Form\ChoiceList::flip()` instead. Lists that feed `EntityType` are left alone — they pass
+entities as values with `choice_label` supplying the label, which is already correct.
+
+### 5.16 The bundles' service definitions were never ported — every listener inert
+
+Bundle DI extensions went away with the bundles, and nothing replaced them: not one of the 120
+definitions in the bundles' `Resources/config/services.yml` had been carried over. An autowired
+class with no `kernel.event_listener` tag is never called, so every SMS and e-mail the
+application sends — password changes, OTPs, signup notifications, invoice messages — was
+dispatched into an empty dispatcher.
+
+`port-services.php` ports them under their original ids (controllers still fetch some by name),
+rebuilding constructor arguments by reflection because Symfony 2 listed every argument
+positionally, including ones that are now autowired and several that no longer exist.
+55 `doctrine.event_listener` and 22 `kernel.event_listener` services are registered again.
+
+### 5.17 StofDoctrineExtensionsBundle was never registered — every Gedmo attribute inert
+
+The bundle is in `composer.json` but was missing from `config/bundles.php`, and
+`app/config/bundles/stof_doctrine.yml` had not been ported. So 265 `Timestampable`, 75
+`Blameable`, 49 `Slug` and the `Tree` mappings did nothing: rows would have been written with
+null `created`/`updated` columns and empty slugs, and the category trees would have stopped
+maintaining themselves.
+
+### 5.18 Six wire-locked mobile endpoints are dead in the legacy application
+
+Five name an action that exists in neither tree; one, `api_portal_app`, is shadowed by a
+duplicate route name (§5.10). Catalogued with the evidence in
+`migration/contract/dead-mobile-endpoints.md`. `check-api-contract.php` accepts exactly these
+six and fails on any other change, so the other 90 cannot regress unnoticed.
+
+One deserves a decision rather than a catalogue entry: `api_portal_app_user_register` names
+`ApiPortalController::userRegisterAction`, and a `userRegisterAction` does exist — on
+`ApiPoskeeperController`. The two serve different clients and return different shapes, so the
+route was left dead rather than pointed at a plausible-looking implementation.
+
+### 5.19 A file whose class does not match its name — 1 case
+
+`Core/UserBundle/Form/Type/DomainAdminType.php` declares `class DomainSignType`. PSR-0 never
+loaded it, so it was dead code in the legacy tree; but Symfony and Doctrine both *scan* the
+directory rather than autoload it, which made `getAllMetadata()` a fatal redeclare. `port-http.php`
+now skips any legacy file whose class name does not match its file name, and reports it.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -294,7 +443,7 @@ annotations converted to attributes, mappings validated. FOSUser and FOSComment 
 reproduced from their locked revisions (`6ccff96`, `fa2a676`) so they map onto `fos_user`,
 `user_group` and the comment tables untouched.
 
-### Phase 2 — Authentication and tenancy ← in progress
+### Phase 2 — Authentication and tenancy ✅ done
 
 The gate for everything else: no module can move until a request can be authenticated.
 
@@ -305,13 +454,10 @@ The gate for everything else: no module can move until a request can be authenti
       `username_canonical` / `email_canonical` columns in production were written with this exact
       transform; a divergence means no existing user can log in.
 - [x] Role hierarchy + access control generated by `migration/bin/port-security.php`
-      (114 hierarchy entries, 44 access rules; the other 79 legacy roles are self-referential
-      `ROLE_X: [ROLE_X]` no-ops, preserved as comments so the vocabulary stays visible).
-      All 193 legacy role names verified present.
-- [x] `App\Security\TenantRoutingListener` — port of `DomainAttributeListener`, copying
-      `subdomain`/`domain` into the router context and restoring the parent request's values on
-      sub-request finish.
-- [x] Migrating password hasher — verify existing salted `sha512`, transparently rehash to a modern algorithm on next successful login. **No forced reset for any tenant.**
+      (114 hierarchy entries, 44 access rules). All 193 legacy role names verified present.
+- [x] `App\Security\TenantRoutingListener` — port of `DomainAttributeListener`.
+- [x] Migrating password hasher — verify existing salted `sha512`, transparently rehash on next
+      successful login. **No forced reset for any tenant.**
       ```yaml
       password_hashers:
           App\User\Entity\User:
@@ -323,11 +469,28 @@ The gate for everything else: no module can move until a request can be authenti
               encode_as_base64: true
               iterations: 5000
       ```
-      Verified: Symfony 8's `MessageDigestPasswordHasher` defaults (sha512 / base64 / 5000
-      iterations) and its `$password.'{'.$salt.'}'` salt merge are identical to Symfony 2's
-      `sha512` shorthand.
+- [x] The FOSUserBundle runtime, replaced class for class:
+      `fos_user.user_manager` → `App\User\Manager\UserManager`, `fos_user.group_manager`,
+      `fos_user.util.token_generator`, `fos_user.mailer`, and the four form factories →
+      `App\User\Form\Type\*FormType`. Each form is still created under the name FOSUserBundle's
+      factory used (`fos_user_change_password_form` and friends), because the vendored templates
+      and one controller's POST parsing read those keys.
+- [x] Login / logout / registration / password-reset controllers and templates. All 18
+      `fos_user_*` routes resolve; `ProfileController::showAction` and `GroupController`'s
+      constructor, both lost when the classes stopped extending the bundle's, are restored.
+- [x] 112 files of `@Secure` / `@PreAuthorize` → `#[IsGranted]` (521 conversions).
+- [x] Shared session store and the bridge across the proxy boundary —
+      `App\Security\SharedSession{Authenticator,Listener}` and the legacy half in
+      `Core\UserBundle\EventListener\SharedSessionListener`. Sharing the store is not enough:
+      neither framework can deserialise the other's security token, so each publishes a neutral
+      user identifier and adopts it only when it has no session of its own. Six tests cover the
+      cases where it must *not* fire. Turning it on is a deploy step, written up in
+      `migration/session-bridge.md` — pointing the legacy application at the shared table logs
+      out whoever is signed in at that moment.
+- [x] `symfony/security-acl`: nothing to do. The 9 files the dependency table listed use no ACL
+      API in either tree; the package was a dependency nothing imported.
 
-**Proven by test** (`next/tests/Security/`, 20 tests / 33 assertions, green). The legacy hash is
+**Proven by test** (`next/tests/Security/`, 26 tests / 42 assertions, green). The legacy hash is
 reproduced from Symfony 2's algorithm transcribed by hand rather than by calling Symfony 8's
 hasher, so it is a real cross-check and not the framework agreeing with itself:
 
@@ -337,83 +500,88 @@ hasher, so it is a real cross-check and not the framework agreeing with itself:
 - dropping the salt makes verification fail — which is why `BaseUser` must keep implementing
   `LegacyPasswordAuthenticatedUserInterface`
 - canonicalization matches FOSUserBundle byte-for-byte, including unicode and `ISTANBUL`
+- the session bridge ignores a stale key, a request with no previous session, and never
+  overrides a token this application already has
 
-Remaining in this phase:
+### Phase 3 — Mobile APIs (wire-locked) — structurally verified, responses not yet captured
 
-- [ ] Login / logout / registration / password-reset controllers and templates
-      (12 `fos_user_*` route names). Templates depend on Phase 4.
-- [ ] Shared session store so a user stays logged in across the proxy boundary while both apps
-      serve traffic
-- [ ] Convert 112 files of `@Secure` / `@PreAuthorize` → `#[IsGranted]` (lands with each module port)
-- [ ] Replace `symfony/security-acl` usage (9 files) with voters
+All 96 endpoints are accounted for: **90 resolve at their contract path**, and the other six are
+dead in the legacy application too (§5.18). FOSRestBundle is gone entirely — its `type: rest`
+loader was replaced by explicit paths, and no controller used its view layer: the legacy actions
+build their JSON by hand and return a plain `Response`, which is what they still do.
 
-### Phase 3 — Mobile APIs (wire-locked) — routes ported, contract not yet verified
+- [x] Every endpoint resolves to a controller and action that exist
+- [x] `check-api-contract.php` gates that, and fails on any regression
+- [ ] Record golden responses: `php migration/bin/capture.php legacy` — **needs a staging URL and
+      API credentials** (§11)
+- [ ] Gate every deploy on `compare.php` once a baseline exists
 
-All 96 endpoints route in the new app: `/flutter-api` **66**, `/android-api` **24**,
-`/android-api-portal` **5**. FOSRestBundle's `type: rest` loader is gone; every file it loaded
-declares explicit paths, so the standard YAML loader handles them.
+### Phase 4 — Shared presentation layer ✅ done
 
-> `/android-api-portal/apps` shows 5 rather than the contract's 6 because `api_portal_app` is
-> declared in both `apiPortal.yml` and `apiPoskeeper.yml`. Symfony keeps the last, and Symfony 2
-> did too — so that endpoint is **already unreachable in production today**. See
-> `migration/contract/route-collisions.md` (147 collisions here, 145 in the legacy tree).
-
-- [ ] Record golden responses: `php migration/bin/capture.php legacy` (needs a URL + credentials)
-- [ ] Port the controller bodies off FOSRestBundle's view layer onto the Serializer
-- [ ] Gate every deploy on `compare.php`
-
-### Phase 4 — Shared presentation layer — mechanically done
-
-- [x] 1,754 templates ported to `next/templates/`
+- [x] 1,797 templates ported, including 42 vendored from FOSUserBundle/FOSCommentBundle into
+      protected `_`-prefixed directories
 - [x] 1,834 `Bundle:Dir:file.twig` references rewritten, including interpolated ones
-      (`"BusinessBundle:Print:{$template}.html.twig"`)
-- [x] 42 templates vendored from FOSUserBundle/FOSCommentBundle into protected `_`-prefixed
-      directories, since app templates `{% include %}` their partials
-- [ ] Assetic `{% stylesheets %}` / `{% javascripts %}` blocks → AssetMapper (**428 blocks**)
-- [ ] PDF pipeline off the abandoned wkhtmltopdf shims; PHPExcel → PhpSpreadsheet
-- [ ] Render-test templates against real data
+- [x] **1,079 Assetic blocks** → 1,523 `asset()` references across 759 templates.
+      `symfony/assetic-bundle` has no Symfony 3+ release, so every one of those templates threw
+      "Unknown tag" at render time. `cssrewrite` only mattered because Assetic moved files while
+      concatenating them; each file is now served from the path it already had, so the emitted
+      URLs are unchanged and concatenation becomes a deploy-time concern. `port-assetic.php` also
+      copies the bundles' `Resources/public` into `public/bundles/`, which is what
+      `assets:install` did
+- [x] PHPExcel + liuggio/excelbundle → PhpSpreadsheet behind `SpreadsheetFactory`, which keeps
+      liuggio's method names so the 14 importers and the one exporter did not change
+- [x] gregwar/image-bundle → `App\Tool\Image\*` over gregwar/image. The bundle installs but is
+      a fatal on boot: its DI extension still declares `load()` without a return type. 174
+      templates call `image(...).resize(...)`
+- [x] twig/extensions → `App\Tool\Twig\TextExtension` (the one filter in use)
+- [x] `form_enctype()` and the `sameas` test
+- [x] Render-tested as far as static analysis allows: `lint:twig` passes on 1,795 of 1,797
+      templates. The two exceptions are FOSCommentBundle's own, and need its Twig extension
+- [ ] PDF pipeline: `Knp\Snappy\Pdf` is installed again and the 33 call sites work, but
+      wkhtmltopdf itself is EOL and the binary path is still hard-coded per environment.
+      Replacing the binary is a deployment decision, not a port
 
-### Phase 5 — Module ports — mechanical layer done, semantic layer outstanding
+> The comment widget is **not** ported. FOSCommentBundle's REST API has no routes here, so the
+> five templates that embedded it were calling `path('fos_comment_get_threads')` and would have
+> thrown. Those includes are behind a `comments_enabled` global, defaulting to false, rather
+> than half-implementing a public write API without its ACL. The entities and templates are
+> kept, so porting it later is a contained piece of work.
+
+### Phase 5 — Module ports ✅ mechanically complete; per-module verification outstanding
 
 Every module's controllers, forms, services and listeners are ported, load and resolve.
-Controllers now extend `AbstractController` with constructor injection: Symfony 8 removed
-`getDoctrine()` and `get()`, so all 5,838 Doctrine calls and 1,374 service-locator calls were
-rewritten (`$this->get('session')` → `RequestStack`, `$this->get('request')` → the current
-request, `security.context->getToken()->getUser()` → `getUser()`, and so on).
 
-> Two controllers alias a FOSUserBundle controller as `Controller`
-> (`use FOS\UserBundle\Controller\GroupController as Controller`). Rewriting their
-> `extends Controller` would have silently changed which class they extend, so the transform
-> requires the FrameworkBundle import to be present and flags those two instead.
-
-What is left is per-module semantic work that automation would have gotten wrong:
-
-- [ ] **317 form-type instantiations across 172 files** (`createForm(new XType($deps))` and
-      `$builder->add('f', new XType($deps))`). Symfony 3 removed instance-passing; each dependency
-      must move into that type's `configureOptions()`. Every site carries a `TODO(migration)`
-      comment naming its arguments; the files are listed in
-      `migration/contract/manual-form-files.txt`, and the 214 affected types are excluded from
-      service registration in `next/config/services_legacy.yaml`. **Remove a type from that file as
-      you convert it.**
-- [ ] **205 unresolvable Doctrine aliases** (`migration/contract/unresolved-dql-aliases.txt`) —
-      these name entities that do not exist in the legacy tree either (`Blog`, `Admission`,
-      `MallConnect`, `Team`, `EcommerceMenu`, `MegaMenu`, `Course`, `InstituteLevel`). Dead code:
-      decide per route whether to restore the entity or delete the controller.
-- [ ] **19 template references to bundles that never existed here** (`DocudexUserBundle`) —
-      leftovers from another project; dead today.
-- [ ] **419 routes that cannot resolve** (`migration/contract/unresolvable-routes.md`) — dead in
-      the legacy tree too; delete the route or restore the controller
-- [ ] **3 controllers extending FOSUserBundle bases** (Group, Registration, Profile) — reimplement
-      the inherited behaviour on `AbstractController`
-- [ ] **25 files with `TODO(migration)` markers** for services with no mechanical equivalent
-      (`fos_user.user_manager`, `phpexcel`, custom importers)
-- [ ] 48 broken bidirectional associations (`migration/contract/broken-associations.md`)
+- [x] Controllers on `AbstractController` with constructor injection: 5,838 Doctrine calls and
+      1,374 service-locator calls rewritten, then the remaining 140 `$this->get('id')` sites
+      injected by class (`port-service-locator.php`). **336 of 336 controllers load.**
+- [x] The Symfony 2 form API, across 356 form types: string type names → FQCN (328),
+      `property` → `choice_label` (497), `empty_value` → `placeholder` (495),
+      `setDefaultOptions` → `configureOptions` (22), `getName` → `getBlockPrefix` (22),
+      **choices flipped** (214, §5.15), 542 `new XType($deps)` call sites → `XType::class` plus
+      options, and 213 form-type constructors moved into `configureOptions()`. No form type takes
+      constructor arguments any more, so the 214-entry exclusion list in `services_legacy.yaml`
+      is empty and every type autowires
+- [x] 351 `$form->isValid()` calls given their `isSubmitted()` guard — Symfony 3 throws rather
+      than returning false, so each was a 500 on the first GET of its page
+- [x] 24 `dispatch('name', $event)` calls swapped to Symfony 5's argument order
+- [x] `ContainerAwareTrait`, `ContainerAware` and `ContainerAwareCommand`, all removed by
+      Symfony 5-7; the four console commands carry `#[AsCommand]` and their return types
+- [x] The bundles' service definitions (§5.16) and the Gedmo listeners (§5.17)
+- [x] 48 broken bidirectional associations (§5.6) — the mapping validates completely
+- [x] 419 routes with no controller or action removed, catalogued (§5.12)
+- [ ] **205 unresolvable Doctrine aliases** (`migration/contract/unresolved-dql-aliases.txt`).
+      These name entities that exist in neither tree (`Blog`, `Admission`, `MallConnect`, `Team`,
+      `EcommerceMenu`, `MegaMenu`, `Course`, `InstituteLevel`), and no table for any of them
+      appears in the production dump either. The controllers that reference them are dead code
+      whose routes still resolve; deleting a customer-facing controller is a product decision, so
+      they are catalogued rather than removed
 - [ ] Verify behaviour against real data, module by module, before flipping each proxy route
+      (§8 gives the order)
 
-### Phase 6 — Decommission
+### Phase 6 — Decommission — needs production
 
-Unchanged: retire the PHP 7.4 pool, collapse proxy rules, drop shims that are no longer reachable.
-`LegacyArrayType` stays until §7 is done deliberately.
+Unchanged, and unchangeable from here: retire the PHP 7.4 pool, collapse the proxy rules, drop
+the shims that are no longer reachable. `LegacyArrayType` stays until §7 is done deliberately.
 
 ## 7. Deferred work — deliberately not done during the migration
 
@@ -463,28 +631,32 @@ layer and ships in Phase 3.
 
 ## 9. Dependency replacement table
 
-No Symfony 5/6/7/8 release exists for any of these.
+No Symfony 5/6/7/8 release exists for any of these. All are resolved.
 
 | Package | Locked | Replacement |
 |---|---|---|
-| `friendsofsymfony/user-bundle` | dev-master | ✅ `App\Security\Model\BaseUser` + native security |
-| `friendsofsymfony/comment-bundle` | 2.0.8 | ✅ `App\Comment\Model\Base{Comment,Thread}` |
+| `friendsofsymfony/user-bundle` | dev-master | ✅ `App\Security\Model\BaseUser` + native security, `App\User\Manager\*`, `App\User\Form\Type\*` |
+| `friendsofsymfony/comment-bundle` | 2.0.8 | ✅ `App\Comment\Model\Base{Comment,Thread}` (entities). The REST API is **not** ported — see phase 4 |
 | `sensio/distribution-bundle` | 5.0.21 | ✅ Symfony Flex |
 | `sensio/generator-bundle` | 2.5.3 | ✅ MakerBundle |
-| `jms/security-extra-bundle` | 1.6.1 | `#[IsGranted]` — 112 files |
-| `jms/di-extra-bundle` | 1.6.0 | Autowiring |
-| `jms/aop-bundle` | 1.2.0 | Drop |
-| `symfony/assetic-bundle` + `kriswallsmith/assetic` | 2.7.1 / 1.3.2 | AssetMapper — 428 blocks |
-| `friendsofsymfony/rest-bundle` | 1.5.3 | Native controllers + Serializer — 96 endpoints |
-| `phpoffice/phpexcel` + `liuggio/excelbundle` | 1.8.1 | PhpSpreadsheet |
-| `h4cc/wkhtmltopdf-amd64` / `-image-` | 0.12.2.1 | Re-plumb; wkhtmltopdf is EOL |
-| `symfony/security-acl` | 3.0.1 | Voters — 9 files |
-| `divi/ajax-login-bundle` | dev-master | Drop |
-| `xiidea/ez-maintenance` | 1.0.0 | Drop |
-| `gregwar/image-bundle` | 2.1.3 | Evaluate; 13 model files reference it |
+| `jms/security-extra-bundle` | 1.6.1 | ✅ `#[IsGranted]` — 521 conversions across 112 files |
+| `jms/di-extra-bundle` | 1.6.0 | ✅ Autowiring |
+| `jms/aop-bundle` | 1.2.0 | ✅ Dropped, unused |
+| `symfony/assetic-bundle` + `kriswallsmith/assetic` | 2.7.1 / 1.3.2 | ✅ Plain `asset()` — 1,079 blocks, 1,523 references |
+| `friendsofsymfony/rest-bundle` | 1.5.3 | ✅ Explicit routes; the controllers never used its view layer |
+| `phpoffice/phpexcel` + `liuggio/excelbundle` | 1.8.1 | ✅ PhpSpreadsheet behind `App\Tool\Service\SpreadsheetFactory` |
+| `swiftmailer/swiftmailer` | 5.x | ✅ `symfony/mailer`, same `EasyMailer` signature |
+| `twig/extensions` | 1.x | ✅ `App\Tool\Twig\TextExtension` (`truncate`) |
+| `eightpoints/guzzle-bundle` | 4.5 | ✅ A plain `GuzzleHttp\Client` definition with api_crm's base URI |
+| `h4cc/wkhtmltopdf-amd64` / `-image-` | 0.12.2.1 | ⚠️ `knplabs/knp-snappy` reinstated so the 33 call sites work; the wkhtmltopdf binary is EOL and remains a deployment decision |
+| `symfony/security-acl` | 3.0.1 | ✅ Nothing to do — no ACL API is used in either tree |
+| `divi/ajax-login-bundle` | dev-master | ✅ Dropped |
+| `xiidea/ez-maintenance` | 1.0.0 | ✅ Dropped |
+| `gregwar/image-bundle` | 2.1.3 | ✅ `App\Tool\Image\*` over `gregwar/image`; the bundle itself is a fatal on Symfony 8 |
+| `stof/doctrine-extensions-bundle` | 1.x | ✅ Registered and configured — it had been neither (§5.17) |
 
-Note: four constraints in `composer.json` are unpinned (`dev-master` / `@stable`), so the
-legacy build is reproducible only from `composer.lock`, not from `composer.json`.
+Note: four constraints in the legacy `composer.json` are unpinned (`dev-master` / `@stable`), so
+the legacy build is reproducible only from `composer.lock`, not from `composer.json`.
 
 ---
 
@@ -492,21 +664,44 @@ legacy build is reproducible only from `composer.lock`, not from `composer.json`
 
 | Risk | Mitigation |
 |---|---|
-| **No test suite** — nothing catches a regression in 700k lines | Golden-response harness covers the 96 mobile endpoints. Extend record-and-diff to the highest-traffic HTML routes per module; cheaper than retrofitting unit tests |
+| **No test suite** — nothing catches a regression in 700k lines | Four checks now run without a database and belong in CI: `verify-columns.php`, `check-routes.php`, `check-api-contract.php`, `validate-mapping.php`. They catch the class of defect that actually bit during this port — silent renames and dangling references. Extend record-and-diff to the highest-traffic HTML routes per module; cheaper than retrofitting unit tests |
+| **The shared database is the real contract** | `verify-columns.php` compares every ported column name against the legacy annotations and must stay at 0. It caught 782 divergences from one line of configuration (§5.13) |
 | **Symfony 8.1 reaches EOL Jan 2027** — the migration will outlive it | Minor Symfony upgrades are BC-safe. Ride 8.2 → 8.3 → 8.4 (next LTS, Nov 2027). Budget a day per bump |
-| **Shared database, two writers** | Schema changes additive-only until decommission. Never let a port alter a column the legacy app still reads |
+| **Shared database, two writers** | Schema changes additive-only until decommission. The only additive change this migration needs is the `sessions` table |
 | **Serialized `array` columns** | Keep `LegacyArrayType` registered for the whole migration; convert per §7 |
-| **Mobile clients cannot update in lockstep** | `compare.php` gates every API deploy; drift is a release blocker |
+| **Mobile clients cannot update in lockstep** | `check-api-contract.php` gates the URLs today; `compare.php` gates response shape once a baseline exists. Drift is a release blocker |
 | **Password rehashing is one-way** | Expected and safe; remove the legacy hasher on telemetry, not a schedule |
+| **Turning on the session bridge logs everyone out once** | Deliberate deploy step in a quiet window, documented with its rollback in `migration/session-bridge.md` |
 
 ---
 
-## 11. Not yet possible in this environment
+## 11. What still needs a running system
 
-Nothing has been run against real data. The legacy app has no `vendor/`, no
-`app/config/parameters.yml`, and no reachable database, so these remain open:
+The application has never served a request against real data. What that leaves open:
 
-- [ ] **Golden API capture** — needs a staging base URL and API credentials in `migration/capture-config.json`
-- [ ] **Schema diff** — compare the ported mapping against the live `terminalbd` schema and confirm every one of the 335 entities matches its real table. Needs a real dump or a read-only connection. (`ammar_db.sql.gz` in the repo root is *not* usable: `file` identifies it as an HTML document, not gzipped SQL — probably a failed download.)
-- [ ] **Verify the 24 serialized columns** actually contain `serialize()` output and not a mix of formats
-- [ ] **Confirm `fos_user` column set** matches the reproduced `BaseUser` on the real database
+- [ ] **Golden API capture** — `capture.php` needs a staging base URL and API credentials in
+      `migration/capture-config.json`. Until it runs, the mobile contract is verified
+      structurally (the endpoint resolves, at the same path) but not by response shape
+- [ ] **Per-module behaviour checks** before each proxy flip, in the order §8 gives
+- [ ] **The session bridge deploy step** — `migration/session-bridge.md`
+- [ ] **Decommissioning** the PHP 7.4 pool and collapsing the proxy rules
+
+Done since this section was first written:
+
+- [x] **Schema diff** — `schema-diff.php` runs against `bm_db.sql.gz` (Adminer dump, 155 tables,
+      one tenant). 121 entities match a table in it; 74 mapped columns are absent from that dump
+      and 18 of its columns are unmapped. Those are the dump's age, not port defects —
+      `medicine_sales.is_online` and its neighbours do not exist in that database at all.
+      The authority on port correctness is `verify-columns.php`, which compares against the
+      legacy annotations rather than one tenant's snapshot, and reports **0** differences.
+      (The earlier `ammar_db.sql.gz` was unusable — `file` identified it as an HTML document.)
+- [x] **The serialized columns** — 9 of the 24 belong to tables this dump carries, and the one
+      that matters most has data to check: `fos_user.roles` holds
+      `a:1:{i:0;s:16:"ROLE_SUPER_ADMIN";}` — `serialize()` output, exactly what
+      `LegacyArrayType` expects and what §5.1 predicted. The other eight columns have no rows in
+      this tenant's database, so they stay unconfirmed; a dump from a tenant that uses those
+      modules would close it
+- [x] **`fos_user` column set** — the table in the dump has 25 columns and the ported mapping
+      declares the same 25: nothing mapped is missing from the table, and nothing in the table is
+      unmapped. The password column holds 88-character base64 with a 32-character salt beside it,
+      which is the format the migrating hasher is configured to verify

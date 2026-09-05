@@ -119,7 +119,10 @@ function readArray(string $code, int $pos): ?array
     return null;
 }
 
-$stats = ['empty_value' => 0, 'virtual' => 0, 'cascade_validation' => 0, 'choices flipped' => 0, 'choices_as_values dropped' => 0, 'choices skipped' => 0, 'files' => 0];
+/** Helpers returning a Symfony 2 value => label list at runtime. */
+const RUNTIME_VALUE_LABEL_LISTS = ['getAccessRoleGroup', 'getAppRoleGroup'];
+
+$stats = ['runtime choice lists flipped' => 0, 'empty_value' => 0, 'virtual' => 0, 'cascade_validation' => 0, 'choices flipped' => 0, 'choices_as_values dropped' => 0, 'choices skipped' => 0, 'files' => 0];
 $skipped = [];
 
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/src'));
@@ -215,6 +218,25 @@ foreach ($iterator as $file) {
 
     $code = preg_replace('/\s*([\'"])choices_as_values\1\s*=>\s*[^,\]\)]+,?/', '', $code, -1, $n);
     $stats['choices_as_values dropped'] += $n;
+
+    // Choice lists built at runtime cannot be flipped in place. The role lists
+    // are the ones that matter - UserRepository returns
+    // [group => [ROLE_X => 'Label']], Symfony 2's order - and they are read by
+    // non-form code too, so they are flipped at the call site.
+    foreach (RUNTIME_VALUE_LABEL_LISTS as $method) {
+        $code = preg_replace(
+            '/([\'"]choices[\'"]\s*=>\s*)\$this->' . preg_quote($method, '/') . '\(\)/',
+            '$1ChoiceList::flip($this->' . $method . '())',
+            $code,
+            -1,
+            $n,
+        );
+        $stats['runtime choice lists flipped'] += $n;
+
+        if ($n > 0 && !str_contains($code, 'use App\\Form\\ChoiceList;')) {
+            $code = preg_replace('/^(namespace [^;]+;\n)/m', "$1\nuse App\\Form\\ChoiceList;\n", $code, 1);
+        }
+    }
 
     if ($code !== $original) {
         ++$stats['files'];

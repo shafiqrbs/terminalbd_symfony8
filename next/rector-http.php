@@ -22,8 +22,16 @@ return RectorConfig::configure()
             __DIR__ . '/src/Security',
             __DIR__ . '/src/Comment',
             __DIR__ . '/src/Doctrine',
-
         ],
+        // ... and every other hand-written replacement; see
+        // migration/hand-written.txt.
+        array_map(
+            static fn (string $line): string => __DIR__ . '/' . $line,
+            array_values(array_filter(array_map(
+                static fn (string $line): string => trim(explode('#', $line, 2)[0]),
+                file(dirname(__DIR__) . '/migration/hand-written.txt'),
+            ))),
+        ),
         // FormTypeInstanceToClassConstRector converts `createForm(new XType())`
         // to `createForm(XType::class)` correctly, but crashes on the sites that
         // pass constructor dependencies - and a crash skips the whole file. Those

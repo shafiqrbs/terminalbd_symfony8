@@ -106,7 +106,7 @@ class ItemController extends AbstractController
         $categoryName = $data['item']['category'];
         $brandName = (isset($data['item']['brand']) and $data['item']['brand']) ? $data['item']['brand'] :'';
         $vendorName = (isset($data['item']['vendor']) and $data['item']['vendor']) ? $data['item']['vendor'] :'';
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $checkData = $this->em->getRepository(\App\Inventory\Entity\Item::class)->checkDuplicateSKU($inventory,$data);
             $barcode = (isset($data['item']['barcode']) and $data['item']['barcode']) ? $data['item']['barcode']:'';
             $barcodeCount = $this->em->getRepository(\App\Inventory\Entity\Item::class)->getExistBarcode($inventory->getId(),$barcode);
@@ -337,7 +337,7 @@ class ItemController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         $erors = $editForm->getErrors();
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if(empty($entity->getItemUnit())){
                 $unit = $this->em->getRepository(\App\Tool\Entity\ProductUnit::class)->find(4);
                 $entity->setItemUnit($unit);
@@ -377,7 +377,7 @@ class ItemController extends AbstractController
 
         $editForm = $this->createWebForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(
@@ -740,7 +740,6 @@ class ItemController extends AbstractController
 		$global = $this->getUser()->getGlobalOption();
 		$data = $_REQUEST;
 		$entities = $this->em->getRepository(\App\Inventory\Entity\SalesItem::class)->gpProductWiseSales($global,$data);
-		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$phpExcelObject = $this->spreadsheetFactory->createPHPExcelObject();
 
 		$phpExcelObject->setActiveSheetIndex(0)
@@ -789,10 +788,8 @@ class ItemController extends AbstractController
 		$phpExcelObject->setActiveSheetIndex(0);
 
 		// create the writer
-		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$writer = $this->spreadsheetFactory->createWriter($phpExcelObject, 'Excel2007');
 		// create the response
-		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$response = $this->spreadsheetFactory->createStreamedResponse($writer);
 		// adding headers
 		$dispositionHeader = $response->headers->makeDisposition(

@@ -11,17 +11,11 @@ class SmsGateWay
 
     private $password;
 
-    /**
-     * @var Client
-     */
-    private $client;
-
-    public function  __construct(private $username, $password, Client $client)
+    public function  __construct(private $username, $password, private readonly Client $client)
     {
 
         $this->password = $password;
         $this->password = $password;
-        $this->client = $client;
     }
 
     public function sendPrevious($msg, $phone){

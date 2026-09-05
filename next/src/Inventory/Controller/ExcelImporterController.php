@@ -123,16 +123,12 @@ class ExcelImporterController extends AbstractController
         $inventory = $excelImporter->getInventoryConfig();
 
         if($excelImporter->getMode() == 'purchase'){
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $importer = $this->excel;
             $importer->setInventoryConfig($inventory->getId());
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $reader = $this->excelDataReader;
         }else{
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $importer = $this->productExcel;
             $importer->setExcelImport($excelImporter);
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $reader = $this->productDataReader;
         }
         $file =  realpath($excelImporter->getAbsolutePath());

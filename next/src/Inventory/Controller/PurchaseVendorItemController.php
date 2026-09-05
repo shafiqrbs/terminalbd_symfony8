@@ -72,7 +72,7 @@ class PurchaseVendorItemController extends AbstractController
         $form = $this->createCreateForm($entity,$purchase->getId());
         $form->handleRequest($request);
         if( $this->checkItemQuantity($purchase, $vendorQnt) == true ){
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $em = $this->em;
 
                 $masterItem = $this->em->getRepository(\App\Inventory\Entity\Product::class)->findOneBy(array('inventoryConfig' => $purchase->getInventoryConfig(),'name' => $entity->getName()));
@@ -242,7 +242,7 @@ class PurchaseVendorItemController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if(!empty($entity->upload())) {
                 $entity->removeUpload();
             }

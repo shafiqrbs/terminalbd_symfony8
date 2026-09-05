@@ -176,7 +176,14 @@ foreach ($files ?? [] as $path) {
         // the ones that are now autowired, and several of those services are
         // gone (fos_user.*, security.encoder_factory). Keep only the scalars
         // the constructor actually needs and let autowiring do the rest.
-        $reflection = class_exists($class) ? new ReflectionClass($class) : null;
+        // Loading a ported class can fatal on a parent that no longer exists.
+        // Report it and move on: the definition is dropped, not the pipeline.
+        try {
+            $reflection = class_exists($class) ? new ReflectionClass($class) : null;
+        } catch (Throwable $e) {
+            $dropped[] = $id . ' (' . $class . ' cannot be loaded: ' . $e->getMessage() . ')';
+            continue;
+        }
         $ctor = $reflection?->getConstructor();
         $scalars = [];
 

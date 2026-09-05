@@ -80,7 +80,9 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/
     $path = $file->getPathname();
     $code = file_get_contents($path);
 
-    if (!preg_match('/\$this->(container->)?get\(/', $code)) {
+    // Files whose calls are already converted still carry the marker.
+    if (!preg_match('/\$this->(container->)?get\(/', $code)
+        && !str_contains($code, 'TODO(migration): AbstractController::')) {
         continue;
     }
 
@@ -200,6 +202,23 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/
             $code,
         );
     }
+
+    // port-controllers.php leaves a marker above each $this->get() it could
+    // not convert; the ones converted here no longer need it.
+    $lines = explode("\n", $code);
+    $kept = [];
+
+    for ($i = 0, $count = count($lines); $i < $count; ++$i) {
+        if (preg_match('/^\s*\/\/ TODO\(migration\): AbstractController::(get|getDoctrine)\(\) was removed/', $lines[$i])
+            && isset($lines[$i + 1])
+            && !preg_match('/(?:this|container)->get(?:Doctrine)?\(/', $lines[$i + 1])) {
+            continue;
+        }
+
+        $kept[] = $lines[$i];
+    }
+
+    $code = implode("\n", $kept);
 
     if ($code !== $original) {
         ++$stats['files'];

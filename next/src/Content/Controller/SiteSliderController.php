@@ -55,7 +55,6 @@ class SiteSliderController extends AbstractController
             $em = $this->em;
             $em->persist($entity);
 
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $uploadableManager = $this->uploadableManager;
 
             // Here, "getMyFile" returns the "UploadedFile" instance that the form bound in your $myFile property
@@ -185,7 +184,6 @@ class SiteSliderController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
 	        $entity->upload();
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             //$uploadableManager = $this->uploadableManager;
             // Here, "getMyFile" returns the "UploadedFile" instance that the form bound in your $myFile property
             //$uploadableManager->markEntityToUpload($entity, $entity->getFile());

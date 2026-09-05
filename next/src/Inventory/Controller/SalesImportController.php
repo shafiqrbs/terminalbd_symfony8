@@ -108,10 +108,8 @@ class SalesImportController extends AbstractController
         set_time_limit(0);
         ignore_user_abort(true);
         $em = $this->em;
-        // TODO(migration): AbstractController::get() was removed; inject this service.
         $importer = $this->salesExcel;
         $importer->setSalesImport($SalesImport);
-        // TODO(migration): AbstractController::get() was removed; inject this service.
         $reader = $this->salesDataReader;
         $file =  realpath($SalesImport->getAbsolutePath());
         $importer->import($reader->getData($file));

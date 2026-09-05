@@ -112,6 +112,8 @@ class AssociationController extends AbstractController
     private function createCreateForm(Customer $entity)
     {
         $em = $this->em->getRepository(\App\DomainUser\Entity\Customer::class);
+        // TODO(migration): SF3+ takes a form type class-string, not an instance.
+        // Move these constructor arguments into MemberEditProfileType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new MemberEditProfileType($em), $entity, array(
             'action' => $this->generateUrl('domain_association_create'),
             'method' => 'POST',
@@ -253,6 +255,8 @@ class AssociationController extends AbstractController
     private function createEditForm(Customer $entity)
     {
         $em = $this->em->getRepository(\App\DomainUser\Entity\Customer::class);
+        // TODO(migration): SF3+ takes a form type class-string, not an instance.
+        // Move these constructor arguments into MemberEditProfileType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new MemberEditProfileType($em), $entity, array(
             'action' => $this->generateUrl('domain_association_profile_update', array('id' => $entity->getId())),
             'method' => 'PUT',

@@ -324,7 +324,57 @@ foreach ($iterator as $file) {
     }
 }
 
+// mark-manual-forms.php runs before this and leaves a TODO at every site that
+// still passed an instance. Those that have been converted no longer need it.
+$markersRemoved = 0;
+
+foreach ($iterator as $file) {
+    if ($file->getExtension() !== 'php') {
+        continue;
+    }
+
+    $path = $file->getPathname();
+    $code = file_get_contents($path);
+
+    if (!str_contains($code, 'TODO(migration): SF')) {
+        continue;
+    }
+
+    $lines = explode("\n", $code);
+    $kept = [];
+
+    for ($i = 0, $count = count($lines); $i < $count; ++$i) {
+        if (!preg_match('/^\s*\/\/ TODO\(migration\): SF\d?\+? takes a form type class-string/', $lines[$i])) {
+            $kept[] = $lines[$i];
+            continue;
+        }
+
+        // Look at the first line after the marker and its continuations.
+        $j = $i + 1;
+
+        while ($j < $count && preg_match('/^\s*\/\/ (Move these constructor arguments|and pass them)/', $lines[$j])) {
+            ++$j;
+        }
+
+        if ($j < $count && str_contains($lines[$j], 'new ')) {
+            // Still an instance: keep the marker.
+            $kept[] = $lines[$i];
+            continue;
+        }
+
+        $i = $j - 1;
+        ++$markersRemoved;
+    }
+
+    $updated = implode("\n", $kept);
+
+    if ($updated !== $code && !$dryRun) {
+        file_put_contents($path, $updated);
+    }
+}
+
 printf("call sites converted:                    %d (in %d files)\n", $converted, $touched);
+printf("stale TODO markers removed:              %d\n", $markersRemoved);
 
 if ($unknown !== []) {
     printf("skipped - type not found in src/:        %d\n", array_sum($unknown));

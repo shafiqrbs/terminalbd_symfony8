@@ -53,7 +53,7 @@ class ItemImporterController extends AbstractController
         $entity = new ItemImport();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
             $entity->setRestaurantConfig($config);
@@ -112,10 +112,8 @@ class ItemImporterController extends AbstractController
         set_time_limit(0);
         ignore_user_abort(true);
         $em = $this->em;
-        // TODO(migration): AbstractController::get() was removed; inject this service.
         $importer = $this->productExcel;
         $importer->setItemImport($ItemImporter);
-        // TODO(migration): AbstractController::get() was removed; inject this service.
         $reader = $this->productDataReader;
         $file =  realpath($ItemImporter->getAbsolutePath());
         $data = $reader->getData($file);
@@ -181,7 +179,7 @@ class ItemImporterController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             return $this->redirect($this->generateUrl('restaurant_itemimporter_edit', array('id' => $id)));
         }

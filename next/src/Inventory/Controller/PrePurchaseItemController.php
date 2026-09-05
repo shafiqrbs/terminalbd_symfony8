@@ -50,7 +50,7 @@ class PrePurchaseItemController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $entity->setInventoryConfig($inventory);
@@ -177,7 +177,7 @@ class PrePurchaseItemController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"

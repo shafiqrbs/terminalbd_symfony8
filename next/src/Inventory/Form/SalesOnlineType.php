@@ -127,6 +127,8 @@ class SalesOnlineType extends AbstractType
                 'choices' => array('In-progress' => 'In-progress', 'Done' => 'Done', 'Delivered' => 'Delivered', 'Courier' => 'Courier', 'Cancel' => 'Cancel', 'Returned' => 'Returned'),
             ))
 	        ->add('remark', TextareaType::class, array('attr'=>array('class'=>'m-wrap span12 customer-input','rows'=>2,'placeholder'=>'Enter narration')));
+           // TODO(migration): SF3+ takes a form type class-string, not an instance.
+           // Move these constructor arguments into SalesOnlineCustomerType::configureOptions() and pass them as form options: $this->location
            // $builder->add('customer', new SalesOnlineCustomerType($this->location));
 
     }

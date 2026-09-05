@@ -67,6 +67,7 @@ require __DIR__ . '/hand-written.php';
 
 $handWritten = handWrittenFiles();
 $skipped = 0;
+$mismatched = [];
 
 $stats = ['tpl_refs' => 0, 'ctrl_refs' => 0];
 
@@ -136,14 +137,29 @@ foreach ($phpFiles as $p) {
 
     $target = "$root/next/src/" . str_replace('\\', '/', substr($newNs, strlen('App\\'))) . '/' . basename($p);
 
+    // Written for the legacy application only: the Symfony 8 half of the
+    // session bridge is App\Security\SharedSessionAuthenticator.
+    if (str_ends_with($p, 'Core/UserBundle/EventListener/SharedSessionListener.php')) { continue; }
+
     // A hand-written replacement is never overwritten by its ported original.
     if (isset($handWritten[substr($target, strlen("$root/next/"))])) { $skipped++; continue; }
+
+    // A file whose class name does not match its file name was never loadable
+    // under PSR-0 either, so it is dead in the legacy tree. Copying it in makes
+    // it a duplicate declaration, because Symfony and Doctrine both scan the
+    // directory rather than autoload it.
+    if (preg_match('/^(?:final |abstract )?class\s+(\w+)/m', $out, $cm)
+        && $cm[1] !== basename($p, '.php')) {
+        $mismatched[] = substr($p, strlen("$root/")) . " declares class {$cm[1]}";
+        continue;
+    }
 
     if (!$dryRun) { @mkdir(dirname($target), 0775, true); file_put_contents($target, $out); }
     $written++;
 }
 printf("%s %d php files (controllers, forms, services, listeners)\n", $dryRun ? 'would write' : 'wrote', $written);
 if ($skipped) printf("  kept %d hand-written file(s) - see migration/hand-written.txt\n", $skipped);
+foreach ($mismatched as $line) printf("  skipped dead file: %s\n", $line);
 if ($unmapped) printf("  unmapped namespaces: %s\n", implode(', ', array_keys($unmapped)));
 
 // ---- 2. templates ----------------------------------------------------------

@@ -81,6 +81,8 @@ class MegaMenuController extends AbstractController
         $sr = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
         $go = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class);
 
+        // TODO(migration): SF3+ takes a form type class-string, not an instance.
+        // Move these constructor arguments into MegaMenuType::configureOptions() and pass them as form options: $em, $cr , $sr, $go), $entity, array(
         $form = $this->createForm(new MegaMenuType($em, $cr , $sr, $go), $entity, array(
             'action' => $this->generateUrl('megamenu_create'),
             'method' => 'POST',
@@ -178,6 +180,8 @@ class MegaMenuController extends AbstractController
         $em = $this->em->getRepository(\App\Product\Entity\Category::class);
         $cr = $this->em->getRepository(\App\Product\Entity\Collection::class);
         $sr = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
+        // TODO(migration): SF3+ takes a form type class-string, not an instance.
+        // Move these constructor arguments into MegaMenuType::configureOptions() and pass them as form options: $em, $cr,$sr), $entity, array(
         $form = $this->createForm(new MegaMenuType($em, $cr,$sr), $entity, array(
             'action' => $this->generateUrl('megamenu_update', array('id' => $entity->getId())),
             'method' => 'PUT',

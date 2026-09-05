@@ -64,7 +64,6 @@ class ManageUserController extends AbstractController
 
         $user = new User();//$userManager->createUser();
 
-	    // TODO(migration): AbstractController::get() was removed; inject this service.
 	    $service = $this->userType;
 
         $form = $this->createForm($service, $user);
@@ -94,7 +93,6 @@ class ManageUserController extends AbstractController
     {
         $userManager = $this->getUserManager();
 
-	    // TODO(migration): AbstractController::get() was removed; inject this service.
 	    $service = $this->userType;
 	    $form = $this->createForm($service, $user);
 
@@ -122,9 +120,7 @@ class ManageUserController extends AbstractController
         ]);
     }
 
-    /**
-     * @JMS\Secure(roles="ROLE_USER_DELETE")
-     */
+    #[IsGranted('ROLE_USER_DELETE')]
     public function deleteAction(Request $request, User $user)
     {
         $userManager = $this->getUserManager();
@@ -241,6 +237,7 @@ class ManageUserController extends AbstractController
 
                 $userManager = $this->getUserManager();
                 $userManager->updateUser($user);
+
 
                 $this->requestStack->getSession()->getFlashBag()->add(
                     'user-success',

@@ -146,9 +146,7 @@ class MedicineImportController extends AbstractController
 		ini_set('max_execution_time', 0);
 		ignore_user_abort(true);
 		$em = $this->em;
-		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$importer = $this->excel;
-		// TODO(migration): AbstractController::get() was removed; inject this service.
 		$reader = $this->excelDataReader;
 		$file =  realpath($excelImporter->getAbsolutePath());
 		$data = $reader->getData($file);
@@ -232,7 +230,6 @@ class MedicineImportController extends AbstractController
                     if (!file_exists($entity->getUploadDir())) {
                         mkdir($entity->getUploadDir(), 0777, true);
                     }
-                    // TODO(migration): AbstractController::get() was removed; inject this service.
                     $this->imageResizer->resizeImage(480, $path, $img);
                     $entity->setPath($imgName);
                     $em->persist($entity);

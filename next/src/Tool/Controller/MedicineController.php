@@ -105,7 +105,6 @@ class MedicineController extends AbstractController
             if (!file_exists($entity->getUploadDir())) {
                 mkdir($entity->getUploadDir(), 0777, true);
             }
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $this->imageResizer->resizeImage(480, $path, $file);
             $entity->setPath($imgName);
             $em->persist($entity);

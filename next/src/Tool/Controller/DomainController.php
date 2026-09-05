@@ -208,7 +208,6 @@ class DomainController extends AbstractController
             //$a = mt_rand(1000,9999);
             $a = '*148148#';
             $entity->setPlainPassword($a);
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $this->userManager->updateUser($entity);
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Change password successfully"
@@ -224,7 +223,6 @@ class DomainController extends AbstractController
         if(!empty($entity)){
             $a = $request->request->get('password');
             $entity->setPlainPassword($a);
-            // TODO(migration): AbstractController::get() was removed; inject this service.
             $this->userManager->updateUser($entity);
             $dispatcher = $this->eventDispatcher;
             $dispatcher->dispatch(new PasswordChangeDomainSmsEvent($option,$entity->getUsername(),$a), 'setting_tool.post.change_domain_password');
@@ -394,7 +392,6 @@ class DomainController extends AbstractController
 
         exec("rm -rf app/cache/*");
         exec("rm -rf app/logs/*");
-        // TODO(migration): AbstractController::get() was removed; inject this service.
         $kernel = $this->kernel;
         $application = new Application($kernel);
         $application->setAutoExit(false);

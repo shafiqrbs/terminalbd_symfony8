@@ -165,6 +165,12 @@ foreach ($em->getMetadataFactory()->getAllMetadata() as $meta) {
 
             $block = attributeBlock($code, $property);
 
+            // Doctrine reports two problems for the same property in one case;
+            // the second arrives after the mapping is already gone.
+            if ($block === null && preg_match('/(?:private|protected|public)\s+\$' . preg_quote($property, '/') . '\b/', $code)) {
+                continue;
+            }
+
             if ($block !== null) {
                 [$from, $to] = $block;
                 $note = "    // Was a OneToMany mappedBy '{$m[3]}', a field that does not exist on\n"

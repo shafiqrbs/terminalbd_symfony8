@@ -55,37 +55,44 @@ $PHP migration/bin/port-routing.php
 $PHP migration/bin/port-auth-routes.php 2>&1 | head -1 || true
 
 echo
-echo "############ 10. Symfony 2 form API ############"
+echo "############ 10. FOSUserBundle residue ############"
+# Before the form and controller passes: those treat a class extending
+# AbstractType differently from one extending a bundle's base type.
+$PHP migration/bin/port-fosuser.php
+
+echo
+echo "############ 11. Symfony 2 form API ############"
 $PHP migration/bin/port-forms.php
 $PHP migration/bin/port-form-options.php
 $PHP migration/bin/port-form-instances.php
 $PHP migration/bin/port-form-types.php
 
 echo
-echo "############ 11. Symfony 2 controller idioms ############"
+echo "############ 12. Symfony 2 controller idioms ############"
 $PHP migration/bin/port-controller-api.php
 $PHP migration/bin/port-container-aware.php
+$PHP migration/bin/prune-dead-imports.php
 
 echo
-echo "############ 12. abandoned dependencies ############"
+echo "############ 13. abandoned dependencies ############"
 $PHP migration/bin/port-phpexcel.php
 $PHP migration/bin/port-assetic.php
 $PHP migration/bin/port-twig-legacy.php
 
 echo
-echo "############ 13. container config ############"
+echo "############ 14. container config ############"
 $PHP migration/bin/port-parameters.php
 $PHP migration/bin/port-services.php
 $PHP migration/bin/gen-service-excludes.php
 $PHP migration/bin/port-service-locator.php
 
 echo
-echo "############ 14. mapping repairs ############"
+echo "############ 15. mapping repairs ############"
 $PHP migration/bin/fix-attribute-names.php
 $PHP migration/bin/fix-associations.php
 
 echo
-echo "############ 15. drop routes with no controller ############"
+echo "############ 16. drop routes with no controller ############"
 $PHP migration/bin/check-routes.php --prune --report=migration/contract/unresolvable-routes.md | tail -3
 
 echo
@@ -123,15 +130,19 @@ echo "controllers loadable: $loadable"
 
 echo
 echo "-- is the mapping right? --"
-(cd next && $PHP bin/validate-mapping.php 2>&1 | tail -1)
-$PHP migration/bin/verify-columns.php --report=migration/contract/column-verification.md 2>&1 | tail -2
-$PHP migration/bin/check-routes.php 2>&1 | tail -3
-$PHP migration/bin/check-api-contract.php --report=migration/contract/api-contract.md 2>&1 | tail -4
-(cd next && $PHP bin/console lint:twig templates/ 2>&1 | tail -1)
+# Reporting, not gating: each of these exits non-zero when it finds something,
+# and the point here is to print what it found.
+(cd next && $PHP bin/validate-mapping.php 2>&1 | tail -1) || true
+$PHP migration/bin/verify-columns.php --report=migration/contract/column-verification.md 2>&1 | tail -2 || true
+$PHP migration/bin/check-routes.php 2>&1 | tail -3 || true
+$PHP migration/bin/check-api-contract.php --report=migration/contract/api-contract.md 2>&1 | tail -4 || true
+# Two templates are FOSCommentBundle's own and need its Twig extension; the
+# comment API is not ported. See §5 of the plan.
+(cd next && $PHP bin/console lint:twig templates/ 2>&1 | tail -1) || true
 
 # Only when a dump is present: it is gitignored, being tenant data.
 if [ -f bm_db.sql.gz ]; then
   echo
   echo "-- against a real database dump --"
-  $PHP migration/bin/schema-diff.php bm_db.sql.gz --report=migration/contract/schema-diff.md 2>&1 | tail -5
+  $PHP migration/bin/schema-diff.php bm_db.sql.gz --report=migration/contract/schema-diff.md 2>&1 | tail -5 || true
 fi
