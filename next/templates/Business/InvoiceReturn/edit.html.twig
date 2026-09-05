@@ -165,11 +165,9 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@BusinessBundle/Resources/public/js/invoice-return.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/business/js/invoice-return.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

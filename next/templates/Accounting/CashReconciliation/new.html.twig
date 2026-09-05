@@ -400,11 +400,9 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@AccountingBundle/Resources/public/js/reconciliation.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/accounting/js/reconciliation.js') }}"></script>
+    
 {% endblock %}
 {% block documentready %}
     {{ parent() }}

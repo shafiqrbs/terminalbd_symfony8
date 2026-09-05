@@ -138,18 +138,14 @@
     </style>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@SettingToolBundle/Resources/public/css/print.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/settingtool/css/print.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@SettingToolBundle/Resources/public/js/print.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/settingtool/js/print.js') }}"></script>
+    
 {% endblock  %}
 

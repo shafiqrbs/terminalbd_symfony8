@@ -7,21 +7,15 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets  filter='cssrewrite'
 
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}" />
-    {% endstylesheets %}
 
 {% endblock stylesheets %}
 
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts
-    "assets/plugins/jquery-multi-select/js/jquery.multi-select.js"
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('assets/plugins/jquery-multi-select/js/jquery.multi-select.js') }}"></script>
+    
 {% endblock javascripts %}
 
 {% block documentready %}

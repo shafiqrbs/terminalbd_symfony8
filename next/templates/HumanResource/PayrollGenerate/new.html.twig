@@ -706,11 +706,9 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@HumanResourceBundle/Resources/public/js/approveProcess.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/humanresource/js/approveProcess.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

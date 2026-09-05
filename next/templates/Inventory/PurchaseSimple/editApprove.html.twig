@@ -266,12 +266,11 @@
     {% endblock %}
     {% block javascriptBlock %}
         {{ parent() }}
-        {% javascripts
-        '@InventoryBundle/Resources/public/js/puschase-simple.js'
-        '@InventoryBundle/Resources/public/js/editable.js'
-        %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
-        {% endjavascripts %}
+
+        <script type="text/javascript" src="{{ asset('bundles/inventory/js/puschase-simple.js') }}"></script>
+        
+        <script type="text/javascript" src="{{ asset('bundles/inventory/js/editable.js') }}"></script>
+        
     {% endblock  %}
     {% block documentready %}
     {{ parent() }}

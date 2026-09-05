@@ -212,12 +212,11 @@
 
     {{ parent() }}
 
-    {% javascripts
-    'assets/plugins/jquery-validation/dist/jquery.validate.min.js'
-    'assets/plugins/jquery-validation/dist/additional-methods.min.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('assets/plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('assets/plugins/jquery-validation/dist/additional-methods.min.js') }}"></script>
+    
 
 {% endblock javascripts %}
 

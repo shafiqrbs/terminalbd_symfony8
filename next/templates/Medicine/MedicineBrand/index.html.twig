@@ -107,11 +107,9 @@
     </div>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@MedicineBundle/Resources/public/css/datatable-pagination.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/medicine/css/datatable-pagination.css') }}"/>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

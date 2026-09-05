@@ -5,12 +5,11 @@
 
     {{ parent() }}
 
-    {% stylesheets  filter='cssrewrite'
-    'assets/plugins/select2/select2_metro.css'
-    'assets/plugins/bootstrap-fileupload/bootstrap-fileupload.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}" />
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('assets/plugins/select2/select2_metro.css') }}" />
+    
+    <link rel="stylesheet" href="{{ asset('assets/plugins/bootstrap-fileupload/bootstrap-fileupload.css') }}" />
+    
 
 {% endblock stylesheets %}
 
@@ -173,15 +172,17 @@
 
 {% block javascripts %}
 {{ parent() }}
-{% javascripts
-    'assets/plugins/select2/select2.min.js'
-    'assets/plugins/bootstrap-fileupload/bootstrap-fileupload.js'
-    'assets/plugins/jquery-validation/dist/jquery.validate.min.js'
-    'assets/plugins/jquery-validation/dist/additional-methods.min.js'
-    "assets/plugins/jquery-multi-select/js/jquery.multi-select.js"
-%}
-<script type="text/javascript" src="{{ asset_url }}"></script>
-{% endjavascripts %}
+
+<script type="text/javascript" src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ asset('assets/plugins/bootstrap-fileupload/bootstrap-fileupload.js') }}"></script>
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-validation/dist/additional-methods.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ asset('assets/plugins/jquery-multi-select/js/jquery.multi-select.js') }}"></script>
+
 {% endblock javascripts %}
 
 {% block documentReady %}

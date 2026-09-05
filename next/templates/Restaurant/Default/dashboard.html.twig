@@ -276,21 +276,19 @@
     {% endif %}
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@MedicineBundle/Resources/public/css/dashboard.css'
-    '@RestaurantBundle/Resources/public/css/invoice.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/medicine/css/dashboard.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('bundles/restaurant/css/invoice.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@RestaurantBundle/Resources/public/js/temporary.js'
-    '@RestaurantBundle/Resources/public/js/datetimepicker_css.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/temporary.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/datetimepicker_css.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

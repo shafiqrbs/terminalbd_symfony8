@@ -286,19 +286,15 @@
     </div>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@AccountingBundle/Resources/public/css/style.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/accounting/css/style.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@AccountingBundle/Resources/public/js/approveProcess.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/accounting/js/approveProcess.js') }}"></script>
+    
 {% endblock %}
 {% block documentready %}
     {{ parent() }}

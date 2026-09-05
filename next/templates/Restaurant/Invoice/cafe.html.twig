@@ -408,24 +408,23 @@
 {% endblock %}
 
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@HospitalBundle/Resources/public/css/invoice.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/hospital/css/invoice.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@RestaurantBundle/Resources/public/js/invoice.js'
-    '@RestaurantBundle/Resources/public/js/posprint.js'
-    '@RestaurantBundle/Resources/public/js/editable.js'
-    '@RestaurantBundle/Resources/public/js/datetimepicker_css.js'
-    '@RestaurantBundle/Resources/public/js/approveProcess.js'
 
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/invoice.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/posprint.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/editable.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/datetimepicker_css.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/approveProcess.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

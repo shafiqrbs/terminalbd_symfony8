@@ -157,19 +157,15 @@
     </div>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@DoctorPrescriptionBundle/Resources/public/css/invoice.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/doctorprescription/css/invoice.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@DoctorPrescriptionBundle/Resources/public/js/patient.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/doctorprescription/js/patient.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

@@ -6,12 +6,11 @@
     <meta content="" name="description"/>
     <meta content="" name="author"/>
     <link rel="shortcut icon" href="{{ asset('assets/img/favicon.ico') }}">
-    {% stylesheets filter='cssrewrite'
-        'assets/print/css/print.css'
-        'assets/print/css/prescription.css'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+        <link rel="stylesheet" href="{{ asset('assets/print/css/print.css') }}"/>
+    
+        <link rel="stylesheet" href="{{ asset('assets/print/css/prescription.css') }}"/>
+    
     <script type="text/javascript">
         window.print();
         setTimeout(function () {

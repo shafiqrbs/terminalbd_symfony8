@@ -545,22 +545,21 @@
     </div>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-        '@DoctorPrescriptionBundle/Resources/public/css/invoice.css'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+        <link rel="stylesheet" href="{{ asset('bundles/doctorprescription/css/invoice.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-        '@DoctorPrescriptionBundle/Resources/public/js/patient.js'
-        '@DoctorPrescriptionBundle/Resources/public/js/invoice.js'
-        '@DoctorPrescriptionBundle/Resources/public/js/editable.js'
-        '@DoctorPrescriptionBundle/Resources/public/js/approveProcess.js'
-    %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+        <script type="text/javascript" src="{{ asset('bundles/doctorprescription/js/patient.js') }}"></script>
+    
+        <script type="text/javascript" src="{{ asset('bundles/doctorprescription/js/invoice.js') }}"></script>
+    
+        <script type="text/javascript" src="{{ asset('bundles/doctorprescription/js/editable.js') }}"></script>
+    
+        <script type="text/javascript" src="{{ asset('bundles/doctorprescription/js/approveProcess.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

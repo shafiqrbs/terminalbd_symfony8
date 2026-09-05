@@ -290,19 +290,15 @@
     </style>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@MedicineBundle/Resources/public/css/dashboard.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/medicine/css/dashboard.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@MedicineBundle/Resources/public/js/jquery-canvas.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/medicine/js/jquery-canvas.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

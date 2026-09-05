@@ -50,8 +50,7 @@
 {% endblock %}
 
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@InventoryBundle/Resources/public/css/print.css' %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/inventory/css/print.css') }}"/>
+    
 {% endblock %}

@@ -267,21 +267,19 @@
     </div>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@InventoryBundle/Resources/public/css/dashboard.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/inventory/css/dashboard.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@MedicineBundle/Resources/public/js/temporary-sales.js'
-    '@MedicineBundle/Resources/public/js/approveProcess.js'
-    '@MedicineBundle/Resources/public/js/jquery-canvas.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/medicine/js/temporary-sales.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/medicine/js/approveProcess.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/medicine/js/jquery-canvas.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

@@ -6,12 +6,11 @@
     <meta content="" name="description"/>
     <meta content="" name="author"/>
     <link rel="shortcut icon" href="{{ asset('assets/img/favicon.ico') }}">
-    {% stylesheets filter='cssrewrite'
-        'assets/plugins/font-awesome/css/font-awesome.min.css'
-        'assets/css/print.css'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+        <link rel="stylesheet" href="{{ asset('assets/plugins/font-awesome/css/font-awesome.min.css') }}"/>
+    
+        <link rel="stylesheet" href="{{ asset('assets/css/print.css') }}"/>
+    
     {% if entity.hmsInvoice.hospitalConfig.printOff != 1  %}
     <script type="text/javascript">
         window.print();

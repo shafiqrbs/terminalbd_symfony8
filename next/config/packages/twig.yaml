@@ -1,5 +1,10 @@
 twig:
     file_name_pattern: '*.twig'
+    globals:
+        # FOSCommentBundle's comment API is not ported; the five templates that
+        # embed the async comment widget check this before including it. Turn
+        # on together with the App\Comment controllers when that lands.
+        comments_enabled: false
 
 when@test:
     twig:

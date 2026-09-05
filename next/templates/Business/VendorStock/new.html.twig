@@ -171,19 +171,15 @@
 {% endblock %}
 
 {% block cssBlock %}
-{% stylesheets filter='cssrewrite'
-    '@BusinessBundle/Resources/public/css/invoice.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/business/css/invoice.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@BusinessBundle/Resources/public/js/vendorStock.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/business/js/vendorStock.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

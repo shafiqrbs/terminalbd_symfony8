@@ -500,22 +500,21 @@
     </style>
 {% endblock %}
 {% block cssBlock %}
-{% stylesheets filter='cssrewrite'
-    '@HospitalBundle/Resources/public/css/admission.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/hospital/css/admission.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@HospitalBundle/Resources/public/js/admission.js'
-    '@HospitalBundle/Resources/public/js/approveProcess.js'
-    '@HospitalBundle/Resources/public/js/editable.js'
-    '@HospitalBundle/Resources/public/js/datetimepicker_css.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/hospital/js/admission.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/hospital/js/approveProcess.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/hospital/js/editable.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/hospital/js/datetimepicker_css.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

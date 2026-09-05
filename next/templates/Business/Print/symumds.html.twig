@@ -196,11 +196,9 @@
     </script>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-        '@BusinessBundle/Resources/public/css/print.css'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+        <link rel="stylesheet" href="{{ asset('bundles/business/css/print.css') }}"/>
+    
 {% endblock  %}
 
 

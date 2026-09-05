@@ -187,13 +187,13 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@DoctorPrescriptionBundle/Resources/public/js/editable.js'
-    '@DoctorPrescriptionBundle/Resources/public/js/invoice.js'
-    '@DoctorPrescriptionBundle/Resources/public/js/approveProcess.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/doctorprescription/js/editable.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/doctorprescription/js/invoice.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/doctorprescription/js/approveProcess.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

@@ -41,3 +41,15 @@ services:
         arguments:
             $tokenTtl: '%fos_user.resetting.token_ttl%'
         tags: ['controller.service_arguments']
+
+    # gregwar/image-bundle has no Symfony 8 release (its DI extension is a
+    # fatal on boot); these two reproduce the image.handling service and the
+    # image() Twig function over the gregwar/image library, with the bundle's
+    # own defaults.
+    App\Tool\Image\ImageHandling:
+        arguments:
+            $publicDir: '%kernel.project_dir%/public'
+
+    App\Tool\Twig\ImageExtension:
+        arguments:
+            $publicDir: '%kernel.project_dir%/public'

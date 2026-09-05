@@ -148,23 +148,23 @@
     <link href="{{ asset('assets/css/pages/timeline.css') }}" rel="stylesheet" type="text/css"/>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@DomainUserBundle/Resources/public/css/style.css'
-    '@DomainUserBundle/Resources/public/css/messagebox.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/domainuser/css/style.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('bundles/domainuser/css/messagebox.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@DomainUserBundle/Resources/public/js/messagebox.js'
-    '@DomainUserBundle/Resources/public/js/editable.js'
-    '@DomainUserBundle/Resources/public/js/approveProcess.js'
-    '@DomainUserBundle/Resources/public/js/association.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/domainuser/js/messagebox.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/domainuser/js/editable.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/domainuser/js/approveProcess.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/domainuser/js/association.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

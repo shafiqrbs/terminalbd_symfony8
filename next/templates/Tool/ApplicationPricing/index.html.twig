@@ -100,11 +100,9 @@
 
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@SettingToolBundle/Resources/public/js/editable.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/settingtool/js/editable.js') }}"></script>
+    
 {% endblock %}
 {% block documentready %}
     {{ parent() }}

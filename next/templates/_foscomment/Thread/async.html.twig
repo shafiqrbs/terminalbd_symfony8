@@ -11,7 +11,7 @@
 
 <div id="fos_comment_thread"></div>
 
-{% javascripts '@FOSCommentBundle/Resources/assets/js/comments.js' %}
+
 <script type="text/javascript">
 // thread id
 var fos_comment_thread_id = '{{ id }}';
@@ -23,10 +23,10 @@ var fos_comment_thread_api_base_url = '{{ path('fos_comment_get_threads') }}';
 (function() {
     var fos_comment_script = document.createElement('script');
     fos_comment_script.async = true;
-    fos_comment_script.src = '{{ asset_url }}';
+    fos_comment_script.src = '{{ asset('bundles/_foscomment/js/comments.js') }}';
     fos_comment_script.type = 'text/javascript';
 
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(fos_comment_script);
 })();
 </script>
-{% endjavascripts %}
+

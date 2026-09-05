@@ -87,10 +87,9 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@PosBundle/Resources/public/js/approveProcess.js' %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/pos/js/approveProcess.js') }}"></script>
+    
 {% endblock %}
 {% block documentready %}
     {{ parent() }}

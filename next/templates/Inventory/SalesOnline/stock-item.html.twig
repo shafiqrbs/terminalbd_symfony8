@@ -352,20 +352,17 @@
     {% endblock %}
 
     {% block cssBlock %}
-        {% stylesheets filter='cssrewrite'
-            '@InventoryBundle/Resources/public/css/manual-sales.css'
-        %}
-            <link rel="stylesheet" href="{{ asset_url }}"/>
-        {% endstylesheets %}
+
+            <link rel="stylesheet" href="{{ asset('bundles/inventory/css/manual-sales.css') }}"/>
+        
     {% endblock  %}
     {% block javascriptBlock %}
         {{ parent() }}
-        {% javascripts
-            '@InventoryBundle/Resources/public/js/approveProcess.js'
-            '@InventoryBundle/Resources/public/js/sales-online.js'
-        %}
-            <script type="text/javascript" src="{{ asset_url }}"></script>
-        {% endjavascripts %}
+
+            <script type="text/javascript" src="{{ asset('bundles/inventory/js/approveProcess.js') }}"></script>
+        
+            <script type="text/javascript" src="{{ asset('bundles/inventory/js/sales-online.js') }}"></script>
+        
     {% endblock %}
     {% block documentready %}
     {{ parent() }}

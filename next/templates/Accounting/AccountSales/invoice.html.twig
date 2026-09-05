@@ -183,12 +183,11 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@AccountingBundle/Resources/public/js/common.js'
-    '@AccountingBundle/Resources/public/js/approveProcess.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/accounting/js/common.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/accounting/js/approveProcess.js') }}"></script>
+    
 {% endblock %}
 {% block documentready %}
     {{ parent() }}

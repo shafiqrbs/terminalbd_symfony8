@@ -67,7 +67,12 @@
                             {% include('flash-message.html.twig')  %}
                             <div class="clearfix">&nbsp;</div>
                             {% set paymentID = entity.globalOption.id~'-customer-'~entity.id %}
-                            {% include '_foscomment/Thread/async.html.twig' with {'id': paymentID } %}
+                            {# The comment widget needs FOSCommentBundle's REST API, which is not
+                               ported yet: async.html.twig calls path('fos_comment_get_threads').
+                               Guarded rather than deleted so the port is a one-line change. #}
+                            {% if comments_enabled %}
+                                {% include '_foscomment/Thread/async.html.twig' with {'id': paymentID } %}
+                            {% endif %}
                             <div class="clearfix">&nbsp;</div>
                         </div>
                     </div>
@@ -104,11 +109,9 @@
 
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@DomainUserBundle/Resources/public/js/comment-mod.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/domainuser/js/comment-mod.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

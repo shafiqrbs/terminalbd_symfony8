@@ -168,19 +168,49 @@
 {% endblock %}
 
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@InventoryBundle/Resources/public/css/style.css' %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/inventory/css/style.css') }}"/>
+    
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@InventoryBundle/Resources/public/js/*'
-    '@InventoryBundle/Resources/public/js/puschaseReturn.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/approveProcess.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/damage.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/delivery.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/editable.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/goods.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/item.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/posprint.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/puschase-simple.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/puschase.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/puschaseItem.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/puschaseReturn.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/puschaseVendorItem.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/sales-manual.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/sales-online.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/sales.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/salesReturn.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/salesmanual.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/puschaseReturn.js') }}"></script>
+    
 {% endblock %}
 {% block documentready %}
     {{ parent() }}

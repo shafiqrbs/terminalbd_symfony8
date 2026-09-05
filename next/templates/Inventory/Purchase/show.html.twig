@@ -227,12 +227,11 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@InventoryBundle/Resources/public/js/approveProcess.js'
-    '@InventoryBundle/Resources/public/js/puschase.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/approveProcess.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/puschase.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

@@ -220,11 +220,9 @@
 
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@InventoryBundle/Resources/public/js/puschaseVendorItem.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/puschaseVendorItem.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

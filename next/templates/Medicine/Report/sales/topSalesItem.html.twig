@@ -92,12 +92,11 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-        '@MedicineBundle/Resources/public/js/editable.js'
-        '@MedicineBundle/Resources/public/js/approveProcess.js'
-    %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+        <script type="text/javascript" src="{{ asset('bundles/medicine/js/editable.js') }}"></script>
+    
+        <script type="text/javascript" src="{{ asset('bundles/medicine/js/approveProcess.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

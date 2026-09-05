@@ -163,10 +163,8 @@
 
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@HospitalBundle/Resources/public/js/doctorInvoice.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/hospital/js/doctorInvoice.js') }}"></script>
+    
 {% endblock  %}
 

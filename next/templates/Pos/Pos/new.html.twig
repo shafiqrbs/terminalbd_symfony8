@@ -565,22 +565,21 @@
 </style>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@PosBundle/Resources/public/css/pos.css'
-    '@PosBundle/Resources/public/css/table.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/pos/css/pos.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('bundles/pos/css/table.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@PosBundle/Resources/public/js/jquery.filtertable.js'
-    '@PosBundle/Resources/public/js/numeric.js'
-    '@PosBundle/Resources/public/js/pos.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/pos/js/jquery.filtertable.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/pos/js/numeric.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/pos/js/pos.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

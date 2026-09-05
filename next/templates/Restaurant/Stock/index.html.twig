@@ -317,12 +317,11 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@RestaurantBundle/Resources/public/js/editable.js'
-    '@RestaurantBundle/Resources/public/js/approveProcess.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/editable.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/approveProcess.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

@@ -4,7 +4,7 @@
 
 {% block body %}
 
-    <form action="{{ path('fos_user_profile_edit') }}" {{ form_enctype(form) }} method="POST"
+    <form action="{{ path('fos_user_profile_edit') }}" enctype="multipart/form-data" method="POST"
           class="fos_user_profile_edit">
         {{ form_widget(form) }}
         <div>

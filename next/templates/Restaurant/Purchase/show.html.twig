@@ -139,10 +139,8 @@
 {% endblock %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@RestaurantBundle/Resources/public/js/purchase.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/purchase.js') }}"></script>
+    
 {% endblock  %}
 

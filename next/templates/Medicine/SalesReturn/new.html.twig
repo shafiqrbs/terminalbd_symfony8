@@ -219,20 +219,17 @@
     </style>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@MedicineBundle/Resources/public/css/invoice.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/medicine/css/invoice.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@MedicineBundle/Resources/public/js/temporary-sales.js'
-    '@MedicineBundle/Resources/public/js/sales-return.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/medicine/js/temporary-sales.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/medicine/js/sales-return.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

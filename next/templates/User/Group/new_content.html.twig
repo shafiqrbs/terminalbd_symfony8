@@ -39,7 +39,7 @@
             <h4 class="modal-title bold text-center"> Group Add Form</h4>
         </div>
 
-        <form action="{{ path('fos_user_group_new') }}" {{ form_enctype(form) }} method="POST" class="fos_user_group_new">
+        <form action="{{ path('fos_user_group_new') }}" enctype="multipart/form-data" method="POST" class="fos_user_group_new">
 
         <div class="alert alert-error {% if not form.vars.errors|length %} hide {% endif %}">
             <button class="close" data-dismiss="alert"></button>

@@ -340,7 +340,12 @@
 
                     <div class="form-actions" >
                         {% set paymentID = entity.globalOption.id~'-ecommerce-payment-'~entity.id %}
-                        {% include '_foscomment/Thread/async.html.twig' with {'id': paymentID } %}
+                        {# The comment widget needs FOSCommentBundle's REST API, which is not
+                           ported yet: async.html.twig calls path('fos_comment_get_threads').
+                           Guarded rather than deleted so the port is a one-line change. #}
+                        {% if comments_enabled %}
+                            {% include '_foscomment/Thread/async.html.twig' with {'id': paymentID } %}
+                        {% endif %}
                     </div>
                 </div>
 
@@ -350,20 +355,23 @@
     </div>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@CustomerBundle/Resources/public/css/style.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/customer/css/style.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@CustomerBundle/Resources/public/js/*'
-    '@CustomerBundle/Resources/public/js/approveProcess.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/customer/js/approveProcess.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/customer/js/ecommerce.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/customer/js/editable.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/customer/js/medicine.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/customer/js/approveProcess.js') }}"></script>
+    
 {% endblock %}
 {% block documentready %}
     {{ parent() }}

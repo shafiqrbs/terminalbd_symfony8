@@ -167,21 +167,19 @@
     {% endif %}
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@RestaurantBundle/Resources/public/css/invoice.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/restaurant/css/invoice.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@RestaurantBundle/Resources/public/js/temporary.js'
-    '@RestaurantBundle/Resources/public/js/approveProcess.js'
-    '@RestaurantBundle/Resources/public/js/posprint.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/temporary.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/approveProcess.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/posprint.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

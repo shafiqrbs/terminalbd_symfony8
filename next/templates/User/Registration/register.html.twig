@@ -9,7 +9,7 @@
     <!-- BEGIN LOGIN -->
     <div class="content">
         <!-- BEGIN REGISTRATION FORM -->
-        <form action="{{ path('fos_user_registration_register') }}" {{ form_enctype(form) }} method="POST" class="fos_user_registration_register form-vertical">
+        <form action="{{ path('fos_user_registration_register') }}" enctype="multipart/form-data" method="POST" class="fos_user_registration_register form-vertical">
             <div class="alert alert-error {% if not form.vars.errors|length %} hide {% endif %}">
                 <button class="close" data-dismiss="alert"></button>
                 You have some form errors. Please check below.

@@ -196,9 +196,7 @@
     </style>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@DoctorPrescriptionBundle/Resources/public/css/print.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/doctorprescription/css/print.css') }}"/>
+    
 {% endblock  %}

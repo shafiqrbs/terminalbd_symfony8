@@ -102,9 +102,7 @@
 </style>
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@HospitalBundle/Resources/public/css/print.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/hospital/css/print.css') }}"/>
+    
 {% endblock  %}

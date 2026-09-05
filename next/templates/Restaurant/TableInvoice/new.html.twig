@@ -464,21 +464,19 @@
 {% endblock %}
 
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@RestaurantBundle/Resources/public/css/invoice.css'
-    '@RestaurantBundle/Resources/public/css/tableInvoice.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/restaurant/css/invoice.css') }}"/>
+    
+    <link rel="stylesheet" href="{{ asset('bundles/restaurant/css/tableInvoice.css') }}"/>
+    
 {% endblock  %}
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@RestaurantBundle/Resources/public/js/approveProcess.js'
-    '@RestaurantBundle/Resources/public/js/tablepos.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/approveProcess.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/restaurant/js/tablepos.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

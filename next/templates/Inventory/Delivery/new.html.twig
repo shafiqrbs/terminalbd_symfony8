@@ -165,12 +165,11 @@
 
 {% block javascriptBlock %}
     {{ parent() }}
-    {% javascripts
-    '@InventoryBundle/Resources/public/js/editable.js'
-    '@InventoryBundle/Resources/public/js/delivery.js'
-    %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/editable.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/inventory/js/delivery.js') }}"></script>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}

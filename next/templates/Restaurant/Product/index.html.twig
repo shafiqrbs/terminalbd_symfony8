@@ -208,11 +208,9 @@
 
 {% endblock %}
 {% block cssBlock %}
-    {% stylesheets filter='cssrewrite'
-    '@RestaurantBundle/Resources/public/css/datatable-pagination.css'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+
+    <link rel="stylesheet" href="{{ asset('bundles/restaurant/css/datatable-pagination.css') }}"/>
+    
 {% endblock  %}
 {% block documentready %}
     {{ parent() }}
