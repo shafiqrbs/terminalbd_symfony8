@@ -16,18 +16,14 @@ class PurchaseItemType extends AbstractType
     /** @var  HospitalConfig */
     public  $option;
 
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
             ->add('stockName',TextType::class, ['attr'=>['class'=>'m-wrap span12 select2StockMedicinePurchase input','placeholder'=>'Enter stock medicine name']])
             ->add('expirationEndDate',TextType::class, ['attr'=>['class'=>'m-wrap span3 dateCalendar input','placeholder'=>'Expiry date','autoComplete'=>'off']])
@@ -41,6 +37,10 @@ class PurchaseItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicinePurchaseItem::class
         ]);

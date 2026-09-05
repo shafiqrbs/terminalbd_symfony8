@@ -1,60 +1,35 @@
 <?php
 
-/*
- * This file is part of the Docudex project.
- *
- * (c) Mohammad Emran Hasan <phpfour@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace App\User\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use App\User\Entity\Group;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Group Form
- *
- * Small description about GroupFormType.
- *
- * @author Mohammad Emran Hasan <phpfour@gmail.com>
+ * Replaces the form built by fos_user.group.form.factory.
+ * FOSUserBundle's GroupFormType exposed the name only; roles are assigned
+ * through the app's own category-access screen.
  */
 class GroupFormType extends AbstractType
 {
-    public function __construct(private $class, private $permissionBuilder)
-    {
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('name', null, [
-            'label' => 'Name',
-            'attr'  => ['class' => 'span5']
-        ]);
-
-        $builder->add('description', TextareaType::class, [
-            'label'    => 'Description',
-            'required' => false,
-            'attr'     => ['class' => 'span5', 'rows' => 3]
-        ]);
-
-        $builder->add('roles', ChoiceType::class, [
-            'choices'  => $this->permissionBuilder->getPermissionHierarchyForChoiceField(),
-            'multiple' => true,
-            'attr'     => ['class' => 'span5', 'size' => 15]
+            'label' => 'form.group.name',
+            'translation_domain' => 'FOSUserBundle',
         ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => $this->class,
-            'intention'  => 'group',
+            'data_class' => Group::class,
+            'csrf_token_id' => 'group',
+            'empty_data' => fn () => new Group(''),
         ]);
     }
 

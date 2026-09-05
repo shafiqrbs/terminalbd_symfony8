@@ -27,8 +27,8 @@ class PortalBankAccountType extends AbstractType
                 ],
                 'required'    => true,
                 'class' => Bank::class,
-                'empty_value' => '---Select Bank ---',
-                'property' => 'name',
+                'placeholder' => '---Select Bank ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')
                     ->orderBy('wt.name','ASC'),

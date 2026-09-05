@@ -221,7 +221,7 @@ class DeliveryController extends AbstractController
     private function createEditForm(Delivery $entity)
     {
         $deliveryItem = new DeliveryItem();
-        $form = $this->createForm(new DeliveryType(), $deliveryItem , [
+        $form = $this->createForm(DeliveryType::class, $deliveryItem, [
             'action' => $this->generateUrl('inventory_delivery_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

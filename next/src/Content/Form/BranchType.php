@@ -14,10 +14,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class  BranchType extends AbstractType
 {
+    protected $location;
 
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -25,6 +23,8 @@ class  BranchType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter location name'],
@@ -61,7 +61,7 @@ class  BranchType extends AbstractType
             ])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'constraints' =>[
                     new NotBlank(message: 'Please input required'),
 
@@ -69,7 +69,6 @@ class  BranchType extends AbstractType
                 'attr'=>['class'=>'select2 span12'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('status')
@@ -81,6 +80,10 @@ class  BranchType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Page::class
         ]);

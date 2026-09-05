@@ -16,10 +16,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ContactPageType extends AbstractType
 {
-
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
+    protected $location;
 
 
     /**
@@ -28,6 +25,8 @@ class ContactPageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
             ->add('address1',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter address'],
                 'constraints' =>[
@@ -37,11 +36,10 @@ class ContactPageType extends AbstractType
             ])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span12'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('contactMobile',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter contact mobile']])
@@ -61,7 +59,7 @@ class ContactPageType extends AbstractType
                 'attr'=>['class'=>'check-list span12'],
                 'expanded'      =>true,
                 'multiple'      =>true,
-                'choices' => ['Sunday' => 'Sunday',  'Monday' => 'Monday', 'Tuesday' => 'Tuesday', 'Wednesday' => 'Wednesday', 'Thursday' => 'Thursday', 'Friday' => 'Friday', 'Saturday' => 'Saturday'],
+                'choices' => ['Sunday' => 'Sunday', 'Monday' => 'Monday', 'Tuesday' => 'Tuesday', 'Wednesday' => 'Wednesday', 'Thursday' => 'Thursday', 'Friday' => 'Friday', 'Saturday' => 'Saturday'],
             ])
             ->add('isContactForm')
             ->add('isBranch')
@@ -76,6 +74,10 @@ class ContactPageType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => ContactPage::class
         ]);

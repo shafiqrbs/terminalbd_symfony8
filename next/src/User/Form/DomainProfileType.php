@@ -16,13 +16,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 class DomainProfileType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption, private readonly LocationRepository $location, private readonly DesignationRepository $designation)
-    {
-    }
+    protected $globalOption;
+    protected $location;
+    protected $designation;
 
 
     /**
@@ -31,6 +29,10 @@ class DomainProfileType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+        $this->designation = $options['designation'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter your full name'],
                 'constraints' =>[
@@ -42,9 +44,9 @@ class DomainProfileType extends AbstractType
             ->add('designation', EntityType::class, [
                 'required'    => false,
                 'class' => Designation::class,
-                'empty_value' => '---Choose a designation---',
+                'placeholder' => '---Choose a designation---',
                 'group_by'  => 'parent.name',
-                'property'  => 'name',
+                'choice_label'  => 'name',
                 'choice_translation_domain' => true,
                 'constraints' =>[
                     new NotBlank(message: 'Select user designation')
@@ -58,6 +60,12 @@ class DomainProfileType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+            'designation' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Profile::class
         ]);

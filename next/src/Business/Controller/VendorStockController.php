@@ -145,17 +145,13 @@ class VendorStockController extends AbstractController
     private function createEditForm(BusinessVendorStock $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into VendorStockType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new VendorStockType($globalOption), $entity, array(
-            'action' => $this->generateUrl('business_vendor_stock_update', array('id' => $entity->getId())),
+        $form = $this->createForm(VendorStockType::class, $entity, array('action' => $this->generateUrl('business_vendor_stock_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'VendorStock',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 

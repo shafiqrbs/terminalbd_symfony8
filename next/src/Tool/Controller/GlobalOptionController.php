@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Tool\Service\ToolManager;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -108,17 +109,13 @@ class GlobalOptionController extends AbstractController
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SignupType::configureOptions() and pass them as form options: $em,$location), $entity, array(
-        $form = $this->createForm(new SignupType($em,$location), $entity, array(
-            'action' => $this->generateUrl('globaloption_create', array('id' => $entity->getId())),
+        $form = $this->createForm(SignupType::class, $entity, array('action' => $this->generateUrl('globaloption_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'id' => 'signup',
                 'class' => 'form-horizontal  registration signupForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em, 'location' => $location));
 
         return $form;
     }
@@ -255,16 +252,12 @@ class GlobalOptionController extends AbstractController
     private function createEditForm(GlobalOption $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into GlobalOptionType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new GlobalOptionType($location), $entity, array(
-            'action' => $this->generateUrl('globaloption_update', array('id' => $entity->getId())),
+        $form = $this->createForm(GlobalOptionType::class, $entity, array('action' => $this->generateUrl('globaloption_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
 
         return $form;
 
@@ -380,7 +373,7 @@ class GlobalOptionController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('globaloption_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }
@@ -435,16 +428,12 @@ class GlobalOptionController extends AbstractController
     private function createModifyForm(GlobalOption $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into GlobalOptionModifyType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new GlobalOptionModifyType($location), $entity, array(
-            'action' => $this->generateUrl('globaloption_modify_update', array('id' => $entity->getId())),
+        $form = $this->createForm(GlobalOptionModifyType::class, $entity, array('action' => $this->generateUrl('globaloption_modify_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
 
         return $form;
 

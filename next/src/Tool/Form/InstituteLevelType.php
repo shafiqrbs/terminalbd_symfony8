@@ -12,11 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class InstituteLevelType extends AbstractType
 {
-
-
-    public function __construct(private readonly InstituteLevelRepository $em)
-    {
-    }
+    protected $em;
 
 
     /**
@@ -25,6 +21,8 @@ class InstituteLevelType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+
 
             $builder
                 ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter name'],
@@ -34,10 +32,10 @@ class InstituteLevelType extends AbstractType
                 ])
                 ->add('parent', EntityType::class, [
                     'required'    => true,
-                    'empty_value' => '--- Select parent ---',
+                    'placeholder' => '--- Select parent ---',
                     'attr'=>['class'=>'location m-wrap span10 selectbox'],
                     'class' => 'SettingToolBundle:InstituteLevel',
-                    'property' => 'nestedLabel',
+                    'choice_label' => 'nestedLabel',
                     'choices'=> $this->instituteChoiceList()
                 ])
 
@@ -55,12 +53,15 @@ class InstituteLevelType extends AbstractType
 
     }
 
-
     /**
      * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => 'App\Tool\Entity\InstituteLevel'
         ]);

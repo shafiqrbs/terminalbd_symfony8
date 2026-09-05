@@ -19,13 +19,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 class DomainUserProfileType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption, private readonly DesignationRepository $designation)
-    {
-    }
+    protected $globalOption;
+    protected $designation;
 
 
     /**
@@ -34,6 +31,9 @@ class DomainUserProfileType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->designation = $options['designation'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter your full name'],
                 'constraints' =>[
@@ -53,8 +53,8 @@ class DomainUserProfileType extends AbstractType
             ->add('designation', EntityType::class, [
                 'required'    => true,
                 'class' => Designation::class,
-                'empty_value' => '---Choose a designation---',
-                'property' => 'name',
+                'placeholder' => '---Choose a designation---',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Select user designation')
                 ],
@@ -66,8 +66,8 @@ class DomainUserProfileType extends AbstractType
             ->add('branches', EntityType::class, [
                 'required'    => true,
                 'class' => Branches::class,
-                'empty_value' => '---Choose a branch---',
-                'property' => 'name',
+                'placeholder' => '---Choose a branch---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->andWhere("e.globalOption =".$this->globalOption->getId())
@@ -76,8 +76,8 @@ class DomainUserProfileType extends AbstractType
             ->add('bank', EntityType::class, [
                 'required'    => true,
                 'class' => Bank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->orderBy("b.name", "ASC"),
@@ -90,6 +90,11 @@ class DomainUserProfileType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'designation' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Profile::class
         ]);

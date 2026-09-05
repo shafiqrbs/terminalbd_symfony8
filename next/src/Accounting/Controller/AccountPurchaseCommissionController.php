@@ -112,16 +112,12 @@ class AccountPurchaseCommissionController extends AbstractController
     private function createCreateForm(AccountPurchaseCommission $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountPurchaseCommissionType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountPurchaseCommissionType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_purchasecommission_create'),
+        $form = $this->createForm(AccountPurchaseCommissionType::class, $entity, array('action' => $this->generateUrl('account_purchasecommission_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'global' => $globalOption));
       return $form;
     }
 

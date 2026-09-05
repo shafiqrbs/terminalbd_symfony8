@@ -18,15 +18,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class BusinessStoreType extends AbstractType
 {
 
-
     /** @var  $option GlobalOption  */
     public  $option;
-
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -34,6 +27,8 @@ class BusinessStoreType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter store name'],
@@ -52,8 +47,8 @@ class BusinessStoreType extends AbstractType
             ->add('customer', EntityType::class, [
                 'required'    => true,
                 'class' => Customer::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a DSR ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a DSR ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[
                     new NotBlank(message: 'Enter DSR')
@@ -66,8 +61,8 @@ class BusinessStoreType extends AbstractType
             ->add('area', EntityType::class, [
                 'required'    => true,
                 'class' => BusinessArea::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a area ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a area ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[
                     new NotBlank(message: 'Enter area')
@@ -80,8 +75,8 @@ class BusinessStoreType extends AbstractType
             ->add('marketing', EntityType::class, [
                 'required'    => true,
                 'class' => Marketing::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a SM ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a SM ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[
                     new NotBlank(message: 'Enter SR')
@@ -92,7 +87,6 @@ class BusinessStoreType extends AbstractType
                     ->orderBy("e.name","ASC")
             ])
 
-
         ;
     }
     
@@ -101,6 +95,10 @@ class BusinessStoreType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => BusinessStore::class
         ]);
@@ -119,6 +117,5 @@ class BusinessStoreType extends AbstractType
         return $syndicateTree = $this->location->getLocationOptionGroup();
 
     }
-
 
 }

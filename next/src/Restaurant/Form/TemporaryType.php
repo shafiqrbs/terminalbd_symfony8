@@ -20,11 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class TemporaryType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption )
-    {
-        $this->config  = $this->globalOption->getRestaurantConfig()->getId();
-    }
+    protected $globalOption;
 
 
     /**
@@ -33,6 +29,8 @@ class TemporaryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('payment',TextType::class, ['attr'=>['class'=>'m-wrap span12 payment','placeholder'=>'Payment','data-original-title'=>'Add payment amount','autocomplete'=>'off']])
@@ -47,14 +45,14 @@ class TemporaryType extends AbstractType
             ->add('discountCoupon',TextType::class, ['attr'=>['class'=>'tooltips span12 m-wrap discountCoupon','data-trigger' => 'hover','placeholder'=>'Coupon No','data-original-title'=>'Enter Discount Coupon No','autocomplete'=>'off']])
             ->add('discountType', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices'   => ['flat' => 'Flat', 'percentage' => 'Percentage'],
+                'choices'   => ['Flat' => 'flat', 'Percentage' => 'percentage'],
                 'required'  => true,
             ])
-/*            ->add('tokenNo', 'entity', array(
+/*            ->add('tokenNo', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Restaurant\Entity\Particular',
-                'property' => 'name',
-                'empty_value' => '---Select Table no ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Select Table no ---',
                 'attr'=>array('class'=>'span12 m-wrap'),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
@@ -69,7 +67,7 @@ class TemporaryType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -77,10 +75,10 @@ class TemporaryType extends AbstractType
             ])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -89,9 +87,9 @@ class TemporaryType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -101,9 +99,9 @@ class TemporaryType extends AbstractType
             ->add('salesBy', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Served By---',
+                'placeholder' => '---Served By---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->where("u.isDelete != 1")
                     ->andWhere("u.enabled = 1")
@@ -115,9 +113,9 @@ class TemporaryType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -130,6 +128,10 @@ class TemporaryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Invoice::class
         ]);

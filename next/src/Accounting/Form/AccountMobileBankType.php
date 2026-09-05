@@ -16,18 +16,14 @@ class AccountMobileBankType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('mobile',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric mobile','placeholder'=>'add payment receive mobile no'],
@@ -41,15 +37,7 @@ class AccountMobileBankType extends AbstractType
             ])
             ->add('serviceName', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => [
-                    'Bkash'         => 'Bkash',
-                    'Rocket'        => 'Rocket',
-                    'Nexus'         => 'Nexus',
-                    'iPay'          => 'iPay',
-                    'Nagad'         => 'Nagad',
-                    'Ucash'         => 'Ucash',
-                    'City Touch'    => 'City Touch',
-                ],
+                'choices' => ['Bkash' => 'Bkash', 'Rocket' => 'Rocket', 'Nexus' => 'Nexus', 'iPay' => 'iPay', 'Nagad' => 'Nagad', 'Ucash' => 'Ucash', 'City Touch' => 'City Touch'],
             ])
             ->add('accountOwner',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'add account ownership'],
                 'constraints' =>[
@@ -61,11 +49,7 @@ class AccountMobileBankType extends AbstractType
             ])
             ->add('accountType', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => [
-                    'Personal' => 'Personal',
-                    'General' => 'General',
-                    'Merchant' => 'Merchant',
-                ],
+                'choices' => ['Personal' => 'Personal', 'General' => 'General', 'Merchant' => 'Merchant'],
             ]);
     }
 
@@ -74,6 +58,10 @@ class AccountMobileBankType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => AccountMobileBank::class
         ]);
@@ -86,6 +74,5 @@ class AccountMobileBankType extends AbstractType
     {
         return 'appstore_bundle_accountingbundle_AccountBank';
     }
-
 
 }

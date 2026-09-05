@@ -91,7 +91,7 @@ class CourierController extends AbstractController
      */
     private function createCreateForm(Courier $entity)
     {
-        $form = $this->createForm(new CourierType(), $entity, [
+        $form = $this->createForm(CourierType::class, $entity, [
             'action' => $this->generateUrl('business_courier_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -139,7 +139,7 @@ class CourierController extends AbstractController
      */
     private function createEditForm(Courier $entity )
     {
-        $form = $this->createForm(new CourierType(), $entity, [
+        $form = $this->createForm(CourierType::class, $entity, [
             'action' => $this->generateUrl('business_courier_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

@@ -134,16 +134,12 @@ class BusinessStoreLedgerController extends AbstractController
     private function createCreateForm(BusinessStoreLedger $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BusinessStoreLedgerType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new BusinessStoreLedgerType($option), $entity, array(
-            'action' => $this->generateUrl('business_store_ledger_create', array('id' => $entity->getId())),
+        $form = $this->createForm(BusinessStoreLedgerType::class, $entity, array('action' => $this->generateUrl('business_store_ledger_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $option));
         return $form;
     }
 

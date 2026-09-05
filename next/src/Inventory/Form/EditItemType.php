@@ -17,6 +17,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EditItemType extends AbstractType
 {
+    protected $itemGroup;
+    protected $category;
+
 
     /** @var  ItemGroupRepository */
     private $groupRep;
@@ -27,20 +30,16 @@ class EditItemType extends AbstractType
     /** @var InventoryConfig */
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig, ItemGroupRepository $groupRep, CategoryRepository $catRep )
-    {
-        $this->inventoryConfig = $inventoryConfig;
-        $this->category = $catRep;
-        $this->itemGroup = $groupRep;
-    }
-
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+        $this->itemGroup = $options['groupRep'];
+        $this->category = $options['catRep'];
+
 
         $builder
 
@@ -54,8 +53,8 @@ class EditItemType extends AbstractType
             ->add('itemUnit', EntityType::class, [
                 'required'    => false,
                 'class' => ProductUnit::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a item unit ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a item unit ---',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -78,6 +77,12 @@ class EditItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+            'groupRep' => null,
+            'catRep' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Item::class
         ]);

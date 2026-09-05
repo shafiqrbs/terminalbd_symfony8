@@ -149,7 +149,7 @@ class InvoiceSmsEmailController extends AbstractController
      */
     private function createEditForm(InvoiceSmsEmail $entity)
     {
-        $form = $this->createForm(new InvoiceSmsEmailType(), $entity, [
+        $form = $this->createForm(InvoiceSmsEmailType::class, $entity, [
             'action' => $this->generateUrl('invoicesmsemail_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

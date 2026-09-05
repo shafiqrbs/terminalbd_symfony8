@@ -19,11 +19,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class DoctorType extends AbstractType
 {
-
-
-    public function __construct(private readonly HmsCategoryRepository $emCategory, private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $emCategory;
+    protected $globalOption;
 
 
     /**
@@ -32,6 +29,9 @@ class DoctorType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->emCategory = $options['emCategory'];
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter Doctor name'],
@@ -57,7 +57,7 @@ class DoctorType extends AbstractType
                 'attr'=>['class'=>'check-list span12'],
                 'expanded'      =>true,
                 'multiple'      =>true,
-                'choices' => ['Sunday' => 'Sunday',  'Monday' => 'Monday', 'Tuesday' => 'Tuesday', 'Wednesday' => 'Wednesday', 'Thursday' => 'Thursday', 'Friday' => 'Friday', 'Saturday' => 'Saturday'],
+                'choices' => ['Sunday' => 'Sunday', 'Monday' => 'Monday', 'Tuesday' => 'Tuesday', 'Wednesday' => 'Wednesday', 'Thursday' => 'Thursday', 'Friday' => 'Friday', 'Saturday' => 'Saturday'],
             ])
             ->add('room',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter room/cabin name or no']])
             ->add('particularCode',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter particular code']])
@@ -66,9 +66,9 @@ class DoctorType extends AbstractType
             ->add('sendToAccount')
             ->add('assignDoctor', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select doctor from employee list---',
+                'placeholder' => '---Select doctor from employee list---',
                 'class' => User::class,
-                'property' => 'userDoctor',
+                'choice_label' => 'userDoctor',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->join('e.profile','p')
@@ -80,9 +80,9 @@ class DoctorType extends AbstractType
             ])
             ->add('assignOperator', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select operator---',
+                'placeholder' => '---Select operator---',
                 'class' => User::class,
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.enabled = 1")
@@ -91,21 +91,21 @@ class DoctorType extends AbstractType
                     ->setParameter('roles', '%"ROLE_DOMAIN_OPERATOR"%')
                     ->orderBy("e.id","ASC")
             ])
-            /*->add('category', 'entity', array(
+            /*->add('category', EntityType::class, array(
                 'required'    => true,
-                'empty_value' => '---Select category---',
+                'placeholder' => '---Select category---',
                 'attr'=>array('class'=>'m-wrap span12 select2'),
                 'class' => 'App\Hospital\Entity\HmsCategory',
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->PathologyChoiceList()
             ))*/
 
             ->add('department', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select department---',
+                'placeholder' => '---Select department---',
                 'attr'=>['class'=>'m-wrap span12 select2'],
                 'class' => HmsCategory::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->DepartmentChoiceList()
             ])
         ;
@@ -117,12 +117,15 @@ class DoctorType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'emCategory' => null,
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => Particular::class,
-            'cascade_validation' => true,
             'error_bubbling'     => false,
         ]);
     }
-
 
     /**
      * @return string

@@ -46,7 +46,7 @@ class VendorProfileType extends AbstractType
             ->add('about',TextareaType::class, ['attr'=>['class'=>'m-wrap span12']])
             ->add('bloodGroup', ChoiceType::class, [
                 'attr'=>['class'=>''],
-                'choices' => ['A+' => 'A+',  'A-' => 'A-'],
+                'choices' => ['A+' => 'A+', 'A-' => 'A-'],
             ])
             ->add('interest',TextType::class, ['attr'=>['class'=>'m-wrap span12']])
             ->add('file')

@@ -22,15 +22,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PurchaseType extends AbstractType
 {
+    protected $accountHead;
+
     /** @var  HospitalConfig */
     public  $option;
-
-    public function __construct(GlobalOption $option, private readonly AccountHeadRepository $accountHead)
-    {
-        $this->option = $option;
-
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -38,13 +33,16 @@ class PurchaseType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+        $this->accountHead = $options['accountHead'];
+
         $builder
 
             ->add('accountVendor', EntityType::class, [
                 'required'    => true,
                 'class' => AccountVendor::class,
-                'empty_value' => '---Choose a vendor ---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor ---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[ new NotBlank(message: 'Please select your vendor name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -54,8 +52,8 @@ class PurchaseType extends AbstractType
             ->add('accountHead', EntityType::class, [
                 'required'    => true,
                 'class' => AccountHead::class,
-                'empty_value' => '---Choose a account head---',
-                'property' => 'name',
+                'placeholder' => '---Choose a account head---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12  m-wrap'],
                 'constraints' =>[
                     new NotBlank(message: 'Please select account head')
@@ -65,8 +63,8 @@ class PurchaseType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a Transaction---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a Transaction---',
                 'attr'=>['class'=>'span12 transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -76,8 +74,8 @@ class PurchaseType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -87,8 +85,8 @@ class PurchaseType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -108,6 +106,11 @@ class PurchaseType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'option' => null,
+            'accountHead' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AccountPurchase::class
         ]);
     }
@@ -119,7 +122,6 @@ class PurchaseType extends AbstractType
     {
         return 'purchase';
     }
-
 
     /**
      * @return mixed

@@ -110,16 +110,12 @@ class StockTransferController extends AbstractController
     private function createCreateForm(ProductTransfer $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into StockTransferType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new StockTransferType($config), $entity, array(
-            'action' => $this->generateUrl('business_transfer_create'),
+        $form = $this->createForm(StockTransferType::class, $entity, array('action' => $this->generateUrl('business_transfer_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'config' => $config));
         return $form;
     }
 

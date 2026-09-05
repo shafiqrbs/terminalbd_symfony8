@@ -19,11 +19,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PathologyType extends AbstractType
 {
-
-
-    public function __construct(private readonly HmsCategoryRepository $emCategory, private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $emCategory;
+    protected $globalOption;
 
 
     /**
@@ -32,6 +29,9 @@ class PathologyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->emCategory = $options['emCategory'];
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter test name'],
@@ -42,8 +42,8 @@ class PathologyType extends AbstractType
             ->add('accountHead', EntityType::class, [
                 'class'     => AccountHead::class,
                 'group_by'  => 'parent.name',
-                'property'  => 'name',
-                'empty_value' => '---Choose a account---',
+                'choice_label'  => 'name',
+                'placeholder' => '---Choose a account---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'choice_translation_domain' => true,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -77,7 +77,7 @@ class PathologyType extends AbstractType
             ->add('assignOperator', EntityType::class, [
                 'required'    => false,
                 'class' => User::class,
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.enabled = 1")
@@ -91,19 +91,19 @@ class PathologyType extends AbstractType
 
             ->add('department', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select department---',
+                'placeholder' => '---Select department---',
                 'attr'=>['class'=>'m-wrap span12 select2'],
                 'class' => HmsCategory::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->DepartmentChoiceList()
             ])
 
             ->add('category', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select pathology---',
+                'placeholder' => '---Select pathology---',
                 'attr'=>['class'=>'m-wrap span12 select2'],
                 'class' => HmsCategory::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->PathologyChoiceList()
             ]);
     }
@@ -113,6 +113,11 @@ class PathologyType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'emCategory' => null,
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Particular::class
         ]);

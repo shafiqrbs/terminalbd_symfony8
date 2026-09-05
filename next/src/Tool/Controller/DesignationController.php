@@ -77,16 +77,12 @@ class DesignationController extends AbstractController
     {
 
         $em = $this->em->getRepository(\App\Tool\Entity\Designation::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DesignationType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm(new DesignationType($em), $entity, array(
-            'action' => $this->generateUrl('designation_create'),
+        $form = $this->createForm(DesignationType::class, $entity, array('action' => $this->generateUrl('designation_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em));
         return $form;
     }
 
@@ -156,16 +152,12 @@ class DesignationController extends AbstractController
     private function createEditForm(Designation $entity)
     {
         $em = $this->em->getRepository(\App\Tool\Entity\Designation::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DesignationType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm(new DesignationType($em), $entity, array(
-            'action' => $this->generateUrl('designation_update', array('id' => $entity->getId())),
+        $form = $this->createForm(DesignationType::class, $entity, array('action' => $this->generateUrl('designation_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em));
          return $form;
     }
     /**

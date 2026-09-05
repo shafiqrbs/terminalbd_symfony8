@@ -20,25 +20,21 @@ class PurchaseOrderType extends AbstractType
 
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
         $builder
 
             ->add('vendor', EntityType::class, [
                 'required'    => false,
                 'class' => Vendor::class,
-                'empty_value' => '---Choose a vendor ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a vendor ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')
                     ->andWhere("wt.status = 1"),
@@ -50,7 +46,7 @@ class PurchaseOrderType extends AbstractType
                 ]
             ])
             ->add('memo',TextType::class, ['attr'=>['class'=>'m-wrap span6','placeholder'=>'memo no']])
-            /*->add('chalan','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))*/
+            /*->add('chalan', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))*/
             ->add('receiveDate',DateType::class, ['attr'=>['class'=>'m-wrap span12 datepicker','placeholder'=>''],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -70,14 +66,14 @@ class PurchaseOrderType extends AbstractType
                     new NotBlank(message: 'Please add total qnt')
                 ]])
             ->add('totalItem',TextType::class, ['attr'=>['class'=>'m-wrap span6','placeholder'=>'total item']])
-            /*->add('advanceAmount','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
-            ->add('commissionAmount','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
-            ->add('vatAmount','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
-            ->add('taxAmount','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
-            ->add('totalQnt','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
-            ->add('totalItem','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
-            ->add('paymentType','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
-            ->add('paymentMethod','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))*/
+            /*->add('advanceAmount', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
+            ->add('commissionAmount', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
+            ->add('vatAmount', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
+            ->add('taxAmount', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
+            ->add('totalQnt', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
+            ->add('totalItem', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
+            ->add('paymentType', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))
+            ->add('paymentMethod', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'')))*/
             ->add('file',FileType::class,['attr'=>['class'=>'default span12']])
         ;
     }
@@ -87,6 +83,10 @@ class PurchaseOrderType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => PurchaseOrder::class
         ]);

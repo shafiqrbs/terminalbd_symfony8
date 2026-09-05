@@ -2,6 +2,9 @@
 
 namespace App\Hospital\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\DomainUser\Form\CustomerForHospitalAdmissionType;
 use App\DomainUser\Form\CustomerForHospitalType;
 use App\DomainUser\Form\CustomerType;
@@ -14,11 +17,13 @@ use App\Location\Repository\LocationRepository;
 use App\Tool\Entity\GlobalOption;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class InvoiceAdmissionType extends AbstractType
 {
+    protected $globalOption;
+
 
     /** @var  LocationRepository */
     private $location;
@@ -27,15 +32,6 @@ class InvoiceAdmissionType extends AbstractType
     private $emCategory;
 
     /** @var  GlobalOption */
-    private $globalOption;
-
-
-    function __construct(GlobalOption $globalOption , HmsCategoryRepository $emCategory ,  LocationRepository $location)
-    {
-        $this->location         = $location;
-        $this->emCategory       = $emCategory;
-        $this->globalOption     = $globalOption;
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -43,21 +39,25 @@ class InvoiceAdmissionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->emCategory = $options['emCategory'];
+        $this->location = $options['location'];
+
         $builder
 
-            ->add('cardNo','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off')))
-            ->add('transactionId','text', array('attr'=>array('class'=>'m-wrap span12 admissionInput','placeholder'=>'Add payment transaction id','data-original-title'=>'Add payment transaction id','autocomplete'=>'off')))
-            ->add('paymentMobile','text', array('attr'=>array('class'=>'m-wrap span12 mobile','placeholder'=>'Add payment mobile no','data-original-title'=>'Add payment mobile no','autocomplete'=>'off')))
-            ->add('receive','text', array('attr'=>array('class'=>'tooltips span11 m-wrap payment admissionInput','data-trigger' => 'hover','placeholder'=>'Receive amount','data-original-title'=>'Enter received amount','autocomplete'=>'off'),
+            ->add('cardNo', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off')))
+            ->add('transactionId', TextType::class, array('attr'=>array('class'=>'m-wrap span12 admissionInput','placeholder'=>'Add payment transaction id','data-original-title'=>'Add payment transaction id','autocomplete'=>'off')))
+            ->add('paymentMobile', TextType::class, array('attr'=>array('class'=>'m-wrap span12 mobile','placeholder'=>'Add payment mobile no','data-original-title'=>'Add payment mobile no','autocomplete'=>'off')))
+            ->add('receive', TextType::class, array('attr'=>array('class'=>'tooltips span11 m-wrap payment admissionInput','data-trigger' => 'hover','placeholder'=>'Receive amount','data-original-title'=>'Enter received amount','autocomplete'=>'off'),
             ))
-            ->add('discount','hidden')
-            ->add('discountCalculation','text', array('attr'=>array('class'=>'tooltips span11 m-wrap discount admissionInput','data-trigger' => 'hover','placeholder'=>'Discount amount','data-original-title'=>'Enter discount amount','autocomplete'=>'off'),
+            ->add('discount', HiddenType::class)
+            ->add('discountCalculation', TextType::class, array('attr'=>array('class'=>'tooltips span11 m-wrap discount admissionInput','data-trigger' => 'hover','placeholder'=>'Discount amount','data-original-title'=>'Enter discount amount','autocomplete'=>'off'),
             ))
-            ->add('comment','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add remarks','autocomplete'=>'off')))
-            ->add('transactionMethod', 'entity', array(
+            ->add('comment', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add remarks','autocomplete'=>'off')))
+            ->add('transactionMethod', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\Tool\Entity\TransactionMethod',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 m-wrap transactionMethod'),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
@@ -66,12 +66,12 @@ class InvoiceAdmissionType extends AbstractType
                         ->orderBy("e.id","ASC");
                 }
             ))
-            ->add('paymentCard', 'entity', array(
+            ->add('paymentCard', EntityType::class, array(
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => 'App\Tool\Entity\PaymentCard',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
                         ->where("e.status = 1")
@@ -79,12 +79,12 @@ class InvoiceAdmissionType extends AbstractType
                 }
             ))
 
-            ->add('accountBank', 'entity', array(
+            ->add('accountBank', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Accounting\Entity\AccountBank',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -93,12 +93,12 @@ class InvoiceAdmissionType extends AbstractType
                 }
             ))
 
-            ->add('accountMobileBank', 'entity', array(
+            ->add('accountMobileBank', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Accounting\Entity\AccountMobileBank',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -107,16 +107,20 @@ class InvoiceAdmissionType extends AbstractType
                 }
             ))
         ;
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerForHospitalAdmissionType::configureOptions() and pass them as form options: $this->location 
-        //$builder->add('customer', new CustomerForHospitalAdmissionType( $this->location ));
+        //$builder->add('customer', CustomerForHospitalAdmissionType::class, ['location' => $this->location]);
     }
     
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'emCategory' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults(array(
             'data_class' => 'App\Hospital\Entity\Invoice'
         ));
@@ -125,7 +129,7 @@ class InvoiceAdmissionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'invoice';
     }
@@ -147,6 +151,5 @@ class InvoiceAdmissionType extends AbstractType
         return $this->emCategory->getParentCategoryTree($parent = 7 /** Department */);
 
     }
-
 
 }

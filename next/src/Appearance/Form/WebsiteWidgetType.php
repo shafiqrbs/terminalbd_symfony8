@@ -21,11 +21,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class WebsiteWidgetType extends AbstractType
 {
+    protected $globalOption;
 
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-        $this->globalId = $this->globalOption->getId();
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -33,13 +30,15 @@ class WebsiteWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('menu', EntityType::class, [
                 'required'    => false,
                 'class' => Menu::class,
-                'empty_value' => '---Select Menu Page---',
-                'property' => 'menu',
+                'placeholder' => '---Select Menu Page---',
+                'choice_label' => 'menu',
                 'attr'=>['class'=>'m-wrap span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -50,8 +49,8 @@ class WebsiteWidgetType extends AbstractType
                 'required'    => false,
                 'multiple'    => true,
                 'class' => ModuleCategory::class,
-                'empty_value' => '---Select page---',
-                'property' => 'name',
+                'placeholder' => '---Select page---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -60,19 +59,10 @@ class WebsiteWidgetType extends AbstractType
             ])
             ->add('position', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12 select2 '],
-                'empty_value' => '---Select Position---',
+                'placeholder' => '---Select Position---',
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'header'                => 'Header',
-                    'body-top'                  => 'Body Top',
-                    'body-bottom'               => 'Body Bottom',
-                    'sidebar-top'               => 'Sidebar Top',
-                    'sidebar-bottom'            => 'Sidebar Bottom',
-                    'footer'                    => 'Footer',
-                    'mobile'                    => 'Mobile',
-                    'mobile-intro'              => 'Mobile Intro',
-                ],
+                'choices' => ['Header' => 'header', 'Body Top' => 'body-top', 'Body Bottom' => 'body-bottom', 'Sidebar Top' => 'sidebar-top', 'Sidebar Bottom' => 'sidebar-bottom', 'Footer' => 'footer', 'Mobile' => 'mobile', 'Mobile Intro' => 'mobile-intro'],
             ])
             ->add('pageFeatureName',TextType::class, ['attr'=>['class'=>'span12 m-wrap']])
             ->add('moduleFeatureName',TextType::class, ['attr'=>['class'=>'span12 m-wrap']])
@@ -81,31 +71,22 @@ class WebsiteWidgetType extends AbstractType
                 'attr'=>['class'=>'m-wrap span12'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'list'                => 'List',
-                    'grid'                => 'Grid',
-                    'slider'              => 'Slider',
-                ],
+                'choices' => ['List' => 'list', 'Grid' => 'grid', 'Slider' => 'slider'],
             ])
 
             ->add('pageShowType', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'list'                => 'List',
-                    'grid'                => 'Grid',
-                    'slider'              => 'Slider',
-                ],
+                'choices' => ['List' => 'list', 'Grid' => 'grid', 'Slider' => 'slider'],
             ])
-
 
             ->add('page', EntityType::class, [
                 'required'    => false,
                 'multiple'    => true,
                 'class' => Page::class,
-                'empty_value' => '---Select Page---',
-                'property' => 'name',
+                'placeholder' => '---Select Page---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -118,8 +99,8 @@ class WebsiteWidgetType extends AbstractType
                 'required'    => false,
                 'multiple'    => false,
                 'class' => Module::class,
-                'empty_value' => '---Select page module---',
-                'property' => 'name',
+                'placeholder' => '---Select page module---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->join('e.nav' ,'n')
@@ -134,8 +115,8 @@ class WebsiteWidgetType extends AbstractType
             ->add('jsFeature', EntityType::class, [
                 'required'    => false,
                 'class' => JsFeature::class,
-                'empty_value' => '---Select Any Feature---',
-                'property' => 'name',
+                'placeholder' => '---Select Any Feature---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 '],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -145,27 +126,17 @@ class WebsiteWidgetType extends AbstractType
             ->add('content',TextareaType::class, ['attr'=>['class'=>'span12 m-wrap ckeditor','rows' => 6]])
             ->add('sliderFeature', ChoiceType::class, [
                 'attr'=>['class'=>'span12  m-wrap targetTo'],
-                'empty_value' => '---Slider with Feature ---',
+                'placeholder' => '---Slider with Feature ---',
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'category'          => 'Category',
-                    'brand'             => 'Brand',
-                    'promotion'         => 'Promotion',
-                    'featureProduct'    => 'FeatureProduct',
-                    'tag'               => 'Tag',
-                    'discount'          => 'Discount'
-                ],
+                'choices' => ['Category' => 'category', 'Brand' => 'brand', 'Promotion' => 'promotion', 'FeatureProduct' => 'featureProduct', 'Tag' => 'tag', 'Discount' => 'discount'],
             ])
             ->add('sliderFeaturePosition', ChoiceType::class, [
                 'attr'=>['class'=>'span12  m-wrap'],
-                'empty_value' => '---Feature Position ---',
+                'placeholder' => '---Feature Position ---',
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'left'               => 'Left',
-                    'right'             => 'Right',
-                ],
+                'choices' => ['Left' => 'left', 'Right' => 'right'],
             ])
             ;
     }
@@ -175,6 +146,10 @@ class WebsiteWidgetType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => FeatureWidget::class
         ]);

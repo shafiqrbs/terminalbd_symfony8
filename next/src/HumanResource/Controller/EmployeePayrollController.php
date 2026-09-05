@@ -102,16 +102,12 @@ class EmployeePayrollController extends AbstractController
         $option = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $user = $this->em->getRepository(\App\User\Entity\User::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into UserType::configureOptions() and pass them as form options: $user,$option,$location), $entity, array(
-        $form = $this->createForm(new UserType($user,$option,$location), $entity, array(
-            'action' => $this->generateUrl('employee_payroll_create'),
+        $form = $this->createForm(UserType::class, $entity, array('action' => $this->generateUrl('employee_payroll_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $user, 'option' => $option, 'location' => $location));
         return $form;
     }
 
@@ -145,16 +141,12 @@ class EmployeePayrollController extends AbstractController
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $user = $this->em->getRepository(\App\User\Entity\User::class);
         $designationRepository = $this->em->getRepository(Designation::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into EditUserType::configureOptions() and pass them as form options: $user,$option,$location,$designationRepository), $entity, array(
-        $form = $this->createForm(new EditUserType($user,$option,$location,$designationRepository), $entity, array(
-            'action' => $this->generateUrl('employee_payroll_update',array('id'=> $entity->getId())),
+        $form = $this->createForm(EditUserType::class, $entity, array('action' => $this->generateUrl('employee_payroll_update',array('id'=> $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $user, 'option' => $option, 'location' => $location, 'designationRepository' => $designationRepository));
         return $form;
     }
 
@@ -200,16 +192,12 @@ class EmployeePayrollController extends AbstractController
         $option = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $user = $this->em->getRepository(\App\User\Entity\User::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into EmployeePayrollType::configureOptions() and pass them as form options: $user,$option,$location), $entity, array(
-        $form = $this->createForm(new EmployeePayrollType($user,$option,$location), $entity, array(
-            'action' => $this->generateUrl('employee_payroll_setting_update',array('id'=> $entity->getId())),
+        $form = $this->createForm(EmployeePayrollType::class, $entity, array('action' => $this->generateUrl('employee_payroll_setting_update',array('id'=> $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $user, 'option' => $option, 'location' => $location));
         return $form;
     }
 

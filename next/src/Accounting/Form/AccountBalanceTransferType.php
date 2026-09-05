@@ -20,18 +20,14 @@ class AccountBalanceTransferType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'Add amount'],
@@ -42,8 +38,8 @@ class AccountBalanceTransferType extends AbstractType
             ->add('toTransactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a Transaction Method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a Transaction Method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap toTransactionMethod'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -57,8 +53,8 @@ class AccountBalanceTransferType extends AbstractType
             ->add('toAccountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -68,8 +64,8 @@ class AccountBalanceTransferType extends AbstractType
             ->add('toAccountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile account---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile account---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -78,8 +74,8 @@ class AccountBalanceTransferType extends AbstractType
 			->add('fromTransactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a Transaction Method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a Transaction Method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap fromTransactionMethod'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -93,8 +89,8 @@ class AccountBalanceTransferType extends AbstractType
             ->add('fromAccountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -104,8 +100,8 @@ class AccountBalanceTransferType extends AbstractType
             ->add('fromAccountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile account---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile account---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -120,6 +116,10 @@ class AccountBalanceTransferType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AccountBalanceTransfer::class
         ]);
     }
@@ -131,6 +131,5 @@ class AccountBalanceTransferType extends AbstractType
     {
         return 'balanceTransfer';
     }
-
 
 }

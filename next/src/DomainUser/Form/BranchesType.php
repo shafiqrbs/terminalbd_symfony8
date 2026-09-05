@@ -17,14 +17,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BranchesType extends AbstractType
 {
+    protected $location;
+
 
     /** @var GlobalOption */
     public  $globalOption;
-
-    public function __construct(GlobalOption $globalOption, private readonly LocationRepository $location)
-    {
-        $this->globalOption = $globalOption;
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -32,6 +29,9 @@ class BranchesType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Branch name'],
                 'constraints' =>[
@@ -51,23 +51,22 @@ class BranchesType extends AbstractType
                 'multiple'      =>false,
                 'required'    => true,
                 'class' => User::class,
-                'property' => 'username',
+                'choice_label' => 'username',
                 'attr'=>['class'=>'span12 select2'],
-                'empty_value' => '---Choose assign manager ---',
+                'placeholder' => '---Choose assign manager ---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->andWhere("u.globalOption =".$this->globalOption->getId())
                     ->orderBy("u.username", "ASC")
             ])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span12'],
                 'class' => Location::class,
                 'constraints' =>[
                     new NotBlank(message: 'Select user location')
                 ],
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('status');
@@ -78,6 +77,11 @@ class BranchesType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Branches::class
         ]);

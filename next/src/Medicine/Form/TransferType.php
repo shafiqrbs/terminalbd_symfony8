@@ -18,25 +18,21 @@ class TransferType extends AbstractType
 
     public  $option;
 
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
 
             ->add('customer', EntityType::class, [
                 'required'    => true,
                 'class' => Customer::class,
-                'empty_value' => '---Choose a customer ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a customer ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 inputs select2'],
                 'constraints' =>[ new NotBlank(message: 'Please select customer name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')
@@ -50,6 +46,10 @@ class TransferType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicineTransfer::class
         ]);

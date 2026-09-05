@@ -180,17 +180,13 @@ class PurchaseController extends AbstractController
     private function createEditForm(BusinessPurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PurchaseType($globalOption), $entity, array(
-            'action' => $this->generateUrl('business_purchase_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PurchaseType::class, $entity, array('action' => $this->generateUrl('business_purchase_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 
@@ -621,17 +617,13 @@ class PurchaseController extends AbstractController
     private function createOpeningForm(BusinessPurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseOpeningType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PurchaseOpeningType($globalOption), $entity, array(
-            'action' => $this->generateUrl('business_purchase_opening_create'),
+        $form = $this->createForm(PurchaseOpeningType::class, $entity, array('action' => $this->generateUrl('business_purchase_opening_create'),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchaseForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 

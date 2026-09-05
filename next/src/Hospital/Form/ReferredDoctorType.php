@@ -17,10 +17,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ReferredDoctorType extends AbstractType
 {
+    protected $emCategory;
+    protected $globalOption;
+    protected $location;
 
-    public function __construct(private readonly HmsCategoryRepository $emCategory, private readonly GlobalOption $globalOption, private readonly LocationRepository $location)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -28,6 +28,10 @@ class ReferredDoctorType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->emCategory = $options['emCategory'];
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter Doctor/Reference name'],
@@ -43,11 +47,10 @@ class ReferredDoctorType extends AbstractType
             ->add('address',TextareaType::class, ['attr'=>['class'=>'m-wrap span12 ','rows' => 4,'placeholder'=>'Enter customer address']])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span12'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ]);
     }
@@ -57,6 +60,12 @@ class ReferredDoctorType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'emCategory' => null,
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Particular::class
         ]);

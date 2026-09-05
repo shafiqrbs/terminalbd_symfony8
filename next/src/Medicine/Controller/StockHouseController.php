@@ -134,16 +134,12 @@ class StockHouseController extends AbstractController
     private function createStockInForm(MedicineStockHouse $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into HouseStockInType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new HouseStockInType($config), $entity, array(
-            'action' => $this->generateUrl('medicine_stockhouse_in_create'),
+        $form = $this->createForm(HouseStockInType::class, $entity, array('action' => $this->generateUrl('medicine_stockhouse_in_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'config' => $config));
         return $form;
     }
 
@@ -203,16 +199,12 @@ class StockHouseController extends AbstractController
     private function createStockOutForm(MedicineStockHouse $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into HouseStockOutType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new HouseStockOutType($config), $entity, array(
-            'action' => $this->generateUrl('medicine_stockhouse_out_create'),
+        $form = $this->createForm(HouseStockOutType::class, $entity, array('action' => $this->generateUrl('medicine_stockhouse_out_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'config' => $config));
         return $form;
     }
 

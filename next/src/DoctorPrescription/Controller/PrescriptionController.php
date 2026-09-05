@@ -132,10 +132,7 @@ class PrescriptionController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerForDpsType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new CustomerForDpsType($location), $entity, array(
-            'action' => $this->generateUrl('dps_prescription_create'),
+        $form = $this->createForm(CustomerForDpsType::class, $entity, array('action' => $this->generateUrl('dps_prescription_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
@@ -143,8 +140,7 @@ class PrescriptionController extends AbstractController
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
 
-            )
-        ));
+            ), 'location' => $location));
         return $form;
     }
 
@@ -153,18 +149,14 @@ class PrescriptionController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $diagnostic = $this->em->getRepository(\App\Medicine\Entity\DiagnosticReport::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceTransactionType::configureOptions() and pass them as form options: $globalOption,$location,$diagnostic), $entity, array(
-        $form = $this->createForm(new InvoiceTransactionType($globalOption,$location,$diagnostic), $entity, array(
-            'action' => $this->generateUrl('dps_prescription_update', array('id' => $entity->getId())),
+        $form = $this->createForm(InvoiceTransactionType::class, $entity, array('action' => $this->generateUrl('dps_prescription_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location, 'diagnostic' => $diagnostic));
         return $form;
     }
 
@@ -173,18 +165,14 @@ class PrescriptionController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $diagnostic = $this->em->getRepository(\App\Medicine\Entity\DiagnosticReport::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PrescriptionType::configureOptions() and pass them as form options: $globalOption,$location,$diagnostic), $entity, array(
-        $form = $this->createForm(new PrescriptionType($globalOption,$location,$diagnostic), $entity, array(
-            'action' => $this->generateUrl('dps_prescription_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PrescriptionType::class, $entity, array('action' => $this->generateUrl('dps_prescription_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location, 'diagnostic' => $diagnostic));
         return $form;
     }
 

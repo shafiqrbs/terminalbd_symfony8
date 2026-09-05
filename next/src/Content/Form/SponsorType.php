@@ -14,10 +14,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SponsorType extends AbstractType
 {
+    protected $globalOption;
 
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -25,6 +23,8 @@ class SponsorType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
 
         $builder
 
@@ -43,6 +43,10 @@ class SponsorType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Page::class
         ]);

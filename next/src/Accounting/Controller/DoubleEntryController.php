@@ -148,7 +148,7 @@ class DoubleEntryController extends AbstractController
      */
     private function createCreateForm(AccountJournal $entity)
     {
-        $form = $this->createForm(new DoubleEntryType(),$entity, [
+        $form = $this->createForm(DoubleEntryType::class, $entity, [
             'action' => $this->generateUrl('account_double_entry_create'),
             'method' => 'POST',
             'attr' => [
@@ -220,7 +220,7 @@ class DoubleEntryController extends AbstractController
      */
     private function createEditForm(AccountJournal $entity)
     {
-            $form = $this->createForm(new DoubleEntryType(),$entity, [
+            $form = $this->createForm(DoubleEntryType::class, $entity, [
             'action' => $this->generateUrl('account_double_entry_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

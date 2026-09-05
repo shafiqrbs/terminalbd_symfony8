@@ -35,17 +35,14 @@ class ConfigType extends AbstractType
             ->add('currency', EntityType::class, [
                 'required'    => false,
                 'class' => Currency::class,
-                'empty_value' => '--Select Currency--',
-                'property' => 'nameWithCode',
+                'placeholder' => '--Select Currency--',
+                'choice_label' => 'nameWithCode',
                 'attr'=>['class'=>'m-wrap span12 inputs']
 
             ])
             ->add('itemSearch', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                    'Rack'       => 'Rack',
-                    'Brand'      => 'Brand'
-                ],
+                'choices' => ['Rack' => 'Rack', 'Brand' => 'Brand'],
             ])
 
             ->add('salesAvgHide')
@@ -72,20 +69,9 @@ class ConfigType extends AbstractType
                 'attr' => [
                     'class'=>'m-wrap span12'],
                     'expanded'      =>false,
-                    'empty_value' => '---Default expiry date---',
+                    'placeholder' => '---Default expiry date---',
                     'multiple'      =>false,
-                    'choices' => [
-                        '1' => '1 Month',
-                        '2' => '2 Month',
-                        '3' => '3 Month',
-                        '4' => '4 Month',
-                        '5' => '5 Month',
-                        '6' => '6 Month',
-                        '12' => '1 Year',
-                        '18' => '1.5 Year',
-                        '24' => '2 Years',
-
-                    ],
+                    'choices' => ['1 Month' => '1', '2 Month' => '2', '3 Month' => '3', '4 Month' => '4', '5 Month' => '5', '6 Month' => '6', '1 Year' => '12', '1.5 Year' => '18', '2 Years' => '24'],
             ])
             ->add('address',TextareaType::class,['attr'=>['class'=>'m-wrap span12','rows' => 4,'placeholder'=>'Enter vendor address']])
             ->add('printCss',TextareaType::class,['attr'=>['class'=>'m-wrap span12','rows' => 12,'placeholder'=>'Enter print css']])

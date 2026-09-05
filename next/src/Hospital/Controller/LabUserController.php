@@ -119,16 +119,12 @@ class LabUserController extends AbstractController
     {
 
         $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into LabUserType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
-        $form = $this->createForm(new LabUserType($em,$globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_labuser_create', array('id' => $entity->getId())),
+        $form = $this->createForm(LabUserType::class, $entity, array('action' => $this->generateUrl('hms_labuser_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'emCategory' => $em, 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -195,16 +191,12 @@ class LabUserController extends AbstractController
     private function createEditForm(Particular $entity,$globalOption)
     {
         $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into LabUserType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
-        $form = $this->createForm(new LabUserType($em,$globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_labuser_update', array('id' => $entity->getId())),
+        $form = $this->createForm(LabUserType::class, $entity, array('action' => $this->generateUrl('hms_labuser_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'emCategory' => $em, 'globalOption' => $globalOption));
 
 
         return $form;

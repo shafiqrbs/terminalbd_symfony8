@@ -20,16 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ExpenditureType extends AbstractType
 {
+    protected $expenseCategoryRepository;
+
 
     /** @var  GlobalOption */
 
     public  $globalOption;
-
-    public function __construct(GlobalOption $globalOption, private readonly ExpenseCategoryRepository $expenseCategoryRepository )
-    {
-        $this->globalOption = $globalOption;
-
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -37,6 +33,9 @@ class ExpenditureType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->expenseCategoryRepository = $options['expenseCategoryRepository'];
+
         $builder
 
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'Amount'],
@@ -47,8 +46,8 @@ class ExpenditureType extends AbstractType
             ->add('toUser', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'empty_value' => '---Choose a account user---',
-                'property' => 'userFullName',
+                'placeholder' => '---Choose a account user---',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[new NotBlank(message: 'Please select to user name')],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
@@ -60,8 +59,8 @@ class ExpenditureType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a transaction method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a transaction method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -74,8 +73,8 @@ class ExpenditureType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.globalOption =".$this->globalOption->getId()),
@@ -84,8 +83,8 @@ class ExpenditureType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile account---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile account---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.globalOption =".$this->globalOption->getId()),
@@ -96,18 +95,18 @@ class ExpenditureType extends AbstractType
                 'constraints' =>[
                     new NotBlank(message: 'Please select category')
                 ],
-                'empty_value' => '---Select expense category---',
+                'placeholder' => '---Select expense category---',
                 'attr'=>['class'=>'ExpenseCategory m-wrap span12 select2'],
                 'class' => ExpenseCategory::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->ExpenseCategoryChoiceList()
             ])
 
-            /*->add('toUser', 'entity', array(
+            /*->add('toUser', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\User\Entity\User',
-                'empty_value' => '---Choose a user---',
-                'property' => 'userFullName',
+                'placeholder' => '---Choose a user---',
+                'choice_label' => 'userFullName',
                 'attr'=>array('class'=>'span12 m-wrap'),
                 'constraints' =>array(new NotBlank(array('message'=>'Please select to user name'))),
                 'query_builder' => function(EntityRepository $er){
@@ -129,6 +128,11 @@ class ExpenditureType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+            'expenseCategoryRepository' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => Expenditure::class
         ]);
     }
@@ -149,7 +153,5 @@ class ExpenditureType extends AbstractType
         return $ExpenseCategoryTree = $this->expenseCategoryRepository->getFlatExpenseCategoryTree($this->globalOption);
 
     }
-
-
 
 }

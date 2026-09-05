@@ -106,17 +106,13 @@ class StockOutController extends AbstractController
     private function createEditForm(HmsStockOut $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into StockOutType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new StockOutType($config), $entity, array(
-            'action' => $this->generateUrl('hms_stockout_update', array('id' => $entity->getId())),
+        $form = $this->createForm(StockOutType::class, $entity, array('action' => $this->generateUrl('hms_stockout_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'posForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'config' => $config));
         return $form;
     }
 
@@ -124,16 +120,12 @@ class StockOutController extends AbstractController
     {
 	    $entity = new HmsStockOutItem();
     	$config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into StockOutItemType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new StockOutItemType($config), $entity, array(
-            'action' => $this->generateUrl('hms_stockout_particular_add', array('invoice' => $invoice->getId())),
+        $form = $this->createForm(StockOutItemType::class, $entity, array('action' => $this->generateUrl('hms_stockout_particular_add', array('invoice' => $invoice->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'config' => $config));
         return $form;
     }
 

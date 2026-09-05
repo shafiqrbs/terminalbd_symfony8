@@ -115,10 +115,7 @@ class InvoiceFuelPumpController extends AbstractController
     private function createEditForm(BusinessBatchParticular $purchaseItem,BusinessBatch $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BusinessBatchParticularType::configureOptions() and pass them as form options: $globalOption), $purchaseItem, array(
-        $form = $this->createForm(new BusinessBatchParticularType($globalOption), $purchaseItem, array(
-            'action' => $this->generateUrl('business_fuelstation_add_particular', array('id' => $entity->getId())),
+        $form = $this->createForm(BusinessBatchParticularType::class, $purchaseItem, array('action' => $this->generateUrl('business_fuelstation_add_particular', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
@@ -126,8 +123,7 @@ class InvoiceFuelPumpController extends AbstractController
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
 
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

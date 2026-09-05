@@ -90,7 +90,7 @@ class SizeController extends AbstractController
      */
     private function createCreateForm(ItemSize $entity)
     {
-        $form = $this->createForm(new SizeType(), $entity, [
+        $form = $this->createForm(SizeType::class, $entity, [
             'action' => $this->generateUrl('size_create'),
             'method' => 'POST',
             'attr' => [
@@ -166,7 +166,7 @@ class SizeController extends AbstractController
      */
     private function createEditForm(ItemSize $entity)
     {
-         $form = $this->createForm(new SizeType(), $entity, [
+         $form = $this->createForm(SizeType::class, $entity, [
             'action' => $this->generateUrl('size_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

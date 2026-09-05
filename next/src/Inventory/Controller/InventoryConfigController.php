@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -120,7 +121,7 @@ class InventoryConfigController extends AbstractController
      */
     private function createCreateForm(InventoryConfig $entity)
     {
-        $form = $this->createForm(new InventoryConfigType(), $entity, [
+        $form = $this->createForm(InventoryConfigType::class, $entity, [
             'action' => $this->generateUrl('inventoryconfig_create'),
             'method' => 'POST',
             'attr' => [
@@ -129,7 +130,7 @@ class InventoryConfigController extends AbstractController
             ]
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Create']);
+        $form->add('submit', SubmitType::class, ['label' => 'Create']);
 
         return $form;
     }
@@ -277,7 +278,7 @@ class InventoryConfigController extends AbstractController
      */
     private function createEditForm(InventoryConfig $entity)
     {
-        $form = $this->createForm(new InventoryConfigType(), $entity, [
+        $form = $this->createForm(InventoryConfigType::class, $entity, [
             'action' => $this->generateUrl('inventoryconfig_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

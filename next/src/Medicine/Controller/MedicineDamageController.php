@@ -113,7 +113,7 @@ class MedicineDamageController extends AbstractController
      */
     private function createCreateForm(MedicineDamage $entity)
     {
-        $form = $this->createForm(new MedicineDamageType(), $entity, [
+        $form = $this->createForm(MedicineDamageType::class, $entity, [
             'action' => $this->generateUrl('medicine_damage_create'),
             'method' => 'POST',
             'attr' => [
@@ -156,7 +156,7 @@ class MedicineDamageController extends AbstractController
      */
     private function createEditForm(MedicineDamage $entity)
     {
-        $form = $this->createForm(new MedicineDamageType(), $entity, [
+        $form = $this->createForm(MedicineDamageType::class, $entity, [
             'action' => $this->generateUrl('medicine_damage_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

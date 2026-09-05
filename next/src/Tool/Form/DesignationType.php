@@ -13,9 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class DesignationType extends AbstractType
 {
-    public function __construct(private readonly DesignationRepository $em)
-    {
-    }
+    protected $em;
 
 
     /**
@@ -24,6 +22,8 @@ class DesignationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter expense category name'],
@@ -34,14 +34,13 @@ class DesignationType extends AbstractType
             ])
             ->add('parent', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select Parent Designation---',
+                'placeholder' => '---Select Parent Designation---',
                 'attr'=>['class'=>'ExpenseCategory m-wrap span12 select2'],
                 'class' => Designation::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->DesignationChoiceList()
             ])
             ->add('status')
-
 
         ;
     }
@@ -51,6 +50,10 @@ class DesignationType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Designation::class
         ]);
@@ -72,7 +75,5 @@ class DesignationType extends AbstractType
         return $this->em->getFlatDesignationTree();
 
     }
-
-
 
 }

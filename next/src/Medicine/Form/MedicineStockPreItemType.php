@@ -12,11 +12,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MedicineStockPreItemType extends AbstractType
 {
+    protected $medicineConfig;
 
-
-    public function __construct(private readonly MedicineConfig $medicineConfig)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -24,6 +21,8 @@ class MedicineStockPreItemType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->medicineConfig = $options['medicineConfig'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 select2StockMedicinePurchaseItem','placeholder'=>'Enter medicine name'],
                 'constraints' =>[
@@ -40,6 +39,10 @@ class MedicineStockPreItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'medicineConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicineStock::class
         ]);

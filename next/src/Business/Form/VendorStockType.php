@@ -20,25 +20,21 @@ class VendorStockType extends AbstractType
     /** @var  HospitalConfig */
     public  $option;
 
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
 
             ->add('vendor', EntityType::class, [
                 'required'    => true,
                 'class' => AccountVendor::class,
-                'empty_value' => '---Choose a vendor ---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor ---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'constraints' =>[ new NotBlank(message: 'Please select your vendor name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -57,6 +53,10 @@ class VendorStockType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => BusinessVendorStock::class
         ]);

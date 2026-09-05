@@ -18,13 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class StockType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-
-        $this->config               = $this->globalOption->getRestaurantConfig()->getId();
-    }
-
+    protected $globalOption;
 
 
     /**
@@ -33,6 +27,8 @@ class StockType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter product name'],
@@ -43,20 +39,17 @@ class StockType extends AbstractType
             ->add('productionType', ChoiceType::class, [
                 'required'    => false,
                 'attr'=>['class'=>'m-wrap span12'],
-                'empty_value' => '---Production Type---',
-                'choices' => [
-                    'pre-production' => 'Pre-production',
-                    'post-production' => 'Post-production'
-                ],
+                'placeholder' => '---Production Type---',
+                'choices' => ['Pre-production' => 'pre-production', 'Post-production' => 'post-production'],
             ])
             ->add('service', EntityType::class, [
                 'required'    => false,
                 'class' => Service::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please select required')
                 ],
-                'empty_value' => '---Choose product type ---',
+                'placeholder' => '---Choose product type ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -70,9 +63,9 @@ class StockType extends AbstractType
                 'required'    => false,
                 'class' => Category::class,
                 'group_by'  => 'service.name',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'choice_translation_domain' => true,
-                'empty_value' => '---Choose a category ---',
+                'placeholder' => '---Choose a category ---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -82,11 +75,11 @@ class StockType extends AbstractType
             ->add('unit', EntityType::class, [
                 'required'    => true,
                 'class' => ProductUnit::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please select required')
                 ],
-                'empty_value' => '---Choose a unit ---',
+                'placeholder' => '---Choose a unit ---',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -101,6 +94,10 @@ class StockType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => Particular::class
         ]);
     }
@@ -112,6 +109,5 @@ class StockType extends AbstractType
     {
         return 'particular';
     }
-
 
 }

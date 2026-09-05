@@ -36,8 +36,8 @@ class ConfigType extends AbstractType
             ->add('currency', EntityType::class, [
                 'required'    => false,
                 'class' => Currency::class,
-                'empty_value' => '--Select Currency--',
-                'property' => 'nameWithCode',
+                'placeholder' => '--Select Currency--',
+                'choice_label' => 'nameWithCode',
                 'attr'=>['class'=>'m-wrap span12 inputs select2']
 
             ])
@@ -63,37 +63,25 @@ class ConfigType extends AbstractType
             ->add('vatMode', ChoiceType::class, [
                 'required'    => false,
                 'attr'=>['class'=>'m-wrap span12'],
-                'empty_value' => '---VAT Mode---',
-                'choices' => [
-                    'including' => 'Including',
-                    'excluding' => 'Excluding',
-                ],
+                'placeholder' => '---VAT Mode---',
+                'choices' => ['Including' => 'including', 'Excluding' => 'excluding'],
             ])
             ->add('discountType', ChoiceType::class, [
                 'required'    => false,
                 'attr'=>['class'=>'m-wrap span12'],
-                'empty_value' => '---Discount Type---',
-                'choices' => [
-                    'percentage' => 'Percentage',
-                    'flat' => 'Flat',
-                ],
+                'placeholder' => '---Discount Type---',
+                'choices' => ['Percentage' => 'percentage', 'Flat' => 'flat'],
             ])
              ->add('salesMode', ChoiceType::class, [
                 'required'    => false,
                 'attr'=>['class'=>'m-wrap span12'],
-                'empty_value' => '---Sales Mode---',
-                'choices' => [
-                    'category' => 'Category',
-                    'table' => 'Table',
-                ],
+                'placeholder' => '---Sales Mode---',
+                'choices' => ['Category' => 'category', 'Table' => 'table'],
             ])
             ->add('payFor', ChoiceType::class, [
                 'required'    => true,
                 'attr'=>['class'=>'m-wrap span12'],
-                'choices' => [
-                    'pre-pay' => 'Pre-pay',
-                    'post-pay' => 'Post-pay',
-                ],
+                'choices' => ['Pre-pay' => 'pre-pay', 'Post-pay' => 'post-pay'],
             ])
             ->add('discountPercentage',IntegerType::class,['attr'=>['class'=>'m-wrap numeric span5']])
             ->add('invoiceHeight',TextType::class,['attr'=>['class'=>'m-wrap numeric span12']])

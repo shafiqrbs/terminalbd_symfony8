@@ -20,11 +20,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class InvoicePaymentType extends AbstractType
 {
+    protected $globalOption;
 
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -32,6 +29,8 @@ class InvoicePaymentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('cardNo',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off']])
@@ -51,7 +50,7 @@ class InvoicePaymentType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -60,10 +59,10 @@ class InvoicePaymentType extends AbstractType
             ])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -71,9 +70,9 @@ class InvoicePaymentType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -82,9 +81,9 @@ class InvoicePaymentType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -98,6 +97,10 @@ class InvoicePaymentType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => InvoiceTransaction::class
         ]);

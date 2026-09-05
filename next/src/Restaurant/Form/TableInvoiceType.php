@@ -19,11 +19,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class TableInvoiceType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption )
-    {
-        $this->config  = $this->globalOption->getRestaurantConfig()->getId();
-    }
+    protected $globalOption;
 
 
     /**
@@ -32,6 +28,8 @@ class TableInvoiceType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('payment',TextType::class, ['attr'=>['class'=>'m-wrap span12 input-number payment tooltips','data-trigger' => 'hover','placeholder'=>'Receive BDT','data-original-title'=>'Add receive amount','autocomplete'=>'off']])
@@ -42,17 +40,17 @@ class TableInvoiceType extends AbstractType
             ->add('discount',HiddenType::class,['attr'=>['class'=>'discount']])
             ->add('discountType', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap invoice-change'],
-                'choices'   => ['flat' => 'Flat', 'percentage' => 'Percentage'],
+                'choices'   => ['Flat' => 'flat', 'Percentage' => 'percentage'],
                 'required'  => true,
             ])
             ->add('discountCalculation',TextType::class, ['attr'=>['class'=>'tooltips span12 m-wrap input-number invoice-change ','data-trigger' => 'hover','placeholder'=>'Discount','data-original-title'=>'Enter discount amount','autocomplete'=>'off']])
             ->add('discountCoupon',TextType::class, ['attr'=>['class'=>'tooltips span12 m-wrap input-number discountCoupon invoice-change','data-trigger' => 'hover','placeholder'=>'Coupon No','data-original-title'=>'Enter Discount Coupon No','autocomplete'=>'off']])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'span12 m-wrap invoice-change'],
-                'empty_value' => '---Payment card---',
+                'placeholder' => '---Payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -60,9 +58,9 @@ class TableInvoiceType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap invoice-change'],
-                'empty_value' => '---Choose Bank Account---',
+                'placeholder' => '---Choose Bank Account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -72,9 +70,9 @@ class TableInvoiceType extends AbstractType
             ->add('salesBy', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap sales-by invoice-change'],
-                'empty_value' => '---Order Taken By---',
+                'placeholder' => '---Order Taken By---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->where("u.isDelete != 1")
                     ->andWhere("u.enabled = 1")
@@ -86,9 +84,9 @@ class TableInvoiceType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap invoice-change'],
-                'empty_value' => '---Choose Mobile Account---',
+                'placeholder' => '---Choose Mobile Account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -101,6 +99,10 @@ class TableInvoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => RestaurantTableInvoice::class
         ]);

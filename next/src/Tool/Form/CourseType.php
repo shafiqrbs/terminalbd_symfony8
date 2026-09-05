@@ -30,7 +30,7 @@ class CourseType extends AbstractType
                 'multiple'      =>true,
                 'expanded'      =>true,
                 'class'         => 'App\Tool\Entity\CourseLevel',
-                'property'      => 'name',
+                'choice_label'      => 'name',
                 'attr'          =>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('c')
                 ->andWhere("c.status = 1")

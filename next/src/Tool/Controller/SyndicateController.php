@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,16 +80,12 @@ class SyndicateController extends AbstractController
 
         $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SyndicateType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm(new SyndicateType($em), $entity, array(
-            'action' => $this->generateUrl('syndicate_create', array('id' => $entity->getId())),
+        $form = $this->createForm(SyndicateType::class, $entity, array('action' => $this->generateUrl('syndicate_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em));
 
 
         return $form;
@@ -167,16 +164,12 @@ class SyndicateController extends AbstractController
 
         $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SyndicateType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm(new SyndicateType($em), $entity, array(
-            'action' => $this->generateUrl('syndicate_update', array('id' => $entity->getId())),
+        $form = $this->createForm(SyndicateType::class, $entity, array('action' => $this->generateUrl('syndicate_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em));
 
         return $form;
     }
@@ -247,7 +240,7 @@ class SyndicateController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('syndicate_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

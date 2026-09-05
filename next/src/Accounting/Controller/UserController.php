@@ -131,7 +131,7 @@ class UserController extends AbstractController
     private function createCreateForm(Profile $entity)
     {
 
-        $form = $this->createForm(new UserType(), $entity, [
+        $form = $this->createForm(UserType::class, $entity, [
             'action' => $this->generateUrl('account_user_create'),
             'method' => 'POST',
             'attr' => [
@@ -188,7 +188,7 @@ class UserController extends AbstractController
     private function createEditForm(Profile $entity)
     {
 
-        $form = $this->createForm(new UserType(), $entity, [
+        $form = $this->createForm(UserType::class, $entity, [
             'action' => $this->generateUrl('account_user_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

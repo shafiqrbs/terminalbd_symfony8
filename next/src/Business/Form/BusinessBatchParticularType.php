@@ -17,16 +17,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BusinessBatchParticularType extends AbstractType
 {
+    protected $globalOption;
 
 
     /** @var $config BusinessConfig */
     private $config;
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-        $this->config     = $this->globalOption->getBusinessConfig();
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -34,14 +29,16 @@ class BusinessBatchParticularType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('startMeterReading',TextType::class, ['required'=> true,'attr'=>['class'=>'m-wrap span8 number','placeholder'=>'Start Meter Reading','autocomplete'=>'off']])
             ->add('businessParticular', EntityType::class, [
                 'required'    => true,
                 'class' => BusinessParticular::class,
-                'empty_value' => '---Choose a item ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a item ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap number'],
                 'constraints' =>[ new NotBlank(message: 'Please select item name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -51,8 +48,8 @@ class BusinessBatchParticularType extends AbstractType
             ->add('wearhouse', EntityType::class, [
                 'required'    => true,
                 'class' => WearHouse::class,
-                'empty_value' => '---Choose a from wearhouse ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a from wearhouse ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[ new NotBlank(message: 'Please select your vendor name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -62,7 +59,7 @@ class BusinessBatchParticularType extends AbstractType
             ->add('salesBy', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->where("u.isDelete != 1")
@@ -78,6 +75,10 @@ class BusinessBatchParticularType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => BusinessBatchParticular::class
         ]);

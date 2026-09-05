@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -76,7 +77,7 @@ class MobileThemeController extends AbstractController
     private function createCreateForm(MobileTheme $entity)
     {
 
-        $form = $this->createForm(new MobileThemeType(), $entity, [
+        $form = $this->createForm(MobileThemeType::class, $entity, [
             'action' => $this->generateUrl('mobiletheme_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -159,7 +160,7 @@ class MobileThemeController extends AbstractController
     private function createEditForm(MobileTheme $entity)
     {
 
-        $form = $this->createForm(new MobileThemeType(), $entity, [
+        $form = $this->createForm(MobileThemeType::class, $entity, [
             'action' => $this->generateUrl('mobiletheme_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -240,7 +241,7 @@ class MobileThemeController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('mobiletheme_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

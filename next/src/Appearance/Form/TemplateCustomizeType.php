@@ -25,7 +25,7 @@ class TemplateCustomizeType extends AbstractType
             ->add('showSocialIcon')
             ->add('mobileFooter', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => ['' => '- Mobile Footer -','none' => 'None','footer' => 'Simple Footer','contact' => 'Contact','cart' => 'Cart'],
+                'choices' => ['- Mobile Footer -' => '', 'None' => 'none', 'Simple Footer' => 'footer', 'Contact' => 'contact', 'Cart' => 'cart'],
             ])
             ->add('mobileLogin')
             ->add('contactForm')
@@ -59,43 +59,37 @@ class TemplateCustomizeType extends AbstractType
             ->add('cssStyleMobile',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','rows'=> 12,'placeholder'=>'Enter customize site css style for mobile']])
             ->add('sidebarPosition', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => ['' => '---Select One---','left' => 'Left',  'right' => 'Right'],
+                'choices' => ['---Select One---' => '', 'Left' => 'left', 'Right' => 'right'],
             ])
 
               ->add('contentAlign', ChoiceType::class, [
                 'attr'=>['class'=>'span8 m-wrap'],
-                'choices' => ['' => '- Content Align -','justify' => 'Justify','left' => 'Left','center' => 'Center','right' => 'Right'],
+                'choices' => ['- Content Align -' => '', 'Justify' => 'justify', 'Left' => 'left', 'Center' => 'center', 'Right' => 'right'],
             ])
 
              ->add('siteLanguage', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => ['english' => 'English',  'bangoli' => 'Bangoli'],
+                'choices' => ['English' => 'english', 'Bangoli' => 'bangoli'],
             ])
 
             ->add('socialIconType', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                	'' => '---Select Icon Type ---',
-	                'icon-fadein' => 'Icon Fadein',
-	                'icon-loop' => 'Icon Loop',
-	                'icon-square' => 'Icon Square',
-	                'icon-circle' => 'Icon Circle',
-                ],
+                'choices' => ['---Select Icon Type ---' => '', 'Icon Fadein' => 'icon-fadein', 'Icon Loop' => 'icon-loop', 'Icon Square' => 'icon-square', 'Icon Circle' => 'icon-circle'],
             ])
 
             ->add('socialIconPosition', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => ['' => '---Select Icon Position---','menu-right' => 'Menu-Right','top-left' => 'Top-Left','top-center' => 'Top-Center','top-right' => 'Top-Right'],
+                'choices' => ['---Select Icon Position---' => '', 'Menu-Right' => 'menu-right', 'Top-Left' => 'top-left', 'Top-Center' => 'top-center', 'Top-Right' => 'top-right'],
             ])
 
             ->add('topIconPosition', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => ['' => '---Contact Position---','text-left' => 'Left','text-center' => 'Center','text-right' => 'Right'],
+                'choices' => ['---Contact Position---' => '', 'Left' => 'text-left', 'Center' => 'text-center', 'Right' => 'text-right'],
             ])
 
             ->add('topTextPosition', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => ['' => '---Top Text Position---','menu-right' => 'Menu-Right','text-left' => 'Left','text-center' => 'Center','text-right' => 'Right'],
+                'choices' => ['---Top Text Position---' => '', 'Menu-Right' => 'menu-right', 'Left' => 'text-left', 'Center' => 'text-center', 'Right' => 'text-right'],
             ])
 
             ->add('breadcrumb')
@@ -103,11 +97,11 @@ class TemplateCustomizeType extends AbstractType
 
 	        ->add('breadcrumbPosition', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => 'Select Breadcrumb Position', 'flat-left' => 'Flat-Left','flat-right' => 'Flat-Right',  'left' => 'Left','center' => 'Center'],
+                'choices' => ['Select Breadcrumb Position' => '', 'Flat-Left' => 'flat-left', 'Flat-Right' => 'flat-right', 'Left' => 'left', 'Center' => 'center'],
             ])
             ->add('breadcrumbFontSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => 'Font Size', '10px' => '10px',  '12px' => '12px','14px' => '14px', '16px' => '16px','18px' => '18px',  '20px' => '20px'],
+                'choices' => ['Font Size' => '', '10px' => '10px', '12px' => '12px', '14px' => '14px', '16px' => '16px', '18px' => '18px', '20px' => '20px'],
             ])
             ->add('stickyBgColor',TextType::class, ['attr'=>[
                 'class'=>'m-wrap span10 colorpicker-default',
@@ -129,7 +123,7 @@ class TemplateCustomizeType extends AbstractType
                 'class'=>'m-wrap span10 colorpicker-default',
                 'placeholder'=>'']
             ])
-           /* ->add('breadcrumbBorderColor','text', array('attr'=>array(
+           /* ->add('breadcrumbBorderColor', TextType::class, array('attr'=>array(
                 'class'=>'m-wrap span10 colorpicker-default',
                 'placeholder'=>'')
             ))*/
@@ -148,7 +142,7 @@ class TemplateCustomizeType extends AbstractType
             ->add('siteTitle',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Site page welcome text']])
             ->add('siteTitleSize', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => ['H1' => 'H1','H2' => 'H2','H3' => 'H3','H4' => 'H4'],
+                'choices' => ['H1' => 'H1', 'H2' => 'H2', 'H3' => 'H3', 'H4' => 'H4'],
             ])
             ->add('siteTitleColor',TextType::class, ['attr'=>[
                 'class'=>'m-wrap span10 colorpicker-default',
@@ -173,69 +167,40 @@ class TemplateCustomizeType extends AbstractType
 
             ->add('siteFontSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => 'Font Size', '10px' => '10px',  '11px' => '11px','12px' => '12px','13px' => '13px','14px' => '14px','15px' => '15px', '16px' => '16px', '17px' => '17px','18px' => '18px',  '20px' => '20px', '22px' => '22px','24px' => '24px'],
+                'choices' => ['Font Size' => '', '10px' => '10px', '11px' => '11px', '12px' => '12px', '13px' => '13px', '14px' => '14px', '15px' => '15px', '16px' => '16px', '17px' => '17px', '18px' => '18px', '20px' => '20px', '22px' => '22px', '24px' => '24px'],
             ])
 
             ->add('contentFontSize', ChoiceType::class, [
                 'attr'=>['class'=>' span8'],
-                'choices' => ['' => 'Font Size', '10px' => '10px',  '11px' => '11px','12px' => '12px','13px' => '13px','14px' => '14px','15px' => '15px', '16px' => '16px', '17px' => '17px','18px' => '18px',  '20px' => '20px', '22px' => '22px','24px' => '24px','28px' => '28px','30px' => '30px'],
+                'choices' => ['Font Size' => '', '10px' => '10px', '11px' => '11px', '12px' => '12px', '13px' => '13px', '14px' => '14px', '15px' => '15px', '16px' => '16px', '17px' => '17px', '18px' => '18px', '20px' => '20px', '22px' => '22px', '24px' => '24px', '28px' => '28px', '30px' => '30px'],
             ])
 
             ->add('contentLineHeight', ChoiceType::class, [
                 'attr'=>['class'=>' span8'],
-                'choices' => ['' => 'Font Size','10px' => '10px',  '11px' => '11px','12px' => '12px','13px' => '13px','14px' => '14px', '15px' => '15px', '16px' => '16px', '17px' => '17px','18px' => '18px',  '20px' => '20px', '22px' => '22px','24px' => '24px', '26px' => '26px',  '28px' => '28px','30px' => '39px','32px' => '32px','34px' => '34px','36px' => '36px', '38px' => '38px', '40px' => '40px','42px' => '42px',  '44px' => '44px', '46px' => '46px','48px' => '48px'],
+                'choices' => ['Font Size' => '', '10px' => '10px', '11px' => '11px', '12px' => '12px', '13px' => '13px', '14px' => '14px', '15px' => '15px', '16px' => '16px', '17px' => '17px', '18px' => '18px', '20px' => '20px', '22px' => '22px', '24px' => '24px', '26px' => '26px', '28px' => '28px', '39px' => '30px', '32px' => '32px', '34px' => '34px', '36px' => '36px', '38px' => '38px', '40px' => '40px', '42px' => '42px', '44px' => '44px', '46px' => '46px', '48px' => '48px'],
             ])
 
             ->add('pagination', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => ['bootstrap' => 'Bootstrap',  'nextPrev' => 'Next Previous', 'nextPrevDropDown' => 'Next Previous with drop down'],
+                'choices' => ['Bootstrap' => 'bootstrap', 'Next Previous' => 'nextPrev', 'Next Previous with drop down' => 'nextPrevDropDown'],
             ])
             ->add('carouselHeight', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                    '720px'     => '720px',
-                    '628px'     => '628px',
-                    '444px'     => '444px',
-                    '360px'     => '360px',
-                ],
+                'choices' => ['720px' => '720px', '628px' => '628px', '444px' => '444px', '360px' => '360px'],
             ])
             ->add('mobileCarouselHeight', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                    '220px'     => '220px',
-                    '280px'     => '280px',
-                    '320px'     => '320px',
-                    '360px'     => '360px',
-                ],
+                'choices' => ['220px' => '220px', '280px' => '280px', '320px' => '320px', '360px' => '360px'],
             ])
             ->add('sliderPosition', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                    'top-left'      => 'Top-Left',
-                    'top-center'    => 'Top-Center',
-                    'top-right'     => 'Top-Right',
-                    'vertical'      => 'Vertical',
-                    'bottom-left'   => 'Bottom-Left',
-                    'bottom-center' => 'Bottom-Center',
-                    'bottom-right'  => 'Bottom-Right'
-                ],
+                'choices' => ['Top-Left' => 'top-left', 'Top-Center' => 'top-center', 'Top-Right' => 'top-right', 'Vertical' => 'vertical', 'Bottom-Left' => 'bottom-left', 'Bottom-Center' => 'bottom-center', 'Bottom-Right' => 'bottom-right'],
             ])
             ->add('sliderLeftRightPosition',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'Slider Top/Bottom']])
             ->add('sliderTopBottomPosition',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'Slider Left/Right']])
             ->add('siteFontFamily', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                    '' => '---Select font family---',
-                    'Open Sans, sans-serif' => 'Open Sans, sans-serif',
-                    'Helvetica, sans-serif' => 'Helvetica, sans-serif',
-                    'Verdana' => 'Verdana',
-                    'Gill Sans' => 'Gill Sans',
-                    'Avantgarde' => 'Avantgarde',
-                    'Helvetica Narrow' => 'Helvetica Narrow',
-                    'Times' => 'Times',
-                    'Times New Roman' => 'Times New Roman',
-                    'Palatino' => 'Palatino',
-                    ]
+                'choices' => ['---Select font family---' => '', 'Open Sans, sans-serif' => 'Open Sans, sans-serif', 'Helvetica, sans-serif' => 'Helvetica, sans-serif', 'Verdana' => 'Verdana', 'Gill Sans' => 'Gill Sans', 'Avantgarde' => 'Avantgarde', 'Helvetica Narrow' => 'Helvetica Narrow', 'Times' => 'Times', 'Times New Roman' => 'Times New Roman', 'Palatino' => 'Palatino']
             ])
 
             ->add('anchorColor',TextType::class, ['attr'=>[
@@ -275,25 +240,25 @@ class TemplateCustomizeType extends AbstractType
             ])
             ->add('dividerFontSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => 'Font Size', '10px' => '10px',  '12px' => '12px','14px' => '14px', '16px' => '16px','18px' => '18px',  '20px' => '20px','22px' => '22px', '24px' => '24px', ],
+                'choices' => ['Font Size' => '', '10px' => '10px', '12px' => '12px', '14px' => '14px', '16px' => '16px', '18px' => '18px', '20px' => '20px', '22px' => '22px', '24px' => '24px'],
             ])
 
             ->add('siteH1TextSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => '---Select One---','30px' => '30px', '32px' => '32px','34px' => '34px', '36px' => '36px','38px' => '38px', '40px' => '40px','42px' => '42px', '44px' => '44px','46px' => '46px','48px' => '48px', '50px' => '50px'],
+                'choices' => ['---Select One---' => '', '30px' => '30px', '32px' => '32px', '34px' => '34px', '36px' => '36px', '38px' => '38px', '40px' => '40px', '42px' => '42px', '44px' => '44px', '46px' => '46px', '48px' => '48px', '50px' => '50px'],
             ])
 
             ->add('siteH2TextSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => '---Select One---','24px' => '24px',  '26px' => '26px','28px' => '28px', '30px' => '30px','32px' => '32px',  '34px' => '34px','36px' => '36px'],
+                'choices' => ['---Select One---' => '', '24px' => '24px', '26px' => '26px', '28px' => '28px', '30px' => '30px', '32px' => '32px', '34px' => '34px', '36px' => '36px'],
             ])
             ->add('siteH3TextSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => '---Select One---','18px' => '18px',  '20px' => '20px','22px' => '22px', '24px' => '24px', '26px' => '26px','28px' => '28px', '30px' => '30px'],
+                'choices' => ['---Select One---' => '', '18px' => '18px', '20px' => '20px', '22px' => '22px', '24px' => '24px', '26px' => '26px', '28px' => '28px', '30px' => '30px'],
             ])
             ->add('siteH4TextSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => '---Select One---','10px' => '10px',  '12px' => '12px','14px' => '14px', '16px' => '16px','18px' => '18px',  '20px' => '20px','22px' => '22px', '24px' => '24px'],
+                'choices' => ['---Select One---' => '', '10px' => '10px', '12px' => '12px', '14px' => '14px', '16px' => '16px', '18px' => '18px', '20px' => '20px', '22px' => '22px', '24px' => '24px'],
             ])
 
             ->add('siteTitleBgColor',TextType::class, ['attr'=>[
@@ -321,7 +286,7 @@ class TemplateCustomizeType extends AbstractType
 
             ->add('headerBorderHeight', ChoiceType::class, [
                 'attr'=>['class'=>'span6 m-wrap'],
-                'choices' => ['1px' => '1px',  '2px' => '2px', '3px' => '3px', '4px' => '4px',  '5px' => '5px'],
+                'choices' => ['1px' => '1px', '2px' => '2px', '3px' => '3px', '4px' => '4px', '5px' => '5px'],
             ])
 
             ->add('menuBgColor',TextType::class, ['attr'=>[
@@ -354,16 +319,16 @@ class TemplateCustomizeType extends AbstractType
 
             ->add('menuFontSize', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => ['' => '---Select One---','10px' => '10px',  '11px' => '11px',  '12px' => '12px', '13px' => '13px', '14px' => '14px',  '15px' => '15px', '16px' => '16px', '17px' => '17px',  '18px' => '18px', '19px' => '19px', '20px' => '20px'],
+                'choices' => ['---Select One---' => '', '10px' => '10px', '11px' => '11px', '12px' => '12px', '13px' => '13px', '14px' => '14px', '15px' => '15px', '16px' => '16px', '17px' => '17px', '18px' => '18px', '19px' => '19px', '20px' => '20px'],
             ])
 
             ->add('menuLetter', ChoiceType::class, [
                 'attr'=>['class'=>'span10 m-wrap'],
-                'choices' => ['uppercase' => 'Uppercase',  'capitalize' => 'Capitalize', 'lowercase' => 'Lowercase'],
+                'choices' => ['Uppercase' => 'uppercase', 'Capitalize' => 'capitalize', 'Lowercase' => 'lowercase'],
             ])
             ->add('boxShadow', ChoiceType::class, [
                 'attr'=>['class'=>'span10 m-wrap'],
-                'choices' => ['' => '-Select Box Shadow-','shadow-box-1' => 'Shadow-Box-1','shadow-box-2' => 'Shadow-Box-2','shadow-box-3' => 'Shadow-Box-3','shadow-box-4' => 'Shadow-Box-4','shadow-box-5' => 'Shadow-Box-5','shadow-box-6' => 'Shadow-Box-6'],
+                'choices' => ['-Select Box Shadow-' => '', 'Shadow-Box-1' => 'shadow-box-1', 'Shadow-Box-2' => 'shadow-box-2', 'Shadow-Box-3' => 'shadow-box-3', 'Shadow-Box-4' => 'shadow-box-4', 'Shadow-Box-5' => 'shadow-box-5', 'Shadow-Box-6' => 'shadow-box-6'],
             ])
             ->add('boxShadowColor',TextType::class, ['attr'=>[
                 'class'=>'m-wrap span10 colorpicker-default',
@@ -372,7 +337,7 @@ class TemplateCustomizeType extends AbstractType
 
             ->add('menuPosition', ChoiceType::class, [
                 'attr'=>['class'=>'span10 m-wrap'],
-                'choices' => ['' => 'Navbar-Default','navbar-right' => 'Navbar-Right','navbar-center' => 'Navbar-Center',  'brand-center' => 'Logo-Center','navbar-brand-top' => 'Logo-Center-Top',  'brand-center center-side' => 'Logo-Center Menu-Side'],
+                'choices' => ['Navbar-Default' => '', 'Navbar-Right' => 'navbar-right', 'Navbar-Center' => 'navbar-center', 'Logo-Center' => 'brand-center', 'Logo-Center-Top' => 'navbar-brand-top', 'Logo-Center Menu-Side' => 'brand-center center-side'],
             ])
 
             ->add('menuTopMargin',TextType::class, ['attr'=>[
@@ -426,7 +391,7 @@ class TemplateCustomizeType extends AbstractType
             ])
             ->add('playStore',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Play Store url']])
             ->add('appleStore',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Apple store url']])
-           /* ->add('messengerScript','textarea', array('attr'=>array('class'=>'m-wrap span12','rows'=> 6,'placeholder'=>'Enter messenger script')))*/
+           /* ->add('messengerScript', TextareaType::class, array('attr'=>array('class'=>'m-wrap span12','rows'=> 6,'placeholder'=>'Enter messenger script')))*/
             ->add('metaDescription',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','rows'=>4,'placeholder'=>'Enter meta description']])
             ->add('metaKeyword',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','rows'=>5,'placeholder'=>'Enter meta keywords']])
             ->add('placeholderColor',TextType::class, ['attr'=>[

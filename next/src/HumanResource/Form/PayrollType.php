@@ -2,7 +2,6 @@
 
 namespace App\HumanResource\Form;
 
-
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -15,14 +14,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PayrollType extends AbstractType
 {
+    protected $global;
+
 
     /** @var  GlobalOption */
     private $option;
-
-    public function __construct( GlobalOption $option)
-    {
-        $this->global = $option;
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -30,6 +26,8 @@ class PayrollType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->global = $options['option'];
+
 
         $builder
 
@@ -47,31 +45,20 @@ class PayrollType extends AbstractType
                  'constraints' =>[
                      new NotBlank(message: 'Please Choose Salary Type'),
                  ],
-                'empty_value' => '-Choose Salary Type-',
-                'choices' => [
-                    'fixed' => 'Fixed',
-                    'honourable' => 'Honourable',
-                    'day' => 'Day',
-                    'hour' => 'Hour',
-                ],
+                'placeholder' => '-Choose Salary Type-',
+                'choices' => ['Fixed' => 'fixed', 'Honourable' => 'honourable', 'Day' => 'day', 'Hour' => 'hour'],
             ])
-            /*->add('employeeType', 'choice', array(
+            /*->add('employeeType', ChoiceType::class, array(
                 'attr'=>array('class'=>'span8 m-wrap'),
                 'constraints' =>array(
                     new NotBlank(array('message'=>'Select Employee Type'))
                 ),
-                'empty_value' => '---Select Employee Type---',
-                'choices' => array(
-                    'Full Time' => 'Full Time',
-                    'Half Time' => 'Half Time',
-                    'Contractual' => 'Contractual',
-                    'Hourly' => 'Hourly'
-                ),
+                'placeholder' => '---Select Employee Type---',
+                'choices' => array('Full Time' => 'Full Time', 'Half Time' => 'Half Time', 'Contractual' => 'Contractual', 'Hourly' => 'Hourly'),
             ))*/
             ->add('remark',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter any remark']])
 
         ;
-
 
     }
     
@@ -80,6 +67,10 @@ class PayrollType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Payroll::class
         ]);

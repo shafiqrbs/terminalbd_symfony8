@@ -19,25 +19,21 @@ class PrePurchaseItemType extends AbstractType
 
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
         $builder
 
             ->add('masterItem', EntityType::class, [
                 'required'    => true,
                 'class' => Product::class,
-                'empty_value' => '---Choose a item ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a item ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2 itemInput'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -75,6 +71,10 @@ class PrePurchaseItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => PrePurchaseItem::class
         ]);

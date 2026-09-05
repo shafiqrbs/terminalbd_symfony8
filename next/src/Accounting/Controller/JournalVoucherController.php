@@ -155,7 +155,7 @@ class JournalVoucherController extends AbstractController
      */
     private function createCreateForm(AccountJournal $entity)
     {
-        $form = $this->createForm(new JournalVoucherType(),$entity, [
+        $form = $this->createForm(JournalVoucherType::class, $entity, [
             'action' => $this->generateUrl('journal_voucher_create'),
             'method' => 'POST',
             'attr' => [
@@ -225,7 +225,7 @@ class JournalVoucherController extends AbstractController
      */
     private function createEditForm(AccountJournal $entity)
     {
-            $form = $this->createForm(new JournalVoucherType(),$entity, [
+            $form = $this->createForm(JournalVoucherType::class, $entity, [
             'action' => $this->generateUrl('journal_voucher_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

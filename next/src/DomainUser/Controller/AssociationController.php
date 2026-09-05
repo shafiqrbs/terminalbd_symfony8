@@ -109,8 +109,6 @@ class AssociationController extends AbstractController
     private function createCreateForm(Customer $entity)
     {
         $em = $this->em->getRepository(\App\DomainUser\Entity\Customer::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MemberEditProfileType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new MemberEditProfileType($em), $entity, array(
             'action' => $this->generateUrl('domain_association_create'),
             'method' => 'POST',
@@ -252,8 +250,6 @@ class AssociationController extends AbstractController
     private function createEditForm(Customer $entity)
     {
         $em = $this->em->getRepository(\App\DomainUser\Entity\Customer::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MemberEditProfileType::configureOptions() and pass them as form options: $em), $entity, array(
         $form = $this->createForm(new MemberEditProfileType($em), $entity, array(
             'action' => $this->generateUrl('domain_association_profile_update', array('id' => $entity->getId())),
             'method' => 'PUT',
@@ -505,10 +501,7 @@ class AssociationController extends AbstractController
     private function createInvoiceCreateForm(BusinessInvoice $entity, Customer $customer)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AssociationInvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AssociationInvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('domain_association_invoice_create', array('customer' => $customer->getCustomerId())),
+        $form = $this->createForm(AssociationInvoiceType::class, $entity, array('action' => $this->generateUrl('domain_association_invoice_create', array('customer' => $customer->getCustomerId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
@@ -516,8 +509,7 @@ class AssociationController extends AbstractController
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
 
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -630,10 +622,7 @@ class AssociationController extends AbstractController
     private function editInvoiceCreateForm(BusinessInvoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AssociationInvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AssociationInvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('domain_association_invoice_update', array('id'=>$entity->getId())),
+        $form = $this->createForm(AssociationInvoiceType::class, $entity, array('action' => $this->generateUrl('domain_association_invoice_update', array('id'=>$entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
@@ -641,8 +630,7 @@ class AssociationController extends AbstractController
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
 
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

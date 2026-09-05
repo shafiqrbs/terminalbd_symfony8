@@ -22,18 +22,14 @@ class AccountConditionLedgerType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric removeZero','placeholder'=>'Received amount'],
@@ -44,8 +40,8 @@ class AccountConditionLedgerType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a Transaction Method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a Transaction Method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -55,8 +51,8 @@ class AccountConditionLedgerType extends AbstractType
             ->add('condition', EntityType::class, [
                'required'    => true,
                'class' => AccountCondition::class,
-               'empty_value' => '---Choose a Condition Account---',
-               'property' => 'name',
+               'placeholder' => '---Choose a Condition Account---',
+               'choice_label' => 'name',
                'attr'=>['class'=>'span12 m-wrap'],
                'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                    ->where("b.globalOption =".$this->globalOption->getId())
@@ -65,8 +61,8 @@ class AccountConditionLedgerType extends AbstractType
              ->add('accountBank', EntityType::class, [
                'required'    => true,
                'class' => AccountBank::class,
-               'empty_value' => '---Choose a bank---',
-               'property' => 'name',
+               'placeholder' => '---Choose a bank---',
+               'choice_label' => 'name',
                'attr'=>['class'=>'span12 m-wrap'],
                'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                    ->where("b.globalOption =".$this->globalOption->getId())
@@ -76,17 +72,13 @@ class AccountConditionLedgerType extends AbstractType
 		        'attr'=>['class'=>'span12 m-wrap'],
 		        'expanded'      =>false,
 		        'multiple'      =>false,
-		        'choices' => [
-                    'Due' => 'Receive from Due',
-                    'Debit' => 'Debit Adjustment',
-                    'Credit' => 'Credit Adjustment',
-		        ],
+		        'choices' => ['Receive from Due' => 'Due', 'Debit Adjustment' => 'Debit', 'Credit Adjustment' => 'Credit'],
 	        ])
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.globalOption =".$this->globalOption->getId())
@@ -100,6 +92,10 @@ class AccountConditionLedgerType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AccountConditionLedger::class
         ]);
     }
@@ -111,6 +107,5 @@ class AccountConditionLedgerType extends AbstractType
     {
         return 'ledger';
     }
-
 
 }

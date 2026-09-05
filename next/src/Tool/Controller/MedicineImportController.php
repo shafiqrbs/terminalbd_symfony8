@@ -104,7 +104,7 @@ class MedicineImportController extends AbstractController
      */
     private function createCreateForm(MedicineImport $entity)
 	{
-		$form = $this->createForm(new MedicineImportType(), $entity, [
+		$form = $this->createForm(MedicineImportType::class, $entity, [
 			'action' => $this->generateUrl('medicine_import_create'),
 			'method' => 'POST',
 		]);

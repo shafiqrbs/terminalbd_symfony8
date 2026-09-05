@@ -2,6 +2,7 @@
 
 namespace App\Appearance\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Appearance\Entity\MenuGrouping;
 use Symfony\Component\Form\AbstractType;
@@ -17,12 +18,12 @@ class MenuGroupingType extends AbstractType
     {
         $builder
 
-           /* ->add('menuGroup', 'entity', array(
-                'empty_value' => '---Select Menu Group---',
+           /* ->add('menuGroup', EntityType::class, array(
+                'placeholder' => '---Select Menu Group---',
                 'required'    => true,
                 'attr'=>array('class'=>'form-control input-sm select2'),
                 'class' => \App\Appearance\Entity\MenuGroup::class,
-                'property' => 'name'
+                'choice_label' => 'name'
             ))*/
         ;
     }

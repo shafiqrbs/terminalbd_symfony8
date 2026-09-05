@@ -161,7 +161,7 @@ class InvoiceModuleController extends AbstractController
      */
     private function createEditForm(InvoiceModule $entity)
     {
-        $form = $this->createForm(new InvoiceType(), $entity, array(
+        $form = $this->createForm(InvoiceType::class, $entity, array(
             'action' => $this->generateUrl('invoicemodule_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
@@ -267,16 +267,12 @@ class InvoiceModuleController extends AbstractController
     private function createReceivePaymentForm(InvoiceModule $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoicePaymentReceiveType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new InvoicePaymentReceiveType($option), $entity, array(
-            'action' => $this->generateUrl('invoicemodule_ajax_payment', array('id' => $entity->getId())),
+        $form = $this->createForm(InvoicePaymentReceiveType::class, $entity, array('action' => $this->generateUrl('invoicemodule_ajax_payment', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $option));
         return $form;
     }
 

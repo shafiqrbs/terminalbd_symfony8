@@ -19,25 +19,21 @@ class PrepurchaseType extends AbstractType
     /** @var  HospitalConfig */
     public  $option;
 
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
             ->add('discountCalculation',NumberType::class, ['attr'=>['class'=>'td-inline-input span12 salesInput','placeholder'=>'(%)','data-original-title'=>'(%)','autocomplete'=>'off']])
             ->add('medicineVendor', EntityType::class, [
                 'required'    => true,
                 'class' => MedicineVendor::class,
-                'empty_value' => '---Choose a vendor/supplier ---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor/supplier ---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'m-wrap span12 inputs select2'],
                 'constraints' =>[ new NotBlank(message: 'Please select your vendor name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')
@@ -51,6 +47,10 @@ class PrepurchaseType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicinePrepurchase::class
         ]);

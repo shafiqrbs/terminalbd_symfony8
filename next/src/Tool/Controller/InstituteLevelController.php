@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -72,16 +73,12 @@ class InstituteLevelController extends AbstractController
     {
         $em = $this->em->getRepository('SettingToolBundle:InstituteLevel');
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InstituteLevelType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm(new InstituteLevelType($em), $entity, array(
-            'action' => $this->generateUrl('institutelevel_create'),
+        $form = $this->createForm(InstituteLevelType::class, $entity, array('action' => $this->generateUrl('institutelevel_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em));
 
         return $form;
     }
@@ -158,14 +155,10 @@ class InstituteLevelController extends AbstractController
     {
         $em = $this->em->getRepository('SettingToolBundle:InstituteLevel');
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InstituteLevelType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm(new InstituteLevelType($em), $entity, array(
-            'action' => $this->generateUrl('institutelevel_update', array('id' => $entity->getId())),
-            'method' => 'PUT',
-        ));
+        $form = $this->createForm(InstituteLevelType::class, $entity, array('action' => $this->generateUrl('institutelevel_update', array('id' => $entity->getId())),
+            'method' => 'PUT', 'em' => $em));
 
-        $form->add('submit', 'submit', array('label' => 'Update'));
+        $form->add('submit', SubmitType::class, array('label' => 'Update'));
 
         return $form;
     }
@@ -235,7 +228,7 @@ class InstituteLevelController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('institutelevel_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

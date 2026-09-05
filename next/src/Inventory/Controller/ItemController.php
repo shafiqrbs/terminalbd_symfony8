@@ -80,12 +80,8 @@ class ItemController extends AbstractController
     {
         $em = $this->em->getRepository(\App\Inventory\Entity\ItemTypeGrouping::class);
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ItemSearchType::configureOptions() and pass them as form options: $inventoryConfig,$em), $entity, array(
-        $form = $this->createForm(new ItemSearchType($inventoryConfig,$em), $entity, array(
-            'action' => $this->generateUrl('item'),
-            'method' => 'GET'
-        ));
+        $form = $this->createForm(ItemSearchType::class, $entity, array('action' => $this->generateUrl('item'),
+            'method' => 'GET', 'inventoryConfig' => $inventoryConfig));
         return $form;
     }
 
@@ -183,17 +179,13 @@ class ItemController extends AbstractController
         $groupRep = $this->em->getRepository(\App\Product\Entity\ItemGroup::class);
         $catRep = $this->em->getRepository(\App\Product\Entity\Category::class);
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ItemType::configureOptions() and pass them as form options: $inventoryConfig,$groupRep,$catRep), $entity, array(
-        $form = $this->createForm(new ItemType($inventoryConfig,$groupRep,$catRep), $entity, array(
-            'action' => $this->generateUrl('item_create'),
+        $form = $this->createForm(ItemType::class, $entity, array('action' => $this->generateUrl('item_create'),
             'method' => 'POST',
             'attr' => array(
                 'id' => 'item',
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'inventoryConfig' => $inventoryConfig, 'groupRep' => $groupRep, 'catRep' => $catRep));
         return $form;
     }
 
@@ -276,17 +268,13 @@ class ItemController extends AbstractController
         $groupRep = $this->em->getRepository(\App\Product\Entity\ItemGroup::class);
         $catRep = $this->em->getRepository(\App\Product\Entity\Category::class);
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into EditItemType::configureOptions() and pass them as form options: $inventoryConfig,$groupRep,$catRep), $entity, array(
-        $form = $this->createForm(new EditItemType($inventoryConfig,$groupRep,$catRep), $entity, array(
-            'action' => $this->generateUrl('item_update', array('id' => $entity->getId())),
+        $form = $this->createForm(EditItemType::class, $entity, array('action' => $this->generateUrl('item_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'id' => 'item',
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'inventoryConfig' => $inventoryConfig, 'groupRep' => $groupRep, 'catRep' => $catRep));
         return $form;
     }
 
@@ -320,16 +308,12 @@ class ItemController extends AbstractController
     private function createWebForm(Item $entity)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ItemWebType::configureOptions() and pass them as form options: $inventory), $entity, array(
-        $form = $this->createForm(new ItemWebType($inventory), $entity, array(
-            'action' => $this->generateUrl('item_web_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ItemWebType::class, $entity, array('action' => $this->generateUrl('item_web_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'inventoryConfig' => $inventory));
         return $form;
     }
 

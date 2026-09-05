@@ -87,7 +87,7 @@ class PurchaseReturnController extends AbstractController
      */
     private function createCreateForm(PurchaseReturn $entity)
     {
-        $form = $this->createForm(new PurchaseReturnType(), $entity, [
+        $form = $this->createForm(PurchaseReturnType::class, $entity, [
             'action' => $this->generateUrl('inventory_purchasereturn_create'),
             'method' => 'POST',
         ]);
@@ -164,7 +164,7 @@ class PurchaseReturnController extends AbstractController
      */
     private function createEditForm(PurchaseReturn $entity)
     {
-        $form = $this->createForm(new PurchaseReturnType(), $entity, [
+        $form = $this->createForm(PurchaseReturnType::class, $entity, [
             'action' => $this->generateUrl('inventory_purchasereturn_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);

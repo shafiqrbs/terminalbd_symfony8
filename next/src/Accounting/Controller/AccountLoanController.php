@@ -201,16 +201,12 @@ class AccountLoanController extends AbstractController
     private function createCreateForm(AccountLoan $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountLoanType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountLoanType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_loan_create'),
+        $form = $this->createForm(AccountLoanType::class, $entity, array('action' => $this->generateUrl('account_loan_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
       return $form;
     }
 

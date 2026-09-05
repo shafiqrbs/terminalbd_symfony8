@@ -16,10 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class HomeSliderType extends AbstractType
 {
+    protected $user;
 
-    public function __construct(private $user)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -27,6 +25,8 @@ class HomeSliderType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->user = $options['user'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'span12 m-wrap','placeholder'=>'Enter full name'],
                 'constraints' =>[
@@ -39,8 +39,8 @@ class HomeSliderType extends AbstractType
             ->add('page', EntityType::class, [
                 'required'    => false,
                 'class' => Page::class,
-                'empty_value' => '---Select Target Page---',
-                'property' => 'name',
+                'placeholder' => '---Select Target Page---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12 '],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -54,6 +54,10 @@ class HomeSliderType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'user' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => HomeSlider::class
         ]);

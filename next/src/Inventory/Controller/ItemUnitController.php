@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,7 +76,7 @@ class ItemUnitController extends AbstractController
      */
     private function createCreateForm(ItemUnit $entity)
     {
-        $form = $this->createForm(new ItemUnitType(), $entity, [
+        $form = $this->createForm(ItemUnitType::class, $entity, [
             'action' => $this->generateUrl('itemunit_create'),
             'method' => 'POST',
             'attr' => [
@@ -156,7 +157,7 @@ class ItemUnitController extends AbstractController
      */
     private function createEditForm(ItemUnit $entity)
     {
-        $form = $this->createForm(new ItemUnitType(), $entity, [
+        $form = $this->createForm(ItemUnitType::class, $entity, [
             'action' => $this->generateUrl('itemunit_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -234,7 +235,7 @@ class ItemUnitController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('itemunit_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

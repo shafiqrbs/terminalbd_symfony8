@@ -14,10 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SiteSettingType extends AbstractType
 {
-
-    public function __construct(public $syndicateId)
-    {
-    }
+    protected $syndicateId;
 
 
     /**
@@ -26,17 +23,16 @@ class SiteSettingType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-
+        $this->syndicateId = $options['syndicateId'];
 
 
         $builder
 
-
               ->add('theme', EntityType::class, [
                  'required'    => false,
                  'class' => Theme::class,
-                 'empty_value' => '---Select Theme ---',
-                 'property' => 'name',
+                 'placeholder' => '---Select Theme ---',
+                 'choice_label' => 'name',
                  'attr'=>['class'=>'m-wrap span12'],
                  'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')
                      ->andWhere("wt.status = 1")
@@ -45,12 +41,12 @@ class SiteSettingType extends AbstractType
                      ->orderBy('wt.name','ASC'),
               ])
 
-              /*->add('syndicateModules', 'entity', array(
+              /*->add('syndicateModules', EntityType::class, array(
                   'required'      => true,
                   'expanded'      =>true,
                   'multiple'      =>true,
                   'class' => 'App\Tool\Entity\SyndicateModule',
-                  'property' => 'name',
+                  'choice_label' => 'name',
                   'attr'=>array('class'=>'check-list span12'),
                   'query_builder' => function(EntityRepository $er){
                           return $er->createQueryBuilder('sm')
@@ -67,7 +63,7 @@ class SiteSettingType extends AbstractType
                 'expanded'      =>true,
                 'multiple'      =>true,
                 'class' => Module::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'check-list span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('m')
                     ->where("m.status = 1")
@@ -81,22 +77,24 @@ class SiteSettingType extends AbstractType
                 'expanded'      =>true,
                 'multiple'      =>true,
                 'class' => AppModule::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'check-list span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('m')
                     ->andWhere("m.status = 1")
                     ->orderBy('m.name','ASC'),
             ]);
 
-
     }
-
 
     /**
      * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'syndicateId' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => SiteSetting::class
         ]);

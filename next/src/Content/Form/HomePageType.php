@@ -2,6 +2,9 @@
 
 namespace App\Content\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,10 +16,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class HomePageType extends AbstractType
 {
+    protected $globalOption;
+    protected $siteSettingId;
 
-    public function __construct(private $globalOption, private $siteSettingId)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -24,6 +26,9 @@ class HomePageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->siteSettingId = $options['siteSettingId'];
+
 
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter name '],
@@ -36,12 +41,12 @@ class HomePageType extends AbstractType
             ->add('featureText',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','rows'=>4]])
             ->add('content',TextareaType::class, ['attr'=>['class'=>'wysihtml5 m-wrap span12','rows'=>10]])
             /*
-           ->add('file','file', array('attr'=>array('class'=>'default')))
-           ->add('photo_gallery', 'entity', array(
+           ->add('file', FileType::class, array('attr'=>array('class'=>'default')))
+           ->add('photo_gallery', EntityType::class, array(
                'required'    => false,
                'class' => 'App\Media\Entity\PhotoGallery',
-               'empty_value' => '---Select Photo Gallery---',
-               'property' => 'name',
+               'placeholder' => '---Select Photo Gallery---',
+               'choice_label' => 'name',
                'attr'=>array('class'=>'m-wrap select2 span12'),
                'query_builder' => function(EntityRepository $er){
                        return $er->createQueryBuilder('o')
@@ -51,12 +56,12 @@ class HomePageType extends AbstractType
                    },
            ))
 
-          ->add('syndicateModules', 'entity', array(
+          ->add('syndicateModules', EntityType::class, array(
                'required'      => true,
                'expanded'      =>true,
                'multiple'      =>true,
                'class' => 'App\Tool\Entity\SyndicateModule',
-               'property' => 'name',
+               'choice_label' => 'name',
                'attr'=>array('class'=>'check-list span12'),
                'query_builder' => function(EntityRepository $er){
                        return $er->createQueryBuilder('sm')
@@ -69,12 +74,12 @@ class HomePageType extends AbstractType
                    },
 
            ))
-           ->add('modules', 'entity', array(
+           ->add('modules', EntityType::class, array(
                'required'      => true,
                'expanded'      =>true,
                'multiple'      =>true,
                'class' => 'App\Tool\Entity\Module',
-               'property' => 'name',
+               'choice_label' => 'name',
                'attr'=>array('class'=>'check-list span12'),
                'query_builder' => function(EntityRepository $er){
                        return $er->createQueryBuilder('sm')
@@ -86,7 +91,7 @@ class HomePageType extends AbstractType
                    },
 
            ))
-           ->add('showingListing', 'choice', array(
+           ->add('showingListing', ChoiceType::class, array(
                'choices'  => array(3 => 3, 5 => 5),
                'attr'=>array('class'=>'radio-list'),
                'expanded' => true,
@@ -104,6 +109,11 @@ class HomePageType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'siteSettingId' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => HomePage::class
         ]);

@@ -104,7 +104,7 @@ class OtherServiceController extends AbstractController
      */
     private function createCreateForm(Particular $entity)
     {
-        $form = $this->createForm(new OtherServiceType(), $entity, [
+        $form = $this->createForm(OtherServiceType::class, $entity, [
             'action' => $this->generateUrl('hms_other_service_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -151,7 +151,7 @@ class OtherServiceController extends AbstractController
     private function createEditForm(Particular $entity)
     {
 
-        $form = $this->createForm(new OtherServiceType(), $entity, [
+        $form = $this->createForm(OtherServiceType::class, $entity, [
             'action' => $this->generateUrl('hms_other_service_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

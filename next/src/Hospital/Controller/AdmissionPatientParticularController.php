@@ -89,17 +89,13 @@ class AdmissionPatientParticularController extends AbstractController
     private function createInvoicePaymentForm(InvoiceTransaction $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoicePaymentType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new InvoicePaymentType($globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_invoice_admission_daily_invoice_transaction_submit', array('invoice' => $entity->getHmsInvoice()->getInvoice(),'id' => $entity->getId())),
+        $form = $this->createForm(InvoicePaymentType::class, $entity, array('action' => $this->generateUrl('hms_invoice_admission_daily_invoice_transaction_submit', array('invoice' => $entity->getHmsInvoice()->getInvoice(),'id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'newInvoicePayment',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -178,17 +174,13 @@ class AdmissionPatientParticularController extends AbstractController
     private function createCreateForm(AdmissionPatientParticular $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceAdmittedParticularType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new InvoiceAdmittedParticularType($config), $entity, array(
-            'action' => $this->generateUrl('hms_invoice_admitted_create', array('id' => $entity->getId())),
+        $form = $this->createForm(InvoiceAdmittedParticularType::class, $entity, array('action' => $this->generateUrl('hms_invoice_admitted_create', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'hospitalConfig' => $config));
         return $form;
     }
 

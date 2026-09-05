@@ -101,7 +101,7 @@ class DiseasesController extends AbstractController
      */
     private function createCreateForm(DpsParticular $entity)
     {
-        $form = $this->createForm(new DiseasesType(), $entity, [
+        $form = $this->createForm(DiseasesType::class, $entity, [
             'action' => $this->generateUrl('dps_diseases_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -148,7 +148,7 @@ class DiseasesController extends AbstractController
     {
 
 
-        $form = $this->createForm(new DiseasesType(), $entity, [
+        $form = $this->createForm(DiseasesType::class, $entity, [
             'action' => $this->generateUrl('dps_diseases_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

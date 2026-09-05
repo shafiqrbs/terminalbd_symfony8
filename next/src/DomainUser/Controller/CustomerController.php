@@ -125,16 +125,12 @@ class CustomerController extends AbstractController
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-        $form = $this->createForm(new CustomerType($globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('domain_customer_create'),
+        $form = $this->createForm(CustomerType::class, $entity, array('action' => $this->generateUrl('domain_customer_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location));
         return $form;
     }
     #[IsGranted(new Expression("is_granted('ROLE_CRM') or is_granted('ROLE_DOMAIN')"))]
@@ -236,16 +232,12 @@ class CustomerController extends AbstractController
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerEditType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-        $form = $this->createForm(new CustomerEditType($globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('domain_customer_update', array('id' => $entity->getId())),
+        $form = $this->createForm(CustomerEditType::class, $entity, array('action' => $this->generateUrl('domain_customer_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location));
         return $form;
     }
     /**

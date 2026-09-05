@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -73,7 +74,7 @@ class BrandingController extends AbstractController
      */
     private function createCreateForm(Branding $entity)
     {
-        $form = $this->createForm(new BrandingType(), $entity, [
+        $form = $this->createForm(BrandingType::class, $entity, [
             'action' => $this->generateUrl('branding_create'),
             'method' => 'POST',
             'attr' => [
@@ -155,7 +156,7 @@ class BrandingController extends AbstractController
      */
     private function createEditForm(Branding $entity)
     {
-        $form = $this->createForm(new BrandingType(), $entity, [
+        $form = $this->createForm(BrandingType::class, $entity, [
             'action' => $this->generateUrl('branding_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -233,7 +234,7 @@ class BrandingController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('branding_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

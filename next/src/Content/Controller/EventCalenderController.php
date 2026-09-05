@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -69,12 +70,12 @@ class EventCalenderController extends AbstractController
      */
     private function createCreateForm(EventCalender $entity)
     {
-        $form = $this->createForm(new EventCalenderType(), $entity, [
+        $form = $this->createForm(EventCalenderType::class, $entity, [
             'action' => $this->generateUrl('eventcalender_create'),
             'method' => 'POST',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Create']);
+        $form->add('submit', SubmitType::class, ['label' => 'Create']);
 
         return $form;
     }
@@ -149,12 +150,12 @@ class EventCalenderController extends AbstractController
      */
     private function createEditForm(EventCalender $entity)
     {
-        $form = $this->createForm(new EventCalenderType(), $entity, [
+        $form = $this->createForm(EventCalenderType::class, $entity, [
             'action' => $this->generateUrl('eventcalender_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Update']);
+        $form->add('submit', SubmitType::class, ['label' => 'Update']);
 
         return $form;
     }
@@ -224,7 +225,7 @@ class EventCalenderController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('eventcalender_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

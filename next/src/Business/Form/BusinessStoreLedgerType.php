@@ -21,15 +21,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class BusinessStoreLedgerType extends AbstractType
 {
 
-
     /** @var  $option GlobalOption  */
     public  $option;
-
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -37,6 +30,8 @@ class BusinessStoreLedgerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
 
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span6','autocomplete'=>'off','placeholder'=>'Enter amount'],
@@ -48,11 +43,7 @@ class BusinessStoreLedgerType extends AbstractType
                 'attr'=>['class'=>'m-wrap discount-type span6'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'Receive' => 'Receive',
-                    'Due' => 'Due',
-                    'Opening' => 'Opening',
-                ],
+                'choices' => ['Receive' => 'Receive', 'Due' => 'Due', 'Opening' => 'Opening'],
             ])
             ->add('cardNo',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off']])
             ->add('transactionId',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add payment transaction id','data-original-title'=>'Add payment transaction id','autocomplete'=>'off']])
@@ -60,7 +51,7 @@ class BusinessStoreLedgerType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span6 transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -68,10 +59,10 @@ class BusinessStoreLedgerType extends AbstractType
             ])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -79,9 +70,9 @@ class BusinessStoreLedgerType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->option->getId())
@@ -91,9 +82,9 @@ class BusinessStoreLedgerType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->option->getId())
@@ -102,8 +93,8 @@ class BusinessStoreLedgerType extends AbstractType
             ->add('store', EntityType::class, [
                 'required'    => true,
                 'class' => BusinessStore::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a store ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a store ---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Enter store')
@@ -114,8 +105,6 @@ class BusinessStoreLedgerType extends AbstractType
                     ->orderBy("e.name","ASC")
             ])
 
-
-
         ;
     }
     
@@ -124,6 +113,10 @@ class BusinessStoreLedgerType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => BusinessStoreLedger::class
         ]);
@@ -142,6 +135,5 @@ class BusinessStoreLedgerType extends AbstractType
         return $syndicateTree = $this->location->getLocationOptionGroup();
 
     }
-
 
 }

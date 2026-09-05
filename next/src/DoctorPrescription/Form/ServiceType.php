@@ -30,18 +30,11 @@ class ServiceType extends AbstractType
                 'attr'=>['class'=>'span12 m-wrap select-custom'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'empty_value' => '---Choose service format---',
+                'placeholder' => '---Choose service format---',
                 'constraints' =>[
                     new NotBlank(message: 'Select service format')
                 ],
-                'choices' => [
-                    'label-value' => 'Label Value',
-                    'text-field' => 'Text Field',
-                    'checkbox-text-field' => 'Checkbox with Text Field',
-                    'checkbox' => 'Checkbox',
-                    'textarea' => 'Text-area',
-                    'file' => 'File Upload'
-                ],
+                'choices' => ['Label Value' => 'label-value', 'Text Field' => 'text-field', 'Checkbox with Text Field' => 'checkbox-text-field', 'Checkbox' => 'checkbox', 'Text-area' => 'textarea', 'File Upload' => 'file'],
             ])
             ->add('status')
         ;

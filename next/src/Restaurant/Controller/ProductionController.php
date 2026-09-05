@@ -115,16 +115,12 @@ class ProductionController extends AbstractController
     private function createCreateForm(ProductionBatch $entity)
     {
         $config = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ProductionBatchType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new ProductionBatchType($config), $entity, array(
-            'action' => $this->generateUrl('restaurant_production_create'),
+        $form = $this->createForm(ProductionBatchType::class, $entity, array('action' => $this->generateUrl('restaurant_production_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $config));
         return $form;
     }
 
@@ -138,7 +134,7 @@ class ProductionController extends AbstractController
     private function createProductionCostingForm(Particular $entity)
     {
 
-        $form = $this->createForm(new ProductionType(), $entity, array(
+        $form = $this->createForm(ProductionType::class, $entity, array(
             'action' => $this->generateUrl('restaurant_production_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(

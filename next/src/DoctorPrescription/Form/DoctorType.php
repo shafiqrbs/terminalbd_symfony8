@@ -2,7 +2,6 @@
 
 namespace App\DoctorPrescription\Form;
 
-
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,11 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class DoctorType extends AbstractType
 {
-
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
     /**
@@ -31,6 +26,8 @@ class DoctorType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('room',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter room/cabin name or no']])
@@ -46,14 +43,14 @@ class DoctorType extends AbstractType
                 'attr'=>['class'=>'check-list span12'],
                 'expanded'      =>true,
                 'multiple'      =>true,
-                'choices' => ['Sunday' => 'Sunday',  'Monday' => 'Monday', 'Tuesday' => 'Tuesday', 'Wednesday' => 'Wednesday', 'Thursday' => 'Thursday', 'Friday' => 'Friday', 'Saturday' => 'Saturday'],
+                'choices' => ['Sunday' => 'Sunday', 'Monday' => 'Monday', 'Tuesday' => 'Tuesday', 'Wednesday' => 'Wednesday', 'Thursday' => 'Thursday', 'Friday' => 'Friday', 'Saturday' => 'Saturday'],
             ])
             ->add('room',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter room/cabin name or no']])
             ->add('assignDoctor', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select doctor from employee list---',
+                'placeholder' => '---Select doctor from employee list---',
                 'class' => User::class,
-                'property' => 'userDoctor',
+                'choice_label' => 'userDoctor',
                 'constraints' =>[
                     new NotBlank(message: 'Please select doctor from employee list'),
                 ],
@@ -74,12 +71,14 @@ class DoctorType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => DpsParticular::class,
-            'cascade_validation' => true,
             'error_bubbling'     => false,
         ]);
     }
-
 
     /**
      * @return string
@@ -88,6 +87,5 @@ class DoctorType extends AbstractType
     {
         return 'appstore_bundle_hospitalbundle_particular';
     }
-
 
 }

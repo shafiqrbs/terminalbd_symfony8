@@ -18,10 +18,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PageFeatureType extends AbstractType
 {
+    protected $globalOption;
 
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -29,6 +27,8 @@ class PageFeatureType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'span12 m-wrap','placeholder'=>'Enter full name'],
                 'constraints' =>[
@@ -41,8 +41,8 @@ class PageFeatureType extends AbstractType
             ->add('menu', EntityType::class, [
                 'required'    => false,
                 'class' => Menu::class,
-                'empty_value' => '---Select page---',
-                'property' => 'menu',
+                'placeholder' => '---Select page---',
+                'choice_label' => 'menu',
                 'attr'=>['class'=>'m-wrap span12 '],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -57,30 +57,17 @@ class PageFeatureType extends AbstractType
 
             ->add('captionPosition', ChoiceType::class, [
                 'attr'=>['class'=>'span12  m-wrap'],
-                'empty_value' => '---Caption Position ---',
+                'placeholder' => '---Caption Position ---',
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-	                'top-left'               => 'Top Left',
-	                'top-center'             => 'Top Center',
-	                'top-right'              => 'Top Right',
-	                'center-left'            => 'Center Left',
-	                'center-center'          => 'Center Center',
-	                'center-right'           => 'Center Right',
-	                'bottom-left'            => 'Bottom Left',
-	                'bottom-center'          => 'Bottom Center',
-	                'bottom-right'           => 'Bottom Right',
-
-                ],
+                'choices' => ['Top Left' => 'top-left', 'Top Center' => 'top-center', 'Top Right' => 'top-right', 'Center Left' => 'center-left', 'Center Center' => 'center-center', 'Center Right' => 'center-right', 'Bottom Left' => 'bottom-left', 'Bottom Center' => 'bottom-center', 'Bottom Right' => 'bottom-right'],
             ])
             ->add('targetTo', ChoiceType::class, [
                 'attr'=>['class'=>'span12  m-wrap targetTo'],
-                'empty_value' => '---Select Target URL ---',
+                'placeholder' => '---Select Target URL ---',
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'Page'              => 'Page',
-                ],
+                'choices' => ['Page' => 'Page'],
             ]);
     }
     
@@ -89,6 +76,10 @@ class PageFeatureType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Feature::class
         ]);
@@ -101,6 +92,5 @@ class PageFeatureType extends AbstractType
     {
         return 'setting_bundle_appearancebundle_feature';
     }
-
 
 }

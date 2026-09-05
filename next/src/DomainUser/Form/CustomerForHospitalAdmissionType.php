@@ -17,10 +17,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CustomerForHospitalAdmissionType extends AbstractType
 {
+    protected $location;
 
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -28,6 +26,8 @@ class CustomerForHospitalAdmissionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 patientName','autocomplete'=>'off','placeholder'=>'Patient name'],
@@ -71,8 +71,8 @@ class CustomerForHospitalAdmissionType extends AbstractType
             ]])
             ->add('bloodGroup', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'empty_value' => '--- Select Blood Group ---',
-                'choices' => ['A+' => 'A+',  'A-' => 'A-','B+' => 'B+',  'B-' => 'B-',  'O+' => 'O+',  'O-' => 'O-',  'AB+' => 'AB+',  'AB-' => 'AB-'],
+                'placeholder' => '--- Select Blood Group ---',
+                'choices' => ['A+' => 'A+', 'A-' => 'A-', 'B+' => 'B+', 'B-' => 'B-', 'O+' => 'O+', 'O-' => 'O-', 'AB+' => 'AB+', 'AB-' => 'AB-'],
             ])
             ->add('ageType', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span3 select-custom ageType'],
@@ -81,19 +81,19 @@ class CustomerForHospitalAdmissionType extends AbstractType
                 'constraints' =>[
                     new NotBlank(message: 'patient age type'),
                 ],
-                'choices' => ['Years' => 'Years','Months' => 'Months','Day' => 'Day']
+                'choices' => ['Years' => 'Years', 'Months' => 'Months', 'Day' => 'Day']
             ])
             ->add('gender', ChoiceType::class, [
                 'attr'=>['class'=>'span6 m-wrap select-custom gender'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Female' => 'Female','Male' => 'Male', 'Others' => 'Others'],
+                'choices' => ['Female' => 'Female', 'Male' => 'Male', 'Others' => 'Others'],
             ])
             ->add('maritalStatus', ChoiceType::class, [
                 'attr'=>['class'=>'span6 m-wrap select-custom maritalStatus'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Single' => 'Single','Married' => 'Married', 'Divorced' => 'Divorced','Widow'=>'Widow'],
+                'choices' => ['Single' => 'Single', 'Married' => 'Married', 'Divorced' => 'Divorced', 'Widow' => 'Widow'],
             ])
 
             ->add('alternativeContactPerson',TextType::class, ['attr'=>['class'=>'m-wrap span6 ','placeholder'=>'Guardian name'],
@@ -113,11 +113,10 @@ class CustomerForHospitalAdmissionType extends AbstractType
             ])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span12 location'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
 
@@ -129,6 +128,10 @@ class CustomerForHospitalAdmissionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Customer::class
         ]);

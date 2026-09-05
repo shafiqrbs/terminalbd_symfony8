@@ -75,7 +75,7 @@ class PortalBkashAccountController extends AbstractController
      */
     private function createCreateForm(PortalBkashAccount $entity)
     {
-        $form = $this->createForm(new PortalBkashAccountType(), $entity, [
+        $form = $this->createForm(PortalBkashAccountType::class, $entity, [
             'action' => $this->generateUrl('bkash_create'),
             'method' => 'POST',
         ]);
@@ -145,7 +145,7 @@ class PortalBkashAccountController extends AbstractController
      */
     private function createEditForm(PortalBkashAccount $entity)
     {
-        $form = $this->createForm(new PortalBkashAccountType(), $entity, [
+        $form = $this->createForm(PortalBkashAccountType::class, $entity, [
             'action' => $this->generateUrl('bkash_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);

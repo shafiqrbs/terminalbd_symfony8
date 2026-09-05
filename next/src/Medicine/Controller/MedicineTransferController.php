@@ -110,16 +110,12 @@ class MedicineTransferController extends AbstractController
     private function createCreateForm(MedicineTransfer $entity)
     {
         $global = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into TransferType::configureOptions() and pass them as form options: $global), $entity, array(
-        $form = $this->createForm(new TransferType($global), $entity, array(
-            'action' => $this->generateUrl('medicine_transfer_create'),
+        $form = $this->createForm(TransferType::class, $entity, array('action' => $this->generateUrl('medicine_transfer_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $global));
         return $form;
     }
 
@@ -150,7 +146,7 @@ class MedicineTransferController extends AbstractController
     */
     private function createEditForm(MedicineTransfer $entity,MedicineTransferItem $purchaseItem)
     {
-        $form = $this->createForm(new TransferItemType(), $purchaseItem, array(
+        $form = $this->createForm(TransferItemType::class, $purchaseItem, array(
             'action' => $this->generateUrl('medicine_transfer_update', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(

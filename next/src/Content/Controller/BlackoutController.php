@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -87,7 +88,7 @@ class BlackoutController extends AbstractController
     private function createCreateForm(Blackout $entity)
     {
 
-        $form = $this->createForm(new BlackoutType(), $entity , [
+        $form = $this->createForm(BlackoutType::class, $entity, [
             'action' => $this->generateUrl('blackout_create'),
             'method' => 'POST',
             'attr' => [
@@ -96,7 +97,7 @@ class BlackoutController extends AbstractController
             ]
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Submit', 'attr' => ['class' => 'btn btn-primary']]);
+        $form->add('submit', SubmitType::class, ['label' => 'Submit', 'attr' => ['class' => 'btn btn-primary']]);
         return $form;
     }
 
@@ -160,7 +161,7 @@ class BlackoutController extends AbstractController
     private function createEditForm(Blackout $entity)
     {
 
-        $form = $this->createForm(new BlackoutType(), $entity, [
+        $form = $this->createForm(BlackoutType::class, $entity, [
             'action' => $this->generateUrl('blackout_update', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -169,7 +170,7 @@ class BlackoutController extends AbstractController
             ]
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Submit', 'attr' => ['class' => 'btn btn-primary']]);
+        $form->add('submit', SubmitType::class, ['label' => 'Submit', 'attr' => ['class' => 'btn btn-primary']]);
         return $form;
     }
     /**

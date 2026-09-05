@@ -32,11 +32,11 @@ class ParticularType extends AbstractType
             ->add('service', EntityType::class, [
                 'required'    => false,
                 'class' => Service::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please select required')
                 ],
-                'empty_value' => '---Choose a particular type ---',
+                'placeholder' => '---Choose a particular type ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                 ->where("e.status = 1")

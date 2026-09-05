@@ -17,10 +17,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SurgeryType extends AbstractType
 {
+    protected $config;
 
-    public function __construct(private readonly HospitalConfig $config)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -28,6 +26,8 @@ class SurgeryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->config = $options['config'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter surgery name'],
@@ -38,8 +38,8 @@ class SurgeryType extends AbstractType
             ->add('accountHead', EntityType::class, [
                 'class'     => AccountHead::class,
                 'group_by'  => 'parent.name',
-                'property'  => 'name',
-                'empty_value' => '---Choose a account---',
+                'choice_label'  => 'name',
+                'placeholder' => '---Choose a account---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'choice_translation_domain' => true,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -58,8 +58,8 @@ class SurgeryType extends AbstractType
             ->add('surgeryDepartment', EntityType::class, [
                 'required'    => true,
                 'class' => HmsServiceGroup::class,
-                'property' => 'name',
-                'empty_value' => '---Select surgery department---',
+                'choice_label' => 'name',
+                'placeholder' => '---Select surgery department---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Select surgery department'),
@@ -73,7 +73,6 @@ class SurgeryType extends AbstractType
             ->add('minimumPrice',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter minimum price']])
             ->add('commission',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter commission']])
 
-
         ;
     }
     
@@ -82,6 +81,10 @@ class SurgeryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'config' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Particular::class
         ]);
@@ -94,7 +97,5 @@ class SurgeryType extends AbstractType
     {
         return 'appstore_bundle_hospitalbundle_particular';
     }
-
-
 
 }

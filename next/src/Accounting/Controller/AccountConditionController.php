@@ -112,7 +112,7 @@ class AccountConditionController extends AbstractController
      */
     private function createCreateForm(AccountCondition $entity)
     {
-        $form = $this->createForm(new AccountConditionType(), $entity, array(
+        $form = $this->createForm(AccountConditionType::class, $entity, array(
             'action' => $this->generateUrl('account_condition_create'),
             'method' => 'POST',
             'attr' => array(
@@ -160,7 +160,7 @@ class AccountConditionController extends AbstractController
     */
     private function createEditForm(AccountCondition $entity)
     {
-        $form = $this->createForm(new AccountConditionType(), $entity, array(
+        $form = $this->createForm(AccountConditionType::class, $entity, array(
             'action' => $this->generateUrl('account_condition_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
@@ -244,16 +244,12 @@ class AccountConditionController extends AbstractController
     private function createLedgerForm(AccountConditionLedger $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountConditionLedgerType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new AccountConditionLedgerType($option), $entity, array(
-            'action' => $this->generateUrl('account_condition_ledger_create'),
+        $form = $this->createForm(AccountConditionLedgerType::class, $entity, array('action' => $this->generateUrl('account_condition_ledger_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $option));
         return $form;
     }
 

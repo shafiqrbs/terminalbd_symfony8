@@ -2,6 +2,7 @@
 
 namespace App\DomainUser\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Tool\Service\ToolManager;
@@ -111,16 +112,12 @@ class CustomerInventoryController extends AbstractController
     private function createCreateForm(Customer $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new CustomerType($location), $entity, array(
-            'action' => $this->generateUrl('inventory_customer_create'),
+        $form = $this->createForm(CustomerType::class, $entity, array('action' => $this->generateUrl('inventory_customer_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $location));
         return $form;
     }
 
@@ -194,16 +191,12 @@ class CustomerInventoryController extends AbstractController
     private function createEditForm(Customer $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new CustomerType($location), $entity, array(
-            'action' => $this->generateUrl('inventory_customer_update', array('id' => $entity->getId())),
+        $form = $this->createForm(CustomerType::class, $entity, array('action' => $this->generateUrl('inventory_customer_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $location));
         return $form;
     }
     /**
@@ -276,7 +269,7 @@ class CustomerInventoryController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('inventory_customer_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

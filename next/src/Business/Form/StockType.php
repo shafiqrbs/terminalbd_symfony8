@@ -22,17 +22,13 @@ class StockType extends AbstractType
     /** @var  $option GlobalOption  */
     public  $option;
 
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void {
+        $this->option = $options['option'];
+
 
 	    $builder
 	    ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span8','placeholder'=>'Enter product name'],
@@ -43,8 +39,8 @@ class StockType extends AbstractType
             ->add('businessParticularType', EntityType::class, [
                 'required'    => true,
                 'class' => BusinessParticularType::class,
-                'empty_value' => '---Choose a particular type ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a particular type ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[ new NotBlank(message: 'Please select particular type') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -55,8 +51,8 @@ class StockType extends AbstractType
             ->add('category', EntityType::class, [
                 'required'    => false,
                 'class' => Category::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a category ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a category ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -66,8 +62,8 @@ class StockType extends AbstractType
             ->add('brand', EntityType::class, [
                 'required'    => false,
                 'class' => BusinessBrand::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a brand ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a brand ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -77,8 +73,8 @@ class StockType extends AbstractType
             ->add('unit', EntityType::class, [
                 'required'    => true,
                 'class' => ProductUnit::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a unit ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a unit ---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -93,6 +89,10 @@ class StockType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'option' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => BusinessParticular::class
         ]);
     }
@@ -104,6 +104,5 @@ class StockType extends AbstractType
     {
         return 'business_particular';
     }
-
 
 }

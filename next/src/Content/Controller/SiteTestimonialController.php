@@ -66,7 +66,7 @@ class SiteTestimonialController extends AbstractController
      */
     private function createCreateForm(Testimonial $entity)
     {
-	    $form = $this->createForm(new SiteTestimonialType(), $entity, [
+	    $form = $this->createForm(SiteTestimonialType::class, $entity, [
             'action' => $this->generateUrl('sitetestimonial_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -127,7 +127,7 @@ class SiteTestimonialController extends AbstractController
      */
     private function createEditForm(Testimonial $entity)
     {
-        $form = $this->createForm(new SiteTestimonialType(), $entity, [
+        $form = $this->createForm(SiteTestimonialType::class, $entity, [
             'action' => $this->generateUrl('sitetestimonial_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

@@ -75,16 +75,12 @@ class ProductController extends AbstractController
     private function createCreateForm(Page $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ProductType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()), $entity, array(
-        $form = $this->createForm(new ProductType($this->getUser()->getGlobalOption()), $entity, array(
-            'action' => $this->generateUrl('product_create'),
+        $form = $this->createForm(ProductType::class, $entity, array('action' => $this->generateUrl('product_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $this->getUser()->getGlobalOption()));
         return $form;
     }
 
@@ -154,16 +150,12 @@ class ProductController extends AbstractController
     private function createEditForm(Page $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ProductType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()), $entity, array(
-        $form = $this->createForm(new ProductType($this->getUser()->getGlobalOption()), $entity, array(
-            'action' => $this->generateUrl('product_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ProductType::class, $entity, array('action' => $this->generateUrl('product_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $this->getUser()->getGlobalOption()));
         return $form;
     }
     /**

@@ -43,14 +43,14 @@ class CustomerForHospitalType extends AbstractType
                 'attr'=>['class'=>'span12 m-wrap inputs ageType'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Years' => 'Years','Months' => 'Months','Day' => 'Day']
+                'choices' => ['Years' => 'Years', 'Months' => 'Months', 'Day' => 'Day']
             ])
             ->add('gender', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap inputs gender'],
                 'expanded'      =>false,
                 'multiple'      =>false,
                 'data' => 'Male',
-                'choices' => ['Female' => 'Female','Male' => 'Male', 'Others' => 'Others'],
+                'choices' => ['Female' => 'Female', 'Male' => 'Male', 'Others' => 'Others'],
             ])
             ->add('address',TextareaType::class, ['attr'=>['class'=>'m-wrap span12 resize inputs address','rows'=>3,'autocomplete'=>'off','placeholder'=>'Enter patient address']
             ]);

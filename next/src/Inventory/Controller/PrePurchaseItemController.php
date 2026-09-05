@@ -79,16 +79,12 @@ class PrePurchaseItemController extends AbstractController
     private function createCreateForm(PrePurchaseItem $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PrePurchaseItemType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new PrePurchaseItemType($config), $entity, array(
-            'action' => $this->generateUrl('prepurchaseitem_create'),
+        $form = $this->createForm(PrePurchaseItemType::class, $entity, array('action' => $this->generateUrl('prepurchaseitem_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'inventoryConfig' => $config));
         return $form;
     }
 
@@ -157,16 +153,12 @@ class PrePurchaseItemController extends AbstractController
     private function createEditForm(PrePurchaseItem $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PrePurchaseItemType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new PrePurchaseItemType($config), $entity, array(
-            'action' => $this->generateUrl('prepurchaseitem_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PrePurchaseItemType::class, $entity, array('action' => $this->generateUrl('prepurchaseitem_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'inventoryConfig' => $config));
          return $form;
     }
     /**

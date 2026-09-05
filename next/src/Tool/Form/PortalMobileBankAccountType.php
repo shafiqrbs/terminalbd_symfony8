@@ -30,10 +30,7 @@ class PortalMobileBankAccountType extends AbstractType
             ])
             ->add('serviceName', ChoiceType::class, [
                 'attr'=>['class'=>'span12 select2'],
-                'choices' => [
-                    'Bkash' => 'Bkash',
-                    'Rocket' => 'Rocket',
-                ],
+                'choices' => ['Bkash' => 'Bkash', 'Rocket' => 'Rocket'],
             ])
             ->add('accountOwner',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'add account ownership'],
                 'constraints' =>[
@@ -42,11 +39,7 @@ class PortalMobileBankAccountType extends AbstractType
             ])
             ->add('accountType', ChoiceType::class, [
                 'attr'=>['class'=>'span12 select2'],
-                'choices' => [
-                    'Personal' => 'Personal',
-                    'General' => 'General',
-                    'Merchant' => 'Merchant',
-                ],
+                'choices' => ['Personal' => 'Personal', 'General' => 'General', 'Merchant' => 'Merchant'],
             ])
         ;
     }

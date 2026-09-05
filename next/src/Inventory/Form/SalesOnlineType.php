@@ -2,6 +2,11 @@
 
 namespace App\Inventory\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use App\DomainUser\Form\SalesCustomerType;
 use App\DomainUser\Form\SalesOnlineCustomerType;
 use App\Inventory\Entity\SalesItem;
@@ -10,27 +15,18 @@ use App\Location\Repository\LocationRepository;
 use App\Tool\Entity\GlobalOption;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SalesOnlineType extends AbstractType
 {
-
+    protected $location;
 
 
     /** @var GlobalOption */
     public  $globalOption;
 
     /** @var  LocationRepository */
-    private $location;
-
-
-    function __construct(GlobalOption $globalOption,  LocationRepository $location )
-    {
-        $this->globalOption = $globalOption;
-        $this->location = $location;
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -38,18 +34,21 @@ class SalesOnlineType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
 
-            ->add('payment','text', array('attr'=>array('class'=>'receive-empty m-wrap span12 amount inputs','placeholder'=>'Receive amount','data-original-title'=>'Enter receive amount','autocomplete'=>'off')))
-            ->add('discountCalculation','text', array('attr'=>array('class'=>'m-wrap span12 amount inputs salesOperation','placeholder'=>'Discount','data-original-title'=>'Enter discount amount','autocomplete'=>'off')))
-            ->add('deliveryCharge','text', array('attr'=>array('class'=>'m-wrap amount span12 inputs salesOperation','placeholder'=>'Delivery charge','data-original-title'=>'Enter delivery charge','autocomplete'=>'off')))
-            ->add('cardNo','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment card/cheque no','data-original-title'=>'Add payment card/cheque no','autocomplete'=>'off')))
-            ->add('transactionId','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment transaction id','data-original-title'=>'Add payment transaction id','autocomplete'=>'off')))
-            ->add('paymentMobile','text', array('attr'=>array('class'=>'m-wrap span12 mobile','placeholder'=>'Add payment mobile no','data-original-title'=>'Add payment mobile no','autocomplete'=>'off')))
-            ->add('transactionMethod', 'entity', array(
+            ->add('payment', TextType::class, array('attr'=>array('class'=>'receive-empty m-wrap span12 amount inputs','placeholder'=>'Receive amount','data-original-title'=>'Enter receive amount','autocomplete'=>'off')))
+            ->add('discountCalculation', TextType::class, array('attr'=>array('class'=>'m-wrap span12 amount inputs salesOperation','placeholder'=>'Discount','data-original-title'=>'Enter discount amount','autocomplete'=>'off')))
+            ->add('deliveryCharge', TextType::class, array('attr'=>array('class'=>'m-wrap amount span12 inputs salesOperation','placeholder'=>'Delivery charge','data-original-title'=>'Enter delivery charge','autocomplete'=>'off')))
+            ->add('cardNo', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment card/cheque no','data-original-title'=>'Add payment card/cheque no','autocomplete'=>'off')))
+            ->add('transactionId', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment transaction id','data-original-title'=>'Add payment transaction id','autocomplete'=>'off')))
+            ->add('paymentMobile', TextType::class, array('attr'=>array('class'=>'m-wrap span12 mobile','placeholder'=>'Add payment mobile no','data-original-title'=>'Add payment mobile no','autocomplete'=>'off')))
+            ->add('transactionMethod', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\Tool\Entity\TransactionMethod',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 m-wrap transactionMethod inputs'),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
@@ -58,32 +57,29 @@ class SalesOnlineType extends AbstractType
                         ->orderBy("e.id","ASC");
                 }
             ))
-            ->add('paymentCard', 'entity', array(
+            ->add('paymentCard', EntityType::class, array(
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => 'App\Tool\Entity\PaymentCard',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'empty_value' => '---Choose payment method---',
+                'placeholder' => '---Choose payment method---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
                         ->where("e.status = 1")
                         ->orderBy("e.id","ASC");
                 }
             ))
-	        ->add('discountType', 'choice', array(
+	        ->add('discountType', ChoiceType::class, array(
 		        'required'    => true,
 		        'attr'=>array('class'=>'span12 m-wrap inputs salesOperation'),
-		        'choices' => array(
-			        'Flat' => 'Flat',
-			        'Percentage' => 'Percentage',
-		        ),
+		        'choices' => array('Flat' => 'Flat', 'Percentage' => 'Percentage'),
 	        ))
-	        ->add('salesBy', 'entity', array(
+	        ->add('salesBy', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\User\Entity\User',
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>array('class'=>'span12 m-wrap inputs'),
-                'empty_value' => '---Sales By---',
+                'placeholder' => '---Sales By---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('u')
                         ->where("u.isDelete != 1")
@@ -94,12 +90,12 @@ class SalesOnlineType extends AbstractType
                 }
             ))
 
-            ->add('accountBank', 'entity', array(
+            ->add('accountBank', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Accounting\Entity\AccountBank',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -107,12 +103,12 @@ class SalesOnlineType extends AbstractType
                         ->orderBy("b.name", "ASC");
                 }
             ))
-            ->add('accountMobileBank', 'entity', array(
+            ->add('accountMobileBank', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Accounting\Entity\AccountMobileBank',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'empty_value' => '---Choose receive mobile account---',
+                'placeholder' => '---Choose receive mobile account---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -120,26 +116,17 @@ class SalesOnlineType extends AbstractType
                         ->orderBy("b.name", "ASC");
                 }
             ))
-          //  ->add('discount','hidden')
-            ->add('process', 'choice', array(
+          //  ->add('discount', HiddenType::class)
+            ->add('process', ChoiceType::class, array(
                 'required'    => false,
                 'attr'=>array('class'=>'span9 m-wrap inputs'),
-                'empty_value' => '---Choose current process---',
+                'placeholder' => '---Choose current process---',
                 'constraints' =>array(
                     new NotBlank(array('message'=>'Select current process'))
                 ),
-                'choices' => array(
-                    'In-progress' => 'In-progress',
-                    'Done' => 'Done',
-                    'Delivered' => 'Delivered',
-                    'Courier' => 'Courier',
-                    'Cancel' => 'Cancel',
-                    'Returned' => 'Returned',
-                ),
+                'choices' => array('In-progress' => 'In-progress', 'Done' => 'Done', 'Delivered' => 'Delivered', 'Courier' => 'Courier', 'Cancel' => 'Cancel', 'Returned' => 'Returned'),
             ))
-	        ->add('remark','textarea', array('attr'=>array('class'=>'m-wrap span12 customer-input','rows'=>2,'placeholder'=>'Enter narration')));
-           // TODO(migration): SF3+ takes a form type class-string, not an instance.
-           // Move these constructor arguments into SalesOnlineCustomerType::configureOptions() and pass them as form options: $this->location
+	        ->add('remark', TextareaType::class, array('attr'=>array('class'=>'m-wrap span12 customer-input','rows'=>2,'placeholder'=>'Enter narration')));
            // $builder->add('customer', new SalesOnlineCustomerType($this->location));
 
     }
@@ -147,8 +134,13 @@ class SalesOnlineType extends AbstractType
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults(array(
             'data_class' => 'App\Inventory\Entity\Sales'
         ));
@@ -157,7 +149,7 @@ class SalesOnlineType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'sales';
     }

@@ -2,7 +2,7 @@
 
 namespace App\HumanResource\Form;
 
-
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\User\Entity\Repository\UserRepository;
 use Doctrine\ORM\EntityRepository;
 use App\Location\Repository\LocationRepository;
@@ -10,11 +10,12 @@ use App\Tool\Entity\GlobalOption;
 use App\Tool\Repository\DesignationRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EditUserType extends AbstractType
 {
+    protected $designationRepository;
 
 
     /** @var  UserRepository */
@@ -26,19 +27,7 @@ class EditUserType extends AbstractType
     /** @var  LocationRepository */
     private $location;
 
-
      /** @var  DesignationRepository */
-    private $designationRepository;
-
-
-    function __construct( UserRepository $user , GlobalOption $option , LocationRepository $location, DesignationRepository $designationRepository)
-    {
-        $this->location = $location;
-        $this->user = $user;
-        $this->option = $option;
-        $this->designationRepository = $designationRepository;
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -46,22 +35,19 @@ class EditUserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('userGroup', 'choice', array(
+        $this->user = $options['user'];
+        $this->option = $options['option'];
+        $this->location = $options['location'];
+        $this->designationRepository = $options['designationRepository'];
+
+        $builder->add('userGroup', ChoiceType::class, array(
         'attr'=>array('class'=>'m-wrap span8'),
         'expanded'      => false,
         'multiple'      => false,
-        'choices' => array(
-            'employee' => 'Employee',
-            'user' => 'User',
-            'marketing' => 'Marketing Executive',
-        ),
+        'choices' => array('Employee' => 'employee', 'User' => 'user', 'Marketing Executive' => 'marketing'),
         ));
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into \App\DomainUser\Form\EmployeeProfileType::configureOptions() and pass them as form options: $this->user, $this->option,$this->location
-        $builder->add('profile', new \App\DomainUser\Form\EmployeeProfileType($this->user, $this->option,$this->location));
-      // TODO(migration): SF3+ takes a form type class-string, not an instance.
-      // Move these constructor arguments into EmployeePayrollType::configureOptions() and pass them as form options: $this->user, $this->option,$this->location
-      //  $builder->add('employeePayroll', new EmployeePayrollType($this->user, $this->option,$this->location));
+        $builder->add('profile', EmployeeProfileType::class, ['user' => $this->user, 'option' => $this->option, 'location' => $this->location]);
+      //  $builder->add('employeePayroll', EmployeePayrollType::class, ['user' => $this->user, 'option' => $this->option, 'location' => $this->location]);
     }
 
     public function getAccessRoleGroup(){
@@ -72,8 +58,15 @@ class EditUserType extends AbstractType
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'user' => null,
+            'option' => null,
+            'location' => null,
+            'designationRepository' => null,
+        ]);
+
         $resolver->setDefaults(array(
             'data_class' => 'App\User\Entity\User'
         ));
@@ -82,10 +75,9 @@ class EditUserType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'user';
     }
-
 
 }

@@ -13,20 +13,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SalesTemporaryItemType extends AbstractType
 {
+    protected $glodbalOption;
+    protected $em;
 
 
     /** @var  $globalOption GlobalOption */
     private $globalOption;
-
-
-
-    public function __construct(GlobalOption $globalOption, /** @var $em MedicineSalesItemRepository */
-    private readonly MedicineSalesItemRepository $em)
-    {
-        $this->glodbalOption     = $globalOption;
-        $this->config     = $globalOption->getMedicineConfig();
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -34,6 +26,9 @@ class SalesTemporaryItemType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->glodbalOption = $options['globalOption'];
+        $this->em = $options['em'];
+
         $builder
 
             ->add('stockName',TextType::class, ['attr'=>['class'=>'m-wrap span12 select2StockMedicine input','placeholder'=>'Enter stock medicine name']])
@@ -45,7 +40,7 @@ class SalesTemporaryItemType extends AbstractType
                     'attr' => ['class' => 'm-wrap span12 input'],
                     'expanded' => false,
                     'multiple' => false,
-                    'empty_value' => '---Purchase Item---',
+                    'placeholder' => '---Purchase Item---',
                     'choices' => [],
                 ]);
             }
@@ -62,6 +57,11 @@ class SalesTemporaryItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'em' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicineSalesItem::class
         ]);

@@ -83,16 +83,12 @@ class MedicineMinimumStockController extends AbstractController
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $em = $this->em->getRepository(\App\Medicine\Entity\MedicineMinimumStock::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MedicineMinimumStockType::configureOptions() and pass them as form options: $em,$config), $entity, array(
-        $form = $this->createForm(new MedicineMinimumStockType($em,$config), $entity, array(
-            'action' => $this->generateUrl('medicine_minimum_create'),
+        $form = $this->createForm(MedicineMinimumStockType::class, $entity, array('action' => $this->generateUrl('medicine_minimum_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em, 'config' => $config));
         return $form;
     }
 
@@ -129,7 +125,7 @@ class MedicineMinimumStockController extends AbstractController
     */
     private function createEditForm(MedicineMinimumStock $entity)
     {
-        $form = $this->createForm(new MedicineMinimumStockType(), $entity, array(
+        $form = $this->createForm(MedicineMinimumStockType::class, $entity, array(
             'action' => $this->generateUrl('medicine_minimum_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(

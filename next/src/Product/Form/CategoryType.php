@@ -13,10 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CategoryType extends AbstractType
 {
-
-    public function __construct(private readonly CategoryRepository $em)
-    {
-    }
+    protected $em;
 
 
     /**
@@ -25,6 +22,8 @@ class CategoryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter category name'],
@@ -35,15 +34,14 @@ class CategoryType extends AbstractType
             ])
             ->add('parent', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select parent category---',
+                'placeholder' => '---Select parent category---',
                 'attr'=>['class'=>'category m-wrap span12 select2'],
                 'class' => \App\Product\Entity\Category::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->categoryChoiceList()
             ])
             ->add('file')
             ->add('status')
-
 
         ;
     }
@@ -53,6 +51,10 @@ class CategoryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Category::class
         ]);
@@ -74,6 +76,5 @@ class CategoryType extends AbstractType
         return $categoryTree = $this->em->getFlatCategoryTree();
 
     }
-
 
 }

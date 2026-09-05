@@ -14,10 +14,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ItemSizeType extends AbstractType
 {
-
-    public function __construct(private readonly CategoryRepository $em, private readonly InventoryConfig $inventoryConfig)
-    {
-    }
+    protected $em;
+    protected $inventoryConfig;
 
 
     /**
@@ -26,6 +24,9 @@ class ItemSizeType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+        $this->inventoryConfig = $options['inventoryConfig'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add  size/dimension/weight/others name'],
@@ -37,13 +38,13 @@ class ItemSizeType extends AbstractType
                 'expanded'      =>true,
                 'multiple'      =>true,
                 'required'    => true,
-                'empty_value' => '---Select parent category---',
+                'placeholder' => '---Select parent category---',
                 'attr'=>['class'=>'category m-wrap span12 check-list'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
                 ],
                 'class' => \App\Product\Entity\Category::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->categoryChoiceList()
             ])
             ->add('status');
@@ -54,6 +55,11 @@ class ItemSizeType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => ItemSize::class
         ]);

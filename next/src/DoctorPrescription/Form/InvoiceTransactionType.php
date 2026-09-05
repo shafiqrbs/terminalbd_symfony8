@@ -2,6 +2,9 @@
 
 namespace App\DoctorPrescription\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\DomainUser\Form\CustomerForDmsType;
 use App\DomainUser\Form\CustomerForDpsType;
 use App\DomainUser\Form\CustomerForHospitalType;
@@ -16,11 +19,13 @@ use App\Location\Repository\LocationRepository;
 use App\Tool\Entity\GlobalOption;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class InvoiceTransactionType extends AbstractType
 {
+    protected $globalOption;
+
 
     /** @var  LocationRepository */
     private $location;
@@ -29,16 +34,6 @@ class InvoiceTransactionType extends AbstractType
     private $diagnostic;
 
     /** @var  GlobalOption */
-    private $globalOption;
-
-
-    function __construct(GlobalOption $globalOption ,  LocationRepository $location ,  DiagnosticReportRepository $diagnostic)
-    {
-        $this->location         = $location;
-        $this->diagnostic         = $diagnostic;
-        $this->globalOption     = $globalOption;
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -46,29 +41,27 @@ class InvoiceTransactionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+        $this->diagnostic = $options['diagnostic'];
+
         $builder
 
-            ->add('process', 'choice', array(
+            ->add('process', ChoiceType::class, array(
                 'attr'=>array('class'=>'m-wrap invoiceProcess select-custom'),
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'empty_value' => '---Choose process---',
-                'choices' => array(
-                    'Created' => 'Created',
-                    'Appointment' => 'Appointment',
-                    'Visit' => 'Visit',
-                    'Done' => 'Done',
-                    'Canceled' => 'Canceled',
-                ),
+                'placeholder' => '---Choose process---',
+                'choices' => array('Created' => 'Created', 'Appointment' => 'Appointment', 'Visit' => 'Visit', 'Done' => 'Done', 'Canceled' => 'Canceled'),
             ))
 
-            ->add('investigations', 'entity', array(
+            ->add('investigations', EntityType::class, array(
                 'required'    => true,
                 'multiple'      =>true,
                 'attr'=>array('class'=>'m-wrap span12 select2'),
                 'class' => 'App\Medicine\Entity\DiagnosticReport',
                 'group_by'  => 'category.name',
-                'property'  => 'name',
+                'choice_label'  => 'name',
                 'choice_translation_domain' => true,
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
@@ -78,13 +71,13 @@ class InvoiceTransactionType extends AbstractType
 
             ))
 
-            ->add('cardNo','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off')))
-            ->add('transactionId','text', array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment transaction id','data-original-title'=>'Add payment transaction id','autocomplete'=>'off')))
-            ->add('paymentMobile','text', array('attr'=>array('class'=>'m-wrap span12 mobile','placeholder'=>'Add payment mobile no','data-original-title'=>'Add payment mobile no','autocomplete'=>'off')))
-            ->add('transactionMethod', 'entity', array(
+            ->add('cardNo', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off')))
+            ->add('transactionId', TextType::class, array('attr'=>array('class'=>'m-wrap span12','placeholder'=>'Add payment transaction id','data-original-title'=>'Add payment transaction id','autocomplete'=>'off')))
+            ->add('paymentMobile', TextType::class, array('attr'=>array('class'=>'m-wrap span12 mobile','placeholder'=>'Add payment mobile no','data-original-title'=>'Add payment mobile no','autocomplete'=>'off')))
+            ->add('transactionMethod', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\Tool\Entity\TransactionMethod',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 m-wrap transactionMethod'),
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
@@ -93,12 +86,12 @@ class InvoiceTransactionType extends AbstractType
                         ->orderBy("e.id","ASC");
                 }
             ))
-            ->add('paymentCard', 'entity', array(
+            ->add('paymentCard', EntityType::class, array(
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => 'App\Tool\Entity\PaymentCard',
                 'attr'=>array('class'=>'span12 m-wrap'),
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('e')
                         ->where("e.status = 1")
@@ -106,12 +99,12 @@ class InvoiceTransactionType extends AbstractType
                 }
             ))
 
-            ->add('accountBank', 'entity', array(
+            ->add('accountBank', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Accounting\Entity\AccountBank',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 select2'),
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -120,12 +113,12 @@ class InvoiceTransactionType extends AbstractType
                 }
             ))
 
-            ->add('accountMobileBank', 'entity', array(
+            ->add('accountMobileBank', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Accounting\Entity\AccountMobileBank',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 select2'),
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -133,10 +126,10 @@ class InvoiceTransactionType extends AbstractType
                         ->orderBy("b.name", "ASC");
                 }
             ))
-            ->add('assignDoctor', 'entity', array(
+            ->add('assignDoctor', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\DoctorPrescription\Entity\DpsParticular',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'multiple'    => false,
                 'expanded' => false,
                 'attr'=>array('class'=>'m-wrap span12'),
@@ -151,16 +144,20 @@ class InvoiceTransactionType extends AbstractType
                         ->orderBy("e.name","ASC");
                 }
             ));
-           // TODO(migration): SF3+ takes a form type class-string, not an instance.
-           // Move these constructor arguments into CustomerForDpsType::configureOptions() and pass them as form options: $this->location 
-           $builder->add('customer', new CustomerForDpsType( $this->location ));
+           $builder->add('customer', CustomerForDpsType::class, ['location' => $this->location]);
     }
     
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+            'diagnostic' => null,
+        ]);
+
         $resolver->setDefaults(array(
             'data_class' => 'App\DoctorPrescription\Entity\DpsInvoice'
         ));
@@ -169,7 +166,7 @@ class InvoiceTransactionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'appstore_bundle_dpsinvoice';
     }

@@ -75,7 +75,7 @@ class GalleryImageController extends AbstractController
     private function createCreateForm(GalleryImage $entity)
     {
 
-        $form = $this->createForm(new GalleryImageType(), $entity, [
+        $form = $this->createForm(GalleryImageType::class, $entity, [
             'action' => $this->generateUrl('galleryimage_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -158,7 +158,7 @@ class GalleryImageController extends AbstractController
      */
     private function createEditForm($id)
     {
-        $form = $this->createForm(new GalleryImageType(), null, [
+        $form = $this->createForm(GalleryImageType::class, null, [
             'action' => $this->generateUrl('galleryimage_update', ['id' => $id]),
             'method' => 'POST',
             'attr' => [

@@ -13,16 +13,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class ItemImporterType extends AbstractType
 {
 
-
     /** @var  GlobalOption */
     public  $option;
-
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -30,6 +22,8 @@ class ItemImporterType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add  file name'],
                 'constraints' =>[
@@ -43,6 +37,10 @@ class ItemImporterType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => ItemImport::class
         ]);

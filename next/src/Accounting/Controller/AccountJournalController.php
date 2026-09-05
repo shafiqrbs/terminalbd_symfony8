@@ -2,6 +2,7 @@
 
 namespace App\Accounting\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Knp\Component\Pager\PaginatorInterface;
@@ -127,16 +128,12 @@ class AccountJournalController extends AbstractController
     private function createCreateForm(AccountJournal $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountJournalType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountJournalType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_journal_create'),
+        $form = $this->createForm(AccountJournalType::class, $entity, array('action' => $this->generateUrl('account_journal_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
       return $form;
     }
 
@@ -199,7 +196,7 @@ class AccountJournalController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('account_journal_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

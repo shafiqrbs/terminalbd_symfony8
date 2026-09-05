@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -79,7 +80,7 @@ class NoticeBoardController extends AbstractController
     {
 
 
-        $form = $this->createForm(new NoticeBoardType(), $entity, [
+        $form = $this->createForm(NoticeBoardType::class, $entity, [
             'action' => $this->generateUrl('noticeboard_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -162,7 +163,7 @@ class NoticeBoardController extends AbstractController
     private function createEditForm(Page $entity)
     {
 
-        $form = $this->createForm(new NoticeBoardType(), $entity, [
+        $form = $this->createForm(NoticeBoardType::class, $entity, [
             'action' => $this->generateUrl('noticeboard_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -237,7 +238,7 @@ class NoticeBoardController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('noticeboard_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

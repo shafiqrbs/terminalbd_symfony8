@@ -163,51 +163,39 @@ class PrepurchaseController extends AbstractController
     private function createEditForm(MedicinePrepurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PrepurchaseType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PrepurchaseType($globalOption), $entity, array(
-            'action' => $this->generateUrl('medicine_prepurchase_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PrepurchaseType::class, $entity, array('action' => $this->generateUrl('medicine_prepurchase_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchaseForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 
     private function createPurchaseItemForm(MedicinePrepurchaseItem $purchaseItem , MedicinePrepurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseItemType::configureOptions() and pass them as form options: $globalOption), $purchaseItem, array(
-        $form = $this->createForm(new PurchaseItemType($globalOption), $purchaseItem, array(
-            'action' => $this->generateUrl('medicine_prepurchase_particular_add', array('invoice' => $entity->getId())),
+        $form = $this->createForm(PurchaseItemType::class, $purchaseItem, array('action' => $this->generateUrl('medicine_prepurchase_particular_add', array('invoice' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchaseItemForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 
     private function createStockItemForm(MedicineStock $entity, MedicinePrepurchase $purchase )
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MedicineStockPreItemType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new MedicineStockPreItemType($config), $entity, array(
-            'action' => $this->generateUrl('medicine_prestock_item_create', array('id' => $purchase->getId())),
+        $form = $this->createForm(MedicineStockPreItemType::class, $entity, array('action' => $this->generateUrl('medicine_prestock_item_create', array('id' => $purchase->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'id' => 'stockItemForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'medicineConfig' => $config));
         return $form;
     }
 

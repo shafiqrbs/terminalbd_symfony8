@@ -191,7 +191,7 @@ class BranchInvoiceController extends AbstractController
      */
     private function createEditForm(BranchInvoice $entity, BranchInvoiceItem $branchItem )
     {
-        $form = $this->createForm(new BranchInvoiceItemType(), $branchItem, [
+        $form = $this->createForm(BranchInvoiceItemType::class, $branchItem, [
             'action' => $this->generateUrl('inventory_branchinvoice_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

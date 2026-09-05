@@ -28,18 +28,14 @@ class ItemWebType extends AbstractType
 
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-    }
-
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
 
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 ','placeholder'=>'Add web item name']])
@@ -50,7 +46,7 @@ class ItemWebType extends AbstractType
                 'expanded'      =>false,
                 'placeholder' => 'Choose made in',
                 'class' => Country::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('m')
                     ->orderBy('m.name','ASC'),
@@ -58,8 +54,8 @@ class ItemWebType extends AbstractType
             ->add('brand', EntityType::class, [
                 'required'    => false,
                 'class' => Branding::class,
-                'empty_value' => 'Choose a brand',
-                'property' => 'name',
+                'placeholder' => 'Choose a brand',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->Where("b.status = 1"),
@@ -69,10 +65,7 @@ class ItemWebType extends AbstractType
                 'constraints' =>[
                     new NotBlank(message: 'Please chose required')
                 ],
-                'choices' => [
-                    'Kids' => 'Kids',
-                    'Adult' => 'Adult'
-                ],
+                'choices' => ['Kids' => 'Kids', 'Adult' => 'Adult'],
             ])
 
             ->add('gender', ChoiceType::class, [
@@ -80,10 +73,7 @@ class ItemWebType extends AbstractType
                 'constraints' =>[
                     new NotBlank(message: 'Please chose required')
                 ],
-                'choices' => [
-                    'Male' => 'Male',
-                    'Female' => 'Female'
-                ],
+                'choices' => ['Male' => 'Male', 'Female' => 'Female'],
             ])
             ->add('material',TextType::class, ['attr'=>['class'=>'m-wrap span12 ']])
             ->add('isWeb')
@@ -95,6 +85,10 @@ class ItemWebType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Item::class
         ]);

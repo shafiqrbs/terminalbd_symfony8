@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -72,16 +73,12 @@ class ItemAttributeController extends AbstractController
     private function createCreateForm(ItemAttribute $entity)
     {
         $em = $this->em->getRepository(\App\Product\Entity\Category::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ItemAttributeType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm(new ItemAttributeType($em), $entity, array(
-            'action' => $this->generateUrl('itemattribute_create'),
+        $form = $this->createForm(ItemAttributeType::class, $entity, array('action' => $this->generateUrl('itemattribute_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $em));
         return $form;
     }
 
@@ -149,16 +146,12 @@ class ItemAttributeController extends AbstractController
     private function createEditForm(ItemAttribute $entity)
     {
         $em = $this->em->getRepository(\App\Product\Entity\Category::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ItemAttributeType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm(new ItemAttributeType($em), $entity, array(
-            'action' => $this->generateUrl('itemattribute_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ItemAttributeType::class, $entity, array('action' => $this->generateUrl('itemattribute_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $em));
          return $form;
     }
     /**
@@ -226,7 +219,7 @@ class ItemAttributeController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('itemattribute_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

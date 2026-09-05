@@ -94,7 +94,7 @@ class BusinessWearHouseController extends AbstractController
     private function createCreateForm(WearHouse $entity)
     {
 
-        $form = $this->createForm(new WearHouseType(), $entity, [
+        $form = $this->createForm(WearHouseType::class, $entity, [
             'action' => $this->generateUrl('business_wearhouse_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -143,7 +143,7 @@ class BusinessWearHouseController extends AbstractController
     private function createEditForm(WearHouse $entity )
     {
 
-        $form = $this->createForm(new WearHouseType(), $entity, [
+        $form = $this->createForm(WearHouseType::class, $entity, [
             'action' => $this->generateUrl('business_wearhouse_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

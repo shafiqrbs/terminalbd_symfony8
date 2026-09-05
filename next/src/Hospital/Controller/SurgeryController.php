@@ -106,16 +106,12 @@ class SurgeryController extends AbstractController
     {
 
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SurgeryType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new SurgeryType($config), $entity, array(
-            'action' => $this->generateUrl('hms_surgery_create', array('id' => $entity->getId())),
+        $form = $this->createForm(SurgeryType::class, $entity, array('action' => $this->generateUrl('hms_surgery_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'config' => $config));
         return $form;
     }
 
@@ -153,16 +149,12 @@ class SurgeryController extends AbstractController
     {
 
         $config = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SurgeryType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new SurgeryType($config), $entity, array(
-            'action' => $this->generateUrl('hms_surgery_update', array('id' => $entity->getId())),
+        $form = $this->createForm(SurgeryType::class, $entity, array('action' => $this->generateUrl('hms_surgery_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'config' => $config));
         return $form;
     }
     /**

@@ -66,34 +66,26 @@ class RestaurantTemporaryController extends AbstractController
     private function createTemporaryForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into TemporaryType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new TemporaryType($globalOption), $entity, array(
-            'action' => $this->generateUrl('restaurant_temporary_create'),
+        $form = $this->createForm(TemporaryType::class, $entity, array('action' => $this->generateUrl('restaurant_temporary_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
     private function createInvoiceParticularForm(RestaurantTemporary $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into RestaurantTemporaryParticularType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new RestaurantTemporaryParticularType($config), $entity, array(
-            'action' => $this->generateUrl('restaurant_temporary_particular_add'),
+        $form = $this->createForm(RestaurantTemporaryParticularType::class, $entity, array('action' => $this->generateUrl('restaurant_temporary_particular_add'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'particularForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'restaurantConfig' => $config));
         return $form;
     }
 

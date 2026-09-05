@@ -2,7 +2,6 @@
 
 namespace App\Pos\Form;
 
-
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -21,11 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class PosType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption )
-    {
-        $this->config  = $this->globalOption->getInventoryConfig()->getId();
-    }
+    protected $globalOption;
 
 
     /**
@@ -34,6 +29,8 @@ class PosType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('payment',TextType::class, ['attr'=>['class'=>'m-wrap span4 input-number invoice-change payment amount tooltips','data-trigger' => 'hover','placeholder'=>'Amount','data-original-title'=>'Add receive amount','autocomplete'=>'off']])
@@ -45,7 +42,7 @@ class PosType extends AbstractType
             ->add('discount',HiddenType::class,['attr'=>['class'=>'discount amount']])
             ->add('discountType', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap invoice-change'],
-                'choices'   => ['flat' => 'Flat', 'percent' => 'Percent'],
+                'choices'   => ['Flat' => 'flat', 'Percent' => 'percent'],
                 'required'  => true,
             ])
             ->add('isHold',CheckboxType::class, ['attr'=>['class'=>'m-wrap isHold tooltips','data-trigger' => 'hover','placeholder'=>'Hold','data-original-title'=>'Invoice Hold','autocomplete'=>'off']])
@@ -53,10 +50,10 @@ class PosType extends AbstractType
             ->add('discountCoupon',TextType::class, ['mapped'=> false,'attr'=>['class'=>'tooltips span12 m-wrap input-number discountCoupon invoice-change','data-trigger' => 'hover','placeholder'=>'Coupon No','data-original-title'=>'Enter Discount Coupon No','autocomplete'=>'off']])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'span12 m-wrap invoice-change'],
-                'empty_value' => '---Payment card---',
+                'placeholder' => '---Payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -64,9 +61,9 @@ class PosType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap invoice-change'],
-                'empty_value' => '---Choose Bank Account---',
+                'placeholder' => '---Choose Bank Account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -76,9 +73,9 @@ class PosType extends AbstractType
             ->add('salesBy', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap sales-by invoice-change'],
-                'empty_value' => '---Sales By---',
+                'placeholder' => '---Sales By---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->where("u.isDelete != 1")
                     ->andWhere("u.enabled = 1")
@@ -90,9 +87,9 @@ class PosType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap invoice-change'],
-                'empty_value' => '---Choose Mobile Account---',
+                'placeholder' => '---Choose Mobile Account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -105,6 +102,10 @@ class PosType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Pos::class
         ]);

@@ -11,6 +11,7 @@
 
 namespace App\User\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -24,16 +25,17 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class UserFormType extends AbstractType
 {
+    protected $newEntry;
+
 
     /**
      * @param bool   $newEntry
      */
-    public function __construct(private $newEntry = true)
-    {
-    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->newEntry = $options['newEntry'];
+
         $builder
             ->add('fullName', TextType::class, ['class' => 'm-wrap placeholder-no-fix']);
 
@@ -41,7 +43,7 @@ class UserFormType extends AbstractType
             $builder
                 ->add('username', null, ['label' => 'form.username', 'translation_domain' => 'FOSUserBundle'])
                 ->add('plainPassword', RepeatedType::class, [
-                    'type' => 'password',
+                    'type' => PasswordType::class,
                     'options' => ['translation_domain' => 'FOSUserBundle'],
                     'first_options' => ['label' => 'form.password'],
                     'second_options' => ['label' => 'form.password_confirmation'],
@@ -56,7 +58,7 @@ class UserFormType extends AbstractType
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('g')
                     ->andWhere("g.name != :group")
                     ->setParameter('group', 'Super Administrator'),
-                'property' => 'name',
+                'choice_label' => 'name',
                 'multiple' => true,
             ])
             ->add('profile', ProfileFormType::class)
@@ -65,6 +67,10 @@ class UserFormType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'newEntry' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => User::class,
             'validation_groups'  => 'registration',

@@ -2,6 +2,7 @@
 
 namespace App\Restaurant\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Restaurant\Entity\Particular;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,16 +15,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class RestaurantParticularType extends AbstractType
 {
+    protected $particular;
+
 
     /** @var  RestaurantConfig */
     private $restaurantConfig;
-
-
-    public function __construct(RestaurantConfig  $restaurantConfig ,  private readonly ParticularRepository $particular)
-    {
-        $this->restaurantConfig         = $restaurantConfig->getId();
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -31,13 +27,16 @@ class RestaurantParticularType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->restaurantConfig = $options['restaurantConfig'];
+        $this->particular = $options['particular'];
+
         $builder
 
             ->add('particular', EntityType::class, [
                 'class'     => Particular::class,
                 'group_by'  => 'category.name',
-                'property'  => 'codeName',
-                'empty_value' => '-Choose product name -',
+                'choice_label'  => 'codeName',
+                'placeholder' => '-Choose product name -',
                 'attr'=>['class'=>'span12 m-wrap select2 particular'],
                 'choice_translation_domain' => true,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -48,20 +47,23 @@ class RestaurantParticularType extends AbstractType
                     ->orderBy("c.sorting", "ASC")
                     ->addOrderBy("e.sorting", "ASC")
             ])
-            /*  ->add('salesPrice', 'choice', array(
+            /*  ->add('salesPrice', ChoiceType::class, array(
                 'label' => 'Choose your car',
                 'choices' => $this->ParticularChoiceList(),
             ))*/;
 
     }
 
-
-
     /**
      * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'restaurantConfig' => null,
+            'particular' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => InvoiceParticular::class
         ]);
@@ -80,9 +82,5 @@ class RestaurantParticularType extends AbstractType
         return $syndicateTree = $this->particular->getParticularOptionGroup($this->restaurantConfig);
 
     }
-
-
-
-
 
 }

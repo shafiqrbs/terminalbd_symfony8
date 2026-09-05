@@ -74,16 +74,12 @@ class SponsorController extends AbstractController
     private function createCreateForm(Page $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SponsorType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()), $entity, array(
-        $form = $this->createForm(new SponsorType($this->getUser()->getGlobalOption()), $entity, array(
-            'action' => $this->generateUrl('sponsor_create'),
+        $form = $this->createForm(SponsorType::class, $entity, array('action' => $this->generateUrl('sponsor_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $this->getUser()->getGlobalOption()));
         return $form;
     }
 
@@ -153,16 +149,12 @@ class SponsorController extends AbstractController
     private function createEditForm(Sponsor $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SponsorType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()), $entity, array(
-        $form = $this->createForm(new SponsorType($this->getUser()->getGlobalOption()), $entity, array(
-            'action' => $this->generateUrl('sponsor_update', array('id' => $entity->getId())),
+        $form = $this->createForm(SponsorType::class, $entity, array('action' => $this->generateUrl('sponsor_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $this->getUser()->getGlobalOption()));
         return $form;
     }
     /**

@@ -14,10 +14,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CustomCategoryType extends AbstractType
 {
-
-	public function __construct(private readonly InventoryConfig $inventoryConfig, private readonly CategoryRepository $em)
-    {
-    }
+    protected $inventoryConfig;
+    protected $em;
 
 
 	/**
@@ -26,6 +24,9 @@ class CustomCategoryType extends AbstractType
 	 */
 	public function buildForm(FormBuilderInterface $builder, array $options): void
 	{
+        $this->inventoryConfig = $options['inventoryConfig'];
+        $this->em = $options['em'];
+
 		$builder
 
 			->add('name',TextType::class,
@@ -37,10 +38,10 @@ class CustomCategoryType extends AbstractType
 			])
 			->add('parent', EntityType::class, [
 				'required'    => true,
-				'empty_value' => '---Select parent category---',
+				'placeholder' => '---Select parent category---',
 				'attr'=>['class'=>'category m-wrap span12 select2'],
 				'class' => \App\Product\Entity\Category::class,
-				'property' => 'nestedLabel',
+				'choice_label' => 'nestedLabel',
 				'choices'=> $this->categoryChoiceList()
 			])
 		;
@@ -51,6 +52,11 @@ class CustomCategoryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
 	{
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+            'em' => null,
+        ]);
+
 		$resolver->setDefaults([
 			'data_class' => Category::class
 		]);
@@ -73,6 +79,5 @@ class CustomCategoryType extends AbstractType
 		return $categoryTree = $this->em->getFlatInventoryCategoryTree($this->inventoryConfig);
 
 	}
-
 
 }

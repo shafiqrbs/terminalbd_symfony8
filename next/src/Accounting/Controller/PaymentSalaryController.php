@@ -121,16 +121,12 @@ class PaymentSalaryController extends AbstractController
     private function createCreateForm(PaymentSalary $entity,$user)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PaymentSalaryType::configureOptions() and pass them as form options: $user), $entity, array(
-        $form = $this->createForm(new PaymentSalaryType($user), $entity, array(
-            'action' => $this->generateUrl('account_paymentsalary_create',array('user' => $user->getId())),
+        $form = $this->createForm(PaymentSalaryType::class, $entity, array('action' => $this->generateUrl('account_paymentsalary_create',array('user' => $user->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $user));
         return $form;
     }
 

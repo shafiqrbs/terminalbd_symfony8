@@ -16,12 +16,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SidebarWidgetPanelType extends AbstractType
 {
+    protected $globalOption;
 
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-        $this->globalId = $this->globalOption->getId();
-        $this->modules = $this->globalOption->getSiteSetting()->getModuleIds();
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -29,13 +25,15 @@ class SidebarWidgetPanelType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('page', EntityType::class, [
                 'required'    => false,
                 'multiple'      =>true,
                 'class' => Page::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 multiselect'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -48,7 +46,7 @@ class SidebarWidgetPanelType extends AbstractType
                 'required'    => false,
                 'multiple'      =>true,
                 'class' => Module::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 multiselect'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -61,7 +59,7 @@ class SidebarWidgetPanelType extends AbstractType
                 'required'    => false,
                 'multiple'      =>true,
                 'class' => Feature::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 multiselect'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -75,6 +73,10 @@ class SidebarWidgetPanelType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => SidebarWidgetPanel::class
         ]);
     }
@@ -86,6 +88,5 @@ class SidebarWidgetPanelType extends AbstractType
     {
         return 'setting_bundle_appearancebundle_featurewidgetpanel';
     }
-
 
 }

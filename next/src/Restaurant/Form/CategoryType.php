@@ -16,12 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CategoryType extends AbstractType
 {
+    protected $globalOption;
 
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-
-        $this->config               = $this->globalOption->getRestaurantConfig()->getId();
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -29,15 +25,17 @@ class CategoryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('service', EntityType::class, [
                 'required'    => false,
                 'class' => Service::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please select required')
                 ],
-                'empty_value' => '---Choose product type ---',
+                'placeholder' => '---Choose product type ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -49,8 +47,8 @@ class CategoryType extends AbstractType
             ->add('productGroup', EntityType::class, [
                 'required'    => false,
                 'class' => Particular::class,
-                'property' => 'name',
-                'empty_value' => '---Choose product group ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose product group ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->join("e.service",'s')
@@ -74,6 +72,10 @@ class CategoryType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => Category::class
         ]);
     }
@@ -85,6 +87,5 @@ class CategoryType extends AbstractType
     {
         return 'category';
     }
-
 
 }

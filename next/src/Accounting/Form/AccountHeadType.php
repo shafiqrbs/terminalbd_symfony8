@@ -30,8 +30,8 @@ class AccountHeadType extends AbstractType
             ->add('parent', EntityType::class, [
                 'required'    => false,
                 'class' => AccountHead::class,
-                'empty_value' => '---Select parent account head---',
-                'property' => 'name',
+                'placeholder' => '---Select parent account head---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -40,19 +40,11 @@ class AccountHeadType extends AbstractType
             ])
             ->add('toIncrease', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                    'Debit' => 'Debit',
-                    'Credit' => 'Credit',
-                ],
+                'choices' => ['Debit' => 'Debit', 'Credit' => 'Credit'],
             ])
             ->add('motherAccount', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                    'assets' => 'Assets',
-                    'revenue' => 'Revenue',
-                    'liabilities' => 'Liabilities',
-                    'expenses' => 'Expenses',
-                ],
+                'choices' => ['Assets' => 'assets', 'Revenue' => 'revenue', 'Liabilities' => 'liabilities', 'Expenses' => 'expenses'],
             ])
             ->add('isParent')
             ->add('status')

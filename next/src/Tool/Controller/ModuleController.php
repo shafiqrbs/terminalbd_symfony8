@@ -3,6 +3,7 @@
 namespace App\Tool\Controller;
 
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -112,7 +113,7 @@ class ModuleController extends AbstractController
      */
     private function createCreateForm(Module $entity)
     {
-        $form = $this->createForm(new ModuleType(), $entity, [
+        $form = $this->createForm(ModuleType::class, $entity, [
             'action' => $this->generateUrl('module_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -194,7 +195,7 @@ class ModuleController extends AbstractController
      */
     private function createEditForm(Module $entity)
     {
-        $form = $this->createForm(new ModuleType(), $entity, [
+        $form = $this->createForm(ModuleType::class, $entity, [
             'action' => $this->generateUrl('module_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -270,7 +271,7 @@ class ModuleController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('module_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

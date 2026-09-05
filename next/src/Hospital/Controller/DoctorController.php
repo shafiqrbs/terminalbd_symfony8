@@ -143,16 +143,12 @@ class DoctorController extends AbstractController
     {
 
         $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DoctorType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
-        $form = $this->createForm(new DoctorType($em,$globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_doctor_create', array('id' => $entity->getId())),
+        $form = $this->createForm(DoctorType::class, $entity, array('action' => $this->generateUrl('hms_doctor_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $em));
         return $form;
     }
 
@@ -229,16 +225,12 @@ class DoctorController extends AbstractController
     private function createEditForm(Particular $entity,$globalOption)
     {
         $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DoctorType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
-        $form = $this->createForm(new DoctorType($em,$globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_doctor_update', array('id' => $entity->getId())),
+        $form = $this->createForm(DoctorType::class, $entity, array('action' => $this->generateUrl('hms_doctor_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $em));
 
 
         return $form;

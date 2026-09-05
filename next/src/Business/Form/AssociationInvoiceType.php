@@ -20,11 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class AssociationInvoiceType extends AbstractType
 {
-
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
     /**
@@ -33,6 +29,8 @@ class AssociationInvoiceType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('cardNo',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off']])
             ->add('transactionId',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add TRX ID','data-original-title'=>'Add TRX ID','autocomplete'=>'off']])
@@ -40,7 +38,7 @@ class AssociationInvoiceType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -48,10 +46,10 @@ class AssociationInvoiceType extends AbstractType
             ])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -59,8 +57,8 @@ class AssociationInvoiceType extends AbstractType
             ->add('salesBy', EntityType::class, [
                 'required'    => false,
                 'class' => User::class,
-                'property' => 'userFullName',
-                'empty_value' => '---Choose Receive Member---',
+                'choice_label' => 'userFullName',
+                'placeholder' => '---Choose Receive Member---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->where("u.isDelete != 1")
@@ -73,18 +71,14 @@ class AssociationInvoiceType extends AbstractType
                 'attr'=>['class'=>'m-wrap span12 invoiceProcess select-custom'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'In-progress' => 'In-progress',
-                    'Done' => 'Done',
-                    'Hold' => 'Hold',
-                ],
+                'choices' => ['In-progress' => 'In-progress', 'Done' => 'Done', 'Hold' => 'Hold'],
             ])
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -94,9 +88,9 @@ class AssociationInvoiceType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive mobile account---',
+                'placeholder' => '---Choose receive mobile account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -112,6 +106,10 @@ class AssociationInvoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => BusinessInvoice::class
         ]);

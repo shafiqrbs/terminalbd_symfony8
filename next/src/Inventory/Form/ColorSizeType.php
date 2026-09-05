@@ -25,9 +25,7 @@ class ColorSizeType extends AbstractType
             ]])
             ->add('type', ChoiceType::class, [
                 'attr'=>['class'=>'span6'],
-                'choices' => [
-                    'color' => 'Color',
-                    'size' => 'Size']
+                'choices' => ['Color' => 'color', 'Size' => 'size']
             ])
         ;
     }

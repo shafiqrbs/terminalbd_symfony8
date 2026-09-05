@@ -135,10 +135,7 @@ class InvoiceController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-        $form = $this->createForm(new InvoiceType($globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('business_invoice_update', array('id' => $entity->getId())),
+        $form = $this->createForm(InvoiceType::class, $entity, array('action' => $this->generateUrl('business_invoice_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
@@ -146,8 +143,7 @@ class InvoiceController extends AbstractController
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
 
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location));
         return $form;
     }
 

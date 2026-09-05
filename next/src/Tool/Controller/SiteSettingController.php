@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -80,16 +81,12 @@ class SiteSettingController extends AbstractController
             $syndicateId = $entities->getSyndicate()->getId();
         }
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SiteSettingType::configureOptions() and pass them as form options: $syndicateId), $entity, array(
-        $form = $this->createForm(new SiteSettingType($syndicateId), $entity, array(
-            'action' => $this->generateUrl('sitesetting_create', array('id' => $entity->getId())),
+        $form = $this->createForm(SiteSettingType::class, $entity, array('action' => $this->generateUrl('sitesetting_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'syndicateId' => $syndicateId));
 
 
         return $form;
@@ -166,16 +163,12 @@ class SiteSettingController extends AbstractController
             $syndicateId = $entities->getSyndicate()->getId();
         }
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SiteSettingType::configureOptions() and pass them as form options: $syndicateId), $entity, array(
-        $form = $this->createForm(new SiteSettingType($syndicateId), $entity, array(
-            'action' => $this->generateUrl('sitesetting_update', array('id' => $entity->getId())),
+        $form = $this->createForm(SiteSettingType::class, $entity, array('action' => $this->generateUrl('sitesetting_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'syndicateId' => $syndicateId));
 
         return $form;
     }
@@ -244,7 +237,7 @@ class SiteSettingController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('sitesetting_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

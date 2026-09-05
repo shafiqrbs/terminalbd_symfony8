@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Restaurant\Entity\RestaurantConfig;
 use App\Restaurant\Form\ConfigType;
-use Frontend\FrontentBundle\Service\MobileDetect;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -59,9 +58,7 @@ class RestaurantConfigController extends AbstractController
     {
 
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ConfigType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new ConfigType($config), $entity, array(
+        $form = $this->createForm(ConfigType::class, $entity, array(
             'action' => $this->generateUrl('restaurant_config_update'),
             'method' => 'PUT',
             'attr' => array(

@@ -15,10 +15,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CustomerForDpsType extends AbstractType
 {
+    protected $location;
 
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -26,6 +24,8 @@ class CustomerForDpsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
 
             ->add('age',NumberType::class, ['attr'=>['class'=>'m-wrap span12 numeric inputs patientAge','placeholder'=>'Enter age'],
@@ -42,28 +42,27 @@ class CustomerForDpsType extends AbstractType
                 'attr'=>['class'=>'span12 select-custom inputs ageType'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Years' => 'Years','Months' => 'Months','Day' => 'Day']
+                'choices' => ['Years' => 'Years', 'Months' => 'Months', 'Day' => 'Day']
             ])
             ->add('bloodGroup', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12 inputs'],
-                'empty_value' => '-Blood Group-',
-                'choices' => ['A+' => 'A+',  'A-' => 'A-','B+' => 'B+',  'B-' => 'B-',  'O+' => 'O+',  'O-' => 'O-',  'AB+' => 'AB+',  'AB-' => 'AB-'],
+                'placeholder' => '-Blood Group-',
+                'choices' => ['A+' => 'A+', 'A-' => 'A-', 'B+' => 'B+', 'B-' => 'B-', 'O+' => 'O+', 'O-' => 'O-', 'AB+' => 'AB+', 'AB-' => 'AB-'],
             ])
             ->add('gender', ChoiceType::class, [
                 'attr'=>['class'=>'span12 select-custom inputs gender'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Female' => 'Female','Male' => 'Male', 'Others' => 'Others'],
+                'choices' => ['Female' => 'Female', 'Male' => 'Male', 'Others' => 'Others'],
             ])
             ->add('ageGroup', ChoiceType::class, [
                 'attr'=>['class'=>'span12 select-custom inputs'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Adult' => 'Adult','Child' => 'Child'],
+                'choices' => ['Adult' => 'Adult', 'Child' => 'Child'],
             ])
             ->add('address',TextareaType::class, ['attr'=>['required'=>false ,'class'=>'m-wrap span12 resize inputs address','rows'=> 3,'autocomplete'=>'off','placeholder'=>'Enter patient address']
             ])
-
 
         ;
     }
@@ -73,6 +72,10 @@ class CustomerForDpsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Customer::class
         ]);

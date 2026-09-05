@@ -109,16 +109,12 @@ class CustomerHmsController extends AbstractController
     private function createCreateForm(Customer $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerForDiagonesticType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new CustomerForDiagonesticType($location), $entity, array(
-            'action' => $this->generateUrl('hms_customer_create'),
+        $form = $this->createForm(CustomerForDiagonesticType::class, $entity, array('action' => $this->generateUrl('hms_customer_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
         return $form;
     }
 
@@ -182,16 +178,12 @@ class CustomerHmsController extends AbstractController
     private function createEditForm(Customer $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerForDiagonesticType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new CustomerForDiagonesticType($location), $entity, array(
-            'action' => $this->generateUrl('hms_customer_update', array('id' => $entity->getId())),
+        $form = $this->createForm(CustomerForDiagonesticType::class, $entity, array('action' => $this->generateUrl('hms_customer_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
         return $form;
     }
     /**

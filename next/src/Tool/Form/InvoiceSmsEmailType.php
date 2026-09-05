@@ -30,12 +30,12 @@ class InvoiceSmsEmailType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => false,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Select transaction method')
                 ],
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
-                'empty_value' => '---Choose mobile bank account---',
+                'placeholder' => '---Choose mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->orderBy("b.name", "ASC")
@@ -44,9 +44,9 @@ class InvoiceSmsEmailType extends AbstractType
             ->add('portalBankAccount', EntityType::class, [
                 'required'    => false,
                 'class' => PortalBankAccount::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap select2'],
-                'empty_value' => '---Choose mobile bank account---',
+                'placeholder' => '---Choose mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->orderBy("b.name", "ASC")
@@ -54,9 +54,9 @@ class InvoiceSmsEmailType extends AbstractType
             ->add('portalMobileBankAccount', EntityType::class, [
                 'required'    => false,
                 'class' => PortalMobileBankAccount::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap select2'],
-                'empty_value' => '---Choose mobile bank account---',
+                'placeholder' => '---Choose mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->orderBy("b.name", "ASC")

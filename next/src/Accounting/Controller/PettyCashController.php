@@ -98,16 +98,12 @@ class PettyCashController extends AbstractController
     private function createCreateForm(PettyCash $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PettyCashType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PettyCashType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_pettycash_create'),
+        $form = $this->createForm(PettyCashType::class, $entity, array('action' => $this->generateUrl('account_pettycash_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
       return $form;
     }
 

@@ -50,8 +50,8 @@ class ProductType extends AbstractType
             ->add('brand', EntityType::class, [
                 'required'    => false,
                 'class' => Branding::class,
-                'empty_value' => '---Select brand name---',
-                'property' => 'name',
+                'placeholder' => '---Select brand name---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span8 selectbox'],
                 'query_builder' => fn(BrandingRepository $er) => $er->createQueryBuilder('c')
                     ->andWhere("c.status = 1")
@@ -67,64 +67,22 @@ class ProductType extends AbstractType
             ->add('file')
             ->add('isFeature')
             ->add('content',TextareaType::class, ['attr'=>['class'=>'no-resize span12','rows'=>5]])
-            ->add('status', ChoiceType::class, ['choices' => ['1' => 'Publish', '2' => 'Pending', '3' => 'Expired'],
+            ->add('status', ChoiceType::class, ['choices' => ['Publish' => '1', 'Pending' => '2', 'Expired' => '3'],
                 'expanded'=>true]
             )
             ->add('availability', ChoiceType::class, [
                     'attr'=>['class'=>'selectbox span8'],
-                    'choices' => [
-                    'In stock' => 'In stock',
-                    'Pre-order' => 'Pre-order',
-                    'Confirm sms' => 'Confirm sms',
-                    'Out of stock' => 'Out of stock'
-                ],
+                    'choices' => ['In stock' => 'In stock', 'Pre-order' => 'Pre-order', 'Confirm sms' => 'Confirm sms', 'Out of stock' => 'Out of stock'],
                 'expanded'=>false]
             )
             ->add('dealType', ChoiceType::class, [
                     'attr'=>['class'=>'selectbox span8'],
-                    'choices' => [
-                    '' => '--select deal--',
-                    'Today' => 'Today',
-                    'Weekly' => 'Weekly',
-                    'Monthly' => 'Monthly'
-                ],
+                    'choices' => ['--select deal--' => '', 'Today' => 'Today', 'Weekly' => 'Weekly', 'Monthly' => 'Monthly'],
                     'expanded'=>false]
             )
             ->add('unit', ChoiceType::class, [
                     'attr'=>['class'=>'selectbox span8'],
-                    'choices' => [
-                    'Bag' => 'Bag',
-                    'Bottle' => 'Bottle',
-                    'Box' => 'Box',
-                    'Can' => 'Can',
-                    'Cft' => 'Cft',
-                    'Coil' => 'Coil',
-                    'Cylinder' => 'Cylinder',
-                    'Carton' => 'Carton',
-                    'Feet' => 'Feet',
-                    'Gallon' => 'Gallon',
-                    'Jar' => 'Jar',
-                    'Job' => 'Job',
-                    'Kg' => 'Kg',
-                    'Liter' => 'Liter',
-                    'Meter' => 'Meter',
-                    'ML' => 'ML',
-                    'MM' => 'MM',
-                    'Nos' => 'Nos',
-                    'Pail' => 'Pail',
-                    'Pair' => 'Pair',
-                    'Pcs' => 'Pcs',
-                    'Packet' => 'Packet',
-                    'Pound' => 'Pound',
-                    'Prs' => 'Prs',
-                    'Refile' => 'Refile',
-                    'Rft' => 'Rft',
-                    'Rim' => 'Rim',
-                    'Roll' => 'Roll',
-                    'Set' => 'Set',
-                    'Sft' => 'Sft',
-                    'Yard' => 'Yard',
-                ],
+                    'choices' => ['Bag' => 'Bag', 'Bottle' => 'Bottle', 'Box' => 'Box', 'Can' => 'Can', 'Cft' => 'Cft', 'Coil' => 'Coil', 'Cylinder' => 'Cylinder', 'Carton' => 'Carton', 'Feet' => 'Feet', 'Gallon' => 'Gallon', 'Jar' => 'Jar', 'Job' => 'Job', 'Kg' => 'Kg', 'Liter' => 'Liter', 'Meter' => 'Meter', 'ML' => 'ML', 'MM' => 'MM', 'Nos' => 'Nos', 'Pail' => 'Pail', 'Pair' => 'Pair', 'Pcs' => 'Pcs', 'Packet' => 'Packet', 'Pound' => 'Pound', 'Prs' => 'Prs', 'Refile' => 'Refile', 'Rft' => 'Rft', 'Rim' => 'Rim', 'Roll' => 'Roll', 'Set' => 'Set', 'Sft' => 'Sft', 'Yard' => 'Yard'],
                 'expanded'=>false]
             );
     }

@@ -150,16 +150,12 @@ class PurchaseController extends AbstractController
     private function createCreateForm(Purchase $entity)
     {
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
-        $form = $this->createForm(new PurchaseType($inventoryConfig), $entity, array(
-            'action' => $this->generateUrl('purchase_create'),
+        $form = $this->createForm(PurchaseType::class, $entity, array('action' => $this->generateUrl('purchase_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $inventoryConfig));
        return $form;
     }
 
@@ -227,18 +223,13 @@ class PurchaseController extends AbstractController
     private function createEditForm(Purchase $entity)
     {
         $inventoryConfig =  $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
-        $form = $this->createForm(new PurchaseType($inventoryConfig), $entity, array(
-            'action' => $this->generateUrl('purchase_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PurchaseType::class, $entity, array('action' => $this->generateUrl('purchase_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
                 'id' => 'purchaseForm',
-            )
-
-        ));
+            ), 'option' => $inventoryConfig));
         return $form;
     }
     /**
@@ -406,18 +397,13 @@ class PurchaseController extends AbstractController
     private function createEditApproveForm(Purchase $entity)
     {
         $inventoryConfig =  $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseApproveType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
-        $form = $this->createForm(new PurchaseApproveType($inventoryConfig), $entity, array(
-            'action' => $this->generateUrl('purchase_update_approve', array('id' => $entity->getId())),
+        $form = $this->createForm(PurchaseApproveType::class, $entity, array('action' => $this->generateUrl('purchase_update_approve', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
                 'id' => 'purchaseForm',
-            )
-
-        ));
+            ), 'inventoryConfig' => $inventoryConfig));
         return $form;
     }
 

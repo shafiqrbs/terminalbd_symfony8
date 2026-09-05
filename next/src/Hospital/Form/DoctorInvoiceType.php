@@ -20,10 +20,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class DoctorInvoiceType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
     /**
@@ -32,6 +29,8 @@ class DoctorInvoiceType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('paymentMobile',TextType::class, ['attr'=>['class'=>'m-wrap span12 mobile','placeholder'=>'Add payment mobile no','data-original-title'=>'Add payment mobile no','autocomplete'=>'off']])
@@ -44,11 +43,11 @@ class DoctorInvoiceType extends AbstractType
             ->add('comment',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','rows'=>3,'placeholder'=>'Add remarks','autocomplete'=>'off']])
             ->add('assignDoctor', EntityType::class, [
                   'required'    => true,
-                  'property' => 'referred',
+                  'choice_label' => 'referred',
                     'constraints' =>[
                         new NotBlank(message: 'Please select doctor/referred/agent'),
                     ],
-                  'empty_value' => '--- Select Doctor/Referred ---',
+                  'placeholder' => '--- Select Doctor/Referred ---',
                   'attr'=>['class'=>'m-wrap span12 select2'],
                   'class' => Particular::class,
                   'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -60,8 +59,8 @@ class DoctorInvoiceType extends AbstractType
             ])
             ->add('hmsCommission', EntityType::class, [
                   'required'    => true,
-                  'property' => 'name',
-                  'empty_value' => '--- Select commission type ---',
+                  'choice_label' => 'name',
+                  'placeholder' => '--- Select commission type ---',
                   'constraints' =>[
                         new NotBlank(message: 'Payment input required'),
                   ],
@@ -76,7 +75,7 @@ class DoctorInvoiceType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -86,9 +85,9 @@ class DoctorInvoiceType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -98,9 +97,9 @@ class DoctorInvoiceType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -115,6 +114,10 @@ class DoctorInvoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => DoctorInvoice::class
         ]);

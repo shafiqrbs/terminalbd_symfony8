@@ -13,10 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class MarketingExecutiveType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
     /**
@@ -25,12 +22,14 @@ class MarketingExecutiveType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('marketingExecutive', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select marketing executive from employee---',
+                'placeholder' => '---Select marketing executive from employee---',
                 'class' => User::class,
-                'property' => 'userMarketingExecutive',
+                'choice_label' => 'userMarketingExecutive',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->join('e.profile','p')
@@ -46,8 +45,11 @@ class MarketingExecutiveType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => Particular::class,
-            'cascade_validation' => true,
             'error_bubbling'     => false,
         ]);
     }
@@ -59,6 +61,5 @@ class MarketingExecutiveType extends AbstractType
     {
         return 'executive';
     }
-
 
 }

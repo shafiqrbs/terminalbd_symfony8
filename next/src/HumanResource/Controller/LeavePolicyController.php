@@ -2,6 +2,7 @@
 
 namespace App\HumanResource\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -72,7 +73,7 @@ class LeavePolicyController extends AbstractController
      */
     private function createCreateForm(LeavePolicy $entity)
     {
-        $form = $this->createForm(new LeavePolicyType(), $entity, [
+        $form = $this->createForm(LeavePolicyType::class, $entity, [
             'action' => $this->generateUrl('leavepolicy_create'),
             'method' => 'POST',
             'attr' => [
@@ -156,12 +157,12 @@ class LeavePolicyController extends AbstractController
      */
     private function createEditForm(LeavePolicy $entity)
     {
-        $form = $this->createForm(new LeavePolicyType(), $entity, [
+        $form = $this->createForm(LeavePolicyType::class, $entity, [
             'action' => $this->generateUrl('leavepolicy_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Update']);
+        $form->add('submit', SubmitType::class, ['label' => 'Update']);
 
         return $form;
     }
@@ -230,7 +231,7 @@ class LeavePolicyController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('leavepolicy_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

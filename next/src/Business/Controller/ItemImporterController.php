@@ -74,17 +74,13 @@ class ItemImporterController extends AbstractController
     private function createCreateForm(ItemImport $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ItemImporterType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new ItemImporterType($globalOption), $entity, array(
-            'action' => $this->generateUrl('business_itemimporter_create'),
+        $form = $this->createForm(ItemImporterType::class, $entity, array('action' => $this->generateUrl('business_itemimporter_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 
@@ -157,12 +153,8 @@ class ItemImporterController extends AbstractController
     private function createEditForm(ItemImport $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ItemImporterType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new ItemImporterType($globalOption), $entity, array(
-            'action' => $this->generateUrl('business_itemimporter_update', array('id' => $entity->getId())),
-            'method' => 'PUT',
-        ));
+        $form = $this->createForm(ItemImporterType::class, $entity, array('action' => $this->generateUrl('business_itemimporter_update', array('id' => $entity->getId())),
+            'method' => 'PUT', 'option' => $globalOption));
         return $form;
     }
     /**

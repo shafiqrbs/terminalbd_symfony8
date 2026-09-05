@@ -2,6 +2,7 @@
 
 namespace App\Appearance\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -109,16 +110,12 @@ class WebsiteWidgetController extends AbstractController
     {
 
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into WebsiteWidgetType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new WebsiteWidgetType($globalOption), $entity, array(
-            'action' => $this->generateUrl('appearancewebsitewidget_create'),
+        $form = $this->createForm(WebsiteWidgetType::class, $entity, array('action' => $this->generateUrl('appearancewebsitewidget_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -193,16 +190,12 @@ class WebsiteWidgetController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $category = $this->em->getRepository(\App\Product\Entity\Category::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into WebsiteWidgetType::configureOptions() and pass them as form options: $globalOption,$category), $entity, array(
-        $form = $this->createForm(new WebsiteWidgetType($globalOption,$category), $entity, array(
-            'action' => $this->generateUrl('appearancewebsitewidget_update', array('id' => $entity->getId())),
+        $form = $this->createForm(WebsiteWidgetType::class, $entity, array('action' => $this->generateUrl('appearancewebsitewidget_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
     /**
@@ -278,7 +271,7 @@ class WebsiteWidgetController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('appearancewebsitewidget_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
             ;
     }

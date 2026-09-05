@@ -34,56 +34,17 @@ class PurchaseItemAttributeType extends AbstractType
 
             ->add('assuranceFromVendor', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => [
-                    '1 Month' => '1 Month',
-                    '3 Month' => '3 Month',
-                    '4 Month' => '4 Month',
-                    '6 Month' => '6 Month',
-                    '1 Year' => '1 Year',
-                    '1 Year 6 Month' => '1 Year 6 Month',
-                    '2 Year' => '2 Year',
-                    '2 Year 6 Month' => '2 Year 6 Month',
-                    '3 Year' => '3 Year',
-                    '3 Year 6 Month' => '3 Year 6 Month',
-                    '4 Year' => '4 Year',
-                    '4 Year 6 Month' => '4 Year 6 Month',
-                    '5 Year' => '5 Year',
-                    '5 Year 6 Month' => '5 Year 6 Month',
-                    'Life Time' => 'Life Time',
-                    'Others' => 'Others',
-
-                ],
+                'choices' => ['1 Month' => '1 Month', '3 Month' => '3 Month', '4 Month' => '4 Month', '6 Month' => '6 Month', '1 Year' => '1 Year', '1 Year 6 Month' => '1 Year 6 Month', '2 Year' => '2 Year', '2 Year 6 Month' => '2 Year 6 Month', '3 Year' => '3 Year', '3 Year 6 Month' => '3 Year 6 Month', '4 Year' => '4 Year', '4 Year 6 Month' => '4 Year 6 Month', '5 Year' => '5 Year', '5 Year 6 Month' => '5 Year 6 Month', 'Life Time' => 'Life Time', 'Others' => 'Others'],
                 'data' => $options->getData() ?: '1 Year'
             ])
             ->add('assuranceToCustomer', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => [
-                    '1 Month' => '1 Month',
-                    '3 Month' => '3 Month',
-                    '4 Month' => '4 Month',
-                    '6 Month' => '6 Month',
-                    '1 Year' => '1 Year',
-                    '1 Year 6 Month' => '1 Year 6 Month',
-                    '2 Year' => '2 Year',
-                    '2 Year 6 Month' => '2 Year 6 Month',
-                    '3 Year' => '3 Year',
-                    '3 Year 6 Month' => '3 Year 6 Month',
-                    '4 Year' => '4 Year',
-                    '4 Year 6 Month' => '4 Year 6 Month',
-                    '5 Year' => '5 Year',
-                    '5 Year 6 Month' => '5 Year 6 Month',
-                    'Life Time' => 'Life Time',
-                    'Others' => 'Others',
-                ],
+                'choices' => ['1 Month' => '1 Month', '3 Month' => '3 Month', '4 Month' => '4 Month', '6 Month' => '6 Month', '1 Year' => '1 Year', '1 Year 6 Month' => '1 Year 6 Month', '2 Year' => '2 Year', '2 Year 6 Month' => '2 Year 6 Month', '3 Year' => '3 Year', '3 Year 6 Month' => '3 Year 6 Month', '4 Year' => '4 Year', '4 Year 6 Month' => '4 Year 6 Month', '5 Year' => '5 Year', '5 Year 6 Month' => '5 Year 6 Month', 'Life Time' => 'Life Time', 'Others' => 'Others'],
                 'data' => $options->getData() ? : '1 Year'
             ])
             ->add('assuranceType', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => [
-                    'Warranty' => 'Warranty',
-                    'Grantee' => 'Grantee',
-                    'Others' => 'Others',
-                ],
+                'choices' => ['Warranty' => 'Warranty', 'Grantee' => 'Grantee', 'Others' => 'Others'],
             ]);
     }
     

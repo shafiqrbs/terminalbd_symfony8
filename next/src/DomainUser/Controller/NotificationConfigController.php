@@ -57,7 +57,7 @@ class NotificationConfigController extends AbstractController
      */
     private function createEditForm(NotificationConfig $entity)
     {
-        $form = $this->createForm(new NotificationConfigType(), $entity, [
+        $form = $this->createForm(NotificationConfigType::class, $entity, [
             'action' => $this->generateUrl('domain_notificationconfig_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

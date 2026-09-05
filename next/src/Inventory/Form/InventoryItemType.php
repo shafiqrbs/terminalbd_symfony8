@@ -13,16 +13,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 class InventoryItemType extends AbstractType
 {
 
-
     /** @var InventoryConfig */
 
     public  $inventoryConfig;
-
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -30,13 +23,15 @@ class InventoryItemType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
 
         $builder
             ->add('name', EntityType::class, [
                 'required'    => true,
                 'class' => Item::class,
-                'empty_value' => '---Choose a item ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a item ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -50,6 +45,10 @@ class InventoryItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Item::class
         ]);

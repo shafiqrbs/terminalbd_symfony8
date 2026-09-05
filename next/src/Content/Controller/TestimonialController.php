@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -74,7 +75,7 @@ class TestimonialController extends AbstractController
     private function createCreateForm(Page $entity)
     {
 
-        $form = $this->createForm(new TestimonialType(), $entity, [
+        $form = $this->createForm(TestimonialType::class, $entity, [
             'action' => $this->generateUrl('testimonial_create'),
             'method' => 'POST',
             'attr' => [
@@ -157,7 +158,7 @@ class TestimonialController extends AbstractController
     {
 
 
-        $form = $this->createForm(new TestimonialType(), $entity, [
+        $form = $this->createForm(TestimonialType::class, $entity, [
             'action' => $this->generateUrl('testimonial_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -230,7 +231,7 @@ class TestimonialController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('testimonial_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

@@ -22,28 +22,24 @@ class PurchaseVendorItemType extends AbstractType
 
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-    }
-
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 ','placeholder'=>'vendor base item name'],
                 'constraints' =>[
                     new NotBlank(message: 'Please add vendor base item name')
                 ]])
 
-            /*->add('masterItem', 'entity', array(
+            /*->add('masterItem', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\Inventory\Entity\Product',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>array('class'=>'span12 select2'),
                 'constraints' =>array(
                     new NotBlank(array('message'=>'Please input required'))
@@ -58,8 +54,8 @@ class PurchaseVendorItemType extends AbstractType
             ->add('brand', EntityType::class, [
                 'required'    => true,
                 'class' => ItemBrand::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a Brand ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a Brand ---',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -70,11 +66,8 @@ class PurchaseVendorItemType extends AbstractType
             ->add('warningLabel', ChoiceType::class, [
                 'required'    => false,
                 'attr'=>['class'=>'span12'],
-                'empty_value' => '---Choose a warning label---',
-                'choices' => [
-                    'Warranty' => 'Warranty',
-                    'Guarantee' => 'Guarantee',
-                ],
+                'placeholder' => '---Choose a warning label---',
+                'choices' => ['Warranty' => 'Warranty', 'Guarantee' => 'Guarantee'],
             ])
             ->add('quantity',NumberType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'quantity'],
                 'constraints' =>[
@@ -101,6 +94,10 @@ class PurchaseVendorItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => PurchaseVendorItem::class
         ]);

@@ -20,6 +20,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ItemType extends AbstractType
 {
+    protected $itemGroup;
+    protected $category;
+
 
     /** @var  ItemGroupRepository */
     private $groupRep;
@@ -30,20 +33,16 @@ class ItemType extends AbstractType
     /** @var InventoryConfig */
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig, ItemGroupRepository $groupRep, CategoryRepository $catRep )
-    {
-        $this->inventoryConfig = $inventoryConfig;
-        $this->category = $catRep;
-        $this->itemGroup = $groupRep;
-    }
-
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+        $this->itemGroup = $options['groupRep'];
+        $this->category = $options['catRep'];
+
 
         $builder
             ->add('category', TextType::class, [
@@ -58,12 +57,12 @@ class ItemType extends AbstractType
                 [
                     'mapped' => false,
                     'attr' => ['data' => $this->inventoryConfig->getId()]])
-            /*->add('itemGroup', 'entity', array(
+            /*->add('itemGroup', EntityType::class, array(
                 'required'    => false,
-                'empty_value' => '---Select item group---',
+                'placeholder' => '---Select item group---',
                 'attr'=>array('class'=>'category m-wrap span12 select2'),
                 'class' => \App\Product\Entity\ItemGroup::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->ItemGroupChoiceList()
             ))*/
 
@@ -81,9 +80,9 @@ class ItemType extends AbstractType
             ->add('itemUnit', EntityType::class, [
                 'required' => false,
                 'class' => ProductUnit::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'data' => 4,
-                'empty_value' => '---Choose a item unit ---',
+                'placeholder' => '---Choose a item unit ---',
                 'attr' => ['class' => 'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -135,8 +134,8 @@ class ItemType extends AbstractType
                 ->add('color', EntityType::class, [
                     'required' => true,
                     'class' => ItemColor::class,
-                    'empty_value' => '---Choose a color ---',
-                    'property' => 'name',
+                    'placeholder' => '---Choose a color ---',
+                    'choice_label' => 'name',
                     'attr' => ['class' => 'span12 select2'],
                     'constraints' => [
                         new NotBlank(message: 'Please input required')
@@ -152,8 +151,8 @@ class ItemType extends AbstractType
                     ->add('size', EntityType::class, [
                         'required'    => true,
                         'class' => ItemSize::class,
-                        'empty_value' => '---Choose a size/weight ---',
-                        'property' => 'name',
+                        'placeholder' => '---Choose a size/weight ---',
+                        'choice_label' => 'name',
                         'attr'=>['class'=>'span12 select2'],
                         'constraints' =>[
                             new NotBlank(message: 'Please input required')
@@ -178,7 +177,6 @@ class ItemType extends AbstractType
 
             }
 
-
     }
     
     /**
@@ -186,6 +184,12 @@ class ItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+            'groupRep' => null,
+            'catRep' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Item::class
         ]);

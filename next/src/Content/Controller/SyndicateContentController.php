@@ -2,6 +2,8 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\ResetType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Appearance\Service\MenuManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -77,19 +79,15 @@ class SyndicateContentController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption()->getId();
         $siteSettingId = $entity->getUser()->getSiteSetting()->getId();
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SyndicateContentType::configureOptions() and pass them as form options: $globalOption,$siteSettingId), $entity, array(
-        $form = $this->createForm(new SyndicateContentType($globalOption,$siteSettingId), $entity, array(
-            'action' => $this->generateUrl('syndicatecontent_create'),
+        $form = $this->createForm(SyndicateContentType::class, $entity, array('action' => $this->generateUrl('syndicatecontent_create'),
             'method' => 'POT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'siteSettingId' => $siteSettingId));
 
-        $form->add('submit', 'submit', array('label' => 'Update', 'attr' => array('class' => 'btn btn-primary')));
-        $form->add('reset', 'reset', array('label' => 'Reset', 'attr' => array('class' => 'btn btn-danger')));
+        $form->add('submit', SubmitType::class, array('label' => 'Update', 'attr' => array('class' => 'btn btn-primary')));
+        $form->add('reset', ResetType::class, array('label' => 'Reset', 'attr' => array('class' => 'btn btn-danger')));
 
         return $form;
     }
@@ -168,19 +166,15 @@ class SyndicateContentController extends AbstractController
     {
        $globalOption = $this->getUser()->getGlobalOption()->getId();
        $siteSettingId = $this->getUser()->getSiteSetting()->getId();
-            // TODO(migration): SF3+ takes a form type class-string, not an instance.
-            // Move these constructor arguments into SyndicateContentType::configureOptions() and pass them as form options: $globalOption,$siteSettingId), $entity, array(
-            $form = $this->createForm(new SyndicateContentType($globalOption,$siteSettingId), $entity, array(
-            'action' => $this->generateUrl('syndicatecontent_update', array('id' => $entity->getId())),
+            $form = $this->createForm(SyndicateContentType::class, $entity, array('action' => $this->generateUrl('syndicatecontent_update', array('id' => $entity->getId())),
             'method' => 'PUT',
                 'attr' => array(
                     'class' => 'form-horizontal',
                     'novalidate' => 'novalidate',
-                )
-        ));
+                ), 'globalOption' => $globalOption, 'siteSettingId' => $siteSettingId));
 
-        $form->add('submit', 'submit', array('label' => 'Update', 'attr' => array('class' => 'btn btn-primary')));
-        $form->add('reset', 'reset', array('label' => 'Reset', 'attr' => array('class' => 'btn btn-danger')));
+        $form->add('submit', SubmitType::class, array('label' => 'Update', 'attr' => array('class' => 'btn btn-primary')));
+        $form->add('reset', ResetType::class, array('label' => 'Reset', 'attr' => array('class' => 'btn btn-danger')));
 
         return $form;
 
@@ -258,7 +252,7 @@ class SyndicateContentController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('syndicatecontent_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

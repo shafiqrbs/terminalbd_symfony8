@@ -109,10 +109,7 @@ class InvoiceAssociationController extends AbstractController
     private function createCreateForm(BusinessInvoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerInvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new CustomerInvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('customerweb_invoice_create', array('shop' => $globalOption->getSlug())),
+        $form = $this->createForm(CustomerInvoiceType::class, $entity, array('action' => $this->generateUrl('customerweb_invoice_create', array('shop' => $globalOption->getSlug())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
@@ -120,8 +117,7 @@ class InvoiceAssociationController extends AbstractController
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
 
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -180,10 +176,7 @@ class InvoiceAssociationController extends AbstractController
     private function createEditForm(BusinessInvoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerInvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new CustomerInvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('customerweb_invoice_update', array('shop' => $globalOption->getSlug(),'id' =>$entity->getId())),
+        $form = $this->createForm(CustomerInvoiceType::class, $entity, array('action' => $this->generateUrl('customerweb_invoice_update', array('shop' => $globalOption->getSlug(),'id' =>$entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
@@ -191,8 +184,7 @@ class InvoiceAssociationController extends AbstractController
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
 
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

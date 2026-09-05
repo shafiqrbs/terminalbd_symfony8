@@ -32,8 +32,8 @@ class ParticularType extends AbstractType
             ->add('particularType', EntityType::class, [
                 'required'    => true,
                 'class' => MedicineParticularType::class,
-                'empty_value' => '---Choose a particular type ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a particular type ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 inputs'],
                 'constraints' =>[ new NotBlank(message: 'Select particular type') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')

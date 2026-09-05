@@ -14,11 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AccountLoanUserType extends AbstractType
 {
-
-
-    public function __construct(private readonly GlobalOption $option)
-    {
-    }
+    protected $option;
 
 
     /**
@@ -27,6 +23,8 @@ class AccountLoanUserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Customer name'],
                     'constraints' =>[
@@ -47,6 +45,10 @@ class AccountLoanUserType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => AccountLoanUser::class
         ]);

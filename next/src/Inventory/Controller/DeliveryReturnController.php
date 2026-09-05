@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -138,7 +139,7 @@ class DeliveryReturnController extends AbstractController
      */
     private function createCreateForm(DeliveryReturn $entity)
     {
-        $form = $this->createForm(new DeliveryReturnType(), $entity, [
+        $form = $this->createForm(DeliveryReturnType::class, $entity, [
             'action' => $this->generateUrl('inventory_deliveryreturn_create'),
             'method' => 'POST',
             'attr' => [
@@ -221,7 +222,7 @@ class DeliveryReturnController extends AbstractController
      */
     private function createEditForm(DeliveryReturn $entity)
     {
-        $form = $this->createForm(new DeliveryReturnType(), $entity, [
+        $form = $this->createForm(DeliveryReturnType::class, $entity, [
             'action' => $this->generateUrl('inventory_deliveryreturn_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -296,7 +297,7 @@ class DeliveryReturnController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('inventory_deliveryreturn_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

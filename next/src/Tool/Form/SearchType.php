@@ -14,10 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SearchType extends AbstractType
 {
-
-    public function __construct(private readonly SyndicateRepository $em)
-    {
-    }
+    protected $em;
 
 
     /**
@@ -26,6 +23,7 @@ class SearchType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
 
 
             $builder
@@ -36,21 +34,18 @@ class SearchType extends AbstractType
 
                 ->add('syndicate', EntityType::class, [
                     'required'    => true,
-                    'empty_value' => '---Select Business Sector---',
+                    'placeholder' => '---Select Business Sector---',
                     'attr'=>['class'=>'select2 span12'],
                     'class' => Syndicate::class,
                     'choices'=> $this->SyndicateChoiceList(),
-                    'choices_as_values' => true,
                     'choice_label' => 'nestedLabel',
                 ])
 
-
                 ->add('location', EntityType::class, [
                     'required'    => false,
-                    'empty_value' => '---Select Business Sector---',
+                    'placeholder' => '---Select Business Sector---',
                     'class' => Location::class,
                     'choices'=> $this->LocationChoiceList(),
-                    'choices_as_values' => true,
                     'choice_label' => 'nestedLabel',
                 ]);
 
@@ -61,6 +56,10 @@ class SearchType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => GlobalOption::class
         ]);
@@ -89,5 +88,4 @@ class SearchType extends AbstractType
 
     }
 }
-
 

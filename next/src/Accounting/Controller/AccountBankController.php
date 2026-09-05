@@ -89,16 +89,12 @@ class AccountBankController extends AbstractController
     private function createCreateForm(AccountBank $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountBankType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountBankType($globalOption), $entity, array(
-            'action' => $this->generateUrl('accountbank_create'),
+        $form = $this->createForm(AccountBankType::class, $entity, array('action' => $this->generateUrl('accountbank_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
       return $form;
     }
 
@@ -171,16 +167,12 @@ class AccountBankController extends AbstractController
     private function createEditForm(AccountBank $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountBankType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountBankType($globalOption), $entity, array(
-            'action' => $this->generateUrl('accountbank_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AccountBankType::class, $entity, array('action' => $this->generateUrl('accountbank_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

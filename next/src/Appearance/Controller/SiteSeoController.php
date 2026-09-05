@@ -69,7 +69,7 @@ class SiteSeoController extends AbstractController
      */
     private function createCreateForm(TemplateCustomize $entity)
     {
-        $form = $this->createForm(new TemplateCustomizeType(), $entity, [
+        $form = $this->createForm(TemplateCustomizeType::class, $entity, [
             'action' => $this->generateUrl('templatecustomize_create'),
             'method' => 'POST',
             'attr' => [
@@ -143,7 +143,7 @@ class SiteSeoController extends AbstractController
      */
     private function createEditForm(TemplateCustomize $entity)
     {
-        $form = $this->createForm(new TemplateCustomizeType(), $entity, [
+        $form = $this->createForm(TemplateCustomizeType::class, $entity, [
             'action' => $this->generateUrl('templatecustomize_update', ['id' => $entity->getGlobalOption()->getId()]),
             'method' => 'PUT',
             'attr' => [

@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,7 +76,7 @@ class CourseController extends AbstractController
      */
     private function createCreateForm(Course $entity)
     {
-        $form = $this->createForm(new CourseType(), $entity, [
+        $form = $this->createForm(CourseType::class, $entity, [
             'action' => $this->generateUrl('course_create'),
             'method' => 'POST',
             'attr' => [
@@ -157,7 +158,7 @@ class CourseController extends AbstractController
      */
     private function createnewForm(Course $entity)
     {
-        $form = $this->createForm(new CourseType(), $entity, [
+        $form = $this->createForm(CourseType::class, $entity, [
             'action' => $this->generateUrl('course_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -233,7 +234,7 @@ class CourseController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('course_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

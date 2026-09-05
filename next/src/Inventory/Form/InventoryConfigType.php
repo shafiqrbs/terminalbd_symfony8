@@ -41,10 +41,7 @@ class InventoryConfigType extends AbstractType
             ->add('usingBarcode',
                 ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap  inline-radio'],
-                'choices' => [
-                    'item'  => 'Stock Item',
-                    'purchase-item'   => 'Purchase-item',
-                ],
+                'choices' => ['Stock Item' => 'item', 'Purchase-item' => 'purchase-item'],
                 'required'    => true,
                 'multiple'    => false,
                 'expanded'  => true,
@@ -53,10 +50,7 @@ class InventoryConfigType extends AbstractType
             ->add('vatMode',
                 ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap  inline-radio'],
-                'choices' => [
-                    'including'  => 'Including',
-                    'excluding'   => 'Excluding',
-                ],
+                'choices' => ['Including' => 'including', 'Excluding' => 'excluding'],
                 'required'    => true,
                 'multiple'    => false,
                 'expanded'  => true,
@@ -65,11 +59,7 @@ class InventoryConfigType extends AbstractType
             ->add('printer',
                 ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'choices' => [
-                    'save'          => 'Save',
-                    'printer'       => 'Printer',
-                    'pos'           => 'Pos Printer',
-                ],
+                'choices' => ['Save' => 'save', 'Printer' => 'printer', 'Pos Printer' => 'pos'],
                     'required'    => true,
                     'multiple'    => false,
                     'expanded'  => false,
@@ -96,11 +86,7 @@ class InventoryConfigType extends AbstractType
             ->add('barcodeBrandVendor',
                 ChoiceType::class, [
                     'attr'=>['class'=>'m-wrap span12'],
-                    'choices' => [
-                        '0' => '--Select one--',
-                        '1' => 'Brand',
-                        '2' => 'Vendor',
-                    ],
+                    'choices' => ['--Select one--' => '0', 'Brand' => '1', 'Vendor' => '2'],
                     'required'    => true,
                     'multiple'    => false,
                     'expanded'  => false,
@@ -109,19 +95,7 @@ class InventoryConfigType extends AbstractType
             ->add('barcodeThickness',
                 ChoiceType::class, [
                     'attr'=>['class'=>'m-wrap span12'],
-                    'choices' => [
-                        '20' => '20',
-                        '22' => '22',
-                        '24' => '24',
-                        '26' => '26',
-                        '28' => '28',
-                        '30' => '30',
-                        '32' => '32',
-                        '34' => '34',
-                        '36' => '36',
-                        '38' => '38',
-                        '40' => '40',
-                    ],
+                    'choices' => ['20' => '20', '22' => '22', '24' => '24', '26' => '26', '28' => '28', '30' => '30', '32' => '32', '34' => '34', '36' => '36', '38' => '38', '40' => '40'],
                     'required'    => true,
                     'multiple'    => false,
                     'expanded'  => false,
@@ -130,15 +104,7 @@ class InventoryConfigType extends AbstractType
             ->add('barcodeFontSize',
                 ChoiceType::class, [
                     'attr'=>['class'=>'m-wrap span12'],
-                    'choices' => [
-                        '7' => '7',
-                        '8' => '8',
-                        '9' => '9',
-                        '10' => '10',
-                        '11' => '11',
-                        '12' => '12',
-                        '13' => '13',
-                    ],
+                    'choices' => ['7' => '7', '8' => '8', '9' => '9', '10' => '10', '11' => '11', '12' => '12', '13' => '13'],
                     'required'    => true,
                     'multiple'    => false,
                     'expanded'  => false,
@@ -147,10 +113,7 @@ class InventoryConfigType extends AbstractType
             ->add('salesMode',
                 ChoiceType::class, [
                     'attr'=>['class'=>'m-wrap inline-radio'],
-                    'choices' => [
-                        'stock' => 'Stock',
-                        'purchase-item' => 'Purchase Item'
-                    ],
+                    'choices' => ['Stock' => 'stock', 'Purchase Item' => 'purchase-item'],
                     'required'    => true,
                     'multiple'    => false,
                     'expanded'  => true,
@@ -159,11 +122,8 @@ class InventoryConfigType extends AbstractType
             ->add('deliveryProcess',
                 ChoiceType::class, [
                     'attr'=>['class'=>'m-wrap inline-radio'],
-                    'choices' => [
-                        'manual-sales' => 'Simple sales',
-                        'general-sales' => 'General Sales'
-                    ],
-                    'empty_value' => '---Choose a sales ---',
+                    'choices' => ['Simple sales' => 'manual-sales', 'General Sales' => 'general-sales'],
+                    'placeholder' => '---Choose a sales ---',
                     'required'    => false,
                     'multiple'    => false,
                     'expanded'  => false,
@@ -172,12 +132,7 @@ class InventoryConfigType extends AbstractType
             ->add('barcodeScale',
                 ChoiceType::class, [
                     'attr'=>['class'=>'m-wrap span12'],
-                    'choices' => [
-                        '1' => '1',
-                        '2' => '2',
-                        '3' => '3',
-                        '4' => '4',
-                    ],
+                    'choices' => ['1' => '1', '2' => '2', '3' => '3', '4' => '4'],
                     'required'    => true,
                     'multiple'    => false,
                     'expanded'  => false,
@@ -186,14 +141,7 @@ class InventoryConfigType extends AbstractType
             ->add('barcodePerRow',
                 ChoiceType::class, [
                     'attr'=>['class'=>'m-wrap span12'],
-                    'choices' => [
-                         1 => 1,
-                        '2' => '2',
-                        '3' => '3',
-                        '4' => '4',
-                        '5' => '5',
-                        '6' => '6',
-                    ],
+                    'choices' => [1 => 1, '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6'],
                     'required'    => true,
                     'multiple'    => false,
                     'expanded'  => false,
@@ -206,12 +154,7 @@ class InventoryConfigType extends AbstractType
             ->add('barcodeText',
                 ChoiceType::class, [
                     'attr'=>['class'=>'m-wrap span12'],
-                    'choices' => [
-                        '' => '--Select Barcode Text--',
-                        'including vat' => 'including vat',
-                        'without vat' => 'without vat',
-                        '+ vat' => '+ vat',
-                    ],
+                    'choices' => ['--Select Barcode Text--' => '', 'including vat' => 'including vat', 'without vat' => 'without vat', '+ vat' => '+ vat'],
                     'required'    => true,
                     'multiple'    => false,
                     'expanded'  => false,
@@ -220,8 +163,8 @@ class InventoryConfigType extends AbstractType
             ->add('currency', EntityType::class, [
                 'required'    => true,
                 'class' => Currency::class,
-                'empty_value' => '---Choose a currency ---',
-                'property' => 'nameWithCode',
+                'placeholder' => '---Choose a currency ---',
+                'choice_label' => 'nameWithCode',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->orderBy("e.id","ASC"),

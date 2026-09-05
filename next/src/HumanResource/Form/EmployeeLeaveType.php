@@ -2,7 +2,6 @@
 
 namespace App\HumanResource\Form;
 
-
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\HumanResource\Entity\LeaveSetup;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -16,11 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmployeeLeaveType extends AbstractType
 {
-
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
     /**
@@ -29,14 +24,16 @@ class EmployeeLeaveType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('leaveSetup', EntityType::class, [
                 'required'    => false,
                 'class' => LeaveSetup::class,
-                'property' => 'leaveOffDay',
+                'choice_label' => 'leaveOffDay',
                 'attr'=>['class'=>'span12'],
-                'empty_value' => '---Select Leave Type---',
+                'placeholder' => '---Select Leave Type---',
                 'constraints' =>[
                     new NotBlank(message: 'Select leave type required')
                 ],
@@ -64,6 +61,10 @@ class EmployeeLeaveType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => EmployeeLeave::class
         ]);
     }
@@ -75,6 +76,5 @@ class EmployeeLeaveType extends AbstractType
     {
         return 'appstore_bundle_hr_leave';
     }
-
 
 }

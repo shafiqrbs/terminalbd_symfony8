@@ -17,11 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CabinType extends AbstractType
 {
-
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
     /**
@@ -30,14 +26,16 @@ class CabinType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('serviceGroup', EntityType::class, [
                 'required'    => false,
                 'class' => HmsServiceGroup::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12'],
-                'empty_value' => '---Select cabin/ward ---',
+                'placeholder' => '---Select cabin/ward ---',
                 'constraints' =>[
                     new NotBlank(message: 'Please select required')
                 ],
@@ -50,8 +48,8 @@ class CabinType extends AbstractType
             ->add('accountHead', EntityType::class, [
                 'class'     => AccountHead::class,
                 'group_by'  => 'parent.name',
-                'property'  => 'name',
-                'empty_value' => '---Choose a account---',
+                'choice_label'  => 'name',
+                'placeholder' => '---Choose a account---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'choice_translation_domain' => true,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -76,6 +74,10 @@ class CabinType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => Particular::class
         ]);
     }
@@ -87,6 +89,5 @@ class CabinType extends AbstractType
     {
         return 'particular';
     }
-
 
 }

@@ -18,10 +18,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class InvoiceType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption, private readonly LocationRepository $location, private readonly DiagnosticReportRepository $diagnostic)
-    {
-    }
+    protected $globalOption;
+    protected $location;
+    protected $diagnostic;
 
 
     /**
@@ -30,11 +29,15 @@ class InvoiceType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+        $this->diagnostic = $options['diagnostic'];
+
         $builder
             ->add('diseasesProfile', EntityType::class, [
                 'required' => true,
                 'class' => DpsParticular::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'multiple' => false,
                 'expanded' => false,
                 'attr' => ['class' => 'm-wrap span12'],
@@ -49,11 +52,8 @@ class InvoiceType extends AbstractType
                 'attr' => ['class' => 'm-wrap invoiceProcess select-custom'],
                 'expanded' => false,
                 'multiple' => false,
-                'empty_value' => '---Choose process---',
-                'choices' => [
-                    'In-progress' => 'In-progress',
-                    'Closed' => 'Closed',
-                ],
+                'placeholder' => '---Choose process---',
+                'choices' => ['In-progress' => 'In-progress', 'Closed' => 'Closed'],
             ]);
 
         if ($this->globalOption->getDpsConfig()->isInvestigation() == 1){
@@ -64,7 +64,7 @@ class InvoiceType extends AbstractType
                     'attr' => ['class' => 'm-wrap span12 select2'],
                     'class' => DiagnosticReport::class,
                     'group_by' => 'category.name',
-                    'property' => 'name',
+                    'choice_label' => 'name',
                     'choice_translation_domain' => true,
                     'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                         ->join("e.category", 'c')
@@ -80,6 +80,12 @@ class InvoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+            'diagnostic' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => DpsInvoice::class
         ]);

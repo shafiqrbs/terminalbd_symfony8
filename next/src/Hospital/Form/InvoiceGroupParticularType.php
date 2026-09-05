@@ -2,7 +2,6 @@
 
 namespace App\Hospital\Form;
 
-
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -16,13 +15,10 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-
 class InvoiceGroupParticularType extends AbstractType
 {
-
-    public function __construct(private readonly HospitalConfig $hospitalConfig, private readonly HmsCategoryRepository $emCategory)
-    {
-    }
+    protected $hospitalConfig;
+    protected $emCategory;
 
 
     /**
@@ -31,13 +27,16 @@ class InvoiceGroupParticularType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->hospitalConfig = $options['hospitalConfig'];
+        $this->emCategory = $options['emCategory'];
+
 
         $builder
             ->add('assignDoctor', EntityType::class, [
                 'required'    => false,
                 'class' => Particular::class,
-                'property' => 'reportDoctor',
-                'empty_value' => '---Select Assign Doctor---',
+                'choice_label' => 'reportDoctor',
+                'placeholder' => '---Select Assign Doctor---',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where('e.hospitalConfig ='.$this->hospitalConfig->getId())
@@ -48,8 +47,8 @@ class InvoiceGroupParticularType extends AbstractType
             ->add('assignLabuser', EntityType::class, [
                 'required'    => false,
                 'class' => Particular::class,
-                'property' => 'reportDoctor',
-                'empty_value' => '---Select Assign Lab User---',
+                'choice_label' => 'reportDoctor',
+                'placeholder' => '---Select Assign Lab User---',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where('e.hospitalConfig ='.$this->hospitalConfig->getId())
@@ -61,15 +60,15 @@ class InvoiceGroupParticularType extends AbstractType
                 'attr'=>['class'=>'span12 select-custom'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Done' => 'Done', 'In-progress' => 'In-progress','Damage' => 'Damage', 'Impossible' => 'Impossible'],
+                'choices' => ['Done' => 'Done', 'In-progress' => 'In-progress', 'Damage' => 'Damage', 'Impossible' => 'Impossible'],
             ])
             ->add('comment',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','rows'=>3,'placeholder'=>'Add any comment','autocomplete'=>'off']])
             ->add('category', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select pathology---',
+                'placeholder' => '---Select pathology---',
                 'attr'=>['class'=>'m-wrap span12 select2'],
                 'class' => HmsCategory::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->PathologyChoiceList()
             ])
         ;
@@ -81,6 +80,11 @@ class InvoiceGroupParticularType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'hospitalConfig' => null,
+            'emCategory' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => InvoicePathologicalGroup::class
         ]);

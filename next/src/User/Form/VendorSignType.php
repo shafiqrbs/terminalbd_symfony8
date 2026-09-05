@@ -3,6 +3,7 @@
 namespace App\User\Form;
 
 
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -32,7 +33,7 @@ class VendorSignType extends AbstractType
                     ]]
             )
             ->add('plainPassword', RepeatedType::class, [
-                'type' => 'password',
+                'type' => PasswordType::class,
                 'options' => ['translation_domain' => 'FOSUserBundle'],
                 'first_options' => ['label' => 'form.password'],
                 'second_options' => ['label' => 'form.password_confirmation'],

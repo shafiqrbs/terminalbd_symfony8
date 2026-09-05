@@ -1,162 +1,107 @@
 <?php
 
-/*
- * This file is part of the FOSUserBundle package.
- *
- * (c) FriendsOfSymfony <http://friendsofsymfony.github.com/>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace App\User\Controller;
 
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use App\User\Entity\User;
+use App\User\Form\Type\ChangePasswordFormType;
+use App\User\Manager\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use FOS\UserBundle\FOSUserEvents;
-use FOS\UserBundle\Event\FormEvent;
-use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\Event\GetResponseUserEvent;
-use FOS\UserBundle\Model\UserInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
- * Controller managing the password change
+ * Was FOSUserBundle's ChangePasswordController.
  *
- * @author Thibault Duplessis <thibault.duplessis@gmail.com>
- * @author Christophe Coevoet <stof@notk.org>
+ * The FOSUserEvents dispatches are gone: nothing in this application ever
+ * listened to them (they existed for FOSUserBundle's own listeners, which no
+ * longer exist), and no listener subscribes to them in either tree.
+ *
+ * The form is still created as `fos_user_change_password_form` because that is
+ * the name FOSUserBundle's form factory used, and both the templates and the
+ * POST body below read that key.
  */
 class ChangePasswordController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly FormFactoryInterface $formFactory,
+        private readonly UserManager $userManager,
     ) {
     }
-
-
 
     /**
      * Change user password
      */
     public function changePasswordAction(Request $request)
     {
+        $user = $this->requireUser();
 
-        $user = $this->getUser();
-
-
-        if (!is_object($user) || !$user instanceof UserInterface) {
-            throw new AccessDeniedException('This user does not have access to this section.');
-        }
-
-        /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-        $dispatcher = $this->eventDispatcher;
-
-        $event = new GetResponseUserEvent($user, $request);
-        $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_INITIALIZE, $event);
-
-        if (null !== $event->getResponse()) {
-            return $event->getResponse();
-        }
-
-        /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
-        // TODO(migration): AbstractController::get() was removed; inject this service.
-        $formFactory = $this->get('fos_user.change_password.form.factory');
-
-        $form = $formFactory->createForm();
-        $form->setData($user);
+        $form = $this->formFactory->createNamed(
+            'fos_user_change_password_form',
+            ChangePasswordFormType::class,
+            $user,
+        );
 
         $form->handleRequest($request);
-        if ($form->isValid()) {
-            /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
-            // TODO(migration): AbstractController::get() was removed; inject this service.
-            $userManager = $this->get('fos_user.user_manager');
-            $event = new FormEvent($form, $request);
-            $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_SUCCESS, $event);
-            $userManager->updateUser($user);
-            $em = $this->em;
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->userManager->updateUser($user);
+
             $data = $request->request->all();
             $password = $data['fos_user_change_password_form']['plainPassword']['first'];
             $user->setAppPassword($password);
-            $em->flush();
+            $this->em->flush();
 
-            if (null === $response = $event->getResponse()) {
-                $url = $this->generateUrl('domain_change_password');
-                $response = new RedirectResponse($url);
-            }
-
-            $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
-
-            return $response;
+            return new RedirectResponse($this->generateUrl('domain_change_password'));
         }
 
         return $this->render('User/ChangePassword/changePassword.html.twig', [
             'entity' => $user,
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 
- /**
+    /**
      * Change user password
      */
     public function customerChangePasswordAction(Request $request)
     {
+        $user = $this->requireUser();
 
-        $user = $this->getUser();
-
-
-        if (!is_object($user) || !$user instanceof UserInterface) {
-            throw new AccessDeniedException('This user does not have access to this section.');
-        }
-
-        /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-        $dispatcher = $this->eventDispatcher;
-
-        $event = new GetResponseUserEvent($user, $request);
-        $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_INITIALIZE, $event);
-
-        if (null !== $event->getResponse()) {
-            return $event->getResponse();
-        }
-
-        /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
-        // TODO(migration): AbstractController::get() was removed; inject this service.
-        $formFactory = $this->get('fos_user.change_password.form.factory');
-
-        $form = $formFactory->createForm();
-        $form->setData($user);
+        $form = $this->formFactory->createNamed(
+            'fos_user_change_password_form',
+            ChangePasswordFormType::class,
+            $user,
+        );
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
-            /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
-            // TODO(migration): AbstractController::get() was removed; inject this service.
-            $userManager = $this->get('fos_user.user_manager');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->userManager->updateUser($user);
 
-            $event = new FormEvent($form, $request);
-            $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_SUCCESS, $event);
-
-            $userManager->updateUser($user);
-
-            if (null === $response = $event->getResponse()) {
-                $url = $this->generateUrl('customer_self_update_profile');
-                $response = new RedirectResponse($url);
-            }
-
-            $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
-
-            return $response;
+            return new RedirectResponse($this->generateUrl('customer_self_update_profile'));
         }
 
         return $this->render('User/ChangePassword/customerChangePassword.html.twig', [
             'globalOption' => '',
             'entity' => $user,
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 
+    private function requireUser(): User
+    {
+        $user = $this->getUser();
 
+        if (!$user instanceof User) {
+            throw new AccessDeniedException('This user does not have access to this section.');
+        }
+
+        return $user;
+    }
 }

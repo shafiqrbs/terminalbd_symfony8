@@ -104,17 +104,13 @@ class AccessoriesPurchaseController extends AbstractController
     private function createEditForm(HmsPurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccessoriesPurchaseType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccessoriesPurchaseType($globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_accessories_purchase_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AccessoriesPurchaseType::class, $entity, array('action' => $this->generateUrl('hms_accessories_purchase_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'posForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 

@@ -18,11 +18,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ServiceType extends AbstractType
 {
+    protected $globalOption;
 
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -30,6 +27,8 @@ class ServiceType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
 
 	    $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 tooltips','placeholder'=>'Enter service name'],
@@ -42,8 +41,8 @@ class ServiceType extends AbstractType
             ->add('icon', EntityType::class, [
                 'required'    => false,
                 'class' => Icon::class,
-                'empty_value' => '---Select icon---',
-                'property' => 'name',
+                'placeholder' => '---Select icon---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->where("o.status = 1")
@@ -54,8 +53,8 @@ class ServiceType extends AbstractType
                 'expanded'      =>true,
                 'multiple'      =>true,
                 'class' => ModuleCategory::class,
-                'empty_value' => '---Select category---',
-                'property' => 'name',
+                'placeholder' => '---Select category---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'check-list  span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->join('o.module', 'module')
@@ -74,6 +73,10 @@ class ServiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Page::class
         ]);

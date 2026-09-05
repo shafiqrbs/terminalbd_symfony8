@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Content\Entity\Page;
@@ -77,16 +78,12 @@ class BranchController extends AbstractController
     private function createCreateForm(Page $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BranchType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new BranchType($location), $entity, array(
-            'action' => $this->generateUrl('branch_create', array('id' => $entity->getId())),
+        $form = $this->createForm(BranchType::class, $entity, array('action' => $this->generateUrl('branch_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
         return $form;
     }
 
@@ -161,16 +158,12 @@ class BranchController extends AbstractController
     private function createEditForm(Page $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BranchType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new BranchType($location), $entity, array(
-            'action' => $this->generateUrl('branch_update', array('id' => $entity->getId())),
+        $form = $this->createForm(BranchType::class, $entity, array('action' => $this->generateUrl('branch_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
         return $form;
     }
     /**
@@ -235,7 +228,7 @@ class BranchController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('branch_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
             ;
     }

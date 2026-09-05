@@ -75,16 +75,12 @@ class PortfolioController extends AbstractController
     private function createCreateForm(Page $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PortfolioType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()), $entity, array(
-        $form = $this->createForm(new PortfolioType($this->getUser()->getGlobalOption()), $entity, array(
-            'action' => $this->generateUrl('portfolio_create'),
+        $form = $this->createForm(PortfolioType::class, $entity, array('action' => $this->generateUrl('portfolio_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $this->getUser()->getGlobalOption()));
         return $form;
     }
 
@@ -154,16 +150,12 @@ class PortfolioController extends AbstractController
     private function createEditForm(Page $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PortfolioType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()), $entity, array(
-        $form = $this->createForm(new PortfolioType($this->getUser()->getGlobalOption()), $entity, array(
-            'action' => $this->generateUrl('portfolio_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PortfolioType::class, $entity, array('action' => $this->generateUrl('portfolio_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $this->getUser()->getGlobalOption()));
         return $form;
     }
     /**

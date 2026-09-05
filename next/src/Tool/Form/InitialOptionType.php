@@ -19,10 +19,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class InitialOptionType extends AbstractType
 {
-
-    public function __construct(private readonly SyndicateRepository $em, private readonly LocationRepository $location)
-    {
-    }
+    protected $em;
+    protected $location;
 
 
     /**
@@ -31,6 +29,8 @@ class InitialOptionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+        $this->location = $options['location'];
 
 
             $builder
@@ -50,15 +50,14 @@ class InitialOptionType extends AbstractType
                     'attr'=>['class'=>'select2 span12'],
                     'class' => Syndicate::class,
                     'choices'=> $this->SyndicateChoiceList(),
-                    'choices_as_values' => true,
                     'choice_label' => 'nestedLabel',
                 ])
 
                 ->add('mainApp', EntityType::class, [
                     'required'    => true,
                     'class' => AppModule::class,
-                    'empty_value' => '---Select Main Application ---',
-                    'property' => 'name',
+                    'placeholder' => '---Select Main Application ---',
+                    'choice_label' => 'name',
                     'attr'     =>['id' => '' , 'class' => 'm-wrap span12'],
                     'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('s')
                         ->andWhere("s.status = 1")
@@ -66,14 +65,13 @@ class InitialOptionType extends AbstractType
                 ])
                 ->add('location', EntityType::class, [
                     'required'    => false,
-                    'empty_value' => '---Select Location---',
+                    'placeholder' => '---Select Location---',
                     'constraints' =>[
                         new NotBlank(message: 'Please enter location')
                     ],
                     'attr'=>['class'=>'select2 span12'],
                     'class' => Location::class,
                     'choices'=> $this->LocationChoiceList(),
-                    'choices_as_values' => true,
                     'choice_label' => 'nestedLabel',
                 ]);
 
@@ -84,6 +82,11 @@ class InitialOptionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => GlobalOption::class
         ]);
@@ -112,5 +115,4 @@ class InitialOptionType extends AbstractType
 
     }
 }
-
 

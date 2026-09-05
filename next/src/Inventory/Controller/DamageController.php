@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -112,7 +113,7 @@ class DamageController extends AbstractController
      */
     private function createCreateForm(Damage $entity)
     {
-        $form = $this->createForm(new DamageType(), $entity, [
+        $form = $this->createForm(DamageType::class, $entity, [
             'action' => $this->generateUrl('inventory_damage_create'),
             'method' => 'POST',
             'attr' => [
@@ -199,7 +200,7 @@ class DamageController extends AbstractController
      */
     private function createEditForm(Damage $entity)
     {
-        $form = $this->createForm(new DamageType(), $entity, [
+        $form = $this->createForm(DamageType::class, $entity, [
             'action' => $this->generateUrl('inventory_damage_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -274,7 +275,7 @@ class DamageController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('inventory_damage_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

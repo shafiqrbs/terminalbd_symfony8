@@ -109,16 +109,12 @@ class ProductController extends AbstractController
     private function createCreateForm(Particular $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ProductType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new ProductType($globalOption), $entity, array(
-            'action' => $this->generateUrl('restaurant_product_create', array('id' => $entity->getId())),
+        $form = $this->createForm(ProductType::class, $entity, array('action' => $this->generateUrl('restaurant_product_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -159,16 +155,12 @@ class ProductController extends AbstractController
     {
 
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ProductType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new ProductType($globalOption), $entity, array(
-            'action' => $this->generateUrl('restaurant_product_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ProductType::class, $entity, array('action' => $this->generateUrl('restaurant_product_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
     /**

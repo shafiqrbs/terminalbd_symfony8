@@ -18,10 +18,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CustomerEditType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption, private readonly LocationRepository $location)
-    {
-    }
+    protected $globalOption;
+    protected $location;
 
 
     /**
@@ -30,12 +28,15 @@ class CustomerEditType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
             ->add('marketing', EntityType::class, [
                 'required'    => false,
                 'class' => User::class,
-                'empty_value' => '---Choose a marketing executive---',
-                'property' => 'userFullName',
+                'placeholder' => '---Choose a marketing executive---',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->where("u.isDelete != 1")
@@ -45,11 +46,10 @@ class CustomerEditType extends AbstractType
             ])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>' m-wrap span12'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Customer name'],
@@ -75,6 +75,11 @@ class CustomerEditType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Customer::class
         ]);

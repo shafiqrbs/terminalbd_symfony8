@@ -11,13 +11,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SalesItemType extends AbstractType
 {
+    protected $option;
 
-
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -25,6 +20,8 @@ class SalesItemType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
 
             ->add('stockName',TextType::class, ['attr'=>['class'=>'m-wrap span12 select2StockMedicine input','placeholder'=>'Enter stock medicine name']])
@@ -38,6 +35,10 @@ class SalesItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicineSalesItem::class
         ]);

@@ -34,7 +34,7 @@ class SiteSliderType extends AbstractType
             ])
             ->add('businessSector', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'choices' => ['portal' => 'Portal','education' => 'Education',  'ecommerce' => 'E-commerce', 'reservation' => 'Reservation', 'fleet' => 'Fleet Management'],
+                'choices' => ['Portal' => 'portal', 'Education' => 'education', 'E-commerce' => 'ecommerce', 'Reservation' => 'reservation', 'Fleet Management' => 'fleet'],
             ])
             ->add('file',FileType::class, ['attr'=>['class'=>'default']])
             ->add('content',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','rows'=>3]])

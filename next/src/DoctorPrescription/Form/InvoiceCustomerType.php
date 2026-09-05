@@ -14,10 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class InvoiceCustomerType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
     /**
@@ -26,12 +23,14 @@ class InvoiceCustomerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('assignDoctor', EntityType::class, [
                 'required'    => true,
                 'class' => DpsParticular::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'multiple'    => false,
                 'expanded' => false,
                 'attr'=>['class'=>'m-wrap span12'],
@@ -50,6 +49,10 @@ class InvoiceCustomerType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => DpsInvoice::class
         ]);

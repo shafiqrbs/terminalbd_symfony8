@@ -76,7 +76,7 @@ class ExcelImporterController extends AbstractController
      */
     private function createCreateForm(ExcelImporter $entity)
     {
-        $form = $this->createForm(new ExcelImporterType(), $entity, [
+        $form = $this->createForm(ExcelImporterType::class, $entity, [
             'action' => $this->generateUrl('inventory_excelimproter_create'),
             'method' => 'POST',
             'attr' => [
@@ -174,7 +174,7 @@ class ExcelImporterController extends AbstractController
      */
     private function createEditForm(ExcelImporter $entity)
     {
-        $form = $this->createForm(new ExcelImporterType(), $entity, [
+        $form = $this->createForm(ExcelImporterType::class, $entity, [
             'action' => $this->generateUrl('inventory_excelimproter_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);

@@ -17,10 +17,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CustomerForDmsType extends AbstractType
 {
+    protected $location;
 
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -28,6 +26,8 @@ class CustomerForDmsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 inputs patientName','autocomplete'=>'off','placeholder'=>'Enter patient name'],
@@ -49,29 +49,28 @@ class CustomerForDmsType extends AbstractType
                 'attr'=>['class'=>'span12 select-custom inputs ageType'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Years' => 'Years','Months' => 'Months','Day' => 'Day']
+                'choices' => ['Years' => 'Years', 'Months' => 'Months', 'Day' => 'Day']
             ])
             ->add('gender', ChoiceType::class, [
                 'attr'=>['class'=>'span12 select-custom inputs gender'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Female' => 'Female','Male' => 'Male', 'Others' => 'Others'],
+                'choices' => ['Female' => 'Female', 'Male' => 'Male', 'Others' => 'Others'],
             ])
             ->add('ageGroup', ChoiceType::class, [
                 'attr'=>['class'=>'span12 select-custom inputs'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Adult' => 'Adult','Child' => 'Child'],
+                'choices' => ['Adult' => 'Adult', 'Child' => 'Child'],
             ])
             ->add('address',TextareaType::class, ['attr'=>['required'=>false ,'class'=>'m-wrap span12 resize inputs address','rows'=> 3,'autocomplete'=>'off','placeholder'=>'Enter patient address']
             ])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span12 location'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
 
@@ -83,6 +82,10 @@ class CustomerForDmsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Customer::class
         ]);

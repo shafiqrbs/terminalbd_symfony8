@@ -2,6 +2,7 @@
 
 namespace App\Product\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -75,7 +76,7 @@ class CollectionController extends AbstractController
     private function createCreateForm(Collection $entity)
     {
 
-        $form = $this->createForm(new CollectionType(), $entity, [
+        $form = $this->createForm(CollectionType::class, $entity, [
             'action' => $this->generateUrl('collection_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -157,7 +158,7 @@ class CollectionController extends AbstractController
      */
     private function createEditForm(Collection $entity)
     {
-        $form = $this->createForm(new CollectionType(), $entity, [
+        $form = $this->createForm(CollectionType::class, $entity, [
             'action' => $this->generateUrl('collection_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -239,7 +240,7 @@ class CollectionController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('collection_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

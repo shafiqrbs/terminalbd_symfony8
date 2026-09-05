@@ -11,6 +11,7 @@
 
 namespace App\User\Form\Type;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,18 +22,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 class ProfileType extends AbstractType
 {
-
-
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
+    protected $location;
 
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
            $builder
                 ->add('name',TextType::class, ['required' => false,'attr'=>['class'=>'m-wrap span12 form-control','placeholder'=>'Enter your full name'],
                 'constraints' =>[
@@ -46,16 +44,15 @@ class ProfileType extends AbstractType
                            new Length(max: 200)
                        ]]
                )
-               /*->add('location', 'entity', array(
+               /*->add('location', EntityType::class, array(
                    'required'    => false,
-                   'empty_value' => '---Select Location---',
+                   'placeholder' => '---Select Location---',
                    'attr'=>array('class'=>'select-location span12 m-wrap form-control'),
                    'class' => 'App\Location\Entity\Location',
                    'constraints' =>array(
                        new NotBlank(array('message'=>'Select user location'))
                    ),
                    'choices'=> $this->LocationChoiceList(),
-                   'choices_as_values' => true,
                    'choice_label' => 'nestedLabel',
                ))*/
                 ->add('address',TextType::class, ['required' => false,'attr'=>['class'=>'m-wrap span12 form-control','placeholder'=>'Enter your full address']])
@@ -70,6 +67,10 @@ class ProfileType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Profile::class
         ]);

@@ -74,7 +74,7 @@ class SmsEmailPricingController extends AbstractController
      */
     private function createCreateForm(SmsEmailPricing $entity)
     {
-        $form = $this->createForm(new SmsEmailPricingType(), $entity, [
+        $form = $this->createForm(SmsEmailPricingType::class, $entity, [
             'action' => $this->generateUrl('smspricing_create'),
             'method' => 'POST',
             'attr' => [
@@ -150,7 +150,7 @@ class SmsEmailPricingController extends AbstractController
      */
     private function createEditForm(SmsEmailPricing $entity)
     {
-        $form = $this->createForm(new SmsEmailPricingType(), $entity, [
+        $form = $this->createForm(SmsEmailPricingType::class, $entity, [
             'action' => $this->generateUrl('smspricing_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

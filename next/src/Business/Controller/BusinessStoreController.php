@@ -127,16 +127,12 @@ class BusinessStoreController extends AbstractController
     private function createCreateForm(BusinessStore $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BusinessStoreType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new BusinessStoreType($option), $entity, array(
-            'action' => $this->generateUrl('business_store_create', array('id' => $entity->getId())),
+        $form = $this->createForm(BusinessStoreType::class, $entity, array('action' => $this->generateUrl('business_store_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $option));
         return $form;
     }
 
@@ -150,16 +146,12 @@ class BusinessStoreController extends AbstractController
     private function createLedgerForm(BusinessStore $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BusinessStoreLedgerType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new BusinessStoreLedgerType($option), $entity, array(
-            'action' => $this->generateUrl('business_store_create', array('id' => $entity->getId())),
+        $form = $this->createForm(BusinessStoreLedgerType::class, $entity, array('action' => $this->generateUrl('business_store_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $option));
         return $form;
     }
 
@@ -197,16 +189,12 @@ class BusinessStoreController extends AbstractController
     private function createEditForm(BusinessStore $entity )
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BusinessStoreType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new BusinessStoreType($option), $entity, array(
-            'action' => $this->generateUrl('business_store_update', array('id' => $entity->getId())),
+        $form = $this->createForm(BusinessStoreType::class, $entity, array('action' => $this->generateUrl('business_store_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $option));
 
 
         return $form;

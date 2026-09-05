@@ -18,10 +18,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CustomerType extends AbstractType
 {
+    protected $globalOption;
+    protected $location;
 
-    public function __construct(private readonly GlobalOption $globalOption, private readonly LocationRepository $location)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -29,6 +28,9 @@ class CustomerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Customer name'],
                     'constraints' =>[
@@ -53,18 +55,17 @@ class CustomerType extends AbstractType
             ->add('address',TextareaType::class, ['attr'=>['class'=>'m-wrap span12 ','rows'=>8,'placeholder'=>'Enter customer address']])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>' m-wrap span12'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('marketing', EntityType::class, [
                 'required'    => false,
                 'class' => User::class,
-                'empty_value' => '---Choose a marketing executive---',
-                'property' => 'userFullName',
+                'placeholder' => '---Choose a marketing executive---',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'select2 span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->where("u.isDelete != 1")
@@ -79,6 +80,11 @@ class CustomerType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Customer::class
         ]);

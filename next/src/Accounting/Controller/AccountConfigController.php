@@ -64,16 +64,12 @@ class AccountConfigController extends AbstractController
     private function createEditForm(AccountingConfig $entity)
     {
         $config = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountConfigType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new AccountConfigType($config), $entity, array(
-            'action' => $this->generateUrl('account_config_update'),
+        $form = $this->createForm(AccountConfigType::class, $entity, array('action' => $this->generateUrl('account_config_update'),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'global' => $config));
         return $form;
     }
 

@@ -96,16 +96,12 @@ class CategoryController extends AbstractController
     {
 
         $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CategoryType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
-        $form = $this->createForm(new CategoryType($em,$globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_category_create', array('id' => $entity->getId())),
+        $form = $this->createForm(CategoryType::class, $entity, array('action' => $this->generateUrl('hms_category_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'emCategory' => $em, 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -166,16 +162,12 @@ class CategoryController extends AbstractController
     private function createEditForm(HmsCategory $entity,$globalOption)
     {
         $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CategoryType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
-        $form = $this->createForm(new CategoryType($em,$globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_category_update', array('id' => $entity->getId())),
+        $form = $this->createForm(CategoryType::class, $entity, array('action' => $this->generateUrl('hms_category_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'emCategory' => $em, 'globalOption' => $globalOption));
 
 
         return $form;

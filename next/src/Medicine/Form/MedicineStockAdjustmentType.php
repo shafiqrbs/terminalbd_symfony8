@@ -30,11 +30,7 @@ class MedicineStockAdjustmentType extends AbstractType
                 'attr'=>['class'=>'m-wrap discount-type span12'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'Minus' => 'Minus',
-                    'Plus' => 'Plus',
-                    'Sample' => 'Sample',
-                ],
+                'choices' => ['Minus' => 'Minus', 'Plus' => 'Plus', 'Sample' => 'Sample'],
             ])
             ->add('quantity',NumberType::class, ['attr'=>['class'=>'m-wrap span12 form-control input-number input','placeholder'=>'Quantity']])
             ->add('bonus',NumberType::class, ['attr'=>['class'=>'m-wrap span12 form-control input-number input','placeholder'=>'Bonus']])

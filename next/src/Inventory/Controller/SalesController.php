@@ -449,17 +449,13 @@ class SalesController extends AbstractController
     private function createEditForm(Sales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SalesType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new SalesType($globalOption), $entity, array(
-            'action' => $this->generateUrl('inventory_sales_update', array('id' => $entity->getId())),
+        $form = $this->createForm(SalesType::class, $entity, array('action' => $this->generateUrl('inventory_sales_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'id' => 'posForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

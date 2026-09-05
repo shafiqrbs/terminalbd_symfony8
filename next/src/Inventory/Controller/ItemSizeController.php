@@ -82,16 +82,12 @@ class ItemSizeController extends AbstractController
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $em = $this->em->getRepository(\App\Product\Entity\Category::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ItemSizeType::configureOptions() and pass them as form options: $em,$inventory), $entity, array(
-        $form = $this->createForm(new ItemSizeType($em,$inventory), $entity, array(
-            'action' => $this->generateUrl('itemsize_create'),
+        $form = $this->createForm(ItemSizeType::class, $entity, array('action' => $this->generateUrl('itemsize_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em, 'inventoryConfig' => $inventory));
         return $form;
     }
 
@@ -162,16 +158,12 @@ class ItemSizeController extends AbstractController
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $em = $this->em->getRepository(\App\Product\Entity\Category::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ItemSizeType::configureOptions() and pass them as form options: $em,$inventory), $entity, array(
-        $form = $this->createForm(new ItemSizeType($em,$inventory), $entity, array(
-            'action' => $this->generateUrl('itemsize_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ItemSizeType::class, $entity, array('action' => $this->generateUrl('itemsize_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em, 'inventoryConfig' => $inventory));
          return $form;
     }
     /**
@@ -283,7 +275,7 @@ class ItemSizeController extends AbstractController
     private function createSizeGroupForm(ItemSizeGroup $entity)
     {
 
-        $form = $this->createForm(new ItemSizeGroupType(), $entity, array(
+        $form = $this->createForm(ItemSizeGroupType::class, $entity, array(
             'action' => $this->generateUrl('itemsize_group_create'),
             'method' => 'POST',
         ));

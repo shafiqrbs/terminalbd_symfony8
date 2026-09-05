@@ -95,16 +95,12 @@ class AccountLoanUserController extends AbstractController
     private function createCreateForm(AccountLoanUser $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountLoanUserType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new AccountLoanUserType($option), $entity, array(
-            'action' => $this->generateUrl('account_loanuser_create'),
+        $form = $this->createForm(AccountLoanUserType::class, $entity, array('action' => $this->generateUrl('account_loanuser_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $option));
       return $form;
     }
 
@@ -149,16 +145,12 @@ class AccountLoanUserController extends AbstractController
     private function createEditForm(AccountLoanUser $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountLoanUserType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new AccountLoanUserType($option), $entity, array(
-            'action' => $this->generateUrl('account_loanuser_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AccountLoanUserType::class, $entity, array('action' => $this->generateUrl('account_loanuser_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $option));
         return $form;
     }
     /**

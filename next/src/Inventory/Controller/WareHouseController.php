@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -71,16 +72,12 @@ class WareHouseController extends AbstractController
     private function createCreateForm(WareHouse $entity)
     {
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into WareHouseType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
-        $form = $this->createForm(new WareHouseType($inventoryConfig), $entity, array(
-            'action' => $this->generateUrl('inventory_warehouse_create'),
+        $form = $this->createForm(WareHouseType::class, $entity, array('action' => $this->generateUrl('inventory_warehouse_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form addPurchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'inventoryConfig' => $inventoryConfig));
         return $form;
     }
 
@@ -159,12 +156,8 @@ class WareHouseController extends AbstractController
     private function createEditForm(WareHouse $entity)
     {
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into WareHouseType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
-        $form = $this->createForm(new WareHouseType($inventoryConfig), $entity, array(
-            'action' => $this->generateUrl('inventory_warehouse_update', array('id' => $entity->getId())),
-            'method' => 'PUT',
-        ));
+        $form = $this->createForm(WareHouseType::class, $entity, array('action' => $this->generateUrl('inventory_warehouse_update', array('id' => $entity->getId())),
+            'method' => 'PUT', 'inventoryConfig' => $inventoryConfig));
         return $form;
     }
     /**
@@ -233,7 +226,7 @@ class WareHouseController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('inventory_warehouse_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

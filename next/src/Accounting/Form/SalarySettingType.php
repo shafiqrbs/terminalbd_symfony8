@@ -19,17 +19,14 @@ class SalarySettingType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('basicAmount',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'add payment amount BDT'],
@@ -53,8 +50,8 @@ class SalarySettingType extends AbstractType
             ->add('user', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'empty_value' => '---Choose a employee---',
-                'property' => 'userFullName',
+                'placeholder' => '---Choose a employee---',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -69,6 +66,10 @@ class SalarySettingType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => SalarySetting::class
         ]);

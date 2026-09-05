@@ -37,10 +37,7 @@ class SmsEmailPricingType extends AbstractType
             ])
             ->add('type', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                    'SMS' => 'SMS',
-                    'Email' => 'Email',
-                ],
+                'choices' => ['SMS' => 'SMS', 'Email' => 'Email'],
             ])
             ->add('status')
         ;

@@ -2,7 +2,10 @@
 
 namespace App\User\Form;
 
+use App\Form\ChoiceList;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\User\Entity\Repository\UserRepository;
 use Doctrine\ORM\EntityRepository;
 use App\Location\Repository\LocationRepository;
@@ -10,13 +13,14 @@ use App\Tool\Entity\GlobalOption;
 use App\Tool\Repository\DesignationRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 class DomainEditUserType extends AbstractType
 {
+    protected $user;
+
 
     /** @var  GlobalOption */
     private $globalOption;
@@ -25,15 +29,6 @@ class DomainEditUserType extends AbstractType
     private $designation;
 
     /** @var  UserRepository */
-    private $user;
-
-
-    function __construct(UserRepository $user , GlobalOption $globalOption,DesignationRepository $designation)
-    {
-        $this->user = $user;
-        $this->globalOption = $globalOption;
-        $this->designation = $designation;
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -41,15 +36,19 @@ class DomainEditUserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->user = $options['user'];
+        $this->globalOption = $options['globalOption'];
+        $this->designation = $options['designation'];
+
         $builder
 
-            ->add('email','text', array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter your valid email address'),
+            ->add('email', TextType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter your valid email address'),
                     'constraints' =>array(
                         new NotBlank(array('message'=>'Please enter your email address')),
                         new Length(array('max'=>200))
                     ))
             )
-            ->add('roles', 'choice', array(
+            ->add('roles', ChoiceType::class, array(
                     'attr'=>array('class'=>'category form-control'),
                     'required'=>true,
                     'constraints' =>array(
@@ -57,27 +56,31 @@ class DomainEditUserType extends AbstractType
                     ),
                     'multiple'    => true,
                     'empty_data'  => null,
-                    'choices'   => $this->getAccessRoleGroup())
+                    'choices'   => ChoiceList::flip($this->getAccessRoleGroup()))
             )
-            ->add('appRoles', 'choice', array(
+            ->add('appRoles', ChoiceType::class, array(
                     'attr'=>array('class'=>'category form-control'),
                     'required'=>false,
                     'multiple'    => true,
                     'empty_data'  => null,
-                    'choices'   => $this->getAppRoleGroup())
+                    'choices'   => ChoiceList::flip($this->getAppRoleGroup()))
             )
             ->add('enabled');
-            // TODO(migration): SF3+ takes a form type class-string, not an instance.
-            // Move these constructor arguments into DomainUserProfileType::configureOptions() and pass them as form options: $this->globalOption, $this->designation
-            $builder->add('profile', new DomainUserProfileType($this->globalOption, $this->designation));
+            $builder->add('profile', DomainUserProfileType::class, ['globalOption' => $this->globalOption, 'designation' => $this->designation]);
 
     }
 
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'user' => null,
+            'globalOption' => null,
+            'designation' => null,
+        ]);
+
         $resolver->setDefaults(array(
             'data_class' => 'App\User\Entity\User'
         ));
@@ -86,7 +89,7 @@ class DomainEditUserType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'Core_userbundle_user';
     }

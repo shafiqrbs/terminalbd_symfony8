@@ -101,16 +101,12 @@ class SalarySettingController extends AbstractController
     private function createCreateForm(Payroll $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SalarySettingType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new SalarySettingType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_salarysetting_create'),
+        $form = $this->createForm(SalarySettingType::class, $entity, array('action' => $this->generateUrl('account_salarysetting_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
        return $form;
     }
 
@@ -180,16 +176,12 @@ class SalarySettingController extends AbstractController
     private function createEditForm(Payroll $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SalarySettingType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new SalarySettingType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_salarysetting_update', array('id' => $entity->getId())),
+        $form = $this->createForm(SalarySettingType::class, $entity, array('action' => $this->generateUrl('account_salarysetting_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
     /**

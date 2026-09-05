@@ -14,10 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SalesCustomerType extends AbstractType
 {
-
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
+    protected $location;
 
 
     /**
@@ -26,6 +23,8 @@ class SalesCustomerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 customer-input','autocomplete'=>'off','placeholder'=>'Customer name']]
             )
@@ -34,11 +33,10 @@ class SalesCustomerType extends AbstractType
             ->add('address',TextareaType::class, ['attr'=>['class'=>'m-wrap span12 customer-input','rows'=>2,'placeholder'=>'Enter customer address']])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span11 customer-input'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ]);
 
@@ -49,6 +47,10 @@ class SalesCustomerType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Customer::class
         ]);

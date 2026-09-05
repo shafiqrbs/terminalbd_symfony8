@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -78,7 +79,7 @@ class ColorSizeController extends AbstractController
      */
     private function createCreateForm(ColorSize $entity)
     {
-        $form = $this->createForm(new ColorSizeType(), $entity, [
+        $form = $this->createForm(ColorSizeType::class, $entity, [
             'action' => $this->generateUrl('colorsize_create'),
             'method' => 'POST',
             'attr' => [
@@ -159,7 +160,7 @@ class ColorSizeController extends AbstractController
      */
     private function createEditForm(ColorSize $entity)
     {
-        $form = $this->createForm(new ColorSizeType(), $entity, [
+        $form = $this->createForm(ColorSizeType::class, $entity, [
             'action' => $this->generateUrl('colorsize_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -237,7 +238,7 @@ class ColorSizeController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('colorsize_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

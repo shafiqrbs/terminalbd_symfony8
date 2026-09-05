@@ -137,17 +137,13 @@ class PurchaseController extends AbstractController
     private function createOpeningForm(MedicinePurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseOpeningType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PurchaseOpeningType($globalOption), $entity, array(
-            'action' => $this->generateUrl('medicine_purchase_opening_create'),
+        $form = $this->createForm(PurchaseOpeningType::class, $entity, array('action' => $this->generateUrl('medicine_purchase_opening_create'),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchaseForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 
@@ -306,17 +302,13 @@ class PurchaseController extends AbstractController
     private function createEditForm(MedicinePurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PurchaseType($globalOption), $entity, array(
-            'action' => $this->generateUrl('medicine_purchase_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PurchaseType::class, $entity, array('action' => $this->generateUrl('medicine_purchase_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchaseForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 
@@ -330,40 +322,32 @@ class PurchaseController extends AbstractController
     private function createManualEditForm(MedicinePurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseManualType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PurchaseManualType($globalOption), $entity, array(
-            'action' => $this->generateUrl('medicine_purchase_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PurchaseManualType::class, $entity, array('action' => $this->generateUrl('medicine_purchase_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchaseForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 
     private function createPurchaseItemForm(MedicinePurchaseItem $purchaseItem , MedicinePurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseItemType::configureOptions() and pass them as form options: $globalOption), $purchaseItem, array(
-        $form = $this->createForm(new PurchaseItemType($globalOption), $purchaseItem, array(
-            'action' => $this->generateUrl('medicine_purchase_particular_add', array('invoice' => $entity->getId())),
+        $form = $this->createForm(PurchaseItemType::class, $purchaseItem, array('action' => $this->generateUrl('medicine_purchase_particular_add', array('invoice' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form particular-info',
                 'id' => 'purchaseItemForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 
     private function createPurchaseManualItemForm(MedicinePurchaseItem $purchaseItem , MedicinePurchase $entity)
     {
-        $form = $this->createForm(new PurchaseItemManualType(), $purchaseItem, array(
+        $form = $this->createForm(PurchaseItemManualType::class, $purchaseItem, array(
             'action' => $this->generateUrl('medicine_purchase_particular_add_manual', array('invoice' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
@@ -378,7 +362,7 @@ class PurchaseController extends AbstractController
     private function createPurchaseBarcodeItemForm(MedicinePurchaseItem $purchaseItem , MedicinePurchase $entity)
     {
 
-        $form = $this->createForm(new PurchaseBarcodeItemType(), $purchaseItem, array(
+        $form = $this->createForm(PurchaseBarcodeItemType::class, $purchaseItem, array(
             'action' => $this->generateUrl('medicine_purchase_barcode_item', array('purchase' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
@@ -394,17 +378,13 @@ class PurchaseController extends AbstractController
     private function createStockItemForm(MedicineStock $entity, MedicinePurchase $purchase )
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MedicineStockItemType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new MedicineStockItemType($config), $entity, array(
-            'action' => $this->generateUrl('medicine_stock_item_create', array('id' => $purchase->getId())),
+        $form = $this->createForm(MedicineStockItemType::class, $entity, array('action' => $this->generateUrl('medicine_stock_item_create', array('id' => $purchase->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form particular-info',
                 'id' => 'medicineStock',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'medicineConfig' => $config));
         return $form;
     }
 

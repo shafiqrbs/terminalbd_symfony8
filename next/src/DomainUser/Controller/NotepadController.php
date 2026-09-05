@@ -98,9 +98,7 @@ class NotepadController extends AbstractController
     private function createCreateForm(Notepad $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into NotepadType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new NotepadType($location), $entity, array(
+        $form = $this->createForm(NotepadType::class, $entity, array(
             'action' => $this->generateUrl('domain_notepad_create'),
             'method' => 'POST',
             'attr' => array(
@@ -198,9 +196,7 @@ class NotepadController extends AbstractController
     private function createEditForm(Notepad $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into NotepadType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new NotepadType($location), $entity, array(
+        $form = $this->createForm(NotepadType::class, $entity, array(
             'action' => $this->generateUrl('domain_notepad_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(

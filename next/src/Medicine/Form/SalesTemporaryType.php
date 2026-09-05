@@ -22,10 +22,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SalesTemporaryType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption, private readonly LocationRepository $location)
-    {
-    }
+    protected $globalOption;
+    protected $location;
 
 
     /**
@@ -34,6 +32,9 @@ class SalesTemporaryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
 
             ->add('cardNo',TextType::class, ['attr'=>['class'=>'m-wrap span12 salesInput','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off']])
@@ -46,7 +47,7 @@ class SalesTemporaryType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'salesInput span12 m-wrap transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -55,10 +56,10 @@ class SalesTemporaryType extends AbstractType
             ])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'salesInput span12 m-wrap'],
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -67,9 +68,9 @@ class SalesTemporaryType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'salesInput span12 m-wrap'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -78,9 +79,9 @@ class SalesTemporaryType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap salesInput'],
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -89,9 +90,9 @@ class SalesTemporaryType extends AbstractType
             ->add('salesBy', EntityType::class, [
                 'required'    => false,
                 'class' => User::class,
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap salesInput'],
-                'empty_value' => '---Choose sales by---',
+                'placeholder' => '---Choose sales by---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->where("u.isDelete != 1")
                     ->andWhere("u.enabled = 1")
@@ -103,10 +104,7 @@ class SalesTemporaryType extends AbstractType
                 'attr'=>['class'=>'m-wrap discount-type span12'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'flat' => 'Flat',
-                    'percentage' => 'Percentage',
-                ],
+                'choices' => ['Flat' => 'flat', 'Percentage' => 'percentage'],
             ])
         ;
 
@@ -117,6 +115,11 @@ class SalesTemporaryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicineSales::class
         ]);

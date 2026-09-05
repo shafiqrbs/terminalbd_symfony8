@@ -22,18 +22,14 @@ class AccountBusinessPurchaseType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('payment',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'add payment amount BDT'],
@@ -45,19 +41,14 @@ class AccountBusinessPurchaseType extends AbstractType
 		        'attr'=>['class'=>'span12 m-wrap'],
 		        'expanded'      =>false,
 		        'multiple'      =>false,
-		        'choices' => [
-			        'Due' => 'Due',
-			        'Advance' => 'Advance',
-			        'Discount' => 'Discount',
-			        'Outstanding' => 'Outstanding',
-		        ],
+		        'choices' => ['Due' => 'Due', 'Advance' => 'Advance', 'Discount' => 'Discount', 'Outstanding' => 'Outstanding'],
 	        ])
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 transactionMethod'],
-                'empty_value' => '---Choose a method---',
+                'placeholder' => '---Choose a method---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->andWhere("e.slug != 'cash-on-delivery'")
@@ -66,8 +57,8 @@ class AccountBusinessPurchaseType extends AbstractType
             ->add('accountVendor', EntityType::class, [
                 'required'    => true,
                 'class' => AccountVendor::class,
-                'empty_value' => '---Choose a vendor---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'span12 select2 vendor-ledger-business'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -79,8 +70,8 @@ class AccountBusinessPurchaseType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -90,8 +81,8 @@ class AccountBusinessPurchaseType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -108,6 +99,10 @@ class AccountBusinessPurchaseType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AccountPurchase::class
         ]);
     }
@@ -119,6 +114,5 @@ class AccountBusinessPurchaseType extends AbstractType
     {
         return 'appstore_bundle_accountingbundle_accountpurchase';
     }
-
 
 }

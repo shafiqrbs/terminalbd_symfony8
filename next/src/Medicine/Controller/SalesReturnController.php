@@ -174,17 +174,13 @@ class SalesReturnController extends AbstractController
 	{
         $globalOption = $this->getUser()->getGlobalOption();
         $em = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class);
-     // TODO(migration): SF3+ takes a form type class-string, not an instance.
-     // Move these constructor arguments into SalesTemporaryItemType::configureOptions() and pass them as form options: $globalOption,$em), $salesItem, array(
-	    $form = $this->createForm(new SalesTemporaryItemType($globalOption,$em), $salesItem, array(
-			'action' => $this->generateUrl('medicine_sales_temporary_item_add'),
+	    $form = $this->createForm(SalesTemporaryItemType::class, $salesItem, array('action' => $this->generateUrl('medicine_sales_temporary_item_add'),
 			'method' => 'POST',
 			'attr' => array(
 				'class' => 'form-horizontal',
 				'id' => 'salesTemporaryItemForm',
 				'novalidate' => 'novalidate',
-			)
-		));
+			), 'globalOption' => $globalOption, 'em' => $em));
 		return $form;
 	}
 
@@ -192,17 +188,13 @@ class SalesReturnController extends AbstractController
 	{
 		$globalOption = $this->getUser()->getGlobalOption();
 		$location = $this->em->getRepository(\App\Location\Entity\Location::class);
-  // TODO(migration): SF3+ takes a form type class-string, not an instance.
-  // Move these constructor arguments into SalesTemporaryType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-		$form = $this->createForm(new SalesTemporaryType($globalOption,$location), $entity, array(
-			'action' => $this->generateUrl('medicine_sales_temporary_create'),
+		$form = $this->createForm(SalesTemporaryType::class, $entity, array('action' => $this->generateUrl('medicine_sales_temporary_create'),
 			'method' => 'POST',
 			'attr' => array(
 				'class' => 'form-horizontal',
 				'id' => 'salesTemporaryForm',
 				'novalidate' => 'novalidate',
-			)
-		));
+			), 'globalOption' => $globalOption, 'location' => $location));
 		return $form;
 	}
 

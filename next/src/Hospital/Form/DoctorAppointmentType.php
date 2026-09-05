@@ -25,11 +25,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DoctorAppointmentType extends AbstractType
 {
-
-
-    public function __construct(private readonly GlobalOption $globalOption, private readonly HmsCategoryRepository $emCategory)
-    {
-    }
+    protected $globalOption;
+    protected $emCategory;
 
 
     /**
@@ -38,6 +35,9 @@ class DoctorAppointmentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->emCategory = $options['emCategory'];
+
         $builder
 
             ->add('cardNo',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off']])
@@ -58,7 +58,7 @@ class DoctorAppointmentType extends AbstractType
             ->add('visitType', EntityType::class, [
                 'required'    => true,
                 'class' => HmsServiceGroup::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap visitType'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where('e.hospitalConfig ='.$this->globalOption->getHospitalConfig()->getId())
@@ -69,8 +69,8 @@ class DoctorAppointmentType extends AbstractType
             ->add('assignDoctor', EntityType::class, [
                 'required'    => true,
                 'class' => Particular::class,
-                'property' => 'visitDoctor',
-                'empty_value' => '---Select Assign Doctor---',
+                'choice_label' => 'visitDoctor',
+                'placeholder' => '---Select Assign Doctor---',
                 'attr'=>['class'=>'span12 m-wrap select2 assignDoctor'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where('e.hospitalConfig ='.$this->globalOption->getHospitalConfig()->getId())
@@ -81,9 +81,9 @@ class DoctorAppointmentType extends AbstractType
             ->add('referredDoctor', EntityType::class, [
                 'required'    => false,
                 'class' => Particular::class,
-                'property' => 'referredName',
+                'choice_label' => 'referredName',
                 'attr'=>['class'=>'span12 select2 m-wrap referredDoctor'],
-                'empty_value' => '--- Choose Referred ---',
+                'placeholder' => '--- Choose Referred ---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere('b.service IN(:service)') ->setParameter('service',array_values([5,6]))
@@ -94,8 +94,8 @@ class DoctorAppointmentType extends AbstractType
             ->add('diseasesProfile', EntityType::class, [
                 'required'    => false,
                 'class' => HmsServiceGroup::class,
-                'property' => 'name',
-                'empty_value' => '---Select diseases profile---',
+                'choice_label' => 'name',
+                'placeholder' => '---Select diseases profile---',
                 'attr'=>['class'=>'span12 m-wrap select2 diseasesProfile'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where('e.hospitalConfig ='.$this->globalOption->getHospitalConfig()->getId())
@@ -107,8 +107,8 @@ class DoctorAppointmentType extends AbstractType
             ->add('specialization', EntityType::class, [
                 'required'    => false,
                 'class' => HmsServiceGroup::class,
-                'property' => 'name',
-                'empty_value' => '--- Select Specialization ---',
+                'choice_label' => 'name',
+                'placeholder' => '--- Select Specialization ---',
                 'attr'=>['class'=>'span12 m-wrap select2 specialization'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where('e.hospitalConfig ='.$this->globalOption->getHospitalConfig()->getId())
@@ -121,7 +121,7 @@ class DoctorAppointmentType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -130,10 +130,10 @@ class DoctorAppointmentType extends AbstractType
             ])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -142,9 +142,9 @@ class DoctorAppointmentType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -153,9 +153,9 @@ class DoctorAppointmentType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -167,9 +167,9 @@ class DoctorAppointmentType extends AbstractType
             $builder->add('marketingExecutive', EntityType::class, [
                 'required'    => false,
                 'class' => Particular::class,
-                'property' => 'marketingExecutiveEmployee',
+                'choice_label' => 'marketingExecutiveEmployee',
                 'attr'=>['class'=>'span12 select2 m-wrap marketingExecutive'],
-                'empty_value' => '--- Choose Marketing Executive ---',
+                'placeholder' => '--- Choose Marketing Executive ---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere('b.service IN(:service)') ->setParameter('service',array_values([14]))
@@ -185,6 +185,11 @@ class DoctorAppointmentType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'emCategory' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Invoice::class
         ]);

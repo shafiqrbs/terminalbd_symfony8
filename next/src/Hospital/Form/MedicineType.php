@@ -40,11 +40,11 @@ class MedicineType extends AbstractType
             ->add('unit', EntityType::class, [
                 'required'    => true,
                 'class' => ProductUnit::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please select required')
                 ],
-                'empty_value' => '---Choose a unit ---',
+                'placeholder' => '---Choose a unit ---',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")

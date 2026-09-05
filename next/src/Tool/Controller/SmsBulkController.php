@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Tool\Entity\GlobalOption;
@@ -92,16 +93,12 @@ class SmsBulkController extends AbstractController
     {
 
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SmsBulkType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new SmsBulkType($location), $entity, array(
-            'action' => $this->generateUrl('smsbulk_create'),
+        $form = $this->createForm(SmsBulkType::class, $entity, array('action' => $this->generateUrl('smsbulk_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
         return $form;
     }
 
@@ -176,16 +173,12 @@ class SmsBulkController extends AbstractController
     private function createEditForm(SmsBulk $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SmsBulkType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new SmsBulkType($location), $entity, array(
-            'action' => $this->generateUrl('smsbulk_update', array('id' => $entity->getId())),
+        $form = $this->createForm(SmsBulkType::class, $entity, array('action' => $this->generateUrl('smsbulk_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
        return $form;
     }
     /**
@@ -253,7 +246,7 @@ class SmsBulkController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('smsbulk_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

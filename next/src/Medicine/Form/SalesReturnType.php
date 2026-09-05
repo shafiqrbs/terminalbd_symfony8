@@ -15,10 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SalesReturnType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
     /**
@@ -27,6 +24,8 @@ class SalesReturnType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('payment',TextType::class, ['attr'=>['class'=>'m-wrap span12 salesInput td-inline-input','placeholder'=>'Received','data-original-title'=>'Received','autocomplete'=>'off']])
@@ -34,7 +33,7 @@ class SalesReturnType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'salesInput span12 m-wrap transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -44,9 +43,9 @@ class SalesReturnType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'salesInput span12 m-wrap'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -55,16 +54,16 @@ class SalesReturnType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap salesInput'],
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
                     ->orderBy("b.name", "ASC")
             ])
         ;
-      //  $builder->add('customer', new CustomerForMedicineType());
+      //  $builder->add('customer', CustomerForMedicineType::class);
     }
     
     /**
@@ -72,6 +71,10 @@ class SalesReturnType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => 'App\Medicine\Entity\SalesReturnInvoice'
         ]);

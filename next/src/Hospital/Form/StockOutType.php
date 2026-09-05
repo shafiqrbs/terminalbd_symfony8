@@ -17,28 +17,21 @@ class StockOutType extends AbstractType
 
     public  $config;
 
-    public function __construct(HospitalConfig $config)
-    {
-        $this->config = $config;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->config = $options['config'];
+
         $builder
 
 	        ->add('invoiceFor', ChoiceType::class, [
 		        'attr'=>['class'=>'span12 select-custom'],
 		        'expanded'      =>false,
 		        'multiple'      =>false,
-		        'choices' => [
-			        'expenditure' => 'Expenditure',
-			        'customer' => 'Customer',
-		        ],
+		        'choices' => ['Expenditure' => 'expenditure', 'Customer' => 'customer'],
 	        ])
 	        ->add('remark',TextareaType::class, ['attr'=>['class'=>'m-wrap span12 resize ','rows'=>3,'required' => false ,'label' => 'form.name','placeholder'=>'Enter remark']])
             ->add('payment',TextType::class, ['attr'=>['class'=>'numeric m-wrap span12','placeholder'=>'Payment amount']
@@ -50,6 +43,10 @@ class StockOutType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'config' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => HmsStockOut::class
         ]);

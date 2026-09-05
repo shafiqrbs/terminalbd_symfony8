@@ -36,7 +36,7 @@ class BrandingType extends AbstractType
                 'required'      => true,
                 'multiple'      =>true,
                 'class' => Category::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 multiselect'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('c')
                     ->andWhere("c.status = 1")
@@ -47,10 +47,7 @@ class BrandingType extends AbstractType
 
             ->add('type', ChoiceType::class, [
                 'attr' =>['class'=>'selectbox'],
-                'choices'   => [
-                    'national'     => 'National',
-                    'international'    => 'International'
-                ],
+                'choices'   => ['National' => 'national', 'International' => 'international'],
                 'multiple'  => false,
             ])
 

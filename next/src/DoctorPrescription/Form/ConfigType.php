@@ -28,15 +28,15 @@ class ConfigType extends AbstractType
             ->add('isDefaultMedicine')
             ->add('bodyFontSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => 'Font Size', '10px' => '10px',  '12px' => '12px','14px' => '14px', '16px' => '16px','18px' => '18px',  '20px' => '20px'],
+                'choices' => ['Font Size' => '', '10px' => '10px', '12px' => '12px', '14px' => '14px', '16px' => '16px', '18px' => '18px', '20px' => '20px'],
             ])
             ->add('invoiceFontSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => 'Font Size', '10px' => '10px',  '12px' => '12px','14px' => '14px', '16px' => '16px','18px' => '18px',  '20px' => '20px'],
+                'choices' => ['Font Size' => '', '10px' => '10px', '12px' => '12px', '14px' => '14px', '16px' => '16px', '18px' => '18px', '20px' => '20px'],
             ])
             ->add('sidebarFontSize', ChoiceType::class, [
                 'attr'=>['class'=>' span12'],
-                'choices' => ['' => 'Font Size', '10px' => '10px',  '12px' => '12px','14px' => '14px', '16px' => '16px','18px' => '18px',  '20px' => '20px'],
+                'choices' => ['Font Size' => '', '10px' => '10px', '12px' => '12px', '14px' => '14px', '16px' => '16px', '18px' => '18px', '20px' => '20px'],
             ])
             ->add('customPrescription')
             ->add('invoicePrintLogo')

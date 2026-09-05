@@ -18,10 +18,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class NewsType extends AbstractType
 {
+    protected $globalOption;
 
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -29,6 +27,8 @@ class NewsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter Name'],
                 'constraints' =>[
@@ -44,8 +44,8 @@ class NewsType extends AbstractType
                 'multiple'      =>true,
                 'required'    => false,
                 'class' => ModuleCategory::class,
-                'empty_value' => '---Select category page---',
-                'property' => 'name',
+                'placeholder' => '---Select category page---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'check-list span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
 	                    ->join('o.module', 'module')
@@ -58,8 +58,8 @@ class NewsType extends AbstractType
             ->add('photo_gallery', EntityType::class, [
                 'required'    => false,
                 'class' => PhotoGallery::class,
-                'empty_value' => '---Select Photo Gallery---',
-                'property' => 'name',
+                'placeholder' => '---Select Photo Gallery---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->where("o.status = 1")
@@ -74,6 +74,10 @@ class NewsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Page::class
         ]);

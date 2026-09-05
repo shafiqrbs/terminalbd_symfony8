@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -138,18 +139,12 @@ class PurchaseVendorItemController extends AbstractController
     private function createCreateForm(PurchaseVendorItem $entity , $purchase)
     {
         $inventoryConfig = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseVendorItemType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
-        $form = $this->createForm(new PurchaseVendorItemType($inventoryConfig), $entity, array(
-            'action' => $this->generateUrl('inventory_purchasevendoritem_create',array('purchase'=>$purchase)),
+        $form = $this->createForm(PurchaseVendorItemType::class, $entity, array('action' => $this->generateUrl('inventory_purchasevendoritem_create',array('purchase'=>$purchase)),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'action',
                 'novalidate' => 'novalidate',
-            )
-
-
-        ));
+            ), 'inventoryConfig' => $inventoryConfig));
         return $form;
     }
 
@@ -222,16 +217,12 @@ class PurchaseVendorItemController extends AbstractController
     private function createEditForm(PurchaseVendorItem $entity)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseVendorItemDetailsType::configureOptions() and pass them as form options: $inventory), $entity, array(
-        $form = $this->createForm(new PurchaseVendorItemDetailsType($inventory), $entity, array(
-            'action' => $this->generateUrl('inventory_purchasevendoritem_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PurchaseVendorItemDetailsType::class, $entity, array('action' => $this->generateUrl('inventory_purchasevendoritem_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'action',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'inventoryConfig' => $inventory));
         return $form;
     }
     /**
@@ -298,7 +289,7 @@ class PurchaseVendorItemController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('inventory_purchasevendoritem_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

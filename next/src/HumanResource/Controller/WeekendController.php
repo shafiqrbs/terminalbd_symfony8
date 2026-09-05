@@ -68,7 +68,7 @@ class WeekendController extends AbstractController
     private function createEditForm(Weekend $entity)
     {
 
-        $form = $this->createForm(new WeekendType(), $entity, [
+        $form = $this->createForm(WeekendType::class, $entity, [
             'action' => $this->generateUrl('weekend_update', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [

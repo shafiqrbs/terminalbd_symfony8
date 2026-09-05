@@ -159,16 +159,12 @@ class PhotoGalleryController extends AbstractController
     private function createCreateForm(PhotoGallery $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PhotoGalleryType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()), $entity, array(
-        $form = $this->createForm(new PhotoGalleryType($this->getUser()->getGlobalOption()), $entity, array(
-            'action' => $this->generateUrl('gallery_create', array('id' => $entity->getId())),
+        $form = $this->createForm(PhotoGalleryType::class, $entity, array('action' => $this->generateUrl('gallery_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $this->getUser()->getGlobalOption()));
 
         return $form;
     }
@@ -240,16 +236,12 @@ class PhotoGalleryController extends AbstractController
     private function createEditForm(PhotoGallery $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PhotoGalleryType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()), $entity, array(
-        $form = $this->createForm(new PhotoGalleryType($this->getUser()->getGlobalOption()), $entity, array(
-            'action' => $this->generateUrl('gallery_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PhotoGalleryType::class, $entity, array('action' => $this->generateUrl('gallery_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $this->getUser()->getGlobalOption()));
         return $form;
 
     }

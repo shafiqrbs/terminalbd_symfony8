@@ -16,10 +16,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class LocationType extends AbstractType
 {
-
-    public function __construct(private readonly LocationRepository $em)
-    {
-    }
+    protected $em;
 
 
     /**
@@ -28,8 +25,9 @@ class LocationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
+        $this->em = $options['em'];
 
+        $builder
 
         ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter location name'],
         'constraints' =>[
@@ -39,13 +37,13 @@ class LocationType extends AbstractType
         ])
         ->add('parent', EntityType::class, [
             'required'    => true,
-            'empty_value' => '---Select Parent Location---',
+            'placeholder' => '---Select Parent Location---',
             'attr'=>['class'=>'location m-wrap span10 select2'],
             'class' => \App\Location\Entity\Location::class,
             'constraints' =>[
                 new NotBlank(message: 'Select Parent Location')
             ],
-            'property' => 'nestedLabel',
+            'choice_label' => 'nestedLabel',
             'choices'=> $this->LocationChoiceList()
         ]);
 
@@ -56,6 +54,10 @@ class LocationType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Location::class
         ]);

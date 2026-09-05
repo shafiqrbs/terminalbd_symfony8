@@ -73,7 +73,7 @@ class MenuGroupingController extends AbstractController
     private function createCreateForm(MenuGrouping $entity)
     {
 
-        $form = $this->createForm(new MenuGroupingType(), $entity, [
+        $form = $this->createForm(MenuGroupingType::class, $entity, [
             'action' => $this->generateUrl('menugrouping_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [

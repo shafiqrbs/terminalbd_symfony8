@@ -1,38 +1,35 @@
 <?php
 
-/*
- * This file is part of the FOSUserBundle package.
- *
- * (c) FriendsOfSymfony <http://friendsofsymfony.github.com/>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace App\User\Controller;
 
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use App\Tool\Event\PasswordChangeSmsEvent;
 use App\Tool\Service\ToolManager;
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\User\Entity\Profile;
+use App\User\Entity\User;
+use App\User\Form\Type\ResettingFormType;
+use App\User\Mailer\ResettingMailer;
+use App\User\Manager\UserManager;
+use App\User\Service\MobileDetect;
+use App\User\Util\TokenGenerator;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use DateTime;
-use App\Tool\Event\PasswordChangeSmsEvent;
-use App\User\Service\MobileDetect;
-use FOS\UserBundle\FOSUserEvents;
-use FOS\UserBundle\Event\FormEvent;
-use FOS\UserBundle\Event\GetResponseUserEvent;
-use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\Model\UserInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Controller managing the resetting of the password
+ * Was FOSUserBundle's ResettingController.
  *
- * @author Thibault Duplessis <thibault.duplessis@gmail.com>
- * @author Christophe Coevoet <stof@notk.org>
+ * fos_user.user_manager, fos_user.util.token_generator and fos_user.mailer are
+ * now App\User\Manager\UserManager, App\User\Util\TokenGenerator and
+ * App\User\Mailer\ResettingMailer. The FOSUserEvents dispatches are dropped -
+ * nothing subscribed to them.
  */
 class ResettingController extends AbstractController
 {
@@ -41,6 +38,11 @@ class ResettingController extends AbstractController
         private readonly RequestStack $requestStack,
         private readonly ToolManager $toolManager,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly FormFactoryInterface $formFactory,
+        private readonly UserManager $userManager,
+        private readonly TokenGenerator $tokenGenerator,
+        private readonly ResettingMailer $mailer,
+        private readonly int $tokenTtl,
     ) {
     }
 
@@ -50,12 +52,9 @@ class ResettingController extends AbstractController
     public function requestAction()
     {
         $detect = new MobileDetect();
-        if($detect->isMobile() OR  $detect->isTablet() ) {
-            $theme = 'Resetting/Mobile';
-        }else{
-            $theme = 'Resetting';
-        }
-        return $this->render('UserBundle:'.$theme.':reset.html.twig');
+        $theme = ($detect->isMobile() || $detect->isTablet()) ? 'Resetting/Mobile' : 'Resetting';
+
+        return $this->render('User/' . $theme . '/reset.html.twig');
     }
 
     /**
@@ -63,11 +62,9 @@ class ResettingController extends AbstractController
      */
     public function sendEmailAction(Request $request)
     {
-        $username = $request->request->get('username');
+        $username = (string) $request->request->get('username');
 
-
-        // TODO(migration): AbstractController::get() was removed; inject this service.
-        $user = $this->get('fos_user.user_manager')->findUserByUsernameOrEmail($username);
+        $user = $this->userManager->findUserByUsernameOrEmail($username);
 
         if (null === $user) {
             return $this->render('_fosuser/Resetting/request.html.twig', [
@@ -75,22 +72,17 @@ class ResettingController extends AbstractController
             ]);
         }
 
-        if ($user->isPasswordRequestNonExpired($this->container->getParameter('fos_user.resetting.token_ttl'))) {
+        if ($user->isPasswordRequestNonExpired($this->tokenTtl)) {
             return $this->render('_fosuser/Resetting/passwordAlreadyRequested.html.twig');
         }
 
         if (null === $user->getConfirmationToken()) {
-            /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
-            // TODO(migration): AbstractController::get() was removed; inject this service.
-            $tokenGenerator = $this->get('fos_user.util.token_generator');
-            $user->setConfirmationToken($tokenGenerator->generateToken());
+            $user->setConfirmationToken($this->tokenGenerator->generateToken());
         }
 
-        // TODO(migration): AbstractController::get() was removed; inject this service.
-        $this->get('fos_user.mailer')->sendResettingEmailMessage($user);
+        $this->mailer->sendResettingEmailMessage($user);
         $user->setPasswordRequestedAt(new DateTime());
-        // TODO(migration): AbstractController::get() was removed; inject this service.
-        $this->get('fos_user.user_manager')->updateUser($user);
+        $this->userManager->updateUser($user);
 
         return new RedirectResponse($this->generateUrl('fos_user_resetting_check_email',
             ['email' => $this->getObfuscatedEmail($user)]
@@ -119,48 +111,28 @@ class ResettingController extends AbstractController
      */
     public function resetAction(Request $request, $token)
     {
-
-        /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
-        // TODO(migration): AbstractController::get() was removed; inject this service.
-        $formFactory = $this->get('fos_user.resetting.form.factory');
-        /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
-        // TODO(migration): AbstractController::get() was removed; inject this service.
-        $userManager = $this->get('fos_user.user_manager');
-        /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-        $dispatcher = $this->eventDispatcher;
-
-        $user = $userManager->findUserByConfirmationToken($token);
+        $user = $this->userManager->findUserByConfirmationToken($token);
 
         if (null === $user) {
             throw new NotFoundHttpException(sprintf('The user with "confirmation token" does not exist for value "%s"', $token));
         }
 
-        $event = new GetResponseUserEvent($user, $request);
-        $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_INITIALIZE, $event);
-
-        if (null !== $event->getResponse()) {
-            return $event->getResponse();
-        }
-
-        $form = $formFactory->createForm();
-        $form->setData($user);
+        // FOSUserBundle's form factory named this form; the template and the
+        // POST body still use that name.
+        $form = $this->formFactory->createNamed('fos_user_resetting_form', ResettingFormType::class, $user);
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
-            $event = new FormEvent($form, $request);
-            $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Clearing both is what FOSUserBundle's RESETTING_RESET_SUCCESS
+            // listener did: without it the reset link stays usable.
+            $user->setConfirmationToken(null);
+            $user->setPasswordRequestedAt(null);
+            $user->setEnabled(true);
 
-            $userManager->updateUser($user);
+            $this->userManager->updateUser($user);
 
-            if (null === $response = $event->getResponse()) {
-                $url = $this->generateUrl('fos_user_profile_show');
-                $response = new RedirectResponse($url);
-            }
-
-            $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
-
-            return $response;
+            return new RedirectResponse($this->generateUrl('fos_user_profile_show'));
         }
 
         return $this->render('_fosuser/Resetting/reset.html.twig', [
@@ -173,14 +145,11 @@ class ResettingController extends AbstractController
      * Get the truncated email displayed when requesting the resetting.
      *
      * The default implementation only keeps the part following @ in the address.
-     *
-     * @param \FOS\UserBundle\Model\UserInterface $user
-     *
-     * @return string
      */
-    protected function getObfuscatedEmail(UserInterface $user)
+    protected function getObfuscatedEmail(User $user): string
     {
-        $email = $user->getEmail();
+        $email = (string) $user->getEmail();
+
         if (false !== $pos = strpos($email, '@')) {
             $email = '...' . substr($email, $pos);
         }
@@ -190,40 +159,30 @@ class ResettingController extends AbstractController
 
     public function forgetPasswordAction(Request $request)
     {
-
         $intlMobile = $request->request->get('username');
         $mobile = $this->toolManager->specialExpClean($intlMobile);
-        $profile = $this->em->getRepository(\App\User\Entity\Profile::class)->findOneBy(['mobile' => $mobile]);
-        if(empty($profile)){
+        $profile = $this->em->getRepository(Profile::class)->findOneBy(['mobile' => $mobile]);
 
-            $detect = new \Frontend\FrontentBundle\Service\MobileDetect();
-            if($detect->isMobile() OR  $detect->isTablet() ) {
-                $theme = 'Resetting/Mobile';
-            }else{
-                $theme = 'Resetting';
-            }
-            return $this->render('UserBundle:'.$theme.':reset.html.twig', [
+        if (empty($profile)) {
+
+            $detect = new MobileDetect();
+            $theme = ($detect->isMobile() || $detect->isTablet()) ? 'Resetting/Mobile' : 'Resetting';
+
+            return $this->render('User/' . $theme . '/reset.html.twig', [
                 'invalid_username' => $mobile
             ]);
 
-        }else{
-
-            $entity = $profile->getUser();
-            $a = mt_rand(1000,9999);
-            $entity->setPlainPassword($a);
-            // TODO(migration): AbstractController::get() was removed; inject this service.
-            $this->get('fos_user.user_manager')->updateUser($entity);
-            $this->requestStack->getSession()->getFlashBag()->add(
-                'success',"Send sms on your mobile"
-            );
-            $dispatcher = $this->container->get('event_dispatcher');
-            $dispatcher->dispatch('setting_tool.post.change_password', new PasswordChangeSmsEvent($entity,$a));
-            return $this->redirect($this->generateUrl('homepage'));
-
         }
 
+        $entity = $profile->getUser();
+        $a = mt_rand(1000, 9999);
+        $entity->setPlainPassword((string) $a);
+        $this->userManager->updateUser($entity);
+        $this->requestStack->getSession()->getFlashBag()->add(
+            'success', "Send sms on your mobile"
+        );
+        $this->eventDispatcher->dispatch(new PasswordChangeSmsEvent($entity, $a), 'setting_tool.post.change_password');
 
-
+        return $this->redirect($this->generateUrl('homepage'));
     }
-
 }

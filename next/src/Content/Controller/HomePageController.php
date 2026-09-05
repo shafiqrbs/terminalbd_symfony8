@@ -127,16 +127,12 @@ class HomePageController extends AbstractController
 
         $siteSettingId = $entity->getUser()->getSiteSetting()->getId();
         $globalOption = $this->getUser()->getGlobalOption()->getId();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into HomePageType::configureOptions() and pass them as form options: $globalOption,$siteSettingId), $entity, array(
-        $form = $this->createForm(new HomePageType($globalOption,$siteSettingId), $entity, array(
-            'action' => $this->generateUrl('homepage_update', array('id' => $entity->getId())),
+        $form = $this->createForm(HomePageType::class, $entity, array('action' => $this->generateUrl('homepage_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'siteSettingId' => $siteSettingId));
 
         return $form;
     }

@@ -83,7 +83,7 @@ class DepartmentController extends AbstractController
      */
     private function createCreateForm(HrDepartment $entity)
     {
-        $form = $this->createForm(new DepartmentType(), $entity, [
+        $form = $this->createForm(DepartmentType::class, $entity, [
             'action' => $this->generateUrl('hrdepartment_create'),
             'method' => 'POST',
             'attr' => [
@@ -125,7 +125,7 @@ class DepartmentController extends AbstractController
      */
     private function createEditForm(HrDepartment $entity)
     {
-        $form = $this->createForm(new DepartmentType(), $entity, [
+        $form = $this->createForm(DepartmentType::class, $entity, [
             'action' => $this->generateUrl('hrdepartment_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

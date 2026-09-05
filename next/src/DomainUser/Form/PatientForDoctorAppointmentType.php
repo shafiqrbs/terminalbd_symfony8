@@ -48,13 +48,13 @@ class PatientForDoctorAppointmentType extends AbstractType
                 'attr'=>['class'=>'span12 m-wrap inputs ageType'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Years' => 'Years','Months' => 'Months','Day' => 'Day']
+                'choices' => ['Years' => 'Years', 'Months' => 'Months', 'Day' => 'Day']
             ])
             ->add('gender', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap inputs gender'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Female' => 'Female','Male' => 'Male', 'Others' => 'Others'],
+                'choices' => ['Female' => 'Female', 'Male' => 'Male', 'Others' => 'Others'],
             ])
            ;
     }

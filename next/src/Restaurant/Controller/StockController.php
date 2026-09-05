@@ -115,16 +115,12 @@ class StockController extends AbstractController
     private function createCreateForm(Particular $entity)
     {
         $global = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into StockType::configureOptions() and pass them as form options: $global), $entity, array(
-        $form = $this->createForm(new StockType($global), $entity, array(
-            'action' => $this->generateUrl('restaurant_stock_create', array('id' => $entity->getId())),
+        $form = $this->createForm(StockType::class, $entity, array('action' => $this->generateUrl('restaurant_stock_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $global));
         return $form;
 
     }
@@ -168,16 +164,12 @@ class StockController extends AbstractController
     private function createEditForm(Particular $entity)
     {
         $global = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into StockType::configureOptions() and pass them as form options: $global), $entity, array(
-        $form = $this->createForm(new StockType($global), $entity, array(
-            'action' => $this->generateUrl('restaurant_stock_update', array('id' => $entity->getId())),
+        $form = $this->createForm(StockType::class, $entity, array('action' => $this->generateUrl('restaurant_stock_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $global));
         return $form;
     }
     /**

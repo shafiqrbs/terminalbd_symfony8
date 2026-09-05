@@ -20,18 +20,14 @@ class AccountBankType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('address',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'add bank address']])
@@ -63,31 +59,27 @@ class AccountBankType extends AbstractType
             ->add('file')
             ->add('accountType', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => [
-                    'Savings' => 'Savings',
-                    'Current' => 'Current',
-                    'Other' => 'Other'
-                ],
+                'choices' => ['Savings' => 'Savings', 'Current' => 'Current', 'Other' => 'Other'],
             ])
             ->add('method', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a method---',
+                'placeholder' => '---Choose a method---',
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
                 ],
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->orderBy("b.name", "ASC"),
             ])->add('bank', EntityType::class, [
                 'required'    => true,
                 'class' => Bank::class,
-                'empty_value' => '---Choose a bank---',
+                'placeholder' => '---Choose a bank---',
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
                 ],
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->orderBy("b.name", "ASC"),
@@ -100,6 +92,10 @@ class AccountBankType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AccountBank::class
         ]);
     }
@@ -111,6 +107,5 @@ class AccountBankType extends AbstractType
     {
         return 'accountBank';
     }
-
 
 }

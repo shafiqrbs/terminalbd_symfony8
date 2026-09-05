@@ -15,14 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ProductionBatchType extends AbstractType
 {
-
-
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-
-        $this->config               = $this->globalOption->getRestaurantConfig()->getId();
-    }
+    protected $globalOption;
 
 
     /**
@@ -31,16 +24,18 @@ class ProductionBatchType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('productionItem', EntityType::class, [
                 'required'    => false,
                 'class' => Particular::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please select required')
                 ],
-                'empty_value' => '---Choose a production item ---',
+                'placeholder' => '---Choose a production item ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->join('e.service','s')
@@ -66,6 +61,10 @@ class ProductionBatchType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => ProductionBatch::class
         ]);
     }
@@ -77,6 +76,5 @@ class ProductionBatchType extends AbstractType
     {
         return 'productionBatch';
     }
-
 
 }

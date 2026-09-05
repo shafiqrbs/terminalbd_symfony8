@@ -313,17 +313,13 @@ class InvoiceParticularController extends AbstractController
     {
         $hospitalConfig = $this->getUser()->getGlobalOption()->getHospitalConfig();
         $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceGroupParticularType::configureOptions() and pass them as form options: $hospitalConfig,$em), $entity, array(
-        $form = $this->createForm(new InvoiceGroupParticularType($hospitalConfig,$em), $entity, array(
-            'action' => $this->generateUrl('hms_pathological_group_report_update',['invoice' => $invoice]),
+        $form = $this->createForm(InvoiceGroupParticularType::class, $entity, array('action' => $this->generateUrl('hms_pathological_group_report_update',['invoice' => $invoice]),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceParticular',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'hospitalConfig' => $hospitalConfig, 'emCategory' => $em));
         return $form;
     }
 
@@ -447,16 +443,12 @@ class InvoiceParticularController extends AbstractController
     {
 
         $hospitalConfig = $this->getUser()->getGlobalOption()->getHospitalConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceParticularType::configureOptions() and pass them as form options: $hospitalConfig), $entity, array(
-        $form = $this->createForm(new InvoiceParticularType($hospitalConfig), $entity, array(
-            'action' => $this->generateUrl('hms_invoice_particular_update', array('id' => $entity->getId())),
+        $form = $this->createForm(InvoiceParticularType::class, $entity, array('action' => $this->generateUrl('hms_invoice_particular_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'hospitalConfig' => $hospitalConfig));
         return $form;
     }
 

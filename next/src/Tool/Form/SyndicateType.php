@@ -16,10 +16,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SyndicateType extends AbstractType
 {
-
-    public function __construct(private readonly SyndicateRepository $em)
-    {
-    }
+    protected $em;
 
 
     /**
@@ -28,6 +25,8 @@ class SyndicateType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter name'],
                 'constraints' =>[
@@ -43,39 +42,26 @@ class SyndicateType extends AbstractType
 
             ->add('domainProperty', ChoiceType::class, [
                 'attr'=>['class'=>' m-wrap span10 selectbox'],
-                'empty_value' => '--- Select domain property ---',
-                'choices' => [
-                    'application'      => 'Application',
-                    'businesses'      => 'Businesses',
-                    'education'     => 'Education',
-                    'ecommerce'     => 'Ecommerce',
-                    'food'          => 'Food',
-                    'medical'       => 'Medical',
-                    'property'      => 'Property',
-                    'reservation'   => 'Reservation',
-                    'service'       => 'Service',
-                    'transport'     => 'Transport',
-                    'others'         => 'Others'
-                ],
+                'placeholder' => '--- Select domain property ---',
+                'choices' => ['Application' => 'application', 'Businesses' => 'businesses', 'Education' => 'education', 'Ecommerce' => 'ecommerce', 'Food' => 'food', 'Medical' => 'medical', 'Property' => 'choice_label', 'Reservation' => 'reservation', 'Service' => 'service', 'Transport' => 'transport', 'Others' => 'others'],
             ])
 
-
-     /*       ->add('parent', 'entity', array(
+     /*       ->add('parent', EntityType::class, array(
                 'required'    => true,
-                'empty_value' => '--- Select parent ---',
+                'placeholder' => '--- Select parent ---',
                 'attr'=>array('class'=>'location m-wrap span10 selectbox'),
                 'class' => \App\Tool\Entity\Syndicate::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->SyndicateChoiceList()
             ))*/
 
             ->add('parent', EntityType::class, [
                 'required'      => false,
-                'empty_value' => '--- Select parent sector ---',
+                'placeholder' => '--- Select parent sector ---',
                 'multiple'      =>false,
                 'expanded'      =>false,
                 'class'         => \App\Tool\Entity\Syndicate::class,
-                'property'      => 'name',
+                'choice_label'      => 'name',
                 'attr'          =>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('d')
                     ->where("d.level = 1")
@@ -91,6 +77,10 @@ class SyndicateType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Syndicate::class
         ]);

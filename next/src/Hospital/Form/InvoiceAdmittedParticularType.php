@@ -2,7 +2,6 @@
 
 namespace App\Hospital\Form;
 
-
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Hospital\Entity\Particular;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,13 +13,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 class InvoiceAdmittedParticularType extends AbstractType
 {
-
-    public function __construct(private readonly HospitalConfig $hospitalConfig)
-    {
-    }
+    protected $hospitalConfig;
 
 
     /**
@@ -29,6 +24,8 @@ class InvoiceAdmittedParticularType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->hospitalConfig = $options['hospitalConfig'];
+
 
         $servicies = [];
         $servies = $this->hospitalConfig->getServices();
@@ -41,11 +38,11 @@ class InvoiceAdmittedParticularType extends AbstractType
             ->add('particular', EntityType::class,[
                 'class'     => Particular::class,
                 'group_by'  => 'service.name',
-                'property'  => 'name',
+                'choice_label'  => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please choose particular')
                 ],
-                'empty_value' => '---Test Name, Accessories, Surgery, Cabin etc.---',
+                'placeholder' => '---Test Name, Accessories, Surgery, Cabin etc.---',
                 'attr'=>['class'=>'span12 m-wrap particular select2'],
                 'choice_translation_domain' => true,
                 'query_builder' => function(EntityRepository $er) use($servicies) {
@@ -69,6 +66,10 @@ class InvoiceAdmittedParticularType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'hospitalConfig' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AdmissionPatientParticular::class
         ]);
     }
@@ -80,7 +81,5 @@ class InvoiceAdmittedParticularType extends AbstractType
     {
         return 'admitted_particular';
     }
-
-
 
 }

@@ -127,17 +127,13 @@ class PurchaseReturnController extends AbstractController
     private function createCreateForm(BusinessPurchaseReturn $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseReturnType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PurchaseReturnType($globalOption), $entity, array(
-            'action' => $this->generateUrl('business_purchase_return_create'),
+        $form = $this->createForm(PurchaseReturnType::class, $entity, array('action' => $this->generateUrl('business_purchase_return_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 

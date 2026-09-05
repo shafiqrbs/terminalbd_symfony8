@@ -19,7 +19,6 @@ use App\Restaurant\Form\TableInvoiceType;
 use App\Restaurant\Form\TemporaryType;
 use App\Restaurant\Service\PosItemManager;
 use CodeItNow\BarcodeBundle\Utils\BarcodeGenerator;
-use Frontend\FrontentBundle\Service\MobileDetect;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\RunAs;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
@@ -123,17 +122,13 @@ class TableInvoiceController extends AbstractController
     private function createTemporaryForm(RestaurantTableInvoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into TableInvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new TableInvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('restaurant_tableinvoice_create'),
+        $form = $this->createForm(TableInvoiceType::class, $entity, array('action' => $this->generateUrl('restaurant_tableinvoice_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

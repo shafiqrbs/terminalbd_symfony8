@@ -93,16 +93,12 @@ class ParticularController extends AbstractController
     {
 
         $em = $this->em->getRepository(\App\Hospital\Entity\Particular::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ParticularType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
-        $form = $this->createForm(new ParticularType($em,$globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_particular_create', array('id' => $entity->getId())),
+        $form = $this->createForm(ParticularType::class, $entity, array('action' => $this->generateUrl('hms_particular_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'dpsConfig' => $em));
         return $form;
     }
 
@@ -163,16 +159,12 @@ class ParticularController extends AbstractController
     private function createEditForm(Particular $entity,$globalOption)
     {
         $em = $this->em->getRepository(\App\Hospital\Entity\Particular::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ParticularType::configureOptions() and pass them as form options: $em,$globalOption), $entity, array(
-        $form = $this->createForm(new ParticularType($em,$globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_particular_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ParticularType::class, $entity, array('action' => $this->generateUrl('hms_particular_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'dpsConfig' => $em));
 
 
         return $form;

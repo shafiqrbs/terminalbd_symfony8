@@ -12,16 +12,19 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AdmissionPromotionType extends AbstractType
 {
+    protected $user;
+    protected $branch;
 
-    public function __construct(private $user, private $branch)
-    {
-    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->user = $options['user'];
+        $this->branch = $options['branch'];
+
         $builder
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter payment amount'],
                 'constraints' =>[
@@ -32,16 +35,15 @@ class AdmissionPromotionType extends AbstractType
             ->add('position', ChoiceType::class, [
                 'required'      =>true,
                 'attr'=>['class'=>'selectbox'],
-                'choices' => ['top' => 'Top',  'right' => 'Right', 'admission' => 'Admission Page'],
+                'choices' => ['Top' => 'top', 'Right' => 'right', 'Admission Page' => 'admission'],
             ])
             ->add('paymentStatus', ChoiceType::class, [
                 'required'      =>true,
                 'attr'=>['class'=>'selectbox'],
-                'choices' => ['Receive' => 'Receive',  'Due' => 'Due','Others'=>'Others'],
+                'choices' => ['Receive' => 'Receive', 'Due' => 'Due', 'Others' => 'Others'],
             ])
             ->add('promotionStartDate',DateType::class, ['attr'=>['class'=>'selectbox']])
             ->add('promotionEndDate',DateType::class, ['attr'=>['class'=>'selectbox']]);
-
 
     }
 
@@ -50,6 +52,11 @@ class AdmissionPromotionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'user' => null,
+            'branch' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => 'App\Content\Entity\Admission'
         ]);

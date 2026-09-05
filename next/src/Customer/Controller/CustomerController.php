@@ -6,7 +6,6 @@ namespace App\Customer\Controller;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
-use Frontend\FrontentBundle\Service\Cart;
 use App\Tool\Entity\Module;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -83,10 +82,7 @@ class CustomerController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerInvoiceType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-        $form = $this->createForm(new CustomerInvoiceType($globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('customerweb_invoice_create', array('shop' => $globalOption->getSlug())),
+        $form = $this->createForm(CustomerInvoiceType::class, $entity, array('action' => $this->generateUrl('customerweb_invoice_create', array('shop' => $globalOption->getSlug())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
@@ -94,8 +90,7 @@ class CustomerController extends AbstractController
                 'novalidate' => 'novalidate',
                 'enctype' => 'multipart/form-data',
 
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

@@ -35,8 +35,8 @@ class CollectionType extends AbstractType
             ->add('parent', EntityType::class, [
                 'required'    => false,
                 'class' => Collection::class,
-                'empty_value' => '---Select parent collection---',
-                'property' => 'name',
+                'placeholder' => '---Select parent collection---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span8 selectbox'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('c')
                     ->andWhere("c.status = 1")

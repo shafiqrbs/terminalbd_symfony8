@@ -21,18 +21,14 @@ class AccountHmsPurchaseType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('payment',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'add payment amount BDT'],
@@ -43,8 +39,8 @@ class AccountHmsPurchaseType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a transaction method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a transaction method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 transactionMethod'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -57,8 +53,8 @@ class AccountHmsPurchaseType extends AbstractType
             ->add('hmsVendor', EntityType::class, [
                 'required'    => true,
                 'class' => HmsVendor::class,
-                'empty_value' => '---Choose a vendor---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'span12 select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -70,8 +66,8 @@ class AccountHmsPurchaseType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -81,8 +77,8 @@ class AccountHmsPurchaseType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -99,6 +95,10 @@ class AccountHmsPurchaseType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AccountPurchase::class
         ]);
     }
@@ -110,6 +110,5 @@ class AccountHmsPurchaseType extends AbstractType
     {
         return 'appstore_bundle_accountingbundle_accountpurchase';
     }
-
 
 }

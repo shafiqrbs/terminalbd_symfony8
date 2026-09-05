@@ -100,16 +100,12 @@ class CategoryController extends AbstractController
     private function createCreateForm(Category $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CategoryType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new CategoryType($option), $entity, array(
-            'action' => $this->generateUrl('restaurant_category_create', array('id' => $entity->getId())),
+        $form = $this->createForm(CategoryType::class, $entity, array('action' => $this->generateUrl('restaurant_category_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'emCategory' => $option));
         return $form;
     }
 
@@ -149,7 +145,7 @@ class CategoryController extends AbstractController
     {
 
         $option = $this->getUser()->getGlobalOption();
-        $form = $this->createForm(new CategoryType(), $entity, array(
+        $form = $this->createForm(CategoryType::class, $entity, array(
             'action' => $this->generateUrl('restaurant_category_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(

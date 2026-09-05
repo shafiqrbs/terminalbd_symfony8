@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -98,7 +99,7 @@ class ItemTypeGroupingController extends AbstractController
      */
     private function createCreateForm(ItemTypeGrouping $entity)
     {
-        $form = $this->createForm(new ItemTypeGroupingType(), $entity, [
+        $form = $this->createForm(ItemTypeGroupingType::class, $entity, [
             'action' => $this->generateUrl('itemtypegrouping_create'),
             'method' => 'POST',
         ]);
@@ -151,12 +152,12 @@ class ItemTypeGroupingController extends AbstractController
      */
     private function createEditForm(ItemTypeGrouping $entity)
     {
-        $form = $this->createForm(new ItemTypeGroupingType(), $entity, [
+        $form = $this->createForm(ItemTypeGroupingType::class, $entity, [
             'action' => $this->generateUrl('itemtypegrouping_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Update']);
+        $form->add('submit', SubmitType::class, ['label' => 'Update']);
 
         return $form;
     }
@@ -226,7 +227,7 @@ class ItemTypeGroupingController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('itemtypegrouping_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

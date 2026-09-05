@@ -17,11 +17,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CustomerForDiagonesticType extends AbstractType
 {
+    protected $location;
 
-
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -29,6 +26,8 @@ class CustomerForDiagonesticType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
 
             ->add('customerId',TextType::class, ['attr'=>['class'=>'m-wrap span12 inputs patientName','autocomplete'=>'off','placeholder'=>'Enter patient ID'],
@@ -55,21 +54,20 @@ class CustomerForDiagonesticType extends AbstractType
                 'attr'=>['class'=>'span12 m-wrap inputs ageType'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Years' => 'Years','Months' => 'Months','Day' => 'Day']
+                'choices' => ['Years' => 'Years', 'Months' => 'Months', 'Day' => 'Day']
             ])
             ->add('gender', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap inputs gender'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['Female' => 'Female','Male' => 'Male', 'Others' => 'Others'],
+                'choices' => ['Female' => 'Female', 'Male' => 'Male', 'Others' => 'Others'],
             ])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 m-wrap span12'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('address',TextareaType::class, ['attr'=>['class'=>'m-wrap span12 resize inputs address','rows'=>3,'autocomplete'=>'off','placeholder'=>'Enter patient address']
@@ -81,6 +79,10 @@ class CustomerForDiagonesticType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Customer::class
         ]);

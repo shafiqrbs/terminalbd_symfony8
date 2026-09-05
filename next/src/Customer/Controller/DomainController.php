@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use App\User\Entity\User;
 use App\User\Form\CustomerEditProfileType;
-use Frontend\FrontentBundle\Service\Cart;
 use App\Tool\Entity\GlobalOption;
 use App\Tool\Form\DomainSearchType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -83,16 +82,12 @@ class DomainController extends AbstractController
     {
         $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DomainSearchType::configureOptions() and pass them as form options: $em,$location), $entity, array(
-        $form = $this->createForm(new DomainSearchType($em,$location), $entity, array(
-            'action' => $this->generateUrl('customer_domain'),
+        $form = $this->createForm(DomainSearchType::class, $entity, array('action' => $this->generateUrl('customer_domain'),
             'method' => 'GET',
             'attr' => array(
                 'id' => '',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em, 'location' => $location));
         return $form;
     }
 

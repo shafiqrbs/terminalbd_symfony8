@@ -108,7 +108,7 @@ class StockAdjustmentController extends AbstractController
      */
     private function createCreateForm(ItemStockAdjustment $entity)
     {
-        $form = $this->createForm(new StockAdjustmentType(), $entity, [
+        $form = $this->createForm(StockAdjustmentType::class, $entity, [
             'action' => $this->generateUrl('inv_stock_adjustment_create'),
             'method' => 'POST',
             'attr' => [

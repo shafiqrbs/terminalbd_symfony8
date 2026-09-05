@@ -747,17 +747,13 @@ class PosController extends AbstractController
     private function createTemporaryForm(Pos $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PosType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PosType($globalOption), $entity, array(
-            'action' => $this->generateUrl('pos_create'),
+        $form = $this->createForm(PosType::class, $entity, array('action' => $this->generateUrl('pos_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

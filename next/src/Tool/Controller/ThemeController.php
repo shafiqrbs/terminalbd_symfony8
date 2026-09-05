@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -90,7 +91,7 @@ class ThemeController extends AbstractController
      */
     private function createCreateForm(Theme $entity)
     {
-        $form = $this->createForm(new ThemeType(), $entity, [
+        $form = $this->createForm(ThemeType::class, $entity, [
             'action' => $this->generateUrl('theme_create'),
             'method' => 'POST',
             'attr' => [
@@ -171,7 +172,7 @@ class ThemeController extends AbstractController
      */
     private function createEditForm(Theme $entity)
     {
-        $form = $this->createForm(new ThemeType(), $entity, [
+        $form = $this->createForm(ThemeType::class, $entity, [
             'action' => $this->generateUrl('theme_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -247,7 +248,7 @@ class ThemeController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('theme_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

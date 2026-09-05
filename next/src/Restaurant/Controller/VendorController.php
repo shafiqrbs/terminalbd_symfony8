@@ -91,7 +91,7 @@ class VendorController extends AbstractController
      */
     private function createCreateForm(AccountVendor $entity)
     {
-        $form = $this->createForm(new VendorType(), $entity, [
+        $form = $this->createForm(VendorType::class, $entity, [
             'action' => $this->generateUrl('restaurant_vendor_create'),
             'method' => 'POST',
             'attr' => [
@@ -137,7 +137,7 @@ class VendorController extends AbstractController
      */
     private function createEditForm(AccountVendor $entity)
     {
-        $form = $this->createForm(new VendorType(), $entity, [
+        $form = $this->createForm(VendorType::class, $entity, [
             'action' => $this->generateUrl('restaurant_vendor_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

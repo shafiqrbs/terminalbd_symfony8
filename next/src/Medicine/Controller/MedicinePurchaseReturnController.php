@@ -108,16 +108,12 @@ class MedicinePurchaseReturnController extends AbstractController
     private function createCreateForm(MedicinePurchaseReturn $entity)
     {
         $global = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseReturnType::configureOptions() and pass them as form options: $global), $entity, array(
-        $form = $this->createForm(new PurchaseReturnType($global), $entity, array(
-            'action' => $this->generateUrl('medicine_purchase_return_create'),
+        $form = $this->createForm(PurchaseReturnType::class, $entity, array('action' => $this->generateUrl('medicine_purchase_return_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $global));
         return $form;
     }
 
@@ -148,7 +144,7 @@ class MedicinePurchaseReturnController extends AbstractController
     */
     private function createEditForm(MedicinePurchaseReturn $entity,MedicinePurchaseReturnItem $purchaseItem)
     {
-        $form = $this->createForm(new PurchaseReturnItemType(), $purchaseItem, array(
+        $form = $this->createForm(PurchaseReturnItemType::class, $purchaseItem, array(
             'action' => $this->generateUrl('medicine_purchase_return_update', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(

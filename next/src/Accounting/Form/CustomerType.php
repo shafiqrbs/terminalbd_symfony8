@@ -16,10 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CustomerType extends AbstractType
 {
+    protected $location;
 
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -27,6 +25,8 @@ class CustomerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Customer name'],
                     'constraints' =>[
@@ -42,14 +42,13 @@ class CustomerType extends AbstractType
             ->add('address',TextareaType::class, ['attr'=>['class'=>'m-wrap span12 ','rows'=>4,'placeholder'=>'Enter customer address']])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 m-wrap span12'],
                 'class' => Location::class,
                 'constraints' =>[
                     new NotBlank(message: 'Select customer location')
                 ],
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
 
@@ -58,11 +57,7 @@ class CustomerType extends AbstractType
                 'expanded'      =>false,
                 'required'    => true,
                 'multiple'      =>false,
-                'choices' => [
-                    'employee' => 'Employee',
-                    'stakeholder' => 'Stakeholder',
-                    'other' => 'Other',
-                ],
+                'choices' => ['Employee' => 'employee', 'Stakeholder' => 'stakeholder', 'Other' => 'other'],
             ]);
     }
     
@@ -71,6 +66,10 @@ class CustomerType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Profile::class
         ]);

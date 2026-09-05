@@ -18,10 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SiteContentType extends AbstractType
 {
-
-	public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
 	/**
@@ -30,6 +27,8 @@ class SiteContentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter Name'],
                 'constraints' =>[
@@ -41,14 +40,14 @@ class SiteContentType extends AbstractType
             ->add('content',TextareaType::class, ['attr'=>['class'=>'ckeditor m-wrap span12','rows'=>15]])
 	        ->add('businessSector', ChoiceType::class, [
 		        'attr'=>['class'=>'m-wrap span12'],
-		        'choices' => ['portal' => 'Portal','education' => 'Education',  'ecommerce' => 'E-commerce', 'reservation' => 'Reservation', 'fleet' => 'Fleet Management'],
+		        'choices' => ['Portal' => 'portal', 'Education' => 'education', 'E-commerce' => 'ecommerce', 'Reservation' => 'reservation', 'Fleet Management' => 'fleet'],
 	        ])
 
 	        ->add('parent', EntityType::class, [
                 'required'    => false,
                 'class' => SiteContent::class,
-                'empty_value' => '---Select parent page---',
-                'property' => 'name',
+                'placeholder' => '---Select parent page---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->andWhere("o.status = 1")
@@ -57,8 +56,8 @@ class SiteContentType extends AbstractType
 	        ->add('photo_gallery', EntityType::class, [
 		        'required'    => false,
 		        'class' => PhotoGallery::class,
-		        'empty_value' => '---Select Photo Gallery---',
-		        'property' => 'name',
+		        'placeholder' => '---Select Photo Gallery---',
+		        'choice_label' => 'name',
 		        'attr'=>['class'=>'select2 span12'],
 		        'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
 			                  ->where("o.status = 1")
@@ -75,6 +74,10 @@ class SiteContentType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => SiteContent::class
         ]);

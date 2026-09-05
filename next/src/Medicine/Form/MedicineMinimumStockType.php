@@ -14,24 +14,21 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MedicineMinimumStockType extends AbstractType
 {
+    protected $em;
+
 
     /** @var $config MedicineConfig */
     private $config;
 
-
-
-    public function __construct(/** @var $em MedicineMinimumStockRepository */
-    private readonly MedicineMinimumStockRepository $em, MedicineConfig $config)
-    {
-        $this->config = $config->getId();
-
-    }
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+        $this->config = $options['config'];
+
 
         $builder
             ->add('minQuantity',TextType::class, ['attr'=>['class'=>'m-wrap span12 inputs ','required' => true ,'label' => 'form.name','placeholder'=>'Enter min qnt'],
@@ -46,14 +43,14 @@ class MedicineMinimumStockType extends AbstractType
                 'attr'=>['class'=>'m-wrap span12 select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Select company name')],
-                'empty_value' => '---Choose a company---',
+                'placeholder' => '---Choose a company---',
                 'choices' => $this->companyChoiceList($this->config),
             ])
             ->add('medicineForm', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12 select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Select Medicine Form')],
-                'empty_value' => '---Choose a Medicine Form---',
+                'placeholder' => '---Choose a Medicine Form---',
                 'choices' => $this->medicineFormList(),
             ]);
     }
@@ -75,6 +72,11 @@ class MedicineMinimumStockType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+            'config' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicineMinimumStock::class
         ]);

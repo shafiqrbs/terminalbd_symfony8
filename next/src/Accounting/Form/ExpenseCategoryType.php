@@ -16,10 +16,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ExpenseCategoryType extends AbstractType
 {
-
-    public function __construct(private readonly ExpenseCategoryRepository $em, private readonly AccountHeadRepository $accountHead, private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $em;
+    protected $accountHead;
+    protected $globalOption;
 
 
     /**
@@ -28,6 +27,10 @@ class ExpenseCategoryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+        $this->accountHead = $options['accountHead'];
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter expense category name'],
@@ -39,8 +42,8 @@ class ExpenseCategoryType extends AbstractType
             ->add('accountHead', EntityType::class, [
                 'required'    => true,
                 'class' => AccountHead::class,
-                'empty_value' => '---Choose a account head---',
-                'property' => 'name',
+                'placeholder' => '---Choose a account head---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2 m-wrap'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -50,14 +53,13 @@ class ExpenseCategoryType extends AbstractType
 
             ->add('parent', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select parent expense category---',
+                'placeholder' => '---Select parent expense category---',
                 'attr'=>['class'=>'ExpenseCategory m-wrap span12'],
                 'class' => ExpenseCategory::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->ExpenseCategoryChoiceList()
             ])
             ->add('status')
-
 
         ;
     }
@@ -67,6 +69,12 @@ class ExpenseCategoryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+            'accountHead' => null,
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => ExpenseCategory::class
         ]);
@@ -97,6 +105,5 @@ class ExpenseCategoryType extends AbstractType
         return $this->accountHead->getAccountHeadTrees();
 
     }
-
 
 }

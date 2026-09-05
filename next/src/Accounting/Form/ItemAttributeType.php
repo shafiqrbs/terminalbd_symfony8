@@ -12,16 +12,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ItemAttributeType extends AbstractType
 {
+    protected $option;
+
 
     /** @var  AssetsCategoryRepository */
     private $em;
-
-
-    public function __construct(private readonly GlobalOption $option , AssetsCategoryRepository $em)
-    {
-        $this->em = $em;
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -29,6 +24,9 @@ class ItemAttributeType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+        $this->em = $options['em'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Attribute name'],
                 'constraints' =>[
@@ -36,13 +34,13 @@ class ItemAttributeType extends AbstractType
                 ]])
             ->add('category', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select parent category---',
+                'placeholder' => '---Select parent category---',
                 'attr'=>['class'=>'category m-wrap span12 select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
                 ],
                 'class' => 'Appstore\Bundle\AssetsBundle\Entity\AssetsCategory',
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->categoryChoiceList()
             ])
             ->add('placeholder',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Attribute placeholder']])
@@ -55,6 +53,11 @@ class ItemAttributeType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+            'em' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => 'Appstore\Bundle\AssetsBundle\Entity\ItemAttribute'
         ]);

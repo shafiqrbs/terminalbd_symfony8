@@ -28,7 +28,7 @@ class ApplicationPricingType extends AbstractType
                 'required'      => true,
                 'expanded'      =>false,
                 'class' => AppModule::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('m')
                     ->orderBy('m.name','ASC'),

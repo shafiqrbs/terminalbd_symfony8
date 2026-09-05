@@ -2,6 +2,7 @@
 
 namespace App\DoctorPrescription\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -95,16 +96,12 @@ class ExpenseCategoryController extends AbstractController
 
         $em = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class);
         $emHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ExpenseCategoryType::configureOptions() and pass them as form options: $em,$emHead,$globalOption), $entity, array(
-        $form = $this->createForm(new ExpenseCategoryType($em,$emHead,$globalOption), $entity, array(
-            'action' => $this->generateUrl('dps_expensecategory_create', array('id' => $entity->getId())),
+        $form = $this->createForm(ExpenseCategoryType::class, $entity, array('action' => $this->generateUrl('dps_expensecategory_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em, 'accountHead' => $emHead, 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -179,16 +176,12 @@ class ExpenseCategoryController extends AbstractController
     {
         $em = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class);
         $emHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ExpenseCategoryType::configureOptions() and pass them as form options: $em,$emHead,$globalOption), $entity, array(
-        $form = $this->createForm(new ExpenseCategoryType($em,$emHead,$globalOption), $entity, array(
-            'action' => $this->generateUrl('dps_expensecategory_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ExpenseCategoryType::class, $entity, array('action' => $this->generateUrl('dps_expensecategory_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em, 'accountHead' => $emHead, 'globalOption' => $globalOption));
 
 
         return $form;
@@ -264,7 +257,7 @@ class ExpenseCategoryController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('dps_expensecategory_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
             ;
     }

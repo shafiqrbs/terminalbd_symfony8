@@ -19,15 +19,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 class ProfileFormType extends AbstractType
 {
-    public function __construct(private $edit = false)
-    {
-    }
+    protected $edit;
+
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->edit = $options['edit'];
+
            $builder
                 ->add('mobile',TextType::class, ['attr'=>['class'=>'m-wrap placeholder-no-fix mobile','placeholder'=>'Enter your mobile no'],
                 'constraints' =>[
@@ -42,6 +42,10 @@ class ProfileFormType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'edit' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Profile::class
         ]);

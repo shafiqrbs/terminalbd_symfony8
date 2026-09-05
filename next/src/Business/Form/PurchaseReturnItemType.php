@@ -26,8 +26,8 @@ class PurchaseReturnItemType extends AbstractType
             ->add('businessParticular', EntityType::class, [
                 'required'    => true,
                 'class' => BusinessParticular::class,
-                'empty_value' => '---Choose a vendor ---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor ---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'m-wrap span12 inputs select2'],
                 'constraints' =>[ new NotBlank(message: 'Please select your product name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')

@@ -29,7 +29,7 @@ class AccountHeadSubType extends AbstractType
             ->add('parent', EntityType::class, [
                 'class'     => AccountHead::class,
                 'group_by'  => 'parent.name',
-                'property'  => 'name',
+                'choice_label'  => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'choice_translation_domain' => true,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')

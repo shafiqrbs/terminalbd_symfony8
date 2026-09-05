@@ -46,43 +46,22 @@ class MallConnectType extends AbstractType
                     new NotBlank(message: 'Please input required')
                 ],
                 'attr'=>['class'=>'select2 span12'],
-                'choices' => [
-                    '' => 'Select block',
-                    'Level-01' => 'Level-01',
-                    'Level-02' => 'Level-02',
-                    'Level-03' => 'Level-03',
-                    'Level-04' => 'Level-04',
-                    'Level-05' => 'Level-05',
-                    'Level-06' => 'Level-06',
-                    'Level-07' => 'Level-07',
-                    'Level-08' => 'Level-08',
-                    'Level-09' => 'Level-09',
-                    'Level-10' => 'Level-10'
-                ],
+                'choices' => ['Select block' => '', 'Level-01' => 'Level-01', 'Level-02' => 'Level-02', 'Level-03' => 'Level-03', 'Level-04' => 'Level-04', 'Level-05' => 'Level-05', 'Level-06' => 'Level-06', 'Level-07' => 'Level-07', 'Level-08' => 'Level-08', 'Level-09' => 'Level-09', 'Level-10' => 'Level-10'],
             ])
             ->add('block', ChoiceType::class, [
                 'attr'=>['class'=>'select2 span12'],
-                'choices' => [
-                    '' => '---Select block----',
-                    'Block-A' => 'Block-A',
-                    'Block-B' => 'Block-B',
-                    'Block-C' => 'Block-C',
-                    'Block-D' => 'Block-D',
-                    'Block-E' => 'Block-E',
-                    'Block-F' => 'Block-F',
-
-                ],
+                'choices' => ['---Select block----' => '', 'Block-A' => 'Block-A', 'Block-B' => 'Block-B', 'Block-C' => 'Block-C', 'Block-D' => 'Block-D', 'Block-E' => 'Block-E', 'Block-F' => 'Block-F'],
             ])
             ->add('mall', EntityType::class, [
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
                 ],
                 'required'      => false,
-                'empty_value'   => '--- Select Shopping mall ---',
+                'placeholder'   => '--- Select Shopping mall ---',
                 'multiple'      =>false,
                 'expanded'      =>false,
                 'class'         =>GlobalOption::class,
-                'property'      =>'name',
+                'choice_label'      =>'name',
                 'attr'          =>['class'=>'m-wrap span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('d')
                     ->where("d.syndicate = 224")
@@ -97,7 +76,7 @@ class MallConnectType extends AbstractType
                 'expanded'      =>true,
                 'multiple'      =>true,
                 'class' => Category::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>''],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('s')
                     ->andWhere("s.status = 1")

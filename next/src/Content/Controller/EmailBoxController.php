@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -69,12 +70,12 @@ class EmailBoxController extends AbstractController
      */
     private function createCreateForm(EmailBox $entity)
     {
-        $form = $this->createForm(new EmailBoxType(), $entity, [
+        $form = $this->createForm(EmailBoxType::class, $entity, [
             'action' => $this->generateUrl('mail_create'),
             'method' => 'POST',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Create']);
+        $form->add('submit', SubmitType::class, ['label' => 'Create']);
 
         return $form;
     }
@@ -149,12 +150,12 @@ class EmailBoxController extends AbstractController
      */
     private function createEditForm(EmailBox $entity)
     {
-        $form = $this->createForm(new EmailBoxType(), $entity, [
+        $form = $this->createForm(EmailBoxType::class, $entity, [
             'action' => $this->generateUrl('mail_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Update']);
+        $form->add('submit', SubmitType::class, ['label' => 'Update']);
 
         return $form;
     }
@@ -224,7 +225,7 @@ class EmailBoxController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('mail_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

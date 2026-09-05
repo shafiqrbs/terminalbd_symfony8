@@ -92,7 +92,7 @@ class BusinessBrandController extends AbstractController
     private function createCreateForm(BusinessBrand $entity)
     {
 
-        $form = $this->createForm(new BusinessBrandType(), $entity, [
+        $form = $this->createForm(BusinessBrandType::class, $entity, [
             'action' => $this->generateUrl('business_brand_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -141,7 +141,7 @@ class BusinessBrandController extends AbstractController
     private function createEditForm(BusinessBrand $entity )
     {
 
-        $form = $this->createForm(new BusinessBrandType(), $entity, [
+        $form = $this->createForm(BusinessBrandType::class, $entity, [
             'action' => $this->generateUrl('business_brand_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

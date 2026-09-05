@@ -15,26 +15,21 @@ class WareHouseType extends AbstractType
 
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-
-    }
-
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
         $builder
             ->add('name')
             ->add('parent', EntityType::class, [
                 'required'    => false,
                 'class' => WareHouse::class,
-                'empty_value' => '---Select warehouse---',
-                'property' => 'name',
+                'placeholder' => '---Select warehouse---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'selectbox'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('w')
                     ->where("w.status = 1")
@@ -52,6 +47,10 @@ class WareHouseType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => WareHouse::class
         ]);

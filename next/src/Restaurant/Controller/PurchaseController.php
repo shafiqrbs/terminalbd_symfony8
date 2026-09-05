@@ -114,17 +114,13 @@ class PurchaseController extends AbstractController
     private function createEditForm(Purchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new PurchaseType($globalOption), $entity, array(
-            'action' => $this->generateUrl('restaurant_purchase_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PurchaseType::class, $entity, array('action' => $this->generateUrl('restaurant_purchase_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'posForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 

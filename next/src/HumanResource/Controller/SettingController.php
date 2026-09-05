@@ -83,7 +83,7 @@ class SettingController extends AbstractController
      */
     private function createCreateForm(PayrollSetting $entity)
     {
-        $form = $this->createForm(new PayrollSettingType(), $entity, [
+        $form = $this->createForm(PayrollSettingType::class, $entity, [
             'action' => $this->generateUrl('payrollsetting_create'),
             'method' => 'POST',
             'attr' => [
@@ -125,7 +125,7 @@ class SettingController extends AbstractController
      */
     private function createEditForm(PayrollSetting $entity)
     {
-        $form = $this->createForm(new PayrollSettingType(), $entity, [
+        $form = $this->createForm(PayrollSettingType::class, $entity, [
             'action' => $this->generateUrl('payrollsetting_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

@@ -41,7 +41,7 @@ class MobileThemeType extends AbstractType
                 'expanded'      =>true,
                 'multiple'      =>true,
                 'class' => Syndicate::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'selectbox'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('s')
                     ->andWhere("s.status = 1")

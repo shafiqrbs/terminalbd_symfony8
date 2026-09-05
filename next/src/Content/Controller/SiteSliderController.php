@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -78,7 +79,7 @@ class SiteSliderController extends AbstractController
     private function createCreateForm(SiteSlider $entity)
     {
 
-        $form = $this->createForm(new SiteSliderType(), $entity, [
+        $form = $this->createForm(SiteSliderType::class, $entity, [
             'action' => $this->generateUrl('siteslider_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -155,7 +156,7 @@ class SiteSliderController extends AbstractController
     private function createEditForm(SiteSlider $entity)
     {
 
-        $form = $this->createForm(new SiteSliderType(), $entity, [
+        $form = $this->createForm(SiteSliderType::class, $entity, [
             'action' => $this->generateUrl('siteslider_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -231,7 +232,7 @@ class SiteSliderController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('siteslider_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

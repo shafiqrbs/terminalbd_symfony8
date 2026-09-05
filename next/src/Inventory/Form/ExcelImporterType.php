@@ -26,11 +26,8 @@ class ExcelImporterType extends AbstractType
             ->add('mode', ChoiceType::class, [
                 'required'    => false,
                 'attr'=>['class'=>'span12'],
-                'empty_value' => '---Choose a Mode---',
-                'choices' => [
-                    'stock' => 'Stock',
-                    'purchase' => 'Purchase',
-                ],
+                'placeholder' => '---Choose a Mode---',
+                'choices' => ['Stock' => 'stock', 'Purchase' => 'purchase'],
             ])
             ->add('file');
     }

@@ -109,7 +109,7 @@ class AccessoriesController extends AbstractController
     private function createCreateForm(Particular $entity)
     {
 
-        $form = $this->createForm(new AccessoriesType(), $entity, [
+        $form = $this->createForm(AccessoriesType::class, $entity, [
             'action' => $this->generateUrl('hms_accessories_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -153,7 +153,7 @@ class AccessoriesController extends AbstractController
      */
     private function createEditForm(Particular $entity)
     {
-        $form = $this->createForm(new AccessoriesType(), $entity, [
+        $form = $this->createForm(AccessoriesType::class, $entity, [
             'action' => $this->generateUrl('hms_accessories_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

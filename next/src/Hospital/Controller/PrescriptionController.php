@@ -104,17 +104,13 @@ class PrescriptionController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DoctorAppointmentType::configureOptions() and pass them as form options: $globalOption,$category), $entity, array(
-        $form = $this->createForm(new DoctorAppointmentType($globalOption,$category), $entity, array(
-            'action' => $this->generateUrl('hms_doctor_visit_create'),
+        $form = $this->createForm(DoctorAppointmentType::class, $entity, array('action' => $this->generateUrl('hms_doctor_visit_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'id' => 'appointmentPatientForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'emCategory' => $category));
         return $form;
     }
 
@@ -233,17 +229,13 @@ class PrescriptionController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DoctorAppointmentType::configureOptions() and pass them as form options: $globalOption,$category), $entity, array(
-        $form = $this->createForm(new DoctorAppointmentType($globalOption,$category), $entity, array(
-            'action' => $this->generateUrl('hms_prescription_update', array('id' => $entity->getId())),
+        $form = $this->createForm(DoctorAppointmentType::class, $entity, array('action' => $this->generateUrl('hms_prescription_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'emCategory' => $category));
         return $form;
     }
 

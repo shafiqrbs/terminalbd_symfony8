@@ -55,17 +55,13 @@ class HmsInvoiceTemporaryParticularController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceType::configureOptions() and pass them as form options: $globalOption,$category ,$location), $entity, array(
-        $form = $this->createForm(new InvoiceType($globalOption,$category ,$location), $entity, array(
-            'action' => $this->generateUrl('hms_invoice_temporary_create'),
+        $form = $this->createForm(InvoiceType::class, $entity, array('action' => $this->generateUrl('hms_invoice_temporary_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal',
                 'id' => 'invoicePatientForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $category, 'diagnostic' => $location));
 
         return $form;
     }

@@ -2,27 +2,33 @@
 
 namespace App\Tool\Service;
 
-use Swift_Mailer;
-use Swift_Message;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
+/**
+ * Swiftmailer has no Symfony 5+ release; this is the same service on
+ * symfony/mailer. The public signature is unchanged so the listeners that
+ * call it (DomainNotification, CustomerSignup, SmsEmail, UserSignup) did not
+ * have to move.
+ */
 class EasyMailer
 {
-    private $mailer;
-
-    public function __construct(Swift_Mailer $mailer) {
-
-        $this->mailer = $mailer;
+    public function __construct(private readonly MailerInterface $mailer)
+    {
     }
 
     public function send($to, $from, $subject, $body, $attachments = [])
     {
-        $message = Swift_Message::newInstance()
-            ->setSubject($subject)
-            ->setFrom($from)
-            ->setTo($to)
-            ->setBody($body, 'text/html');
-        ;
+        $message = (new Email())
+            ->subject((string) $subject)
+            ->from(...(array) $from)
+            ->to(...(array) $to)
+            ->html((string) $body);
+
+        foreach ($attachments as $attachment) {
+            $message->attachFromPath($attachment);
+        }
 
         $this->mailer->send($message);
     }
-} 
+}

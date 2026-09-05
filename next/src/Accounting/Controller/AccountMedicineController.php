@@ -177,16 +177,12 @@ class AccountMedicineController extends AbstractController
     private function createCreateForm(AccountPurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountMedicinePurchaseType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountMedicinePurchaseType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_purchase_medicine_create'),
+        $form = $this->createForm(AccountMedicinePurchaseType::class, $entity, array('action' => $this->generateUrl('account_purchase_medicine_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -240,16 +236,12 @@ class AccountMedicineController extends AbstractController
     private function salesCreateForm(AccountSales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountSalesMedicineType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountSalesMedicineType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_sales_medicine_create'),
+        $form = $this->createForm(AccountSalesMedicineType::class, $entity, array('action' => $this->generateUrl('account_sales_medicine_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -318,16 +310,12 @@ class AccountMedicineController extends AbstractController
     private function createEditForm(AccountSales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountSalesInvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountSalesInvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_sales_medicine_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AccountSalesInvoiceType::class, $entity, array('action' => $this->generateUrl('account_sales_medicine_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

@@ -118,16 +118,12 @@ class ProfitWithdrawalController extends AbstractController
     private function createCreateForm(AccountJournal $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ProfitWithdrawalType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new ProfitWithdrawalType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_profit_withdrawal_create'),
+        $form = $this->createForm(ProfitWithdrawalType::class, $entity, array('action' => $this->generateUrl('account_profit_withdrawal_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
       return $form;
     }
 
@@ -198,16 +194,12 @@ class ProfitWithdrawalController extends AbstractController
     private function createEditForm(AccountJournal $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ProfitWithdrawalType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new ProfitWithdrawalType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_journal_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ProfitWithdrawalType::class, $entity, array('action' => $this->generateUrl('account_journal_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
     /**

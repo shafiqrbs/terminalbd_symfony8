@@ -29,36 +29,20 @@ class ConfigType extends AbstractType
             ->add('invoiceComment',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','rows'=> 3,'placeholder'=>'Enter invoice comment']])
             ->add('bodyFontSize', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'choices' => ['' => 'Font Size','10px' => '10px',  '11px' => '11px','12px' => '12px','13px' => '13px','14px' => '14px', '15px' => '15px', '16px' => '16px', '17px' => '17px','18px' => '18px',  '20px' => '20px', '22px' => '22px','24px' => '24px', '26px' => '26px',  '28px' => '28px','30px' => '39px','32px' => '32px','34px' => '34px','36px' => '36px', '38px' => '38px', '40px' => '40px','42px' => '42px',  '44px' => '44px', '46px' => '46px','48px' => '48px'],
+                'choices' => ['Font Size' => '', '10px' => '10px', '11px' => '11px', '12px' => '12px', '13px' => '13px', '14px' => '14px', '15px' => '15px', '16px' => '16px', '17px' => '17px', '18px' => '18px', '20px' => '20px', '22px' => '22px', '24px' => '24px', '26px' => '26px', '28px' => '28px', '39px' => '30px', '32px' => '32px', '34px' => '34px', '36px' => '36px', '38px' => '38px', '40px' => '40px', '42px' => '42px', '44px' => '44px', '46px' => '46px', '48px' => '48px'],
             ])
             ->add('productionType', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'choices' => ['' => '-- Select Production --', 'pre-production' => 'Pre Production','post-production' => 'Post Production','vendor-stock' => 'Vendor Stock'],
+                'choices' => ['-- Select Production --' => '', 'Pre Production' => 'pre-production', 'Post Production' => 'post-production', 'Vendor Stock' => 'vendor-stock'],
             ])
 	        ->add('businessModel', ChoiceType::class, [
 		        'attr'=>['class'=>'m-wrap span12'],
-		        'choices' => [
-			        '' => '-- Select business model --',
-			        'general' => 'General',
-			        'distribution' => 'Distribution',
-			        'sign' => 'Digital-Sign',
-			        'electrical' => 'Electrical',
-			        'stationary' => 'Stationary',
-			        'commission' => 'Agent Commission',
-			        'event' => 'Event',
-			        'fuelstation' => 'Fuel Station',
-			        'bricks' => 'Bricks',
-			        'sawmill' => 'Sawmill',
-			        'association' => 'Association',
-		        ],
+		        'choices' => ['-- Select business model --' => '', 'General' => 'general', 'Distribution' => 'distribution', 'Digital-Sign' => 'sign', 'Electrical' => 'electrical', 'Stationary' => 'stationary', 'Agent Commission' => 'commission', 'Event' => 'event', 'Fuel Station' => 'fuelstation', 'Bricks' => 'bricks', 'Sawmill' => 'sawmill', 'Association' => 'association'],
 	        ])
 	        ->add('stockFormat',
 		        ChoiceType::class, [
 			        'attr'=>['class'=>'m-wrap  span12'],
-			        'choices' => [
-				        'wearhouse'           => 'Wearhouse',
-				        'category'           => 'Category'
-			        ],
+			        'choices' => ['Wearhouse' => 'wearhouse', 'Category' => 'category'],
 			        'required'    => false,
 			        'multiple'    => true,
 			        'expanded'  => false,

@@ -53,9 +53,7 @@ class DpsConfigController extends AbstractController
     {
 
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ConfigType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new ConfigType($config), $entity, array(
+        $form = $this->createForm(ConfigType::class, $entity, array(
             'action' => $this->generateUrl('dps_config_update'),
             'method' => 'PUT',
             'attr' => array(

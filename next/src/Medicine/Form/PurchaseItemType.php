@@ -16,24 +16,20 @@ class PurchaseItemType extends AbstractType
     /** @var  HospitalConfig */
     public  $option;
 
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
             ->add('stockName',TextType::class, ['attr'=>['class'=>'m-wrap span12 select2StockMedicinePurchaseItem input','placeholder'=>'Enter stock medicine name']])
             ->add('expirationEndDate',TextType::class, ['attr'=>['class'=>'m-wrap span12 dateCalendar input','placeholder'=>'Expiry date','autoComplete'=>'off']])
             ->add('salesPrice',TextType::class, ['attr'=>['class'=>'m-wrap purchase-input span10 input','placeholder'=>'Total MRP','autoComplete'=>'off']])
             ->add('bonusQuantity',TextType::class, ['attr'=>['class'=>'m-wrap span9','placeholder'=>'Bonus QTY','autoComplete'=>'off']])
-          //  ->add('batchno','text', array('attr'=>array('class'=>'m-wrap purchase-input span12 form-control input-number input','placeholder'=>'Batch no','autoComplete'=>'off')))
+          //  ->add('batchno', TextType::class, array('attr'=>array('class'=>'m-wrap purchase-input span12 form-control input-number input','placeholder'=>'Batch no','autoComplete'=>'off')))
             ->add('quantity',NumberType::class, ['attr'=>['class'=>'m-wrap purchase-input span12 form-control input-number input red-border','placeholder'=>'Quantity','autoComplete'=>'off']]);
     }
     
@@ -42,6 +38,10 @@ class PurchaseItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicinePurchaseItem::class
         ]);

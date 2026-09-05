@@ -96,16 +96,12 @@ class AttendanceController extends AbstractController
     private function createCreateForm(EmployeeLeave $entity,$user)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into EmployeeLeaveType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new EmployeeLeaveType($option), $entity, array(
-            'action' => $this->generateUrl('attendance_user_create',array('user'=> $user)),
+        $form = $this->createForm(EmployeeLeaveType::class, $entity, array('action' => $this->generateUrl('attendance_user_create',array('user'=> $user)),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $option));
         return $form;
     }
 

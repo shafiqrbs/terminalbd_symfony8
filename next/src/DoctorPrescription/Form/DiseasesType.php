@@ -32,7 +32,6 @@ class DiseasesType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => DpsParticular::class,
-            'cascade_validation' => true,
             'error_bubbling'     => false,
         ]);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -99,16 +100,12 @@ class CustomCategoryController extends AbstractController
 
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $em = $this->em->getRepository(\App\Product\Entity\Category::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomCategoryType::configureOptions() and pass them as form options: $inventory,$em), $entity, array(
-        $form = $this->createForm(new CustomCategoryType($inventory,$em), $entity, array(
-            'action' => $this->generateUrl('inventory_category_create'),
+        $form = $this->createForm(CustomCategoryType::class, $entity, array('action' => $this->generateUrl('inventory_category_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'inventoryConfig' => $inventory, 'em' => $em));
         return $form;
     }
 
@@ -179,16 +176,12 @@ class CustomCategoryController extends AbstractController
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $em = $this->em->getRepository(\App\Product\Entity\Category::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomCategoryType::configureOptions() and pass them as form options: $inventory,$em), $entity, array(
-        $form = $this->createForm(new CustomCategoryType($inventory,$em), $entity, array(
-            'action' => $this->generateUrl('inventory_category_update', array('id' => $entity->getId())),
+        $form = $this->createForm(CustomCategoryType::class, $entity, array('action' => $this->generateUrl('inventory_category_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'novalidate' => 'novalidate',
                 'class' => 'form-horizontal',
-            )
-        ));
+            ), 'inventoryConfig' => $inventory, 'em' => $em));
         return $form;
     }
     /**
@@ -264,7 +257,7 @@ class CustomCategoryController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('inventory_category_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm();
     }
 }

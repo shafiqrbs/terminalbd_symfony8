@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -79,7 +80,7 @@ class VendorController extends AbstractController
      */
     private function createCreateForm(Vendor $entity)
     {
-        $form = $this->createForm(new VendorType(), $entity, [
+        $form = $this->createForm(VendorType::class, $entity, [
             'action' => $this->generateUrl('inventory_vendor_create'),
             'method' => 'POST',
             'attr' => [
@@ -159,7 +160,7 @@ class VendorController extends AbstractController
      */
     private function createEditForm(Vendor $entity)
     {
-        $form = $this->createForm(new VendorType(), $entity, [
+        $form = $this->createForm(VendorType::class, $entity, [
             'action' => $this->generateUrl('inventory_vendor_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -249,7 +250,7 @@ class VendorController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('inventory_vendor_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

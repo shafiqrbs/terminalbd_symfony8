@@ -36,7 +36,7 @@ class VendorType extends AbstractType
                 'expanded'      =>false,
                 'placeholder' => 'Choose a country',
                 'class' => Country::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('m')
                     ->orderBy('m.name','ASC'),

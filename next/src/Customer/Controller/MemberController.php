@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use App\DomainUser\Entity\Customer;
 use App\DomainUser\Form\MemberEditProfileType;
-use Frontend\FrontentBundle\Service\Cart;
 use App\Tool\Entity\Module;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -118,8 +117,6 @@ class MemberController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $em = $this->em->getRepository(\App\DomainUser\Entity\Customer::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MemberEditProfileType::configureOptions() and pass them as form options: $em), $profile, array(
         $form = $this->createForm(new MemberEditProfileType($em), $profile, array(
             'action' => $this->generateUrl('member_profile_update', array('shop' => $globalOption->getSlug())),
             'method' => 'PUT',

@@ -20,18 +20,14 @@ class AccountOnlineOrderType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'Add Received Amount BDT'],
@@ -42,8 +38,8 @@ class AccountOnlineOrderType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a Transaction Method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a Transaction Method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2 transactionMethod'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -56,8 +52,8 @@ class AccountOnlineOrderType extends AbstractType
             ->add('customer', EntityType::class, [
                 'required'    => true,
                 'class' => Customer::class,
-                'empty_value' => '---Choose a customer---',
-                'property' => 'name',
+                'placeholder' => '---Choose a customer---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -68,8 +64,8 @@ class AccountOnlineOrderType extends AbstractType
             ->add('accountBank', EntityType::class, [
                'required'    => true,
                'class' => AccountBank::class,
-               'empty_value' => '---Choose a bank---',
-               'property' => 'name',
+               'placeholder' => '---Choose a bank---',
+               'choice_label' => 'name',
                'attr'=>['class'=>'span12 select2'],
                'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                    ->where("b.status = 1")
@@ -79,8 +75,8 @@ class AccountOnlineOrderType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -97,6 +93,10 @@ class AccountOnlineOrderType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => 'App\Accounting\Entity\AccountOnlineOrder'
         ]);
     }
@@ -108,6 +108,5 @@ class AccountOnlineOrderType extends AbstractType
     {
         return 'appstore_bundle_accountingbundle_AccountOnlineOrder';
     }
-
 
 }

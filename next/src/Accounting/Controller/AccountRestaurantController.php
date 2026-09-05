@@ -139,16 +139,12 @@ class AccountRestaurantController extends AbstractController
     private function createCreateForm(AccountPurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountHmsPurchaseType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountHmsPurchaseType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_purchase_hospital_create'),
+        $form = $this->createForm(AccountHmsPurchaseType::class, $entity, array('action' => $this->generateUrl('account_purchase_hospital_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

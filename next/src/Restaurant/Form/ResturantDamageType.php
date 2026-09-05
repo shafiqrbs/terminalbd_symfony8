@@ -20,26 +20,21 @@ class ResturantDamageType extends AbstractType
 
 	public  $config;
 
-	public function __construct(RestaurantConfig  $config)
-	{
-		$this->config = $config;
-
-	}
-
-
 	/**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->config = $options['config'];
+
         $builder
 
 	        ->add('particular', EntityType::class, [
 		        'required'    => true,
 		        'class' => Particular::class,
-		        'empty_value' => '---Choose a product ---',
-		        'property' => 'name',
+		        'placeholder' => '---Choose a product ---',
+		        'choice_label' => 'name',
 		        'attr'=>['class'=>'span12 m-wrap select2'],
 		        'constraints' =>[ new NotBlank(message: 'Please select your vendor name') ],
 		        'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -61,6 +56,10 @@ class ResturantDamageType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'config' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => RestaurantDamage::class
         ]);
     }
@@ -72,6 +71,5 @@ class ResturantDamageType extends AbstractType
     {
         return 'damage';
     }
-
 
 }

@@ -13,11 +13,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TeamType extends AbstractType
 {
+    protected $globalOption;
 
-
-    public function __construct(private $globalOption)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -25,6 +22,8 @@ class TeamType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter team member name'],
                 'constraints' =>[
@@ -48,6 +47,10 @@ class TeamType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Page::class
         ]);

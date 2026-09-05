@@ -78,7 +78,7 @@ class ProductionController extends AbstractController
     private function createProductionCostingForm(BusinessParticular $entity)
     {
 
-        $form = $this->createForm(new ProductionType(), $entity, [
+        $form = $this->createForm(ProductionType::class, $entity, [
             'action' => $this->generateUrl('business_production_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -166,7 +166,7 @@ class ProductionController extends AbstractController
     private function createPreProductionForm(BusinessProduction $entity, BusinessParticular $item)
 	{
 
-		$form = $this->createForm(new PreproductionType(), $entity, [
+		$form = $this->createForm(PreproductionType::class, $entity, [
 			'action' => $this->generateUrl('business_pre_production_create', ['item' => $item->getId()]),
 			'method' => 'POST',
 			'attr' => [
@@ -181,7 +181,7 @@ class ProductionController extends AbstractController
 	private function updatePreProductionForm(BusinessParticular $entity)
 	{
 
-		$form = $this->createForm(new PreproductionType(), $entity, [
+		$form = $this->createForm(PreproductionType::class, $entity, [
 			'action' => $this->generateUrl('business_pre_production_update', ['id' => $entity->getId()]),
 			'method' => 'POST',
 			'attr' => [

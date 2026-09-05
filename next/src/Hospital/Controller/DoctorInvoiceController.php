@@ -157,16 +157,12 @@ class DoctorInvoiceController extends AbstractController
     private function createCreateForm(DoctorInvoice $entity,Invoice $invoice)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DoctorInvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new DoctorInvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_doctor_invoice_create', array('id' => $invoice->getId())),
+        $form = $this->createForm(DoctorInvoiceType::class, $entity, array('action' => $this->generateUrl('hms_doctor_invoice_create', array('id' => $invoice->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

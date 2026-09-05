@@ -2,6 +2,7 @@
 
 namespace App\Inventory\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -73,16 +74,12 @@ class PurchaseOrderController extends AbstractController
     private function createCreateForm(PurchaseOrder $entity)
     {
         $inventoryConfig =  $user = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseOrderType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
-        $form = $this->createForm(new PurchaseOrderType($inventoryConfig), $entity, array(
-            'action' => $this->generateUrl('purchaseorder_create'),
+        $form = $this->createForm(PurchaseOrderType::class, $entity, array('action' => $this->generateUrl('purchaseorder_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'inventoryConfig' => $inventoryConfig));
        return $form;
     }
 
@@ -157,14 +154,10 @@ class PurchaseOrderController extends AbstractController
     private function createEditForm(PurchaseOrder $entity)
     {
         $inventoryConfig =  $user = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseOrderType::configureOptions() and pass them as form options: $inventoryConfig), $entity, array(
-        $form = $this->createForm(new PurchaseOrderType($inventoryConfig), $entity, array(
-            'action' => $this->generateUrl('purchaseorder_update', array('id' => $entity->getId())),
-            'method' => 'PUT',
-        ));
+        $form = $this->createForm(PurchaseOrderType::class, $entity, array('action' => $this->generateUrl('purchaseorder_update', array('id' => $entity->getId())),
+            'method' => 'PUT', 'inventoryConfig' => $inventoryConfig));
 
-        $form->add('submit', 'submit', array('label' => 'Update'));
+        $form->add('submit', SubmitType::class, array('label' => 'Update'));
 
         return $form;
     }
@@ -234,7 +227,7 @@ class PurchaseOrderController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('purchaseorder_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

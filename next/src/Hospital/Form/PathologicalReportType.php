@@ -15,10 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PathologicalReportType extends AbstractType
 {
-
-    public function __construct(private readonly Particular $particular)
-    {
-    }
+    protected $particular;
 
 
     /**
@@ -27,6 +24,8 @@ class PathologicalReportType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->particular = $options['particular'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter particular name'],
@@ -37,8 +36,8 @@ class PathologicalReportType extends AbstractType
             ->add('parent', EntityType::class, [
                 'required'    => false,
                 'class' => PathologicalReport::class,
-                'empty_value' => '---Select parent name---',
-                'property' => 'name',
+                'placeholder' => '---Select parent name---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->where("o.status = 1")
@@ -55,6 +54,10 @@ class PathologicalReportType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'particular' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => PathologicalReport::class
         ]);

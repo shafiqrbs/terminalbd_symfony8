@@ -156,17 +156,13 @@ class SalesOnlineController extends AbstractController
 
     private function createItemForm(SalesItem $item , Sales $entity)
     {
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SalesItemType::configureOptions() and pass them as form options: $entity->getInventoryConfig()), $item, array(
-        $form = $this->createForm(new SalesItemType($entity->getInventoryConfig()), $item, array(
-            'action' => $this->generateUrl('inventory_salesonline_item_create', array('id' => $entity->getId())),
+        $form = $this->createForm(SalesItemType::class, $item, array('action' => $this->generateUrl('inventory_salesonline_item_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'id' => 'stockItem',
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $entity->getInventoryConfig()));
         return $form;
     }
 
@@ -181,17 +177,13 @@ class SalesOnlineController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SalesOnlineType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-        $form = $this->createForm(new SalesOnlineType($globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('inventory_salesonline_update', array('id' => $entity->getId())),
+        $form = $this->createForm(SalesOnlineType::class, $entity, array('action' => $this->generateUrl('inventory_salesonline_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'id' => 'salesForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location));
         return $form;
     }
 

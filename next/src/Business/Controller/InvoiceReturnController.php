@@ -144,17 +144,13 @@ class InvoiceReturnController extends AbstractController
     private function createCreateForm(BusinessInvoiceReturn $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceReturnType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new InvoiceReturnType($globalOption), $entity, array(
-            'action' => $this->generateUrl('business_invoice_return_create'),
+        $form = $this->createForm(InvoiceReturnType::class, $entity, array('action' => $this->generateUrl('business_invoice_return_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 

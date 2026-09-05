@@ -16,10 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MasterProductType extends AbstractType
 {
-
-    public function __construct(private readonly CategoryRepository $em, private readonly InventoryConfig $inventoryConfig)
-    {
-    }
+    protected $em;
+    protected $inventoryConfig;
 
 
     /**
@@ -28,6 +26,9 @@ class MasterProductType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+        $this->inventoryConfig = $options['inventoryConfig'];
+
 
         $builder
 
@@ -37,11 +38,11 @@ class MasterProductType extends AbstractType
             ->add('productUnit', EntityType::class, [
                 'required'    => true,
                 'class' => ProductUnit::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please select required')
                 ],
-                'empty_value' => '---Choose a item unit ---',
+                'placeholder' => '---Choose a item unit ---',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -49,10 +50,10 @@ class MasterProductType extends AbstractType
             ])
            ->add('category', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select parent category---',
+                'placeholder' => '---Select parent category---',
                 'attr'=>['class'=>'category m-wrap span12 select2'],
                 'class' => \App\Product\Entity\Category::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->categoryChoiceList()
             ]);
             
@@ -64,6 +65,11 @@ class MasterProductType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Product::class
         ]);

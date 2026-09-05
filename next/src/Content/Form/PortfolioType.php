@@ -18,10 +18,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PortfolioType extends AbstractType
 {
+    protected $globalOption;
 
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -29,6 +27,8 @@ class PortfolioType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
 
         $builder
 
@@ -44,8 +44,8 @@ class PortfolioType extends AbstractType
             ->add('moduleCategory', EntityType::class, [
                 'required'    => false,
                 'class' => ModuleCategory::class,
-                'empty_value' => '---Select Category---',
-                'property' => 'name',
+                'placeholder' => '---Select Category---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
 	                    ->join('o.module', 'module')
@@ -56,7 +56,6 @@ class PortfolioType extends AbstractType
                     ->orderBy('o.name','ASC'),
             ]);
 
-
     }
     
     /**
@@ -64,6 +63,10 @@ class PortfolioType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Page::class
         ]);

@@ -14,11 +14,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class LabUserType extends AbstractType
 {
-
-
-    public function __construct(private readonly HmsCategoryRepository $emCategory, private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $emCategory;
+    protected $globalOption;
 
 
     /**
@@ -27,6 +24,9 @@ class LabUserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->emCategory = $options['emCategory'];
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter lab user name'],
@@ -45,12 +45,15 @@ class LabUserType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'emCategory' => null,
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => Particular::class,
-            'cascade_validation' => true,
             'error_bubbling'     => false,
         ]);
     }
-
 
     /**
      * @return string

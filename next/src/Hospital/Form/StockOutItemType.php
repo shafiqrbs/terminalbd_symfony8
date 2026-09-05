@@ -17,24 +17,20 @@ class StockOutItemType extends AbstractType
 
     public  $config;
 
-    public function __construct(HospitalConfig $config)
-    {
-        $this->config = $config;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->config = $options['config'];
+
         $builder
 
 	        ->add('particular', EntityType::class, [
 		        'required'    => false,
-		        'property' => 'particularNameCode',
-		        'empty_value' => '--- Select medicine/accessories ---',
+		        'choice_label' => 'particularNameCode',
+		        'placeholder' => '--- Select medicine/accessories ---',
 		        'attr'=>['class'=>'m-wrap span12 select2 particular'],
 		        'class' => Particular::class,
 		        'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -54,6 +50,10 @@ class StockOutItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'config' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => HmsStockOutItem::class
         ]);

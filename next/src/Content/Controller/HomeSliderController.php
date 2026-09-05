@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -74,16 +75,12 @@ class HomeSliderController extends AbstractController
     private function createCreateForm(HomeSlider $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into HomeSliderType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()->getId()), $entity, array(
-        $form = $this->createForm(new HomeSliderType($this->getUser()->getGlobalOption()->getId()), $entity, array(
-            'action' => $this->generateUrl('homeslider_create'),
+        $form = $this->createForm(HomeSliderType::class, $entity, array('action' => $this->generateUrl('homeslider_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $this->getUser()->getGlobalOption()->getId()));
        return $form;
     }
 
@@ -159,16 +156,12 @@ class HomeSliderController extends AbstractController
     private function createEditForm(HomeSlider $entity)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into HomeSliderType::configureOptions() and pass them as form options: $this->getUser()->getGlobalOption()->getId()), $entity, array(
-        $form = $this->createForm(new HomeSliderType($this->getUser()->getGlobalOption()->getId()), $entity, array(
-            'action' => $this->generateUrl('homeslider_update', array('id' => $entity->getId())),
+        $form = $this->createForm(HomeSliderType::class, $entity, array('action' => $this->generateUrl('homeslider_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $this->getUser()->getGlobalOption()->getId()));
         return $form;
     }
     /**
@@ -244,7 +237,7 @@ class HomeSliderController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('homeslider_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

@@ -58,7 +58,7 @@ class TransactionMethodController extends AbstractController
      */
     private function createCreateForm(TransactionMethod $entity)
     {
-        $form = $this->createForm(new TransactionMethodType(), $entity, [
+        $form = $this->createForm(TransactionMethodType::class, $entity, [
             'action' => $this->generateUrl('transactionmethod_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -122,7 +122,7 @@ class TransactionMethodController extends AbstractController
      */
     private function createEditForm(TransactionMethod $entity)
     {
-        $form = $this->createForm(new TransactionMethodType(), $entity, [
+        $form = $this->createForm(TransactionMethodType::class, $entity, [
             'action' => $this->generateUrl('transactionmethod_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

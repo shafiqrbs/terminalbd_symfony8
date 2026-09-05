@@ -17,10 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PhotoGalleryType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
 
 
     /**
@@ -29,6 +26,8 @@ class PhotoGalleryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 ','placeholder'=>'Enter title'],
                 'constraints' =>[
@@ -43,7 +42,7 @@ class PhotoGalleryType extends AbstractType
                     new NotBlank(message: 'Please input required')
                 ],
                 'class' => Module::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'check-list span6'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->join('o.siteSettings','m')
@@ -61,6 +60,10 @@ class PhotoGalleryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => PhotoGallery::class
         ]);

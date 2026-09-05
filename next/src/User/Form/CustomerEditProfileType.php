@@ -14,13 +14,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 class CustomerEditProfileType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption, private readonly LocationRepository $location)
-    {
-    }
+    protected $globalOption;
+    protected $location;
 
 
     /**
@@ -29,6 +26,9 @@ class CustomerEditProfileType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter your full name'],
                 'constraints' =>[
@@ -49,14 +49,13 @@ class CustomerEditProfileType extends AbstractType
             ->add('nid',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter national id card no']])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span12'],
                 'class' => Location::class,
                 'constraints' =>[
                     new NotBlank(message: 'Select user location')
                 ],
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('file');
@@ -64,6 +63,11 @@ class CustomerEditProfileType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Profile::class
         ]);

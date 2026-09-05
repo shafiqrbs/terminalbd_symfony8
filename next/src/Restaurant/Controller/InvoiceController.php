@@ -369,17 +369,13 @@ class InvoiceController extends AbstractController
     private function createEditForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new InvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('restaurant_invoice_update', array('id' => $entity->getId())),
+        $form = $this->createForm(InvoiceType::class, $entity, array('action' => $this->generateUrl('restaurant_invoice_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -387,16 +383,12 @@ class InvoiceController extends AbstractController
     {
         $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
         $particular = $this->em->getRepository(\App\Restaurant\Entity\Particular::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into RestaurantParticularType::configureOptions() and pass them as form options: $config,$particular), $entity, array(
-        $form = $this->createForm(new RestaurantParticularType($config,$particular), $entity, array(
-            'method' => 'POST',
+        $form = $this->createForm(RestaurantParticularType::class, $entity, array('method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'particularForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'restaurantConfig' => $config, 'particular' => $particular));
         return $form;
     }
 

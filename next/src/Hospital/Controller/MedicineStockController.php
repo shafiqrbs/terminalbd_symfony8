@@ -305,16 +305,12 @@ class MedicineStockController extends AbstractController
     {
 
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MedicineStockType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new MedicineStockType($config), $entity, array(
-            'action' => $this->generateUrl('hms_stock_create', array('id' => $entity->getId())),
+        $form = $this->createForm(MedicineStockType::class, $entity, array('action' => $this->generateUrl('hms_stock_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'medicineConfig' => $config));
         return $form;
     }
 
@@ -322,16 +318,12 @@ class MedicineStockController extends AbstractController
     {
 
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccessoriesStockType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new AccessoriesStockType($config), $entity, array(
-            'action' => $this->generateUrl('hms_stock_accessories_create'),
+        $form = $this->createForm(AccessoriesStockType::class, $entity, array('action' => $this->generateUrl('hms_stock_accessories_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'medicineConfig' => $config));
         return $form;
     }
 
@@ -396,31 +388,23 @@ class MedicineStockController extends AbstractController
     private function createEditForm(MedicineStock $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MedicineStockType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new MedicineStockType($config), $entity, array(
-            'action' => $this->generateUrl('hms_stock_update', array('id' => $entity->getId())),
+        $form = $this->createForm(MedicineStockType::class, $entity, array('action' => $this->generateUrl('hms_stock_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'medicineConfig' => $config));
         return $form;
     }
      private function createEditAccessoriesForm(MedicineStock $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccessoriesStockType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new AccessoriesStockType($config), $entity, array(
-            'action' => $this->generateUrl('hms_stock_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AccessoriesStockType::class, $entity, array('action' => $this->generateUrl('hms_stock_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'medicineConfig' => $config));
         return $form;
     }
     /**

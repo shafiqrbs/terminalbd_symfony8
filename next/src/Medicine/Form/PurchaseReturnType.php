@@ -18,25 +18,21 @@ class PurchaseReturnType extends AbstractType
 
     public  $option;
 
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
 
             ->add('medicineVendor', EntityType::class, [
                 'required'    => true,
                 'class' => MedicineVendor::class,
-                'empty_value' => '---Choose a vendor ---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor ---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'m-wrap span12 inputs'],
                 'constraints' =>[ new NotBlank(message: 'Please select your vendor name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')
@@ -50,6 +46,10 @@ class PurchaseReturnType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicinePurchaseReturn::class
         ]);

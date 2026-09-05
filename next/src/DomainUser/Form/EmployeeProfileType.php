@@ -22,10 +22,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmployeeProfileType extends AbstractType
 {
-
-    public function __construct(private readonly UserRepository $user, private readonly GlobalOption $option, private readonly LocationRepository $location)
-    {
-    }
+    protected $user;
+    protected $option;
+    protected $location;
 
 
     /**
@@ -34,6 +33,10 @@ class EmployeeProfileType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->user = $options['user'];
+        $this->option = $options['option'];
+        $this->location = $options['location'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter Employee Full Name'],
                     'constraints' =>[
@@ -77,8 +80,8 @@ class EmployeeProfileType extends AbstractType
             ->add('designation', EntityType::class, [
                 'required'    => true,
                 'class' => Designation::class,
-                'empty_value' => '---Choose a designation---',
-                'property' => 'name',
+                'placeholder' => '---Choose a designation---',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Select Employee Designation')
                 ],
@@ -91,8 +94,8 @@ class EmployeeProfileType extends AbstractType
             ->add('department', EntityType::class, [
                 'required'    => true,
                 'class' => HrDepartment::class,
-                'empty_value' => '---Choose a department Name---',
-                'property' => 'name',
+                'placeholder' => '---Choose a department Name---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.globalOption =".$this->option->getId())
@@ -101,53 +104,38 @@ class EmployeeProfileType extends AbstractType
             ])
             ->add('maritalStatus', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'empty_value' => 'Marital Status',
-                'choices' => ['Married' => 'Married','Un-married' => 'Un-married','Single' => 'Single'],
+                'placeholder' => 'Marital Status',
+                'choices' => ['Married' => 'Married', 'Un-married' => 'Un-married', 'Single' => 'Single'],
             ])
             ->add('bloodGroup', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'empty_value' => 'Blood Group',
-                'choices' => ['A+' => 'A+',  'A-' => 'A-','B+' => 'B+',  'B-' => 'B-',  'O+' => 'O+',  'O-' => 'O-',  'AB+' => 'AB+',  'AB-' => 'AB-'],
+                'placeholder' => 'Blood Group',
+                'choices' => ['A+' => 'A+', 'A-' => 'A-', 'B+' => 'B+', 'B-' => 'B-', 'O+' => 'O+', 'O-' => 'O-', 'AB+' => 'AB+', 'AB-' => 'AB-'],
             ])
             ->add('religionStatus', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => [
-                    'Islam' => 'Islam',
-                    'Hinduism' => 'Hinduism',
-                    'Buddhism' => 'Buddhism',
-                    'Christianity' => 'Christianity',
-                    'Other religions' => 'Other religions',
-                ],
+                'choices' => ['Islam' => 'Islam', 'Hinduism' => 'Hinduism', 'Buddhism' => 'Buddhism', 'Christianity' => 'Christianity', 'Other religions' => 'Other religions'],
             ])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span12'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('file')
             ->add('gender', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'choices' => [
-                    'Male' => 'Male',
-                    'Female' => 'Female'
-                ],
+                'choices' => ['Male' => 'Male', 'Female' => 'Female'],
             ])
             ->add('employeeType', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[
                     new NotBlank(message: 'Select Employee Type')
                 ],
-                'empty_value' => '---Select Employee Type---',
-                'choices' => [
-                    'Full Time' => 'Full Time',
-                    'Half Time' => 'Half Time',
-                    'Contractual' => 'Contractual',
-                    'Hourly' => 'Hourly',
-                ],
+                'placeholder' => '---Select Employee Type---',
+                'choices' => ['Full Time' => 'Full Time', 'Half Time' => 'Half Time', 'Contractual' => 'Contractual', 'Hourly' => 'Hourly'],
             ]);
 
     }
@@ -157,6 +145,12 @@ class EmployeeProfileType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'user' => null,
+            'option' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Profile::class
         ]);

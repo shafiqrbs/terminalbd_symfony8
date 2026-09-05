@@ -2,7 +2,6 @@
 
 namespace App\Restaurant\Form;
 
-
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Restaurant\Entity\Particular;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,10 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class RestaurantTemporaryParticularType extends AbstractType
 {
-
-    public function __construct(private readonly RestaurantConfig  $restaurantConfig)
-    {
-    }
+    protected $restaurantConfig;
 
 
     /**
@@ -26,13 +22,15 @@ class RestaurantTemporaryParticularType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->restaurantConfig = $options['restaurantConfig'];
+
         $builder
 
             ->add('particular', EntityType::class, [
                 'class'     => Particular::class,
                 'group_by'  => 'category.name',
-                'property'  => 'codeName',
-                'empty_value' => '--- Choose Code & Particular ---',
+                'choice_label'  => 'codeName',
+                'placeholder' => '--- Choose Code & Particular ---',
                 'attr'=>['class'=>'span12 m-wrap select2 particular'],
                 'choice_translation_domain' => true,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -51,6 +49,10 @@ class RestaurantTemporaryParticularType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'restaurantConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => RestaurantTemporary::class
         ]);

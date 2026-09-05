@@ -105,16 +105,12 @@ class AccountSalesAdjustmentController extends AbstractController
     private function createCreateForm(AccountSalesAdjustment $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountSalesAdjustmentType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountSalesAdjustmentType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_salesadjustment_create'),
+        $form = $this->createForm(AccountSalesAdjustmentType::class, $entity, array('action' => $this->generateUrl('account_salesadjustment_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
       return $form;
     }
 

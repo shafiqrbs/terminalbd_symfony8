@@ -114,16 +114,12 @@ class MarketingExecutiveController extends AbstractController
      */
     private function createCreateForm(Particular $entity, $globalOption)
     {
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MarketingExecutiveType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new MarketingExecutiveType($globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_marketing_executive_create', array('id' => $entity->getId())),
+        $form = $this->createForm(MarketingExecutiveType::class, $entity, array('action' => $this->generateUrl('hms_marketing_executive_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -187,16 +183,12 @@ class MarketingExecutiveController extends AbstractController
      */
     private function createEditForm(Particular $entity,$globalOption)
     {
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into MarketingExecutiveType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new MarketingExecutiveType($globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_marketing_executive_update', array('id' => $entity->getId())),
+        $form = $this->createForm(MarketingExecutiveType::class, $entity, array('action' => $this->generateUrl('hms_marketing_executive_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
 
 
         return $form;

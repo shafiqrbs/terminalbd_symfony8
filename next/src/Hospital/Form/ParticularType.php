@@ -17,11 +17,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ParticularType extends AbstractType
 {
-
-
-    public function __construct(private readonly HmsCategoryRepository $emCategory, private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $emCategory;
+    protected $globalOption;
 
 
     /**
@@ -30,18 +27,15 @@ class ParticularType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->emCategory = $options['emCategory'];
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('service', ChoiceType::class, [
                 'required'    => false,
                 'attr'=>['class'=>'span12'],
-                'empty_value' => '---Choose a service type---',
-                'choices' => [
-                    'Cabin & Word'  => 'Cabin & Word',
-                    'Surgery'       => 'Surgery',
-                    'Pathology'     => 'Pathology',
-                    'Medicine'     => 'Medicine',
-                    'Operation'     => 'Operation'
-                ],
+                'placeholder' => '---Choose a service type---',
+                'choices' => ['Cabin & Word' => 'Cabin & Word', 'Surgery' => 'Surgery', 'Pathology' => 'Pathology', 'Medicine' => 'Medicine', 'Operation' => 'Operation'],
             ])
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter particular name'],
                 'constraints' =>[
@@ -58,7 +52,7 @@ class ParticularType extends AbstractType
             ->add('service', EntityType::class, [
                 'required'    => true,
                 'class' => Service::class,
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -67,19 +61,19 @@ class ParticularType extends AbstractType
 
             ->add('department', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select category---',
+                'placeholder' => '---Select category---',
                 'attr'=>['class'=>'ExpenseCategory m-wrap span12 select2'],
                 'class' => 'App\Hospital\Entity\Category',
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->DepartmentChoiceList()
             ])
 
             ->add('category', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select category---',
+                'placeholder' => '---Select category---',
                 'attr'=>['class'=>'ExpenseCategory m-wrap span12 select2'],
                 'class' => 'App\Hospital\Entity\Category',
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->PathologyChoiceList()
             ])
         ;
@@ -90,6 +84,11 @@ class ParticularType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'emCategory' => null,
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Particular::class
         ]);

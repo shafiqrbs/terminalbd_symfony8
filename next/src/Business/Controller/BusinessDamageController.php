@@ -102,16 +102,12 @@ class BusinessDamageController extends AbstractController
     private function createCreateForm(BusinessDamage $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-     // TODO(migration): SF3+ takes a form type class-string, not an instance.
-     // Move these constructor arguments into BusinessDamageType::configureOptions() and pass them as form options: $config), $entity, array(
-    	$form = $this->createForm(new BusinessDamageType($config), $entity, array(
-            'action' => $this->generateUrl('business_damage_create'),
+    	$form = $this->createForm(BusinessDamageType::class, $entity, array('action' => $this->generateUrl('business_damage_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'config' => $config));
         return $form;
     }
 
@@ -151,16 +147,12 @@ class BusinessDamageController extends AbstractController
     private function createEditForm(BusinessDamage $entity)
     {
 	    $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-     // TODO(migration): SF3+ takes a form type class-string, not an instance.
-     // Move these constructor arguments into BusinessDamageType::configureOptions() and pass them as form options: $config), $entity, array(
-    	$form = $this->createForm(new BusinessDamageType($config), $entity, array(
-            'action' => $this->generateUrl('business_damage_update', array('id' => $entity->getId())),
+    	$form = $this->createForm(BusinessDamageType::class, $entity, array('action' => $this->generateUrl('business_damage_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'config' => $config));
         return $form;
     }
     /**

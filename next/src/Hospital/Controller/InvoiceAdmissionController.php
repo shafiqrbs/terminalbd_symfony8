@@ -227,17 +227,13 @@ class InvoiceAdmissionController extends AbstractController
         $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $cabins = $this->em->getRepository(Invoice::class)->getExistCabin($globalOption->getHospitalConfig());
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into NewPatientAdmissionType::configureOptions() and pass them as form options: $globalOption,$category ,$location,$cabins), $entity, array(
-        $form = $this->createForm(new NewPatientAdmissionType($globalOption,$category ,$location,$cabins), $entity, array(
-            'action' => $this->generateUrl('hms_invoice_admitted_create', array('id' => $entity->getId())),
+        $form = $this->createForm(NewPatientAdmissionType::class, $entity, array('action' => $this->generateUrl('hms_invoice_admitted_create', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'admissionForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'emCategory' => $category, 'location' => $location, 'cabins' => $cabins));
         return $form;
     }
 
@@ -432,17 +428,13 @@ class InvoiceAdmissionController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceAdmissionType::configureOptions() and pass them as form options: $globalOption,$location,$category), $entity, array(
-        $form = $this->createForm(new InvoiceAdmissionType($globalOption,$location,$category), $entity, array(
-            'action' => $this->generateUrl('hms_invoice_admission_update', array('id' => $entity->getId())),
+        $form = $this->createForm(InvoiceAdmissionType::class, $entity, array('action' => $this->generateUrl('hms_invoice_admission_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'emCategory' => $location, 'location' => $category));
         return $form;
     }
 
@@ -459,17 +451,13 @@ class InvoiceAdmissionController extends AbstractController
         $admission = $this->em->getRepository(\App\Hospital\Entity\Invoice::class);
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $category = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PatientAdmissionType::configureOptions() and pass them as form options: $globalOption,$admission,$location,$category), $entity, array(
-        $form = $this->createForm(new PatientAdmissionType($globalOption,$admission,$location,$category), $entity, array(
-            'action' => $this->generateUrl('hms_invoice_admitted_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PatientAdmissionType::class, $entity, array('action' => $this->generateUrl('hms_invoice_admitted_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'admission' => $admission, 'location' => $location, 'emCategory' => $category));
         return $form;
     }
 
@@ -765,17 +753,13 @@ class InvoiceAdmissionController extends AbstractController
     private function createInvoicePaymentForm(Invoice $invoice, InvoiceTransaction $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoicePaymentType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new InvoicePaymentType($globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_invoice_admission_approved', array('id' => $invoice->getId())),
+        $form = $this->createForm(InvoicePaymentType::class, $entity, array('action' => $this->generateUrl('hms_invoice_admission_approved', array('id' => $invoice->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoicePayment',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

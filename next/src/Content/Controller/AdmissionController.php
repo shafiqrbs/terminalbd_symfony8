@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -102,16 +103,12 @@ class AdmissionController extends AbstractController
                 }
             endforeach;
         }
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AdmissionType::configureOptions() and pass them as form options: $user->getId(),$branch='branch'), $entity, array(
-        $form = $this->createForm(new AdmissionType($user->getId(),$branch='branch'), $entity, array(
-            'action' => $this->generateUrl('admission_create', array('id' => $entity->getId())),
+        $form = $this->createForm(AdmissionType::class, $entity, array('action' => $this->generateUrl('admission_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $user->getId(), 'branch' => $branch='branch'));
         return $form;
     }
 
@@ -197,16 +194,12 @@ class AdmissionController extends AbstractController
                 }
             endforeach;
         }
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AdmissionType::configureOptions() and pass them as form options: $user->getId(),$branch='branch'), $entity, array(
-        $form = $this->createForm(new AdmissionType($user->getId(),$branch='branch'), $entity, array(
-            'action' => $this->generateUrl('admission_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AdmissionType::class, $entity, array('action' => $this->generateUrl('admission_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $user->getId(), 'branch' => $branch='branch'));
 
         return $form;
     }
@@ -277,7 +270,7 @@ class AdmissionController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('admission_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

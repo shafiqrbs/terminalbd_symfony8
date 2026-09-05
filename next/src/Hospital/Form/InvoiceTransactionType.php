@@ -2,7 +2,6 @@
 
 namespace App\Hospital\Form;
 
-
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Tool\Entity\TransactionMethod;
@@ -16,13 +15,10 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-
 class InvoiceTransactionType extends AbstractType
 {
+    protected $hospitalConfig;
 
-    public function __construct(private readonly HospitalConfig $hospitalConfig)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -30,6 +26,8 @@ class InvoiceTransactionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->hospitalConfig = $options['hospitalConfig'];
+
         $builder
 
             ->add('cardNo',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off']])
@@ -40,7 +38,7 @@ class InvoiceTransactionType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -48,10 +46,10 @@ class InvoiceTransactionType extends AbstractType
             ])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -60,9 +58,9 @@ class InvoiceTransactionType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->hospitalConfig->getGlobalOption()->getId())
@@ -72,9 +70,9 @@ class InvoiceTransactionType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->hospitalConfig->getGlobalOption()->getId())
@@ -89,6 +87,10 @@ class InvoiceTransactionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'hospitalConfig' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => InvoiceTransaction::class
         ]);
     }
@@ -100,7 +102,5 @@ class InvoiceTransactionType extends AbstractType
     {
         return 'appstore_bundle_hospitalbundle_invoice_transaction';
     }
-
-
 
 }

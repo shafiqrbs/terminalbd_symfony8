@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Docudex project.
  *
@@ -11,248 +13,161 @@
 
 namespace App\User\Controller;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
 use App\User\Entity\Group;
-use FOS\UserBundle\Controller\GroupController as Controller;
-use FOS\UserBundle\Event\FormEvent;
-use FOS\UserBundle\Event\GetResponseGroupEvent;
-use FOS\UserBundle\Event\GroupEvent;
-use FOS\UserBundle\FOSUserEvents;
-use JMS\SecurityExtraBundle\Annotation as JMS;
+use App\User\Form\Type\GroupFormType;
+use App\User\Manager\GroupManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-// TODO(migration): extends an aliased FOSUserBundle controller that no longer exists.
-// Reimplement the inherited behaviour on AbstractController.
-class GroupController extends Controller
+/**
+ * Was an override of FOSUserBundle's GroupController.
+ *
+ * Three Symfony 2 constructs are gone with it: the `templating` service
+ * (removed in Symfony 5) is now $this->render(), $form->bind($request) is
+ * handleRequest(), and the group form comes from the app's own GroupFormType
+ * under the name FOSUserBundle's factory gave it.
+ */
+class GroupController extends AbstractController
 {
+    public function __construct(
+        private readonly RequestStack $requestStack,
+        private readonly FormFactoryInterface $formFactory,
+        private readonly GroupManager $groupManager,
+    ) {
+    }
 
-	public function listAction()
-	{
-		$groups = $this->container->get('fos_user.group_manager')->findGroups();
+    public function listAction(): Response
+    {
+        return $this->render('User/Group/list.html.twig', [
+            'groups' => $this->groupManager->findGroups(),
+        ]);
+    }
 
-		return $this->container->get('templating')->renderResponse('User/Group/list.html.twig', ['groups' => $groups]);
-	}
+    public function newAction(Request $request): Response
+    {
+        $group = $this->groupManager->createGroup('');
 
-	public function newAction(Request $request)
-	{
-		/** @var $groupManager \FOS\UserBundle\Model\GroupManagerInterface */
-		$groupManager = $this->container->get('fos_user.group_manager');
-		/** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
-		$formFactory = $this->container->get('fos_user.group.form.factory');
-		/** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-		$dispatcher = $this->container->get('event_dispatcher');
+        $form = $this->createGroupForm($group);
+        $form->handleRequest($request);
 
-		$group = $groupManager->createGroup('');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->groupManager->updateGroup($group);
 
-		$dispatcher->dispatch(FOSUserEvents::GROUP_CREATE_INITIALIZE, new GroupEvent($group, $request));
+            $this->requestStack->getSession()->getFlashBag()->add(
+                'success-status',
+                'Group Created Successfully!'
+            );
 
-		$form = $formFactory->createForm();
-		$form->setData($group);
+            return new RedirectResponse($this->generateUrl('fos_user_group_list'));
+        }
 
-		if ($request->isMethod('POST')) {
-			$form->bind($request);
+        return $this->render('User/Group/new.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 
-			if ($form->isValid()) {
-				$event = new FormEvent($form, $request);
-				//$dispatcher->dispatch(FOSUserEvents::GROUP_CREATE_SUCCESS, $event);
+    public function editByIdAction(Request $request, Group $group): Response
+    {
+        $form = $this->createGroupForm($group);
+        $form->handleRequest($request);
 
-				$groupManager->updateGroup($group);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->groupManager->updateGroup($group);
 
-				if (null === $response = $event->getResponse()) {
-					$this->requestStack->getSession()->getFlashBag()->add(
-						'success-status',
-						'Group Created Successfully!'
-					);
+            $this->requestStack->getSession()->getFlashBag()->add(
+                'success-status',
+                'Group Updated Successfully!'
+            );
 
-					$url      = $this->container->get('router')->generate('fos_user_group_list');
-					$response = new RedirectResponse($url);
-				}
+            return new RedirectResponse($this->generateUrl('fos_user_group_list'));
+        }
 
-				//$dispatcher->dispatch(FOSUserEvents::GROUP_CREATE_COMPLETED, new FilterGroupResponseEvent($group, $request, $response));
+        return $this->render('User/Group/edit.html.twig', [
+            'form' => $form->createView(),
+            'group' => $group,
+        ]);
+    }
 
-				return $response;
-			}
-		}
+    #[IsGranted('ROLE_GROUP_DELETE')]
+    public function deleteByIdAction(Request $request, Group $group): Response
+    {
+        $this->groupManager->deleteGroup($group);
 
-		return $this->container->get('templating')->renderResponse('User/Group/new.html.twig', [
-			'form' => $form->createview(),
-		]);
-	}
+        $this->requestStack->getSession()->getFlashBag()->add(
+            'success-status',
+            'Group Deleted Successfully!'
+        );
 
-	/**
-     * @param Request $request
-     * @param Group   $group
-     *
-     * @return null|RedirectResponse|Response
-     */
-    public function editByIdAction(Request $request, Group $group)
-	{
-		/** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-		$dispatcher = $this->container->get('event_dispatcher');
+        return new RedirectResponse($this->generateUrl('fos_user_group_list'));
+    }
 
-		$event = new GetResponseGroupEvent($group, $request);
-		$dispatcher->dispatch(FOSUserEvents::GROUP_EDIT_INITIALIZE, $event);
+    #[IsGranted('ROLE_MANAGE_PERMISSION')]
+    public function categoryAccessAction(Request $request, Group $group): Response
+    {
+        set_time_limit(0);
 
-		if (null !== $event->getResponse()) {
-			return $event->getResponse();
-		}
+        if ($group->hasRole('ROLE_MANAGE_GROUPS')) {
+            throw new NotFoundHttpException("Page not found");
+        }
 
-		/** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
-		$formFactory = $this->container->get('fos_user.group.form.factory');
+        if ($request->getRealMethod() == 'POST') {
 
-		$form = $formFactory->createForm();
-		$form->setData($group);
+            $this->requestStack->getSession()->getFlashBag()->add(
+                'success-status',
+                'Group Category Updated Successfully!'
+            );
 
-		if ($request->isMethod('POST')) {
-			$form->bind($request);
+            $categories = $request->request->get('category');
 
-			if ($form->isValid()) {
-				/** @var $groupManager \FOS\UserBundle\Model\GroupManagerInterface */
-				$groupManager = $this->container->get('fos_user.group_manager');
+            $this->updateGroupCategories($group, $categories);
 
-				//$event = new FormEvent($form, $request);
-				//$dispatcher->dispatch(FOSUserEvents::GROUP_EDIT_SUCCESS, $event);
+            return new RedirectResponse($this->generateUrl('fos_user_group_list'));
+        }
 
-				$groupManager->updateGroup($group);
+        $categories = [];//$this->getTermManager()->getCategoryTree();
 
-				if (null === $response = $event->getResponse()) {
-					$this->requestStack->getSession()->getFlashBag()->add(
-						'success-status',
-						'Group Updated Successfully!'
-					);
+        return $this->render('User/Group/category-access.html.twig', [
+            'group' => $group->getName(),
+            'categories' => $categories,
+            'selectedCategories' => $this->getCategoryIds($group),
+        ]);
+    }
 
-					$url      = $this->container->get('router')->generate('fos_user_group_list');
-					$response = new RedirectResponse($url);
+    private function createGroupForm(Group $group)
+    {
+        return $this->formFactory->createNamed('fos_user_group_form', GroupFormType::class, $group);
+    }
 
-				}
+    protected function getCategoryIds(Group $group)
+    {
+        $ids = [];
 
-				//$dispatcher->dispatch(FOSUserEvents::GROUP_EDIT_COMPLETED, new FilterGroupResponseEvent($group, $request, $response));
+        foreach($group->getCategories() as $category)
+        {
+            $ids[] = $category->getTermId();
+        }
 
-				return $response;
-			}
-		}
+        return $ids;
+    }
 
-		return $this->container->get('templating')->renderResponse('User/Group/edit.html.twig', [
-			'form'      => $form->createview(),
-			'group'  => $group,
-		]);
-	}
+    protected function updateGroupCategories(Group $group, $categories = [])
+    {
+        $categories = [];//$this->getTermManager()->getAllTermsByIds($categories);
 
-	/**
-	 *  @JMS\Secure(roles="ROLE_GROUP_DELETE")
-	 */
-	public function deleteByIdAction(Request $request, Group $group)
-	{
-		$this->container->get('fos_user.group_manager')->deleteGroup($group);
+        $groupCategories = $group->getCategories();
 
-		$response = new RedirectResponse($this->container->get('router')->generate('fos_user_group_list'));
+        $groupCategories->clear();
 
-		/** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-		//$dispatcher = $this->container->get('event_dispatcher');
-		//$dispatcher->dispatch(FOSUserEvents::GROUP_DELETE_COMPLETED, new FilterGroupResponseEvent($group, $request, $response));
+        foreach ($categories as $category) {
+            $groupCategories->add($category);
+        }
 
-		$this->requestStack->getSession()->getFlashBag()->add(
-			'success-status',
-			'Group Deleted Successfully!'
-		);
-
-		return $response;
-	}
-
-	/**
-	 * @JMS\Secure(roles="ROLE_MANAGE_PERMISSION")
-	 */
-	public function categoryAccessAction(Request $request, Group $group)
-	{
-		set_time_limit(0);
-
-		if ($group->hasRole('ROLE_MANAGE_GROUPS')) {
-			throw new NotFoundHttpException("Page not found");
-		}
-
-		if ($request->getRealMethod() == 'POST') {
-
-			$this->requestStack->getSession()->getFlashBag()->add(
-				'success-status',
-				'Group Category Updated Successfully!'
-			);
-
-			$categories = $request->request->get('category');
-
-			$this->updateGroupCategories($group, $categories);
-
-			$url      = $this->container->get('router')->generate('fos_user_group_list');
-			return new RedirectResponse($url);
-		}
-
-		$categories = [];//$this->getTermManager()->getCategoryTree();
-
-		return $this->render('User/Group/category-access.html.twig', [
-			'group' => $group->getName(),
-			'categories' => $categories,
-			'selectedCategories' => $this->getCategoryIds($group),
-		]);
-
-	}
-
-	protected function getCategoryIds(Group $group)
-	{
-		$ids = [];
-
-		foreach($group->getCategories() as $category)
-		{
-			$ids[] = $category->getTermId();
-		}
-
-		return $ids;
-	}
-
-	protected function updateGroupCategories(Group $group, $categories = [])
-	{
-		$categories = [];//$this->getTermManager()->getAllTermsByIds($categories);
-
-		$groupCategories = $group->getCategories();
-		$old = clone $groupCategories;
-
-		$groupCategories->clear();
-
-		foreach ($categories as $category) {
-			$groupCategories->add($category);
-		}
-
-		$new = clone $groupCategories;
-
-		$changes = $this->getChangesInCollection($old, $new);
-
-		$dispatcher = $this->container->get('event_dispatcher');
-
-		//$dispatcher
-		//	->dispatch(DocudexUserEvents::USER_GROUP_CATEGORY_CHANGED, new DocudexGroupEvent($group, $changes));
-
-		// TODO(migration): AbstractController::get() was removed; inject this service.
-		$this->get('fos_user.group_manager')->updateGroup($group);
-	}
-
-	protected function getChangesInCollection($col1, $col2) {
-
-		$changes = [];
-
-		foreach ($col1 as $element) {
-			if (!$col2->contains($element)) {
-				$changes['removed'][] = $element->getId();
-			}
-		}
-
-		foreach ($col2 as $element) {
-			if (!$col1->contains($element)) {
-				$changes['added'][] = $element->getId();
-			}
-		}
-
-		return $changes;
-	}
-
+        $this->groupManager->updateGroup($group);
+    }
 }

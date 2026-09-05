@@ -274,16 +274,12 @@ class AccountSalesController extends AbstractController
     private function createCreateForm(AccountSales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountSalesType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountSalesType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_sales_create'),
+        $form = $this->createForm(AccountSalesType::class, $entity, array('action' => $this->generateUrl('account_sales_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
       return $form;
     }
 
@@ -376,16 +372,12 @@ class AccountSalesController extends AbstractController
     private function createEditForm(AccountSales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountSalesInvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountSalesInvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_sales_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AccountSalesInvoiceType::class, $entity, array('action' => $this->generateUrl('account_sales_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
     /**

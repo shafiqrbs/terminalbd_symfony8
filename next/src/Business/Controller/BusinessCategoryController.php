@@ -95,7 +95,7 @@ class BusinessCategoryController extends AbstractController
     private function createCreateForm(Category $entity)
     {
 
-        $form = $this->createForm(new CategoryType(), $entity, [
+        $form = $this->createForm(CategoryType::class, $entity, [
             'action' => $this->generateUrl('business_category_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -144,7 +144,7 @@ class BusinessCategoryController extends AbstractController
     private function createEditForm(Category $entity )
     {
 
-        $form = $this->createForm(new CategoryType(), $entity, [
+        $form = $this->createForm(CategoryType::class, $entity, [
             'action' => $this->generateUrl('business_category_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

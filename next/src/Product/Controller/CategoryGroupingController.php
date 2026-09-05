@@ -2,6 +2,7 @@
 
 namespace App\Product\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -106,7 +107,7 @@ class CategoryGroupingController extends AbstractController
     private function createCreateForm(CategoryGrouping $entity)
     {
 
-        $form = $this->createForm(new CategoryGroupingType(), $entity, [
+        $form = $this->createForm(CategoryGroupingType::class, $entity, [
             'action' => $this->generateUrl('categorygrouping_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -190,12 +191,12 @@ class CategoryGroupingController extends AbstractController
      */
     private function createEditForm(CategoryGrouping $entity)
     {
-        $form = $this->createForm(new CategoryGroupingType(), $entity, [
+        $form = $this->createForm(CategoryGroupingType::class, $entity, [
             'action' => $this->generateUrl('categorygrouping_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Update']);
+        $form->add('submit', SubmitType::class, ['label' => 'Update']);
 
         return $form;
     }
@@ -265,7 +266,7 @@ class CategoryGroupingController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('categorygrouping_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

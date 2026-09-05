@@ -2,6 +2,7 @@
 
 namespace App\Product\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Tool\Service\ToolManager;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -177,12 +178,12 @@ class ProductController extends AbstractController
      */
     private function createCreateForm(Product $entity)
     {
-        $form = $this->createForm(new ProductType(), $entity, [
+        $form = $this->createForm(ProductType::class, $entity, [
             'action' => $this->generateUrl('product_create'),
             'method' => 'POST',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Create']);
+        $form->add('submit', SubmitType::class, ['label' => 'Create']);
 
         return $form;
     }
@@ -282,7 +283,7 @@ class ProductController extends AbstractController
     private function createEditForm(Product $entity)
     {
 
-        $form = $this->createForm(new ProductType(), $entity, [
+        $form = $this->createForm(ProductType::class, $entity, [
             'action' => $this->generateUrl('product_update', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -384,7 +385,7 @@ class ProductController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('product_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
             ;
     }

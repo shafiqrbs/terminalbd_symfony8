@@ -106,16 +106,12 @@ class ParticularController extends AbstractController
     private function createCreateForm(DpsParticular $entity)
     {
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ParticularType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new ParticularType($config), $entity, array(
-            'action' => $this->generateUrl('dps_particular_create', array('id' => $entity->getId())),
+        $form = $this->createForm(ParticularType::class, $entity, array('action' => $this->generateUrl('dps_particular_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'dpsConfig' => $config));
         return $form;
     }
 
@@ -156,16 +152,12 @@ class ParticularController extends AbstractController
     {
 
         $config = $this->getUser()->getGlobalOption()->getDpsConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ParticularType::configureOptions() and pass them as form options: $config), $entity, array(
-        $form = $this->createForm(new ParticularType($config), $entity, array(
-            'action' => $this->generateUrl('dps_particular_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ParticularType::class, $entity, array('action' => $this->generateUrl('dps_particular_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'dpsConfig' => $config));
         return $form;
     }
     /**

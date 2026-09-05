@@ -109,16 +109,12 @@ class ReferredDoctorController extends AbstractController
 
         $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ReferredDoctorType::configureOptions() and pass them as form options: $em,$globalOption,$location), $entity, array(
-        $form = $this->createForm(new ReferredDoctorType($em,$globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('hms_referreddoctor_create', array('id' => $entity->getId())),
+        $form = $this->createForm(ReferredDoctorType::class, $entity, array('action' => $this->generateUrl('hms_referreddoctor_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'emCategory' => $em, 'globalOption' => $globalOption, 'location' => $location));
         return $form;
     }
 
@@ -180,16 +176,12 @@ class ReferredDoctorController extends AbstractController
     {
         $em = $this->em->getRepository(\App\Hospital\Entity\HmsCategory::class);
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ReferredDoctorType::configureOptions() and pass them as form options: $em,$globalOption,$location), $entity, array(
-        $form = $this->createForm(new ReferredDoctorType($em,$globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('hms_referreddoctor_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ReferredDoctorType::class, $entity, array('action' => $this->generateUrl('hms_referreddoctor_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'emCategory' => $em, 'globalOption' => $globalOption, 'location' => $location));
         return $form;
     }
     /**

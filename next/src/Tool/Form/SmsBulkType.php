@@ -2,6 +2,7 @@
 
 namespace App\Tool\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -17,11 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SmsBulkType extends AbstractType
 {
-
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
-
+    protected $location;
 
 
     /**
@@ -30,6 +27,8 @@ class SmsBulkType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter module name'],
                 'constraints' =>[
@@ -49,24 +48,20 @@ class SmsBulkType extends AbstractType
 
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 m-wrap span12'],
                 'class' => Location::class,
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
 
             ->add('sourceTo', ChoiceType::class, [
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Select Source---',
+                'placeholder' => '---Select Source---',
                 'required'    => false,
-                'choices' => [
-                    'Customer' => 'Customer',
-                    'Member' => 'Member',
-                ],
+                'choices' => ['Customer' => 'Customer', 'Member' => 'Member'],
             ]);
-            /*->add('file','file',array('attr'=>array('class'=>'default span12')))*/
+            /*->add('file', FileType::class,array('attr'=>array('class'=>'default span12')))*/
 
     }
     
@@ -75,6 +70,10 @@ class SmsBulkType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => SmsBulk::class
         ]);
@@ -87,7 +86,6 @@ class SmsBulkType extends AbstractType
     {
         return 'setting_bundle_toolbundle_bulksms';
     }
-
 
     protected function LocationChoiceList()
     {

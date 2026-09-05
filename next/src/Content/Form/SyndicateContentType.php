@@ -14,10 +14,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SyndicateContentType extends AbstractType
 {
-
-    public function __construct(private $globalOption, private $siteSettingId)
-    {
-    }
+    protected $globalOption;
+    protected $siteSettingId;
 
 
     /**
@@ -26,14 +24,17 @@ class SyndicateContentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->siteSettingId = $options['siteSettingId'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'form-control']])
             ->add('content',TextareaType::class, ['attr'=>['class'=>'wysihtml5 form-control','rows'=>15]])
             ->add('photo_gallery', EntityType::class, [
                 'required'    => false,
                 'class' => PhotoGallery::class,
-                'empty_value' => '---Select Photo Gallery---',
-                'property' => 'name',
+                'placeholder' => '---Select Photo Gallery---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'form-control input-sm'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->andWhere("o.status = 1")
@@ -50,6 +51,11 @@ class SyndicateContentType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'siteSettingId' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => SyndicateContent::class
         ]);

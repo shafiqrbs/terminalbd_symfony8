@@ -96,9 +96,7 @@ class VendorController extends AbstractController
     private function createCreateForm(AccountVendor $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into VendorType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new VendorType($globalOption), $entity, array(
+        $form = $this->createForm(VendorType::class, $entity, array(
             'action' => $this->generateUrl('account_vendor_create'),
             'method' => 'POST',
             'attr' => array(
@@ -166,9 +164,7 @@ class VendorController extends AbstractController
     private function createEditForm(AccountVendor $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into VendorType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new VendorType($globalOption), $entity, array(
+        $form = $this->createForm(VendorType::class, $entity, array(
             'action' => $this->generateUrl('account_vendor_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(

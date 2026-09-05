@@ -23,24 +23,20 @@ class PurchaseManualType extends AbstractType
 
     public  $option;
 
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
             ->add('medicinePurchaseReturn', EntityType::class, [
                 'required'    => false,
                 'class' => MedicinePurchaseReturn::class,
-                'empty_value' => '--Adjustment return--',
-                'property' => 'invoiceAmount',
+                'placeholder' => '--Adjustment return--',
+                'choice_label' => 'invoiceAmount',
                 'attr'=>['class'=>'m-wrap span12 inputs'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')
                     ->where("wt.medicineConfig =".$this->option->getMedicineConfig()->getId())
@@ -50,8 +46,8 @@ class PurchaseManualType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a Transaction---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a Transaction---',
                 'attr'=>['class'=>'m-wrap span12 inputs transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -62,8 +58,8 @@ class PurchaseManualType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -73,8 +69,8 @@ class PurchaseManualType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -91,6 +87,10 @@ class PurchaseManualType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicinePurchase::class
         ]);

@@ -22,18 +22,14 @@ class AccountLoanType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span6 numeric','placeholder'=>'Amount'],
@@ -44,7 +40,7 @@ class AccountLoanType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Select Transaction Method')
                 ],
@@ -54,15 +50,15 @@ class AccountLoanType extends AbstractType
                     ->andWhere("e.slug != 'cash-on-delivery'")
                     ->orderBy("e.id")
             ])
-            /*->add('customer','text', array('attr'=>array('class'=>'m-wrap span11 select2Customer leftMargin','placeholder'=>'Select customer name','focus' => true),
+            /*->add('customer', TextType::class, array('attr'=>array('class'=>'m-wrap span11 select2Customer leftMargin','placeholder'=>'Select customer name','focus' => true),
                 'constraints' =>array(
                     new NotBlank(array('message'=>'Search the customer name/mobile'))
             )))*/
             ->add('employee', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'empty_value' => '---Choose a employee---',
-                'property' => 'userFullName',
+                'placeholder' => '---Choose a employee---',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->join('b.profile','p')
@@ -72,8 +68,8 @@ class AccountLoanType extends AbstractType
             ->add('accountBank', EntityType::class, [
                'required'    => true,
                'class' => AccountBank::class,
-               'empty_value' => '---Choose a bank---',
-               'property' => 'name',
+               'placeholder' => '---Choose a bank---',
+               'choice_label' => 'name',
                'attr'=>['class'=>'span12 m-wrap'],
                'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                    ->where("b.globalOption =".$this->globalOption->getId())
@@ -83,16 +79,13 @@ class AccountLoanType extends AbstractType
 		        'attr'=>['class'=>'span12 m-wrap'],
 		        'expanded'      =>false,
 		        'multiple'      =>false,
-		        'choices' => [
-			        'Debit' => 'Receive',
-			        'Credit' => 'Payment'
-		        ],
+		        'choices' => ['Receive' => 'Debit', 'Payment' => 'Credit'],
 	        ])
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.globalOption =".$this->globalOption->getId())
@@ -105,6 +98,10 @@ class AccountLoanType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => AccountLoan::class
         ]);
@@ -122,6 +119,5 @@ class AccountLoanType extends AbstractType
     {
         return null;
     }
-
 
 }

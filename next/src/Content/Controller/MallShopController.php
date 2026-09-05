@@ -93,7 +93,7 @@ class MallShopController extends AbstractController
      */
     private function createCreateForm(MallConnect $entity)
     {
-        $form = $this->createForm(new MallShopType(), $entity, [
+        $form = $this->createForm(MallShopType::class, $entity, [
             'action' => $this->generateUrl('mallshop_create'),
             'method' => 'POST',
             'attr' => [
@@ -169,7 +169,7 @@ class MallShopController extends AbstractController
      */
     private function createEditForm(MallConnect $entity)
     {
-        $form = $this->createForm(new MallShopType(), $entity, [
+        $form = $this->createForm(MallShopType::class, $entity, [
             'action' => $this->generateUrl('mallshop_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

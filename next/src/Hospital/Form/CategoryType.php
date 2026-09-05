@@ -14,10 +14,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CategoryType extends AbstractType
 {
-
-    public function __construct(private readonly HmsCategoryRepository $emCategory, private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $emCategory;
+    protected $globalOption;
 
 
     /**
@@ -26,6 +24,9 @@ class CategoryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->emCategory = $options['emCategory'];
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter category name'],
@@ -35,14 +36,13 @@ class CategoryType extends AbstractType
             ])
             ->add('parent', EntityType::class, [
                 'required'    => true,
-                'empty_value' => '---Select parent category---',
+                'placeholder' => '---Select parent category---',
                 'attr'=>['class'=>'ServiceCategory m-wrap span12 select2'],
                 'class' => HmsCategory::class,
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->CategoryChoiceList()
             ])
             ->add('status')
-
 
         ;
     }
@@ -52,6 +52,11 @@ class CategoryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'emCategory' => null,
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => HmsCategory::class
         ]);
@@ -73,6 +78,5 @@ class CategoryType extends AbstractType
         return $this->emCategory->getFlatCategoryTree($this->globalOption);
 
     }
-
 
 }

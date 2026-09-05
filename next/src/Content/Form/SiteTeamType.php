@@ -32,7 +32,7 @@ class SiteTeamType extends AbstractType
             ->add('content',TextareaType::class, ['attr'=>['class'=>'ckeditor m-wrap span12','rows'=>15]])
 	        ->add('businessSector', ChoiceType::class, [
 		        'attr'=>['class'=>'m-wrap span12'],
-		        'choices' => ['portal' => 'Portal','education' => 'Education',  'ecommerce' => 'E-commerce', 'reservation' => 'Reservation', 'fleet' => 'Fleet Management'],
+		        'choices' => ['Portal' => 'portal', 'Education' => 'education', 'E-commerce' => 'ecommerce', 'Reservation' => 'reservation', 'Fleet Management' => 'fleet'],
 	        ])
 			->add('status');
     }

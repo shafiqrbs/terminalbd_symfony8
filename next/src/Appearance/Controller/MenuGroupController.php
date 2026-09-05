@@ -2,6 +2,7 @@
 
 namespace App\Appearance\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -72,7 +73,7 @@ class MenuGroupController extends AbstractController
     private function createCreateForm(MenuGroup $entity)
     {
 
-        $form = $this->createForm(new MenuGroupType(), $entity, [
+        $form = $this->createForm(MenuGroupType::class, $entity, [
             'action' => $this->generateUrl('menugroup_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -155,7 +156,7 @@ class MenuGroupController extends AbstractController
     {
 
 
-        $form = $this->createForm(new MenuGroupType(), $entity, [
+        $form = $this->createForm(MenuGroupType::class, $entity, [
             'action' => $this->generateUrl('menugroup_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -231,7 +232,7 @@ class MenuGroupController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('menugroup_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

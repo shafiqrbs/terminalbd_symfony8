@@ -23,18 +23,14 @@ class AccountJournalType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'Add amount'],
@@ -47,16 +43,13 @@ class AccountJournalType extends AbstractType
                 'constraints' =>[
                     new NotBlank(message: 'Please choose required')
                 ],
-                'choices' => [
-                    'Debit' => 'In',
-                    'Credit' => 'Out',
-                ],
+                'choices' => ['In' => 'Debit', 'Out' => 'Credit'],
             ])
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a transaction method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a transaction method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                /* 'constraints' =>array(
                     new NotBlank(array('message'=>'Please input required'))
@@ -70,11 +63,11 @@ class AccountJournalType extends AbstractType
             ->add('accountHeadDebit', EntityType::class, [
                 'class'     => AccountHead::class,
                 'group_by'  => 'parent.name',
-                'property'  => 'name',
+                'choice_label'  => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please choose debit account')
                 ],
-                'empty_value' => '---Choose a debit account---',
+                'placeholder' => '---Choose a debit account---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'choice_translation_domain' => true,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -87,11 +80,11 @@ class AccountJournalType extends AbstractType
             ->add('accountHeadCredit', EntityType::class, [
                 'class'     => AccountHead::class,
                 'group_by'  => 'parent.name',
-                'property'  => 'name',
+                'choice_label'  => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please choose credit account')
                 ],
-                'empty_value' => '---Choose a credit account---',
+                'placeholder' => '---Choose a credit account---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'choice_translation_domain' => true,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -104,8 +97,8 @@ class AccountJournalType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -115,8 +108,8 @@ class AccountJournalType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile account---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile account---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -126,8 +119,8 @@ class AccountJournalType extends AbstractType
             ->add('toUser', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'empty_value' => '--- Select a account user name ---',
-                'property' => 'userFullName',
+                'placeholder' => '--- Select a account user name ---',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
 	                          ->where("u.isDelete != 1")
@@ -143,6 +136,10 @@ class AccountJournalType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AccountJournal::class
         ]);
     }
@@ -154,6 +151,5 @@ class AccountJournalType extends AbstractType
     {
         return 'appstore_bundle_accountingbundle_AccountJournal';
     }
-
 
 }

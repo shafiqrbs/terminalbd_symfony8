@@ -114,17 +114,13 @@ class AccountVoucherController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $emHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into VoucherType::configureOptions() and pass them as form options: $globalOption,$emHead), $entity, array(
-        $form = $this->createForm(new VoucherType($globalOption,$emHead), $entity, array(
-            'action' => $this->generateUrl('account_voucher_update', array('id' => $entity->getId())),
+        $form = $this->createForm(VoucherType::class, $entity, array('action' => $this->generateUrl('account_voucher_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption, 'accountHead' => $emHead));
         return $form;
     }
 

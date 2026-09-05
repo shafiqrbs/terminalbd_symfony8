@@ -2,7 +2,6 @@
 
 namespace App\Accounting\Form;
 
-
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Tool\Entity\TransactionMethod;
@@ -23,18 +22,14 @@ class AccountSalesHotelType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'Add receive amount'],
@@ -45,7 +40,7 @@ class AccountSalesHotelType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -58,8 +53,8 @@ class AccountSalesHotelType extends AbstractType
             ->add('customer', EntityType::class, [
                 'required'    => true,
                 'class' => Customer::class,
-                'empty_value' => '---Choose a customer---',
-                'property' => 'nameMobile',
+                'placeholder' => '---Choose a customer---',
+                'choice_label' => 'nameMobile',
                 'attr'=>['class'=>'span12 select2 customer-ledger'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.globalOption =".$this->globalOption->getId()),
@@ -67,8 +62,8 @@ class AccountSalesHotelType extends AbstractType
             ->add('accountBank', EntityType::class, [
                'required'    => true,
                'class' => AccountBank::class,
-               'empty_value' => '---Choose a bank---',
-               'property' => 'name',
+               'placeholder' => '---Choose a bank---',
+               'choice_label' => 'name',
                'attr'=>['class'=>'span12 m-wrap'],
                'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                    ->where("b.globalOption =".$this->globalOption->getId())
@@ -78,17 +73,13 @@ class AccountSalesHotelType extends AbstractType
                 'attr'=>['class'=>'span12 m-wrap'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'Due' => 'Due',
-                    'Advance' => 'Advance',
-                    'Outstanding' => 'Outstanding',
-                ],
+                'choices' => ['Due' => 'Due', 'Advance' => 'Advance', 'Outstanding' => 'Outstanding'],
             ])
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.globalOption =".$this->globalOption->getId())
@@ -103,6 +94,10 @@ class AccountSalesHotelType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => AccountSales::class
         ]);
@@ -120,6 +115,5 @@ class AccountSalesHotelType extends AbstractType
     {
         return null;
     }
-
 
 }

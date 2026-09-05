@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -96,16 +97,12 @@ class TeamController extends AbstractController
     {
 
         $globalOption = $this->getUser()->getGlobalOption()->getId();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into TeamType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new TeamType($globalOption), $entity, array(
-            'action' => $this->generateUrl('team_create', array('id' => $entity->getId())),
+        $form = $this->createForm(TeamType::class, $entity, array('action' => $this->generateUrl('team_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
 
         return $form;
     }
@@ -173,16 +170,12 @@ class TeamController extends AbstractController
     private function createEditForm(Page $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption()->getId();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into TeamType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new TeamType($globalOption), $entity, array(
-            'action' => $this->generateUrl('team_update', array('id' => $entity->getId())),
+        $form = $this->createForm(TeamType::class, $entity, array('action' => $this->generateUrl('team_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
 
         return $form;
     }
@@ -249,7 +242,7 @@ class TeamController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('team_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
             ;
     }

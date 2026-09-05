@@ -2,7 +2,6 @@
 
 namespace App\Hospital\Form;
 
-
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Hospital\Entity\Particular;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -14,15 +13,9 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-
 class InvoiceParticularType extends AbstractType
 {
-
-    public function __construct(private readonly HospitalConfig $hospitalConfig)
-    {
-    }
-
-
+    protected $hospitalConfig;
 
 
     /**
@@ -31,12 +24,14 @@ class InvoiceParticularType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->hospitalConfig = $options['hospitalConfig'];
+
         $builder
 
             ->add('assignDoctor', EntityType::class, [
                 'required'    => false,
                 'class' => Particular::class,
-                'property' => 'referred',
+                'choice_label' => 'referred',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where('e.hospitalConfig ='.$this->hospitalConfig->getId())
@@ -48,7 +43,7 @@ class InvoiceParticularType extends AbstractType
                 'attr'=>['class'=>'span12 select-custom'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => ['In-progress' => 'In-progress','Done' => 'Done', 'Damage' => 'Damage', 'Impossible' => 'Impossible'],
+                'choices' => ['In-progress' => 'In-progress', 'Done' => 'Done', 'Damage' => 'Damage', 'Impossible' => 'Impossible'],
             ])
             ->add('comment',TextareaType::class, ['attr'=>['class'=>'m-wrap span12','rows'=>3,'placeholder'=>'Add any comment','autocomplete'=>'off']])
         ;
@@ -59,6 +54,10 @@ class InvoiceParticularType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'hospitalConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => InvoiceParticular::class
         ]);
@@ -71,7 +70,5 @@ class InvoiceParticularType extends AbstractType
     {
         return 'appstore_bundle_hospitalbundle_invoice_particular';
     }
-
-
 
 }

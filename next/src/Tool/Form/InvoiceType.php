@@ -27,8 +27,8 @@ class InvoiceType extends AbstractType
             ->add('globalOption', EntityType::class, [
                     'required'    => false,
                     'class' => GlobalOption::class,
-                    'empty_value' => '---Select Domain ---',
-                    'property' => 'name',
+                    'placeholder' => '---Select Domain ---',
+                    'choice_label' => 'name',
                     'attr'     =>['id' => '' , 'class' => 'm-wrap span12 select2'],
                     'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('s')
                         ->andWhere("s.status = 1")

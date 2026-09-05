@@ -16,11 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AccessoriesStockType extends AbstractType
 {
+    protected $medicineConfig;
 
-
-    public function __construct(private readonly MedicineConfig $medicineConfig)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -28,6 +25,8 @@ class AccessoriesStockType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->medicineConfig = $options['medicineConfig'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 autoComplete2Medicine','placeholder'=>'Enter medicine,herbal,non-medicine,surgery etc'],
                 'constraints' =>[
@@ -42,8 +41,8 @@ class AccessoriesStockType extends AbstractType
             ->add('unit', EntityType::class, [
                 'required'    => false,
                 'class' => ProductUnit::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a unit ---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a unit ---',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -52,8 +51,8 @@ class AccessoriesStockType extends AbstractType
             ->add('rackNo', EntityType::class, [
                 'required'    => false,
                 'class' => MedicineParticular::class,
-                'empty_value' => '---Choose a rack position ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a rack position ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12 inputs'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->join("e.particularType","pt")
@@ -65,8 +64,8 @@ class AccessoriesStockType extends AbstractType
                 'required'    => false,
                 'group_by'  => 'particularType.name',
                 'class' => MedicineParticular::class,
-                'empty_value' => '---Select herbal/accessories brand ---',
-                'property' => 'name',
+                'placeholder' => '---Select herbal/accessories brand ---',
+                'choice_label' => 'name',
                 'choice_translation_domain' => true,
                 'attr'=>['class'=>'m-wrap span12 inputs'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -85,6 +84,10 @@ class AccessoriesStockType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'medicineConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicineStock::class
         ]);

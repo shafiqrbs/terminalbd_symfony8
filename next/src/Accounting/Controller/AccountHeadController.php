@@ -2,6 +2,7 @@
 
 namespace App\Accounting\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Knp\Component\Pager\PaginatorInterface;
@@ -99,7 +100,7 @@ class AccountHeadController extends AbstractController
      */
     private function createCreateForm(AccountHead $entity)
     {
-        $form = $this->createForm(new AccountHeadSubType(), $entity, [
+        $form = $this->createForm(AccountHeadSubType::class, $entity, [
             'action' => $this->generateUrl('accounthead_create'),
             'method' => 'POST',
             'attr' => [
@@ -176,7 +177,7 @@ class AccountHeadController extends AbstractController
      */
     private function createEditForm(AccountHead $entity)
     {
-        $form = $this->createForm(new AccountHeadType(), $entity, [
+        $form = $this->createForm(AccountHeadType::class, $entity, [
             'action' => $this->generateUrl('accounthead_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -253,7 +254,7 @@ class AccountHeadController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('accounthead_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

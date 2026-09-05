@@ -74,7 +74,7 @@ class SalesImportController extends AbstractController
      */
     private function createCreateForm(SalesImport $entity)
     {
-        $form = $this->createForm(new SalesImportType(), $entity, [
+        $form = $this->createForm(SalesImportType::class, $entity, [
             'action' => $this->generateUrl('inventory_salesimport_create'),
             'method' => 'POST',
         ]);
@@ -146,7 +146,7 @@ class SalesImportController extends AbstractController
      */
     private function createEditForm(SalesImport $entity)
     {
-        $form = $this->createForm(new SalesImportType(), $entity, [
+        $form = $this->createForm(SalesImportType::class, $entity, [
             'action' => $this->generateUrl('inventory_salesimport_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);

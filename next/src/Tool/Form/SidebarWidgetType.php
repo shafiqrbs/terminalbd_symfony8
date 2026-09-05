@@ -33,7 +33,7 @@ class SidebarWidgetType extends AbstractType
                 'multiple'      =>true,
                 'expanded'      =>true,
                 'class'         => Page::class,
-                'property'      => 'name',
+                'choice_label'      => 'name',
                 'attr'          =>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                 ->where("e.status = 1")
@@ -45,7 +45,7 @@ class SidebarWidgetType extends AbstractType
                 'multiple'      =>true,
                 'expanded'      =>true,
                 'class'         => Module::class,
-                'property'      => 'name',
+                'choice_label'      => 'name',
                 'attr'          =>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('c')
                 ->andWhere("c.status = 1")

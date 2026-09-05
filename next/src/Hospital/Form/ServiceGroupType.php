@@ -31,9 +31,9 @@ class ServiceGroupType extends AbstractType
             ->add('service', EntityType::class, [
                 'required'    => false,
                 'class' => Service::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
-                'empty_value' => '---Select service group---',
+                'placeholder' => '---Select service group---',
                 'constraints' =>[
                     new NotBlank(message: 'Select service type')
                 ]

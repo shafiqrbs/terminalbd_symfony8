@@ -21,10 +21,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EventType extends AbstractType
 {
+    protected $globalOption;
+    protected $location;
 
-    public function __construct(private $globalOption, private readonly LocationRepository $location)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -32,6 +31,9 @@ class EventType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter title'],
                 'constraints' =>[
@@ -81,8 +83,8 @@ class EventType extends AbstractType
             ->add('photo_gallery', EntityType::class, [
                 'required'    => false,
                 'class' => PhotoGallery::class,
-                'empty_value' => '---Select Photo Gallery---',
-                'property' => 'name',
+                'placeholder' => '---Select Photo Gallery---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->andWhere("o.status = 1")
@@ -93,29 +95,28 @@ class EventType extends AbstractType
             ->add('longitude',TextType::class, ['attr'=>['class'=>'m-wrap span12']])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span12'],
                 'class' => Location::class,
                 'constraints' =>[
                     new NotBlank(message: 'Select customer location')
                 ],
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('eventType', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'empty_value' => '---Select Event Type ---',
+                'placeholder' => '---Select Event Type ---',
                 'expanded'      =>false,
                 'required'    => false,
                 'multiple'      =>false,
-                'choices' => ['Ongoing' => 'Ongoing',  'Upcoming' => 'Upcoming'],
+                'choices' => ['Ongoing' => 'Ongoing', 'Upcoming' => 'Upcoming'],
             ])
             ->add('moduleCategory', EntityType::class, [
                 'required'    => false,
                 'class' => ModuleCategory::class,
-                'empty_value' => '---Select event category ---',
-                'property' => 'name',
+                'placeholder' => '---Select event category ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
 	                    ->join('o.module', 'module')
@@ -132,6 +133,11 @@ class EventType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Page::class
         ]);

@@ -38,12 +38,7 @@ class UserType extends AbstractType
                 'expanded'      =>false,
                 'required'    => true,
                 'multiple'      =>false,
-                'choices' => [
-                    'employee' => 'Employee',
-                    'stakeholder' => 'Stakeholder',
-                    'marketing' => 'Marketing Executive',
-                    'other' => 'Other',
-                ],
+                'choices' => ['Employee' => 'employee', 'Stakeholder' => 'stakeholder', 'Marketing Executive' => 'marketing', 'Other' => 'other'],
             ]);
     }
     

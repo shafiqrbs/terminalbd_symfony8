@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -74,16 +75,12 @@ class AppModuleController extends AbstractController
     private function createCreateForm(AppModule $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AppModuleType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AppModuleType($globalOption), $entity, array(
-            'action' => $this->generateUrl('appmodule_create'),
+        $form = $this->createForm(AppModuleType::class, $entity, array('action' => $this->generateUrl('appmodule_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -158,16 +155,12 @@ class AppModuleController extends AbstractController
     private function createEditForm(AppModule $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AppModuleType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AppModuleType($globalOption), $entity, array(
-            'action' => $this->generateUrl('appmodule_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AppModuleType::class, $entity, array('action' => $this->generateUrl('appmodule_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
 
         return $form;
     }
@@ -230,7 +223,7 @@ class AppModuleController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('appmodule_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

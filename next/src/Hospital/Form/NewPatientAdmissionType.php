@@ -2,6 +2,8 @@
 
 namespace App\Hospital\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use App\DomainUser\Form\CustomerForHospitalAdmissionType;
 use App\DomainUser\Form\CustomerForHospitalNewAdmissionType;
 use App\DomainUser\Form\CustomerForHospitalType;
@@ -15,11 +17,13 @@ use App\Location\Repository\LocationRepository;
 use App\Tool\Entity\GlobalOption;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class NewPatientAdmissionType extends AbstractType
 {
+    protected $cabins;
+
 
     /** @var  LocationRepository */
     private $location;
@@ -31,17 +35,6 @@ class NewPatientAdmissionType extends AbstractType
     private $globalOption;
 
     /** @var  array */
-    private $cabins;
-
-
-    function __construct(GlobalOption $globalOption , HmsCategoryRepository $emCategory ,  LocationRepository $location, $cabins)
-    {
-        $this->location         = $location;
-        $this->emCategory       = $emCategory;
-        $this->globalOption     = $globalOption;
-        $this->cabins     = $cabins;
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -49,18 +42,23 @@ class NewPatientAdmissionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->emCategory = $options['emCategory'];
+        $this->location = $options['location'];
+        $this->cabins = $options['cabins'];
+
         $builder
 
-            ->add('disease','textarea', array('attr'=>array('class'=>'m-wrap span12','rows' => 6,'placeholder'=>'Disease description'),
+            ->add('disease', TextareaType::class, array('attr'=>array('class'=>'m-wrap span12','rows' => 6,'placeholder'=>'Disease description'),
             ))
-            ->add('cabin', 'entity', array(
+            ->add('cabin', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Hospital\Entity\Particular',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'group_by'  => 'serviceGroup.name',
                 'choice_translation_domain' => true,
                 'attr'=>array('class'=>'span12 select2 invoiceCabinBooking m-wrap'),
-                'empty_value' => '---Select cabin/ward no---',
+                'placeholder' => '---Select cabin/ward no---',
                 'constraints' =>array(
                     new NotBlank(array('message'=>'Please select cabin/ward no'))
                 ),
@@ -76,11 +74,11 @@ class NewPatientAdmissionType extends AbstractType
                     return $qb;
                 }
             ))
-            ->add('diseasesProfile', 'entity', array(
+            ->add('diseasesProfile', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\Hospital\Entity\HmsServiceGroup',
-                'property' => 'name',
-                'empty_value' => '---Choose a diseases profile---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a diseases profile---',
                 'attr'=>array('class'=>'span12 m-wrap select2'),
                 'constraints' =>array(
                     new NotBlank(array('message'=>'Select diseases profile')),
@@ -93,21 +91,21 @@ class NewPatientAdmissionType extends AbstractType
                         ->orderBy("e.name","ASC");
                 }
             ))
-            ->add('department', 'entity', array(
+            ->add('department', EntityType::class, array(
                 'required'    => true,
-                'empty_value' => '---Choose a department---',
+                'placeholder' => '---Choose a department---',
                 'attr'=>array('class'=>'m-wrap span12 select2'),
                 'class' => 'App\Hospital\Entity\HmsCategory',
-                'property' => 'nestedLabel',
+                'choice_label' => 'nestedLabel',
                 'choices'=> $this->DepartmentChoiceList()
             ))
 
-            ->add('referredDoctor', 'entity', array(
+            ->add('referredDoctor', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Hospital\Entity\Particular',
-                'property' => 'referredName',
+                'choice_label' => 'referredName',
                 'attr'=>array('class'=>'span12 select2 m-wrap'),
-                'empty_value' => '--- Choose Referred ---',
+                'placeholder' => '--- Choose Referred ---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -117,15 +115,15 @@ class NewPatientAdmissionType extends AbstractType
                 }
             ))
 
-            ->add('assignDoctor', 'entity', array(
+            ->add('assignDoctor', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\Hospital\Entity\Particular',
-                'property' => 'doctor',
+                'choice_label' => 'doctor',
                 'constraints' =>array(
                     new NotBlank(array('message'=>'Select Consultant/Doctor')),
                 ),
                 'attr'=>array('class'=>'span12 select2 m-wrap'),
-                'empty_value' => '--- Choose assign doctor ---',
+                'placeholder' => '--- Choose assign doctor ---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -135,12 +133,12 @@ class NewPatientAdmissionType extends AbstractType
                 }
             ))
 
-            ->add('anesthesiaDoctor', 'entity', array(
+            ->add('anesthesiaDoctor', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Hospital\Entity\Particular',
-                'property' => 'doctor',
+                'choice_label' => 'doctor',
                 'attr'=>array('class'=>'span12 select2 m-wrap'),
-                'empty_value' => '--- Choose anesthesia doctor ---',
+                'placeholder' => '--- Choose anesthesia doctor ---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -149,12 +147,12 @@ class NewPatientAdmissionType extends AbstractType
                         ->orderBy("b.name", "ASC");
                 }
             ))
-            ->add('assistantDoctor', 'entity', array(
+            ->add('assistantDoctor', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Hospital\Entity\Particular',
-                'property' => 'doctor',
+                'choice_label' => 'doctor',
                 'attr'=>array('class'=>'span12 select2 m-wrap'),
-                'empty_value' => '--- Choose assistant doctor ---',
+                'placeholder' => '--- Choose assistant doctor ---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -166,12 +164,12 @@ class NewPatientAdmissionType extends AbstractType
         ;
         if( $this->globalOption->getHospitalConfig()->isMarketingExecutive() == 1){
 
-            $builder->add('marketingExecutive', 'entity', array(
+            $builder->add('marketingExecutive', EntityType::class, array(
                 'required'    => false,
                 'class' => 'App\Hospital\Entity\Particular',
-                'property' => 'marketingExecutiveEmployee',
+                'choice_label' => 'marketingExecutiveEmployee',
                 'attr'=>array('class'=>'span12 select2 m-wrap marketingExecutive'),
-                'empty_value' => '--- Choose Marketing Executive ---',
+                'placeholder' => '--- Choose Marketing Executive ---',
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('b')
                         ->where("b.status = 1")
@@ -181,16 +179,21 @@ class NewPatientAdmissionType extends AbstractType
                 }
             ));
         }
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into CustomerForHospitalNewAdmissionType::configureOptions() and pass them as form options: $this->location 
-        $builder->add('customer', new CustomerForHospitalNewAdmissionType($this->location ));
+        $builder->add('customer', CustomerForHospitalNewAdmissionType::class, ['location' => $this->location]);
     }
     
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'emCategory' => null,
+            'location' => null,
+            'cabins' => null,
+        ]);
+
         $resolver->setDefaults(array(
             'data_class' => 'App\Hospital\Entity\Invoice'
         ));
@@ -199,7 +202,7 @@ class NewPatientAdmissionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'invoice';
     }
@@ -221,6 +224,5 @@ class NewPatientAdmissionType extends AbstractType
         return $this->emCategory->getParentCategoryTree($parent = 7 /** Department */);
 
     }
-
 
 }

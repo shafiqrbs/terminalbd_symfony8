@@ -127,7 +127,7 @@ class SalesReturnController extends AbstractController
      */
     private function createEditForm(SalesReturn $entity)
     {
-        $form = $this->createForm(new SalesReturnType(), $entity, [
+        $form = $this->createForm(SalesReturnType::class, $entity, [
             'action' => $this->generateUrl('inventory_salesreturn_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);

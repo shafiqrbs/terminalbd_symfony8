@@ -91,7 +91,7 @@ class MenuCustomController extends AbstractController
      */
     private function createCreateForm(MenuCustom $entity)
     {
-        $form = $this->createForm(new MenuCustomType(), $entity, [
+        $form = $this->createForm(MenuCustomType::class, $entity, [
             'action' => $this->generateUrl('menucustom_create'),
             'method' => 'POST',
             'attr' => [
@@ -167,7 +167,7 @@ class MenuCustomController extends AbstractController
      */
     private function createEditForm(MenuCustom $entity)
     {
-        $form = $this->createForm(new MenuCustomType(), $entity, [
+        $form = $this->createForm(MenuCustomType::class, $entity, [
             'action' => $this->generateUrl('menucustom_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

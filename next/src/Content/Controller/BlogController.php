@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -99,16 +100,12 @@ class BlogController extends AbstractController
 
         $globalOption = $this->getUser()->getGlobalOption();
         $module = $this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'blog'));
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BlogType::configureOptions() and pass them as form options: $globalOption,$module), $entity, array(
-        $form = $this->createForm(new BlogType($globalOption,$module), $entity, array(
-            'action' => $this->generateUrl('blog_create', array('id' => $entity->getId())),
+        $form = $this->createForm(BlogType::class, $entity, array('action' => $this->generateUrl('blog_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'module' => $module));
 
         return $form;
     }
@@ -177,16 +174,12 @@ class BlogController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $module = $this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'blog'));
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BlogType::configureOptions() and pass them as form options: $globalOption,$module), $entity, array(
-        $form = $this->createForm(new BlogType($globalOption,$module), $entity, array(
-            'action' => $this->generateUrl('blog_update', array('id' => $entity->getId())),
+        $form = $this->createForm(BlogType::class, $entity, array('action' => $this->generateUrl('blog_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'module' => $module));
 
         return $form;
     }
@@ -256,7 +249,7 @@ class BlogController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('blog_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm();
     }
 

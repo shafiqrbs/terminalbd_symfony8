@@ -15,12 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ParticularType extends AbstractType
 {
-
-
-
-    public function __construct(private readonly DpsConfig  $dpsConfig)
-    {
-    }
+    protected $dpsConfig;
 
 
     /**
@@ -29,6 +24,8 @@ class ParticularType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->dpsConfig = $options['dpsConfig'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter service name'],
@@ -39,11 +36,11 @@ class ParticularType extends AbstractType
             ->add('service', EntityType::class, [
                 'required'    => false,
                 'class' => DpsService::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'constraints' =>[
                     new NotBlank(message: 'Please select required')
                 ],
-                'empty_value' => '---Choose a service ---',
+                'placeholder' => '---Choose a service ---',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                 ->where("e.status = 1")
@@ -61,6 +58,10 @@ class ParticularType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'dpsConfig' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => DpsParticular::class
         ]);
     }
@@ -72,6 +73,5 @@ class ParticularType extends AbstractType
     {
         return 'appstore_bundle_hospitalbundle_particular';
     }
-
 
 }

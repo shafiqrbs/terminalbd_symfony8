@@ -23,18 +23,14 @@ class PaymentSalaryType extends AbstractType
 
     public  $user;
 
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
-
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->user = $options['user'];
+
         $builder
 
             ->add('paidAmount',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'Pay amount']])
@@ -46,45 +42,20 @@ class PaymentSalaryType extends AbstractType
                 'constraints' =>[
                     new NotBlank(message: 'Please choose required')
                 ],
-                'choices' => [
-                    'January'       => 'January',
-                    'February'      => 'February',
-                    'March'         => 'March',
-                    'April'         => 'April',
-                    'May'           => 'May',
-                    'June'          => 'June',
-                    'July'          => 'July',
-                    'August'        => 'August',
-                    'September'     => 'September',
-                    'October'       => 'October',
-                    'November'      => 'November',
-                    'December'      => 'December',
-                ],
+                'choices' => ['January' => 'January', 'February' => 'February', 'March' => 'March', 'April' => 'April', 'May' => 'May', 'June' => 'June', 'July' => 'July', 'August' => 'August', 'September' => 'September', 'October' => 'October', 'November' => 'November', 'December' => 'December'],
             ])
             ->add('salaryYear', ChoiceType::class, [
                 'attr'=>['class'=>'span4 select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Please choose required')
                 ],
-                'choices' => [
-                    '2016'       => '2016',
-                    '2017'      => '2017',
-                    '2018'      => '2018',
-                    '2019'      => '2019',
-                    '2020'      => '2020',
-                    '2021'      => '2021',
-                    '2022'      => '2022',
-                    '2023'      => '2023',
-                    '2024'      => '2024',
-                    '2025'      => '2025',
-
-                ],
+                'choices' => ['2016' => '2016', '2017' => '2017', '2018' => '2018', '2019' => '2019', '2020' => '2020', '2021' => '2021', '2022' => '2022', '2023' => '2023', '2024' => '2024', '2025' => '2025'],
             ])
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a transaction method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a transaction method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2 transactionMethod'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -97,8 +68,8 @@ class PaymentSalaryType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.globalOption =".$this->user->getGlobalOption()->getId()),
@@ -107,8 +78,8 @@ class PaymentSalaryType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.globalOption =".$this->user->getGlobalOption()->getId()),
@@ -116,8 +87,8 @@ class PaymentSalaryType extends AbstractType
             ->add('salarySetting', EntityType::class, [
                 'required'    => true,
                 'class' => SalarySetting::class,
-                'empty_value' => '---Select invoice---',
-                'property' => 'invoice',
+                'placeholder' => '---Select invoice---',
+                'choice_label' => 'invoice',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status  =1")
@@ -132,6 +103,10 @@ class PaymentSalaryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'user' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => PaymentSalary::class
         ]);

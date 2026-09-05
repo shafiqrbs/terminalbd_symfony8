@@ -105,16 +105,12 @@ class AccountBalanceTransferController extends AbstractController
     private function createCreateForm(AccountBalanceTransfer $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountBalanceTransferType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountBalanceTransferType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_balancetransfer_create'),
+        $form = $this->createForm(AccountBalanceTransferType::class, $entity, array('action' => $this->generateUrl('account_balancetransfer_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
       return $form;
     }
 

@@ -11,6 +11,8 @@ imports:
     - { resource: services_legacy.yaml }
 
 parameters:
+    # Was fos_user.resetting.token_ttl; ResettingController still reads it.
+    fos_user.resetting.token_ttl: '%env(int:RESETTING_TOKEN_TTL)%'
 
 services:
     _defaults:
@@ -23,3 +25,18 @@ services:
     # and this alias removed once none remain.
     Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
     Psr\Container\ContainerInterface: '@service_container'
+
+    # Replaces fos_user.mailer. The from address was a FOSUserBundle default,
+    # never set in app/config/bundles/fos_user.yml, so it stays configurable.
+    App\User\Mailer\ResettingMailer:
+        arguments:
+            $fromEmail: '%env(MAILER_FROM)%'
+
+    # fos_user.resetting.token_ttl was a bundle parameter; the controller still
+    # honours it when deciding whether a reset was already requested.
+    App\User\Controller\ResettingController:
+        autowire: true
+        autoconfigure: true
+        arguments:
+            $tokenTtl: '%fos_user.resetting.token_ttl%'
+        tags: ['controller.service_arguments']

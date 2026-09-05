@@ -21,13 +21,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 class MyProfileType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption, private readonly LocationRepository $location, private readonly DesignationRepository $designation)
-    {
-    }
+    protected $globalOption;
+    protected $location;
+    protected $designation;
 
 
     /**
@@ -36,6 +34,10 @@ class MyProfileType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+        $this->designation = $options['designation'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter your full name'],
                 'constraints' =>[
@@ -49,8 +51,8 @@ class MyProfileType extends AbstractType
             ->add('designation', EntityType::class, [
                 'required'    => true,
                 'class' => Designation::class,
-                'empty_value' => '---Choose a Designation---',
-                'property' => 'name',
+                'placeholder' => '---Choose a Designation---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span1q select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status =1")
@@ -64,8 +66,8 @@ class MyProfileType extends AbstractType
             ->add('bank', EntityType::class, [
                 'required'    => true,
                 'class' => Bank::class,
-                'empty_value' => '---Choose a Bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a Bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->orderBy("b.name", "ASC"),
@@ -74,25 +76,30 @@ class MyProfileType extends AbstractType
             ->add('accountNo',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter your bank account no']])
             ->add('location', EntityType::class, [
                 'required'    => false,
-                'empty_value' => '---Select Location---',
+                'placeholder' => '---Select Location---',
                 'attr'=>['class'=>'select2 span12'],
                 'class' => Location::class,
                 'constraints' =>[
                     new NotBlank(message: 'Select User Location')
                 ],
                 'choices'=> $this->LocationChoiceList(),
-                'choices_as_values' => true,
                 'choice_label' => 'nestedLabel',
             ])
             ->add('bloodGroup', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'choices' => ['A+' => 'A+',  'A-' => 'A-','B+' => 'B+',  'B-' => 'B-',  'O+' => 'O+',  'O-' => 'O-',  'AB+' => 'AB+',  'AB-' => 'AB-'],
+                'choices' => ['A+' => 'A+', 'A-' => 'A-', 'B+' => 'B+', 'B-' => 'B-', 'O+' => 'O+', 'O-' => 'O-', 'AB+' => 'AB+', 'AB-' => 'AB-'],
             ])
             ->add('file');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+            'designation' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Profile::class
         ]);

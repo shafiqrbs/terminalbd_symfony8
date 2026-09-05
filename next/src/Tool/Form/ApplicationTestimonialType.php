@@ -58,7 +58,7 @@ class ApplicationTestimonialType extends AbstractType
                 'expanded'      =>false,
                 'multiple'      =>true,
                 'class' => AppModule::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('s')
                     ->andWhere("s.status = 1")

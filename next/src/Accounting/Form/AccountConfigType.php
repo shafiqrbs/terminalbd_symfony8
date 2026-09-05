@@ -21,23 +21,19 @@ class AccountConfigType extends AbstractType
 
     public  $global;
 
-    public function __construct(GlobalOption $global)
-    {
-        $this->global = $global;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->global = $options['global'];
+
         $builder
             ->add('capitalInvestor', EntityType::class, [
                 'class'     => AccountHead::class,
-                'property'  => 'name',
-                'empty_value' => '---Choose a capital investor---',
+                'choice_label'  => 'name',
+                'placeholder' => '---Choose a capital investor---',
                 'attr'=>['class'=>'span12 m-wrap select2'],
                 'choice_translation_domain' => true,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -57,11 +53,11 @@ class AccountConfigType extends AbstractType
             ])
             ->add('bodyFontSize', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'choices' => ['' => 'Font Size','10px' => '10px',  '11px' => '11px','12px' => '12px','13px' => '13px','14px' => '14px', '15px' => '15px', '16px' => '16px', '17px' => '17px','18px' => '18px',  '20px' => '20px', '22px' => '22px','24px' => '24px', '26px' => '26px',  '28px' => '28px','30px' => '39px','32px' => '32px','34px' => '34px','36px' => '36px', '38px' => '38px', '40px' => '40px','42px' => '42px',  '44px' => '44px', '46px' => '46px','48px' => '48px'],
+                'choices' => ['Font Size' => '', '10px' => '10px', '11px' => '11px', '12px' => '12px', '13px' => '13px', '14px' => '14px', '15px' => '15px', '16px' => '16px', '17px' => '17px', '18px' => '18px', '20px' => '20px', '22px' => '22px', '24px' => '24px', '26px' => '26px', '28px' => '28px', '39px' => '30px', '32px' => '32px', '34px' => '34px', '36px' => '36px', '38px' => '38px', '40px' => '40px', '42px' => '42px', '44px' => '44px', '46px' => '46px', '48px' => '48px'],
             ])
             ->add('businessMode', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span12'],
-                'choices' => ['Proprietorship' => 'Proprietorship',  'Partnership' => 'Partnership'],
+                'choices' => ['Proprietorship' => 'Proprietorship', 'Partnership' => 'Partnership'],
             ])
             ->add('borderWidth',TextType::class,['attr'=>['class'=>'m-wrap numeric span8','maxLength'=>2]])
             ->add('address',TextareaType::class,['attr'=>['class'=>'m-wrap span12','row'=>5]])
@@ -80,6 +76,10 @@ class AccountConfigType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'global' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => AccountingConfig::class
         ]);

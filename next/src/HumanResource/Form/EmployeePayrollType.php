@@ -2,7 +2,6 @@
 
 namespace App\HumanResource\Form;
 
-
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Tool\Entity\Bank;
@@ -20,14 +19,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmployeePayrollType extends AbstractType
 {
+    protected $user;
+    protected $global;
+    protected $location;
+
 
     /** @var  GlobalOption */
     private $option;
-
-    public function __construct( private readonly UserRepository $user , GlobalOption $option , private readonly LocationRepository $location)
-    {
-        $this->global = $option;
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -35,6 +33,10 @@ class EmployeePayrollType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->user = $options['user'];
+        $this->global = $options['option'];
+        $this->location = $options['location'];
+
 
         $builder
 
@@ -58,9 +60,9 @@ class EmployeePayrollType extends AbstractType
             ->add('bank', EntityType::class, [
                 'required'    => false,
                 'class' => Bank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Select Bank Name---',
+                'placeholder' => '---Select Bank Name---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->orderBy("e.name", "ASC")
             ])
@@ -70,12 +72,8 @@ class EmployeePayrollType extends AbstractType
                 'attr'=>['class'=>'m-wrap span8'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'empty_value' => '---Select Mobile Banking---',
-                'choices' => [
-                    'Bkash' => 'Bkash',
-                    'Rocket' => 'Rocket',
-                    'Nagod' => 'Nagod',
-                ],
+                'placeholder' => '---Select Mobile Banking---',
+                'choices' => ['Bkash' => 'Bkash', 'Rocket' => 'Rocket', 'Nagod' => 'Nagod'],
             ])
              ->add('salaryType', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span8'],
@@ -84,13 +82,8 @@ class EmployeePayrollType extends AbstractType
                  'constraints' =>[
                      new NotBlank(message: 'Please Choose Salary Type'),
                  ],
-                'empty_value' => '-Choose Salary Type-',
-                'choices' => [
-                    'fixed' => 'Fixed',
-                    'honourable' => 'Honourable',
-                    'day' => 'Day',
-                    'hour' => 'Hour',
-                ],
+                'placeholder' => '-Choose Salary Type-',
+                'choices' => ['Fixed' => 'fixed', 'Honourable' => 'honourable', 'Day' => 'day', 'Hour' => 'hour'],
             ])
             ->add('paymentMethod', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap span8'],
@@ -99,15 +92,9 @@ class EmployeePayrollType extends AbstractType
                 'constraints' =>[
                     new NotBlank(message: 'Please Choose Payment Method'),
                 ],
-                'empty_value' => '---Choose Payment Method---',
-                'choices' => [
-                    'Cash' => 'Cash in Hand',
-                    'Bank' => 'Bank',
-                    'Mobile Banking' => 'Mobile Banking',
-
-                ],
+                'placeholder' => '---Choose Payment Method---',
+                'choices' => ['Cash in Hand' => 'Cash', 'Bank' => 'Bank', 'Mobile Banking' => 'Mobile Banking'],
             ]);
-
 
     }
     
@@ -116,6 +103,12 @@ class EmployeePayrollType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'user' => null,
+            'option' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => EmployeePayroll::class
         ]);

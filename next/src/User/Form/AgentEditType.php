@@ -2,33 +2,28 @@
 
 namespace App\User\Form;
 
+use App\Form\ChoiceList;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Doctrine\ORM\EntityRepository;
 use App\Location\Repository\LocationRepository;
 use App\Tool\Entity\GlobalOption;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 class AgentEditType extends AbstractType
 {
+    protected $location;
 
 
     /** @var  GlobalOption */
     private $globalOption;
 
     /** @var  LocationRepository */
-    private $location;
-
-
-    function __construct(GlobalOption $globalOption, LocationRepository $location)
-    {
-        $this->globalOption = $globalOption;
-        $this->location = $location;
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -36,9 +31,12 @@ class AgentEditType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
 
-            ->add('roles', 'choice', array(
+            ->add('roles', ChoiceType::class, array(
                 'attr'=>array('class'=>'m-wrap span12  check-list'),
                 'required'=>true,
                 'constraints' =>array(
@@ -47,33 +45,36 @@ class AgentEditType extends AbstractType
                 'multiple'    => true,
                 'expanded'  => true,
                 'empty_data'  => null,
-                'choices'   => $this->getAccessRoleGroup())
+                'choices'   => ChoiceList::flip($this->getAccessRoleGroup()))
             )
 
-            ->add('username','text', array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off' ,'placeholder'=>'Enter your user name'),
+            ->add('username', TextType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off' ,'placeholder'=>'Enter your user name'),
                     'constraints' =>array(
                         new NotBlank(array('message'=>'Please enter your user name')),
                         new Length(array('max'=>200))
                     ))
             )
             ->add('enabled')
-            ->add('email','text', array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter your valid email address'),
+            ->add('email', TextType::class, array('attr'=>array('class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter your valid email address'),
                     'constraints' =>array(
                         new NotBlank(array('message'=>'Please enter user email address')),
                         new Length(array('max'=>200))
             ))
             );
-            // TODO(migration): SF3+ takes a form type class-string, not an instance.
-            // Move these constructor arguments into AgentProfileType::configureOptions() and pass them as form options: $this->globalOption,$this->location
-            $builder->add('profile', new AgentProfileType($this->globalOption,$this->location));
+            $builder->add('profile', AgentProfileType::class, ['location' => $this->globalOption]);
 
     }
 
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults(array(
             'data_class' => 'App\User\Entity\User'
         ));
@@ -82,13 +83,12 @@ class AgentEditType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'Core_userbundle_user';
     }
 
     public function getAccessRoleGroup(){
-
 
         $array = array();
 

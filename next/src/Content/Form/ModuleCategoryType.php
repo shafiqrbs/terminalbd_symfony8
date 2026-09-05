@@ -16,10 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ModuleCategoryType extends AbstractType
 {
+    protected $globalOption;
 
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -27,6 +25,8 @@ class ModuleCategoryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
 
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 tooltips','placeholder'=>'Enter Name'],
@@ -40,7 +40,7 @@ class ModuleCategoryType extends AbstractType
                     new NotBlank(message: 'Please input required')
                 ],
                 'class' => Module::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->join('o.siteSettings','m')
@@ -59,6 +59,10 @@ class ModuleCategoryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => ModuleCategory::class
         ]);

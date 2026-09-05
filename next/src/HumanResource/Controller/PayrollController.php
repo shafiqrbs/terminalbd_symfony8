@@ -106,16 +106,12 @@ class PayrollController extends AbstractController
     private function createCreateForm(Payroll $entity)
     {
         $option = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PayrollType::configureOptions() and pass them as form options: $option), $entity, array(
-        $form = $this->createForm(new PayrollType($option), $entity, array(
-            'action' => $this->generateUrl('payroll_create'),
+        $form = $this->createForm(PayrollType::class, $entity, array('action' => $this->generateUrl('payroll_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $option));
         return $form;
     }
 

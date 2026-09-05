@@ -75,7 +75,7 @@ class PortalBankAccountController extends AbstractController
      */
     private function createCreateForm(PortalBankAccount $entity)
     {
-        $form = $this->createForm(new PortalBankAccountType(), $entity, [
+        $form = $this->createForm(PortalBankAccountType::class, $entity, [
             'action' => $this->generateUrl('bankaccount_create'),
             'method' => 'POST',
         ]);
@@ -144,7 +144,7 @@ class PortalBankAccountController extends AbstractController
      */
     private function createEditForm(PortalBankAccount $entity)
     {
-        $form = $this->createForm(new PortalBankAccountType(), $entity, [
+        $form = $this->createForm(PortalBankAccountType::class, $entity, [
             'action' => $this->generateUrl('bankaccount_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);

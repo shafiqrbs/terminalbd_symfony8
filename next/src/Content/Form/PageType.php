@@ -20,9 +20,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PageType extends AbstractType
 {
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
+    protected $globalOption;
+
 
     /**
      * @param FormBuilderInterface $builder
@@ -30,6 +29,8 @@ class PageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
 
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 tooltips','placeholder'=>'Enter Name'],
@@ -48,14 +49,14 @@ class PageType extends AbstractType
             ->add('galleryPosition', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
                 'required'    => false,
-                'empty_value' => '---Select Gallery Position---',
-                'choices' => ['top' => 'Top','bottom' => 'Bottom']
+                'placeholder' => '---Select Gallery Position---',
+                'choices' => ['Top' => 'top', 'Bottom' => 'bottom']
             ])
             ->add('galleryType', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
                 'required'    => false,
-                'empty_value' => '---Select Gallery Type---',
-                'choices' => ['thumb' => 'Thumb','carousel' => 'Carousel','thumbSlider' => 'Thumb Slider'],
+                'placeholder' => '---Select Gallery Type---',
+                'choices' => ['Thumb' => 'thumb', 'Carousel' => 'carousel', 'Thumb Slider' => 'thumbSlider'],
             ])
             ->add('file',FileType::class, ['attr'=>['class'=>'default']])
             ->add('content',TextareaType::class, ['attr'=>['class'=>'span12 ckeditor m-wrap textarea-large','rows' => 30]])
@@ -64,8 +65,8 @@ class PageType extends AbstractType
             ->add('parent', EntityType::class, [
                 'required'    => false,
                 'class' => Page::class,
-                'empty_value' => '---Select parent page---',
-                'property' => 'name',
+                'placeholder' => '---Select parent page---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->where("o.status = 1")
@@ -75,8 +76,8 @@ class PageType extends AbstractType
             ->add('icon', EntityType::class, [
                 'required'    => false,
                 'class' => Icon::class,
-                'empty_value' => '---Select Icon---',
-                'property' => 'name',
+                'placeholder' => '---Select Icon---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->where("o.status = 1")
@@ -86,8 +87,8 @@ class PageType extends AbstractType
             ->add('photo_gallery', EntityType::class, [
                 'required'    => false,
                 'class' => PhotoGallery::class,
-                'empty_value' => '---Select Photo Gallery---',
-                'property' => 'name',
+                'placeholder' => '---Select Photo Gallery---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'select2 span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->where("o.status = 1")
@@ -105,6 +106,10 @@ class PageType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Page::class
         ]);

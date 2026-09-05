@@ -15,11 +15,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DomainSearchType extends AbstractType
 {
-
-    public function __construct(private readonly SyndicateRepository $em , LocationRepository $location)
-    {
-        $this->location = $location;
-    }
+    protected $em;
+    protected $location;
 
 
     /**
@@ -28,6 +25,8 @@ class DomainSearchType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->em = $options['em'];
+        $this->location = $options['location'];
 
 
             $builder
@@ -38,22 +37,19 @@ class DomainSearchType extends AbstractType
 
                 ->add('syndicate', EntityType::class, [
                     'required'    => true,
-                    'empty_value' => '---Select Business Sector---',
+                    'placeholder' => '---Select Business Sector---',
                     'attr'=>['class'=>'select2 span12'],
                     'class' => Syndicate::class,
                     'choices'=> $this->SyndicateChoiceList(),
-                    'choices_as_values' => true,
                     'choice_label' => 'nestedLabel',
                 ])
 
-
                 ->add('location', EntityType::class, [
                     'required'    => false,
-                    'empty_value' => '---Select Location---',
+                    'placeholder' => '---Select Location---',
                     'attr'=>['class'=>'select2 span12'],
                     'class' => Location::class,
                     'choices'=> $this->LocationChoiceList(),
-                    'choices_as_values' => true,
                     'choice_label' => 'nestedLabel',
                 ]);
 
@@ -64,6 +60,11 @@ class DomainSearchType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'em' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => GlobalOption::class
         ]);
@@ -92,5 +93,4 @@ class DomainSearchType extends AbstractType
 
     }
 }
-
 

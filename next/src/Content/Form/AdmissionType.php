@@ -16,16 +16,19 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AdmissionType extends AbstractType
 {
+    protected $user;
+    protected $branch;
 
-    public function __construct(private $user, private $branch)
-    {
-    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->user = $options['user'];
+        $this->branch = $options['branch'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter title'],
                 'constraints' =>[
@@ -58,7 +61,7 @@ class AdmissionType extends AbstractType
                 'multiple'      =>true,
                 'expanded'      =>true,
                 'attr'=>['class'=>''],
-                'choices' => ['Morning' => 'Morning',  'Afternoon' => 'Afternoon', 'Evening' => 'Evening'],
+                'choices' => ['Morning' => 'Morning', 'Afternoon' => 'Afternoon', 'Evening' => 'Evening'],
             ])
             ->add('tuitionFee',TextType::class, ['attr'=>['class'=>'m-wrap span12 ']])
             ->add('classDuration',TextType::class, ['attr'=>['class'=>'m-wrap span12 ']])
@@ -75,8 +78,8 @@ class AdmissionType extends AbstractType
             ->add('courseLevel', EntityType::class, [
                 'required'      => false,
                 'class'         => 'App\Tool\Entity\CourseLevel',
-                'empty_value' => '---Select course level---',
-                'property'      => 'name',
+                'placeholder' => '---Select course level---',
+                'choice_label'      => 'name',
                 'attr'          =>['class'=>'m-wrap span10 selectbox'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('c')
                     ->andWhere("c.status = 1")
@@ -85,8 +88,8 @@ class AdmissionType extends AbstractType
             ->add('course', EntityType::class, [
                 'required'      => false,
                 'class'         => 'App\Tool\Entity\Course',
-                'property'      => 'name',
-                'empty_value' => '---Select course---',
+                'choice_label'      => 'name',
+                'placeholder' => '---Select course---',
                 'attr'          =>['class'=>'selectbox span10'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('c')
                     ->andWhere("c.status = 1")
@@ -101,14 +104,13 @@ class AdmissionType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
                 'class' => 'App\Content\Entity\Branch',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr' => ['class' => ''],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.user = $this->user ")
             ]);
         }
-
 
     }
 
@@ -117,6 +119,11 @@ class AdmissionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'user' => null,
+            'branch' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => 'App\Content\Entity\Admission'
         ]);

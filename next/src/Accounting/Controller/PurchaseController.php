@@ -100,16 +100,12 @@ class PurchaseController extends AbstractController
     private function paymentCreateForm(AccountPurchase $entity)
     {
         $global = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PaymentPurchaseType::configureOptions() and pass them as form options: $global), $entity, array(
-        $form = $this->createForm(new PaymentPurchaseType($global), $entity, array(
-            'action' => $this->generateUrl('account_purchase_payment_create'),
+        $form = $this->createForm(PaymentPurchaseType::class, $entity, array('action' => $this->generateUrl('account_purchase_payment_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'global' => $global));
         return $form;
     }
 
@@ -240,17 +236,13 @@ class PurchaseController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $emHead = $this->em->getRepository(\App\Accounting\Entity\AccountHead::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PurchaseType::configureOptions() and pass them as form options: $globalOption,$emHead), $entity, array(
-        $form = $this->createForm(new PurchaseType($globalOption,$emHead), $entity, array(
-            'action' => $this->generateUrl('account_expense_purchase_update', array('id' => $entity->getId())),
+        $form = $this->createForm(PurchaseType::class, $entity, array('action' => $this->generateUrl('account_expense_purchase_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption, 'accountHead' => $emHead));
         return $form;
     }
 

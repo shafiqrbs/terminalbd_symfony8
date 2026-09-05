@@ -26,7 +26,7 @@ class SiteSettingAppType extends AbstractType
                 'expanded'      =>true,
                 'multiple'      =>true,
                 'class' => AppModule::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'check-list span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('m')
                     ->andWhere("m.status = 1")

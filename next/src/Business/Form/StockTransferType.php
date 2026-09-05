@@ -21,18 +21,14 @@ class StockTransferType extends AbstractType
     /** @var  HospitalConfig */
     public  $config;
 
-    public function __construct(BusinessConfig $config)
-    {
-        $this->config = $config;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->config = $options['config'];
+
 
         $builder
             ->add('businessParticular',
@@ -45,8 +41,8 @@ class StockTransferType extends AbstractType
             ->add('fromWearHouse', EntityType::class, [
                 'required'    => true,
                 'class' => WearHouse::class,
-                'empty_value' => '---Choose a from wearhouse ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a from wearhouse ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[ new NotBlank(message: 'Please select your vendor name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -56,8 +52,8 @@ class StockTransferType extends AbstractType
             ->add('toWearHouse', EntityType::class, [
                 'required'    => true,
                 'class' => WearHouse::class,
-                'empty_value' => '---Choose a to wearhouse ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a to wearhouse ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[ new NotBlank(message: 'Please select your vendor name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -75,6 +71,10 @@ class StockTransferType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'config' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => ProductTransfer::class
         ]);

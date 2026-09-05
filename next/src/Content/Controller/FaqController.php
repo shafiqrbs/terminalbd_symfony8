@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,7 +76,7 @@ class FaqController extends AbstractController
      */
     private function createCreateForm(Page $entity)
     {
-        $form = $this->createForm(new FaqType(), $entity, [
+        $form = $this->createForm(FaqType::class, $entity, [
             'action' => $this->generateUrl('faq_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -157,7 +158,7 @@ class FaqController extends AbstractController
      */
     private function createEditForm(Page $entity)
     {
-        $form = $this->createForm(new FaqType(), $entity, [
+        $form = $this->createForm(FaqType::class, $entity, [
             'action' => $this->generateUrl('faq_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -225,7 +226,7 @@ class FaqController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('faq_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

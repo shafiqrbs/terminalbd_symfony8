@@ -16,18 +16,30 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\User\Entity\User;
 use App\User\Form\MemberEditProfileType;
 use App\User\Form\DomainUserProfileType;
-use FOS\UserBundle\FOSUserEvents;
-use FOS\UserBundle\Event\FormEvent;
-use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\Event\GetResponseUserEvent;
-use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use FOS\UserBundle\Controller\ProfileController as BaseProfileController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ProfileController extends BaseProfileController
+class ProfileController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
+
+    /**
+     * Show the user. FOSUserBundle's ProfileController supplied this before
+     * the class stopped extending it; fos_user_profile_show routes here.
+     */
+    public function showAction()
+    {
+        return $this->render('_fosuser/Profile/show.html.twig', [
+            'user' => $this->getUser(),
+        ]);
+    }
+
     /**
      * Edit the user
      */
@@ -86,16 +98,12 @@ class ProfileController extends BaseProfileController
 
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DomainUserProfileType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-        $form = $this->createForm(new DomainUserProfileType($globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('domain_update_profile'),
+        $form = $this->createForm(DomainUserProfileType::class, $entity, array('action' => $this->generateUrl('domain_update_profile'),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'designation' => $location));
         return $form;
     }
 

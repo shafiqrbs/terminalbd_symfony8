@@ -26,18 +26,14 @@ class   AccountPurchaseType extends AbstractType
 
     public  $global;
 
-    public function __construct(GlobalOption $global)
-    {
-        $this->global = $global;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->global = $options['global'];
+
         $builder
 
             ->add('payment',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'add payment amount removeZero'],
@@ -48,8 +44,8 @@ class   AccountPurchaseType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a transaction method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a transaction method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -60,18 +56,13 @@ class   AccountPurchaseType extends AbstractType
 		        'attr'=>['class'=>'span12 m-wrap'],
 		        'expanded'      =>false,
 		        'multiple'      =>false,
-		        'choices' => [
-			        'Due' => 'Payment of Due',
-			        'Advance' => 'Payment of Advance',
-			        'Debit' => 'Debit Adjustment',
-			        'Credit' => 'Credit Adjustment',
-		        ],
+		        'choices' => ['Payment of Due' => 'Due', 'Payment of Advance' => 'Advance', 'Debit Adjustment' => 'Debit', 'Credit Adjustment' => 'Credit'],
 	        ])
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -81,8 +72,8 @@ class   AccountPurchaseType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
 	                    ->where("b.status = 1")
@@ -96,8 +87,8 @@ class   AccountPurchaseType extends AbstractType
             $builder->add('medicineVendor', EntityType::class, [
                 'required'    => true,
                 'class' => MedicineVendor::class,
-                'empty_value' => '---Choose a vendor company---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor company---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'span12 m-wrap select2 vendor-ledger-medicine '],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -113,8 +104,8 @@ class   AccountPurchaseType extends AbstractType
             $builder->add('vendor', EntityType::class, [
                 'required'    => true,
                 'class' => Vendor::class,
-                'empty_value' => '---Choose a vendor company---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor company---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'span12 select2 m-wrap vendor-ledger-inventory'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -128,8 +119,8 @@ class   AccountPurchaseType extends AbstractType
             $builder->add('accountVendor', EntityType::class, [
                 'required'    => true,
                 'class' => AccountVendor::class,
-                'empty_value' => '---Choose a vendor company---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor company---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'span10 select2  vendor-ledger-business'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -146,6 +137,10 @@ class   AccountPurchaseType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'global' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AccountPurchase::class
         ]);
     }
@@ -157,6 +152,5 @@ class   AccountPurchaseType extends AbstractType
     {
         return 'purchase';
     }
-
 
 }

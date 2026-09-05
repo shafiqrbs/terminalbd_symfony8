@@ -2,6 +2,7 @@
 
 namespace App\Content\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -69,12 +70,12 @@ class AdmissionCommentController extends AbstractController
      */
     private function createCreateForm(AdmissionComment $entity)
     {
-        $form = $this->createForm(new AdmissionCommentType(), $entity, [
+        $form = $this->createForm(AdmissionCommentType::class, $entity, [
             'action' => $this->generateUrl('admissioncomment_create'),
             'method' => 'POST',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Create']);
+        $form->add('submit', SubmitType::class, ['label' => 'Create']);
 
         return $form;
     }
@@ -149,12 +150,12 @@ class AdmissionCommentController extends AbstractController
      */
     private function createEditForm(AdmissionComment $entity)
     {
-        $form = $this->createForm(new AdmissionCommentType(), $entity, [
+        $form = $this->createForm(AdmissionCommentType::class, $entity, [
             'action' => $this->generateUrl('admissioncomment_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Update']);
+        $form->add('submit', SubmitType::class, ['label' => 'Update']);
 
         return $form;
     }
@@ -224,7 +225,7 @@ class AdmissionCommentController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('admissioncomment_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

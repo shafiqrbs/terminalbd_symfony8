@@ -12,11 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BusinessAreaType extends AbstractType
 {
-
-
-    public function __construct(private readonly LocationRepository $location)
-    {
-    }
+    protected $location;
 
 
     /**
@@ -25,6 +21,8 @@ class BusinessAreaType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->location = $options['location'];
+
         $builder
 
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','autocomplete'=>'off','placeholder'=>'Enter business area name'],
@@ -41,6 +39,10 @@ class BusinessAreaType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => BusinessArea::class
         ]);
@@ -59,6 +61,5 @@ class BusinessAreaType extends AbstractType
         return $syndicateTree = $this->location->getLocationOptionGroup();
 
     }
-
 
 }

@@ -32,9 +32,9 @@ class JournalVoucherType extends AbstractType
             ->add('voucherType', EntityType::class, [
                 'required'    => true,
                 'class' => VoucherType::class,
-                'empty_value' => '---Choose a voucher type---',
+                'placeholder' => '---Choose a voucher type---',
                 'constraints' =>[new NotBlank(message: 'Please select to voucher type')],
-                'property' => 'voucherName',
+                'choice_label' => 'voucherName',
                 'attr'=>['class'=>'span12 m-wrap voucherType select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")

@@ -4,7 +4,7 @@ namespace App\DomainUser\Controller;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use App\User\Form\DomainEditUserType;
-use FOS\UserBundle\Model\UserManager;
+use App\User\Manager\UserManager;
 use App\User\Entity\User;
 use App\User\Form\DomainEditSignType;
 use App\User\Form\DomainSignType;
@@ -24,6 +24,7 @@ class DomainUserController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
+        private readonly UserManager $userManager,
     ) {
     }
 
@@ -95,16 +96,12 @@ class DomainUserController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $designation = $this->em->getRepository(\App\Tool\Entity\Designation::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DomainSignType::configureOptions() and pass them as form options: $user,$globalOption,$location,$designation), $entity, array(
-        $form = $this->createForm(new DomainSignType($user,$globalOption,$location,$designation), $entity, array(
-            'action' => $this->generateUrl('domain_create'),
+        $form = $this->createForm(DomainSignType::class, $entity, array('action' => $this->generateUrl('domain_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $user, 'globalOption' => $globalOption, 'location' => $location, 'designation' => $designation));
         return $form;
     }
 
@@ -195,16 +192,12 @@ class DomainUserController extends AbstractController
         $user = $this->em->getRepository(\App\User\Entity\User::class);
         $globalOption = $this->getUser()->getGlobalOption();
         $designation = $this->em->getRepository(\App\Tool\Entity\Designation::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DomainEditUserType::configureOptions() and pass them as form options: $user,$globalOption,$designation), $entity, array(
-        $form = $this->createForm(new DomainEditUserType($user,$globalOption,$designation), $entity, array(
-            'action' => $this->generateUrl('domain_update', array('id' => $entity->getId())),
+        $form = $this->createForm(DomainEditUserType::class, $entity, array('action' => $this->generateUrl('domain_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'user' => $user, 'globalOption' => $globalOption, 'designation' => $designation));
         return $form;
     }
     /**
@@ -274,16 +267,12 @@ class DomainUserController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $designation = $this->em->getRepository(\App\Tool\Entity\Designation::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into DomainEditSignType::configureOptions() and pass them as form options: $globalOption,$location,$designation), $entity, array(
-        $form = $this->createForm(new DomainEditSignType($globalOption,$location,$designation), $entity, array(
-            'action' => $this->generateUrl('domain_update_profile'),
+        $form = $this->createForm(DomainEditSignType::class, $entity, array('action' => $this->generateUrl('domain_update_profile'),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location, 'designation' => $designation));
         return $form;
     }
 
@@ -370,8 +359,7 @@ class DomainUserController extends AbstractController
         $password = '@123456';
         $user->setPlainPassword($password);
         $user->setAppPassword($password);
-        // TODO(migration): AbstractController::get() was removed; inject this service.
-        $this->get('fos_user.user_manager')->updateUser($user);
+        $this->userManager->updateUser($user);
         $this->requestStack->getSession()->getFlashBag()->add(
             'success',"Password reset successfully"
         );

@@ -139,16 +139,12 @@ class ExpenditureController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $expenseCategory = $this->em->getRepository(\App\Accounting\Entity\ExpenseCategory::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ExpenditureType::configureOptions() and pass them as form options: $globalOption,$expenseCategory), $entity, array(
-        $form = $this->createForm(new ExpenditureType($globalOption,$expenseCategory), $entity, array(
-            'action' => $this->generateUrl('account_expenditure_create'),
+        $form = $this->createForm(ExpenditureType::class, $entity, array('action' => $this->generateUrl('account_expenditure_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'expenseCategoryRepository' => $expenseCategory));
       return $form;
     }
 

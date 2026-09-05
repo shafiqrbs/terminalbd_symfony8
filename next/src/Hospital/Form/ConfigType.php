@@ -37,7 +37,7 @@ class ConfigType extends AbstractType
                 'required'    => false,
                 'expanded'    => true,
                 'multiple'    => true,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'check-list m-wrap'],
                 'class' => Service::class,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -48,12 +48,7 @@ class ConfigType extends AbstractType
             ->add('invoiceProcess',
                 ChoiceType::class, [
                     'attr'=>['class'=>'check-list  span8'],
-                    'choices' => [
-                        'diagnostic'    => 'Diagnostic',
-                        'admission'   => 'Admission',
-                        'visit'  => 'Visit',
-                        'commission'  => 'Commission ',
-                    ],
+                    'choices' => ['Diagnostic' => 'diagnostic', 'Admission' => 'admission', 'Visit' => 'visit', 'Commission ' => 'commission'],
                     'required'    => true,
                     'multiple'    => true,
                     'expanded'  => true,

@@ -91,7 +91,7 @@ class MallConnectController extends AbstractController
      */
     private function createCreateForm(MallConnect $entity)
     {
-        $form = $this->createForm(new MallConnectType(), $entity, [
+        $form = $this->createForm(MallConnectType::class, $entity, [
             'action' => $this->generateUrl('mallconnect_create'),
             'method' => 'POST',
             'attr' => [
@@ -167,7 +167,7 @@ class MallConnectController extends AbstractController
      */
     private function createEditForm(MallConnect $entity)
     {
-        $form = $this->createForm(new MallConnectType(), $entity, [
+        $form = $this->createForm(MallConnectType::class, $entity, [
             'action' => $this->generateUrl('mallconnect_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

@@ -2,6 +2,7 @@
 
 namespace App\Location\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -89,16 +90,12 @@ class LocationController extends AbstractController
     {
         $em = $this->em->getRepository(\App\Location\Entity\Location::class);
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into LocationType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm( new LocationType($em), $entity, array(
-            'action' => $this->generateUrl('location_create'),
+        $form = $this->createForm(LocationType::class, $entity, array('action' => $this->generateUrl('location_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em));
 
         return $form;
     }
@@ -175,16 +172,12 @@ class LocationController extends AbstractController
     {
         $em = $this->em->getRepository(\App\Location\Entity\Location::class);
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into LocationType::configureOptions() and pass them as form options: $em), $entity, array(
-        $form = $this->createForm(new LocationType($em), $entity, array(
-            'action' => $this->generateUrl('location_update', array('id' => $entity->getId())),
+        $form = $this->createForm(LocationType::class, $entity, array('action' => $this->generateUrl('location_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em));
 
         return $form;
     }
@@ -254,7 +247,7 @@ class LocationController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('location_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', SubmitType::class, array('label' => 'Delete'))
             ->getForm()
         ;
     }

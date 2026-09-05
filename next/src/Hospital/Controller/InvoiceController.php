@@ -544,17 +544,13 @@ class InvoiceController extends AbstractController
     private function createInvoicePaymentForm(Invoice $invoice, InvoiceTransaction $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoicePaymentType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new InvoicePaymentType($globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_add_invoice_payment', array('id' => $invoice->getId())),
+        $form = $this->createForm(InvoicePaymentType::class, $entity, array('action' => $this->generateUrl('hms_add_invoice_payment', array('id' => $invoice->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'invoicePayment',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -568,17 +564,13 @@ class InvoiceController extends AbstractController
     private function createEditForm(Invoice $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into InvoiceEditType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new InvoiceEditType($globalOption), $entity, array(
-            'action' => $this->generateUrl('hms_invoice_update', array('id' => $entity->getId())),
+        $form = $this->createForm(InvoiceEditType::class, $entity, array('action' => $this->generateUrl('hms_invoice_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal',
                 'id' => 'invoiceForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

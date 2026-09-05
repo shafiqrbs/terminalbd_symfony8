@@ -276,16 +276,12 @@ class AccountPurchaseController extends AbstractController
     private function createCreateForm(AccountPurchase $entity)
     {
         $global = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountPurchaseType::configureOptions() and pass them as form options: $global), $entity, array(
-        $form = $this->createForm(new AccountPurchaseType($global), $entity, array(
-            'action' => $this->generateUrl('account_purchase_create'),
+        $form = $this->createForm(AccountPurchaseType::class, $entity, array('action' => $this->generateUrl('account_purchase_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'global' => $global));
         return $form;
     }
 
@@ -351,16 +347,12 @@ class AccountPurchaseController extends AbstractController
     private function createEditForm(AccountPurchase $entity)
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountPurchaseType::configureOptions() and pass them as form options: $inventory), $entity, array(
-        $form = $this->createForm(new AccountPurchaseType($inventory), $entity, array(
-            'action' => $this->generateUrl('account_purchase_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AccountPurchaseType::class, $entity, array('action' => $this->generateUrl('account_purchase_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'global' => $inventory));
         return $form;
     }
     /**

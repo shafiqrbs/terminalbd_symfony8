@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -77,7 +78,7 @@ class ColorController extends AbstractController
      */
     private function createCreateForm(ProductColor $entity)
     {
-        $form = $this->createForm(new ColorType(), $entity, [
+        $form = $this->createForm(ColorType::class, $entity, [
             'action' => $this->generateUrl('color_create'),
             'method' => 'POST',
             'attr' => [
@@ -158,7 +159,7 @@ class ColorController extends AbstractController
      */
     private function createEditForm(ProductColor $entity)
     {
-        $form = $this->createForm(new ColorType(), $entity, [
+        $form = $this->createForm(ColorType::class, $entity, [
             'action' => $this->generateUrl('color_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -243,7 +244,7 @@ class ColorController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('color_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

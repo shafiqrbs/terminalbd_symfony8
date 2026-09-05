@@ -32,10 +32,7 @@ class PayrollSettingType extends AbstractType
                 'attr'=>['class'=>'m-wrap span12'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'allowance' => 'Allowance',
-                    'deduction' => 'Deduction',
-                ],
+                'choices' => ['Allowance' => 'allowance', 'Deduction' => 'deduction'],
             ])
         ;
     }

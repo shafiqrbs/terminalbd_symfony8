@@ -22,16 +22,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class VoucherType extends AbstractType
 {
+    protected $accountHead;
+
     /** @var  HospitalConfig */
     public  $option;
-
-
-    public function __construct(GlobalOption $option, AccountHeadRepository $accountHead)
-    {
-        $this->option = $option;
-
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -39,13 +33,16 @@ class VoucherType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+        $this->accountHead = $options['accountHead'];
+
         $builder
 
             ->add('accountVendor', EntityType::class, [
                 'required'    => true,
                 'class' => AccountVendor::class,
-                'empty_value' => '---Choose a vendor ---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor ---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'constraints' =>[ new NotBlank(message: 'Please select your vendor name') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -57,18 +54,14 @@ class VoucherType extends AbstractType
                 'expanded'      =>false,
                 'required'    => true,
                 'multiple'      =>false,
-                'choices' => [
-                    'Hold' => 'Hold',
-                    'In-progress' => 'In-progress',
-                    'Done' => 'Done',
-                ],
+                'choices' => ['Hold' => 'Hold', 'In-progress' => 'In-progress', 'Done' => 'Done'],
             ])
 
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a Transaction---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a Transaction---',
                 'attr'=>['class'=>'span12 transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -78,8 +71,8 @@ class VoucherType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -89,8 +82,8 @@ class VoucherType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -109,6 +102,11 @@ class VoucherType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'option' => null,
+            'accountHead' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => AccountPurchase::class
         ]);
     }
@@ -120,7 +118,6 @@ class VoucherType extends AbstractType
     {
         return 'purchase';
     }
-
 
     /**
      * @return mixed

@@ -2,6 +2,7 @@
 
 namespace App\Business\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -23,10 +24,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class InvoiceType extends AbstractType
 {
-
-    public function __construct(private readonly GlobalOption $globalOption, private readonly LocationRepository $location)
-    {
-    }
+    protected $globalOption;
+    protected $location;
 
 
     /**
@@ -35,6 +34,9 @@ class InvoiceType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+        $this->location = $options['location'];
+
         $builder
 
             ->add('discountCalculation',NumberType::class, ['attr'=>['class'=>'m-wrap span12 salesInput','placeholder'=>'Discount','data-original-title'=>'Add payment discount','maxlength' => 6,'autocomplete'=>'off']])
@@ -42,28 +44,17 @@ class InvoiceType extends AbstractType
                 'attr'=>['class'=>'m-wrap discount-type span12'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'flat' => 'Flat',
-                    'percentage' => 'Percentage',
-                    'package' => 'Package',
-                    'sample' => 'Sample',
-                ],
+                'choices' => ['Flat' => 'flat', 'Percentage' => 'percentage', 'Package' => 'package', 'Sample' => 'sample'],
             ])
-           /* ->add('discount','hidden')*/
+           /* ->add('discount', HiddenType::class)*/
             ->add('received',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Payment amount']])
             ->add('process', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap invoiceProcess span12 select-custom'],
                 'expanded'      =>false,
                 'multiple'      =>false,
                 'constraints' =>[ new NotBlank(message: 'Confirm current process status') ],
-                'empty_value' => '--- Choose an order process ---',
-                'choices' => [
-                    'Created' => 'Created',
-                    'Delivered' => 'Delivered',
-                    'In-progress' => 'In-progress',
-                    'Condition' => 'Condition',
-                    'Quotation' => 'Quotation',
-                ],
+                'placeholder' => '--- Choose an order process ---',
+                'choices' => ['Created' => 'Created', 'Delivered' => 'Delivered', 'In-progress' => 'In-progress', 'Condition' => 'Condition', 'Quotation' => 'Quotation'],
             ])
             ->add('cardNo',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add payment card no','data-original-title'=>'Add payment card no','autocomplete'=>'off']])
             ->add('transactionId',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Add payment transaction id','data-original-title'=>'Add payment transaction id','autocomplete'=>'off']])
@@ -71,7 +62,7 @@ class InvoiceType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -79,10 +70,10 @@ class InvoiceType extends AbstractType
             ])
             ->add('paymentCard', EntityType::class, [
                 'required'    => false,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'class' => PaymentCard::class,
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose payment card---',
+                'placeholder' => '---Choose payment card---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
                     ->orderBy("e.id","ASC")
@@ -90,7 +81,7 @@ class InvoiceType extends AbstractType
             ->add('salesBy', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'property' => 'userFullName',
+                'choice_label' => 'userFullName',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->where("u.isDelete != 1")
@@ -103,9 +94,9 @@ class InvoiceType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive bank account---',
+                'placeholder' => '---Choose receive bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -115,9 +106,9 @@ class InvoiceType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => false,
                 'class' => AccountMobileBank::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose receive mobile bank account---',
+                'placeholder' => '---Choose receive mobile bank account---',
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
                     ->andWhere("b.globalOption =".$this->globalOption->getId())
@@ -131,6 +122,11 @@ class InvoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+            'location' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => BusinessInvoice::class
         ]);

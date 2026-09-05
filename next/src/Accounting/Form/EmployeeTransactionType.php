@@ -21,18 +21,14 @@ class EmployeeTransactionType extends AbstractType
 
     public  $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
 
             ->add('amount',TextType::class, ['attr'=>['class'=>'m-wrap span12 numeric','placeholder'=>'Add payment amount BDT'],
@@ -43,8 +39,8 @@ class EmployeeTransactionType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'empty_value' => '---Choose a transaction method---',
-                'property' => 'name',
+                'placeholder' => '---Choose a transaction method---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2 transactionMethod'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -57,24 +53,24 @@ class EmployeeTransactionType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
             ])
 
             ->add('accountBkash', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBkash::class,
-                'empty_value' => '---Choose a bkash---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bkash---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
             ])
 
             ->add('toUser', EntityType::class, [
                 'required'    => true,
                 'class' => User::class,
-                'empty_value' => '---Choose a customer---',
-                'property' => 'username',
+                'placeholder' => '---Choose a customer---',
+                'choice_label' => 'username',
                 'attr'=>['class'=>'span12 select2'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -90,6 +86,10 @@ class EmployeeTransactionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => PettyCash::class
         ]);
     }
@@ -101,6 +101,5 @@ class EmployeeTransactionType extends AbstractType
     {
         return 'appstore_bundle_accountingbundle_PettyCash';
     }
-
 
 }

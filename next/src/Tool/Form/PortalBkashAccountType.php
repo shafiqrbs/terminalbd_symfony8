@@ -21,10 +21,7 @@ class PortalBkashAccountType extends AbstractType
         $builder
             ->add('accountType', ChoiceType::class, [
                 'attr'=>['class'=>'span12'],
-                'choices' => [
-                    'Personal' => 'Personal',
-                    'Merchant' => 'Merchant',
-                ],
+                'choices' => ['Personal' => 'Personal', 'Merchant' => 'Merchant'],
             ])
             ->add('mobile',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter mobile no'],
                 'constraints' =>[

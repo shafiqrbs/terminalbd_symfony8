@@ -91,16 +91,12 @@ class BranchesController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BranchesType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-        $form = $this->createForm(new BranchesType($globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('domain_branches_create'),
+        $form = $this->createForm(BranchesType::class, $entity, array('action' => $this->generateUrl('domain_branches_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location));
         return $form;
     }
 
@@ -172,16 +168,12 @@ class BranchesController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BranchesType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-        $form = $this->createForm(new BranchesType($globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('domain_branches_update', array('id' => $entity->getId())),
+        $form = $this->createForm(BranchesType::class, $entity, array('action' => $this->generateUrl('domain_branches_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location));
          return $form;
     }
     /**

@@ -87,7 +87,7 @@ class ServiceGroupController extends AbstractController
      */
     private function createCreateForm(HmsServiceGroup $entity)
     {
-        $form = $this->createForm(new ServiceGroupType(), $entity, [
+        $form = $this->createForm(ServiceGroupType::class, $entity, [
             'action' => $this->generateUrl('hms_service_group_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -130,7 +130,7 @@ class ServiceGroupController extends AbstractController
      */
     private function createEditForm(HmsServiceGroup $entity)
     {
-        $form = $this->createForm(new ServiceGroupType(), $entity, [
+        $form = $this->createForm(ServiceGroupType::class, $entity, [
             'action' => $this->generateUrl('hms_service_group_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

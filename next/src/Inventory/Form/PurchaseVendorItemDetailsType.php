@@ -24,18 +24,14 @@ class PurchaseVendorItemDetailsType extends AbstractType
 
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-    }
-
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 ','readonly'=>'readonly', 'placeholder'=>'vendor base item name'],
                 'constraints' =>[
@@ -47,8 +43,8 @@ class PurchaseVendorItemDetailsType extends AbstractType
             ->add('masterItem', EntityType::class, [
                 'required'    => true,
                 'class' => Product::class,
-                'empty_value' => '---Choose a item ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a item ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2', 'readonly'=>'readonly'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -58,8 +54,8 @@ class PurchaseVendorItemDetailsType extends AbstractType
             ->add('brand', EntityType::class, [
                 'required'    => true,
                 'class' => ItemBrand::class,
-                'empty_value' => '---Choose a brand ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a brand ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -70,17 +66,14 @@ class PurchaseVendorItemDetailsType extends AbstractType
             ->add('warningLabel', ChoiceType::class, [
                 'required'    => false,
                 'attr'=>['class'=>'span12'],
-                'empty_value' => '---Choose a warning label---',
-                'choices' => [
-                    'Warranty' => 'Warranty',
-                    'Guarantee' => 'Guarantee',
-                ],
+                'placeholder' => '---Choose a warning label---',
+                'choices' => ['Warranty' => 'Warranty', 'Guarantee' => 'Guarantee'],
             ])
             ->add('country', EntityType::class, [
                 'required'    => true,
                 'class' => Country::class,
-                'empty_value' => '---Choose a country ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a country ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 select2'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->orderBy("p.name","ASC"),
@@ -88,18 +81,12 @@ class PurchaseVendorItemDetailsType extends AbstractType
 
             ->add('ageGroup', ChoiceType::class, [
                 'attr'=>['class'=>'span6 select2'],
-                'choices' => [
-                    'Kids' => 'Kids',
-                    'Adult' => 'Adult'
-                ],
+                'choices' => ['Kids' => 'Kids', 'Adult' => 'Adult'],
             ])
 
             ->add('gender', ChoiceType::class, [
                 'attr'=>['class'=>'span12 select2'],
-                'choices' => [
-                    'Male' => 'Male',
-                    'Female' => 'Female'
-                ],
+                'choices' => ['Male' => 'Male', 'Female' => 'Female'],
             ])
             ->add('file')
             ->add('isWeb')
@@ -112,6 +99,10 @@ class PurchaseVendorItemDetailsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => PurchaseVendorItem::class
         ]);

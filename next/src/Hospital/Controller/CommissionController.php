@@ -83,7 +83,7 @@ class CommissionController extends AbstractController
      */
     private function createCreateForm(HmsCommission $entity)
     {
-        $form = $this->createForm(new CommissionType(), $entity, [
+        $form = $this->createForm(CommissionType::class, $entity, [
             'action' => $this->generateUrl('hms_commission_create'),
             'method' => 'POST',
             'attr' => [
@@ -129,7 +129,7 @@ class CommissionController extends AbstractController
      */
     private function createEditForm(HmsCommission $entity)
     {
-        $form = $this->createForm(new CommissionType(), $entity, [
+        $form = $this->createForm(CommissionType::class, $entity, [
             'action' => $this->generateUrl('hms_commission_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

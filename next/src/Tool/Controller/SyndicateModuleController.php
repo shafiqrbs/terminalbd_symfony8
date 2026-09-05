@@ -2,6 +2,7 @@
 
 namespace App\Tool\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -91,7 +92,7 @@ class SyndicateModuleController extends AbstractController
     private function createCreateForm(SyndicateModule $entity)
     {
 
-        $form = $this->createForm(new SyndicateModuleType(), $entity, [
+        $form = $this->createForm(SyndicateModuleType::class, $entity, [
             'action' => $this->generateUrl('syndicatemodule_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -174,7 +175,7 @@ class SyndicateModuleController extends AbstractController
      */
     private function createEditForm(SyndicateModule $entity)
     {
-        $form = $this->createForm(new SyndicateModuleType(), $entity, [
+        $form = $this->createForm(SyndicateModuleType::class, $entity, [
             'action' => $this->generateUrl('syndicatemodule_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [
@@ -252,7 +253,7 @@ class SyndicateModuleController extends AbstractController
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('syndicatemodule_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', ['label' => 'Delete'])
+            ->add('submit', SubmitType::class, ['label' => 'Delete'])
             ->getForm()
         ;
     }

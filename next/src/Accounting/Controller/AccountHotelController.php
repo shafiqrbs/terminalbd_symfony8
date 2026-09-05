@@ -176,16 +176,12 @@ class AccountHotelController extends AbstractController
     private function createCreateForm(AccountPurchase $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountHotelPurchaseType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountHotelPurchaseType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_purchase_business_create'),
+        $form = $this->createForm(AccountHotelPurchaseType::class, $entity, array('action' => $this->generateUrl('account_purchase_business_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -249,16 +245,12 @@ class AccountHotelController extends AbstractController
     private function salesCreateForm(AccountSales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountSalesBusinessType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountSalesBusinessType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_sales_business_create'),
+        $form = $this->createForm(AccountSalesBusinessType::class, $entity, array('action' => $this->generateUrl('account_sales_business_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 
@@ -327,16 +319,12 @@ class AccountHotelController extends AbstractController
     private function createEditForm(AccountSales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AccountSalesInvoiceType::configureOptions() and pass them as form options: $globalOption), $entity, array(
-        $form = $this->createForm(new AccountSalesInvoiceType($globalOption), $entity, array(
-            'action' => $this->generateUrl('account_sales_business_update', array('id' => $entity->getId())),
+        $form = $this->createForm(AccountSalesInvoiceType::class, $entity, array('action' => $this->generateUrl('account_sales_business_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form purchase',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption));
         return $form;
     }
 

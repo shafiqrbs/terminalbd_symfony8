@@ -197,34 +197,26 @@ class SalesController extends AbstractController
     {
         $globalOption = $this->getUser()->getGlobalOption();
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SalesType::configureOptions() and pass them as form options: $globalOption,$location), $entity, array(
-        $form = $this->createForm(new SalesType($globalOption,$location), $entity, array(
-            'action' => $this->generateUrl('medicine_sales_update', array('id' => $entity->getId())),
+        $form = $this->createForm(SalesType::class, $entity, array('action' => $this->generateUrl('medicine_sales_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'salesForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $globalOption, 'location' => $location));
         return $form;
     }
 
     private function createMedicineSalesItemForm(MedicineSalesItem $salesItem , MedicineSales $entity)
     {
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SalesItemType::configureOptions() and pass them as form options: $globalOption), $salesItem, array(
-        $form = $this->createForm(new SalesItemType($globalOption), $salesItem, array(
-            'action' => $this->generateUrl('medicine_sales_item_add', array('invoice' => $entity->getId())),
+        $form = $this->createForm(SalesItemType::class, $salesItem, array('action' => $this->generateUrl('medicine_sales_item_add', array('invoice' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'id' => 'salesItemForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'option' => $globalOption));
         return $form;
     }
 

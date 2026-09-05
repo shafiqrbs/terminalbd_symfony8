@@ -90,16 +90,12 @@ class BusinessAreaController extends AbstractController
     private function createCreateForm(BusinessArea $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BusinessAreaType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new BusinessAreaType($location), $entity, array(
-            'action' => $this->generateUrl('business_area_create', array('id' => $entity->getId())),
+        $form = $this->createForm(BusinessAreaType::class, $entity, array('action' => $this->generateUrl('business_area_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
         return $form;
     }
 
@@ -141,16 +137,12 @@ class BusinessAreaController extends AbstractController
     private function createEditForm(BusinessArea $entity )
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into BusinessAreaType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new BusinessAreaType($location), $entity, array(
-            'action' => $this->generateUrl('business_area_update', array('id' => $entity->getId())),
+        $form = $this->createForm(BusinessAreaType::class, $entity, array('action' => $this->generateUrl('business_area_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'form-horizontal',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
 
 
         return $form;

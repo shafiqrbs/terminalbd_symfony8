@@ -19,11 +19,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ProductType extends AbstractType
 {
+    protected $globalOption;
 
-
-    public function __construct(private readonly GlobalOption $globalOption)
-    {
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -31,6 +28,8 @@ class ProductType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->globalOption = $options['globalOption'];
+
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12 tooltips','placeholder'=>'Product name'],
                 'constraints' =>[
@@ -45,8 +44,8 @@ class ProductType extends AbstractType
             ->add('photo_gallery', EntityType::class, [
                 'required'    => false,
                 'class' => PhotoGallery::class,
-                'empty_value' => '---Select Photo Gallery---',
-                'property' => 'name',
+                'placeholder' => '---Select Photo Gallery---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->where("o.status = 1")
@@ -56,8 +55,8 @@ class ProductType extends AbstractType
             ->add('pricePrefix', EntityType::class, [
                 'required'    => false,
                 'class' => PricePrefix::class,
-                'empty_value' => '---Select Currency---',
-                'property' => 'countryCurrency',
+                'placeholder' => '---Select Currency---',
+                'choice_label' => 'countryCurrency',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->where("o.status = 1")
@@ -68,8 +67,8 @@ class ProductType extends AbstractType
                 'expanded'      =>true,
                 'multiple'      =>true,
                 'class' => ModuleCategory::class,
-                'empty_value' => '---Select category---',
-                'property' => 'name',
+                'placeholder' => '---Select category---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'check-list  span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
                     ->join('o.module', 'module')
@@ -88,6 +87,10 @@ class ProductType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Page::class
         ]);

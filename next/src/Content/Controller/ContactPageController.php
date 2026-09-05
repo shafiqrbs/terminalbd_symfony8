@@ -103,16 +103,12 @@ class ContactPageController extends AbstractController
     {
 
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ContactPageType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new ContactPageType($location), $entity, array(
-            'action' => $this->generateUrl('contactpage_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ContactPageType::class, $entity, array('action' => $this->generateUrl('contactpage_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
         return $form;
 
     }

@@ -12,7 +12,6 @@ use App\User\Entity\User;
 use App\User\Form\AgentProfileType;
 use App\User\Form\CustomerEditProfileType;
 use App\User\Form\SignupType;
-use Frontend\FrontentBundle\Service\Cart;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -103,17 +102,13 @@ class AgentClientController extends AbstractController
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
         $em = $this->em->getRepository(\App\Tool\Entity\Syndicate::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SignupType::configureOptions() and pass them as form options: $em,$location), $entity, array(
-        $form = $this->createForm(new SignupType($em,$location), $entity, array(
-            'action' => $this->generateUrl('agentclient_create', array('id' => $entity->getId())),
+        $form = $this->createForm(SignupType::class, $entity, array('action' => $this->generateUrl('agentclient_create', array('id' => $entity->getId())),
             'method' => 'POST',
             'attr' => array(
                 'id' => 'signup',
                 'class' => 'registration signupForm',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'em' => $em, 'location' => $location));
 
         return $form;
     }
@@ -147,16 +142,12 @@ class AgentClientController extends AbstractController
     private function createEditProfileForm(Profile $entity)
     {
         $location = $this->em->getRepository(\App\Location\Entity\Location::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into AgentProfileType::configureOptions() and pass them as form options: $location), $entity, array(
-        $form = $this->createForm(new AgentProfileType($location), $entity, array(
-            'action' => $this->generateUrl('customer_self_update_profile'),
+        $form = $this->createForm(AgentProfileType::class, $entity, array('action' => $this->generateUrl('customer_self_update_profile'),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'location' => $location));
         return $form;
     }
 

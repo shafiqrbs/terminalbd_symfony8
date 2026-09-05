@@ -20,17 +20,14 @@ class HouseStockOutType extends AbstractType
     /** @var  MedicineConfig  */
     public  $config;
 
-    public function __construct(MedicineConfig $config)
-    {
-        $this->config = $config;
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->config = $options['config'];
+
 
         $builder
             ->add('stockName',TextType::class, ['attr'=>['class'=>'m-wrap span12 select2Stockout','placeholder'=>'Enter stock medicine name']
@@ -39,8 +36,8 @@ class HouseStockOutType extends AbstractType
             ->add('wearHouse', EntityType::class, [
                 'required'    => true,
                 'class' => MedicineParticular::class,
-                'empty_value' => '---Stock House ---',
-                'property' => 'name',
+                'placeholder' => '---Stock House ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>' span12 m-wrap'],
                 'constraints' =>[ new NotBlank(message: 'Select stock house') ],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
@@ -57,6 +54,10 @@ class HouseStockOutType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'config' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicineStockHouse::class
         ]);

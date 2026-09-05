@@ -126,16 +126,12 @@ class ProductController extends AbstractController
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $em = $this->em->getRepository(\App\Product\Entity\Category::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ProductType::configureOptions() and pass them as form options: $em,$inventory), $entity, array(
-        $form = $this->createForm(new ProductType($em,$inventory), $entity, array(
-            'action' => $this->generateUrl('inventory_product_create'),
+        $form = $this->createForm(ProductType::class, $entity, array('action' => $this->generateUrl('inventory_product_create'),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $em));
       return $form;
     }
 
@@ -223,16 +219,12 @@ class ProductController extends AbstractController
     {
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $em = $this->em->getRepository(\App\Product\Entity\Category::class);
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into ProductType::configureOptions() and pass them as form options: $em,$inventory), $entity, array(
-        $form = $this->createForm(new ProductType($em,$inventory), $entity, array(
-            'action' => $this->generateUrl('inventory_product_update', array('id' => $entity->getId())),
+        $form = $this->createForm(ProductType::class, $entity, array('action' => $this->generateUrl('inventory_product_update', array('id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'globalOption' => $em));
         return $form;
     }
 

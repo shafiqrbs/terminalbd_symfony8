@@ -91,16 +91,12 @@ class PathologicalReportController extends AbstractController
     private function createCreateForm(PathologicalReport $entity, Particular $pathology)
     {
 
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PathologicalReportType::configureOptions() and pass them as form options: $pathology), $entity, array(
-        $form = $this->createForm(new PathologicalReportType($pathology), $entity, array(
-            'action' => $this->generateUrl('hms_pathological_report_create', array('pathology' => $pathology->getId())),
+        $form = $this->createForm(PathologicalReportType::class, $entity, array('action' => $this->generateUrl('hms_pathological_report_create', array('pathology' => $pathology->getId())),
             'method' => 'POST',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'particular' => $pathology));
         return $form;
     }
 
@@ -130,16 +126,12 @@ class PathologicalReportController extends AbstractController
      */
     private function createEditForm(PathologicalReport $entity,Particular $pathology)
     {
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into PathologicalReportType::configureOptions() and pass them as form options: $pathology), $entity, array(
-        $form = $this->createForm(new PathologicalReportType($pathology), $entity, array(
-            'action' => $this->generateUrl('hms_pathological_report_update', array('pathology' => $pathology->getId(),'id' => $entity->getId())),
+        $form = $this->createForm(PathologicalReportType::class, $entity, array('action' => $this->generateUrl('hms_pathological_report_update', array('pathology' => $pathology->getId(),'id' => $entity->getId())),
             'method' => 'PUT',
             'attr' => array(
                 'class' => 'horizontal-form',
                 'novalidate' => 'novalidate',
-            )
-        ));
+            ), 'particular' => $pathology));
         return $form;
     }
 

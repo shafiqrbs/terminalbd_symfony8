@@ -13,7 +13,7 @@ namespace App\User\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
-use FOS\UserBundle\Form\Type\ProfileFormType as BaseProfileFormType;
+use App\User\Form\Type\AbstractProfileFormType as BaseProfileFormType;
 
 class UserProfileFormType extends BaseProfileFormType
 {
@@ -23,7 +23,7 @@ class UserProfileFormType extends BaseProfileFormType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    protected function buildUserForm(FormBuilderInterface $builder, array $options)
+    protected function buildUserForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('email', EmailType::class, ['label' => 'form.email', 'translation_domain' => 'FOSUserBundle'])
@@ -34,7 +34,7 @@ class UserProfileFormType extends BaseProfileFormType
         ;
     }
 
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'docudex_user_profile_form';
     }

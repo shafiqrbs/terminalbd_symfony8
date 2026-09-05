@@ -144,7 +144,7 @@ class MarketingController extends AbstractController
      */
     private function createCreateForm(Marketing $entity)
     {
-        $form = $this->createForm(new MarketingType(), $entity, [
+        $form = $this->createForm(MarketingType::class, $entity, [
             'action' => $this->generateUrl('business_marketing_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -192,7 +192,7 @@ class MarketingController extends AbstractController
      */
     private function createEditForm(Marketing $entity )
     {
-        $form = $this->createForm(new MarketingType(), $entity, [
+        $form = $this->createForm(MarketingType::class, $entity, [
             'action' => $this->generateUrl('business_marketing_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

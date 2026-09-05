@@ -8,7 +8,7 @@ use App\Tool\Entity\GlobalOption;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SidebarWidgetType extends AbstractType
@@ -16,27 +16,26 @@ class SidebarWidgetType extends AbstractType
 
     private $globalOption;
 
-    public function __construct(GlobalOption $globalOption)
-    {
-        $this->globalOption = $globalOption;
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        // TODO(migration): SF3+ takes a form type class-string, not an instance.
-        // Move these constructor arguments into SidebarWidgetPanelType::configureOptions() and pass them as form options: $this->globalOption
-        $builder->add('sidebarWidgetPanels', new SidebarWidgetPanelType($this->globalOption));
+        $this->globalOption = $options['globalOption'];
+
+        $builder->add('sidebarWidgetPanels', SidebarWidgetPanelType::class, ['globalOption' => $this->globalOption]);
     }
     
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'globalOption' => null,
+        ]);
+
         $resolver->setDefaults(array(
             'data_class' => 'App\Appearance\Entity\SidebarWidget'
         ));
@@ -45,10 +44,9 @@ class SidebarWidgetType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'setting_bundle_appearancebundle_featurewidget';
     }
-
 
 }

@@ -16,10 +16,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\User\Entity\User;
 use App\User\Form\Type\UserNotificationFormType;
-use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\Event\UserEvent;
-use FOS\UserBundle\FOSUserEvents;
-use JMS\SecurityExtraBundle\Annotation as JMS;
+use App\User\Manager\UserManager;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +28,7 @@ class ManageUserController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly RequestStack $requestStack,
         private readonly PaginatorInterface $paginator,
+        private readonly UserManager $userManager,
     ) {
     }
 
@@ -229,7 +228,7 @@ class ManageUserController extends AbstractController
     {
         $user = $this->getUser();
 
-        $form = $this->createForm(new UserNotificationFormType(), $user);
+        $form = $this->createForm(UserNotificationFormType::class, $user);
 
         if ('POST' === $request->getMethod()) {
 
@@ -239,8 +238,6 @@ class ManageUserController extends AbstractController
 
                 $userManager = $this->getUserManager();
                 $userManager->updateUser($user);
-
-                $this->getEventDispatcher()->dispatch(DocudexUserEvent::USER_NOTIFICATION_SETTINGS_UPDATED, new UserEvent($user, $request));
 
                 $this->requestStack->getSession()->getFlashBag()->add(
                     'user-success',
@@ -255,9 +252,7 @@ class ManageUserController extends AbstractController
     }
 
 
-    /**
-     * @JMS\Secure(roles="ROLE_MANAGE_USERS")
-     */
+    #[IsGranted('ROLE_MANAGE_USERS')]
     public function changeUserPasswordAction(Request $request, User $user)
     {
         $val = $user->getPassword();
@@ -273,10 +268,6 @@ class ManageUserController extends AbstractController
         if ($plainPassword) {
             $this->getUserManager()->changeUserPassword($user, $plainPassword);
 
-            $this->getEventDispatcher()->dispatch(
-                FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
-                new FilterUserResponseEvent($user, $request, $response)
-            );
 
             $this->requestStack->getSession()->getFlashBag()->add(
                 'user-success',
@@ -364,9 +355,8 @@ class ManageUserController extends AbstractController
         return $baseDire;
     }
 
-	private function getUserManager()
+	private function getUserManager(): UserManager
 	{
-		// TODO(migration): AbstractController::get() was removed; inject this service.
-		return $this->get('Core.user_manager');
+		return $this->userManager;
 	}
 }

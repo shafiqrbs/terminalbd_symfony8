@@ -2,6 +2,7 @@
 
 namespace App\Medicine\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Medicine\Entity\MedicinePurchaseReturn;
 use App\Tool\Entity\TransactionMethod;
@@ -26,25 +27,21 @@ class PurchaseType extends AbstractType
 
     public  $option;
 
-    public function __construct(GlobalOption $option)
-    {
-        $this->option = $option;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->option = $options['option'];
+
         $builder
 
-           /* ->add('medicineVendor', 'entity', array(
+           /* ->add('medicineVendor', EntityType::class, array(
                 'required'    => true,
                 'class' => 'App\Medicine\Entity\MedicineVendor',
-                'empty_value' => '---Choose a vendor/supplier ---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor/supplier ---',
+                'choice_label' => 'companyName',
                 'attr'=>array('class'=>'m-wrap span12 medicineVendor select2 inputs'),
                 'constraints' =>array( new NotBlank(array('message'=>'Please select your vendor name')) ),
                 'query_builder' => function(EntityRepository $er){
@@ -58,8 +55,8 @@ class PurchaseType extends AbstractType
             ->add('medicinePurchaseReturn', EntityType::class, [
                 'required'    => false,
                 'class' => MedicinePurchaseReturn::class,
-                'empty_value' => '--Adjustment return--',
-                'property' => 'invoiceAmount',
+                'placeholder' => '--Adjustment return--',
+                'choice_label' => 'invoiceAmount',
                 'attr'=>['class'=>'m-wrap span12 inputs'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('wt')
                     ->where("wt.medicineConfig =".$this->option->getMedicineConfig()->getId())
@@ -69,8 +66,8 @@ class PurchaseType extends AbstractType
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
-                'empty_value' => '---Choose a Transaction---',
+                'choice_label' => 'name',
+                'placeholder' => '---Choose a Transaction---',
                 'attr'=>['class'=>'m-wrap span12 inputs transactionMethod'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('e')
                     ->where("e.status = 1")
@@ -81,8 +78,8 @@ class PurchaseType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -92,8 +89,8 @@ class PurchaseType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'m-wrap span12'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -101,27 +98,21 @@ class PurchaseType extends AbstractType
                     ->orderBy("b.name", "ASC"),
             ])
             ->add('memo',TextType::class, ['attr'=>['class'=>'m-wrap span12 inputs ','required' => false ,'label' => 'form.name','placeholder'=>'Memo no','autocomplete'=>'off']])
-          //  ->add('remark','textarea', array('attr'=>array('class'=>'m-wrap span12  resize ','rows'=>3,'required' => true ,'label' => 'form.name','placeholder'=>'Enter remark')))
+          //  ->add('remark', TextareaType::class, array('attr'=>array('class'=>'m-wrap span12  resize ','rows'=>3,'required' => true ,'label' => 'form.name','placeholder'=>'Enter remark')))
             ->add('receiveDate',DateType::class, ['attr'=>['class'=>'m-wrap span12 inputs','placeholder'=>'Enter receive date']])
             ->add('payment',TextType::class, ['attr'=>['class'=>'numeric span12 inputs m-wrap remove-value','placeholder'=>'Payment amount']])
             ->add('discountCalculation',NumberType::class, ['attr'=>['class'=>'m-wrap span12 salesInput','placeholder'=>'Add payment discount','data-original-title'=>'Add payment discount','autocomplete'=>'off']])
-            /*->add('invoiceMode', 'choice', array(
+            /*->add('invoiceMode', ChoiceType::class, array(
                 'attr'=>array('class'=>'m-wrap invoice-mode span12'),
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => array(
-                    'invoice' => 'Vendor Invoice',
-                    'manual' => 'Manual',
-                ),
+                'choices' => array('Vendor Invoice' => 'invoice', 'Manual' => 'manual'),
             ))*/
             ->add('discountType', ChoiceType::class, [
                 'attr'=>['class'=>'m-wrap discount-type span12'],
                 'expanded'      =>false,
                 'multiple'      =>false,
-                'choices' => [
-                    'percentage' => 'Percentage',
-                    'flat' => 'Flat',
-                ],
+                'choices' => ['Percentage' => 'percentage', 'Flat' => 'flat'],
             ])
            // ->add('asInvestment')
             ->add('discount',HiddenType::class);
@@ -132,6 +123,10 @@ class PurchaseType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'option' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => MedicinePurchase::class
         ]);

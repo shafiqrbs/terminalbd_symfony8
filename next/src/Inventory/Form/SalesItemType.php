@@ -9,20 +9,12 @@ use App\Inventory\Entity\InventoryConfig;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-
 class SalesItemType extends AbstractType
 {
-
 
     /** @var InventoryConfig */
 
     public  $inventoryConfig;
-
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-    }
-
 
     /**
      * @param FormBuilderInterface $builder
@@ -30,6 +22,8 @@ class SalesItemType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
 
         $builder
         ->add('item',TextType::class, ['attr'=>['class'=>'m-wrap span12 select2Item stockItem inputs','placeholder'=>'Enter product name or code','data-original-title'=>'Enter payment amount','autocomplete'=>'off']]);
@@ -42,6 +36,10 @@ class SalesItemType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
+        $resolver->setDefaults([
             'data_class' => SalesItem::class
         ]);
     }
@@ -53,6 +51,5 @@ class SalesItemType extends AbstractType
     {
         return 'salesitem';
     }
-
 
 }

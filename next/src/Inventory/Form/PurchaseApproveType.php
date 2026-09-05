@@ -22,24 +22,20 @@ class PurchaseApproveType extends AbstractType
 
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
         $builder
 
             ->add('transactionMethod', EntityType::class, [
                 'required'    => true,
                 'class' => TransactionMethod::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap transactionMethod'],
                 'constraints' =>[
                     new NotBlank(message: 'Please input required')
@@ -53,8 +49,8 @@ class PurchaseApproveType extends AbstractType
             ->add('accountBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountBank::class,
-                'empty_value' => '---Choose a bank---',
-                'property' => 'name',
+                'placeholder' => '---Choose a bank---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -64,8 +60,8 @@ class PurchaseApproveType extends AbstractType
             ->add('accountMobileBank', EntityType::class, [
                 'required'    => true,
                 'class' => AccountMobileBank::class,
-                'empty_value' => '---Choose a mobile banking---',
-                'property' => 'name',
+                'placeholder' => '---Choose a mobile banking---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span12 m-wrap'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('b')
                     ->where("b.status = 1")
@@ -79,12 +75,8 @@ class PurchaseApproveType extends AbstractType
             ->add('purchaseTo', ChoiceType::class, [
                 'required'    => false,
                 'attr'=>['class'=>'span12 m-wrap'],
-                'empty_value' => '---Choose a purchase To ---',
-                'choices' => [
-                    'International' => 'International',
-                    'National' => 'National',
-                    'In House' => 'In House'
-                ],
+                'placeholder' => '---Choose a purchase To ---',
+                'choices' => ['International' => 'International', 'National' => 'National', 'In House' => 'In House'],
             ])
             ->add('receiveDate', DateType::class, [
                 'widget' => 'single_text',
@@ -104,6 +96,10 @@ class PurchaseApproveType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Purchase::class
         ]);

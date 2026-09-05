@@ -87,7 +87,7 @@ class ServiceController extends AbstractController
      */
     private function createCreateForm(DpsService $entity)
     {
-        $form = $this->createForm(new ServiceType(), $entity, [
+        $form = $this->createForm(ServiceType::class, $entity, [
             'action' => $this->generateUrl('dps_service_create', ['id' => $entity->getId()]),
             'method' => 'POST',
             'attr' => [
@@ -134,7 +134,7 @@ class ServiceController extends AbstractController
     private function createEditForm(DpsService $entity)
     {
 
-        $form = $this->createForm(new ServiceType(), $entity, [
+        $form = $this->createForm(ServiceType::class, $entity, [
             'action' => $this->generateUrl('dps_service_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
             'attr' => [

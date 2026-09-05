@@ -26,25 +26,21 @@ class ItemSearchType extends AbstractType
 
     public  $inventoryConfig;
 
-    public function __construct(InventoryConfig $inventoryConfig)
-    {
-        $this->inventoryConfig = $inventoryConfig;
-    }
-
-
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->inventoryConfig = $options['inventoryConfig'];
+
 
         $builder
             ->add('masterItem', EntityType::class, [
                 'required'    => true,
                 'class' => Product::class,
-                'empty_value' => '---Choose a item ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a item ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span3 select2Product'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('p')
                     ->where("p.status = 1")
@@ -54,8 +50,8 @@ class ItemSearchType extends AbstractType
             ->add('vendor', EntityType::class, [
                 'required'    => true,
                 'class' => Vendor::class,
-                'empty_value' => '---Choose a vendor ---',
-                'property' => 'companyName',
+                'placeholder' => '---Choose a vendor ---',
+                'choice_label' => 'companyName',
                 'attr'=>['class'=>'span3 select2Vendor'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('v')
                     ->where("v.status = 1")
@@ -64,8 +60,8 @@ class ItemSearchType extends AbstractType
             ->add('color', EntityType::class, [
                 'required'    => true,
                 'class' => ItemColor::class,
-                'empty_value' => '---Choose a color ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a color ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span3 select2Color'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('v')
                     ->where("v.status = 1")
@@ -74,8 +70,8 @@ class ItemSearchType extends AbstractType
             ->add('size', EntityType::class, [
                 'required'    => true,
                 'class' => ItemSize::class,
-                'empty_value' => '---Choose a size ---',
-                'property' => 'name',
+                'placeholder' => '---Choose a size ---',
+                'choice_label' => 'name',
                 'attr'=>['class'=>'span3 select2Size'],
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('v')
                     ->where("v.status = 1")
@@ -89,6 +85,10 @@ class ItemSearchType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefaults([
+            'inventoryConfig' => null,
+        ]);
+
         $resolver->setDefaults([
             'data_class' => Item::class
         ]);
