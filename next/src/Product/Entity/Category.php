@@ -116,23 +116,23 @@ class Category
     private $content;
 
     #[Gedmo\Slug(handlers: [new Gedmo\SlugHandler(class: TreeSlugHandler::class, options: ['parentRelationField' => 'parent', 'separator' => '-'])], fields: ['name'])]
-    #[Doctrine\ORM\Mapping\Column(unique: false)]
+    #[ORM\Column(unique: false)]
     private $slug;
 
     #[Gedmo\Slug(handlers: [new Gedmo\SlugHandler(class: TreeSlugHandler::class, options: ['parentRelationField' => 'parent', 'separator' => '-'])], fields: ['nameBn'])]
-    #[Doctrine\ORM\Mapping\Column(unique: false)]
+    #[ORM\Column(unique: false)]
     private $slugBn;
 
     #[Gedmo\TreeParent]
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL', nullable: true)]
-    #[ORM\ManyToOne(targetEntity: \Category::class, inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'children')]
     private $parent;
 
     #[Gedmo\TreeLevel]
     #[ORM\Column(name: 'level', type: 'integer', nullable: true)]
     private $level;
 
-    #[ORM\OneToMany(targetEntity: \Category::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['name' => 'ASC'])]
     private $children;
 

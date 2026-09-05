@@ -49,7 +49,7 @@ class ItemColor
     private $name;
 
     #[Gedmo\Slug(fields: ['name'])]
-    #[Doctrine\ORM\Mapping\Column(length: 255)]
+    #[ORM\Column(length: 255)]
     private $slug;
 
     /**

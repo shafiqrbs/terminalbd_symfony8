@@ -122,10 +122,10 @@ class Particular
 
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL', nullable: true)]
-    #[ORM\ManyToOne(targetEntity: \Particular::class, inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: Particular::class, inversedBy: 'children')]
     private $parent;
 
-    #[ORM\OneToMany(targetEntity: \Particular::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: Particular::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['name' => 'ASC'])]
     private $children;
 

@@ -109,7 +109,7 @@ class AccountVendor
     private $companyName;
 
     #[Gedmo\Slug(fields: ['companyName'])]
-    #[Doctrine\ORM\Mapping\Column(length: 255)]
+    #[ORM\Column(length: 255)]
     private $slug;
 
     /**

@@ -26,10 +26,10 @@ class EmployeeTransaction
     private $id;
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[ORM\ManyToOne(targetEntity: \EmployeeTransaction::class, inversedBy: 'children', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: EmployeeTransaction::class, inversedBy: 'children', cascade: ['persist', 'remove'])]
     protected $parent;
 
-    #[ORM\OneToMany(targetEntity: \EmployeeTransaction::class, mappedBy: 'parent', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: EmployeeTransaction::class, mappedBy: 'parent', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['updated' => 'DESC'])]
     private $children;
 

@@ -96,7 +96,7 @@ class PurchaseVendorItem
     private $webName;
 
     #[Gedmo\Slug(handlers: [new Gedmo\SlugHandler(class: TreeSlugHandler::class, options: ['parentRelationField' => 'masterItem', 'separator' => '-'])], fields: ['webName', 'code'])]
-    #[Doctrine\ORM\Mapping\Column(length: 255, unique: true, nullable: true)]
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
 
     private $slug;
 

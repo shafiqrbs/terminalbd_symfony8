@@ -76,10 +76,10 @@ class Invoice
 
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL', nullable: true)]
-    #[ORM\ManyToOne(targetEntity: \Invoice::class, inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: Invoice::class, inversedBy: 'children')]
     private $parent;
 
-    #[ORM\OneToMany(targetEntity: \Invoice::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: Invoice::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['invoice' => 'ASC'])]
     private $children;
 

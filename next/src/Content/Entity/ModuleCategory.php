@@ -36,7 +36,7 @@ class ModuleCategory
     private $name;
 
     #[Gedmo\Slug(handlers: [new Gedmo\SlugHandler(class: TreeSlugHandler::class, options: ['parentRelationField' => 'globalOption', 'separator' => '-'])], fields: ['name'])]
-    #[Doctrine\ORM\Mapping\Column(length: 255)]
+    #[ORM\Column(length: 255)]
 
     private $slug;
 

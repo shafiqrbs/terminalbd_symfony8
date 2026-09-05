@@ -126,7 +126,7 @@ class Item
     private $skuWebSlug;
 
     #[Gedmo\Slug(fields: ['skuWebSlug'])]
-    #[Doctrine\ORM\Mapping\Column(length: 255)]
+    #[ORM\Column(length: 255)]
     private $slug;
 
     /**

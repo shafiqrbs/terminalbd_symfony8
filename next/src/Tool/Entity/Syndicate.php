@@ -56,14 +56,14 @@ class Syndicate
 
     #[Gedmo\TreeParent]
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL', nullable: true)]
-    #[ORM\ManyToOne(targetEntity: \Syndicate::class, inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: Syndicate::class, inversedBy: 'children')]
     private $parent;
 
     #[Gedmo\TreeLevel]
     #[ORM\Column(name: 'level', type: 'integer', nullable: true)]
     private $level;
 
-    #[ORM\OneToMany(targetEntity: \Syndicate::class, mappedBy: 'parent', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: Syndicate::class, mappedBy: 'parent', cascade: ['remove'])]
     #[ORM\OrderBy(['name' => 'ASC'])]
     private $children;
 

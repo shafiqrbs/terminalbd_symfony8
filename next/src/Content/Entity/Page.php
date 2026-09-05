@@ -39,10 +39,10 @@ class Page
 
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[ORM\ManyToOne(targetEntity: \Page::class, inversedBy: 'children', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Page::class, inversedBy: 'children', cascade: ['detach'])]
     protected $parent;
 
-    #[ORM\OneToMany(targetEntity: \Page::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: Page::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['name' => 'ASC'])]
     private $children;
 
@@ -67,7 +67,7 @@ class Page
 
 
     #[Gedmo\Slug(handlers: [new Gedmo\SlugHandler(class: TreeSlugHandler::class, options: ['parentRelationField' => 'globalOption', 'separator' => '-'])], fields: ['name'])]
-    #[Doctrine\ORM\Mapping\Column]
+    #[ORM\Column]
     private $slug;
 
     /**

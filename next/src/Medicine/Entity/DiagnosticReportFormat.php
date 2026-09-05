@@ -21,10 +21,10 @@ class DiagnosticReportFormat
     private $id;
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[ORM\ManyToOne(targetEntity: \DiagnosticReportFormat::class, inversedBy: 'children', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: DiagnosticReportFormat::class, inversedBy: 'children', cascade: ['detach'])]
     protected $parent;
 
-    #[ORM\OneToMany(targetEntity: \DiagnosticReportFormat::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: DiagnosticReportFormat::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['sorting' => 'ASC'])]
     private $children;
 

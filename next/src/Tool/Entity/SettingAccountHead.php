@@ -21,10 +21,10 @@ class SettingAccountHead
     private $id;
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[ORM\ManyToOne(targetEntity: \SettingAccountHead::class, inversedBy: 'children', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: SettingAccountHead::class, inversedBy: 'children', cascade: ['detach'])]
     protected $parent;
 
-    #[ORM\OneToMany(targetEntity: \SettingAccountHead::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: SettingAccountHead::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['name' => 'ASC'])]
     private $children;
 

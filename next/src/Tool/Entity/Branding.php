@@ -36,7 +36,7 @@ class Branding
 
 
     #[Gedmo\Slug(fields: ['name'])]
-    #[Doctrine\ORM\Mapping\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private $slug;
 
     /**

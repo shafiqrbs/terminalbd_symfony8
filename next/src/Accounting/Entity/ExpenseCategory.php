@@ -46,19 +46,19 @@ class ExpenseCategory
     private $name;
 
     #[Gedmo\Slug(handlers: [new Gedmo\SlugHandler(class: TreeSlugHandler::class, options: ['parentRelationField' => 'parent', 'separator' => '-'])], fields: ['name'])]
-    #[Doctrine\ORM\Mapping\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255, unique: true)]
     private $slug;
 
     #[Gedmo\TreeParent]
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL', nullable: true)]
-    #[ORM\ManyToOne(targetEntity: \ExpenseCategory::class, inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: ExpenseCategory::class, inversedBy: 'children')]
     private $parent;
 
     #[Gedmo\TreeLevel]
     #[ORM\Column(name: 'level', type: 'integer', nullable: true)]
     private $level;
 
-    #[ORM\OneToMany(targetEntity: \ExpenseCategory::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: ExpenseCategory::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['name' => 'ASC'])]
     private $children;
 

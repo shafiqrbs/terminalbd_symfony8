@@ -8,8 +8,21 @@ doctrine:
             json_array: App\Doctrine\Type\LegacyJsonArrayType
     orm:
         validate_xml_mapping: true
-        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        # The live schema was written by Doctrine 2's DefaultNamingStrategy:
+        # implicit columns keep the property's case and join columns are
+        # <property>_id - `globalOption_id`, `receiveDate`. The Symfony Flex
+        # default (underscore_number_aware) would look for `global_option_id`
+        # and `receive_date`, which exist nowhere in the database.
+        # Verified against a production dump by migration/bin/schema-diff.php.
+        naming_strategy: doctrine.orm.naming_strategy.default
         auto_mapping: false
+        # Ported from app/config/config.yml; five repositories call
+        # GROUP_CONCAT and DQL rejects an unregistered function.
+        dql:
+            string_functions:
+                group_concat: App\Tool\DQL\GroupConcat
+                date_format: App\Tool\DQL\DateFormat
+                random: App\Tool\DQL\Random
         mappings:
             # One mapping over the whole tree: the ported entity graph is a single
             # unit (48% of associations cross a former bundle boundary), so there

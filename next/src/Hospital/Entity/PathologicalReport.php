@@ -21,10 +21,10 @@ class PathologicalReport
     private $id;
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[ORM\ManyToOne(targetEntity: \PathologicalReport::class, inversedBy: 'children', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: PathologicalReport::class, inversedBy: 'children', cascade: ['detach'])]
     protected $parent;
 
-    #[ORM\OneToMany(targetEntity: \PathologicalReport::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: PathologicalReport::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['sorting' => 'ASC'])]
     private $children;
 

@@ -26,10 +26,10 @@ class PettyCash
     private $id;
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[ORM\ManyToOne(targetEntity: \PettyCash::class, inversedBy: 'children', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: PettyCash::class, inversedBy: 'children', cascade: ['persist', 'remove'])]
     protected $parent;
 
-    #[ORM\OneToMany(targetEntity: \PettyCash::class, mappedBy: 'parent', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: PettyCash::class, mappedBy: 'parent', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['updated' => 'DESC'])]
     private $children;
 

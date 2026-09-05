@@ -26,10 +26,10 @@ class Collection
     private $id;
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[ORM\ManyToOne(targetEntity: \Collection::class, inversedBy: 'children', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'children', cascade: ['detach'])]
     protected $parent;
 
-    #[ORM\OneToMany(targetEntity: \Collection::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: Collection::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['name' => 'ASC'])]
     private $children;
 
@@ -45,7 +45,7 @@ class Collection
 
 
     #[Gedmo\Slug(fields: ['name'])]
-    #[Doctrine\ORM\Mapping\Column(length: 255)]
+    #[ORM\Column(length: 255)]
     private $slug;
 
 

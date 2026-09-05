@@ -22,10 +22,10 @@ class MenuGrouping
 
 
     #[ORM\JoinColumn(name: 'parent', referencedColumnName: 'id', onDelete: 'SET NULL', nullable: true)]
-    #[ORM\ManyToOne(targetEntity: \MenuGrouping::class, inversedBy: 'children', cascade: ['remove'])]
+    #[ORM\ManyToOne(targetEntity: MenuGrouping::class, inversedBy: 'children', cascade: ['remove'])]
     protected $parent;
 
-    #[ORM\OneToMany(targetEntity: \MenuGrouping::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: MenuGrouping::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['sorting' => 'ASC'])]
     private $children;
 
