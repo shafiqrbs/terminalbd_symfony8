@@ -246,7 +246,7 @@ class ExpenditureController extends AbstractController
         $entities = $this->em->getRepository(\App\Accounting\Entity\ExpenseAndroidProcess::class)->getAndroidSalesList($conf);
         $pagination = $this->paginate($entities);
         $sales = $this->em->getRepository(\App\Accounting\Entity\Expenditure::class)->findAndroidDeviceSales($pagination);
-        return $this->render('@Accounting/Expenditure/android.html.twig', array(
+        return $this->render('Accounting/Expenditure/android.html.twig', array(
             'entities' => $pagination,
             'sales' => $sales,
         ));

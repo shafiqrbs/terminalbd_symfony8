@@ -71,7 +71,7 @@ class BranchInvoiceRepository extends EntityRepository
 
     public function updateBranchInvoiceTotalPrice(BranchInvoice $branchInvoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Inventory\Entity\BranchInvoiceItem::class,'si')
             ->select('sum(si.subTotal) as total , count(si.id) as totalItem , sum(si.quantity) as totalQuantity')

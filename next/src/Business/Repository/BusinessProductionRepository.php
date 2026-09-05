@@ -43,10 +43,10 @@ class BusinessProductionRepository extends EntityRepository
 
 	public function insertProduction($particular, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 	    $entity = new BusinessProduction();
 	    $entity->setBusinessParticular($particular);
-	    $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
+	    $particular = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
 	    $entity->setBusinessParticular($particular);
 	    $entity->setPurchasePrice($data['purchasePrice']);
 	    $entity->setSalesPrice($data['salesPrice']);
@@ -93,7 +93,7 @@ class BusinessProductionRepository extends EntityRepository
     public function insertStockProductionItem(BusinessProduction $production)
     {
 	    
-		$em = $this->_em;
+		$em = $this->getEntityManager();
         $particular = $production->getBusinessParticular();
 	    $qb = $this->createQueryBuilder('e');
 	    $qb->select('SUM(e.quantity) AS quantity');
@@ -103,7 +103,7 @@ class BusinessProductionRepository extends EntityRepository
         $particular->setPurchaseQuantity($productionQnt);
         $em->persist($particular);
         $em->flush();
-		$this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->remainingQnt($particular);
+		$this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->remainingQnt($particular);
 	    $this->productionExpense($production,$particular);
     }
 
@@ -128,9 +128,9 @@ class BusinessProductionRepository extends EntityRepository
 					$entity->setPurchasePrice($element->getPurchasePrice());
 					$entity->setSalesPrice($element->getSalesPrice());
 					$entity->setQuantity($element->getQuantity() * $production->getQuantity());
-					$this->_em->persist($entity);
-					$this->_em->flush();
-					$this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->salesProductionQnt($element);
+					$this->getEntityManager()->persist($entity);
+					$this->getEntityManager()->flush();
+					$this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->salesProductionQnt($element);
 				}
 			}
 		}

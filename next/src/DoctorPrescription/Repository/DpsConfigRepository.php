@@ -17,7 +17,7 @@ class DpsConfigRepository extends EntityRepository
     public function dpsReset(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getDpsConfig()->getId();
 
         $DoctorInvoice = $em->createQuery('DELETE DoctorPrescriptionBundle:DpsInvoice e WHERE e.dpsConfig = '.$config);

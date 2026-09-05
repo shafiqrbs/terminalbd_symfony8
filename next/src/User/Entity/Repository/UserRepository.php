@@ -22,21 +22,21 @@ class UserRepository extends EntityRepository
 
     public function create($data)
     {
-        $this->_em->persist($data);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($data);
+        $this->getEntityManager()->flush();
     }
 
     public function delete($data)
     {
-        $this->_em->remove($data);
-        $this->_em->flush();
+        $this->getEntityManager()->remove($data);
+        $this->getEntityManager()->flush();
     }
 
     public function update($data)
     {
-        $this->_em->persist($data);
-        $this->_em->flush();
-        return $this->_em;
+        $this->getEntityManager()->persist($data);
+        $this->getEntityManager()->flush();
+        return $this->getEntityManager();
     }
 
     public function searchAutoComplete($q, GlobalOption $globalOption)
@@ -76,7 +76,7 @@ class UserRepository extends EntityRepository
 
     public function newExistingCustomerForSales($globalOption,$mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['customerName'];
         $address = $data['customerAddress'] ?? '';
         $email = $data['customerEmail'] ?? '';
@@ -444,7 +444,7 @@ class UserRepository extends EntityRepository
     public function insertAccountUser(GlobalOption $option,$group)
     {
         $user = new User();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $username = time();
         $email = $username."@gmail.com";
         $user->setUsername($username);
@@ -524,7 +524,7 @@ class UserRepository extends EntityRepository
 
     public function getAndroidOTP($mobile){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $user = $this->findOneBy(['username'=>$mobile]);
         if($user){
             $a = mt_rand(1000,9999);
@@ -543,7 +543,7 @@ class UserRepository extends EntityRepository
 
     public function androidUserCreate(GlobalOption $setup,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $mobile = $data['mobile'] ?? '';
         $name = $data['name'] ?? '';
         $password = "8148148#";

@@ -230,8 +230,8 @@ class DpsTreatmentPlanRepository extends EntityRepository
     public function insertInvoiceItems($invoice, $data)
     {
 
-        $particular = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($data['particularId']);
-        $em = $this->_em;
+        $particular = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
         $entity = new DpsTreatmentPlan();
         $entity->setQuantity(1);
         $entity->setPrice($data['price']);
@@ -274,7 +274,7 @@ class DpsTreatmentPlanRepository extends EntityRepository
 
     public function insertPaymentTransaction($entity,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $id = $data['treatment'];
         $item = explode("-", $data['treatment']);
         $particular =  $item[0]; // piece1
@@ -293,9 +293,9 @@ class DpsTreatmentPlanRepository extends EntityRepository
         $payment = $data['receive'] !="" ? $data['receive'] : 0 ;
 
         if($treatmentId > 0){
-            $treatmentPlan = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->find($treatmentId);
+            $treatmentPlan = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class)->find($treatmentId);
         }elseif(empty($treatmentPlan)){
-            $particular =  $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($particular);
+            $particular =  $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($particular);
             $treatmentPlan = new DpsTreatmentPlan();
             $treatmentPlan->setDpsInvoice($entity);
             $treatmentPlan->setDpsParticular($particular);
@@ -400,7 +400,7 @@ class DpsTreatmentPlanRepository extends EntityRepository
     public function salesSummaryAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->getEntityManager();
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -433,7 +433,7 @@ class DpsTreatmentPlanRepository extends EntityRepository
     public function serviceBaseSummaryAction()
     {
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->getEntityManager();
         $data = $_REQUEST;
 
         $user = $this->getUser();
@@ -495,8 +495,8 @@ class DpsTreatmentPlanRepository extends EntityRepository
         $stmt->bindValue('status', 1);
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
 
 
@@ -519,8 +519,8 @@ class DpsTreatmentPlanRepository extends EntityRepository
         $stmt->bindValue('dpsConfig', $config->getId());
         $stmt->bindValue('status', 1);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
 
 
@@ -542,8 +542,8 @@ class DpsTreatmentPlanRepository extends EntityRepository
         $stmt->bindValue('dpsConfig', $config->getId());
         $stmt->bindValue('status', 1);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
 
 

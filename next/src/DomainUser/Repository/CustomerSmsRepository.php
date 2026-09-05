@@ -18,7 +18,7 @@ class CustomerSmsRepository extends EntityRepository
 		$sms->setSuccess($success);
 		$sms->setFailed($total - $success);
 		$sms->setSmsStatus('Done');
-		$this->_em->flush($sms);
+		$this->getEntityManager()->flush($sms);
 
 	}
 }

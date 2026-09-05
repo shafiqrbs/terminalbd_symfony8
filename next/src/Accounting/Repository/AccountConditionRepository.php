@@ -63,7 +63,7 @@ class AccountConditionRepository extends EntityRepository
 
     public function getLastBalance(GlobalOption $global)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('(COALESCE(SUM(e.amount),0)) AS balance');
         $qb->where("e.globalOption = :globalOption");

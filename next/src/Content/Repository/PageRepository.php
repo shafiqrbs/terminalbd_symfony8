@@ -48,7 +48,7 @@ class PageRepository extends EntityRepository
     {
 
         $entity = new Menu();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($page){
 
             $entity->setMenu($page->getMenu());
@@ -66,7 +66,7 @@ class PageRepository extends EntityRepository
     public  function updatePageMenu(Page $page)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
             $entity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['page' => $page->getId()]);
             if(!empty($entity)){
@@ -109,7 +109,7 @@ class PageRepository extends EntityRepository
 
     public function getCategoryPage($globalOption,$module,$cat){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $repository = $em->getRepository(\App\Content\Entity\Page::class);
         $query = $repository->createQueryBuilder('p')
@@ -128,7 +128,7 @@ class PageRepository extends EntityRepository
     public function findModuleContent($doamin,$module,$limit = 5)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $repository = $em->getRepository(\App\Content\Entity\Page::class);
         $query = $repository->createQueryBuilder('p')
             ->where('p.status = 1')
@@ -143,7 +143,7 @@ class PageRepository extends EntityRepository
     public function getListForModule($globalOption,$page)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $modArr = [];
         foreach ($page->getPageModules() as $mod){
             $modArr[] = $mod->getModule()->getId();
@@ -162,7 +162,7 @@ class PageRepository extends EntityRepository
     public function getPages($globalOption)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $query = $this->createQueryBuilder('p')
             ->select('p.id as id','p.menu as menu')

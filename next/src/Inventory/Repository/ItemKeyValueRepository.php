@@ -16,13 +16,13 @@ class ItemKeyValueRepository extends EntityRepository
     public function insertItemKeyValue(PurchaseVendorItem $reEntity,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i=0;
 
         if(isset($data['metaKey']) OR isset($data['metaValue']) ){
             foreach ($data['metaKey'] as $value) {
                 $metaId = $data['metaId'][$i] ?? 0 ;
-                $itemKeyValue = $this->_em->getRepository(\App\Inventory\Entity\ItemKeyValue::class)->findOneBy(['purchaseVendorItem'=>$reEntity,'id' => $metaId]);
+                $itemKeyValue = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemKeyValue::class)->findOneBy(['purchaseVendorItem'=>$reEntity,'id' => $metaId]);
                 if(!empty($metaId) and !empty($itemKeyValue)){
                     $this->updateMetaAttribute($itemKeyValue,$data['metaKey'][$i],$data['metaValue'][$i]);
                 }else{
@@ -47,7 +47,7 @@ class ItemKeyValueRepository extends EntityRepository
 
     public function updateMetaAttribute(ItemKeyValue $itemKeyValue,$key,$value ='')
     {
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $itemKeyValue->setMetaKey($key);
             $itemKeyValue->setMetaValue($value);
             $em->flush();
@@ -55,7 +55,7 @@ class ItemKeyValueRepository extends EntityRepository
 
     public function insertCopyItemKeyValue(PurchaseVendorItem $purchaseVendorItem , PurchaseVendorItem $item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i=0;
 
         if(!empty($item->getItemKeyValues())){
@@ -78,7 +78,7 @@ class ItemKeyValueRepository extends EntityRepository
     public function setDivOrdering($data)
     {
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         foreach ($data as $key => $value){
             $qb->update(\App\Inventory\Entity\ItemKeyValue::class, 'mg')

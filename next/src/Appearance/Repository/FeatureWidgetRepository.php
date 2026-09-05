@@ -18,7 +18,7 @@ class FeatureWidgetRepository extends EntityRepository
     {
 
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){
@@ -38,7 +38,7 @@ class FeatureWidgetRepository extends EntityRepository
     {
 
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){
@@ -59,7 +59,7 @@ class FeatureWidgetRepository extends EntityRepository
     public function setDivResize($data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $width = $data['width'];
         if($width > 100 || $width > 96 ){
             $width = 100;
@@ -76,7 +76,7 @@ class FeatureWidgetRepository extends EntityRepository
 
     public function getFeatureWidget(GlobalOption $option,$menu = "" )
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $qb = $this->createQueryBuilder('e');
         $qb->join('e.menu', 'm');

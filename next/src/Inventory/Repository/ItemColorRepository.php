@@ -13,7 +13,7 @@ class ItemColorRepository extends EntityRepository
 {
     public function getLastId($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(cs)');
         $qb->from(\App\Inventory\Entity\ItemColor::class,'e');
         $qb->where("e.inventoryConfig = :inventory");

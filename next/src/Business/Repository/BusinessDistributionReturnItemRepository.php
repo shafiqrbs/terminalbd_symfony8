@@ -64,7 +64,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
 
     public function returnRemainingStock($config)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('SUM(e.remainingQnt) AS quantity');
         $qb->addSelect('s.id AS id');
@@ -88,7 +88,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
 
     public function returnRemainingStockItem($config,$item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('SUM(e.remainingQnt) AS quantity');
         $qb->join('e.businessParticular','s');
@@ -116,7 +116,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
 
     public function insertPurchaseReturnItem(BusinessPurchaseReturn $entity, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $itemIds = $data['itemId'];
         $quantity= $data['quantity'];
@@ -142,7 +142,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
 
     public function insertSalesDamageReturnItem(BusinessInvoiceReturnItem $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $em->getRepository(\App\Business\Entity\BusinessDistributionReturnItem::class)->findOneBy(['invoiceReturnItem' => $entity]);
         if(empty($exist)){
             $item = new BusinessDistributionReturnItem();
@@ -161,7 +161,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
 
     public function deleteSalesDamageReturnItem(BusinessInvoiceReturnItem $invoiceParticular)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $this->findOneBy(['invoiceReturnItem' => $invoiceParticular->getId()]);
         if($entity){
             $em->remove($entity);
@@ -172,7 +172,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
 
     public function deletePurchaseReturnItem(BusinessInvoiceParticular $invoiceParticular)
     {
-       $em = $this->_em;
+       $em = $this->getEntityManager();
        $entity = $this->findOneBy(['salesInvoiceItem' => $invoiceParticular->getId()]);
        if($entity){
            $em->remove($entity);
@@ -184,7 +184,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
 
     public function removePurchaseReturn(BusinessInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($entity->getBusinessInvoiceParticulars() as $particular){
             $this->deletePurchaseReturnItem($particular);
         }
@@ -197,7 +197,7 @@ class BusinessDistributionReturnItemRepository extends EntityRepository
 
     public function insertUpdateDistributionReturnItem( BusinessInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var $item BusinessInvoiceParticular */
 

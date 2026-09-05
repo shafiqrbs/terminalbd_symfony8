@@ -93,7 +93,7 @@ class AccountSalesReturnRepository extends EntityRepository
 
     public function lastInsertSales($globalOption,$entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSalesReturn::class)->findOneBy(
             ['globalOption'=>$globalOption,'customer'=> $entity->getSales()->getCustomer(),'process'=>'approved'],
             ['id' => 'DESC']
@@ -107,7 +107,7 @@ class AccountSalesReturnRepository extends EntityRepository
 
     public function insertAccountSalesReturn(SalesReturn $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSalesReturn();
         $accountSales->setGlobalOption($entity->getInventoryConfig()->getGlobalOption());
         if(!empty($entity->getBranches())){
@@ -120,7 +120,7 @@ class AccountSalesReturnRepository extends EntityRepository
         $accountSales->setAmount($entity->getTotal());
         $accountSales->setProcess('approved');
         $accountSales->setProcessHead('SalesReturn');
-        $accountSales->setTransactionMethod($this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
+        $accountSales->setTransactionMethod($this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         $em->persist($accountSales);
         $em->flush();
 
@@ -130,13 +130,13 @@ class AccountSalesReturnRepository extends EntityRepository
 
     public function insertAccountSalesReturnx(SalesReturn $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
         $accountSales->setGlobalOption($entity->getInventoryConfig()->getGlobalOption());
         $accountSales->setSalesReturn($entity);
         $accountSales->setCustomer($entity->getSales()->getCustomer());
         /* Cash - Sales Return Payment Account */
-        $accountSales->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(35));
+        $accountSales->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(35));
 
         $accountSales->setReturnAmount($entity->getTotal());
         $accountSales->setApprovedBy($entity->getCreatedBy());

@@ -16,12 +16,12 @@ class BackendWidgetController extends AbstractController
     public function topBarAction($slug='')
     {
         $em = $this->em;
-        return $this->render('@SettingTool/Widget/common.html.twig');
+        return $this->render('Tool/Widget/common.html.twig');
 
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
 
             $globalOption = $this->getUser()->getGlobalOption();
-            return $this->render('@SettingTool/Widget/admin.html.twig', [
+            return $this->render('Tool/Widget/admin.html.twig', [
                 'globalOption' => $globalOption
             ]);
 
@@ -30,7 +30,7 @@ class BackendWidgetController extends AbstractController
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
            // $todaySalesOverview = $em->getRepository(\App\Inventory\Entity\Sales::class)->todaySalesOverview($inventory);
             //$accountHeads = $em->getRepository(\App\Accounting\Entity\Transaction::class)->specificParentAccountHead($inventory,23);
-            return $this->render('@SettingTool/Widget/common.html.twig', [
+            return $this->render('Tool/Widget/common.html.twig', [
                // 'todaySalesOverview'      => $todaySalesOverview,
                 //'accountHeads'      => $accountHeads,
             ]);
@@ -40,7 +40,7 @@ class BackendWidgetController extends AbstractController
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $todaySalesOverview = $em->getRepository(\App\Inventory\Entity\Sales::class)->todaySalesOverview($inventory);
             $accountHeads = $em->getRepository(\App\Accounting\Entity\Transaction::class)->specificParentAccountHead($inventory,23);
-            return $this->render('@SettingTool/Widget/admin.html.twig', [
+            return $this->render('Tool/Widget/admin.html.twig', [
                 'todaySalesOverview'      => $todaySalesOverview,
                 'accountHeads'      => $accountHeads,
             ]);
@@ -50,7 +50,7 @@ class BackendWidgetController extends AbstractController
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $todaySalesOverview = $em->getRepository(\App\Inventory\Entity\Sales::class)->todaySalesOverview($inventory);
             $accountHeads = $em->getRepository(\App\Accounting\Entity\Transaction::class)->specificParentAccountHead($inventory,23);
-            return $this->render('@SettingTool/Widget/admin.html.twig', [
+            return $this->render('Tool/Widget/admin.html.twig', [
                 'todaySalesOverview'      => $todaySalesOverview,
                 'accountHeads'      => $accountHeads,
             ]);

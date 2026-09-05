@@ -202,8 +202,8 @@ class HmsInvoiceReturnRepository extends EntityRepository
         $stmt->bindValue('process', 'Approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;

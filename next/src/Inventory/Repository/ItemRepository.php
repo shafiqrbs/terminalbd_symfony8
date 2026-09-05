@@ -104,7 +104,7 @@ class ItemRepository extends EntityRepository
         /*if(!empty($excelImporter)){
 
             $purchaseIds = array();
-            $purchases = $this->_em->getRepository(\App\Inventory\Entity\Purchase::class)->findBy(array('purchaseImport' => $excelImporter, 'process' => 'imported' ));
+            $purchases = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Purchase::class)->findBy(array('purchaseImport' => $excelImporter, 'process' => 'imported' ));
             foreach ($purchases as $purchase){
                 $purchaseIds = $purchase->getId();
             }
@@ -117,8 +117,8 @@ class ItemRepository extends EntityRepository
         foreach ($result as $row ){
             $entity = $this->find($row['id']);
             $entity->setPurchaseQuantity($row['quantity']);
-            $this->_em->persist($entity);
-            $this->_em->flush($entity);
+            $this->getEntityManager()->persist($entity);
+            $this->getEntityManager()->flush($entity);
         }
 
     }
@@ -139,7 +139,7 @@ class ItemRepository extends EntityRepository
     public function checkDuplicateSKU(InventoryConfig $inventory,$data)
     {
 
-        $product = $this->_em->getRepository(\App\Inventory\Entity\Product::class)->insertMasterItem($inventory,$data);
+        $product = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Product::class)->insertMasterItem($inventory,$data);
         $masterItem = $data['item']['name'];
         $vendor = $data['item']['vendor'] ?? 'NULL';
         $itemColor = $data['item']['color'] ?? 'NULL';
@@ -215,7 +215,7 @@ class ItemRepository extends EntityRepository
 
     public function  getApiStock(GlobalOption $option , $data = '')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getInventoryConfig()->getId();
         $qb = $this->createQueryBuilder('e');
         $qb->join('e.masterItem','m');
@@ -336,27 +336,27 @@ class ItemRepository extends EntityRepository
         $qb->where("item.inventoryConfig = :inventory");
         $qb->setParameter('inventory', $inventory);
 
-        $existMasterItem = $this->_em->getRepository(\App\Inventory\Entity\Product::class)->findOneBy(['name'=> $data['masterItem']])->getId();
+        $existMasterItem = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Product::class)->findOneBy(['name'=> $data['masterItem']])->getId();
         $qb->andWhere('item.masterItem = :masterId');
         $qb->setParameter('masterId', $existMasterItem);
 
         if($inventory->getIsSize() == 1) {
-            $itemSize = $this->_em->getRepository(\App\Inventory\Entity\ItemSize::class)->findOneBy(['name'=> $itemSize ]);
+            $itemSize = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemSize::class)->findOneBy(['name'=> $itemSize ]);
             $qb->andWhere('item.size = :itemSize');
             $qb->setParameter('itemSize', $itemSize);
         }
         if($inventory->getIsColor() == 1) {
-            $itemColor = $this->_em->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['name'=> $itemColor]);
+            $itemColor = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['name'=> $itemColor]);
             $qb->andWhere('item.color = :itemColor');
             $qb->setParameter('itemColor', $itemColor);
         }
         if($inventory->getIsVendor() == 1) {
-            $vendor = $this->_em->getRepository(\App\Inventory\Entity\Vendor::class)->findOneBy(['inventoryConfig'=> $inventory,'companyName'=> $vendor ]);
+            $vendor = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Vendor::class)->findOneBy(['inventoryConfig'=> $inventory,'companyName'=> $vendor ]);
             $qb->andWhere('item.vendor = :vendor');
             $qb->setParameter('vendor', $vendor);
         }
         if($inventory->getIsBrand() == 1) {
-            $itemBrand = $this->_em->getRepository(\App\Inventory\Entity\ItemBrand::class)->findOneBy(['inventoryConfig'=> $inventory,'name'=> $itemBrand ]);
+            $itemBrand = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemBrand::class)->findOneBy(['inventoryConfig'=> $inventory,'name'=> $itemBrand ]);
             $qb->andWhere('item.brand = :itemBrand');
             $qb->setParameter('itemBrand', $itemBrand);
         }
@@ -476,7 +476,7 @@ class ItemRepository extends EntityRepository
 
     public function getLastId($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(item.id)');
         $qb->from(\App\Inventory\Entity\Item::class,'item');
         $qb->where("item.inventoryConfig = :inventory");
@@ -559,7 +559,7 @@ class ItemRepository extends EntityRepository
 
     public function updateRemainingQuantity(Item $item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $remainingQnt = ($item->getPurchaseQuantity() + $item->getSalesQuantityReturn() + $item->getAdjustmentQuantity()) - ($item->getSalesQuantity() + $item->getPurchaseQuantityReturn()+$item->getDamageQuantity());
         $item->setRemainingQnt($remainingQnt);
         $em->flush();
@@ -569,13 +569,13 @@ class ItemRepository extends EntityRepository
 
     public function getItemUpdatePriceQnt(Purchase $purchase){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $purchaseItem PurchaseItem */
         foreach($purchase->getPurchaseItems() as $purchaseItem ){
 
             $entity = $purchaseItem->getItem();
             /** @var Item $entity */
-            $qnt = $this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($entity->getId(),'purchase');
+            $qnt = $this->getEntityManager()->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($entity->getId(),'purchase');
             $entity->setPurchaseQuantity($qnt);
             if($purchaseItem->getSalesPrice() > 0 ){
                 $entity->setSalesPrice($purchaseItem->getSalesPrice());
@@ -593,13 +593,13 @@ class ItemRepository extends EntityRepository
 
     public function purchaseItemReverseUpdateQnt(Purchase $purchase){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var $purchaseItem PurchaseItem  */
         foreach($purchase->getPurchaseItems() as $purchaseItem ){
 
             $entity = $purchaseItem->getItem();
             /** @var Item $entity */
-            $qnt = $this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($entity->getId(),'purchase');
+            $qnt = $this->getEntityManager()->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($entity->getId(),'purchase');
             $entity->setPurchaseQuantity(abs($qnt));
             $entity->setUpdated($purchase->getCreated());
             $em->persist($entity);
@@ -610,7 +610,7 @@ class ItemRepository extends EntityRepository
     }
 
     public function stockAdjustment(Item $stock){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $adjustment = $em->getRepository(\App\Inventory\Entity\ItemStockAdjustment::class)->adjustmentStockItemUpdate($stock);
         $stock->setAdjustmentQuantity($adjustment['quantity']);
         $stock->setBonusAdjustment($adjustment['bonus']);
@@ -622,7 +622,7 @@ class ItemRepository extends EntityRepository
 
     public function getItemPurchaseReturn(PurchaseReturn $purchaseReturn){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $purchaseReturnItem PurchaseReturnItem */
         foreach($purchaseReturn->getPurchaseReturnItems() as $purchaseReturnItem ){
 
@@ -640,7 +640,7 @@ class ItemRepository extends EntityRepository
 
     public function getItemPurchaseReplace($purchaseReplaceItem){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
             $entity = $purchaseReplaceItem->getPurchaseItem()->getItem();
             $qnt = ($entity->getPurchaseQuantityReplace() + $purchaseReplaceItem->getReplaceQuantity());
             $entity->setPurchaseQuantityReturn($qnt);
@@ -652,14 +652,14 @@ class ItemRepository extends EntityRepository
 
     public function getItemSalesUpdate($id){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $salesItems = $em->getRepository(\App\Inventory\Entity\SalesItem::class)->findBy(['sales' => $id]);
         if($salesItems){
             /** @var $salesItem SalesItem */
             foreach($salesItems as $salesItem ){
                 /** @var  $entity Item */
                 $entity = $salesItem->getItem();
-                $qnt = $this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($entity->getId(),'sales');
+                $qnt = $this->getEntityManager()->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($entity->getId(),'sales');
                 $entity->setSalesQuantity(abs($qnt));
                 $em->persist($entity);
                 $em->flush($entity);
@@ -670,7 +670,7 @@ class ItemRepository extends EntityRepository
 
     public function getSalesItemReverse(Sales $sales){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var  $salesItem SalesItem */
 
@@ -678,7 +678,7 @@ class ItemRepository extends EntityRepository
 
             /* @var Item $entity */
             $entity = $salesItem->getItem();
-            $qnt = $this->_em->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($entity->getId(),'sales');
+            $qnt = $this->getEntityManager()->getRepository(\App\Inventory\Entity\StockItem::class)->getItemQuantity($entity->getId(),'sales');
             $entity->setSalesQuantity(abs($qnt));
             $em->persist($entity);
             $em->flush($entity);
@@ -689,7 +689,7 @@ class ItemRepository extends EntityRepository
 
     public function getItemSalesReturnUpdate(SalesReturn $sales){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $salesItem SalesItem */
 
@@ -710,7 +710,7 @@ class ItemRepository extends EntityRepository
 
     public function onlineOrderUpdate(Order $order){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach($order->getOrderItems() as $orderItem ) {
 
             $entity = $orderItem->getPurchaseItem()->getItem();
@@ -724,7 +724,7 @@ class ItemRepository extends EntityRepository
 
     public function itemDamageUpdate(Damage $damage){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
             $entity = $damage->getItem();
             $qnt = ($entity->getDamageQuantity() + $damage->getQuantity());
@@ -737,7 +737,7 @@ class ItemRepository extends EntityRepository
 
     public function groupByItemCategory(InventoryConfig $config){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $qb = $this->createQueryBuilder('item');
         $qb->join('item.masterItem', 'mi');
@@ -769,7 +769,7 @@ class ItemRepository extends EntityRepository
                 $purchasePrice = '';
             }
 
-          //  $ongoingSalesQnt = $this->_em->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesQuantity($purchaseItem);
+          //  $ongoingSalesQnt = $this->getEntityManager()->getRepository(\App\Inventory\Entity\SalesItem::class)->checkSalesQuantity($purchaseItem);
             $ongoingSalesQnt = 0;
             $data .= '<tr>';
             $data .= '<td class="numeric" >' . $purchaseItem->getBarcode() .'</td>';
@@ -796,10 +796,10 @@ class ItemRepository extends EntityRepository
 
         $data ='';
 
-        $result = $this->_em->getRepository(\App\Inventory\Entity\Delivery::class)->stockItemDetails($user,$item);
-        $stockSalesItem = $this->_em->getRepository(\App\Inventory\Entity\Delivery::class)->stockSalesItemDetails($user,$item);
-        $stockOngoingItem = $this->_em->getRepository(\App\Inventory\Entity\Delivery::class)->stockOngoingItemDetails($user,$item);
-        $stockReturnItem = $this->_em->getRepository(\App\Inventory\Entity\Delivery::class)->stockReturnItemDetails($user,$item);
+        $result = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Delivery::class)->stockItemDetails($user,$item);
+        $stockSalesItem = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Delivery::class)->stockSalesItemDetails($user,$item);
+        $stockOngoingItem = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Delivery::class)->stockOngoingItemDetails($user,$item);
+        $stockReturnItem = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Delivery::class)->stockReturnItemDetails($user,$item);
 
         foreach( $result as $row  ) {
 
@@ -898,7 +898,7 @@ class ItemRepository extends EntityRepository
         $domainSlug     = $config->getGlobalOption()->getSlug();
         $skuWeb         = $skuSlug.'_'.$domainSlug;
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity->setName($name);
         $entity->setSku($sku);
         $entity->setSlug($skuSlug);
@@ -947,7 +947,7 @@ class ItemRepository extends EntityRepository
     public function  processStockMigration($from, $to)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $stock = $em->createQuery("DELETE InventoryBundle:Item e WHERE e.inventoryConfig={$to}");
         if($stock){
             $stock->execute();
@@ -959,17 +959,17 @@ class ItemRepository extends EntityRepository
   WHERE medicineConfig_id =:config";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
         $qb1->bindValue('config', $from);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
         $stockUpdate = "UPDATE medicine_stock SET mode = 'medicice' WHERE  medicineConfig_id =:config AND mode IS NULL";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($stockUpdate);
         $qb1->bindValue('config', $to);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
     }
 
     public function getExistVendor($inventory,$name)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $em->getRepository(\App\Inventory\Entity\Vendor::class)->findOneBy(['inventoryConfig'=>$inventory,'companyName'=>$name]);
         if($exist){
             return $exist;
@@ -986,7 +986,7 @@ class ItemRepository extends EntityRepository
 
     public function getExistBrand($inventory,$name)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $em->getRepository(\App\Inventory\Entity\ItemBrand::class)->findOneBy(['inventoryConfig'=>$inventory,'name'=>$name]);
         if($exist){
             return $exist;
@@ -1002,7 +1002,7 @@ class ItemRepository extends EntityRepository
 
     public function getExistCategory($inventory,$name)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $em->getRepository(\App\Product\Entity\Category::class)->findOneBy(['inventoryConfig' => $inventory,'name'=>$name,'permission'=>'private']);
         if($exist){
             return $exist;
@@ -1022,7 +1022,7 @@ class ItemRepository extends EntityRepository
 
     public function getExistMasterItem($inventory,$category,$name)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $em->getRepository(\App\Inventory\Entity\ItemBrand::class)->findOneBy(['inventoryConfig'=>$inventory,'name'=>$name]);
         if($exist){
             return $exist;

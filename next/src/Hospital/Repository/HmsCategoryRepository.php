@@ -101,7 +101,7 @@ class HmsCategoryRepository extends MaterializedPathRepository
     public function setFeatureOrdering($data)
     {
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){
@@ -121,7 +121,7 @@ class HmsCategoryRepository extends MaterializedPathRepository
     {
 
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $isFeatures = $data['feature'];
         $catIDs = $data['catId'];

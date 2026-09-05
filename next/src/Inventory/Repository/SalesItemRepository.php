@@ -37,8 +37,8 @@ class SalesItemRepository extends EntityRepository
             ->getConnection()
             ->prepare($sql);
         $stmt->bindValue('inventoryConfig', $inventory->getId());
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
 
     }
@@ -49,8 +49,8 @@ class SalesItemRepository extends EntityRepository
                 WHERE salesItem.sales_id = :invoice";
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
         $stmt->bindValue('invoice', $entity);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         return $result['total'];
     }
 
@@ -73,8 +73,8 @@ class SalesItemRepository extends EntityRepository
         $stmt->bindValue('process', 'Done');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;
@@ -98,8 +98,8 @@ class SalesItemRepository extends EntityRepository
         $stmt->bindValue('config', $config);
         $stmt->bindValue('process', 'Done');
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['month']] = $result;
@@ -212,7 +212,7 @@ class SalesItemRepository extends EntityRepository
     public function insertSalesItems(Sales $sales,Item $item,$data)
     {
 
-    	$em = $this->_em;
+    	$em = $this->getEntityManager();
 
         $existEntity = $this->findOneBy(['sales'=> $sales,'item'=> $item]);
         $price = empty($data['salesPrice']) ? $item->getSalesPrice() : $data['salesPrice'];
@@ -242,7 +242,7 @@ class SalesItemRepository extends EntityRepository
     public function insertOnlineSalesPurchaseItem(Sales $sales,PurchaseItem $purchaseItem,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $existEntity = $this->findOneBy(['sales'=> $sales,'purchaseItem'=> $purchaseItem]);
         if(!empty($existEntity)){
 
@@ -270,7 +270,7 @@ class SalesItemRepository extends EntityRepository
 
     public function insertSalesPurchaseItems($sales,$purchaseItem,$customPrice = 0 )
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $existEntity = $this->findOneBy(['sales'=> $sales,'purchaseItem'=> $purchaseItem]);
 
         if(!empty($existEntity)){
@@ -300,7 +300,7 @@ class SalesItemRepository extends EntityRepository
 
     public function insertSerialSalesItems($sales,$purchaseItem,PurchaseItemSerial $serial)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $existSerial = $em->getRepository(SalesItemSerial::class)->findOneBy(['purchaseItemSerial'=> $serial]);
         $existEntity = $this->findOneBy(['sales'=> $sales,'purchaseItem'=> $purchaseItem]);
         if(!empty($existEntity) and empty($existSerial)){
@@ -435,7 +435,7 @@ class SalesItemRepository extends EntityRepository
 
     public function manualSalesItemUpdate(SalesItem $salesItem , $data)
     {
-	    $em = $this->_em;
+	    $em = $this->getEntityManager();
 	    $salesItemId = $data['itemId'];
 	    $quantity = $data['quantity'];
 	    $salesPrice =$data['salesPrice'];
@@ -566,7 +566,7 @@ class SalesItemRepository extends EntityRepository
         $globalOption = $user->getGlobalOption();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\Sales::class,'sales');
         $qb->select('SUM(sales.vat) AS salesVat');
         $qb->where("sales.inventoryConfig = :inventoryConfig");

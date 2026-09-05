@@ -70,7 +70,7 @@ class MenuRepository extends EntityRepository
     public function updateMenuForCategory(ModuleCategory $entity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $menu = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['category' => $entity]);
         if(!empty($menu)){

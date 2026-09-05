@@ -33,7 +33,7 @@ class MedicineAndroidProcessRepository extends EntityRepository
 
     public function insertAndroidProcess(GlobalOption $option,$device,$process,$data)
     {
-        $em =  $this->_em;
+        $em =  $this->getEntityManager();
         $device = $em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->findOneBy(['globalOption'=> $option,'id' => $device]);
         $entity = new MedicineAndroidProcess();
         $entity->setMedicineConfig($option->getMedicineConfig());
@@ -53,7 +53,7 @@ class MedicineAndroidProcessRepository extends EntityRepository
 
     public function insertFlutterSalesProcess(GlobalOption $option,$device,$process,$data)
     {
-        $em =  $this->_em;
+        $em =  $this->getEntityManager();
         $device = $em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->findOneBy(['globalOption'=> $option,'id' => $device]);
         $entity = new MedicineAndroidProcess();
         $entity->setMedicineConfig($option->getMedicineConfig());

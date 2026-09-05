@@ -92,7 +92,7 @@ class AccountOnlineOrderRepository extends EntityRepository
 
     public function lastInsertOnlineOrder($globalOption,$entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository('AccountingBundle:AccountOnlineOrder')->findOneBy(
             ['globalOption' => $globalOption,'customer'=> $entity->getCustomer(),'process'=>'approved'],
             ['id' => 'DESC']
@@ -107,7 +107,7 @@ class AccountOnlineOrderRepository extends EntityRepository
     public function insertAccountOnlineOrder(Order $entity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $onlineOrder = new AccountOnlineOrder();
         $onlineOrder->setAccountBank($entity->getAccountBank());
         $onlineOrder->setAccountMobileBank($entity->getAccountMobileBank());
@@ -127,7 +127,7 @@ class AccountOnlineOrderRepository extends EntityRepository
         $onlineOrder->setProcess('approved');
         $em->persist($onlineOrder);
         $em->flush();
-        $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertOnlineOrderCash($onlineOrder);
+        $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertOnlineOrderCash($onlineOrder);
         return $onlineOrder;
 
     }
@@ -150,9 +150,9 @@ class AccountOnlineOrderRepository extends EntityRepository
         $qb->setParameter('globalOption', $globalOption);
         $this->handleSearchBetween($qb,$data);
         $result = $qb->getQuery()->getSingleResult();
-        $purchasePrice = $this->_em->getRepository(\App\Inventory\Entity\SalesItem::class)->reportPurchasePrice($globalOption,$data);
-        $Expenditures = $this->_em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditure($globalOption,$data);
-        $revenues = $this->_em->getRepository(\App\Accounting\Entity\AccountJournal::class)->reportOperatingRevenue($globalOption,$data);
+        $purchasePrice = $this->getEntityManager()->getRepository(\App\Inventory\Entity\SalesItem::class)->reportPurchasePrice($globalOption,$data);
+        $Expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditure($globalOption,$data);
+        $revenues = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountJournal::class)->reportOperatingRevenue($globalOption,$data);
 
         $data =  ['salesAmount' => $result['salesAmount'],'purchasePrice' => $purchasePrice,'revenues' => $revenues ,'expenditures' => $Expenditures];
         return $data;

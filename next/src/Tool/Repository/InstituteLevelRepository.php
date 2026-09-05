@@ -66,7 +66,7 @@ class InstituteLevelRepository extends MaterializedPathRepository{
     public function getInstituteLevelOptions(){
 
         $ret = [];
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $instituteLevels = $em->getRepository('SettingToolBundle:InstituteLevel')->findBy([],['name'=>'asc']);
 
         foreach( $instituteLevels as $cat ){
@@ -248,7 +248,7 @@ class InstituteLevelRepository extends MaterializedPathRepository{
     public function getInstituteLevelList($categories=NULL)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $categories     = $em -> getRepository('SettingToolBundle:InstituteLevel')->findBy(['status'=>1,'parent'=>1],['name'=>'asc']);
 
         $array =[];

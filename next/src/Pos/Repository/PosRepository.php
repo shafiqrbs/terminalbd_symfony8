@@ -18,7 +18,7 @@ class PosRepository extends EntityRepository
 
     public function posReset($option)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getId();
         $history = $em->createQuery("DELETE PosBundle:Pos e WHERE e.terminal = {$config}");
         $history->execute();
@@ -26,7 +26,7 @@ class PosRepository extends EntityRepository
 
     public function insert(User $user){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $find = $this->findOneBy(['createdBy' => $user , 'process' => 'Created']);
         $config = $user->getGlobalOption()->getInventoryConfig();
         $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
@@ -60,7 +60,7 @@ class PosRepository extends EntityRepository
     public function reset($user)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $entity Pos */
         $entity = $this->findOneBy(['createdBy' => $user , 'process' => 'Created']);
         if(empty($entity)){
@@ -97,7 +97,7 @@ class PosRepository extends EntityRepository
     public function update($user,$cart)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $user->getGlobalOption()->getInventoryConfig();
 
         /* @var $entity Pos */
@@ -136,7 +136,7 @@ class PosRepository extends EntityRepository
 
     public function insertHold(Pos $pos,$cart)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($cart->contents() as $product){
             $entity = new PosItem();
             $entity->setPos($pos);
@@ -155,7 +155,7 @@ class PosRepository extends EntityRepository
 
     public function getLastId($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(e.id)');
         $qb->from(\App\Inventory\Entity\Vendor::class,'e');
         $qb->where("e.inventoryConfig = :inventory");

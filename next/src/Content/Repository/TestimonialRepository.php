@@ -15,7 +15,7 @@ class TestimonialRepository extends EntityRepository
     public function  getRandomTestimonial()
     {
         $count = 2;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entities = $em->getRepository(\App\Content\Entity\Testimonial::class)->findBy(['status' => 1]);
         if (!empty($entities)){
             return $data = $this->createQueryBuilder('t')

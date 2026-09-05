@@ -14,7 +14,7 @@ class PettyCashRepository extends EntityRepository
 {
     public function lastInsertCash(PettyCash $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if( $entity->getTransactionMethod()->getId() == 2 ){
 
             $entity = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->findOneBy(

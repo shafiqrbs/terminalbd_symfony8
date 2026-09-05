@@ -64,7 +64,7 @@ class CategoryRepository extends MaterializedPathRepository
     {
 
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $tree = "";					// Clear the directory tree
         $this->depth = 1;			// Child level depth.
@@ -110,7 +110,7 @@ class CategoryRepository extends MaterializedPathRepository
     public function build_child($oldID = null ,$array=[])
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $tree = "";					// Clear the directory tree
         $this->depth = 1;			// Child level depth.
         $top_level_on = 1;			// What top-level category are we on?
@@ -144,7 +144,7 @@ class CategoryRepository extends MaterializedPathRepository
 
     public function printCategoryTree($category,$parent = 0) {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 	    $trees = [];
         /* @var $row Category */
 
@@ -161,7 +161,7 @@ class CategoryRepository extends MaterializedPathRepository
 
 	public function printTree( $category ,$parent = 0, $spacing = '--', $user_tree_array = '' ) {
 
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$user_tree_array = [];
 		foreach ($category as $row )
 		{
@@ -497,7 +497,7 @@ class CategoryRepository extends MaterializedPathRepository
     public function setFeatureOrdering($data)
     {
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){
@@ -517,7 +517,7 @@ class CategoryRepository extends MaterializedPathRepository
     {
 
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $isFeatures = $data['feature'];
         $catIDs = $data['catId'];
@@ -626,7 +626,7 @@ class CategoryRepository extends MaterializedPathRepository
     public function getCategoryOptions(){
 
         $ret = [];
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $categories = $em->getRepository(\App\Product\Entity\Category::class)->findBy(['status'=>1],['name'=>'asc']);
 
         foreach( $categories as $cat ){
@@ -902,8 +902,8 @@ class CategoryRepository extends MaterializedPathRepository
         $items = [];
         $sql = "SELECT id,parent,name FROM categories WHERE  ecommerceConfig_id ={$config} AND level > 2";
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $items[]=['value' => '','text'=> '-- Add Category --'];
         if($results){
             foreach($results as $row){
@@ -918,8 +918,8 @@ class CategoryRepository extends MaterializedPathRepository
 
         $sql = "SELECT name FROM categories WHERE  inventoryConfig_id ={$config->getId()}  and  permission = 'private' ";
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         return $results;
     }
 

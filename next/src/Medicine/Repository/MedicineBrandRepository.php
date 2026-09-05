@@ -107,12 +107,12 @@ class MedicineBrandRepository extends EntityRepository
 
         /** @var $row MedicineBrand */
         foreach ($results as $row ){
-            $company = $this->_em->getRepository(\App\Medicine\Entity\MedicineCompany::class)->findOneBy(['companyId'=> $row->getCompanyId()]);
-            $generic = $this->_em->getRepository(\App\Medicine\Entity\MedicineGeneric::class)->findOneBy(['genericId'=> $row->getGenericId()]);
+            $company = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineCompany::class)->findOneBy(['companyId'=> $row->getCompanyId()]);
+            $generic = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineGeneric::class)->findOneBy(['genericId'=> $row->getGenericId()]);
             $row->setMedicineGeneric($generic);
             $row->setMedicineCompany($company);
-            $this->_em->persist($row);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($row);
+            $this->getEntityManager()->flush();
 
         }
 
@@ -135,7 +135,7 @@ class MedicineBrandRepository extends EntityRepository
 
     public function searchCompanyNameAutoComplete($q)
     {
-        $query = $this->_em->createQueryBuilder();
+        $query = $this->getEntityManager()->createQueryBuilder();
         $query->from(\App\Medicine\Entity\MedicineCompany::class,'e');
         $query->select('e.id as id');
         $query->addSelect('e.name AS text');
@@ -150,7 +150,7 @@ class MedicineBrandRepository extends EntityRepository
 
     public function searchGenericNameAutoComplete($q)
     {
-        $query = $this->_em->createQueryBuilder();
+        $query = $this->getEntityManager()->createQueryBuilder();
         $query->from(\App\Medicine\Entity\MedicineGeneric::class,'g');
         $query->select('g.id as id');
         $query->addSelect('g.name AS text');

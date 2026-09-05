@@ -15,7 +15,7 @@ class MedicineMinimumStockRepository extends EntityRepository
 {
     public function companyList($config){
 
-        $query = $this->_em->createQueryBuilder();
+        $query = $this->getEntityManager()->createQueryBuilder();
         $query->from(\App\Medicine\Entity\MedicineStock::class,'e');
         $query->select('e.brandName as name');
         $query->where("e.medicineConfig = :config")->setParameter('config', $config);
@@ -35,8 +35,8 @@ class MedicineMinimumStockRepository extends EntityRepository
         $stock = "SELECT medicineForm as name FROM `medicine_brand`  WHERE medicineForm NOT IN (',',',,',',.',':',';','.','0','1','..',',',' ')  GROUP BY `medicineForm`  
 ORDER BY `medicineForm`  ASC";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($stock);
-        $qb1->execute();
-        $results =  $qb1->fetchAll();
+        $qb1 = $qb1->executeQuery();
+        $results =  $qb1->fetchAllAssociative();
         foreach ($results as $row){
             $array [$row['name']] =$row['name'];
         }

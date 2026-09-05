@@ -79,7 +79,7 @@ class DailyAttendanceRepository extends EntityRepository
     public function dailyLeaveAttendance(EmployeeLeave $leave,Attendance $attendance,DateTime $datetime)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $today  = $datetime->format('d');
         $month  = $datetime->format('F');
         $year   = $datetime->format('Y');
@@ -96,7 +96,7 @@ class DailyAttendanceRepository extends EntityRepository
         $entity->setYear($year);
         $em->persist($entity);
         $em->flush();
-        $this->_em->getRepository(\App\HumanResource\Entity\Attendance::class)->employeeTotalPresentDay($attendance);
+        $this->getEntityManager()->getRepository(\App\HumanResource\Entity\Attendance::class)->employeeTotalPresentDay($attendance);
     }
 
 

@@ -42,7 +42,7 @@ class ProductRepository extends EntityRepository
 
     public function getLastId($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(e)');
         $qb->from(\App\Inventory\Entity\Product::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
@@ -102,7 +102,7 @@ class ProductRepository extends EntityRepository
 
     public function createNewProduct(InventoryConfig $inventory,$name)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new Product();
         $entity->setInventoryConfig($inventory);
         $entity->setName($name);
@@ -113,7 +113,7 @@ class ProductRepository extends EntityRepository
 
     public function insertMasterItem(InventoryConfig $inventory,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $masterItem = $data['item']['name'];
         $find = $this->findOneBy(['inventoryConfig'=>$inventory,'name' => $masterItem]);
         if(empty($find)){

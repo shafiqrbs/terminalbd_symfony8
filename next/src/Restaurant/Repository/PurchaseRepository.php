@@ -37,7 +37,7 @@ class PurchaseRepository extends EntityRepository
 
     public function updatePurchaseTotalPrice(Purchase $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Restaurant\Entity\PurchaseItem::class,'si')
             ->select('sum(si.purchaseSubTotal) as total')
@@ -68,7 +68,7 @@ class PurchaseRepository extends EntityRepository
 
     public function purchaseTransactionReverse(Purchase $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountCash = $em->createQuery("DELETE AccountingBundle:AccountPurchase e WHERE e.restaurantPurchase = {$entity->getId()}");
         if(!empty($accountCash)){
             $accountCash->execute();
@@ -78,7 +78,7 @@ class PurchaseRepository extends EntityRepository
 
     public function reversePurchaseParticularUpdate(Purchase $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var PurchaseItem $item */
         foreach($invoice->getPurchaseItems() as $item ){

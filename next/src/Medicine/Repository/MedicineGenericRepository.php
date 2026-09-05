@@ -17,7 +17,7 @@ class MedicineGenericRepository extends EntityRepository
     public function checkGenericName($name){
 
         $generic = $this->findOneBy(['name'=>$name]);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(empty($generic)){
             $entity = new MedicineGeneric();
             $entity->setName($name);

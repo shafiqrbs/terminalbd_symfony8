@@ -98,7 +98,7 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
 
     public function approveSalesReturnItem(BusinessInvoiceReturnItem $store)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $store->setStatus(1);
         $em->flush();
         $mode  = strtolower($store->getItemProcess());
@@ -115,7 +115,7 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
 
     public function removeSalesReturnItem(BusinessInvoiceReturnItem $store)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $store->setStatus(0);
         $em->flush();
         $mode  = strtolower($store->getItemProcess());
@@ -145,7 +145,7 @@ class BusinessInvoiceReturnItemRepository extends EntityRepository
 
     public function insertInvoiceReturnItem(BusinessInvoiceReturn $entity, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $itemIds = $data['itemId'];
         $quantity= $data['quantity'];

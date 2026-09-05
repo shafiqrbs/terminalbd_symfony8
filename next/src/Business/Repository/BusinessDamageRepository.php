@@ -27,7 +27,7 @@ class BusinessDamageRepository extends EntityRepository
 
     public function insertSalesReturn(BusinessInvoiceReturnItem $item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new BusinessDamage();
         $config = $item->getInvoiceReturn()->getBusinessConfig();
         $entity->setBusinessConfig($config);

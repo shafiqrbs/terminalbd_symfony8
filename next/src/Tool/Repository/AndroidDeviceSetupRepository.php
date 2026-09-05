@@ -24,8 +24,8 @@ class AndroidDeviceSetupRepository extends EntityRepository
             $head = new AndroidDeviceSetup();
             $head->setGlobalOption($option);
             $head->setDevice($device);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head->getId();
         }
     }

@@ -17,7 +17,7 @@ class EcommerceMenuRepository extends EntityRepository
     {
 
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){
@@ -35,7 +35,7 @@ class EcommerceMenuRepository extends EntityRepository
 
     public function getActiveMenus($subdomain)
     {
-        $option = $this->_em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['subDomain' => $subdomain]);
+        $option = $this->getEntityManager()->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['subDomain' => $subdomain]);
         return $this->findBy(
             ['status' => true,'globalOption' => $option],
             ['sorting'=>'asc']
@@ -88,7 +88,7 @@ class EcommerceMenuRepository extends EntityRepository
             $str .= "<ul class=''>";
             foreach ($item['children'] as $child) {
                 $str .= "<li class='' ><a href='/product/category/{$child->getSlug() }'>{$child->getName() }</a>";
-                $row = $this->_em->getRepository(\App\Product\Entity\Category::class)->find($child->getId());
+                $row = $this->getEntityManager()->getRepository(\App\Product\Entity\Category::class)->find($child->getId());
                 $str .= $this->menuCategoryDropdownChild($row->getChildren());
                 $str .= "</li>";
             }
@@ -101,7 +101,7 @@ class EcommerceMenuRepository extends EntityRepository
     public function menuCategoryDropdownChild($row){
 
         $result = "";
-      //  $row = $this->_em->getRepository(\App\Product\Entity\Category::class)->find($id);
+      //  $row = $this->getEntityManager()->getRepository(\App\Product\Entity\Category::class)->find($id);
         if (!empty($row)) {
             $result .= "<ul class=''>";
             foreach ($row as $child):

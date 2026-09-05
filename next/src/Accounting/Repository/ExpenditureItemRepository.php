@@ -65,7 +65,7 @@ class ExpenditureItemRepository extends EntityRepository
 
     public function updatePurchaseTotalPrice(AccountPurchase $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $this->createQueryBuilder('si')
             ->join('si.purchase','e')
             ->select('sum(si.subTotal) as total')
@@ -92,7 +92,7 @@ class ExpenditureItemRepository extends EntityRepository
     public function insertPurchaseItems($invoice, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new ExpenditureItem();
         $entity->setPurchase($invoice);
         $entity->setParticular($data['particular']);

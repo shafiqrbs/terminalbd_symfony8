@@ -18,7 +18,7 @@ class ProductImportRepository extends EntityRepository
 
     public function  getMasterItem()
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('e.category, e.name, e.unit');
         $qb->distinct();
         $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
@@ -29,7 +29,7 @@ class ProductImportRepository extends EntityRepository
     public function masterItemAdd($inventory,$result)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if (!empty($result)) {
             foreach ($result as $data) {
 
@@ -51,7 +51,7 @@ class ProductImportRepository extends EntityRepository
 
     public function  getColorSizeUnit($parm)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select(" e.unit as name ");
         $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
         $qb->distinct();
@@ -61,7 +61,7 @@ class ProductImportRepository extends EntityRepository
     public function insertVariant($inventory,$type, $result)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if (!empty($result)) {
             foreach ($result as $data) {
 
@@ -81,7 +81,7 @@ class ProductImportRepository extends EntityRepository
 
     public function  getColor()
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select(" e.color as name ");
         $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
         $qb->distinct();
@@ -90,7 +90,7 @@ class ProductImportRepository extends EntityRepository
     public function insertColor($inventory,$result)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if (!empty($result)) {
             foreach ($result as $data) {
 
@@ -109,7 +109,7 @@ class ProductImportRepository extends EntityRepository
 
     public function  getSize()
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select(" e.dimension as name ");
         $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
         $qb->distinct();
@@ -119,7 +119,7 @@ class ProductImportRepository extends EntityRepository
     public function insertSize($inventory,$result)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if (!empty($result)) {
             foreach ($result as $data) {
 
@@ -138,7 +138,7 @@ class ProductImportRepository extends EntityRepository
 
     public function  getVendor()
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select(" e.vendorCode as name ");
         $qb->from(\App\Inventory\Entity\ProductImport::class,'e');
         $qb->distinct();
@@ -148,7 +148,7 @@ class ProductImportRepository extends EntityRepository
     public function insertVendor($inventory, $result)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if (!empty($result)) {
             foreach ($result as $data) {
                 if(!empty($data['name'])){

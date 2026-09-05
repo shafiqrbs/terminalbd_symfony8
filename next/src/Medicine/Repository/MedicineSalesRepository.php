@@ -214,7 +214,7 @@ class MedicineSalesRepository extends EntityRepository
         if($sales->getDue() == 0 ){
             $sales->setPaymentStatus('Paid');
         }
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
     }
 
 
@@ -246,7 +246,7 @@ class MedicineSalesRepository extends EntityRepository
 
     public function updateMedicineSalesTotalPrice(MedicineSales $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Medicine\Entity\MedicineSalesItem::class,'si')
             ->select('sum(si.subTotal) as subTotal')
@@ -311,7 +311,7 @@ class MedicineSalesRepository extends EntityRepository
 
     public function updatePaymentReceive(MedicineSales $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $res = $em->createQueryBuilder()
             ->from('MedicineBundle:MedicineTreatmentPlan','si')
             ->select('sum(si.price) as subTotal ,sum(si.payment) as payment ,sum(si.discount) as discount')
@@ -470,8 +470,8 @@ class MedicineSalesRepository extends EntityRepository
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
         $stmt->bindValue('process', 'Done');
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;
@@ -497,8 +497,8 @@ class MedicineSalesRepository extends EntityRepository
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
         $stmt->bindValue('process', 'Done');
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;
@@ -521,8 +521,8 @@ class MedicineSalesRepository extends EntityRepository
 		$stmt->bindValue('config', $config);
 		$stmt->bindValue('process', 'Done');
 		$stmt->bindValue('year', $year);
-		$stmt->execute();
-		$result =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+		$result =  $stmt->fetchAllAssociative();
 		return $result;
 
 
@@ -545,8 +545,8 @@ class MedicineSalesRepository extends EntityRepository
 		$stmt->bindValue('process', 'Done');
 		$stmt->bindValue('year', $year);
 		$stmt->bindValue('month', $month);
-		$stmt->execute();
-		$result =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+		$result =  $stmt->fetchAllAssociative();
 	    $medicineSalesMonthlyArr = [];
         foreach($result as $row) {
             $medicineSalesMonthlyArr[$row['day']] = $row['total'];
@@ -575,8 +575,8 @@ class MedicineSalesRepository extends EntityRepository
 		$stmt->bindValue('year', $year);
 		$stmt->bindValue('month', $month);
 		$stmt->bindValue('day', $day);
-		$stmt->execute();
-		$result =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+		$result =  $stmt->fetchAllAssociative();
         $medicineSalesMonthlyArr = [];
         foreach($result as $row) {
             $medicineSalesMonthlyArr[$row['hour']] = $row['total'];
@@ -742,8 +742,8 @@ class MedicineSalesRepository extends EntityRepository
         $stmt->bindValue('config', $config);
         $stmt->bindValue('process', 'Done');
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
 
 
@@ -767,8 +767,8 @@ class MedicineSalesRepository extends EntityRepository
 		$stmt->bindValue('process', 'Done');
 		$stmt->bindValue('year', $year);
 		$stmt->bindValue('month', $month);
-		$stmt->execute();
-		$result =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+		$result =  $stmt->fetchAllAssociative();
 		return $result;
 
 	}
@@ -788,8 +788,8 @@ class MedicineSalesRepository extends EntityRepository
         $stmt->bindValue('process', 'Done');
         $stmt->bindValue('start', $startDate);
         $stmt->bindValue('end', $endDate);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
 
     }
@@ -822,7 +822,7 @@ class MedicineSalesRepository extends EntityRepository
 
     public function insertApiSales(GlobalOption $option,MedicineAndroidProcess $process)
     {
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $items = json_decode($process->getJsonItem(),true);
             $config = $option->getMedicineConfig()->getId();
             if($items){
@@ -925,12 +925,12 @@ class MedicineSalesRepository extends EntityRepository
 
     public function insertApiSalesItem(GlobalOption $option,MedicineAndroidProcess $process){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $conf = $option->getMedicineConfig();
 
         $items = json_decode($process->getJsonSubItem(),true);
         $numSubItems = count($items);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($items  and $numSubItems > 0 ) {
             foreach ($items as $item):
                 $deviceSalesId = $item['salesId'];
@@ -982,12 +982,12 @@ class MedicineSalesRepository extends EntityRepository
             set sales.purchasePrice = pa.purchasePrice";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('android', $android);
-        $qb->execute();
+        $qb = $qb->executeQuery();
     }
 
     public function insertApiSalesManual(GlobalOption $option,MedicineAndroidProcess $process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $items = json_decode($process->getJsonItem(),true);
         $subItems = json_decode($process->getJsonSubItem(),true);
@@ -995,7 +995,7 @@ class MedicineSalesRepository extends EntityRepository
 
         $numItems = count($items);
         $numSubItems = count($subItems);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($numItems > 0 ){
         $rows = '';
         $config = $option->getMedicineConfig()->getId();
@@ -1067,7 +1067,7 @@ class MedicineSalesRepository extends EntityRepository
 
             $sql = "INSERT INTO medicine_sales (medicineConfig_id,created,updated,invoice,deviceSalesId,customer_id,createdBy_id,salesBy_id,approvedBy_id,transactionMethod_id,subTotal,discount,netTotal,received,due,discountType,discountCalculation,cardCommission,accountBank_id,accountMobileBank_id,cardNo,androidProcess_id,androidDevice_id,process) VALUES {$rows}";
             $qb = $this->getEntityManager()->getConnection()->prepare($sql);
-            $qb->execute();
+            $qb = $qb->executeQuery();
 
             $stockIds = [];
             if($subItems  and $numSubItems > 0 ) {
@@ -1109,7 +1109,7 @@ class MedicineSalesRepository extends EntityRepository
   SET stock.remainingQuantity = ((COALESCE(stock.openingQuantity,0) + COALESCE(stock.purchaseQuantity,0) + COALESCE(stock.salesReturnQuantity,0)+ COALESCE(stock.bonusQuantity,0)+ COALESCE(stock.bonusAdjustment,0)+ COALESCE(stock.adjustmentQuantity,0)) - (COALESCE(pa.salesQuantity,0) + COALESCE(stock.purchaseReturnQuantity,0) + COALESCE(stock.damageQuantity,0)))
  , stock.salesQuantity = pa.salesQuantity";
                 $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
-                $qb5->execute();
+                $qb5 = $qb5->executeQuery();
             }
 
             $sqlPurchasePrice = "Update medicine_sales as sales
@@ -1121,7 +1121,7 @@ class MedicineSalesRepository extends EntityRepository
             ) as pa on sales.id = pa.medicineSales_id
             set sales.purchasePrice = pa.purchasePrice";
             $qbPurchasePrice = $this->getEntityManager()->getConnection()->prepare($sqlPurchasePrice);
-            $qbPurchasePrice->execute();
+            $qbPurchasePrice = $qbPurchasePrice->executeQuery();
 
             $accountCash = $em->createQuery("DELETE AccountingBundle:AccountSales e WHERE e.globalOption = '{$optionId}' AND e.androidProcessId = '{$androidProcess_id}' AND e.processHead = 'medicine' AND e.processType = 'sales' ");
             if(!empty($accountCash)){
@@ -1135,7 +1135,7 @@ class MedicineSalesRepository extends EntityRepository
   FROM medicine_sales
   WHERE medicineConfig_id ={$config} AND androidProcess_id={$androidProcess_id}";
             $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
-            $qb1->execute();
+            $qb1 = $qb1->executeQuery();
 
 
             $elem1 = "INSERT INTO AccountCash
@@ -1146,7 +1146,7 @@ class MedicineSalesRepository extends EntityRepository
   FROM account_sales
   WHERE globalOption_id ={$optionId} AND androidProcessId={$androidProcess_id}";
             $qbCash = $this->getEntityManager()->getConnection()->prepare($elem1);
-            $qbCash->execute();
+            $qbCash = $qbCash->executeQuery();
 
             $total = $em->createQueryBuilder()
                 ->from(\App\Medicine\Entity\MedicineSales::class,'si')
@@ -1162,7 +1162,7 @@ class MedicineSalesRepository extends EntityRepository
 
     public function countNumberSalesItem($batch)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Medicine\Entity\MedicineSales::class,'si')
             ->select('count(si.id) as totalCount')
@@ -1174,7 +1174,7 @@ class MedicineSalesRepository extends EntityRepository
 
     public function countNumberSalesSubItem($batch)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Medicine\Entity\MedicineSalesItem::class,'si')
             ->select('count(si.id) as totalCount')
@@ -1209,7 +1209,7 @@ class MedicineSalesRepository extends EntityRepository
 
     public function androidDeviceSalesProcess($device)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entities = $this->findBy(['androidDevice' => $device,'deviceApproved' => 0]);
 
         /* @var $entity MedicineSales */
@@ -1228,7 +1228,7 @@ class MedicineSalesRepository extends EntityRepository
     }
 
     public function deleteSalesRecords(MedicineConfig $config){
-      //  $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->accountMedicineSalesReverse($sales);
+      //  $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSales::class)->accountMedicineSalesReverse($sales);
     }
 
     public function getCalculationBankServiceCharge(MedicineSales $entity){
@@ -1264,14 +1264,14 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('config', $config->getId());
         $qb->bindValue('android', $android->getId());
-        $qb->execute();
+        $qb = $qb->executeQuery();
     }
 
 
 
     public function androidMissingSalesImport(MedicineConfig $conf,MedicineSales $sales , MedicineAndroidProcess $process){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $items = json_decode($process->getJsonSubItem(),true);
         if($items) {
             foreach ($items as $item):
@@ -1302,7 +1302,7 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
 
     public function insertEcommerceDirectOrder(Order $order)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $option = $order->getGlobalOption();
 
         $sales = new MedicineSales();
@@ -1338,7 +1338,7 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
 
     private function insertEcommerecSalesItem(MedicineSales $sales,Order $order)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($order->getsales_items()){
 
             /* @var $item sales_item */
@@ -1371,7 +1371,7 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
 
     public function apiSalesLists(GlobalOption $option, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $config = $option->getMedicineConfig()->getId();
         $vendor = $data['vendor_id'] ?? '';
@@ -1452,7 +1452,7 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
 
     public function apiSalesInvoiceDetails(GlobalOption $option, $id)
     {
-        $em     = $this->_em;
+        $em     = $this->getEntityManager();
         /* @var $entity MedicineSales */
         $entity = $this->findOneBy(['medicineConfig'=> $option->getMedicineConfig(),'id' => $id]);
         $data = [];
@@ -1529,7 +1529,7 @@ WHERE  salesItem.`medicineSales_id` IS NULL AND sales.androidProcess_id =:androi
 
     public function getApiSalesInvoice(GlobalOption $option, $invoice)
     {
-        $em     = $this->_em;
+        $em     = $this->getEntityManager();
         /* @var $entity MedicineSales */
         $entity = $this->findOneBy(['medicineConfig'=> $option->getMedicineConfig(),'invoice'=>$invoice]);
         $data = [];

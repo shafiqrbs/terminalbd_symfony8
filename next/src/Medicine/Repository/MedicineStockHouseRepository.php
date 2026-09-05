@@ -89,7 +89,7 @@ class MedicineStockHouseRepository extends EntityRepository
     {
         $global =  $user->getGlobalOption()->getId();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
         $qb->where('e.globalOption = :config');

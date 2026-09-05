@@ -15,7 +15,7 @@ class PurchaseReturnItemRepository extends EntityRepository
 
     public function insertPurchaseReturnsItems($purchaseReturn,$purchaseItem)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $existEntity = $this->findOneBy(['purchaseReturn'=> $purchaseReturn,'purchaseItem'=> $purchaseItem]);
         if(!empty($existEntity)){
 

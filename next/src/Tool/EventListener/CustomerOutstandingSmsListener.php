@@ -42,7 +42,7 @@ class CustomerOutstandingSmsListener extends BaseSmsAwareListener
 
 	    $mobile = "+8801828148148"; //.$invoice->getCustomer()->getMobile();
         $date = date('d-m-Y');
-        $balance = $this->getDoctrine()->getRepository(AccountSales::class)->customerSingleOutstanding( $invoice->getGlobalOption(),$invoice->getId());
+        $balance = $this->doctrine->getRepository(AccountSales::class)->customerSingleOutstanding( $invoice->getGlobalOption(),$invoice->getId());
         $outstanding = number_format($balance,2);
         $msg = "Hello, {$invoice}! We’d like to remind you that a payment for {$outstanding} will be due by {$date}. For more information, {$hotline}";
 	    $msg = $orgName .'\nDear '.$msg;

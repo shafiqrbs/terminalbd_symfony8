@@ -117,7 +117,7 @@ class InvoiceParticularRepository extends EntityRepository
 
     public function initialInvoiceItems(User $user, Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entities = $user->getRestaurantTemps();
         /* @var $temp RestaurantTemporary */
         foreach ($entities as $temp) {
@@ -141,7 +141,7 @@ class InvoiceParticularRepository extends EntityRepository
 
     public function tableInvoiceItems(Invoice $invoice,RestaurantTableInvoice $tableInvoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $temp RestaurantTableInvoiceItem */
         foreach ($tableInvoice->getInvoiceItems() as $temp) {
             $entity = new InvoiceParticular();
@@ -164,7 +164,7 @@ class InvoiceParticularRepository extends EntityRepository
 
     public function insertSalesAccessories(InvoiceParticular $item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var Particular  $particular */
         $particular = $item->getParticular();
         if( $particular->getService()->getSlug() == 'stockable' ){
@@ -177,9 +177,9 @@ class InvoiceParticularRepository extends EntityRepository
 
     public function insertInvoiceItems(Invoice $invoice, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $particularId = (int)$data['particularId'];
-        $particular = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($particularId);
+        $particular = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\Particular::class)->find($particularId);
         $entity = new InvoiceParticular();
         $invoiceParticular = $this->findOneBy(['invoice' => $invoice ,'particular' => $particular]);
         if(!empty($invoiceParticular) and $data['process'] == 'create') {
@@ -271,7 +271,7 @@ class InvoiceParticularRepository extends EntityRepository
     public function invoiceParticularReverse(Invoice $invoice)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var InvoiceParticular $item */
 
@@ -377,7 +377,7 @@ class InvoiceParticularRepository extends EntityRepository
 
     public function reverseInvoiceParticularUpdate(Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var InvoiceParticular $item */
         foreach($invoice->getInvoiceParticulars() as $item ){

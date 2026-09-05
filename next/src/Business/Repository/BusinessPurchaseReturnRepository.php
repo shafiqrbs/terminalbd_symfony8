@@ -89,7 +89,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
 
     public function countReturnQuantity($invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         return $total = $em->createQueryBuilder()
             ->from(\App\Business\Entity\BusinessInvoiceParticular::class,'si')
             ->select('sum(si.damageQnt) as damageQnt')
@@ -100,7 +100,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
 
     public function updatePurchaseTotalPrice(BusinessPurchaseReturn $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $result = $em->createQueryBuilder()
             ->from(\App\Business\Entity\BusinessPurchaseReturnItem::class,'si')
             ->select('sum(si.subTotal) as total','sum(si.damageQnt) as damageQuantity','sum(si.spoilQnt) as spoilQuantity','sum(si.quantity) as quantity')
@@ -133,7 +133,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
 
     public function insertInvoiceDamageItem(User $user, $data)
     {
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $config = $user->getGlobalOption()->getBusinessConfig();
             if(!empty($data['vendor']) and !empty($data['grandTotal'])){
                 $vendor = $em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($data['vendor']);
@@ -154,7 +154,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
 
     public function insertUpdatePurchaseReturnItem(BusinessPurchaseReturn $entity, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $item BusinessInvoiceParticular */
 
         foreach ($data['itemId'] as $key => $item):
@@ -182,7 +182,7 @@ class BusinessPurchaseReturnRepository extends EntityRepository
 
     public function insertDistributionReturnItem(BusinessPurchaseReturn $entity, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         foreach ($data['itemId'] as $key => $item):
 

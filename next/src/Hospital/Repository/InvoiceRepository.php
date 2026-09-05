@@ -559,7 +559,7 @@ class InvoiceRepository extends EntityRepository
 
     public function hmsCommissionGroupReports(User $user,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $hospital = $user->getGlobalOption()->getHospitalConfig()->getId();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\Hospital\Entity\DoctorInvoice::class,'e');
@@ -600,7 +600,7 @@ class InvoiceRepository extends EntityRepository
 
     public function hmsCommissionReportDetails(User $user,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $hospital = $user->getGlobalOption()->getHospitalConfig()->getId();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\Hospital\Entity\DoctorInvoice::class,'e');
@@ -649,7 +649,7 @@ class InvoiceRepository extends EntityRepository
     public function hmsSalesCollectionReports(User $user,$data)
     {
         $hospital = $user->getGlobalOption()->getHospitalConfig()->getId();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(InvoiceTransaction::class,'ip');
         $qb->join('ip.hmsInvoice','e');
@@ -732,7 +732,7 @@ class InvoiceRepository extends EntityRepository
 
     public function updateInvoiceTotalPrice(Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Hospital\Entity\InvoiceParticular::class,'si')
             ->select('sum(si.subTotal) as subTotal')
@@ -781,7 +781,7 @@ class InvoiceRepository extends EntityRepository
         /* @var $invoice Invoice */
 
         $invoice = $transaction->getHmsInvoice();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Hospital\Entity\InvoiceParticular::class,'si')
             ->select('sum(si.subTotal) as subTotal')
@@ -830,7 +830,7 @@ class InvoiceRepository extends EntityRepository
 
     public function updateAdmissionPaymentReceive(Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $res = $em->createQueryBuilder()
             ->from(\App\Hospital\Entity\InvoiceTransaction::class,'si')
             ->select('sum(si.payment) as payment , sum(si.discount) as discount, sum(si.vat) as vat')
@@ -860,7 +860,7 @@ class InvoiceRepository extends EntityRepository
 
     public function updatePaymentReceive(Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $res = $em->createQueryBuilder()
             ->from(\App\Hospital\Entity\InvoiceTransaction::class,'si')
             ->select('sum(si.payment) as payment , sum(si.discount) as discount, sum(si.vat) as vat')
@@ -890,7 +890,7 @@ class InvoiceRepository extends EntityRepository
 
     public function updateCommissionPayment(Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $res = $em->createQueryBuilder()
             ->from(\App\Hospital\Entity\DoctorInvoice::class,'si')
             ->select('sum(si.payment) as payment')
@@ -914,7 +914,7 @@ class InvoiceRepository extends EntityRepository
 
     public function getInvoiceDetails(Invoice $invoice){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\Hospital\Entity\InvoiceParticular::class,'ip');
         $qb->innerJoin('ip.particular','particular');
@@ -926,8 +926,8 @@ class InvoiceRepository extends EntityRepository
 
     public function updatePatientInfo($invoice,Customer $patient)
     {
-        $em = $this->_em;
-        $invoice = $this->_em->getRepository(\App\Hospital\Entity\Invoice::class)->find($invoice);
+        $em = $this->getEntityManager();
+        $invoice = $this->getEntityManager()->getRepository(\App\Hospital\Entity\Invoice::class)->find($invoice);
         $invoice->setCustomer($patient);
         $invoice->setMobile($patient->getMobile());
         $em->persist($invoice);
@@ -939,13 +939,13 @@ class InvoiceRepository extends EntityRepository
     {
         $entity = $invoice->getHmsInvoice();
         $entity->setProcess('Returned');
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
     }
 
     public function patientAdmissionUpdate($data,Invoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $invoiceInfo = $data['appstore_bundle_hospitalbundle_invoice'];
         if($invoiceInfo['cabin']){
             $cabin = $em->getRepository(\App\Hospital\Entity\Particular::class)->find($invoiceInfo['cabin']);
@@ -972,8 +972,8 @@ class InvoiceRepository extends EntityRepository
 
     public function checkCabinBooking($invoice , $cabin)
     {
-        $invoice = $this->_em->getRepository(\App\Hospital\Entity\Invoice::class)->find($invoice);
-        $cabin = $this->_em->getRepository(\App\Hospital\Entity\Particular::class)->find($cabin);
+        $invoice = $this->getEntityManager()->getRepository(\App\Hospital\Entity\Invoice::class)->find($invoice);
+        $cabin = $this->getEntityManager()->getRepository(\App\Hospital\Entity\Particular::class)->find($cabin);
         $qb = $this->createQueryBuilder('e');
         $qb->select('COUNT(e.cabin) AS cabinCount');
         $qb->where('e.hospitalConfig = :config')->setParameter('config', $invoice ->getHospitalConfig()->getId());
@@ -991,7 +991,7 @@ class InvoiceRepository extends EntityRepository
 
     public function checkNewCabinBooking($config,$cabin)
     {
-        $cabin = $this->_em->getRepository(\App\Hospital\Entity\Particular::class)->find($cabin);
+        $cabin = $this->getEntityManager()->getRepository(\App\Hospital\Entity\Particular::class)->find($cabin);
         $qb = $this->createQueryBuilder('e');
         $qb->select('COUNT(e.cabin) AS cabinCount');
         $qb->where('e.hospitalConfig = :config')->setParameter('config', $config);
@@ -1286,7 +1286,7 @@ class InvoiceRepository extends EntityRepository
         $user = $data['user'] ?? '';
         $process = $data['process'] ?? '';
         $surgeryDepartment = $data['surgeryDepartment'] ?? '';
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Hospital\Entity\InvoiceParticular::class,'ip');
         $qb->join('ip.hmsInvoice','e');
         $qb->join('ip.particular','p');
@@ -1347,7 +1347,7 @@ class InvoiceRepository extends EntityRepository
         $anesthesiaDoctor = $data['anesthesiaDoctor'] ?? '';
         $user = $data['user'] ?? '';
         $process = $data['process'] ?? '';
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Hospital\Entity\InvoiceParticular::class,'ip');
         $qb->join('ip.hmsInvoice','e');
         $qb->join('ip.particular','p');
@@ -1453,7 +1453,7 @@ class InvoiceRepository extends EntityRepository
     public function reportAdmissionDepartmentDetails(User $user,$mode, $data)
     {
         $hospital = $user->getGlobalOption()->getHospitalConfig()->getId();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Hospital\Entity\InvoiceParticular::class,'ip');
         $qb->join('ip.hmsInvoice','e');
         $qb->join('e.customer','c');
@@ -1651,7 +1651,7 @@ class InvoiceRepository extends EntityRepository
     }
     public function getServiceGroups($hospital)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Hospital\Entity\InvoiceParticular::class,'e');
         $qb->join('e.particular','p');
         $qb->join('p.service','s');
@@ -1664,7 +1664,7 @@ class InvoiceRepository extends EntityRepository
     }
     public function getServices($hospital)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Hospital\Entity\InvoiceParticular::class,'e');
         $qb->join('e.particular','p');
         $qb->join('p.serviceGroup','s');
@@ -1677,7 +1677,7 @@ class InvoiceRepository extends EntityRepository
     }
     public function getParticulars($hospital)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Hospital\Entity\InvoiceParticular::class,'e');
         $qb->join('e.particular','p');
         $qb->join('p.service','s');

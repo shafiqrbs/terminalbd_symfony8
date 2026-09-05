@@ -49,7 +49,7 @@ class MedicineVendorRepository extends EntityRepository
 
     public function getExistVendor($config,$name)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=>$config,'companyName'=>$name]);
         if($exist){
             return $exist;
@@ -128,8 +128,8 @@ class MedicineVendorRepository extends EntityRepository
             $entity->setMedicineConfig($config);
             $entity->setCompanyName($vendor);
             $entity->setName($vendor);
-            $this->_em->persist($entity);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($entity);
+            $this->getEntityManager()->flush();
         }
         return $entity;
     }
@@ -156,7 +156,7 @@ class MedicineVendorRepository extends EntityRepository
         $email = ((isset($data['email']) and $data['email'])) ? ($data['email']):'';
         $user_id = ((isset($data['user_id']) and $data['user_id'])) ? ($data['user_id']):'';
         $openingBalance = (isset($data['opening_balance']) and $data['opening_balance']) ? trim(floatval($data['opening_balance'])):0;
-        $em  = $this->_em;
+        $em  = $this->getEntityManager();
         $config = $option->getMedicineConfig();
         $entity = $this->findOneBy(['medicineConfig' => $config,'companyName' => $name]);
         $result =[];
@@ -193,7 +193,7 @@ class MedicineVendorRepository extends EntityRepository
     public function updateVendorCompanyName(MedicineVendor $vendor)
     {
         $com = $vendor->getCompanyName();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->update(\App\Accounting\Entity\AccountPurchase::class, 'mg')
             ->set('mg.companyName', ':companyName')
@@ -207,7 +207,7 @@ class MedicineVendorRepository extends EntityRepository
 
     public function apiUpdateVendor($data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $id = trim($data['vendor_id']);
         $name = trim($data['name']);
         $address = trim($data['address']);
@@ -228,7 +228,7 @@ class MedicineVendorRepository extends EntityRepository
     public function  copyToMedicineVendor($from, $to)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $stock = $em->createQuery("DELETE MedicineBundle:MedicineVendor e WHERE e.medicineConfig = {$to}");
         if($stock){
             $stock->execute();
@@ -239,7 +239,7 @@ class MedicineVendorRepository extends EntityRepository
   WHERE medicineConfig_id =:config";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
         $qb1->bindValue('config', $from);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
     }
 
 }

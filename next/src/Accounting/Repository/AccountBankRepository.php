@@ -148,7 +148,7 @@ class AccountBankRepository extends EntityRepository
 
     public function setupDefault(AccountBank $bank)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $globalOption = $bank->getGlobalOption()->getId();
         $qb = $this->createQueryBuilder('e');
         $qb->where("e.globalOption = :globalOption");

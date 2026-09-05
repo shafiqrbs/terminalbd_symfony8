@@ -17,7 +17,7 @@ class MedicineCompanyRepository extends EntityRepository
     public function checkCompanyName($name){
 
         $company = $this->findOneBy(['name'=>$name]);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(empty($company)){
             $entity = new MedicineCompany();
             $entity->setName($name);

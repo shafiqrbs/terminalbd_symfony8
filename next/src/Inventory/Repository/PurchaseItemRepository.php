@@ -169,7 +169,7 @@ class PurchaseItemRepository extends EntityRepository
 
     public function getPurchaseItemCount($item)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(pi.id)');
         $qb->from(\App\Inventory\Entity\PurchaseItem::class,'pi');
         $qb->where("pi.item = :item");
@@ -186,7 +186,7 @@ class PurchaseItemRepository extends EntityRepository
 
     public function getPurchaseItemQuantity($purchase,$purchaseVendorItem = 0 )
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('sum(e.quantity)  as totalQnt', 'count(e.id)  as totalItem');
         $qb->from(\App\Inventory\Entity\PurchaseItem::class, 'e');
         $qb->where("e.purchase = :purchase");
@@ -340,12 +340,12 @@ class PurchaseItemRepository extends EntityRepository
         $data = $qb->getQuery()->getArrayResult();
         foreach ($data as $row){
 
-           $purchaseVendorItem = $this->_em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->findOneBy(['purchase' => $purchase ,'masterItem' => $row['productId']]);
+           $purchaseVendorItem = $this->getEntityManager()->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->findOneBy(['purchase' => $purchase ,'masterItem' => $row['productId']]);
            $entity = new PurchaseVendorItem();
            if(!empty($purchaseVendorItem)){
                $entity = $purchaseVendorItem;
            }
-           $product = $this->_em->getRepository(\App\Inventory\Entity\Product::class)->find($row['productId']);
+           $product = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Product::class)->find($row['productId']);
            $entity->setPurchase($purchase);
            $entity->setInventoryConfig($purchase->getInventoryConfig());
            $entity->setMasterItem($product);
@@ -355,8 +355,8 @@ class PurchaseItemRepository extends EntityRepository
            $entity->setWebPrice($row['sales']);
            $entity->setQuantity($row['quantity']);
            $entity->setMasterQuantity($row['quantity']);
-           $this->_em->persist($entity);
-           $this->_em->flush($entity);
+           $this->getEntityManager()->persist($entity);
+           $this->getEntityManager()->flush($entity);
 
        }
 
@@ -365,10 +365,10 @@ class PurchaseItemRepository extends EntityRepository
         foreach ($purchase->getPurchaseItems() as $item){
 
             $masterItem = $item->getItem()->getMasterItem();
-            $purchaseVendorItem = $this->_em->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->findOneBy(['purchase' => $purchase ,'masterItem' => $masterItem]);
+            $purchaseVendorItem = $this->getEntityManager()->getRepository(\App\Inventory\Entity\PurchaseVendorItem::class)->findOneBy(['purchase' => $purchase ,'masterItem' => $masterItem]);
             $item->setPurchaseVendorItem($purchaseVendorItem);
-            $this->_em->persist($item);
-            $this->_em->flush($item);
+            $this->getEntityManager()->persist($item);
+            $this->getEntityManager()->flush($item);
         }
 
 
@@ -377,7 +377,7 @@ class PurchaseItemRepository extends EntityRepository
 
     public function insertPurchaseItemAttribute($data){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         foreach($data['purchaseItem'] as $key => $val ){
             $entity = $this->find($val);
@@ -535,7 +535,7 @@ class PurchaseItemRepository extends EntityRepository
             foreach ($data as $serial){
                 $elem = "INSERT INTO inv_purchase_item_serial(`inventoryConfig_id`,`item_id`,`purchaseItem_id`,barcode,status) VALUES ($config,$item,$id,trim('$serial'),0)";
                 $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
-                $qb1->execute();
+                $qb1 = $qb1->executeQuery();
             }
         }
     }

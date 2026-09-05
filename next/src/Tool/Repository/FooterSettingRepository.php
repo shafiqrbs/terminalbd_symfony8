@@ -17,7 +17,7 @@ class FooterSettingRepository extends EntityRepository {
 
     public function updateFooterSetting(FooterSetting $entity , $data ){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         if(isset($data['copyRight']) and $data['copyRight'] != '') {
             $entity->setCopyRight($data['copyRight']);

@@ -79,7 +79,7 @@ class MedicinePrepurchaseRepository extends EntityRepository
 
     public function updatePurchaseTotalPrice(MedicinePrepurchase $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Medicine\Entity\MedicinePrepurchaseItem::class,'si')
             ->select('sum(si.subTotal) as total')
@@ -113,7 +113,7 @@ class MedicinePrepurchaseRepository extends EntityRepository
     {
         $global =  $user->getGlobalOption()->getId();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
         $qb->where('e.globalOption = :config');

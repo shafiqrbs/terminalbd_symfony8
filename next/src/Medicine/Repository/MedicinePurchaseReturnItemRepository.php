@@ -43,8 +43,8 @@ class MedicinePurchaseReturnItemRepository extends EntityRepository
             $entity->setMedicineConfig($config);
             $entity->setCompanyName($vendor);
             $entity->setName($vendor);
-            $this->_em->persist($entity);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($entity);
+            $this->getEntityManager()->flush();
         }
         return $entity;
     }

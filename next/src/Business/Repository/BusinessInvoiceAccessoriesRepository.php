@@ -50,7 +50,7 @@ class BusinessInvoiceAccessoriesRepository extends EntityRepository
 
     public function insertInvoiceAccessories(BusinessInvoice $invoice, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new BusinessInvoiceParticular();
         $quantity = !empty($data['quantity']) ? $data['quantity'] :1;
         $accessoriesId = $data['accessories'];

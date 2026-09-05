@@ -81,7 +81,7 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/
     $code = file_get_contents($path);
 
     // Files whose calls are already converted still carry the marker.
-    if (!preg_match('/\$this->(container->)?get\(/', $code)
+    if (!preg_match('/\$this->(container->)?get(Doctrine)?\(/', $code)
         && !str_contains($code, 'TODO(migration): AbstractController::')) {
         continue;
     }
@@ -130,6 +130,17 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/
                 + substr_count($before, "get('router')");
         }
     }
+
+    // AbstractController::getDoctrine() went in Symfony 6 as well. Treat it as
+    // a call for the `doctrine` service, so it is injected like the rest.
+    $code = preg_replace(
+        '/\$this->getDoctrine\(\)/',
+        "\$this->get('doctrine')",
+        $code,
+        -1,
+        $n,
+    );
+    $stats['helper rewrites'] += $n;
 
     // ---- 2. inject whatever is left --------------------------------------
     preg_match_all('/\$this->(?:container->)?get\(\s*[\'"]([^\'"]+)[\'"]\s*\)/', $code, $matches);

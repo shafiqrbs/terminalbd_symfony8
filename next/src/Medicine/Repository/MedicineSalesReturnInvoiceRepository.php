@@ -124,7 +124,7 @@ class MedicineSalesReturnInvoiceRepository extends EntityRepository
     public function insertMedicineSalesReturn(GlobalOption $option , $data = [])
     {
         $config = $option->getMedicineConfig();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $customerId = (isset($data['customer']) and $data['customer']) ? $data['customer']:'';
         $total = (isset($data['total']) and $data['total']) ? round($data['total']):0;
         $payment = (isset($data['payment']) and $data['payment']) ? round($data['payment']):0;
@@ -158,7 +158,7 @@ class MedicineSalesReturnInvoiceRepository extends EntityRepository
             ) as pa on sales.id = pa.medicineSalesReturnInvoice_id
             set sales.subTotal = pa.subTotal";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
-        $qb->execute();
+        $qb = $qb->executeQuery();
 
     }
 }

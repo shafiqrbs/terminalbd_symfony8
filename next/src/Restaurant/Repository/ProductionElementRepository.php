@@ -17,12 +17,12 @@ class ProductionElementRepository extends EntityRepository
 {
     public function insertProductionElement($particular, $data)
     {
-        $em = $this->_em;
-        $existParticular = $this->_em->getRepository(\App\Restaurant\Entity\ProductionElement::class)->findOneBy(['item'=> $particular,'material' => $data['particularId']]);
+        $em = $this->getEntityManager();
+        $existParticular = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\ProductionElement::class)->findOneBy(['item'=> $particular,'material' => $data['particularId']]);
         if(empty($existParticular)){
             $entity = new ProductionElement();
             $entity->setItem($particular);
-            $material = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
+            $material = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
             $entity->setMaterial($material);
             $entity->setPrice($data['price']);
             $entity->setQuantity($data['quantity']);
@@ -47,7 +47,7 @@ class ProductionElementRepository extends EntityRepository
         /* @var $newEntity Particular */
         /* @var $oldEntity Particular */
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var $element ProductionElement */
 
@@ -115,7 +115,7 @@ SET sub.price = $price , sub.subTotal = (sub.quantity * $price)
 WHERE sub.material_id =:material";
             $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
             $qb1->bindValue('material', $id);
-            $qb1->execute();
+            $qb1 = $qb1->executeQuery();
 
         }
 

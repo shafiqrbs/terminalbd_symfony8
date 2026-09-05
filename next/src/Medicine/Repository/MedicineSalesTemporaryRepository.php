@@ -35,11 +35,11 @@ class MedicineSalesTemporaryRepository extends EntityRepository
         $isShort = empty($data['isShort']) ? 0 : 1;
         $purchaseItem = (isset($data['purchaseItem']) and !empty($data['purchaseItem'])) ? $data['purchaseItem'] : '';
         /* @var $stockItem MedicineStock */
-        $stockItem = $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['stockName']);
-        $purchaseStockItem = $this->_em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($purchaseItem);
-        $em = $this->_em;
+        $stockItem = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['stockName']);
+        $purchaseStockItem = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($purchaseItem);
+        $em = $this->getEntityManager();
         $entity = new MedicineSalesTemporary();
-        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
+        $invoiceParticular = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
         if(empty($invoiceParticular)) {
 	        $entity->setQuantity($quantity);
             if($data['itemPercent'] > 0){
@@ -75,9 +75,9 @@ class MedicineSalesTemporaryRepository extends EntityRepository
 
     public function insertBarcodeInvoiceItems(User $user,MedicineStock $stockItem)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicineSalesTemporary();
-        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
+        $invoiceParticular = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
         if(empty($invoiceParticular)) {
 	        $entity->setQuantity(1);
             $entity->setSalesPrice($stockItem->getSalesprice());
@@ -99,9 +99,9 @@ class MedicineSalesTemporaryRepository extends EntityRepository
 
     public function insertAjaxLiveItem(User $user,MedicineStock $stockItem,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicineSalesTemporary();
-        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
+        $invoiceParticular = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
         if(empty($invoiceParticular)) {
             $quantity = $data['quantity'] ?: 1;
             $price = $data['price'] ?: 0;
@@ -139,10 +139,10 @@ class MedicineSalesTemporaryRepository extends EntityRepository
 
     public function insertGenericInvoiceItems(User $user,MedicineStock $stockItem,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $quantity = empty($data['quantity']) or $data['quantity'] == 'NaN'  ? 1 : $data['quantity'];
         $entity = new MedicineSalesTemporary();
-        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
+        $invoiceParticular = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->findOneBy(['user' => $user,'medicineStock' => $stockItem]);
         if(empty($invoiceParticular)) {
             $entity->setQuantity($quantity);
             if($data['itemPercent'] > 0){
@@ -175,11 +175,11 @@ class MedicineSalesTemporaryRepository extends EntityRepository
     public function updateInvoiceItems(User $user, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicineSalesTemporary();
         /* @var $invoiceParticular MedicineSalesTemporary*/
         $salesId = (isset($data['salesItemId']) and $data['salesItemId']) ? $data['salesItemId']:0;
-        $invoiceParticular = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->find($salesId);
+        $invoiceParticular = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->find($salesId);
         if(!empty($invoiceParticular) and $salesId > 0) {
             $entity = $invoiceParticular;
             $qnt = (isset($data['quantity']) and $data['quantity']) ? $data['quantity']:0;
@@ -213,7 +213,7 @@ class MedicineSalesTemporaryRepository extends EntityRepository
     public function insertInstantSalesTemporaryItem(User $user , MedicinePurchaseItem $item,$data){
 
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicineSalesTemporary();
         $entity->setUser($user);
         $entity->setMedicineConfig($user->getGlobalOption()->getMedicineConfig());
@@ -230,7 +230,7 @@ class MedicineSalesTemporaryRepository extends EntityRepository
 
     public function insertDirectInvoiceItems(User $user ,MedicineStock $stock,$data){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicineSalesTemporary();
         $entity->setUser($user);
         $entity->setMedicineConfig($user->getGlobalOption()->getMedicineConfig());
@@ -292,7 +292,7 @@ class MedicineSalesTemporaryRepository extends EntityRepository
 
     public function removeSalesTemporary(User $user)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $user->getGlobalOption()->getMedicineConfig()->getId();
         $DoctorInvoice = $em->createQuery('DELETE MedicineBundle:MedicineSalesTemporary e WHERE e.medicineConfig = '.$config.' and e.user = '.$user->getId());
         $DoctorInvoice->execute();

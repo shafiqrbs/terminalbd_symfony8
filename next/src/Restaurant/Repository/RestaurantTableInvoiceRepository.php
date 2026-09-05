@@ -19,7 +19,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
 
     public function resetData(RestaurantTableInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $invoice->setProcess('Free');
         $invoice->setVat(0);
         $invoice->setSd(0);
@@ -58,7 +58,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
 
     public function generateTableInvoice(RestaurantConfig $config,$tables)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i = 0;
         foreach ($tables as $table):
             $exist = $this->findOneBy(['restaurantConfig' => $config,'table'=>$table]);
@@ -80,12 +80,12 @@ class RestaurantTableInvoiceRepository extends EntityRepository
 
     public function updateKitchenPrint(RestaurantTableInvoice $invoice,$tables)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var $entity RestaurantTableInvoiceItem */
 
         $i = 0;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->update(\App\Restaurant\Entity\RestaurantTableInvoiceItem::class, 'mg')
             ->set('mg.isPrint',0)
@@ -104,7 +104,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
 
     public function updateInvoiceTotalPrice(RestaurantTableInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Restaurant\Entity\RestaurantTableInvoiceItem::class,'si')
             ->select('sum(si.subTotal) as subTotal')
@@ -199,8 +199,8 @@ class RestaurantTableInvoiceRepository extends EntityRepository
 
     public function insertInvoiceItems(RestaurantTableInvoice $invoice, $data)
     {
-        $particular = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
-        $em = $this->_em;
+        $particular = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
         $entity = new RestaurantTableInvoiceItem();
         $invoiceParticular = $em->getRepository(\App\Restaurant\Entity\RestaurantTableInvoiceItem::class)->findOneBy(['tableInvoice' => $invoice ,'particular' => $particular]);
         if(!empty($invoiceParticular) and $data['process'] == 'update') {
@@ -252,7 +252,7 @@ class RestaurantTableInvoiceRepository extends EntityRepository
 
     public function removeInitialParticular(User $user)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $user->getGlobalOption()->getRestaurantConfig()->getId();
         $entity = $em->createQuery('DELETE RestaurantBundle:RestaurantTemporary e WHERE e.restaurantConfig = '.$config.' and e.user = '.$user->getId());
         $entity->execute();
@@ -261,11 +261,11 @@ class RestaurantTableInvoiceRepository extends EntityRepository
     public function updateInvoiceActive(RestaurantTableInvoice $tableInvoice)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = "UPDATE restaurant_table_invoice SET isActive = null  WHERE  restaurantConfig_id =:config";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($qb);
         $qb1->bindValue('config', $tableInvoice->getRestaurantConfig()->getId());
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
         $tableInvoice->setIsActive(1);
         $em->persist($tableInvoice);
         $em->flush();

@@ -16,7 +16,7 @@ class PathologicalReportRepository extends EntityRepository
     public function updateSorting($data){
 
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){

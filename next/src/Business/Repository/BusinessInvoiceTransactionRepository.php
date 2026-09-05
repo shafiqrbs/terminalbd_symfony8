@@ -137,8 +137,8 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
         $entity->setDiscount($invoice->getDiscount());
         $entity->setTotal($invoice->getSubTotal());
         $entity->setPayment($invoice->getPayment());
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
         return $entity;
 
     }
@@ -154,10 +154,10 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
         $entity->setDiscount($data['discount']);
         $entity->setPayment($data['payment']);
         $entity->setProcess('In-progress');
-        $transactionMethod = $this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+        $transactionMethod = $this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         $entity->setTransactionMethod($transactionMethod);
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
         return $entity;
 
     }
@@ -185,8 +185,8 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
             $vat = $this->getCulculationVat($invoice, $entity->getPayment());
             $entity->setVat($vat);
         }
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
 
     }
     public function insertTransaction(BusinessInvoice $invoice)
@@ -214,11 +214,11 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
                 $vat = $this->getCulculationVat($invoice, $entity->getPayment());
                 $entity->setVat($vat);
             }
-            $this->_em->persist($entity);
-            $this->_em->flush($entity);
+            $this->getEntityManager()->persist($entity);
+            $this->getEntityManager()->flush($entity);
             if($invoice->getPayment() > 0){
-                $accountBusinessInvoice = $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountBusinessInvoice($entity);
-                $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountBusinessInvoice);
+                $accountBusinessInvoice = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountBusinessInvoice($entity);
+                $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountBusinessInvoice);
             }
 
 
@@ -247,8 +247,8 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
             $vat = $this->getCulculationVat($invoice, $entity->getPayment());
             $entity->setVat($vat);
         }
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
 
     }
 
@@ -260,12 +260,12 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
             $entity->setVat($vat);
         }
         if(empty($entity->getTransactionMethod())){
-            $entity->setTransactionMethod($this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
+            $entity->setTransactionMethod($this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         }
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
-        $accountBusinessInvoice = $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountBusinessInvoice($entity);
-        $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountBusinessInvoice);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
+        $accountBusinessInvoice = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountBusinessInvoice($entity);
+        $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountBusinessInvoice);
 
     }
 
@@ -273,7 +273,7 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
     {
 
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         if(!empty($entity->getAccountSales())){
             /* @var AccountSales $sales*/
@@ -302,7 +302,7 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
     public function hmsAdmissionSalesTransactionReverse(BusinessInvoice $entity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         if(!empty($entity->getAccountSales())){
             /* @var AccountSales $sales*/
@@ -339,14 +339,14 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
         foreach ($entity->getBusinessInvoiceTransactions() as $transaction) {
 
             $transaction->setDiscount(0);
-            $this->_em->persist($transaction);
-            $this->_em->flush($transaction);
+            $this->getEntityManager()->persist($transaction);
+            $this->getEntityManager()->flush($transaction);
         }
         foreach ($entity->getBusinessInvoiceTransactions() as $transaction) {
 
             if( empty($transaction->getPayment()) and empty($transaction->getDiscount())){
 
-                $qb = $this->_em->createQueryBuilder();
+                $qb = $this->getEntityManager()->createQueryBuilder();
                 $qb->delete('BusinessBundle:BusinessInvoiceTransaction', 'trans')
                     ->where($qb->expr()->eq('trans.id', ':id'))
                     ->setParameter('id', $transaction->getId());
@@ -357,7 +357,7 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
 
     public function removePendingTransaction(BusinessInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $query = $qb->delete('BusinessBundle:BusinessInvoiceTransaction', 'e')
             ->where('e.businessBusinessInvoice = :businessBusinessInvoice')
@@ -407,7 +407,7 @@ class BusinessInvoiceTransactionRepository extends EntityRepository
 
     public function getLastCode(BusinessInvoice $invoice)
     {
-        $qb = $this->_em->getRepository('BusinessBundle:BusinessInvoiceTransaction')->createQueryBuilder('s');
+        $qb = $this->getEntityManager()->getRepository('BusinessBundle:BusinessInvoiceTransaction')->createQueryBuilder('s');
         $qb
             ->select('MAX(s.code)')
             ->where('s.businessBusinessInvoice = :invoice')

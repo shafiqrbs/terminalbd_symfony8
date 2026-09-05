@@ -90,7 +90,7 @@ class AccountPurchaseCommissionRepository extends EntityRepository
 
     public function lastInsertCash($entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository('AccountingBundle:AccountBankCash')->findOneBy(
             [
                 'globalOption' => $entity->getGlobalOption(),
@@ -111,7 +111,7 @@ class AccountPurchaseCommissionRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($journal);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountBankCash();
         $cash->setGlobalOption($journal->getGlobalOption());
         $cash->setBankBranch($journal->getBankBranch());
@@ -136,14 +136,14 @@ class AccountPurchaseCommissionRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountBankCash();
         $cash->setGlobalOption($entity->getGlobalOption());
         $cash->setBankBranch($entity->getBankBranch());
         $cash->setProcessHead('Purchase');
         $cash->setAccountRefNo($entity->getAccountRefNo());
         $cash->setUpdated($entity->getUpdated());
-        $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(32));
+        $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(32));
         $cash->setBalance($balance - $entity->getPayment() );
         $cash->setCredit($entity->getPayment());
         $em->persist($cash);

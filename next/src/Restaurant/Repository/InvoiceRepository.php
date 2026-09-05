@@ -238,7 +238,7 @@ class InvoiceRepository extends EntityRepository
 
     public function updateInvoiceTotalPrice(Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Restaurant\Entity\InvoiceParticular::class,'si')
             ->select('sum(si.subTotal) as subTotal')
@@ -283,7 +283,7 @@ class InvoiceRepository extends EntityRepository
 
     public function getInvoiceDetails(Invoice $invoice){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\Restaurant\Entity\InvoiceParticular::class,'ip');
         $qb->innerJoin('ip.particular','particular');
@@ -295,8 +295,8 @@ class InvoiceRepository extends EntityRepository
 
     public function updatePatientInfo($invoice,Customer $patient)
     {
-        $em = $this->_em;
-        $invoice = $this->_em->getRepository(\App\Restaurant\Entity\Invoice::class)->find($invoice);
+        $em = $this->getEntityManager();
+        $invoice = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\Invoice::class)->find($invoice);
         $invoice->setCustomer($patient);
         $invoice->setMobile($patient->getMobile());
         $em->persist($invoice);
@@ -306,7 +306,7 @@ class InvoiceRepository extends EntityRepository
 
     public function patientAdmissionUpdate($data,Invoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $invoiceInfo = $data['appstore_bundle_configbundle_invoice'];
         if($invoiceInfo['cabin']){
             $cabin = $em->getRepository(\App\Restaurant\Entity\Particular::class)->find($invoiceInfo['cabin']);
@@ -333,8 +333,8 @@ class InvoiceRepository extends EntityRepository
 
     public function checkTokenBooking($invoice , $tokenNo)
     {
-        $invoice = $this->_em->getRepository(\App\Restaurant\Entity\Invoice::class)->find($invoice);
-        $cabin = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($tokenNo);
+        $invoice = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\Invoice::class)->find($invoice);
+        $cabin = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\Particular::class)->find($tokenNo);
         $qb = $this->createQueryBuilder('e');
         $qb->select('COUNT(e.tokenNo) AS cabinCount');
         $qb->where('e.restaurantConfig = :config')->setParameter('config', $invoice ->getRestaurantConfig()->getId());
@@ -345,8 +345,8 @@ class InvoiceRepository extends EntityRepository
             echo 'invalid';
         }else{
             $invoice->setTokenNo($cabin);
-            $this->_em->persist($invoice);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($invoice);
+            $this->getEntityManager()->flush();
             echo 'valid';
         }
         exit;
@@ -375,7 +375,7 @@ class InvoiceRepository extends EntityRepository
             $invoice->setDue($invoice->getTotal() - $invoice->getPayment());
             $invoice->setCustomer($customer);
             $invoice->setMobile($customer->getMobile());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
         }
     }
 
@@ -385,13 +385,13 @@ class InvoiceRepository extends EntityRepository
         $invoice->setDiscount($discount);
         $invoice->setTotal($invoice->getSubTotal() - $returnDiscount);
         $invoice->setDue($invoice->getTotal() - $invoice->getPayment());
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
 
     }
 
     public function salesTransactionReverse(Invoice $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountCash = $em->createQuery("DELETE AccountingBundle:AccountSales e WHERE e.restaurantInvoice = {$entity->getId()}");
         if(!empty($accountCash)){
             $accountCash->execute();
@@ -401,7 +401,7 @@ class InvoiceRepository extends EntityRepository
 
     public function posPrint(Invoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $connector = new DummyPrintConnector();
         $printer = new Printer($connector);
         $printer -> initialize();
@@ -559,7 +559,7 @@ class InvoiceRepository extends EntityRepository
 
     public function insertApiSales(GlobalOption $option,RestaurantAndroidProcess $process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $items = json_decode($process->getJsonItem(),true);
         if($items){
@@ -663,7 +663,7 @@ class InvoiceRepository extends EntityRepository
 
     public function insertApiSalesItem(GlobalOption $option,RestaurantAndroidProcess $process){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $conf = $option->getRestaurantConfig();
 
         $items = json_decode($process->getJsonSubItem(),true);
@@ -715,7 +715,7 @@ class InvoiceRepository extends EntityRepository
             WHERE sales.androidProcess_id =:android";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('android', $android);
-        $qb->execute();
+        $qb = $qb->executeQuery();
     }
 
     public function getCalculationBankServiceCharge(Invoice $entity){

@@ -71,7 +71,7 @@ class BusinessVendorStockRepository extends EntityRepository
 
     public function updateVendorStockTotalPrice(businessVendorStock $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Business\Entity\BusinessVendorStockItem::class,'si')
             ->select('sum(si.subTotal) as total, SUM(si.quantity) as quantity ')
@@ -112,8 +112,8 @@ class BusinessVendorStockRepository extends EntityRepository
         $stmt->bindValue('config', $config);
         $stmt->bindValue('process', 'Approved');
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
 
 

@@ -74,7 +74,7 @@ class AccountJournalItemRepository extends EntityRepository
 
     public function insertDoubleEntry(AccountJournal $journal, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         foreach ($data['accountHead'] as $key => $value):
 

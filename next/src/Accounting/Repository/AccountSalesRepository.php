@@ -251,7 +251,7 @@ class AccountSalesRepository extends EntityRepository
     public function UserSalesReceive(GlobalOption $option,$data, $process = [])
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\User\Entity\User::class,'s');
         $qb->leftJoin('s.accountSales','e');
@@ -428,12 +428,12 @@ class AccountSalesRepository extends EntityRepository
     public function insertSalesAdjustment(AccountSalesAdjustment $entity)
     {
         $accountSales = new AccountSales();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
         $accountSales->setAccountBank($entity->getAccountBank());
         $accountSales->setAccountMobileBank($entity->getAccountMobileBank());
         $accountSales->setGlobalOption($entity->getGlobalOption());
-        $defaultCustomer = $this->_em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$entity->getGlobalOption(),'name'=>'Default']);
+        $defaultCustomer = $this->getEntityManager()->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$entity->getGlobalOption(),'name'=>'Default']);
         $accountSales->setCustomer($defaultCustomer);
         $accountSales->setTransactionMethod($entity->getTransactionMethod());
         $accountSales->setTotalAmount($entity->getSales());
@@ -452,7 +452,7 @@ class AccountSalesRepository extends EntityRepository
         $em->persist($accountSales);
         $em->flush();
         $this->updateCustomerBalance($accountSales);
-        $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+        $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
         return $accountSales;
     }
 
@@ -531,7 +531,7 @@ class AccountSalesRepository extends EntityRepository
 
     public function lastInsertSales($globalOption,$entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Accounting\Entity\AccountSales::class)->findOneBy(
             ['globalOption' => $globalOption,'customer' => $entity->getCustomer(),'process' => 'approved'],
             ['id' => 'DESC']
@@ -543,7 +543,7 @@ class AccountSalesRepository extends EntityRepository
     }
 
     public function updateCustomerBalance(AccountSales $accountSales){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $customer = $accountSales->getCustomer()->getId();
         $qb = $this->createQueryBuilder('e');
         $qb->select('(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) AS balance, COALESCE(SUM(e.amount),0) AS receiveAmount, COALESCE(SUM(e.amount),0) AS dueAmount, COALESCE(SUM(e.amount),0) AS returnAmount ');
@@ -721,8 +721,8 @@ class AccountSalesRepository extends EntityRepository
 
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('globalOption', $globalOption->getId());
-        $qb->execute();
-        $result =  $qb->fetchAll();
+        $qb = $qb->executeQuery();
+        $result =  $qb->fetchAllAssociative();
         return $result;
 
     }
@@ -750,10 +750,10 @@ class AccountSalesRepository extends EntityRepository
 		}
         $option =  $user->getGlobalOption();
 		$salesOverview = $this->getIncomeSummary($user,$data);
-        $salesAdjustment = $this->_em->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($option->getId(), $data);
-        $expenditures = $this->_em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($option, $accountHeads = [37], $data);
-       // $expenditures           = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = array(37), $data);
-        $revenues               = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [20], $data);
+        $salesAdjustment = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($option->getId(), $data);
+        $expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($option, $accountHeads = [37], $data);
+       // $expenditures           = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = array(37), $data);
+        $revenues               = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [20], $data);
 		$data =  ['salesAmount' => $salesOverview['total'] ,'purchasePrice' => $salesOverview['purchasePrice'],'salesAdjustment' => $salesAdjustment,'revenues' => $revenues,'expenditures' => $expenditures,'salesVat' => $salesOverview['vat']];
 		return $data;
 
@@ -773,13 +773,13 @@ class AccountSalesRepository extends EntityRepository
 			$data['endDate'] = date('Y-m-t 23:59:59',strtotime($data['year'].'-'.$data['endMonth']));
 		}
 
-		//$salesPrice             = $this->_em->getRepository(\App\Inventory\Entity\Sales::class)->reportSalesOverview($user,$data);
-		//$purchasePrice          = $this->_em->getRepository(\App\Inventory\Entity\Sales::class)->reportSalesItemPurchaseSalesOverview($user,$data);
+		//$salesPrice             = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Sales::class)->reportSalesOverview($user,$data);
+		//$purchasePrice          = $this->getEntityManager()->getRepository(\App\Inventory\Entity\Sales::class)->reportSalesItemPurchaseSalesOverview($user,$data);
 
 		$accountSales = $this->monthlySalesPurchase($user,$data);
-		$expenditures           = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [37], $data);
-		$revenues               = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [20], $data);
-		$administrative         = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [23], $data);
+		$expenditures           = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [37], $data);
+		$revenues               = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [20], $data);
+		$administrative         = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [23], $data);
 		$array =  ['salesAmount' => $accountSales['salesAmount'] ,'purchasePrice' => $accountSales['purchaseAmount'],'revenues' => $revenues ,'expenditures' => $expenditures,'administrative' => $administrative, 'salesVat' => $accountSales['vatAmount']];
 		return $array;
 
@@ -822,11 +822,11 @@ class AccountSalesRepository extends EntityRepository
 		$result  = $qb->getQuery()->getOneOrNullResult();
 		$salesAmount = $result['salesAmount'];
 
-		$purchase = $this->_em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->reportSalesAccessories($globalOption, $data);
-		$salesVat               = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionVat($globalOption, $accountHeads = [20], $data);
-		$expenditures           = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [37], $data);
-		$revenues               = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [20], $data);
-		$administrative         = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [23], $data);
+		$purchase = $this->getEntityManager()->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->reportSalesAccessories($globalOption, $data);
+		$salesVat               = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionVat($globalOption, $accountHeads = [20], $data);
+		$expenditures           = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [37], $data);
+		$revenues               = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [20], $data);
+		$administrative         = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($user->getGlobalOption(), $accountHeads = [23], $data);
 		$data =  ['salesAmount' => $salesAmount ,'purchase' => $purchase,'revenues' => $revenues ,'expenditures' => $expenditures,'administrative' => $administrative, 'salesVat' => $salesVat];
 		return $data;
 
@@ -851,10 +851,10 @@ class AccountSalesRepository extends EntityRepository
 		$this->handleSearchBetween($qb,$data);
         $qb->groupBy('e.processHead');
         $revenues  = $qb->getQuery()->getArrayResult();
-		$purchase = $this->_em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->reportSalesAccessories($globalOption, $data);
-	//	$revenues = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = array(20), $data);
-        $expenditures = $this->_em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [37], $data);
-        $salesVat = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionVat($globalOption, $accountHeads = [20], $data);
+		$purchase = $this->getEntityManager()->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->reportSalesAccessories($globalOption, $data);
+	//	$revenues = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = array(20), $data);
+        $expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [37], $data);
+        $salesVat = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionVat($globalOption, $accountHeads = [20], $data);
 		$data =  ['purchase' => $purchase, 'revenues' => $revenues ,'expenditures' => $expenditures,'salesVat' => $salesVat];
 		return $data;
 
@@ -862,7 +862,7 @@ class AccountSalesRepository extends EntityRepository
 
 	public function reportMedicineMonthlyIncome(User $user,$data = [])
 	{
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 	    $globalOption = $user->getGlobalOption();
 		if(empty($data)){
 
@@ -879,8 +879,8 @@ class AccountSalesRepository extends EntityRepository
         $sales = $em->getRepository(\App\Accounting\Entity\Transaction::class)->monthlyProfitReconcialtionProcess($user->getGlobalOption(),'sales',$monthYear);
         $purchase = $em->getRepository(\App\Accounting\Entity\Transaction::class)->monthlyProfitReconcialtionProcess($user->getGlobalOption(),'sales-purchase',$monthYear);
         $salesAdjustment = $em->getRepository(\App\Accounting\Entity\Transaction::class)->monthlyProfitReconcialtionProcess($user->getGlobalOption(),'sales-adjustment',$monthYear);
-        $expenditures = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = [37,23], $data);
-		$operatingRevenue = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = [20], $data);
+        $expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = [37,23], $data);
+		$operatingRevenue = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = [20], $data);
 		$data =  ['sales' => $sales['debit'] ,'salesAdjustment' => $salesAdjustment ,'purchase' => $purchase['credit'], 'operatingRevenue' => $operatingRevenue, 'expenditures' => $expenditures];
 		return $data;
 
@@ -897,10 +897,10 @@ class AccountSalesRepository extends EntityRepository
 			$data['startDate'] = date('Y-m-d 00:00:00',strtotime($data['startDate']));
 			$data['endDate'] = date('Y-m-d 23:59:59',strtotime($data['endDate']));
 		}
-		$sales = $this->_em->getRepository(\App\Medicine\Entity\MedicineSales::class)->reportSalesOverview($user, $data);
-        $salesAdjustment = $this->_em->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
-        $purchase = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->reportSalesItemPurchaseSalesOverview($user, $data);
-		$expenditures = $this->_em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [37], $data);
+		$sales = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSales::class)->reportSalesOverview($user, $data);
+        $salesAdjustment = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
+        $purchase = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->reportSalesItemPurchaseSalesOverview($user, $data);
+		$expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [37], $data);
 		$data =  ['sales' => $sales['total'] ,'salesAdjustment' => $salesAdjustment ,'purchase' => $purchase['totalPurchase'], 'expenditures' => $expenditures];
 		return $data;
 
@@ -917,10 +917,10 @@ class AccountSalesRepository extends EntityRepository
             $data['startDate'] = date('Y-m-d 00:00:00',strtotime($data['startDate']));
             $data['endDate'] = date('Y-m-d 23:59:59',strtotime($data['endDate']));
         }
-        $sales = $this->_em->getRepository(\App\Medicine\Entity\MedicineSales::class)->reportSalesOverview($user, $data);
-        $salesAdjustment = $this->_em->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
-        $purchase = $this->_em->getRepository(\App\Medicine\Entity\MedicineSales::class)->reportSalesItemPurchaseSalesOverview($user, $data);
-        $expenditures = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = [37,23], $data);
+        $sales = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSales::class)->reportSalesOverview($user, $data);
+        $salesAdjustment = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
+        $purchase = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSales::class)->reportSalesItemPurchaseSalesOverview($user, $data);
+        $expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = [37,23], $data);
         $data =  ['sales' => $sales['total'] ,'salesAdjustment' => $salesAdjustment,'purchase' => $purchase['totalPurchase'], 'expenditures' => $expenditures];
         return $data;
 
@@ -942,11 +942,11 @@ class AccountSalesRepository extends EntityRepository
 			$data['startDate'] = date('Y-m-d 00:00:00',strtotime($data['year'].'-'.$data['startMonth']));
 			$data['endDate'] = date('Y-m-t 23:59:59',strtotime($data['year'].'-'.$data['endMonth']));
 		}
-		$sales = $this->_em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesOverview($user, $data);
-		$purchase = $this->_em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesItemPurchaseSalesOverview($user, $data);
-        $salesAdjustment = $this->_em->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
-        $operatingRevenue = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = [20], $data);
-        $expenditures = $this->_em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [23,37], $data);
+		$sales = $this->getEntityManager()->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesOverview($user, $data);
+		$purchase = $this->getEntityManager()->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesItemPurchaseSalesOverview($user, $data);
+        $salesAdjustment = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
+        $operatingRevenue = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncome($globalOption, $accountHeads = [20], $data);
+        $expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [23,37], $data);
 		$data =  ['sales' => $sales['total'] ,'salesAdjustment' => $salesAdjustment,'operatingRevenue' => $operatingRevenue,'purchase' => $purchase['totalPurchase'], 'expenditures' => $expenditures];
 		return $data;
 
@@ -964,10 +964,10 @@ class AccountSalesRepository extends EntityRepository
 			$data['endDate'] = date('Y-m-d 23:59:59',strtotime($data['endDate']));
 		}
 
-		$sales = $this->_em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesOverview($user, $data);
-        $salesAdjustment = $this->_em->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
-        $purchase = $this->_em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesItemPurchaseSalesOverview($user, $data);
-        $expenditures = $this->_em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [37], $data);
+		$sales = $this->getEntityManager()->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesOverview($user, $data);
+        $salesAdjustment = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
+        $purchase = $this->getEntityManager()->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesItemPurchaseSalesOverview($user, $data);
+        $expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [37], $data);
 		$data =  ['sales' => $sales['total'] ,'salesAdjustment' => $salesAdjustment,'purchase' => $purchase['totalPurchase'], 'expenditures' => $expenditures];
 		return $data;
 
@@ -984,10 +984,10 @@ class AccountSalesRepository extends EntityRepository
             $data['startDate'] = date('Y-m-d 00:00:00',strtotime($data['startDate']));
             $data['endDate'] = date('Y-m-d 23:59:59',strtotime($data['endDate']));
         }
-        $sales = $this->_em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesOverview($user, $data);
-        $salesAdjustment = $this->_em->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
-        $purchase = $this->_em->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesItemPurchaseSalesOverview($user, $data);
-        $expenditures = $this->_em->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [37], $data);
+        $sales = $this->getEntityManager()->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesOverview($user, $data);
+        $salesAdjustment = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSalesAdjustment::class)->accountCashOverview($user->getGlobalOption()->getId(), $data);
+        $purchase = $this->getEntityManager()->getRepository( \App\Business\Entity\BusinessInvoice::class )->reportSalesItemPurchaseSalesOverview($user, $data);
+        $expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Expenditure::class)->reportExpenditureAccountHead($globalOption, $accountHeads = [37], $data);
         $data =  ['sales' => $sales['total'] ,'salesAdjustment' => $salesAdjustment,'purchase' => $purchase['totalPurchase'], 'expenditures' => $expenditures];
         return $data;
 
@@ -1006,7 +1006,7 @@ class AccountSalesRepository extends EntityRepository
 
     public function insertAccountSales(Sales $entity) {
 
-	    $em = $this->_em;
+	    $em = $this->getEntityManager();
         $purchasePrice = $em->getRepository(\App\Inventory\Entity\SalesItem::class)->getInvoicePurchasePrice($entity->getId());
         $exist = $this->findOneBy(['globalOption'=>$entity->getInventoryConfig()->getGlobalOption(),'sales'=>$entity]);
         if(empty($exist)){
@@ -1037,7 +1037,7 @@ class AccountSalesRepository extends EntityRepository
             $em->flush();
             $this->updateCustomerBalance($accountSales);
             if($accountSales->getAmount() > 0 ){
-                $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+                $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
             }
         }
     }
@@ -1046,7 +1046,7 @@ class AccountSalesRepository extends EntityRepository
 	{
 		$global = $entity->getInventoryConfig()->getGlobalOption();
 		$sales = $entity->getSales();
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$accountSales = new AccountSales();
 		$accountSales->setGlobalOption($global);
 		$accountSales->setCustomer($sales->getCustomer());
@@ -1070,7 +1070,7 @@ class AccountSalesRepository extends EntityRepository
 
 	public function resetAccountSales(Sales $entity) {
 
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$exist = $this->findOneBy(['processHead'=>'inventory','sales'=> $entity,'process'=>'approved']);
 		if($exist){
 			$accountSales = $exist;
@@ -1083,7 +1083,7 @@ class AccountSalesRepository extends EntityRepository
 			$em->flush();
 			$accountSalesClose = $this->updateCustomerBalance($accountSales);
 			if($accountSales->getAmount() > 0 ){
-				$this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->resetSalesCash($accountSales);
+				$this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->resetSalesCash($accountSales);
 			}
 			return $accountSalesClose;
 		}else{
@@ -1094,7 +1094,7 @@ class AccountSalesRepository extends EntityRepository
 
 	public function accountSalesReverse(Sales $entity)
 	{
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$accountCash = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.sales = '.$entity->getId());
 		if(!empty($accountCash)){
 			$accountCash->execute();
@@ -1109,7 +1109,7 @@ class AccountSalesRepository extends EntityRepository
 
     public function insertHospitalAccountInvoice(InvoiceTransaction $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $sourceInvoice = $entity->getHmsInvoice()->getInvoice()."-".$entity->getId();
         $exist = $this->findOneBy(['globalOption' => $entity->getHmsInvoice()->getHospitalConfig()->getGlobalOption(),'sourceInvoice' => $sourceInvoice,'customer' => $entity->getHmsInvoice()->getCustomer()]);
         if(empty($exist)){
@@ -1137,7 +1137,7 @@ class AccountSalesRepository extends EntityRepository
             $em->flush();
             $this->updateCustomerBalance($accountSales);
             if ($entity->getPayment() > 0) {
-                $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+                $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
             }
             return $accountSales;
         }
@@ -1147,7 +1147,7 @@ class AccountSalesRepository extends EntityRepository
 
     public function insertHospitalInvoiceDelete(InvoiceTransaction $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $hmsInvoices = $entity->getHmsInvoice();
         $sourceId = $hmsInvoices->getInvoice()."-".$entity->getId();
         $exist = $this->findOneBy(['sourceInvoice'=>$sourceId,'hmsInvoices'=>$hmsInvoices]);
@@ -1160,7 +1160,7 @@ class AccountSalesRepository extends EntityRepository
     public function insertHospitalFinalAccountInvoice(\App\Hospital\Entity\Invoice $entity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $this->findOneBy(['hmsInvoices'=>$entity->getId(),'processHead' => $entity->getInvoiceMode(),'processType'=>'Sales']);
         if(empty($exist)){
             $accountSales = new AccountSales();
@@ -1188,7 +1188,7 @@ class AccountSalesRepository extends EntityRepository
     public function insertHospitalVisitAccount(\App\Hospital\Entity\Invoice $entity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $this->findOneBy(['hmsInvoices'=>$entity->getId(),'processHead' => $entity->getInvoiceMode(),'processType'=>'Sales']);
         if(empty($exist)){
             $accountSales = new AccountSales();
@@ -1212,7 +1212,7 @@ class AccountSalesRepository extends EntityRepository
             $em->flush();
             $this->updateCustomerBalance($accountSales);
             if($accountSales->getAmount() > 0){
-                $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+                $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
             }
             return $accountSales;
         }
@@ -1225,7 +1225,7 @@ class AccountSalesRepository extends EntityRepository
 
 	public function insertRestaurantAccountInvoice(Invoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
 
         $accountSales->setGlobalOption($entity->getRestaurantConfig()->getGlobalOption());
@@ -1249,7 +1249,7 @@ class AccountSalesRepository extends EntityRepository
         $em->flush();
         $this->updateCustomerBalance($accountSales);
         if($accountSales->getAmount() > 0){
-            $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+            $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
         }
         return $accountSales;
 
@@ -1259,7 +1259,7 @@ class AccountSalesRepository extends EntityRepository
 
 	public function insertMedicineAccountInvoice(MedicineSales $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
         $accountSales->setAccountBank($entity->getAccountBank());
         $accountSales->setAccountMobileBank($entity->getAccountMobileBank());
@@ -1287,7 +1287,7 @@ class AccountSalesRepository extends EntityRepository
         $this->updateCustomerBalance($accountSales);
         $accountSales->getAmount();
         if($accountSales->getAmount() > 0){
-            $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+            $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
         }
         return $accountSales;
 
@@ -1295,7 +1295,7 @@ class AccountSalesRepository extends EntityRepository
 
     public function insertMedicineAccountTransferInvoice(MedicineTransfer $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
         $accountSales->setGlobalOption($entity->getMedicineConfig()->getGlobalOption());
         $accountSales->setCustomer($entity->getCustomer());
@@ -1318,7 +1318,7 @@ class AccountSalesRepository extends EntityRepository
         $em->flush();
         $this->updateCustomerBalance($accountSales);
         if($accountSales->getAmount() > 0){
-            $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+            $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
         }
         return $accountSales;
 
@@ -1328,7 +1328,7 @@ class AccountSalesRepository extends EntityRepository
     {
         $global = $entity->getMedicineConfig()->getGlobalOption();
         $sales = $entity->getMedicineSalesItem()->getMedicineSales();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
         $accountSales->setGlobalOption($global);
         $accountSales->setCustomer($sales->getCustomer());
@@ -1351,7 +1351,7 @@ class AccountSalesRepository extends EntityRepository
     public function insertMedicineAccountSalesReturnInvoice(MedicineSalesReturnInvoice $entity)
     {
         $global = $entity->getMedicineConfig()->getGlobalOption();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
         $accountSales->setGlobalOption($global);
         $accountSales->setCustomer($entity->getCustomer());
@@ -1372,7 +1372,7 @@ class AccountSalesRepository extends EntityRepository
 
     public function accountMedicineSalesReturnDelete(MedicineSalesReturnInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $option = $entity->getMedicineConfig()->getGlobalOption()->getId();
         $accountCash = $em->createQuery("DELETE AccountingBundle:AccountSales e WHERE e.globalOption = '{$option}' AND e.sourceInvoice = '{$entity->getId()}' AND e.processHead = 'sales-return' ");
         if(!empty($accountCash)){
@@ -1382,7 +1382,7 @@ class AccountSalesRepository extends EntityRepository
 
 	public function accountMedicineSalesReverse(MedicineSales $entity)
 	{
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$accountCash = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.medicineSales = '.$entity->getId());
 		if(!empty($accountCash)){
 			$accountCash->execute();
@@ -1393,8 +1393,8 @@ class AccountSalesRepository extends EntityRepository
 
     public function insertBusinessAccountInvoice(BusinessInvoice $entity)
     {
-        $em = $this->_em;
-        $purchasePrice = $this->_em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getInvoicePurchasePrice($entity->getId());
+        $em = $this->getEntityManager();
+        $purchasePrice = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getInvoicePurchasePrice($entity->getId());
         $accountSales = new AccountSales();
         $accountSales->setAccountBank($entity->getAccountBank());
         $accountSales->setAccountMobileBank($entity->getAccountMobileBank());
@@ -1425,7 +1425,7 @@ class AccountSalesRepository extends EntityRepository
         $em->flush();
 	    $this->updateCustomerBalance($accountSales);
         if($accountSales->getAmount() > 0){
-            $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+            $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
         }
         return $accountSales;
     }
@@ -1434,7 +1434,7 @@ class AccountSalesRepository extends EntityRepository
     {
         $global = $sales->getBusinessConfig()->getGlobalOption();
         $amount = $sales->getSalesReturn();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
         $accountSales->setGlobalOption($global);
         $accountSales->setCustomer($sales->getCustomer());
@@ -1446,7 +1446,7 @@ class AccountSalesRepository extends EntityRepository
         $accountSales->setApprovedBy($sales->getCreatedBy());
         $em->persist($accountSales);
         $em->flush();
-      //  $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+      //  $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
         return $accountSales;
     }
 
@@ -1454,7 +1454,7 @@ class AccountSalesRepository extends EntityRepository
     {
         $global = $sales->getBusinessConfig()->getGlobalOption();
         $amount = $sales->getAdjustment();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
         $accountSales->setGlobalOption($global);
         $accountSales->setCustomer($sales->getCustomer());
@@ -1477,7 +1477,7 @@ class AccountSalesRepository extends EntityRepository
         $global = $sales->getBusinessConfig()->getGlobalOption();
         $amount = $sales->getCredit();
         $customer = $sales->getStore()->getCustomer();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountSales = new AccountSales();
         $accountSales->setGlobalOption($global);
         $accountSales->setBusinessInvoice($entity);
@@ -1493,7 +1493,7 @@ class AccountSalesRepository extends EntityRepository
         $em->persist($accountSales);
         $em->flush();
         $this->updateCustomerBalance($accountSales);
-        $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+        $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
         return $accountSales;
     }
 
@@ -1502,7 +1502,7 @@ class AccountSalesRepository extends EntityRepository
         $global = $sales->getBusinessConfig()->getGlobalOption();
         $amount = $sales->getCredit();
         $customer = $sales->getStore()->getCustomer();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $date = time();
         $invoice = "{$sales->getId()}-{$date}";
         $accountSales = new AccountSales();
@@ -1523,7 +1523,7 @@ class AccountSalesRepository extends EntityRepository
         $em->persist($accountSales);
         $em->flush();
         $this->updateCustomerBalance($accountSales);
-        $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
+        $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertSalesCash($accountSales);
         return $accountSales;
     }
 
@@ -1532,7 +1532,7 @@ class AccountSalesRepository extends EntityRepository
         $global = $sales->getBusinessConfig()->getGlobalOption();
         $amount = $sales->getDebit();
         $customer = $sales->getStore()->getCustomer();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $date = time();
         $invoice = "{$sales->getId()}-{$date}";
         $accountSales = new AccountSales();
@@ -1556,7 +1556,7 @@ class AccountSalesRepository extends EntityRepository
 
 	public function accountBusinessSalesReverse(BusinessInvoice $entity)
 	{
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$accountCash = $em->createQuery('DELETE AccountingBundle:AccountSales e WHERE e.businessInvoice = '.$entity->getId());
 		if(!empty($accountCash)){
 			$accountCash->execute();
@@ -1567,7 +1567,7 @@ class AccountSalesRepository extends EntityRepository
 
 	public function accountReverse(AccountSales $entity)
 	{
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.accountSales = {$entity->getId()}");
 		$accountCash->execute();
 	}
@@ -1580,7 +1580,7 @@ class AccountSalesRepository extends EntityRepository
 
         $entity = $this->findOneBy(['globalOption'=>$adjustment->getGlobalOption(),'sourceInvoice'=>$adjustment->getAccountRefNo(),'processHead'=>'Sales-adjustment']);
         if($entity){
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $em->remove($entity);
             $em->flush();
         }
@@ -1660,7 +1660,7 @@ class AccountSalesRepository extends EntityRepository
 
     public function apiInsertOpeningBalance(Customer $customer,$userId)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $user = $em->getRepository(\App\User\Entity\User::class)->find($userId);
         if($user){
             $entity = new AccountSales();
@@ -1687,7 +1687,7 @@ class AccountSalesRepository extends EntityRepository
     public function apiInsertSalesReceive(GlobalOption $option, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $customer = (isset($data['customer_id']) and $data['customer_id']) ? trim($data['customer_id']):'';
         $methodId = (isset($data['method_id']) and $data['method_id']) ? trim($data['method_id']):'';
         $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['user_id']):'';
@@ -1732,7 +1732,7 @@ class AccountSalesRepository extends EntityRepository
     {
         $global = $option->getId();
         $config = $option->getBusinessConfig()->getId();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         if(empty($data)){
             $datetime = new DateTime("now");
@@ -1752,8 +1752,8 @@ JOIN user_profiles as profile ON user.id = profile.user_id
 WHERE sales.globalOption_id = {$global} AND sales.processHead != 'Sales-Return' AND sales.process = 'approved' AND sales.created >= '{$startDate}' AND sales.created <= '{$endDate}'
 GROUP BY user.id ORDER BY sales.amount DESC";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
-        $qb->execute();
-        $result =  $qb->fetchAll();
+        $qb = $qb->executeQuery();
+        $result =  $qb->fetchAllAssociative();
 
         $sql2 = "SELECT user.id as id,SUM(sales.amount) as amount
 FROM account_sales as sales
@@ -1763,8 +1763,8 @@ JOIN user_profiles as profile ON user.id = profile.user_id
 WHERE sales.globalOption_id = {$global} AND sales.processHead = 'Sales-Return' AND sales.process = 'approved' AND sales.created >= '{$startDate}' AND sales.created <= '{$endDate}'
 GROUP BY user.id ORDER BY sales.amount DESC";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sql2);
-        $qb2->execute();
-        $result2 =  $qb2->fetchAll();
+        $qb2 = $qb2->executeQuery();
+        $result2 =  $qb2->fetchAllAssociative();
         $salesReturns = [];
         foreach ($result2 as $r){
             $salesReturns[$r['id']] = $r;

@@ -75,7 +75,7 @@ class SyndicateRepository extends MaterializedPathRepository{
     public function getSyndicateOptions(){
 
         $ret = [];
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $Syndicates = $em->getRepository(\App\Tool\Entity\Syndicate::class)->findBy([],['name'=>'asc']);
 
         foreach( $Syndicates as $cat ){

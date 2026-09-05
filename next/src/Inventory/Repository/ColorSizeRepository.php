@@ -13,7 +13,7 @@ class ColorSizeRepository extends EntityRepository
 {
     public function getLastId($inventory,$type)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(cs)');
         $qb->from(\App\Inventory\Entity\ColorSize::class,'cs');
         $qb->where("cs.type = :type");

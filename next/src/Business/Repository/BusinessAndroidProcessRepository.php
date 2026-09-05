@@ -34,7 +34,7 @@ class BusinessAndroidProcessRepository extends EntityRepository
 
     public function insertAndroidProcess(GlobalOption $option,$device,$process,$data)
     {
-        $em =  $this->_em;
+        $em =  $this->getEntityManager();
 
         $device = $em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->findOneBy(['globalOption'=> $option,'id' => $device]);
         $entity = new BusinessAndroidProcess();
@@ -55,14 +55,14 @@ class BusinessAndroidProcessRepository extends EntityRepository
 
     public function insertApiSalesManual(GlobalOption $option,BusinessAndroidProcess $process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $items = json_decode($process->getJsonItem(),true);
         $subItems = json_decode($process->getJsonSubItem(),true);
 
         $numItems = count($items);
         $numSubItems = count($subItems);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($numItems > 0 and $numSubItems > 0 ){
             $rows = '';
             $config = $option->getBusinessConfig()->getId();
@@ -130,7 +130,7 @@ class BusinessAndroidProcessRepository extends EntityRepository
 
             $sql = "INSERT INTO business_invoice (businessConfig_id,created,updated,invoice,deviceSalesId,customer_id,createdBy_id,salesBy_id,approvedBy_id,transactionMethod_id,subTotal,discount,total,received,due,discountType,discountCalculation,accountBank_id,accountMobileBank_id,cardNo,androidProcess_id,process) VALUES {$rows}";
             $qb = $this->getEntityManager()->getConnection()->prepare($sql);
-            $qb->execute();
+            $qb = $qb->executeQuery();
 
             if($subItems  and $numSubItems > 0 ) {
                 foreach ($subItems as $sub):

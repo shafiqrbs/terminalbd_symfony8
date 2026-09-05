@@ -165,8 +165,8 @@ class AccountCashRepository extends EntityRepository
         $stmt->bindValue('user', $user);
         $stmt->bindValue('startDate', $start);
         $stmt->bindValue('endDate', $end);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         var_dump($result);
         exit;*/
         return $records;
@@ -176,7 +176,7 @@ class AccountCashRepository extends EntityRepository
 
     public function transactionWiseOverview(User $user,$data = [])
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Tool\Entity\TransactionMethod::class,'e');
         $qb->select('e.name AS transactionName');
         $qb->addSelect('e.id AS transactionId');
@@ -245,7 +245,7 @@ class AccountCashRepository extends EntityRepository
 
     public function apiAccountDetails($option,$accountId)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->join('e.accountBank','ab');
         $qb->leftJoin('ab.bank','bank');
@@ -262,7 +262,7 @@ class AccountCashRepository extends EntityRepository
     public function transactionBankCashOverview(User $user, $data = [])
     {
         $globalOption = $user->getGlobalOption();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\AccountBank::class,'accountBank');
         $qb->select('accountBank.id AS accountId , accountBank.name AS bankName');
         $qb->where("accountBank.globalOption = :globalOption");
@@ -295,7 +295,7 @@ class AccountCashRepository extends EntityRepository
     {
 
         $globalOption = $user->getGlobalOption();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\AccountMobileBank::class,'accountMobileBank');
         $qb->select('accountMobileBank.id AS accountId , accountMobileBank.name AS mobileBankName');
         $qb->where("accountMobileBank.globalOption = :globalOption");
@@ -461,7 +461,7 @@ class AccountCashRepository extends EntityRepository
 
     public function lastInsertCash($entity,$processHead)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('e.processHead as name , COALESCE(SUM(e.debit),0) AS debit, COALESCE(SUM(e.credit),0) AS credit');
         $qb->where("e.globalOption = :globalOption")->setParameter('globalOption', $entity->getGlobalOption()->getId());
@@ -486,7 +486,7 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,$processHead);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $journals = $this->findBy([ "accountJournal" => $entity]);
         if(empty($journals)){
             $cash = new AccountCash();
@@ -526,7 +526,7 @@ class AccountCashRepository extends EntityRepository
 
 	private function fromBalanceTransfer(AccountBalanceTransfer $entity,$processHead){
 
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$cash = new AccountCash();
 		$cash->setGlobalOption($entity->getGlobalOption());
         $cash->setBalanceTransfer($entity);
@@ -539,11 +539,11 @@ class AccountCashRepository extends EntityRepository
 			$cash->setBranches($entity->getBranches());
 		}
 		if(!empty($entity->getFromTransactionMethod()) and $entity->getFromTransactionMethod()->getId() == 2 ){
-			$cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(38));
+			$cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(38));
 		}elseif(!empty($entity->getFromTransactionMethod()) and $entity->getFromTransactionMethod()->getId() == 3 ){
-			$cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(45));
+			$cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(45));
 		}else{
-			$cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31));
+			$cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31));
 		}
         $cash->setCreatedBy($entity->getCreatedBy());
 		$cash->setCredit($entity->getAmount());
@@ -556,7 +556,7 @@ class AccountCashRepository extends EntityRepository
 
 	private function toBalanceTransfer(AccountBalanceTransfer $entity,$processHead){
 
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$cash = new AccountCash();
 		$cash->setGlobalOption($entity->getGlobalOption());
         $cash->setBalanceTransfer($entity);
@@ -569,11 +569,11 @@ class AccountCashRepository extends EntityRepository
 			$cash->setBranches($entity->getBranches());
 		}
 		if(!empty($entity->getToTransactionMethod()) and $entity->getToTransactionMethod()->getId() == 2 ){
-			$cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
+			$cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
 		}elseif(!empty($entity->getToTransactionMethod()) and $entity->getToTransactionMethod()->getId() == 3 ){
-			$cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10));
+			$cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10));
 		}else{
-			$cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
+			$cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
 		}
         $cash->setCreatedBy($entity->getCreatedBy());
 		$cash->setDebit($entity->getAmount());
@@ -586,7 +586,7 @@ class AccountCashRepository extends EntityRepository
 
     public function insertPurchaseCommission(AccountPurchaseCommission $entity){
 
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$cash = new AccountCash();
 		$cash->setGlobalOption($entity->getGlobalOption());
 		$cash->setTransactionMethod($entity->getTransactionMethod());
@@ -595,11 +595,11 @@ class AccountCashRepository extends EntityRepository
         $cash->setProcessHead('Purchase-Commission');
 		$cash->setAccountRefNo($entity->getAccountRefNo());
 		if(!empty($entity->getTransactionMethod()) and $entity->getTransactionMethod()->getId() == 2 ){
-			$cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
+			$cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
 		}elseif(!empty($entity->getTransactionMethod()) and $entity->getTransactionMethod()->getId() == 3 ){
-			$cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10));
+			$cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10));
 		}else{
-			$cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
+			$cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
 		}
         $cash->setCreatedBy($entity->getCreatedBy());
 		$cash->setDebit($entity->getAmount());
@@ -615,7 +615,7 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,'Purchase');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
         $cash->setGlobalOption($entity->getGlobalOption());
@@ -627,11 +627,11 @@ class AccountCashRepository extends EntityRepository
         $cash->setAccountRefNo($entity->getAccountRefNo());
         /* Cash - Cash various */
         if($entity->getTransactionMethod()->getId() == 1 ){
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31));
         }elseif($entity->getTransactionMethod()->getId() == 2 ){
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(38));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(38));
         }if($entity->getTransactionMethod()->getId() == 3 ){
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(45));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(45));
         }
         $cash->setBalance($balance - $entity->getPayment() );
         $cash->setCreatedBy($entity->getCreatedBy());
@@ -647,7 +647,7 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,'Purchase');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
         $cash->setGlobalOption($entity->getGlobalOption());
@@ -662,11 +662,11 @@ class AccountCashRepository extends EntityRepository
         /* Cash - Cash various */
 
         if($entity->getTransactionMethod()->getId() == 2){
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
         }elseif($entity->getTransactionMethod()->getId() == 3){
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10));
         }else{
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
         }
         $cash->setBalance($balance - $entity->getPayment() );
         $cash->setCredit($entity->getPayment());
@@ -682,7 +682,7 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,$processHead);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
         /* Cash - Cash various */
@@ -692,20 +692,20 @@ class AccountCashRepository extends EntityRepository
         }elseif($entity->getTransactionMethod() and $entity->getTransactionMethod()->getSlug() == "mobile" and $entity->getAccountMobileBank()){
             /* Current Asset Mobile Account Debit */
             $cash->setAccountMobileBank($entity->getAccountMobileBank());
-            $account = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10);
+            $account = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10);
             $cash->setAccountHead($account);
 
         }else{
 
             /* Cash - Cash Debit */
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
         }
         $cash->setGlobalOption($entity->getGlobalOption());
         $cash->setAccountLoan($entity);
         if(!empty($entity->getTransactionMethod())){
             $cash->setTransactionMethod($entity->getTransactionMethod());
         }else{
-            $method = $this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+            $method = $this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
             $cash->setTransactionMethod($method);
         }
         $cash->setProcessHead($processHead);
@@ -729,7 +729,7 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,$processHead);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
         /* Cash - Cash various */
@@ -739,13 +739,13 @@ class AccountCashRepository extends EntityRepository
         }elseif($entity->getTransactionMethod() and $entity->getTransactionMethod()->getSlug() == "mobile" and $entity->getAccountMobileBank()){
             /* Current Asset Mobile Account Debit */
             $cash->setAccountMobileBank($entity->getAccountMobileBank());
-            $account = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10);
+            $account = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10);
             $cash->setAccountHead($account);
 
         }else{
 
             /* Cash - Cash Debit */
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
         }
         $cash->setGlobalOption($entity->getGlobalOption());
         $cash->setAccountSales($entity);
@@ -755,7 +755,7 @@ class AccountCashRepository extends EntityRepository
         if($entity->getTransactionMethod()){
 	        $cash->setTransactionMethod($entity->getTransactionMethod());
         }else{
-	        $method = $this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+	        $method = $this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
 	        $cash->setTransactionMethod($method);
         }
         $cash->setProcessHead($processHead);
@@ -774,7 +774,7 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,$processHead);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
         /* Cash - Cash various */
@@ -818,7 +818,7 @@ class AccountCashRepository extends EntityRepository
 	    $exist = $this->findOneBy(['processHead'=>'Sales','accountSales'=> $entity]);
 	    if($exist){
 		    $balance = $this->lastInsertCash( $entity, 'Sales' );
-		    $em      = $this->_em;
+		    $em      = $this->getEntityManager();
 		    $cash    = $exist;
 
 		    $cash->setGlobalOption( $entity->getGlobalOption() );
@@ -847,10 +847,10 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,'SalesReturn');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
-        $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(35));
+        $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(35));
         $cash->setGlobalOption($entity->getGlobalOption());
         if(!empty($entity->getBranches())){
             $cash->setBranches($entity->getBranches());
@@ -873,17 +873,17 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,'Online');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
         if($entity->getTransactionMethod()->getId() == 2){
             $cash->setAccountBank($entity->getAccountBank());
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
         }elseif($entity->getTransactionMethod()->getId() == 3 ){
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(43));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(43));
             $cash->setAccountMobileBank($entity->getAccountMobileBank());
         }else{
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(36));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(36));
         }
         $cash->setGlobalOption($entity->getGlobalOption());
         $cash->setAccountOnlineOrder($entity);
@@ -904,10 +904,10 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,'PurchaseReturn');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
-        $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(36));
+        $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(36));
         $cash->setGlobalOption($entity->getGlobalOption());
         $cash->setAccountPurchaseReturn($entity);
         $cash->setTransactionMethod($entity->getTransactionMethod());
@@ -927,14 +927,14 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,'Expenditure');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
         if($entity->getTransactionMethod()->getId() == 2){
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
         }elseif($entity->getTransactionMethod()->getId() == 3){
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10));
         }else{
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
         }
         $cash->setGlobalOption($entity->getGlobalOption());
         if(!empty($entity->getBranches())){
@@ -961,10 +961,10 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,'PettyCash');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
-        $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31));
+        $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31));
         $cash->setGlobalOption($entity->getGlobalOption());
         $cash->setPettyCash($entity);
         $cash->setTransactionMethod($entity->getTransactionMethod());
@@ -986,10 +986,10 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,'PettyCash');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
-        $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
+        $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
         $cash->setGlobalOption($entity->getGlobalOption());
         $cash->setPettyCash($entity);
         $cash->setTransactionMethod($entity->getTransactionMethod());
@@ -1009,10 +1009,10 @@ class AccountCashRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertCash($entity,'PaymentSalary');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
-        $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31));
+        $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(31));
         $cash->setGlobalOption($entity->getGlobalOption());
         $cash->setPaymentSalary($entity);
         $cash->setTransactionMethod($entity->getTransactionMethod());
@@ -1033,22 +1033,22 @@ class AccountCashRepository extends EntityRepository
 
         $invoice = $entity->getDmsInvoice();
         $balance = $this->closingInsertCash($entity,$invoice->getDmsConfig()->getGlobalOption(),'Sales');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
 
         /* Cash - Cash various */
         if($entity->getTransactionMethod()->getId() == 2 ){
             /* Current Asset Bank Cash Debit */
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(3));
             $cash->setAccountBank($entity->getAccountBank());
         }elseif($entity->getTransactionMethod()->getId() == 3 ){
             /* Current Asset Mobile Account Debit */
             $cash->setAccountMobileBank($entity->getAccountMobileBank());
-            $account = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10);
+            $account = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(10);
             $cash->setAccountHead($account);
         }else{
             /* Cash - Cash Debit */
-            $cash->setAccountHead($this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
+            $cash->setAccountHead($this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(30));
         }
         $cash->setGlobalOption($invoice->getDmsConfig()->getGlobalOption());
         $cash->setTransactionMethod($entity->getTransactionMethod());
@@ -1066,7 +1066,7 @@ class AccountCashRepository extends EntityRepository
 
     public function closingInsertCash(DmsTreatmentPlan $entity,$globalOption,$processHead)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($entity->getTransactionMethod()->getId() == 2){
             $array = ['globalOption' => $globalOption,'transactionMethod' => $entity->getTransactionMethod() ,'accountBank' => $entity->getAccountBank(), 'processHead' => $processHead ];
         }elseif($entity->getTransactionMethod()->getId() == 3 ){
@@ -1099,8 +1099,8 @@ class AccountCashRepository extends EntityRepository
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
         $stmt->bindValue('process', $head);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;
@@ -1122,8 +1122,8 @@ class AccountCashRepository extends EntityRepository
         $stmt->bindValue('option', $option);
         $stmt->bindValue('year', $year);
         $stmt->bindValue('process', $head);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['month']] = $result;
@@ -1134,7 +1134,7 @@ class AccountCashRepository extends EntityRepository
     public function insertDoubleEntry(AccountJournal $journal, AccountJournalItem $journalItem,$method)
     {
         $balance = $this->lastInsertCash($journal,"Journal");
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cash = new AccountCash();
         $cash->setGlobalOption($journal->getGlobalOption());
         $cash->setAccountJournal($journal);
@@ -1193,7 +1193,7 @@ class AccountCashRepository extends EntityRepository
 
     public function accountCashReverse($entity,$process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($process == "BalanceTransfer"){
             $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.globalOption = {$entity->getGlobalOption()->getId()} AND e.balanceTransfer ={$entity->getId()}");
             $accountCash->execute();

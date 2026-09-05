@@ -23,7 +23,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
 {
 
     public function getItemOpeningQuantity(Particular $item){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('(COALESCE(SUM(e.quantity),0) AS openingQuantity');
         $qb->where("e.item = :item")->setParameter('item', $item->getId());
@@ -34,7 +34,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
     }
 
     public function updateItemClosingQuantity(RestaurantStockHistory $stock){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $closingQnt = ($stock->getOpeningQuantity() + $stock->getQuantity());
         $stock->setClosingQuantity($closingQnt);
         $em->persist($stock);
@@ -44,7 +44,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
 
     public function processStockQuantity($item , $fieldName = ''){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $openingQnt = $this->getItemOpeningQuantity($item->getParticular());
 
@@ -129,7 +129,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
 
     public function processInsertPurchaseItem(Purchase $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item Purchase  */
 
@@ -144,14 +144,14 @@ class RestaurantStockHistoryRepository extends EntityRepository
 
     public function processInsertDamageItem(RestaurantDamage $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $em->createQuery("DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.damage = '{$entity->getId()}'")->execute();
         $this->processStockQuantity($entity,"damage");
     }
 
     public function processReversePurchaseItem(Purchase $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item Purchase  */
 
@@ -164,7 +164,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
 
     public function processInsertPurchaseReturnItem(BusinessPurchaseReturn $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item BusinessPurchaseReturnItem  */
 
@@ -181,7 +181,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
 
     public function processInsertSalesItem(Invoice $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item InvoiceParticular  */
 
@@ -198,7 +198,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
 
     public function processInsertProductionItem(ProductionExpense $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $em->createQuery("DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.productionExpense = '{$entity->getId()}'")->execute();
         $this->processStockQuantity($entity,"production");
 
@@ -206,7 +206,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
 
     public function processReverseSalesItem(Invoice $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var $item InvoiceParticular  */
         if($entity->getInvoiceParticulars()){
             foreach($entity->getInvoiceParticulars() as $item ){
@@ -219,7 +219,7 @@ class RestaurantStockHistoryRepository extends EntityRepository
 
     public function processInsertSalesReturnItem(BusinessInvoice $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item BusinessInvoiceReturn  */
 
@@ -279,8 +279,8 @@ class RestaurantStockHistoryRepository extends EntityRepository
         $stmt->bindValue('item', "{$item}");
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;

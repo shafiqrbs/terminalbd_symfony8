@@ -14,7 +14,7 @@ class AdsToolRepository extends EntityRepository
 
     public function adsToolUpdate($globalOption,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $globalOption->getAdsTool();
         if(isset($data['googleServiceID']) and $data['googleServiceID'] != '') {
             $entity->setGoogleServiceID($data['googleServiceID']);

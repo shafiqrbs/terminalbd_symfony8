@@ -17,7 +17,7 @@ class CourierRepository extends EntityRepository
     public function setCategorySorting($data)
     {
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($data as $key => $value){
             $particular = $this->findOneBy(['status'=> 1,'id' => $value]);
             $particular->setSorting($i);

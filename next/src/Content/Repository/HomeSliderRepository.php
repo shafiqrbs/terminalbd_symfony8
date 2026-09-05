@@ -17,7 +17,7 @@ class HomeSliderRepository extends EntityRepository
     {
 
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){

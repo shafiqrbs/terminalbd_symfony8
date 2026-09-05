@@ -17,7 +17,7 @@ class SyndicateModuleRepository extends EntityRepository
 
         if($globalOption->getSyndicate()){
             $syndicateId = $globalOption->getSyndicate()->getParent()->getId();
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $db = $em->createQueryBuilder();
             $db->select('sm');
             $db->from(\App\Tool\Entity\SyndicateModule::class, 'sm');

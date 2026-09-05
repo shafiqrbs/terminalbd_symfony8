@@ -18,7 +18,7 @@ class PageMetaRepository extends EntityRepository
     public function pageMeta(Page $page, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if ($page and isset($data['metaValue']) and !empty($data['metaValue'])) {
 
             $i = 0;
@@ -54,8 +54,8 @@ class PageMetaRepository extends EntityRepository
             $meta->setPage($entity);
             $meta->setMetaKey($row->getMetaKey());
             $meta->setMetaValue($row->getMetaValue());
-            $this->_em->persist($meta);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($meta);
+            $this->getEntityManager()->flush();
         }
     }
 

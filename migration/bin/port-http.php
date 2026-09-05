@@ -92,6 +92,31 @@ $rewriteTemplateRefs = static function (string $s) use ($bundleToModule, &$stats
         $s
     );
 
+    // "@SettingTool/Widget/admin.html.twig" - Symfony's bundle-namespace form,
+    // which needs the bundle to still exist. The module directory replaces it.
+    $s = preg_replace_callback(
+        '/@([A-Za-z]+)\/([A-Za-z0-9_.\/-]+\.twig)/',
+        static function (array $m) use ($bundleToModule, &$stats): string {
+            $module = $bundleToModule[$m[1] . 'Bundle'] ?? null;
+
+            foreach ($bundleToModule as $class => $candidate) {
+                if ($candidate === $m[1]) {
+                    $module = $candidate;
+                    break;
+                }
+            }
+
+            if ($module === null) {
+                return $m[0];
+            }
+
+            $stats['tpl_refs']++;
+
+            return $module . '/' . $m[2];
+        },
+        $s
+    );
+
     return preg_replace_callback(
         '/\b([A-Za-z]+Bundle):([A-Za-z0-9_]*):([A-Za-z0-9_.\/\-{}$]+\.twig)\b/',
         static function (array $m) use ($bundleToModule, &$stats): string {

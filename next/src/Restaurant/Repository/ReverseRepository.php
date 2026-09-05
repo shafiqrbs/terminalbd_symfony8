@@ -26,8 +26,8 @@ class ReverseRepository extends EntityRepository
         $reverse->setProcess('Invoice');
         $reverse->setContent($data);
         $reverse->setInvoice($entity);
-        $this->_em->persist($reverse);
-        $this->_em->flush($reverse);
+        $this->getEntityManager()->persist($reverse);
+        $this->getEntityManager()->flush($reverse);
 
     }
 

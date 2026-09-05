@@ -17,7 +17,7 @@ class RestaurantConfigRepository extends EntityRepository
     public function reset(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getRestaurantConfig()->getId();
 
         $history = $em->createQuery('DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.restaurantConfig = '.$config);
@@ -37,14 +37,14 @@ class RestaurantConfigRepository extends EntityRepository
                  WHERE sub.restaurantConfig_id =:config";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
         $qb1->bindValue('config', $config);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
     }
 
     public function delete(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getRestaurantConfig()->getId();
 
         $history = $em->createQuery('DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.restaurantConfig = '.$config);
@@ -75,7 +75,7 @@ class RestaurantConfigRepository extends EntityRepository
     public function resetPurchaseSalesProduction(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getRestaurantConfig ()->getId();
 
         $history = $em->createQuery('DELETE RestaurantBundle:RestaurantStockHistory e WHERE e.restaurantConfig = '.$config);
@@ -110,14 +110,14 @@ class RestaurantConfigRepository extends EntityRepository
                  WHERE sub.restaurantConfig_id =:config";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
         $qb1->bindValue('config', $config);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
     }
 
 
     public function invoiceDelete($config)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cid = $config->getId();
         $Invoice = $em->createQuery("DELETE RestaurantBundle:Invoice e WHERE  e.process = 'Created' and e.restaurantConfig = ".$cid);
         $Invoice->execute();

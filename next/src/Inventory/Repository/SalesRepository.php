@@ -318,8 +318,8 @@ class SalesRepository extends EntityRepository
 		$stmt->bindValue('config', $config);
 		$stmt->bindValue('process', 'Done');
 		$stmt->bindValue('year', $year);
-		$stmt->execute();
-        $results =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['month']] = $result;
@@ -349,8 +349,8 @@ class SalesRepository extends EntityRepository
         $stmt->bindValue('process', 'Done');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;
@@ -375,8 +375,8 @@ class SalesRepository extends EntityRepository
         $stmt->bindValue('inventoryConfig', $inventory);
         $stmt->bindValue('process', 'Done');
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
     }
 
@@ -400,8 +400,8 @@ class SalesRepository extends EntityRepository
 		$stmt->bindValue('process', 'Done');
 		$stmt->bindValue('year', $year);
 		$stmt->bindValue('month', $month);
-		$stmt->execute();
-		$result =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+		$result =  $stmt->fetchAllAssociative();
 		return $result;
 
 
@@ -441,7 +441,7 @@ class SalesRepository extends EntityRepository
 
     public function getSalesLastId($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('s.id');
         $qb->from(\App\Inventory\Entity\Sales::class,'s');
         $qb->where("s.inventoryConfig = :inventory");
@@ -459,7 +459,7 @@ class SalesRepository extends EntityRepository
 
     public function updateSalesTotalPrice(Sales $sales,$import ='')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Inventory\Entity\SalesItem::class,'si')
             ->select('sum(si.subTotal) as total , sum(si.quantity) as totalItem')
@@ -518,8 +518,8 @@ class SalesRepository extends EntityRepository
         if($sales->getDue() == 0 ){
             $sales->setPaymentStatus('Paid');
         }
-        $this->_em->persist($sales);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($sales);
+        $this->getEntityManager()->flush();
     }
 
     public function todaySalesOverview(User $user , $mode='')
@@ -528,7 +528,7 @@ class SalesRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $datetime = new DateTime("now");
         $today_startdatetime = $datetime->format('Y-m-d 00:00:00');
         $today_enddatetime = $datetime->format('Y-m-d 23:59:59');
@@ -667,7 +667,7 @@ class SalesRepository extends EntityRepository
     public  function reportSalesItemStockDetails(User $user, $data=''){
 
         $inventory =  $user->getGlobalOption()->getInventoryConfig()->getId();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'si');
         $qb->join('si.sales','s');
         $qb->leftJoin('s.customer','customer');
@@ -701,7 +701,7 @@ class SalesRepository extends EntityRepository
     public  function reportSalesItemPurchaseItemDetails(User $user, $data=''){
 
         $inventory =  $user->getGlobalOption()->getInventoryConfig()->getId();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'si');
         $qb->join('si.sales','s');
         $qb->leftJoin('s.customer','customer');
@@ -737,7 +737,7 @@ class SalesRepository extends EntityRepository
 
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $datetime = new DateTime("now");
         $today_startdatetime = $datetime->format('Y-m-d 00:00:00');
         $today_enddatetime = $datetime->format('Y-m-d 23:59:59');
@@ -769,7 +769,7 @@ class SalesRepository extends EntityRepository
 
     public function insertPosSales(GlobalOption $option,Pos $pos,$cart)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $config InventoryConfig */
         $config = $option->getInventoryConfig();
         $sales = new Sales();
@@ -827,7 +827,7 @@ class SalesRepository extends EntityRepository
 
     public function insertEcommerceSales(Order $order)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $option = $order->getGlobalOption();
 
         $sales = new Sales();
@@ -865,7 +865,7 @@ class SalesRepository extends EntityRepository
 
     public function insertEcommerceDirectOrder(Order $order)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $option = $order->getGlobalOption();
 
         $sales = new Sales();
@@ -901,7 +901,7 @@ class SalesRepository extends EntityRepository
 
     private function insertEcommerecSalesItem(Sales $sales,Order $order)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($order->getOrderItems()){
 
             /* @var $item OrderItem */
@@ -931,7 +931,7 @@ class SalesRepository extends EntityRepository
 
     private function insertPosSalesItem($sales,$cart)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($cart->contents()){
            foreach ($cart->contents() as $item):
 
@@ -959,7 +959,7 @@ class SalesRepository extends EntityRepository
 
     public function insertPosPurchaseItem($sales,$cart)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($cart->contents()){
             foreach ($cart->contents() as $item):
 
@@ -991,7 +991,7 @@ class SalesRepository extends EntityRepository
 
     public function insertApiSales(GlobalOption $option,InventoryAndroidProcess $process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $items = json_decode($process->getJsonItem(),true);
         if($items){
             foreach ($items as $item):
@@ -1093,7 +1093,7 @@ class SalesRepository extends EntityRepository
 
     public function insertApiSalesItem(GlobalOption $option,InventoryAndroidProcess $process){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $conf = $option->getInventoryConfig();
         $items = json_decode($process->getJsonSubItem(),true);
         if($items) {
@@ -1155,12 +1155,12 @@ class SalesRepository extends EntityRepository
             WHERE sales.androidProcess_id =:android";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('android', $android);
-        $qb->execute();
+        $qb = $qb->executeQuery();
     }
 
     public function countNumberSalesItem($batch)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Medicine\Entity\MedicineSales::class,'si')
             ->select('count(si.id) as totalCount')
@@ -1172,7 +1172,7 @@ class SalesRepository extends EntityRepository
 
     public function countNumberSalesSubItem($batch)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Medicine\Entity\MedicineSalesItem::class,'si')
             ->select('count(si.id) as totalCount')
@@ -1207,7 +1207,7 @@ class SalesRepository extends EntityRepository
 
     public function androidDeviceSalesProcess($device)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entities = $this->findBy(['androidDevice' => $device,'deviceApproved' => 0]);
 
         /* @var $entity Sales */

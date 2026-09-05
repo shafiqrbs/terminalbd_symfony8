@@ -80,7 +80,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function getPurchaseDetails(MedicineConfig $config,MedicineStock $stock){
 
-    	$qb = $this->_em->createQueryBuilder();
+    	$qb = $this->getEntityManager()->createQueryBuilder();
 	    $qb->from(\App\Medicine\Entity\MedicinePurchaseItem::class,'e');
 	    $qb->join('e.medicinePurchase','mp');
 	    $qb->select('e');
@@ -94,7 +94,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function getPurchaseReturnDetails(MedicineConfig $config,MedicineStock $stock){
 
-    	$qb = $this->_em->createQueryBuilder();
+    	$qb = $this->getEntityManager()->createQueryBuilder();
 	    $qb->from(\App\Medicine\Entity\MedicinePurchaseReturnItem::class,'e');
 	    $qb->join('e.medicinePurchaseReturn','mp');
 	    $qb->select('e');
@@ -108,7 +108,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function getSalesDetails(MedicineConfig $config,MedicineStock $stock){
 
-    	$qb = $this->_em->createQueryBuilder();
+    	$qb = $this->getEntityManager()->createQueryBuilder();
 	    $qb->from(\App\Medicine\Entity\MedicineSalesItem::class,'e');
 	    $qb->join('e.medicineSales','mp');
 	    $qb->select('e');
@@ -122,7 +122,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function getSalesReturnDetails(MedicineConfig $config,MedicineStock $stock){
 
-    	$qb = $this->_em->createQueryBuilder();
+    	$qb = $this->getEntityManager()->createQueryBuilder();
 	    $qb->from(\App\Medicine\Entity\MedicineSalesReturn::class,'e');
 	    $qb->select('e');
 	    $qb->where('e.medicineStock = :item')->setParameter('item',$stock->getId());
@@ -135,7 +135,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function getDamageDetails(MedicineConfig $config,MedicineStock $stock){
 
-    	$qb = $this->_em->createQueryBuilder();
+    	$qb = $this->getEntityManager()->createQueryBuilder();
 	    $qb->from(\App\Medicine\Entity\MedicineDamage::class,'e');
 	    $qb->select('e');
 	    $qb->where('e.medicineStock = :item')->setParameter('item',$stock->getId());
@@ -231,7 +231,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function insertBarcodeMedicineStock($config,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $quantity = (float)(trim($data['quantity'])) ? trim($data['quantity']):1;
         $subTotal = (float)(trim($data['salesPrice'])) ? trim($data['salesPrice']):0;
         $price = ($subTotal/$quantity);
@@ -414,7 +414,7 @@ class MedicineStockRepository extends EntityRepository
     public function getPurchaseUpdateQnt(MedicinePurchase $purchase){
 
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var  $purchaseItem MedicinePurchaseItem */
 
         $getMedicinePurchaseItems = $em->getRepository(MedicinePurchaseItem::class)->findBy(['medicinePurchase'=>$purchase->getId()]);
@@ -431,12 +431,12 @@ class MedicineStockRepository extends EntityRepository
 
     public function updateRemovePurchaseQuantity(MedicineStock $stock , $fieldName = '', $pack = 0, $min = 0, $openStock = 0 ){
 
-    	$em = $this->_em;
+    	$em = $this->getEntityManager();
         if($fieldName == 'sales'){
             $qnt = $em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesStockItemUpdate($stock);
             $stock->setSalesQuantity($qnt);
         }elseif($fieldName == 'sales-return'){
-	        $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesReturn::class)->salesReturnStockUpdate($stock);
+	        $quantity = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesReturn::class)->salesReturnStockUpdate($stock);
             $stock->setSalesReturnQuantity($quantity);
         }elseif($fieldName == 'purchase-return'){
             $qnt = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturnItem::class)->purchaseReturnStockUpdate($stock);
@@ -463,7 +463,7 @@ class MedicineStockRepository extends EntityRepository
     }
 
     public function stockAdjustment(MedicineStock $stock){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $adjustment = $em->getRepository(\App\Medicine\Entity\MedicineStockAdjustment::class)->adjustmentStockItemUpdate($stock);
         $stock->setAdjustmentQuantity($adjustment['quantity']);
         $stock->setBonusAdjustment($adjustment['bonus']);
@@ -474,7 +474,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function remainingQnt(MedicineStock $stock)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 	    $qnt = ($stock->getOpeningQuantity() + $stock->getPurchaseQuantity() + $stock->getSalesReturnQuantity() + $stock->getBonusQuantity() + $stock->getBonusAdjustment() + $stock->getAdjustmentQuantity()) - ($stock->getPurchaseReturnQuantity() + $stock->getSalesQuantity() + $stock->getDamageQuantity());
         $stock->setRemainingQuantity($qnt);
         $em->persist($stock);
@@ -483,7 +483,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function updatePurchasePrice(MedicineStock $stock,MedicinePurchaseItem $item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         //$avg = $em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->getPurchaseSalesAvg($stock);
         $stock->setPurchasePrice($item->getPurchasePrice());
 	    $stock->setSalesPrice($item->getSalesPrice());
@@ -519,7 +519,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function getSalesUpdateQnt(MedicineSales $invoice){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var $item MedicineSalesItem */
 
         $salesItems = $em->getRepository(MedicineSalesItem::class)->findBy(['medicineSales' => $invoice->getId()]);
@@ -541,7 +541,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function updateRemoveSalesQuantity(MedicineStock $stock){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qnt = $em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesStockItemUpdate($stock);
         $stock->setPurchaseQuantity($qnt);
         $em->persist($stock);
@@ -838,7 +838,7 @@ class MedicineStockRepository extends EntityRepository
               group by pi.medicineStock_id) as pa on stock.id = pa.medicineStock_id
   SET stock.purchaseQuantity = pa.purchaseQuantity";
         $qb4 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchase);
-        $qb4->execute();
+        $qb4 = $qb4->executeQuery();
         
 
         $sqlStockRemin = "UPDATE medicine_stock as stock
@@ -852,7 +852,7 @@ class MedicineStockRepository extends EntityRepository
   SET stock.remainingQuantity = ((COALESCE(stock.openingQuantity,0) + COALESCE(stock.purchaseQuantity,0) + COALESCE(stock.salesReturnQuantity,0)+ COALESCE(stock.bonusQuantity,0)+ COALESCE(stock.bonusAdjustment,0)+ COALESCE(stock.adjustmentQuantity,0)) - (COALESCE(pa.salesQuantity,0) + COALESCE(stock.purchaseReturnQuantity,0) + COALESCE(stock.damageQuantity,0)))
  , stock.salesQuantity = pa.salesQuantity";
         $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
-        $qb5->execute();
+        $qb5 = $qb5->executeQuery();
 
 
     }
@@ -869,7 +869,7 @@ class MedicineStockRepository extends EntityRepository
               group by pi.medicineStock_id) as pa on stock.id = pa.medicineStock_id
               SET stock.purchaseQuantity = pa.purchaseQuantity";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchase);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
 
         exit;
@@ -883,7 +883,7 @@ class MedicineStockRepository extends EntityRepository
               group by pi.medicineStock_id) as pa on stock.id = pa.medicineStock_id
   SET stock.purchaseQuantity = pa.purchaseQuantity";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchaseReturn);
-        $qb2->execute();
+        $qb2 = $qb2->executeQuery();
 
 
 
@@ -898,7 +898,7 @@ class MedicineStockRepository extends EntityRepository
   SET stock.remainingQuantity = ((COALESCE(stock.openingQuantity,0) + COALESCE(stock.purchaseQuantity,0) + COALESCE(stock.salesReturnQuantity,0)+ COALESCE(stock.bonusQuantity,0)+ COALESCE(stock.bonusAdjustment,0)+ COALESCE(stock.adjustmentQuantity,0)) - (COALESCE(pa.salesQuantity,0) + COALESCE(stock.purchaseReturnQuantity,0) + COALESCE(stock.damageQuantity,0)))
  , stock.salesQuantity = pa.salesQuantity";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sqlStockSales);
-        $qb2->execute();
+        $qb2 = $qb2->executeQuery();
 
     }
 
@@ -915,7 +915,7 @@ class MedicineStockRepository extends EntityRepository
               group by pi.medicineStock_id) as pa on stock.id = pa.medicineStock_id
   SET stock.purchaseQuantity = pa.purchaseQuantity";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchase);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
         exit;
 
@@ -928,7 +928,7 @@ class MedicineStockRepository extends EntityRepository
               group by pi.medicineStock_id) as pa on stock.id = pa.medicineStock_id
   SET stock.purchaseQuantity = pa.purchaseQuantity";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchaseReturn);
-        $qb2->execute();
+        $qb2 = $qb2->executeQuery();
 
 
 
@@ -943,7 +943,7 @@ class MedicineStockRepository extends EntityRepository
   SET stock.remainingQuantity = ((COALESCE(stock.openingQuantity,0) + COALESCE(stock.purchaseQuantity,0) + COALESCE(stock.salesReturnQuantity,0)+ COALESCE(stock.bonusQuantity,0)+ COALESCE(stock.bonusAdjustment,0)+ COALESCE(stock.adjustmentQuantity,0)) - (COALESCE(pa.salesQuantity,0) + COALESCE(stock.purchaseReturnQuantity,0) + COALESCE(stock.damageQuantity,0)))
  , stock.salesQuantity = pa.salesQuantity";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sqlStockSales);
-        $qb2->execute();
+        $qb2 = $qb2->executeQuery();
 
     }
 
@@ -1028,7 +1028,7 @@ class MedicineStockRepository extends EntityRepository
     public function  processStockMigration($from, $to)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $created = new DateTime();
         $data = $created->format('Y-m-d H:m:s');
         $stock = $em->createQuery("DELETE MedicineBundle:MedicineStock e WHERE e.medicineConfig={$to}");
@@ -1041,18 +1041,18 @@ class MedicineStockRepository extends EntityRepository
   WHERE medicineConfig_id =:config AND status=1";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
         $qb1->bindValue('config', $from);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
         $stockUpdate = "UPDATE medicine_stock SET mode = 'medicine' WHERE  medicineConfig_id =:config AND mode IS NULL";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($stockUpdate);
         $qb1->bindValue('config', $to);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
     }
 
     public function insertGlobalToLocalStock(GlobalOption $option,MedicineBrand $brand)
     {
         $config = $option->getMedicineConfig();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $find = $this->findOneBy(['medicineConfig'=>$config,'medicineBrand' => $brand]);
         if(empty($find)){
             $entity = new MedicineStock();
@@ -1078,7 +1078,7 @@ class MedicineStockRepository extends EntityRepository
     public function insertAndroidStock(GlobalOption $option,$data)
     {
         $config = $option->getMedicineConfig();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $find = $this->findOneBy(['medicineConfig'=>$config,'name' => $data['name']]);
         if(empty($find)){
             $entity = new MedicineStock();
@@ -1122,7 +1122,7 @@ class MedicineStockRepository extends EntityRepository
     public function updateAndroidStock($data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $this->find($data['id']);
         /* @var $entity MedicineStock */
         if($entity){
@@ -1164,12 +1164,12 @@ class MedicineStockRepository extends EntityRepository
     {
         $stockUpdate = "UPDATE medicine_stock SET openingApprove = 1 WHERE  medicineConfig_id = {$config->getId()} && openingQuantity IS NOT NULL";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($stockUpdate);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
     }
 
     public function getApiStockDelete(GlobalOption $option,$id)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getMedicineConfig()->getId();
         $stock = $em->createQuery("DELETE MedicineBundle:MedicineStock e WHERE e.medicineConfig = {$config} and id = {$id}");
         $stock->execute();
@@ -1179,7 +1179,7 @@ class MedicineStockRepository extends EntityRepository
 
     public function updateMinimumQty(MedicineStock $stock)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qty = $stock->getMedicineConfig()->getShortQuantity();
         $stock->setMinQuantity($qty);
         $em->flush();

@@ -14,7 +14,7 @@ class PurchaseReturnRepository extends EntityRepository
 {
     public function getRowsCount($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(e.id)');
         $qb->from(\App\Inventory\Entity\PurchaseReturn::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
@@ -31,13 +31,13 @@ class PurchaseReturnRepository extends EntityRepository
     public function insertPurchaseVendor($purchaseReturn,$purchase)
     {
         $purchaseReturn->setVendor($purchase->getVendor());
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
 
     }
 
     public function updatePurchaseReturnTotalPrice($purchaseReturn)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Inventory\Entity\PurchaseReturnItem::class,'e')
             ->select('sum(e.subTotal) as total , count(e.id) as totalItem, sum(e.quantity) as totalQuantity')
@@ -56,7 +56,7 @@ class PurchaseReturnRepository extends EntityRepository
 
     public function todayPurchaseReturn($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $datetime = new DateTime("now");
         $today_startdatetime = $datetime->format('Y-m-d 00:00:00');
         $today_enddatetime = $datetime->format('Y-m-d 23:59:59');

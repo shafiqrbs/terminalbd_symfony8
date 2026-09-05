@@ -22,7 +22,7 @@ class ExpenseCategoryRepository extends MaterializedPathRepository
     public function build_child($oldID,$array)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         global $exclude;
         //echo $menu_id;
         $tempTree="";
@@ -163,7 +163,7 @@ class ExpenseCategoryRepository extends MaterializedPathRepository
     public function getCategoryOptions($globalOption){
 
         $ret = [];
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $categories = $em->getRepository(\App\Accounting\Entity\ExpenseCategory::class)->findBy(['globalOption' => $globalOption ,'status' => 1],['name'=>'asc']);
 
         foreach( $categories as $cat ){
@@ -217,7 +217,7 @@ class ExpenseCategoryRepository extends MaterializedPathRepository
 
     public function generateCommission(GlobalOption $option, AccountHead $head)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $find = $this->findOneBy(['globalOption'=>$option,'accountHead'=>$head,'name'=>'Commission']);
         if(empty($find)){
             $entity = new ExpenseCategory();

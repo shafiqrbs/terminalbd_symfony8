@@ -19,22 +19,22 @@ class PurchaseItemRepository extends EntityRepository
     public function getPurchaseAveragePrice(Particular $particular)
     {
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Restaurant\Entity\PurchaseItem::class,'e');
         $qb->select('AVG(e.purchasePrice) AS avgPurchasePrice');
         $qb->where('e.particular = :particular')->setParameter('particular', $particular) ;
         $res = $qb->getQuery()->getOneOrNullResult();
         if(!empty($res)){
             $particular->setPurchaseAverage($res['avgPurchasePrice']);
-            $this->_em->persist($particular);
-            $this->_em->flush($particular);
+            $this->getEntityManager()->persist($particular);
+            $this->getEntityManager()->flush($particular);
         }
     }
 
     public function insertPurchaseItems($invoice, $data)
     {
-        $particular = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
-        $em = $this->_em;
+        $particular = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
         $entity = new PurchaseItem();
         $entity->setPurchase($invoice);
         $entity->setParticular($particular);

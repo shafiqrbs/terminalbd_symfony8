@@ -34,7 +34,7 @@ class InvoiceModuleRepository extends EntityRepository
         $item->setInvoiceModule($invoice);
         $item->setName("Monthly service charge");
         $item->setAmount($invoice->getGlobalOption()->getMonthlyAmount());
-        $this->_em->persist($item);
+        $this->getEntityManager()->persist($item);
 
         // $this->insertAppModule($invoice);
         // $this->insertModule($invoice);
@@ -46,7 +46,7 @@ class InvoiceModuleRepository extends EntityRepository
     public function updateInvoice($invoice)
     {
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('SUM(i.amount)');
         $qb->from(\App\Tool\Entity\InvoiceModuleItem::class,'i');
         $qb->where("i.invoiceModule = :invoice");
@@ -54,8 +54,8 @@ class InvoiceModuleRepository extends EntityRepository
         $sum = $qb->getQuery()->getSingleScalarResult();
         $invoice->setTotalAmount($sum);
         $invoice->setPaidAmount($sum);
-        $this->_em->persist($invoice);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($invoice);
+        $this->getEntityManager()->flush();
 
     }
 
@@ -71,10 +71,10 @@ class InvoiceModuleRepository extends EntityRepository
                 $item->setName($module->getName());
                 $item->setAppModule($module);
                 $item->setAmount($module->getPrice());
-                $this->_em->persist($item);
+                $this->getEntityManager()->persist($item);
 
             }
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
         }
 
 
@@ -90,10 +90,10 @@ class InvoiceModuleRepository extends EntityRepository
                 $item->setInvoiceModule($invoice);
                 $item->setModule($module);
                 $item->setAmount($module->getPrice());
-                $this->_em->persist($item);
+                $this->getEntityManager()->persist($item);
 
             }
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
         }
     }
     public function insertSyndicateModule($invoice)
@@ -107,17 +107,17 @@ class InvoiceModuleRepository extends EntityRepository
                 $item->setInvoiceModule($invoice);
                 $item->setSyndicateModule($module);
                 $item->setAmount($module->getPrice());
-                $this->_em->persist($item);
+                $this->getEntityManager()->persist($item);
 
             }
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
         }
     }
 
     public function insertInvoiceModuleItem(InvoiceModule $invoiceModule, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if ($invoiceModule and isset($data['name']) and !empty($data['amount'])) {
 
             $i = 0;

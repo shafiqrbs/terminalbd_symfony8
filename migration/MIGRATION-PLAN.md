@@ -549,6 +549,34 @@ Loading the dump and running `doctrine:schema:update` both fail with "Row size t
 off. Production is unaffected — those tables already exist — but provisioning a new tenant or a
 staging environment from the mapping needs that setting, or narrower columns.
 
+### 5.30 Doctrine ORM 3 removed `EntityRepository::$_em` — 2,056 uses
+
+It is `private readonly EntityManagerInterface $em` now, reachable only through the protected
+`getEntityManager()`. The 229 ported repositories read `$this->_em` 2,056 times, and every one of
+those reads an undefined property: PHP warns and evaluates to null, so the next call — almost
+always `->createQuery()` — is a fatal error.
+
+Nothing static sees it. The class compiles, the container lints, the mapping validates; the query
+dies when someone opens the page. It accounted for most of the smoke test's failures, and fixing
+it cleared five whole categories of downstream error at once.
+
+### 5.31 DBAL 4 made `Statement::execute()` private and renamed the fetch methods
+
+172 calls across 50 repositories follow the Symfony 2 shape — `prepare()`, `bindValue()`,
+`execute()`, `fetchAll()`. In DBAL 4 `execute()` is private (a fatal on call) and the fetch
+methods moved onto the `Result` that `executeQuery()` returns. `port-dbal-statements.php`
+rewrites only variables that came from a `->prepare()` call, so Doctrine ORM's own
+`Query::execute()` is untouched.
+
+### 5.32 A dependency that can no longer be downloaded
+
+`lessclick-system/barcode` (`CodeItNow\BarcodeBundle`, used by three controllers) lives on a
+Bitbucket repository that answers 404, with no public mirror. Requiring it makes
+`composer install` fail outright, so it is removed from `composer.json` and the three barcode
+pages are broken until someone picks a replacement — `picqer/php-barcode-generator` is the
+obvious candidate, but the output has to match what the printers expect, so it is not a
+mechanical swap.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -792,46 +820,69 @@ the legacy build is reproducible only from `composer.lock`, not from `composer.j
 
 ## 11. What still needs a running system
 
-The application has now been run against real data: `bm_db.sql.gz` loaded into a scratch
-database, the schema completed from the mapping, and requests served. What that proved, and what
-it cost, is in §5.20-§5.29 — nine defects that every static check had passed over, including one
-that made every authenticated request a fatal error.
+The application has been run against real data: `bm_db.sql.gz` loaded into a scratch database,
+the schema completed from the mapping, and **791 pages requested**. That found twelve defects
+every static check had passed over (§5.20-§5.32), including three that were fatal on every
+affected page.
 
-What works, end to end, against a real database:
+What works, end to end:
 
-- `/login` renders (HTTP 200), from the application's own layout
+- `/login` renders (HTTP 200) from the application's own layout
 - a user whose password is a **Symfony 2 salted sha512 hash logs in through the form**, and the
-  hash is transparently rewritten to bcrypt on the way through — the row went from 88 characters
-  of base64 to `$2y$13$...` — with no forced reset. Logging in again with the upgraded hash works
-- `/profile` returns 200 for the authenticated user, `/logout` clears the session
+  hash is transparently rewritten to bcrypt on the way through — 88 characters of base64 to
+  `$2y$13$...` — with no forced reset. Logging in again with the upgraded hash works
+- `/profile` returns 200 authenticated, `/logout` clears the session
 - `doctrine:schema:validate` reports **"The database schema is in sync with the mapping files"**
-- `create-session-table.php` creates the shared session table the bridge needs
 
-Still open, and why:
+### The smoke test
 
-- [ ] **Golden API capture** — `capture.php` needs a staging base URL and API credentials in
-      `migration/capture-config.json`. The contract is verified structurally (the endpoint
-      resolves, at the same path) but not by response shape
-- [ ] **Per-module behaviour checks** before each proxy flip, in the order §8 gives. The smoke
-      test covered authentication and a handful of pages, not 3,000 routes
+`migration/bin/smoke-test.php` boots the kernel once and drives requests through HttpKernel
+in-process, as a logged-in user. It visits GET routes with no parameters whose name and path do
+not look like they write anything — a legacy application that deletes over GET is normal, so the
+deny-list is deliberately broad. It is resumable, because 110 controllers call `exit;` and take
+the harness with them; every visit is recorded before it is made, so repeated runs converge.
+
+Latest run, 791 pages (`migration/contract/smoke-test.md`):
+
+| pages | cause |
+|---:|---|
+| 296 | a template links to a route that does not exist (§5.28) |
+| 134 | a null the page assumes is there — mostly modules this tenant does not use |
+| 117 | **rendered (HTTP 200)** |
+| 78 | 404, mostly the routes with no controller (§5.12) |
+| 26 | **unexplained — the real remaining list** |
+| 20 | dead entity aliases (§5.11) |
+| 15 | the controller calls `exit;` |
+| 8 | wkhtmltopdf is not installed in this environment |
+
+The 26 unexplained are per-module work, and most look pre-existing: calls to repository methods
+that do not exist (`reportIncome`), two DQL strings ORM 3's stricter parser rejects,
+`find()` with a null identifier, `findBy` on fields the entity never had, and the barcode
+dependency of §5.32. They are listed in full in the report.
+
+The 134 nulls need re-checking on a tenant that actually uses those modules: `business_config`
+and `dps_config` have no rows in this dump, so every page in those modules walks into a null —
+which the legacy application does too.
+
+### Still open
+
+- [ ] **Golden API capture** — `capture.php` needs a staging base URL and API credentials. The
+      mobile contract is verified structurally, not by response shape
+- [ ] **The 296 dead template links and 20 dead aliases** — restoring a controller or removing a
+      link is a product decision, per case
+- [ ] **The 26 unexplained pages**, per module
+- [ ] **A tenant with the other modules configured**, to cover the 134 nulls
 - [ ] **The session bridge deploy step** — `migration/session-bridge.md`
 - [ ] **Decommissioning** the PHP 7.4 pool and collapsing the proxy rules
-- [ ] **193 template links to routes that never existed** (§5.28) and **205 references to entities
-      that never existed** (phase 5) — both need a product decision per case
 
-Verified against the dump while doing the above:
+### Verified against the dump
 
-- [x] **Schema diff** — `schema-diff.php` against `bm_db.sql.gz` (Adminer, 155 tables, one
-      tenant). 121 entities match a table in it; the 74 mapped columns absent from that dump are
-      its age, not port defects — `medicine_sales.is_online` and its neighbours do not exist in
-      that database at all. `verify-columns.php`, which compares against the legacy annotations
-      rather than one tenant's snapshot, reports **0** differences
+- [x] **Schema diff** — 121 entities match a table in it; the 74 mapped columns absent from that
+      dump are its age, not port defects. `verify-columns.php` reports **0** differences against
+      the legacy annotations
 - [x] **The serialized columns** — `fos_user.roles` holds `a:1:{i:0;s:16:"ROLE_SUPER_ADMIN";}`,
-      `serialize()` output, exactly what `LegacyArrayType` expects. Eight of the 24 belong to
-      tables with no rows in this tenant's database and stay unconfirmed
-- [x] **`fos_user` column set** — the table has 25 columns and the ported mapping declares the
-      same 25, in both directions. Passwords are 88-character base64 beside a 32-character salt,
-      the format the migrating hasher verifies
+      exactly what `LegacyArrayType` expects. Eight of the 24 belong to tables with no rows here
+- [x] **`fos_user` column set** — 25 columns in the table, the same 25 in the mapping, both ways
 
-The scratch database (`terminalbd_migration_check`) and `next/.env.local` pointing at it are
-left in place for the next round of module verification; neither is committed.
+The scratch database (`terminalbd_migration_check`) and `next/.env.local` pointing at it are left
+in place for the next round; neither is committed.

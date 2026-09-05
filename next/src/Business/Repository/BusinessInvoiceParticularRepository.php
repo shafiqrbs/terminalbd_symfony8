@@ -49,7 +49,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     public function insertInvoiceParticular(BusinessInvoice $invoice, $data)
     {
         $quantity = (isset($data['quantity']) and !empty($data['quantity'])) ? $data['quantity'] : 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new BusinessInvoiceParticular();
         $entity->setBusinessInvoice($invoice);
         $entity->setParticular($data['particular']);
@@ -64,14 +64,14 @@ class BusinessInvoiceParticularRepository extends EntityRepository
             $entity->setSubTotal($data['price']);
         }
         if($data['unit']) {
-            $unit = $this->_em->getRepository(\App\Tool\Entity\ProductUnit::class)->find($data['unit']);
+            $unit = $this->getEntityManager()->getRepository(\App\Tool\Entity\ProductUnit::class)->find($data['unit']);
             $entity->setUnit($unit);
         }
-        $wearhouse = $this->_em->getRepository(\App\Business\Entity\WearHouse::class)->find($data['wearhouse']);
+        $wearhouse = $this->getEntityManager()->getRepository(\App\Business\Entity\WearHouse::class)->find($data['wearhouse']);
         if($wearhouse){
             $entity->setWearhouse($wearhouse);
         }
-        $batchItem = $this->_em->getRepository(\App\Business\Entity\BusinessBatchParticular::class)->find($data['batchItem']);
+        $batchItem = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessBatchParticular::class)->find($data['batchItem']);
         if($batchItem){
             $entity->setBatchItem($batchItem);
         }
@@ -84,7 +84,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     {
 
         $date = new DateTime("now");
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $invoiceParticular = $this->findOneBy(['businessInvoice'=>$invoice,'businessParticular' => $particular]);
         if($invoiceParticular){
             $entity = $invoiceParticular;
@@ -109,13 +109,13 @@ class BusinessInvoiceParticularRepository extends EntityRepository
 
     public function insertStudentMonthlyParticular(BusinessInvoice $invoice, $lastInvoice , $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($data['itemId'] as $key => $value):
 
             $price = floatval ($data['salesPrice'][$key] ?: 0 );
             if($price > 0){
 
-                $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(['businessConfig' => $invoice->getBusinessConfig(), 'name' => $value ]);
+                $particular = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->findOneBy(['businessConfig' => $invoice->getBusinessConfig(), 'name' => $value ]);
                 $invoiceParticular = $this->findOneBy(['businessInvoice' => $invoice, 'businessParticular' => $particular]);
                 if ($invoiceParticular) {
                     $entity = $invoiceParticular;
@@ -151,7 +151,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     {
        foreach ($data['itemId'] as $key => $value):
 
-           $em = $this->_em;
+           $em = $this->getEntityManager();
 
            $particular = $this->findOneBy(['businessInvoice'=>$invoice,'businessParticular'=>$value]);
            if($particular){
@@ -160,7 +160,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
                $entity = new BusinessInvoiceParticular();
            }
 
-            $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($value);
+            $particular = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->find($value);
 
             $entity->setBusinessInvoice($invoice);
             $entity->setBusinessParticular($particular);
@@ -180,7 +180,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     public function insertCommissionInvoiceParticular(BusinessInvoice $invoice, $data)
     {
         $quantity = (isset($data['quantity']) and !empty($data['quantity'])) ? $data['quantity'] : 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new BusinessInvoiceParticular();
         $entity->setBusinessInvoice($invoice);
         $entity->setParticular($data['particular']);
@@ -194,11 +194,11 @@ class BusinessInvoiceParticularRepository extends EntityRepository
         $entity->setParticular($stock->getName());
         $entity->setBusinessParticular($stock);
         if($data['vendor']) {
-            $vendor = $this->_em->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($data['vendor']);
+            $vendor = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountVendor::class)->find($data['vendor']);
             $entity->setVendor($vendor);
         }
         if($data['stockGrn']) {
-            $stockGrn = $this->_em->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->find($data['stockGrn']);
+            $stockGrn = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessVendorStockItem::class)->find($data['stockGrn']);
             $entity->setVendorStockItem($stockGrn);
         }
         $em->persist($entity);
@@ -209,15 +209,15 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     public function insertStockItem(BusinessInvoice $invoice, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new BusinessInvoiceParticular();
         $quantity = !empty($data['quantity']) ? $data['quantity'] :1;
         $bonusQuantity = !empty($data['bonusQuantity']) ? $data['bonusQuantity'] :0;
-        $wearhouse = $this->_em->getRepository(\App\Business\Entity\WearHouse::class)->find($data['wearhouse']);
+        $wearhouse = $this->getEntityManager()->getRepository(\App\Business\Entity\WearHouse::class)->find($data['wearhouse']);
         if($wearhouse){
             $entity->setWearhouse($wearhouse);
         }
-        $batchItem = $this->_em->getRepository(\App\Business\Entity\BusinessBatchParticular::class)->find($data['batchItem']);
+        $batchItem = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessBatchParticular::class)->find($data['batchItem']);
         if($batchItem){
             $entity->setBatchItem($batchItem);
         }
@@ -243,7 +243,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     public function insertBannerSignItem(BusinessInvoice $invoice, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new BusinessInvoiceParticular();
         $quantity = !empty($data['quantity']) ? $data['quantity'] :1;
         $salesPrice = !empty($data['salesPrice']) ? $data['salesPrice'] :0;
@@ -357,8 +357,8 @@ class BusinessInvoiceParticularRepository extends EntityRepository
                 WHERE salesItem.businessInvoice_id = :invoice";
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
         $stmt->bindValue('invoice', $entity);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         return $result['total'];
     }
 
@@ -588,7 +588,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     public function updateInvoiceItems($data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $invoiceParticular = $this->find($data['itemId']);
         if(!empty($invoiceParticular)) {
 
@@ -614,7 +614,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     public function insertInvoiceDistributionItems(BusinessInvoice $invoice , $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $item = $data['particular'];
 
@@ -719,7 +719,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     public function updateInvoiceDistributionItems($data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $entity BusinessInvoiceParticular */
         $entity = $this->find($data['itemId']);
         $config = $entity->getBusinessInvoice()->getBusinessConfig();
@@ -905,7 +905,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     public function insertDistributionItem(BusinessInvoice $entity,$particulars)
     {
         /* @var $particular BusinessParticular */
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(empty($entity->getBusinessInvoiceParticulars())){
             foreach ($particulars as $particular):
                 $item = new BusinessInvoiceParticular();
@@ -923,7 +923,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     {
         /* @var $particular BusinessInvoiceParticular */
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($entity->getBusinessInvoiceParticulars()){
             foreach ($entity->getBusinessInvoiceParticulars() as $particular):
                 $particular->setQuantity(0);
@@ -941,7 +941,7 @@ class BusinessInvoiceParticularRepository extends EntityRepository
     {
         /* @var $particular BusinessInvoiceParticular */
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($entity->getPurchaseItems()){
             foreach ($entity->getBusinessPurchaseItems() as $particular):
                 $particular->setQuantity(0);

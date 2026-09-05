@@ -49,7 +49,7 @@ class MedicineParticularRepository extends EntityRepository
 
     public function createRack($config,$name)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $type = $em->getRepository(MedicineParticularType::class)->find(1);
         $entity = new MedicineParticular();
         $entity->setMedicineConfig($config);
@@ -63,7 +63,7 @@ class MedicineParticularRepository extends EntityRepository
 
     public function updateBrand(MedicineConfig $config,$name)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $type = $em->getRepository(MedicineParticularType::class)->findOneBy(['slug'=>'brand']);
         $exist = $em->getRepository(MedicineParticular::class)->findOneBy(['medicineConfig' => $config,'particularType' => $type->getId(),'name' => $name]);
         if(empty($exist)){

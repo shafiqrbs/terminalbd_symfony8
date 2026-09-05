@@ -15,7 +15,7 @@ class InvoiceSmsEmailRepository extends EntityRepository
     public function updateInvoice(InvoiceSmsEmail $invoice)
     {
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('SUM(ii.amount) as amount , SUM(ii.quantity) as smsQuantity');
         $qb->from(\App\Tool\Entity\InvoiceSmsEmailItem::class,'i');
         $qb->join('i.smsEmailPricing','ii' );
@@ -27,8 +27,8 @@ class InvoiceSmsEmailRepository extends EntityRepository
         $invoice->setTotalAmount($sum);
         $invoice->setPaidAmount($sum);
         $invoice->setSmsQuantity($smsQuantity);
-        $this->_em->persist($invoice);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($invoice);
+        $this->getEntityManager()->flush();
 
     }
 }

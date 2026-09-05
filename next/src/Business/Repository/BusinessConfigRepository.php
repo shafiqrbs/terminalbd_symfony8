@@ -20,7 +20,7 @@ class BusinessConfigRepository extends EntityRepository
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getBusinessConfig()->getId();
 
         $ledger = $em->createQuery("DELETE BusinessBundle:BusinessStoreLedger e WHERE e.businessConfig = {$config}");
@@ -57,7 +57,7 @@ class BusinessConfigRepository extends EntityRepository
         $stockAdjustment->execute();
 
 
-        $items = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->findBy(['businessConfig'=>$config]);
+        $items = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->findBy(['businessConfig'=>$config]);
 
 	    /* @var BusinessParticular $item */
 
@@ -88,19 +88,19 @@ class BusinessConfigRepository extends EntityRepository
 		    $item->setBonusSalesQuantity(0);
 		    $item->setBonusPurchaseQuantity(0);
 		    $item->setOpeningApprove(0);
-		    $this->_em->flush($item);
+		    $this->getEntityManager()->flush($item);
 	    }
 
         $sales = $em->createQuery('DELETE BusinessBundle:BusinessInvoice e WHERE e.businessConfig = '.$config);
         $sales->execute();
 
-        $items = $this->_em->getRepository(\App\Business\Entity\BusinessStore::class)->findBy(['businessConfig'=>$config]);
+        $items = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessStore::class)->findBy(['businessConfig'=>$config]);
 
         /* @var BusinessStore $item */
 
         foreach ($items as $item){
             $item->setBalance(0);
-            $this->_em->flush($item);
+            $this->getEntityManager()->flush($item);
         }
         $particular = $em->createQuery('DELETE BusinessBundle:BusinessParticular e WHERE e.businessConfig = '.$config);
         $particular->execute();
@@ -113,7 +113,7 @@ class BusinessConfigRepository extends EntityRepository
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getBusinessConfig()->getId();
 
         $ledger = $em->createQuery("DELETE BusinessBundle:BusinessStoreLedger e WHERE e.businessConfig = {$config}");

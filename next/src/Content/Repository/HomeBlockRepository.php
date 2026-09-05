@@ -17,7 +17,7 @@ class HomeBlockRepository extends EntityRepository
     public function getMenuLists($globalOption){
 
 
-        $em =$this->_em;
+        $em =$this->getEntityManager();
         $entity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['globalOption'=>$globalOption,'status'=>1],['menu'=>'asc']);
         if($entity){
             return $entity;
@@ -29,7 +29,7 @@ class HomeBlockRepository extends EntityRepository
     public function insertHomeBlock($data,$homePage)
     {
 
-        $em =$this->_em;
+        $em =$this->getEntityManager();
         $i=0;
         if(!empty($data['blockName'])){
             foreach($data['blockName'] as $block ){

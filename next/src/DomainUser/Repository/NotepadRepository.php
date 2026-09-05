@@ -41,13 +41,13 @@ class NotepadRepository extends EntityRepository
                 FROM domain_notepad as notepad
                 WHERE notepad.globalOption_id = {$globalOption->getId()}  AND YEAR(notepad.created)= {$year} AND MONTH(notepad.created)= {$month} AND DAY(notepad.created)= {$day}";
 	    $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-	    $stmt->execute();
-	    $result =  $stmt->fetchAll();
+	    $stmt = $stmt->executeQuery();
+	    $result =  $stmt->fetchAllAssociative();
 	    if(empty($result)){
 		    $entity = new Notepad();
 		    $entity->setGlobalOption($globalOption);
-		    $this->_em->persist($entity);
-		    $this->_em->flush();
+		    $this->getEntityManager()->persist($entity);
+		    $this->getEntityManager()->flush();
 		    return $entity->getId();
 	    }else{
 		    return $result[0]['id'];
@@ -99,7 +99,7 @@ class NotepadRepository extends EntityRepository
 
     public function apiCreateTrain(GlobalOption $global,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $model = ((isset($data['model']) and $data['model'])) ? ($data['model']):'';
         $name = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
         $days = ((isset($data['days']) and $data['days'])) ? $data['days']:'';

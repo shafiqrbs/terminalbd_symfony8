@@ -15,7 +15,7 @@ class BrandingRepository extends EntityRepository
     public function getBrandingSponsor()
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Tool\Entity\Branding::class)->findBy(['status'=>1,'sponsor'=>1]);
         if(!empty($entity)){
 
@@ -29,15 +29,15 @@ class BrandingRepository extends EntityRepository
 
         $arr = implode(',',$categoryArr);
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $connection = $em->getConnection();
         $statement = $connection->prepare("SELECT distinct b.name,b.id FROM branding as b
          LEFT OUTER JOIN branding_category as bc
          ON b.id = bc.branding_id
          WHERE b.status = :status AND bc.category_id in ($arr) ");
         $statement->bindValue('status', 1);
-        $statement->execute();
-        return $results = $statement->fetchAll();
+        $statement = $statement->executeQuery();
+        return $results = $statement->fetchAllAssociative();
 
     }
 

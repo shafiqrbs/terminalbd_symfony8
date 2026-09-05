@@ -103,7 +103,7 @@ class GlobalOptionRepository extends EntityRepository
 
     public function insertSetupInformation($data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $store = $data['shopName'] ?? '';
         $address = $data['address'] ?? '';
         $mobile = $data['mobile'] ?? '';
@@ -361,7 +361,7 @@ class GlobalOptionRepository extends EntityRepository
 
         $slug = $options['lowercase'] ? mb_strtolower($str, 'UTF-8') : $str;
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Tool\Entity\GlobalOption::class)->findOneBy(['slug'=>$slug]);
         if (empty($entity)){
             return $slug;
@@ -376,7 +376,7 @@ class GlobalOptionRepository extends EntityRepository
     public function checkExistingSlug($slug)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $slugNew = '';
         for ($i = 1; $i < 100; $i++){
@@ -410,7 +410,7 @@ class GlobalOptionRepository extends EntityRepository
     public function appGlobalOption($mobile,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $mainApp = $data['app_slug'];
         $name = $data['store_name'];
         $password = $data['password'];
@@ -511,7 +511,7 @@ class GlobalOptionRepository extends EntityRepository
     public function createGlobalOption($mobile,$data,$user ='')
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $syndicate = $data['domain']['globalOption']['syndicate'];
         $mainApp = $data['domain']['globalOption']['mainApp'];
         $location = $data['domain']['globalOption']['location'];
@@ -566,53 +566,53 @@ class GlobalOptionRepository extends EntityRepository
 
     public function systemConfigUpdate(GlobalOption $globalOption )
     {
-        $accounting = $this->_em->getRepository(\App\Accounting\Entity\AccountingConfig::class)->findOneBy(['globalOption'=>$globalOption]);
+        $accounting = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountingConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($accounting)){
             $config = new AccountingConfig();
             $config->setGlobalOption($globalOption);
-            $this->_em->persist($config);
+            $this->getEntityManager()->persist($config);
         }
 
-        $inventory = $this->_em->getRepository(\App\Inventory\Entity\InventoryConfig::class)->findOneBy(['globalOption'=>$globalOption]);
+        $inventory = $this->getEntityManager()->getRepository(\App\Inventory\Entity\InventoryConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($inventory)){
             $config = new InventoryConfig();
             $config->setGlobalOption($globalOption);
-            $this->_em->persist($config);
+            $this->getEntityManager()->persist($config);
         }
 
-        $hospital = $this->_em->getRepository(\App\Hospital\Entity\HospitalConfig::class)->findOneBy(['globalOption'=>$globalOption]);
+        $hospital = $this->getEntityManager()->getRepository(\App\Hospital\Entity\HospitalConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($hospital)){
             $config = new HospitalConfig();
             $config->setGlobalOption($globalOption);
-            $this->_em->persist($config);
+            $this->getEntityManager()->persist($config);
         }
 
-        $restaurantConfig = $this->_em->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->findOneBy(['globalOption'=>$globalOption]);
+        $restaurantConfig = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\RestaurantConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($restaurantConfig)){
             $config = new RestaurantConfig();
             $config->setGlobalOption($globalOption);
-            $this->_em->persist($config);
+            $this->getEntityManager()->persist($config);
         }
 
-        $dpsConfig = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsConfig::class)->findOneBy(['globalOption'=>$globalOption]);
+        $dpsConfig = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($dpsConfig)){
             $config = new DpsConfig();
             $config->setGlobalOption($globalOption);
-            $this->_em->persist($config);
+            $this->getEntityManager()->persist($config);
         }
 
-        $medicineConfig = $this->_em->getRepository(\App\Medicine\Entity\MedicineConfig::class)->findOneBy(['globalOption'=>$globalOption]);
+        $medicineConfig = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($medicineConfig)){
             $config = new MedicineConfig();
             $config->setGlobalOption($globalOption);
-            $this->_em->persist($config);
+            $this->getEntityManager()->persist($config);
         }
 
-        $businessConfig = $this->_em->getRepository(\App\Business\Entity\BusinessConfig::class)->findOneBy(['globalOption'=>$globalOption]);
+        $businessConfig = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessConfig::class)->findOneBy(['globalOption'=>$globalOption]);
         if(empty($businessConfig)){
             $config = new BusinessConfig();
             $config->setGlobalOption($globalOption);
-            $this->_em->persist($config);
+            $this->getEntityManager()->persist($config);
         }
 
     }
@@ -622,7 +622,7 @@ class GlobalOptionRepository extends EntityRepository
      */
     public function initialSetup(GlobalOption $globalOption)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var GlobalOption $globalOption; */
 
@@ -655,8 +655,8 @@ class GlobalOptionRepository extends EntityRepository
 
     public function defaultMenuSetup($globalOption)
     {
-        $menus = $this->_em->getRepository(\App\Appearance\Entity\MenuCustom::class)->findBy(['status'=>1]);
-        $em = $this->_em;
+        $menus = $this->getEntityManager()->getRepository(\App\Appearance\Entity\MenuCustom::class)->findBy(['status'=>1]);
+        $em = $this->getEntityManager();
         foreach( $menus as $custom){
 
             $menu = new Menu();
@@ -675,8 +675,8 @@ class GlobalOptionRepository extends EntityRepository
     public function initialMenuSetup($globalOption)
     {
 
-        $menus = $this->_em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['globalOption'=>$globalOption,'status'=>1]);
-        $em = $this->_em;
+        $menus = $this->getEntityManager()->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['globalOption'=>$globalOption,'status'=>1]);
+        $em = $this->getEntityManager();
         foreach( $menus as $menu){
 
             $menuGrouping = new MenuGrouping();
@@ -701,7 +701,7 @@ class GlobalOptionRepository extends EntityRepository
 
     public function optionUpdate($entity,$data,$mobile='')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
        // $entity->setStatus(true);
         if(isset($data['domain']) and $data['domain'] != '') {
 
@@ -824,7 +824,7 @@ class GlobalOptionRepository extends EntityRepository
     public function getGlobalOptionGroup()
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $connection = $em->getConnection();
         $statement = $connection->prepare("
         SELECT GROUP_CONCAT(GlobalOption.id) AS groupId,GROUP_CONCAT(GlobalOption.name) as name, GROUP_CONCAT(GlobalOption.subDomain) as subDomain,
@@ -834,8 +834,8 @@ class GlobalOptionRepository extends EntityRepository
         WHERE GlobalOption.status=1
         GROUP BY syndicate_id");
         $statement->bindValue('id', 123);
-        $statement->execute();
-        $results = $statement->fetchAll();
+        $statement = $statement->executeQuery();
+        $results = $statement->fetchAllAssociative();
 
         $globalOptions = $this->getIndexedById($results);
         $grouped = [];
@@ -868,7 +868,7 @@ class GlobalOptionRepository extends EntityRepository
 
     public function getModuleListing($entity,$activeModule='')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $data ="";
         if(!empty($entity->getSiteSetting())) {
             $modules = $entity->getSiteSetting()->getModules();
@@ -904,7 +904,7 @@ class GlobalOptionRepository extends EntityRepository
 
     public function getSyndicateModuleListing($entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $data ="";
         if(!empty($entity->getSiteSetting())) {
             $data .= '<div class="tm-tabs tm-tabs4">';
@@ -943,7 +943,7 @@ class GlobalOptionRepository extends EntityRepository
 
     public function getHomeModuleListing($entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $data ="";
         if( $entity && !empty($entity->getUser()->getHomePage())) {
             $data .= '<div class="tm-tabs tm-tabs4">';
@@ -1000,7 +1000,7 @@ class GlobalOptionRepository extends EntityRepository
 
     public function getSyndicateAdmissionListing($entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($entity && !empty($entity->getUser()->getHomePage())) {
 
             $syndicateModules = $entity->getUser()->getHomePage()->getSyndicateModules();
@@ -1031,7 +1031,7 @@ class GlobalOptionRepository extends EntityRepository
         /**
          * @var GlobalOption $entity
          */
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $db = $em->createQueryBuilder();
         $db->select('g');
         $db->from(\App\Tool\Entity\GlobalOption::class,'g');
@@ -1055,7 +1055,7 @@ class GlobalOptionRepository extends EntityRepository
             $location = $entity->getUser()->$entityClass()->getLocation();
             if ($location) {
                 $locationId = $location->getId();
-                $em = $this->_em;
+                $em = $this->getEntityManager();
                 $db = $em->createQueryBuilder();
                 $db->select('g');
                 $db->from(\App\Tool\Entity\GlobalOption::class, 'g');
@@ -1077,11 +1077,11 @@ class GlobalOptionRepository extends EntityRepository
         /**
          * @var Syndicate $syndicate
          */
-        $syndicate = $this->_em->getRepository(\App\Tool\Entity\Syndicate::class)->find($syndicate);
-        //$level = $this->_em->getRepository('SettingToolBundle:InstituteLevel')->findOneBy(array('slug'=>$level));
+        $syndicate = $this->getEntityManager()->getRepository(\App\Tool\Entity\Syndicate::class)->find($syndicate);
+        //$level = $this->getEntityManager()->getRepository('SettingToolBundle:InstituteLevel')->findOneBy(array('slug'=>$level));
         $entityName = $syndicate->getEntityName();
         if ($entityName) {
-                $em = $this->_em;
+                $em = $this->getEntityManager();
                 $db = $em->createQueryBuilder();
                 $db->select('g');
                 $db->from(\App\Tool\Entity\GlobalOption::class, 'g');
@@ -1208,20 +1208,20 @@ class GlobalOptionRepository extends EntityRepository
         $qb1 = $this->getEntityManager()->getConnection()->prepare($medicine);
         $qb1->bindValue('startDate', $firstMonth);
         $qb1->bindValue('endDate', $lastMonth);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
 
         $restaurant = "UPDATE restaurant_android_process SET jsonItem = '',jsonSubItem = '' WHERE  created >=:startDate AND  created <=:endDate";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($restaurant);
         $qb1->bindValue('startDate', $firstMonth);
         $qb1->bindValue('endDate', $lastMonth);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
         $expense = "UPDATE expense_android_process SET jsonItem = '',jsonSubItem = '' WHERE  created >=:startDate AND  created <=:endDate";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($expense);
         $qb1->bindValue('startDate', $firstMonth);
         $qb1->bindValue('endDate', $lastMonth);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
 
 
@@ -1239,7 +1239,7 @@ class GlobalOptionRepository extends EntityRepository
         $qb1 = $this->getEntityManager()->getConnection()->prepare($sales);
         $qb1->bindValue('configId', $configId);
         $qb1->bindValue('endDate', $lastMonth);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
         $purchase = "DELETE medicine_sales_item FROM medicine_sales_item
         JOIN medicine_sales ON medicine_sales_item.medicineSales_id = medicine_sales.id
@@ -1247,7 +1247,7 @@ class GlobalOptionRepository extends EntityRepository
         $qb1 = $this->getEntityManager()->getConnection()->prepare($purchase);
         $qb1->bindValue('configId', $configId);
         $qb1->bindValue('endDate', $lastMonth);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
         return "success";
 
 

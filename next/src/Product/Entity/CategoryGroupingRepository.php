@@ -15,7 +15,7 @@ class CategoryGroupingRepository extends EntityRepository
     public function getParentCategory($user)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $connection = $em->getConnection();
         $statement = $connection->prepare("SELECT distinct c.name, c.id as category_id  FROM CategoryGrouping as cg
         LEFT OUTER JOIN categorygrouping_category as cgc ON cg.id = cgc.categorygrouping_id
@@ -23,8 +23,8 @@ class CategoryGroupingRepository extends EntityRepository
         WHERE cg.user_id=:user AND c.level = :level ");
         $statement->bindValue('user', $user );
         $statement->bindValue('level',1);
-        $statement->execute();
-        return $results = $statement->fetchAll();
+        $statement = $statement->executeQuery();
+        return $results = $statement->fetchAllAssociative();
 
 
     }

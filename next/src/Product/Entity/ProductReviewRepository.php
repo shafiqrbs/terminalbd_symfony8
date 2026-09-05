@@ -15,7 +15,7 @@ class ProductReviewRepository extends EntityRepository
     public function addReview($data,$product)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new ProductReview();
 
         $entity->setProduct($product);

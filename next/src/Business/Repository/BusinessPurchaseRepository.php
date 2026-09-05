@@ -84,7 +84,7 @@ class BusinessPurchaseRepository extends EntityRepository
 
 	public function updatePurchaseTotalPrice(BusinessPurchase $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Business\Entity\BusinessPurchaseItem::class,'si')
             ->select('sum(si.purchaseSubTotal) as total')
@@ -139,8 +139,8 @@ class BusinessPurchaseRepository extends EntityRepository
 		$stmt->bindValue('config', $config);
 		$stmt->bindValue('process', 'Approved');
 		$stmt->bindValue('year', $year);
-		$stmt->execute();
-		$result =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+		$result =  $stmt->fetchAllAssociative();
 		return $result;
 
 
@@ -164,8 +164,8 @@ class BusinessPurchaseRepository extends EntityRepository
         $stmt->bindValue('process', 'Approved');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $purchaseDays = [];
         foreach ($result as $row):
             $purchaseDays[$row['day']]=$row;
@@ -180,7 +180,7 @@ class BusinessPurchaseRepository extends EntityRepository
 {
 	$global =  $user->getGlobalOption()->getId();
 
-	$qb = $this->_em->createQueryBuilder();
+	$qb = $this->getEntityManager()->createQueryBuilder();
 	$qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
 	$qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
 	$qb->where('e.globalOption = :config');
@@ -204,7 +204,7 @@ class BusinessPurchaseRepository extends EntityRepository
             $end = date('Y-m-d',strtotime($data['endDate']));
         }
 
-		$qb = $this->_em->createQueryBuilder();
+		$qb = $this->getEntityManager()->createQueryBuilder();
 		$qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
 		$qb->join('e.transactionMethod','t');
 		$qb->select('t.name as transactionName , sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
@@ -241,8 +241,8 @@ class BusinessPurchaseRepository extends EntityRepository
         $stmt->bindValue('process',$process);
         $stmt->bindValue('start', $start);
         $stmt->bindValue('end', $end);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $customerSalesSummary = [];
         foreach($result as $row) {
             $id = "{$row['customer']}";
@@ -286,7 +286,7 @@ class BusinessPurchaseRepository extends EntityRepository
 	{
 
 		$global =  $user->getGlobalOption()->getId();
-		$qb = $this->_em->createQueryBuilder();
+		$qb = $this->getEntityManager()->createQueryBuilder();
 		$qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
 		$qb->join('e.accountVendor','t');
 		$qb->select('t.companyName as companyName ,t.name as vendorName ,t.mobile as vendorMobile , sum(e.purchaseAmount) as total ,sum(e.payment) as payment');
@@ -305,7 +305,7 @@ class BusinessPurchaseRepository extends EntityRepository
 	public function insertCommissionPurchase(BusinessInvoice $invoice)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $invoice->getBusinessConfig();
 
         /* @var $rows BusinessInvoiceParticular */
@@ -337,12 +337,12 @@ class BusinessPurchaseRepository extends EntityRepository
     public function insertVendorStockLotPurchase(BusinessVendorStock $vendorStock)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $vendorStock->getBusinessConfig();
 
         /* @var $rows BusinessInvoiceParticular */
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new BusinessPurchase();
         $entity->setBusinessConfig($config);
         $entity->setVendor($vendorStock->getVendor());
@@ -373,7 +373,7 @@ class BusinessPurchaseRepository extends EntityRepository
 
     public function purchaseCommissionInvoiceGenerate(BusinessInvoice $invoice  , AccountVendor $vendor)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new BusinessPurchase();
         $entity->setBusinessConfig($invoice->getBusinessConfig());
         $entity->setVendor($vendor);
@@ -399,8 +399,8 @@ class BusinessPurchaseRepository extends EntityRepository
         $stmt->bindValue('vendor', $vendor->getId());
         $stmt->bindValue('process', 'Commission');
         $stmt->bindValue('receive', $today);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         if(!empty($result['id'])){
             return $data = ['purchase' => $result['id'],'status'=>'valid'];
         }else{
@@ -413,14 +413,14 @@ class BusinessPurchaseRepository extends EntityRepository
     {
         $compare = new DateTime();
         $today =  $compare->format('Y-m-d');
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $purchase = $em->createQuery("DELETE BusinessBundle:BusinessPurchase e WHERE e.businessConfig = {$config} AND e.process = 'Commission' AND e.created LIKE '%{$today}%' ");
         $purchase->execute();
     }
 
     public function insertPurchaseReturn(BusinessInvoiceReturn $return)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($return->getInvoiceReturnItems()){
             $entity = new BusinessPurchase();
             $entity->setBusinessConfig($return->getBusinessConfig());

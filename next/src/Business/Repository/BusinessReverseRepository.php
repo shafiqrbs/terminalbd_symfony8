@@ -27,8 +27,8 @@ class BusinessReverseRepository extends EntityRepository
 		$reverse->setProcess('purchase');
 		$reverse->setContent($data);
 		$reverse->setBusinessPurchase($entity);
-		$this->_em->persist($reverse);
-		$this->_em->flush($reverse);
+		$this->getEntityManager()->persist($reverse);
+		$this->getEntityManager()->flush($reverse);
 
 	}
 	public function salesReverse(BusinessInvoice $entity,$data)
@@ -43,8 +43,8 @@ class BusinessReverseRepository extends EntityRepository
 		$reverse->setProcess('sales');
 		$reverse->setContent($data);
 		$reverse->setBusinessInvoice($entity);
-		$this->_em->persist($reverse);
-		$this->_em->flush($reverse);
+		$this->getEntityManager()->persist($reverse);
+		$this->getEntityManager()->flush($reverse);
 
 	}
 

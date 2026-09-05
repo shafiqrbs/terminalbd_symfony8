@@ -15,7 +15,7 @@ class DomainUserRepository extends EntityRepository
 {
     public function updateDomainUser($entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $user       =  $entity->getUser();
         $profile    =  $entity->getProfile();
@@ -32,7 +32,7 @@ class DomainUserRepository extends EntityRepository
 
     public function updateSalesTarget( User $user,$month = 0 , $year =0,$discount =0)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $this->findOneBy(['user' => $user]);
         $entity->setDiscountPercent($discount);
         $entity->setMonthlySales($month);

@@ -134,7 +134,7 @@
                                         <td class="numeric" >{{ entity.totalItem }}/{{ entity.totalQnt }}</td>
                                         <td class="numeric pull-center" ><a title="Approve" href="javascript:" class="btn green disabled mini" >&nbsp;{{ entity.process|capitalize }}</a></td>
                                         <td class="numeric" id="action-{{ entity.id }}"  >
-                                            {% include "@Inventory/Purchase/action.html.twig" %}
+                                            {% include "Inventory/Purchase/action.html.twig" %}
                                         </td>
                                     </tr>
                                     {#<tr id="show-{{ entity.id }}" class="showing-overview">

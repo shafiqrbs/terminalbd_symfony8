@@ -88,7 +88,7 @@ class AccountPurchaseReturnRepository extends EntityRepository
 
     public function lastInsertPurchase($entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Accounting\Entity\AccountPurchaseReturn::class)->findOneBy(
             ['globalOption'=>$entity->getInventoryConfig()->getGlobalOption(),'vendor'=> $entity->getVendor()],
             ['id' => 'DESC']
@@ -105,7 +105,7 @@ class AccountPurchaseReturnRepository extends EntityRepository
     {
 
         $balance = $this->lastInsertPurchase($entity);
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountPurchase = new AccountPurchaseReturn();
         $accountPurchase->setGlobalOption($entity->getInventoryConfig()->getGlobalOption());
         $accountPurchase->setPurchaseReturn($entity);
@@ -115,11 +115,11 @@ class AccountPurchaseReturnRepository extends EntityRepository
         $accountPurchase->setAmount($entity->getTotal());
         $accountPurchase->setBalance($balance + $entity->getTotal() );
         $accountPurchase->setProcessHead('PurchaseReturn');
-        $accountPurchase->setTransactionMethod($this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
+        $accountPurchase->setTransactionMethod($this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         $em->persist($accountPurchase);
         $em->flush();
 
-        $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountPurchaseReturnCash($accountPurchase);
+        $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->insertAccountPurchaseReturnCash($accountPurchase);
 
         return $accountPurchase;
 

@@ -15,7 +15,7 @@ class AccountingConfigRepository extends EntityRepository
 
     public function accountingReset(GlobalOption $option){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $option = $option->getId();
 
         $transaction = $em->createQuery('DELETE AccountingBundle:Transaction e WHERE e.globalOption = '.$option);
@@ -82,7 +82,7 @@ class AccountingConfigRepository extends EntityRepository
 
     public function accountingDeleteReset(GlobalOption $option){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getAccountingConfig();
         $config->setCapitalInvestor(null);
         $em->flush();

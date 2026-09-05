@@ -50,7 +50,7 @@ class PayrollRepository extends EntityRepository
     public function userInsertUpdate(User $user)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($user->getEmployeePayroll()){
 
             return $user->getEmployeePayroll();
@@ -70,7 +70,7 @@ class PayrollRepository extends EntityRepository
 
     public function insertUpdateParticular(EmployeePayroll $payroll , $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $basic = $payroll->getBasicAmount();
 
         foreach ($data['particular'] as $key => $value):
@@ -122,7 +122,7 @@ class PayrollRepository extends EntityRepository
         $allowance = $this->getAllowanceDeduction($payroll->getId(),'allowance');
         $deduction = $this->getAllowanceDeduction($payroll->getId(),'deduction');
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $payroll->setAllowanceAmount($allowance);
         $payroll->setDeductionAmount($deduction);
         $amount = ($payroll->getBasicAmount() + $allowance);

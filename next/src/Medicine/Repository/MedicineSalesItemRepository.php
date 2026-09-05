@@ -51,8 +51,8 @@ class MedicineSalesItemRepository extends EntityRepository
                 WHERE salesItem.medicineSales_id = :invoice";
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
         $stmt->bindValue('invoice', $entity);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         return $result['total'];
     }
 
@@ -128,8 +128,8 @@ class MedicineSalesItemRepository extends EntityRepository
         if($brandName) {
             $stmt->bindValue('brandName', $brandName);
         }
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return  $result;
     }
 
@@ -158,7 +158,7 @@ class MedicineSalesItemRepository extends EntityRepository
 
     public function insertCopyItems($entity, MedicineSales $sales)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $item MedicineSalesItem */
         foreach ($sales->getMedicineSalesItems() as $item){
 
@@ -177,7 +177,7 @@ class MedicineSalesItemRepository extends EntityRepository
 
     public function temporarySalesInsert(User $user, MedicineSales $sales)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entities = $user->getMedicineSalesTemporary();
         $stockIds = [];
         foreach ($entities as $item) {
@@ -224,7 +224,7 @@ class MedicineSalesItemRepository extends EntityRepository
  , stock.salesQuantity = pa.salesQuantity";
 
         $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
-        $qb5->execute();
+        $qb5 = $qb5->executeQuery();
 
         $DoctorInvoice = $em->createQuery('DELETE MedicineBundle:MedicineSalesTemporary e WHERE e.user = '.$user->getId());
         $DoctorInvoice->execute();
@@ -233,7 +233,7 @@ class MedicineSalesItemRepository extends EntityRepository
 
     public function temporarySalesInsertManual(User $user, MedicineSales $sales)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $salesId = $sales->getId();
         $userId = $user->getId();
 
@@ -248,7 +248,7 @@ class MedicineSalesItemRepository extends EntityRepository
   WHERE user_id =:user";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
         $qb1->bindValue('user', $userId);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
         $sqlStockRemin = "UPDATE medicine_stock as stock
             inner join (
@@ -261,7 +261,7 @@ class MedicineSalesItemRepository extends EntityRepository
  , stock.salesQuantity = pa.salesQuantity";
 
         $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
-        $qb5->execute();
+        $qb5 = $qb5->executeQuery();
 
         $DoctorInvoice = $em->createQuery('DELETE MedicineBundle:MedicineSalesTemporary e WHERE e.user = '.$user->getId());
         $DoctorInvoice->execute();
@@ -279,7 +279,7 @@ class MedicineSalesItemRepository extends EntityRepository
     }
 
     public function insertInstantSalesItem(MedicineSales $sales,MedicinePurchaseItem $item,$data){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicineSalesItem();
         $entity->setMedicineSales($sales);
         $entity->setMedicineStock($item->getMedicineStock());

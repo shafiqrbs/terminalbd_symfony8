@@ -20,7 +20,7 @@ class GlobalApiRepository extends EntityRepository {
 
     public function getApiUsers(GlobalOption $option){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(User::class,'e');
         $qb->join('e.profile','p');
@@ -57,7 +57,7 @@ class GlobalApiRepository extends EntityRepository {
     {
 
         $config = $option->getMedicineConfig();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\Medicine\Entity\MedicineStock::class,'e');
         $qb->leftJoin('e.medicineBrand','brand');
@@ -107,7 +107,7 @@ class GlobalApiRepository extends EntityRepository {
     {
 
         $config = $option->getMedicineConfig()->getId();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(MedicineParticular::class,'e');
         $qb->where("e.medicineConfig = :medicineConfig");
@@ -131,7 +131,7 @@ class GlobalApiRepository extends EntityRepository {
 
     public function getApiCustomerOutstanding($globalOption)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb ->from(\App\Accounting\Entity\AccountSales::class,'e');
         $qb->select('customer.id as customerId ,customer.name as name ,customer.email as email , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
         $qb->join('e.customer','customer');
@@ -157,7 +157,7 @@ class GlobalApiRepository extends EntityRepository {
 
     public function apiApiVendorOutstanding($globalOption)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb ->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
         $qb->join('e.medicineVendor','vendor');

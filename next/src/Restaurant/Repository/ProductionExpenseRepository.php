@@ -29,7 +29,7 @@ class ProductionExpenseRepository extends EntityRepository
 
     public function productionElementExpense(ProductionBatch $batch)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var $elm ProductionElement */
 
@@ -56,7 +56,7 @@ class ProductionExpenseRepository extends EntityRepository
 
     public function salesProductionElementExpense(InvoiceParticular $batch)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var $elm ProductionElement */
 

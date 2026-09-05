@@ -15,7 +15,7 @@ class ContactPageRepository extends EntityRepository
 {
     public function globalOptionContact($user)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $reEntity = $em->getRepository(\App\Content\Entity\ContactPage::class)->findOneBy(['user'=>$user]);
         if(empty($reEntity) && $user){
@@ -41,7 +41,7 @@ class ContactPageRepository extends EntityRepository
     public function contactUpdate($globalOption,$data){
 
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $entity = $em->getRepository(\App\Content\Entity\ContactPage::class)->findOneBy(['globalOption'=>$globalOption]);
 

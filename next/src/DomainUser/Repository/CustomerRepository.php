@@ -21,7 +21,7 @@ class CustomerRepository extends EntityRepository
 {
     public function checkDuplicateCustomer(GlobalOption $globalOption, $mobile)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption,'mobile' => $mobile]);
         if($entity) {
             return false;
@@ -35,7 +35,7 @@ class CustomerRepository extends EntityRepository
     {
 
         $mobile = $global->getMobile();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $global ,'mobile' => $mobile]);
         if($entity){
             return $entity;
@@ -53,7 +53,7 @@ class CustomerRepository extends EntityRepository
 
     public function newExistingCustomer($globalOption,$mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['sales_online']['customer']['name'];
         $location = $data['sales_online']['customer']['location'];
         $address = $data['sales_online']['customer']['address'];
@@ -77,7 +77,7 @@ class CustomerRepository extends EntityRepository
 
     public function eCommerceCustomer(User $user,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['name'];
         $location = $data['location'];
         $address = $data['address'];
@@ -114,7 +114,7 @@ class CustomerRepository extends EntityRepository
 
     public function newExistingCustomerForMedicineSales($globalOption,$phone,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $mobile = $this->validateMobile($phone);
         if(strlen($mobile) > 0){
             $name = $data['customerName'];
@@ -145,7 +145,7 @@ class CustomerRepository extends EntityRepository
 
     public function newExistingCustomerForSales($globalOption,$mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['customerName'];
         $address = $data['customerAddress'] ?? '';
         $email = $data['customerEmail'] ?? '';
@@ -170,7 +170,7 @@ class CustomerRepository extends EntityRepository
 
     public function newExistingCustomerForHotel($globalOption,$mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $namePrefix = $data['namePrefix'] ?? [];
         $email = $data['email'];
         $firstName = $data['firstName'];
@@ -210,7 +210,7 @@ class CustomerRepository extends EntityRepository
 
     public function newExistingRestaurantCustomer($globalOption,$mobile,$name)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $globalOption ,'mobile' => $mobile]);
         if($entity){
             $entity->setName($name);
@@ -231,7 +231,7 @@ class CustomerRepository extends EntityRepository
 
     public function findExistingCustomer(Sales $sales, $mobile)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $sales->getInventoryConfig()->getGlobalOption(),'mobile'=>$mobile]);
         if($entity){
             return $entity;
@@ -248,7 +248,7 @@ class CustomerRepository extends EntityRepository
 
     public function findExistingEcommerceCustomer(GlobalOption $option , User $user)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $option ,'mobile' => $user->getUsername()]);
         if($entity){
             return $entity;
@@ -277,7 +277,7 @@ class CustomerRepository extends EntityRepository
 
     public function findHmsExistingCustomer($globalOption, $mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $name = $data['customer']['name'];
         $gender = $data['customer']['gender'];
@@ -335,7 +335,7 @@ class CustomerRepository extends EntityRepository
 
     public function findHmsExistingCustomerDiagnostic(GlobalOption $globalOption, $mobile,$patientId = '',$data = null)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $customer = $data['customer'];
         $name = $customer['name'];
         $gender = $customer['gender'];
@@ -384,7 +384,7 @@ class CustomerRepository extends EntityRepository
 
     public function updateExistingCustomer(GlobalOption $globalOption,Customer $entity, $mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name       = $data['name'] ?? '';
         $gender     = $data['gender'] ?? '';
         $ageGroup   = $data['ageGroup'] ?? '';
@@ -530,7 +530,7 @@ class CustomerRepository extends EntityRepository
 
     public function insertEcommerceCustomer(Profile $profile)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $user = $profile->getUser()->getId();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $profile->getUser()->getGlobalOption(),'mobile'=> $profile->getUser()->getUsername()]);
         if(empty($entity)){
@@ -562,7 +562,7 @@ class CustomerRepository extends EntityRepository
 
      public function insertContactCustomer($globalOption,$data,$mobile='')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity  ='';
 
         if(!empty($mobile)){
@@ -597,7 +597,7 @@ class CustomerRepository extends EntityRepository
 
     public function insertStudentMember(User $user,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption' => $user->getGlobalOption(), 'user' => $user->getId()]);
         if(empty($exist)){
 
@@ -633,7 +633,7 @@ class CustomerRepository extends EntityRepository
 
     public function insertNewsLetterCustomer($globalOption,$data,$mobile='')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity  ='';
 
         if(!empty($mobile)){
@@ -662,13 +662,13 @@ class CustomerRepository extends EntityRepository
 
     public function insertSMSCustomer($data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(['globalOption'=>$data['globalOption'],'mobile' => $data['mobile']]);
         if($entity){
             return $entity;
         }else{
             $entity = new Customer();
-            $globalOption = $this->_em->getRepository(\App\Tool\Entity\GlobalOption::class)->find($data['globalOption']);
+            $globalOption = $this->getEntityManager()->getRepository(\App\Tool\Entity\GlobalOption::class)->find($data['globalOption']);
             $entity->setMobile($data['mobile']);
             $entity->setName($data['name']);
             $entity->setGlobalOption($globalOption);
@@ -786,7 +786,7 @@ class CustomerRepository extends EntityRepository
 
     public function patientInsertUpdate($data,Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $customer = $data['appstore_bundle_hospitalbundle_invoice']['customer'];
         $patient = $data['patient'];
         $option = $invoice->getHospitalConfig()->getGlobalOption();
@@ -1005,7 +1005,7 @@ class CustomerRepository extends EntityRepository
 
     public function customerOutstanding($globalOption)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb ->from(\App\Accounting\Entity\AccountSales::class,'e');
         $qb->select('customer.id as customerId ,customer.name as name ,customer.email as email , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
         $qb->join('e.customer','customer');
@@ -1049,7 +1049,7 @@ class CustomerRepository extends EntityRepository
     public function apiCreateCustomer(GlobalOption $global,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $mobile = ((isset($data['mobile']) and $data['mobile'])) ? ($data['mobile']):'';
         $name = ((isset($data['name']) and $data['name'])) ? ($data['name']):'';
         $address = ((isset($data['address']) and $data['address'])) ? $data['address']:'';
@@ -1086,7 +1086,7 @@ class CustomerRepository extends EntityRepository
 
     public function apiUpdateCustomer($data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $customerId = trim($data['customer_id']);
         $name = trim($data['name']);
         $address = trim($data['address']);

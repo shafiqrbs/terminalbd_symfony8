@@ -18,7 +18,7 @@ class SiteSettingRepository extends EntityRepository
 
     public function globalOptionSetting($globalOption)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $reEntity = $this->findOneBy(['globalOption'=>$globalOption]);
         if(empty($reEntity) && $globalOption){
@@ -33,7 +33,7 @@ class SiteSettingRepository extends EntityRepository
 
     public function moduleUpdate(GlobalOption $globalOption,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $globalOption->getSiteSetting();
         if(!empty($data['module'])){
 
@@ -75,7 +75,7 @@ class SiteSettingRepository extends EntityRepository
 
     public function removeModuleMenu($globalOption)
     {
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $remove = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['siteSetting' => $globalOption->getSiteSetting()]);
             if(!empty($remove)){
                 $em->remove($remove);
@@ -86,7 +86,7 @@ class SiteSettingRepository extends EntityRepository
 
     public function addModuleMenu($globalOption,$modules,$type)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         foreach( $modules as $module ) {
             $entity = new Menu();
@@ -110,7 +110,7 @@ class SiteSettingRepository extends EntityRepository
 
     public  function insertSettingMenu($user){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $globalOption = $user->getGlobalOption();
         $reEntity = $em->getRepository(\App\Tool\Entity\SiteSetting::class)->findOneBy(['globalOption'=>$globalOption]);
 
@@ -160,7 +160,7 @@ class SiteSettingRepository extends EntityRepository
 
     public function setUpdateSettingSyndicate($entity,$syndicates){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(!empty($entity)){
             $synarr = [];
             foreach($syndicates as $sid ){
@@ -179,7 +179,7 @@ class SiteSettingRepository extends EntityRepository
     public function createSyndicateMenu($reEntity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $syndicates = $reEntity->getSyndicates();
 
@@ -229,7 +229,7 @@ class SiteSettingRepository extends EntityRepository
     public function createModuleMenu($reEntity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $modules = $reEntity->getModules();
         $checkEntity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findBy(['siteSetting'=>$reEntity]);
@@ -275,7 +275,7 @@ class SiteSettingRepository extends EntityRepository
     }
     public function createSyndicateModuleMenu($reEntity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $syndicateModule = $reEntity->getSyndicateModules();
 
@@ -326,7 +326,7 @@ class SiteSettingRepository extends EntityRepository
 
     public function removeExistingMenu($field,$removeData,$reEntity){
 
-        $em =$this->_em;
+        $em =$this->getEntityManager();
 
         foreach($removeData as $data){
             $menuEntity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy([$field => $data ,'siteSetting'=> $reEntity ]);

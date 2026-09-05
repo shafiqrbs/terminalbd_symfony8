@@ -17,7 +17,7 @@ class ProfileRepository extends EntityRepository {
 
     public function updateProfile(Profile $entity , $data , $file){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(isset($file['file'])) {
             $this->fileUploader($entity, $file);
         }
@@ -48,7 +48,7 @@ class ProfileRepository extends EntityRepository {
 
     public function fileUploader(Profile $entity, $file = '')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(isset($file['file'])){
             $img = $file['file'];
             $fileName = $img->getClientOriginalName();
@@ -63,7 +63,7 @@ class ProfileRepository extends EntityRepository {
 
     public function insertNewMember(User $entity, $data = '')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['registration_name'] ?? '';
         $address = $data['registration_address'] ?? '';
         $registration_facebookId = $data['registration_facebookId'] ?? '';
@@ -81,7 +81,7 @@ class ProfileRepository extends EntityRepository {
 
     public function insertEcommerce(User $entity, $data = [])
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $profile = new Profile();
         $profile->setUser($entity);
         $profile->setMobile($entity->getUsername());

@@ -36,7 +36,7 @@ class AndroidTemplateCustomizationRepository extends EntityRepository {
 
     public function updateTemplateCustomize(TemplateCustomize $entity , $data , $file){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $this->fileUploader($entity, $file);
 
@@ -119,7 +119,7 @@ class AndroidTemplateCustomizationRepository extends EntityRepository {
 
     public function fileUploader($entity, $file = '')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(isset($file['logoFile'])){
 
              $img = $file['logoFile'];

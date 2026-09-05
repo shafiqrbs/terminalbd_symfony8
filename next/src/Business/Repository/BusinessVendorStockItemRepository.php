@@ -55,8 +55,8 @@ class BusinessVendorStockItemRepository extends EntityRepository
     public function insertVendorStockItems($invoice, $data)
     {
 
-    	$particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
-        $em = $this->_em;
+    	$particular = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
 	    $price = (isset($data['price']) and !empty($data['price']))? $data['price']:0;
         $entity = new BusinessVendorStockItem();
         $entity->setBusinessVendorStock($invoice);
@@ -118,7 +118,7 @@ class BusinessVendorStockItemRepository extends EntityRepository
 
     private function updateStockVendorStock(BusinessParticular $stock , $qnt ){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $stock->setStockIn($qnt);
         $em->persist($stock);
         $em->flush();
@@ -128,7 +128,7 @@ class BusinessVendorStockItemRepository extends EntityRepository
     private function updateStockInOut(BusinessVendorStock $vendorStock){
 
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->join('e.businessVendorStock', 'mp');
         $qb->select('SUM(e.quantity) AS quantity, SUM(e.salesQuantity) as salesQnt');
@@ -146,7 +146,7 @@ class BusinessVendorStockItemRepository extends EntityRepository
 
     public function insertStockSalesItems(BusinessInvoiceParticular $invoiceParticular ){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $vendorStock BusinessVendorStockItem */
         $vendorStock = $invoiceParticular->getVendorStockItem();
         if($invoiceParticular->getVendorStockItem()){

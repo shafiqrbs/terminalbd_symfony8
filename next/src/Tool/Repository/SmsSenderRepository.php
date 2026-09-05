@@ -26,8 +26,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('E-commerce for'.$process);
         $entity->setReceiver('Customer');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -43,8 +43,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('E-commerce:'.$process);
         $entity->setReceiver('Admin');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -61,8 +61,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('E-commerce'.$process);
         $entity->setReceiver('Customer');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -79,8 +79,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('E-commerce'.$process);
         $entity->setReceiver('Customer');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -98,8 +98,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('E-commerce Payment For'.$process);
         $entity->setReceiver('Customer');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -116,8 +116,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('E-commerce Payment for'.$process);
         $entity->setReceiver('Customer');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -137,8 +137,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('Sales');
         $entity->setReceiver('Customer');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -159,8 +159,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('Sales');
         $entity->setReceiver('Admin');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -179,8 +179,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('Sales');
         $entity->setReceiver('Admin');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -199,8 +199,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('Sales');
         $entity->setReceiver('Customer');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -214,8 +214,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setStatus($status);
         $entity->setProcess('Bulk Sms');
         $entity->setReceiver('Customer');
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -233,8 +233,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('Dental Sales');
         $entity->setReceiver('Customer');
         $entity->setRemark($remark);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($globalOption);
         }
@@ -251,8 +251,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('Notification');
         $entity->setReceiver('Customer');
         $entity->setRemark('OTP');
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($user->getGlobalOption());
         }
@@ -267,8 +267,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setProcess('Payment Invoice');
         $entity->setReceiver('Customer');
         $entity->setRemark($msg);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($customer->getGlobalOption());
         }
@@ -287,8 +287,8 @@ class SmsSenderRepository extends EntityRepository {
 		$entity->setProcess($invoice->getProcess());
 		$entity->setReceiver('Customer');
 		$entity->setRemark($remark);
-		$this->_em->persist($entity);
-		$this->_em->flush();
+		$this->getEntityManager()->persist($entity);
+		$this->getEntityManager()->flush();
 		if($status == 'success'){
 			$this->totalSendSms($globalOption);
 		}
@@ -303,8 +303,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setStatus($status);
         $entity->setReceiver('Customer');
         $entity->setRemark($message);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($customer->getGlobalOption());
         }
@@ -319,8 +319,8 @@ class SmsSenderRepository extends EntityRepository {
         $entity->setStatus($status);
         $entity->setReceiver('Customer Outstanding');
         $entity->setRemark($message);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
         if($status == 'success'){
             $this->totalSendSms($customer->getGlobalOption());
         }
@@ -329,19 +329,19 @@ class SmsSenderRepository extends EntityRepository {
 
     public function totalSendSms($globalOption){
 
-        $totalSms = $this->_em->getRepository(\App\Tool\Entity\SmsSenderTotal::class)->findOneBy(['globalOption' => $globalOption]);
+        $totalSms = $this->getEntityManager()->getRepository(\App\Tool\Entity\SmsSenderTotal::class)->findOneBy(['globalOption' => $globalOption]);
         if($totalSms and $totalSms->getRemaining()){
             $totalSms->setRemaining($totalSms->getRemaining()-1);
             $totalSms->setSending($totalSms->getSending()+1);
-            $this->_em->persist($totalSms);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($totalSms);
+            $this->getEntityManager()->flush();
         }
 
     }
 
     public function smsHistoryDelete(){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountCash = $em->createQuery("DELETE SettingToolBundle:SmsSender e WHERE e.status='success'");
         if(!empty($accountCash)){
             $accountCash->execute();

@@ -16,7 +16,7 @@ class SmsSenderTotalRepository extends EntityRepository {
 
     public function updateSmsBundle(InvoiceSmsEmail $entity)
     {
-        $sms = $this->_em->getRepository(\App\Tool\Entity\SmsSenderTotal::class)->findOneBy(['globalOption'=> $entity->getGlobalOption()]);
+        $sms = $this->getEntityManager()->getRepository(\App\Tool\Entity\SmsSenderTotal::class)->findOneBy(['globalOption'=> $entity->getGlobalOption()]);
         if(empty($sms)){
             $sms = new SmsSenderTotal();
             $sms->setGlobalOption($entity->getGlobalOption());
@@ -27,14 +27,14 @@ class SmsSenderTotalRepository extends EntityRepository {
             $sms->setPurchase($purchase + $entity->getSmsQuantity());
             $sms->setRemaining($purchase + $entity->getSmsQuantity() - $sms->getSending());
         }
-        $this->_em->persist($sms);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($sms);
+        $this->getEntityManager()->flush();
 
-        $sendSms = $this->_em->getRepository(\App\Tool\Entity\SmsSender::class)->findBy(['globalOption'=> $entity->getGlobalOption()]);
+        $sendSms = $this->getEntityManager()->getRepository(\App\Tool\Entity\SmsSender::class)->findBy(['globalOption'=> $entity->getGlobalOption()]);
         if(!empty($sendSms)){
             foreach($sendSms as $send){
-                $this->_em->remove($send);
-                $this->_em->flush();
+                $this->getEntityManager()->remove($send);
+                $this->getEntityManager()->flush();
             }
 
         }

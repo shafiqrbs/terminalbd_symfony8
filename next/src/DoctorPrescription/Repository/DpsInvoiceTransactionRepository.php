@@ -138,8 +138,8 @@ class DpsInvoiceTransactionRepository extends EntityRepository
         $entity->setDiscount($invoice->getDiscount());
         $entity->setTotal($invoice->getSubTotal());
         $entity->setPayment($invoice->getPayment());
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
         return $entity;
 
     }
@@ -155,10 +155,10 @@ class DpsInvoiceTransactionRepository extends EntityRepository
         $entity->setDiscount($data['discount']);
         $entity->setPayment($data['payment']);
         $entity->setProcess('In-progress');
-        $transactionMethod = $this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+        $transactionMethod = $this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         $entity->setTransactionMethod($transactionMethod);
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
         return $entity;
 
     }
@@ -186,8 +186,8 @@ class DpsInvoiceTransactionRepository extends EntityRepository
             $vat = $this->getCulculationVat($invoice, $entity->getPayment());
             $entity->setVat($vat);
         }
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
 
     }
     public function insertTransaction(DpsInvoice $invoice)
@@ -215,11 +215,11 @@ class DpsInvoiceTransactionRepository extends EntityRepository
                 $vat = $this->getCulculationVat($invoice, $entity->getPayment());
                 $entity->setVat($vat);
             }
-            $this->_em->persist($entity);
-            $this->_em->flush($entity);
+            $this->getEntityManager()->persist($entity);
+            $this->getEntityManager()->flush($entity);
             if($invoice->getPayment() > 0){
-                $accountInvoice = $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountInvoice($entity);
-                $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountInvoice);
+                $accountInvoice = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountInvoice($entity);
+                $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountInvoice);
             }
 
 
@@ -248,8 +248,8 @@ class DpsInvoiceTransactionRepository extends EntityRepository
             $vat = $this->getCulculationVat($invoice, $entity->getPayment());
             $entity->setVat($vat);
         }
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
 
     }
 
@@ -261,12 +261,12 @@ class DpsInvoiceTransactionRepository extends EntityRepository
             $entity->setVat($vat);
         }
         if(empty($entity->getTransactionMethod())){
-            $entity->setTransactionMethod($this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
+            $entity->setTransactionMethod($this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
         }
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
-        $accountInvoice = $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountInvoice($entity);
-        $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountInvoice);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
+        $accountInvoice = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertAccountInvoice($entity);
+        $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->hmsSalesTransaction($entity, $accountInvoice);
 
     }
 
@@ -274,7 +274,7 @@ class DpsInvoiceTransactionRepository extends EntityRepository
     {
 
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         if(!empty($entity->getAccountSales())){
             /* @var AccountSales $sales*/
@@ -303,7 +303,7 @@ class DpsInvoiceTransactionRepository extends EntityRepository
     public function hmsAdmissionSalesTransactionReverse(DpsInvoice $entity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         if(!empty($entity->getAccountSales())){
             /* @var AccountSales $sales*/
@@ -340,14 +340,14 @@ class DpsInvoiceTransactionRepository extends EntityRepository
         foreach ($entity->getDpsInvoiceTransactions() as $transaction) {
 
             $transaction->setDiscount(0);
-            $this->_em->persist($transaction);
-            $this->_em->flush($transaction);
+            $this->getEntityManager()->persist($transaction);
+            $this->getEntityManager()->flush($transaction);
         }
         foreach ($entity->getDpsInvoiceTransactions() as $transaction) {
 
             if( empty($transaction->getPayment()) and empty($transaction->getDiscount())){
 
-                $qb = $this->_em->createQueryBuilder();
+                $qb = $this->getEntityManager()->createQueryBuilder();
                 $qb->delete('DoctorPrescriptionBundle:DpsInvoiceTransaction', 'trans')
                     ->where($qb->expr()->eq('trans.id', ':id'))
                     ->setParameter('id', $transaction->getId());
@@ -358,7 +358,7 @@ class DpsInvoiceTransactionRepository extends EntityRepository
 
     public function removePendingTransaction(DpsInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $query = $qb->delete('DoctorPrescriptionBundle:DpsInvoiceTransaction', 'e')
             ->where('e.dmsInvoice = :dmsInvoice')
@@ -408,7 +408,7 @@ class DpsInvoiceTransactionRepository extends EntityRepository
 
     public function getLastCode(Invoice $invoice)
     {
-        $qb = $this->_em->getRepository('DoctorPrescriptionBundle:DpsDpsInvoiceTransaction')->createQueryBuilder('s');
+        $qb = $this->getEntityManager()->getRepository('DoctorPrescriptionBundle:DpsDpsInvoiceTransaction')->createQueryBuilder('s');
         $qb
             ->select('MAX(s.code)')
             ->where('s.dmsInvoice = :invoice')

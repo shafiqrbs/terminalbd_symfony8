@@ -26,8 +26,8 @@ class HmsReverseRepository extends EntityRepository
         $reverse->setProcess($entity->getProcess());
         $reverse->setContent($data);
         $reverse->setHmsInvoice($entity);
-        $this->_em->persist($reverse);
-        $this->_em->flush($reverse);
+        $this->getEntityManager()->persist($reverse);
+        $this->getEntityManager()->flush($reverse);
 
     }
     public function insertAdmissionInvoice(Invoice $entity,$data)
@@ -44,8 +44,8 @@ class HmsReverseRepository extends EntityRepository
         $reverse->setProcess('Admitted Invoice');
         $reverse->setContent($data);
         $reverse->setHmsInvoice($entity);
-        $this->_em->persist($reverse);
-        $this->_em->flush($reverse);
+        $this->getEntityManager()->persist($reverse);
+        $this->getEntityManager()->flush($reverse);
 
     }
 

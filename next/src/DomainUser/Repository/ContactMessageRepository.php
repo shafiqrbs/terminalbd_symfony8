@@ -16,7 +16,7 @@ class ContactMessageRepository extends EntityRepository
     public function insertMessage($data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $user = $em->getRepository(\App\User\Entity\User::class)->find($data['user']);
 
         if($data){
@@ -34,7 +34,7 @@ class ContactMessageRepository extends EntityRepository
 
     public function reply($data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $ids = $data['id'];
         $i=0;
         foreach ($ids as $id ){
@@ -60,7 +60,7 @@ class ContactMessageRepository extends EntityRepository
 
     private function remove($id){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository('SettingContentBundle:CustomerInbox')->find($id);
         $em->remove($entity);
         $em->flush();

@@ -170,7 +170,7 @@ class InvoiceParticularRepository extends EntityRepository
     public function insertMasterParticular(User $user,Invoice $invoice){
 
         $entities = $user->getHmsInvoiceTemporaryParticulars();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $entity HmsInvoiceTemporaryParticular */
         if(!empty($entities)){
             foreach ($entities as $entity) {
@@ -199,10 +199,10 @@ class InvoiceParticularRepository extends EntityRepository
 
     public function insertInvoiceItems($invoice, $data)
     {
-        $particular = $this->_em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
-        $em = $this->_em;
+        $particular = $this->getEntityManager()->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
         $entity = new InvoiceParticular();
-        $invoiceParticular = $this->_em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->findOneBy(['hmsInvoice'=> $invoice ,'particular' => $particular]);
+        $invoiceParticular = $this->getEntityManager()->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->findOneBy(['hmsInvoice'=> $invoice ,'particular' => $particular]);
         if(!empty($invoiceParticular)) {
             $entity = $invoiceParticular;
             if ($particular->getService()->getHasQuantity() == 1){
@@ -244,7 +244,7 @@ class InvoiceParticularRepository extends EntityRepository
 
     public function insertInvoiceParticularMasterUpdate(AdmissionPatientParticular $patientParticular)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $invoice = $patientParticular->getInvoiceTransaction()->getHmsInvoice();
         $particular = $patientParticular->getParticular();
         $entity = $this->findOneBy(['hmsInvoice' => $invoice,'particular' => $particular,'admissionPatientParticular' => $patientParticular]);
@@ -269,7 +269,7 @@ class InvoiceParticularRepository extends EntityRepository
 
     public function reverseInvoiceParticularMasterUpdate(AdmissionPatientParticular $patientParticular)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $patientParticular->getId();
         $entity = $this->findOneBy(['admissionPatientParticular' => $patientParticular]);
         if($entity){
@@ -309,7 +309,7 @@ class InvoiceParticularRepository extends EntityRepository
     public function hmsInvoiceParticularReverse(Invoice $invoice)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var InvoiceParticular $item */
 

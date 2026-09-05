@@ -16,7 +16,7 @@ class ProductCustomAttributeRepository extends EntityRepository
     public function insertProductAttribute($reEntity,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $attributeName      = $data['attributeName'];
         $attributeContent   = $data['attributeContent'];
@@ -45,7 +45,7 @@ class ProductCustomAttributeRepository extends EntityRepository
 
     public function removeAttribute($posts)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
             foreach ($posts as $post ){
                 $entity = $em->getRepository(\App\Product\Entity\ProductCustomAttribute::class)->find($post);
@@ -58,7 +58,7 @@ class ProductCustomAttributeRepository extends EntityRepository
 
     public function insertDuplicateProductAttribute($reEntity,$oldEntity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $productCustomAttributes = $oldEntity->getProductCustomAttributes();
 
 

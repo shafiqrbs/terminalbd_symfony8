@@ -15,7 +15,7 @@ class BusinessProductionExpenseRepository extends EntityRepository
 {
     public function removeProductionExpense(BusinessInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
 	    if(!empty($invoice->getBusinessInvoiceParticulars())) {
 

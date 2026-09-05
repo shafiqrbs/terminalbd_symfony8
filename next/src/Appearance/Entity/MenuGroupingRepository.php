@@ -17,7 +17,7 @@ class MenuGroupingRepository extends EntityRepository
     {
 
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $menuGroup = $em->getRepository(\App\Appearance\Entity\MenuGroup::class)->find($menuGroup);
         if(!empty($posts['menuid'])){
             foreach ($posts['menuid'] as $post ){
@@ -43,7 +43,7 @@ class MenuGroupingRepository extends EntityRepository
 
     public function removeMenuGrouping($posts,$globalOption,$menuGroup)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         if(!empty($posts['delete'])){
             foreach ($posts['delete'] as $post ){
@@ -61,7 +61,7 @@ class MenuGroupingRepository extends EntityRepository
 
     private function childrenMenuRemove($menu)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($menu->getChildren() as $val) {
             $child = $val->getChildren();
             if(!empty($child)){
@@ -79,7 +79,7 @@ class MenuGroupingRepository extends EntityRepository
     {
 
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         foreach ($data as $key => $value){
             $val = $value ?: 0 ;
@@ -130,7 +130,7 @@ class MenuGroupingRepository extends EntityRepository
 
     public function getFooterMenu(){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Appearance\Entity\MenuGrouping::class)->findBy(['menuGroup'=>3]);
         if(!empty($entity)){
             return $entity;

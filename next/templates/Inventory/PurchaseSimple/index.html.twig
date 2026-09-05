@@ -127,7 +127,7 @@
                                         <td class="numeric pull-center" ><a title="Approve" href="javascript:" class="btn {% if entity.process == 'created' %} red {% else %} blue {% endif %} disabled mini" >&nbsp;{{ entity.process|capitalize }}</a></td>
                                         <td class="numeric pull-center" >{% if entity.revised == 1 %} <button class="btn yellow mini"><i class="icon-ok"></i></button> {% endif %}</td>
                                         <td class="numeric" id="action-{{ entity.id }}"  >
-                                            {% include "@Inventory/PurchaseSimple/action.html.twig" %}
+                                            {% include "Inventory/PurchaseSimple/action.html.twig" %}
                                         </td>
                                     </tr>
                                 {% endfor %}

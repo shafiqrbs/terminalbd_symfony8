@@ -27,7 +27,7 @@ FROM medicine_stock as ms
 WHERE medicineConfig_id ={$config} AND (openingQuantity > 0 OR remainingQuantity > 0 OR salesQuantity > 0 OR adjustmentQuantity > 0 OR purchaseQuantity > 0)
 AND NOT EXISTS ( SELECT 1 FROM medicine_stock_report d WHERE d.stockId = ms.id AND d.configId = ms.medicineConfig_id)";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
 
 
@@ -42,7 +42,7 @@ where ms.configId = {$config} AND DATE_FORMAT(pr.updated,'%M') = '{$month}' AND 
 group by pi.medicineStock_id ) pa on stock.stockId = pa.medicineStock_id
 SET stock.purchaseQuantity = pa.quantity , stock.bonusQuantity = pa.bonusQuantity";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchase);
-        $qb2->execute();
+        $qb2 = $qb2->executeQuery();
 
 
 
@@ -56,7 +56,7 @@ where ms.configId = {$config} AND DATE_FORMAT(pr.updated,'%M') = '{$month}' AND 
 group by pi.medicineStock_id ) pa on stock.stockId = pa.medicineStock_id
 SET stock.salesQuantity = pa.quantity";
         $qb3 = $this->getEntityManager()->getConnection()->prepare($sqlStockSales);
-        $qb3->execute();
+        $qb3 = $qb3->executeQuery();
 
 
         $sqlStockSalesReturn = "UPDATE medicine_stock_report as stock
@@ -68,7 +68,7 @@ where ms.configId = {$config} AND DATE_FORMAT(pi.updated,'%M') = '{$month}' AND 
 group by pi.medicineStock_id ) pa on stock.stockId = pa.medicineStock_id
 SET stock.salesReturnQuantity = pa.quantity, stock.quantity = pa.quantity";
         $qb4 = $this->getEntityManager()->getConnection()->prepare($sqlStockSalesReturn);
-        $qb4->execute();
+        $qb4 = $qb4->executeQuery();
 
 
         $sqlStockPurchaseReturn = "UPDATE medicine_stock_report as stock
@@ -81,7 +81,7 @@ where ms.configId = {$config} AND DATE_FORMAT(pr.updated,'%M') = '{$month}' AND 
 group by pi.medicineStock_id ) pa on stock.stockId = pa.medicineStock_id
 SET stock.purchaseReturnQuantity = pa.quantity, stock.quantity = -pa.quantity";
         $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchaseReturn);
-        $qb5->execute();
+        $qb5 = $qb5->executeQuery();
 
 
         $sqlStockAdjustment = "UPDATE medicine_stock_report as stock
@@ -93,7 +93,7 @@ where ms.configId = {$config} AND DATE_FORMAT(pi.updated,'%M') = '{$month}' AND 
 group by pi.medicineStock_id ) pa on stock.stockId = pa.medicineStock_id
 SET stock.adjustmentQuantity = pa.quantity, stock.quantity = pa.quantity , stock.bonusQuantity = pa.bonusQuantity";
         $qb6 = $this->getEntityManager()->getConnection()->prepare($sqlStockAdjustment);
-        $qb6->execute();
+        $qb6 = $qb6->executeQuery();
 
 
         $sqlStockDamage = "UPDATE medicine_stock_report as stock
@@ -105,7 +105,7 @@ where ms.configId = {$config} AND DATE_FORMAT(pi.updated,'%M') = '{$month}' AND 
 group by pi.medicineStock_id ) pa on stock.stockId = pa.medicineStock_id
 SET stock.adjustmentQuantity = pa.quantity, stock.quantity = pa.quantity";
         $qb7 = $this->getEntityManager()->getConnection()->prepare($sqlStockDamage);
-        $qb7->execute();
+        $qb7 = $qb7->executeQuery();
 
         exit;
 
@@ -120,7 +120,7 @@ SET stock.adjustmentQuantity = pa.quantity, stock.quantity = pa.quantity";
               group by pi.medicineStock_id) as pa on stock.id = pa.medicineStock_id
   SET stock.purchaseQuantity = pa.purchaseQuantity , stock.quantity = - pa.purchaseQuantity";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchaseReturn);
-        $qb2->execute();
+        $qb2 = $qb2->executeQuery();
 
 
 
@@ -135,7 +135,7 @@ SET stock.adjustmentQuantity = pa.quantity, stock.quantity = pa.quantity";
   SET stock.remainingQuantity = ((COALESCE(stock.openingQuantity,0) + COALESCE(stock.purchaseQuantity,0) + COALESCE(stock.salesReturnQuantity,0)+ COALESCE(stock.bonusQuantity,0)+ COALESCE(stock.bonusAdjustment,0)+ COALESCE(stock.adjustmentQuantity,0)) - (COALESCE(pa.salesQuantity,0) + COALESCE(stock.purchaseReturnQuantity,0) + COALESCE(stock.damageQuantity,0)))
  , stock.salesQuantity = pa.salesQuantity";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sqlStockSales);
-        $qb2->execute();
+        $qb2 = $qb2->executeQuery();
 
     }
 
@@ -152,7 +152,7 @@ SET stock.adjustmentQuantity = pa.quantity, stock.quantity = pa.quantity";
               group by pi.medicineStock_id) as pa on stock.id = pa.medicineStock_id
   SET stock.purchaseQuantity = pa.purchaseQuantity";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchase);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
         exit;
 
@@ -165,7 +165,7 @@ SET stock.adjustmentQuantity = pa.quantity, stock.quantity = pa.quantity";
               group by pi.medicineStock_id) as pa on stock.id = pa.medicineStock_id
   SET stock.purchaseQuantity = pa.purchaseQuantity";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchaseReturn);
-        $qb2->execute();
+        $qb2 = $qb2->executeQuery();
 
 
 
@@ -180,7 +180,7 @@ SET stock.adjustmentQuantity = pa.quantity, stock.quantity = pa.quantity";
   SET stock.remainingQuantity = ((COALESCE(stock.openingQuantity,0) + COALESCE(stock.purchaseQuantity,0) + COALESCE(stock.salesReturnQuantity,0)+ COALESCE(stock.bonusQuantity,0)+ COALESCE(stock.bonusAdjustment,0)+ COALESCE(stock.adjustmentQuantity,0)) - (COALESCE(pa.salesQuantity,0) + COALESCE(stock.purchaseReturnQuantity,0) + COALESCE(stock.damageQuantity,0)))
  , stock.salesQuantity = pa.salesQuantity";
         $qb2 = $this->getEntityManager()->getConnection()->prepare($sqlStockSales);
-        $qb2->execute();
+        $qb2 = $qb2->executeQuery();
 
     }
 

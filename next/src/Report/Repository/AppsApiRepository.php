@@ -263,7 +263,7 @@ class AppsApiRepository extends EntityRepository
 
     public function colourPlate()
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $colorList = []; // Initialize as a list using traditional array syntax
         $entities = $em->getRepository(ColorPlate::class)->findAll();
 
@@ -285,7 +285,7 @@ class AppsApiRepository extends EntityRepository
 
     public function getApiUsers(GlobalOption $option){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(User::class,'e');
         $qb->join('e.profile','p');
@@ -322,7 +322,7 @@ class AppsApiRepository extends EntityRepository
     {
 
         $config = $option->getMedicineConfig();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\Medicine\Entity\MedicineStock::class,'e');
         $qb->leftJoin('e.unit','u');
@@ -371,7 +371,7 @@ class AppsApiRepository extends EntityRepository
 
     public function getApiSingleStock($option,$id)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\Medicine\Entity\MedicineStock::class,'e');
         $qb->leftJoin('e.category','category');
@@ -411,7 +411,7 @@ class AppsApiRepository extends EntityRepository
     {
 
         $config = $option->getMedicineConfig()->getId();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(MedicineParticular::class,'e');
         $qb->leftJoin('e.particularType','pt');
@@ -435,7 +435,7 @@ class AppsApiRepository extends EntityRepository
 
     public function getApiCustomerOutstanding($globalOption)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb ->from(\App\DomainUser\Entity\Customer::class,'customer');
         $qb->select('customer.id as customerId ,customer.name as name ,customer.email as email , customer.mobile as mobile , customer.address as address,COALESCE(SUM(e.totalAmount),0) as debit, COALESCE(SUM(e.amount),0) as credit,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ');
         $qb->leftJoin('customer.accountSales','e');
@@ -462,7 +462,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiApiVendorOutstanding($globalOption)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb ->from(\App\Medicine\Entity\MedicineVendor::class,'vendor');
         $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.email as email,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
         $qb->join('vendor.accountPurchases','e');
@@ -500,7 +500,7 @@ class AppsApiRepository extends EntityRepository
 
     public function getApiMethodTransaction($entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $methods = [];
         $accountBanks = $em->getRepository(AccountBank::class)->findBy(['globalOption' => $entity->getId(),'status'=>1]);
 
@@ -532,7 +532,7 @@ class AppsApiRepository extends EntityRepository
 
     public function getApiExpenseCategory($entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $expenseCat = $em->getRepository(ExpenseCategory::class)->findBy(['globalOption'=> $entity,'status'=>1]);
         $expenseCategories = [];
@@ -549,7 +549,7 @@ class AppsApiRepository extends EntityRepository
     }
 
     public function getApiProductUnit(){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(ProductUnit::class,'e');
         $qb->select('e.id as id , e.name as name');
@@ -572,7 +572,7 @@ class AppsApiRepository extends EntityRepository
     public function apiAccountSales(GlobalOption $globalOption,$array)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $currentPage = (isset($array['page']) and $array['page']) ? $array['page']:1; // Example: the current page number
         $itemsPerPage = (isset($array['limit']) and $array['limit']) ? $array['limit']:25; // Example: the current page number
         $offset = ($currentPage - 1) * $itemsPerPage;
@@ -629,7 +629,7 @@ class AppsApiRepository extends EntityRepository
 
         $keyword = $data['keyword'] ?? '';
         $vendor =    $data['vendor_id'] ?? '';
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(AccountPurchase::class,'e');
         $qb->leftJoin('e.createdBy','u');
@@ -725,8 +725,8 @@ class AppsApiRepository extends EntityRepository
         where e.globalOption_id = :globalOption {$dateSql} {$keywordSql} {$toUser} {$categorySql} {$accountHeadSql} ORDER BY e.created DESC LIMIT  {$offset},{$itemsPerPage}";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('globalOption', $option->getId());
-        $qb->execute();
-        $result =  $qb->fetchAll();
+        $qb = $qb->executeQuery();
+        $result =  $qb->fetchAllAssociative();
         return $result;
 
     }
@@ -771,8 +771,8 @@ class AppsApiRepository extends EntityRepository
         GROUP BY ec.id";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('globalOption', $option->getId());
-        $qb->execute();
-        $result =  $qb->fetchAll();
+        $qb = $qb->executeQuery();
+        $result =  $qb->fetchAllAssociative();
         return $result;
 
     }
@@ -817,15 +817,15 @@ class AppsApiRepository extends EntityRepository
         GROUP BY ah.id";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('globalOption', $option->getId());
-        $qb->execute();
-        $result =  $qb->fetchAll();
+        $qb = $qb->executeQuery();
+        $result =  $qb->fetchAllAssociative();
         return $result;
 
     }
 
     public function apiInsertExpense(GlobalOption $option, $item = [])
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $amount = (isset($item['amount']) and $item['amount'])? trim($item['amount']):0;
         $method = (isset($item['method_id']) and $item['method_id'])? $item['method_id']:'';
         $category = (isset($item['category_id']) and $item['category_id'])? $item['category_id']:'';
@@ -867,7 +867,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiApproveExpense(GlobalOption $option, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $expenditure = $em->getRepository(Expenditure::class)->find($data['id']);
         $user = $em->getRepository(User::class)->find($data['user_id']);
         if (!empty($expenditure) and $expenditure->getProcess() != "approved" ) {
@@ -889,7 +889,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiDeleteExpense(GlobalOption $option,$id)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->createQuery("DELETE AccountingBundle:Expenditure e WHERE e.id = {$id}");
         if(!empty($entity)){
             $entity->execute();
@@ -904,7 +904,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiInventorySales(GlobalOption $option, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
         $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
@@ -993,7 +993,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiInventorySalesReturn(GlobalOption $option, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
         $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
@@ -1076,7 +1076,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiRestaurantSales(GlobalOption $option, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
         $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
@@ -1163,7 +1163,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiSalesInvoiceDetails(GlobalOption $option, $id)
     {
-        $em     = $this->_em;
+        $em     = $this->getEntityManager();
         /* @var $entity MedicineSales */
         $entity = $em->getRepository(MedicineSales::class)->findOneBy(['medicineConfig'=> $option->getMedicineConfig(),'id' => $id]);
         $data = [];
@@ -1242,7 +1242,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiSalesRestaurantDetails(GlobalOption $option, $id)
     {
-        $em     = $this->_em;
+        $em     = $this->getEntityManager();
         /* @var $entity MedicineSales */
         $entity = $em->getRepository(MedicineSales::class)->findOneBy(['medicineConfig'=> $option->getMedicineConfig(),'id' => $id]);
         $data = [];
@@ -1320,7 +1320,7 @@ class AppsApiRepository extends EntityRepository
     }
 
     public function approveSalesProcess(MedicineSales $purchase){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $purchase->setProcess('Approved');
         $purchase->setApprovedBy($purchase->getCreatedBy());
         if($purchase->getReceived() == 0){
@@ -1334,7 +1334,7 @@ class AppsApiRepository extends EntityRepository
     public function apiInsertSalesReceive(GlobalOption $option, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $customer = (isset($data['customer_id']) and $data['customer_id']) ? trim($data['customer_id']):'';
         $methodId = (isset($data['method_id']) and $data['method_id']) ? trim($data['method_id']):'';
         $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['user_id']):'';
@@ -1375,7 +1375,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiDeleteSales($id)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->createQuery("DELETE AccountingBundle:AccountSales e WHERE e.id = {$id}");
         if(!empty($entity)){
             $entity->execute();
@@ -1385,7 +1385,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiApproveAccountSales(GlobalOption $option, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(AccountSales::class)->find($data['id']);
         $user = $em->getRepository(User::class)->find($data['user_id']);
         if (!empty($entity) and $entity->getProcess() != "approved" ) {
@@ -1408,7 +1408,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiInventoryPurchase(GlobalOption $option, $data = [])
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $currentPage = (isset($data['page']) and $data['page']) ? $data['page']:1; // Example: the current page number
         $itemsPerPage = (isset($data['limit']) and $data['limit']) ? $data['limit']:25; // Example: the current page number
         $offset = ($currentPage - 1) * $itemsPerPage;
@@ -1485,7 +1485,7 @@ class AppsApiRepository extends EntityRepository
     public function apiInsertPurchasePayment(GlobalOption $option, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $vendor = (isset($data['vendor_id']) and $data['vendor_id']) ? trim($data['vendor_id']):'';
         $methodId = (isset($data['method_id']) and $data['method_id']) ? trim($data['method_id']):'';
         $userId = (isset($data['user_id']) and $data['user_id']) ? trim($data['user_id']):'';
@@ -1540,7 +1540,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiDeleteAccountPurchase($id)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->createQuery("DELETE AccountingBundle:AccountPurchase e WHERE e.id = {$id}");
         if(!empty($entity)){
             $entity->execute();
@@ -1551,7 +1551,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiApproveAccountPurchase(GlobalOption $option, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(AccountPurchase::class)->find($data['id']);
         $user = $em->getRepository(User::class)->find($data['user_id']);
         if (!empty($entity) and $entity->getProcess() != "approved" ) {
@@ -1574,7 +1574,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiPurchaseInvoiceDetails(GlobalOption $option, $id)
     {
-        $em     = $this->_em;
+        $em     = $this->getEntityManager();
         /* @var $entity MedicinePurchase */
 
         $entity = $em->getRepository(MedicinePurchase::class)->findOneBy(['medicineConfig'=> $option->getMedicineConfig()->getId(),'id' => $id]);
@@ -1639,7 +1639,7 @@ class AppsApiRepository extends EntityRepository
     }
 
     public function apiPurchaseInvoiceDelete(MedicinePurchase $purchase){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $remove = $em->createQuery("DELETE MedicineBundle:MedicinePurchase e WHERE e.id = {$purchase->getId()}");
         if(!empty($remove)){
             $remove->execute();
@@ -1651,7 +1651,7 @@ class AppsApiRepository extends EntityRepository
     public function apiSyncList(GlobalOption $entity){
 
         $config = $entity->getMedicineConfig()->getId();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(MedicineAndroidProcess::class,'e');
         $qb->leftJoin('e.androidDevice','a');
@@ -1677,7 +1677,7 @@ class AppsApiRepository extends EntityRepository
     }
 
     public function apiSyncProcess($processId){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(MedicineAndroidProcess::class)->find($processId);
         $option = $entity->getMedicineConfig()->getGlobalOption();
         if($entity->getMode() === "offline" and $entity->getProcess() == 'sales'){
@@ -1690,7 +1690,7 @@ class AppsApiRepository extends EntityRepository
 
     public function insertFlutterOrderProcess(GlobalOption $option,$device,$data)
     {
-        $em =  $this->_em;
+        $em =  $this->getEntityManager();
         $process = (isset($data['process']) and $data['process']) ? $data['process'] : '';
         $mode = (isset($data['mode']) and $data['mode']) ? $data['mode'] : 'offline';
         $content = (isset($data['content']) and $data['content']) ? $data['content'] : '';
@@ -1729,7 +1729,7 @@ class AppsApiRepository extends EntityRepository
 
     public function insertApiSales(GlobalOption $option,MedicineAndroidProcess $process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $items = json_decode($process->getJsonItem(),true);
         $numItems = count($items);
         if($numItems > 0 ){
@@ -1831,7 +1831,7 @@ class AppsApiRepository extends EntityRepository
 
     public function insertSalesItem(MedicineSales $purchase,$data){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $records = json_decode($data);
         $totalPurchasePrice = 0;
         foreach ($records as $key => $sub):
@@ -1874,7 +1874,7 @@ class AppsApiRepository extends EntityRepository
 
      public function insertApiSalesReturn(GlobalOption $option,MedicineAndroidProcess $process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $items = json_decode($process->getJsonItem(),true);
 
         $numItems = count($items);
@@ -1922,7 +1922,7 @@ class AppsApiRepository extends EntityRepository
 
     public function insertSalesReturnItem(MedicineSalesReturnInvoice $purchase,$data){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $records = json_decode($data);
         foreach ($records as $key => $sub):
             if($sub) {
@@ -1954,7 +1954,7 @@ class AppsApiRepository extends EntityRepository
 
     public function insertApiPurchase(GlobalOption $option,MedicineAndroidProcess $process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $items = json_decode($process->getJsonItem(),true);
         $numItems = count($items);
         if($numItems > 0 ){
@@ -2028,7 +2028,7 @@ class AppsApiRepository extends EntityRepository
 
     public function insertPurchaseItem(MedicinePurchase $purchase,$data){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $records = json_decode($data);
 
         foreach ($records as $key => $sub):
@@ -2064,7 +2064,7 @@ class AppsApiRepository extends EntityRepository
     }
 
     public function approveProcess(MedicinePurchase $purchase){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $purchase->setProcess('Approved');
         $purchase->setApprovedBy($purchase->getCreatedBy());
         if($purchase->getPayment() == 0){
@@ -2089,7 +2089,7 @@ class AppsApiRepository extends EntityRepository
     public function apiInsertStock(GlobalOption $option,$data)
     {
         $config = $option->getMedicineConfig();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $find = $em->getRepository(MedicineStock::class)->findOneBy(['medicineConfig'=>$config,'name' => $data['name']]);
         if(empty($find)){
             $entity = new MedicineStock();
@@ -2137,7 +2137,7 @@ class AppsApiRepository extends EntityRepository
     public function apiUpdateStock($option,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(MedicineStock::class)->find($data['id']);
 
         /* @var $entity MedicineStock */
@@ -2197,7 +2197,7 @@ class AppsApiRepository extends EntityRepository
 
     public function getStockEdit(GlobalOption $option,$id)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(MedicineStock::class)->find($id);
         $data = [];
         if($entity){
@@ -2230,7 +2230,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiInsertLogs($option,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new AppsApi();
         $entity->setGlobalOption($option);
         $entity->setContent($data['content']);
@@ -2246,7 +2246,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiVendorMedicineOutstanding($globalOption,$vendorId)
     {
-        $qb = $this->_em;
+        $qb = $this->getEntityManager();
         $qb = $qb->createQueryBuilder();
         $qb = $qb->from(AccountPurchase::class,'e');
         $qb->select('vendor.id as vendor_id ,vendor.companyName as name ,vendor.mobile as mobile,vendor.email as email,vendor.address as address,(COALESCE(SUM(e.purchaseAmount),0) - COALESCE(SUM(e.payment),0)) as balance ','COALESCE(SUM(e.purchaseAmount),0)  as debit ','COALESCE(SUM(e.payment),0) as credit ');
@@ -2270,7 +2270,7 @@ class AppsApiRepository extends EntityRepository
 
     public function apiCustomerMedicineOutstanding($globalOption,$customer)
     {
-        $qb = $this->_em;
+        $qb = $this->getEntityManager();
         $qb = $qb->createQueryBuilder();
         $qb = $qb->from(AccountSales::class,'e');
         $qb->select('customer.id as customer_id ,customer.name as name ,customer.mobile as mobile,customer.email as email,customer.address as address,(COALESCE(SUM(e.totalAmount),0) - COALESCE(SUM(e.amount),0)) as balance ','COALESCE(SUM(e.totalAmount),0)  as debit ','COALESCE(SUM(e.amount),0) as credit');

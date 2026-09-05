@@ -17,7 +17,7 @@ class MedicineImportRepository extends EntityRepository
     public function fileUpload(MedicineImport $entity,$data = '')
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(isset($file['file'])){
             $img = $file['file'];
             $fileName = $img->getClientOriginalName();

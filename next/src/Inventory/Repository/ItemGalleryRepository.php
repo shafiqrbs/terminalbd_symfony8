@@ -16,7 +16,7 @@ class ItemGalleryRepository extends EntityRepository
     public function insertProductGallery($reEntity,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i=0;
 
         foreach ($data as $key => $value) {
@@ -40,7 +40,7 @@ class ItemGalleryRepository extends EntityRepository
 
     public function removeImage($posts)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($posts as $post ){
             $entity = $em->getRepository(\App\Inventory\Entity\ItemGallery::class)->find($post);
             $entity->removeUpload($entity->getPurchaseVendorItem()->getInventoryConfig()->getGlobalOption()->getId(),$entity->getPurchaseVendorItem()->getId());

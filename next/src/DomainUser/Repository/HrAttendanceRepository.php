@@ -13,7 +13,7 @@ class HrAttendanceRepository extends EntityRepository
 {
     public function findByMonth($globalOption,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('ha');
         $qb->select('ha.month');
         $qb->select('ha.year');

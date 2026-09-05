@@ -66,7 +66,7 @@ class DesignationRepository extends MaterializedPathRepository
     public function getDesignationOptions(){
 
         $ret = [];
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $designations = $em->getRepository('ProductProductBundle:Designation')->findBy([],['name'=>'asc']);
 
         foreach( $designations as $cat ){

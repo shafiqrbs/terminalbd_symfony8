@@ -74,7 +74,7 @@ class BusinessStoreLedgerRepository extends EntityRepository
 
     public function approveStorePayment(BusinessStoreLedger $ledger,$user)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $ledger->setApprovedBy($user);
         $ledger->setStatus(1);
         $em->flush();
@@ -87,7 +87,7 @@ class BusinessStoreLedgerRepository extends EntityRepository
 
     public function storeInvoiceReverse(BusinessInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $ledger BusinessStoreLedger */
         foreach ($entity->getStoreLedgers() as $ledger):
             $ledger->setApprovedBy(NULL);

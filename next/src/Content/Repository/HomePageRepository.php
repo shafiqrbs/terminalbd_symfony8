@@ -16,7 +16,7 @@ class HomePageRepository extends EntityRepository
 
     public function globalOptionHome($user)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $reEntity = $em->getRepository(\App\Content\Entity\HomePage::class)->findOneBy(['user'=>$user]);
         if(empty($reEntity) && $user){

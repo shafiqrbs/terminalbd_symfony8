@@ -130,7 +130,7 @@ class DeliveryRepository extends EntityRepository
 
     public function updateDeliveryTotal(Delivery $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
         ->from(\App\Inventory\Entity\DeliveryItem::class,'e')
         ->select('sum(e.subTotal) as total , sum(e.quantity) as totalQuantity, count(e.id) as totalItem')
@@ -204,7 +204,7 @@ class DeliveryRepository extends EntityRepository
 
     public  function getReturnOverview($inventory, $branch , $data=''){
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\DeliveryReturn::class,'stock');
         $qb->select('SUM(stock.quantity) AS quantity');
         $qb->where("stock.inventoryConfig = :inventory");
@@ -219,7 +219,7 @@ class DeliveryRepository extends EntityRepository
 
     public  function getSalesOngoingOverview($inventory, $branch , $data=''){
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'stock');
         $qb->join('stock.sales','e');
         $qb->select('SUM(stock.quantity) AS quantity');
@@ -237,7 +237,7 @@ class DeliveryRepository extends EntityRepository
 
     public  function getSalesOverview($inventory, $branch , $data=''){
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'stock');
         $qb->join('stock.sales','e');
         $qb->select('SUM(stock.quantity) AS quantity');
@@ -254,7 +254,7 @@ class DeliveryRepository extends EntityRepository
 
     public  function getSalesReturnOverview($inventory, $branch , $data=''){
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesReturnItem::class,'e');
         $qb->join('e.salesReturn','salesreturn');
         $qb->join('e.salesItem','stock');
@@ -300,7 +300,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\DeliveryItem::class, 'stock');
         $qb->join('stock.delivery', 'delivery');
         $qb->join('stock.item', 'item');
@@ -334,7 +334,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'stock');
         $qb->join('stock.sales','sales');
         $qb->join('stock.item','item');
@@ -358,7 +358,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesReturnItem::class,'sales_return_item');
         $qb->join('sales_return_item.salesReturn','sales_return');
         $qb->join('sales_return_item.salesItem','stock');
@@ -383,7 +383,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'stock');
         $qb->join('stock.sales','sales');
         $qb->join('stock.item','item');
@@ -407,7 +407,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\DeliveryReturn::class,'stock');
         $qb->join('stock.item','item');
         $qb->select('item.id as itemId');
@@ -428,7 +428,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
 
         $qb->from(\App\Inventory\Entity\DeliveryItem::class, 'stock');
         $qb->join('stock.delivery', 'delivery');
@@ -463,7 +463,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'salesItem');
         $qb->join('salesItem.sales','sales');
         $qb->join('salesItem.purchaseItem','purchaseItem');
@@ -493,7 +493,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesReturnItem::class,'sales_return_item');
         $qb->join('sales_return_item.salesReturn','sales_return');
         $qb->join('sales_return_item.salesItem','salesItem');
@@ -523,7 +523,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'salesItem');
         $qb->join('salesItem.sales','sales');
         $qb->join('salesItem.purchaseItem','purchaseItem');
@@ -552,7 +552,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\DeliveryReturn::class,'e');
         $qb->join('e.purchaseItem','purchaseItem');
         $qb->select('purchaseItem.id as purchaseItemId');
@@ -617,7 +617,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
 
         $qb->from(\App\Inventory\Entity\DeliveryItem::class, 'stock');
         $qb->join('stock.delivery', 'delivery');
@@ -643,7 +643,7 @@ class DeliveryRepository extends EntityRepository
 
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\PurchaseItem::class, 'pi');
         $qb->join('pi.item', 'item');
         $qb->select('pi');
@@ -664,7 +664,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'salesItem');
         $qb->join('salesItem.sales','sales');
         $qb->join('salesItem.purchaseItem','purchaseItem');
@@ -703,7 +703,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesReturnItem::class,'sales_return_item');
         $qb->join('sales_return_item.salesReturn','sales_return');
         $qb->join('sales_return_item.salesItem','salesItem');
@@ -737,7 +737,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
 
         $qb->from(\App\Inventory\Entity\DeliveryItem::class, 'stock');
         $qb->join('stock.delivery', 'delivery');
@@ -765,7 +765,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'salesItem');
         $qb->join('salesItem.sales','sales');
         $qb->join('salesItem.purchaseItem','purchaseItem');
@@ -795,7 +795,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesReturnItem::class,'sales_return_item');
         $qb->join('sales_return_item.salesReturn','sales_return');
         $qb->join('sales_return_item.salesItem','salesItem');
@@ -826,7 +826,7 @@ class DeliveryRepository extends EntityRepository
         $inventory = $user->getGlobalOption()->getInventoryConfig();
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\DeliveryReturn::class,'e');
         $qb->join('e.purchaseItem','purchaseItem');
         $qb->select('purchaseItem.id as purchaseItemId');
@@ -871,7 +871,7 @@ class DeliveryRepository extends EntityRepository
 
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
 
         $qb->from(\App\Inventory\Entity\DeliveryItem::class, 'stock');
         $qb->join('stock.delivery', 'delivery');
@@ -899,7 +899,7 @@ class DeliveryRepository extends EntityRepository
 
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'salesItem');
         $qb->join('salesItem.sales','sales');
         $qb->join('sales.branches','branch');
@@ -927,7 +927,7 @@ class DeliveryRepository extends EntityRepository
 
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesReturnItem::class,'sales_return_item');
         $qb->join('sales_return_item.salesReturn','sales_return');
         $qb->join('sales_return.branches','branch');
@@ -955,7 +955,7 @@ class DeliveryRepository extends EntityRepository
 
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'salesItem');
         $qb->join('salesItem.sales','sales');
         $qb->join('sales.branches','branch');
@@ -979,7 +979,7 @@ class DeliveryRepository extends EntityRepository
     {
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\SalesItem::class,'salesItem');
         $qb->join('salesItem.sales','sales');
         $qb->join('sales.branches','branch');
@@ -1006,7 +1006,7 @@ class DeliveryRepository extends EntityRepository
     {
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\DeliveryReturn::class,'e');
         $qb->join('e.branch','branch');
         $qb->select('branch.id AS branchId');

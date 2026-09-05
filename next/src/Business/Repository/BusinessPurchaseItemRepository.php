@@ -128,24 +128,24 @@ class BusinessPurchaseItemRepository extends EntityRepository
 	public function getPurchaseAveragePrice(BusinessParticular $particular)
     {
 
-       /* $qb = $this->_em->createQueryBuilder();
+       /* $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Business\Entity\BusinessPurchaseItem::class,'e');
         $qb->select('AVG(e.purchasePrice) AS avgPurchasePrice');
         $qb->where('e.businessParticular = :particular')->setParameter('particular', $particular) ;
         $res = $qb->getQuery()->getOneOrNullResult();
         if(!empty($res)){
             $particular->setPurchaseAverage($res['avgPurchasePrice']);
-            $this->_em->persist($particular);
-            $this->_em->flush($particular);
+            $this->getEntityManager()->persist($particular);
+            $this->getEntityManager()->flush($particular);
         }*/
     }
 
     public function insertPurchaseItems($invoice, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var $particular BusinessParticular */
-        $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
+        $particular = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
         $entity = new BusinessPurchaseItem();
         $entity->setBusinessPurchase($invoice);
         $entity->setBusinessParticular($particular);
@@ -154,7 +154,7 @@ class BusinessPurchaseItemRepository extends EntityRepository
         }
         $wearhouseId = (isset($data['wearhouse']) and !empty($data['wearhouse']))? $data['wearhouse']:'';
         if($wearhouseId){
-            $wearhouse = $this->_em->getRepository(\App\Business\Entity\WearHouse::class)->find($wearhouseId);
+            $wearhouse = $this->getEntityManager()->getRepository(\App\Business\Entity\WearHouse::class)->find($wearhouseId);
             if($wearhouse){
                 $entity->setWearhouse($wearhouse);
             }
@@ -179,8 +179,8 @@ class BusinessPurchaseItemRepository extends EntityRepository
     public function insertPurchaseDistributionItems($invoice, $data)
     {
         /* @var $particular BusinessParticular */
-        $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
-        $em = $this->_em;
+        $particular = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
 
         $entity = new BusinessPurchaseItem();
         $entity->setBusinessPurchase($invoice);
@@ -207,8 +207,8 @@ class BusinessPurchaseItemRepository extends EntityRepository
 
     public function insertSawmillPurchaseItems($invoice, $data)
     {
-	    $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
-	    $em = $this->_em;
+	    $particular = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
+	    $em = $this->getEntityManager();
 	    $entity = new BusinessPurchaseItem();
 	    $quantity = 0;
 	    $purchasePrice = 0;
@@ -235,8 +235,8 @@ class BusinessPurchaseItemRepository extends EntityRepository
     public function insertSignPurchaseItems($invoice, $data)
     {
         /* @var $particular BusinessParticular */
-        $particular = $this->_em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
-        $em = $this->_em;
+        $particular = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
         $entity = new BusinessPurchaseItem();
         $quantity = 0;
         $purchasePrice = 0;
@@ -336,7 +336,7 @@ class BusinessPurchaseItemRepository extends EntityRepository
 
         foreach ($purchase->getBusinessPurchaseItems() as $item){
 
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $percentage = $purchase->getDiscountCalculation();
             $purchasePrice = $this->stockPurchaseItemPrice($percentage,$item->getActualPurchasePrice());
             $item->setPurchasePrice($purchasePrice);

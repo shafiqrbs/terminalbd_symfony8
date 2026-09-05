@@ -70,7 +70,7 @@ class BusinessInvoiceReturnRepository extends EntityRepository
 
     public function checkInvoiceReturnCreate(BusinessInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $this->findOneBy(['businessConfig'=>$invoice->getBusinessConfig(),'businessInvoice' => $invoice]);
         if(empty($exist)){
             $entity = new BusinessInvoiceReturn();

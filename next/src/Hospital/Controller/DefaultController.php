@@ -2,6 +2,8 @@
 
 namespace App\Hospital\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
+
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,6 +17,7 @@ class DefaultController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly ManagerRegistry $doctrine,
     ) {
     }
 
@@ -25,8 +28,7 @@ class DefaultController extends AbstractController
         /* @var GlobalOption $globalOption */
 
         $globalOption = $this->getUser()->getGlobalOption();
-        // TODO(migration): AbstractController::getDoctrine() was removed; inject ManagerRegistry.
-        $em = $this->getDoctrine();
+        $em = $this->doctrine;
         $data = $_REQUEST;
         $datetime = new DateTime("now");
         $data['startDate'] = $datetime->format('Y-m-d');

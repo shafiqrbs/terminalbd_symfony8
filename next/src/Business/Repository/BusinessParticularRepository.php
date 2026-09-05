@@ -54,13 +54,13 @@ class BusinessParticularRepository extends EntityRepository
 
     public function updateSalesPrice(BusinessParticular $particular)
     {
-	    $price = $this->_em->getRepository(\App\Business\Entity\BusinessProductionElement::class)->getProductPurchaseSalesPrice($particular);
+	    $price = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessProductionElement::class)->getProductPurchaseSalesPrice($particular);
 	    $salesPrice =  empty($price['salesPrice']) ? 0 : $price['salesPrice'];
 	    $purchasePrice = empty($price['purchasePrice']) ? 0 : $price['purchasePrice'];
 	    $particular->setSalesPrice($salesPrice);
     	$particular->setPurchasePrice($purchasePrice);
     	$particular->setProductionSalesPrice($salesPrice);
-	    $this->_em->flush();
+	    $this->getEntityManager()->flush();
 	    return $particular;
     }
 
@@ -160,7 +160,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function getPurchaseDetails(BusinessConfig $config,BusinessParticular $stock){
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Business\Entity\BusinessPurchaseItem::class,'e');
         $qb->join('e.businessPurchase','mp');
         $qb->select('e');
@@ -175,7 +175,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function getPurchaseReturnDetails(BusinessConfig $config,BusinessParticular $stock){
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Business\Entity\BusinessPurchaseReturnItem::class,'e');
         $qb->join('e.businessPurchaseReturn','mp');
         $qb->select('e');
@@ -190,7 +190,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function getSalesDetails(BusinessConfig $config,BusinessParticular $stock){
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Business\Entity\BusinessInvoiceParticular::class,'e');
         $qb->join('e.businessInvoice','mp');
         $qb->select('e');
@@ -205,7 +205,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function getSalesReturnDetails(BusinessConfig $config,BusinessParticular $stock){
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Business\Entity\BusinessInvoiceReturn::class,'e');
         $qb->select('e');
         $qb->where('e.businessParticular = :item')->setParameter('item',$stock->getId());
@@ -218,7 +218,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function getDamageDetails(BusinessConfig $config,BusinessParticular $stock){
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Business\Entity\BusinessDamage::class,'e');
         $qb->select('e');
         $qb->where('e.businessParticular = :item')->setParameter('item',$stock->getId());
@@ -403,7 +403,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function getPurchaseUpdateQntx(BusinessPurchase $purchase){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var BusinessPurchaseItem $purchaseItem */
 
@@ -423,7 +423,7 @@ class BusinessParticularRepository extends EntityRepository
     public function getPurchaseUpdateQnt(BusinessPurchase $purchase){
 
         /** @var  $purchaseItem BusinessPurchaseItem */
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(!empty($purchase->getBusinessPurchaseItems())) {
             foreach ($purchase->getBusinessPurchaseItems() as $purchaseItem) {
                 $stockItem = $purchaseItem->getBusinessParticular();
@@ -461,14 +461,14 @@ class BusinessParticularRepository extends EntityRepository
 
     public function updateRemoveStockQuantity(BusinessParticular $stock,$fieldName=''){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($fieldName == 'sales'){
             $qnt = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->salesStockItemUpdate($stock);
             $stock->setSalesQuantity($qnt);
             $bonusQnt = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->bonusStockItemUpdate($stock);
             $stock->setBonusSalesQuantity($bonusQnt);
         }elseif($fieldName == 'sales-return'){
-            $quantity = $this->_em->getRepository(\App\Business\Entity\BusinessInvoiceReturn::class)->salesReturnStockUpdate($stock);
+            $quantity = $this->getEntityManager()->getRepository(\App\Business\Entity\BusinessInvoiceReturn::class)->salesReturnStockUpdate($stock);
             $stock->setSalesReturnQuantity($quantity);
         }elseif($fieldName == 'purchase-return'){
             $qnt = $em->getRepository(\App\Business\Entity\BusinessPurchaseReturnItem::class)->purchaseReturnStockUpdate($stock);
@@ -497,7 +497,7 @@ class BusinessParticularRepository extends EntityRepository
               group by pi.businessParticular_id) as pa on stock.id = pa.businessParticular_id
   SET stock.purchaseQuantity = pa.purchaseQuantity";
         $qb4 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchase);
-        $qb4->execute();
+        $qb4 = $qb4->executeQuery();
 
 
          $sqlStockReturn = "UPDATE business_particular as stock
@@ -508,7 +508,7 @@ class BusinessParticularRepository extends EntityRepository
               group by pi.businessParticular_id) as pa on stock.id = pa.businessParticular_id
   SET stock.salesReturnQuantity = pa.purchaseQuantity";
         $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockReturn);
-        $qb5->execute();
+        $qb5 = $qb5->executeQuery();
 
 
         $sqlStockPurchaseReturn = "UPDATE business_particular as stock
@@ -519,7 +519,7 @@ class BusinessParticularRepository extends EntityRepository
               group by pi.businessParticular_id) as pa on stock.id = pa.businessParticular_id
   SET stock.purchaseReturnQuantity = pa.purchaseQuantity";
         $qb6 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchaseReturn);
-        $qb6->execute();
+        $qb6 = $qb6->executeQuery();
 
 
         $sqlStockPurchaseReturn = "UPDATE business_particular as stock
@@ -530,7 +530,7 @@ class BusinessParticularRepository extends EntityRepository
               group by pi.item_id) as pa on stock.id = pa.item_id
   SET stock.adjustmentQuantity = pa.purchaseQuantity";
         $qb7 = $this->getEntityManager()->getConnection()->prepare($sqlStockPurchaseReturn);
-        $qb7->execute();
+        $qb7 = $qb7->executeQuery();
 
 
         $sqlStockDamage = "UPDATE business_particular as stock
@@ -541,7 +541,7 @@ class BusinessParticularRepository extends EntityRepository
               group by pi.businessParticular_id) as pa on stock.id = pa.businessParticular_id
   SET stock.damageQuantity = pa.purchaseQuantity";
         $qb8 = $this->getEntityManager()->getConnection()->prepare($sqlStockDamage);
-        $qb8->execute();
+        $qb8 = $qb8->executeQuery();
 
 
         $sqlStockRemin = "UPDATE business_particular as stock
@@ -555,14 +555,14 @@ class BusinessParticularRepository extends EntityRepository
   SET stock.remainingQuantity = ((COALESCE(stock.openingQuantity,0) + COALESCE(stock.purchaseQuantity,0) + COALESCE(stock.salesReturnQuantity,0)+ COALESCE(stock.bonusQuantity,0)+ COALESCE(stock.bonusAdjustment,0)+ COALESCE(stock.adjustmentQuantity,0)) - (COALESCE(pa.salesQuantity,0) + COALESCE(stock.purchaseReturnQuantity,0) + COALESCE(stock.damageQuantity,0)))
  , stock.salesQuantity = pa.salesQuantity";
         $qb5 = $this->getEntityManager()->getConnection()->prepare($sqlStockRemin);
-        $qb5->execute();
+        $qb5 = $qb5->executeQuery();
 
 
     }
 
 	public function updateRemoveProductionQuantity(BusinessInvoiceParticular $invoice_particular,$fieldName=''){
 
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 
 		/* @var $entity BusinessProductionElement */
 
@@ -587,7 +587,7 @@ class BusinessParticularRepository extends EntityRepository
 	}
 
     public function stockAdjustment(BusinessParticular $stock){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $adjustment = $em->getRepository(\App\Business\Entity\ItemStockAdjustment::class)->adjustmentStockItemUpdate($stock);
         $stock->setAdjustmentQuantity($adjustment['quantity']);
         $stock->setBonusAdjustment($adjustment['bonus']);
@@ -601,7 +601,7 @@ class BusinessParticularRepository extends EntityRepository
 
         $quantity = $returnQuantity['quantity'];
         $bonus = $returnQuantity['bonus'];
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $particular->setSalesReturnQuantity($quantity);
         $particular->setReturnBonusQuantity($bonus);
         $em->persist($particular);
@@ -612,7 +612,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function remainingQnt(BusinessParticular $stock)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
        // $em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->getCurrentStock($stock);
         $qnt = ($stock->getOpeningQuantity() + $stock->getPurchaseQuantity() + $stock->getSalesReturnQuantity() + $stock->getTransferQuantity() + $stock->getAdjustmentQuantity()) - ($stock->getPurchaseReturnQuantity() + $stock->getSalesQuantity() + $stock->getDamageQuantity());
         if($stock->getBusinessConfig()->isBonusFromStock() == 1){
@@ -629,7 +629,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function insertInvoiceProductItem(BusinessInvoice $invoice){
 
-	    $em = $this->_em;
+	    $em = $this->getEntityManager();
         if(!empty($invoice->getBusinessInvoiceParticulars())) {
 
             /* @var  $item BusinessInvoiceParticular */
@@ -672,8 +672,8 @@ class BusinessParticularRepository extends EntityRepository
 	               }else{
 		               $entity->setQuantity($element->getQuantity() * $item->getQuantity());
 	               }
-                   $this->_em->persist($entity);
-                   $this->_em->flush();
+                   $this->getEntityManager()->persist($entity);
+                   $this->getEntityManager()->flush();
                    $this->salesProductionQnt($element);
                }
            }
@@ -682,7 +682,7 @@ class BusinessParticularRepository extends EntityRepository
 
 	public function salesProductionQnt( BusinessProductionElement  $element){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $particular = $element->getParticular();
 		$productionQnt = $this->getSumTotalProductionItemQuantity($particular);
 		$invoiceQnt = $this->getSumTotalInvoiceItemQuantity($particular);
@@ -695,7 +695,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function getSumTotalProductionItemQuantity(BusinessParticular $particular){
 
-	    $qb = $this->_em->createQueryBuilder();
+	    $qb = $this->getEntityManager()->createQueryBuilder();
 	    $qb->from(\App\Business\Entity\BusinessProductionExpense::class,'e');
 	    $qb->select('COALESCE(SUM(e.quantity),0) AS quantity');
 	    $qb->where('e.productionElement = :particular')->setParameter('particular', $particular->getId());
@@ -707,7 +707,7 @@ class BusinessParticularRepository extends EntityRepository
 
 	public function getSumTotalInvoiceItemQuantity($particular){
 
-		$qb = $this->_em->createQueryBuilder();
+		$qb = $this->getEntityManager()->createQueryBuilder();
 		$qb->from(\App\Business\Entity\BusinessInvoiceParticular::class,'e');
         $qb->join('e.businessInvoice','i');
 		$qb->select('COALESCE(SUM(e.totalQuantity),0) AS quantity');
@@ -720,7 +720,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function getSumTotalInvoiceItemBonusQuantity($particular){
 
-		$qb = $this->_em->createQueryBuilder();
+		$qb = $this->getEntityManager()->createQueryBuilder();
 		$qb->from(\App\Business\Entity\BusinessInvoiceParticular::class,'e');
         $qb->join('e.businessInvoice','i');
 		$qb->select(' COALESCE(SUM(e.bonusQnt),0) AS quantity');
@@ -735,7 +735,7 @@ class BusinessParticularRepository extends EntityRepository
 
 	public function getSalesUpdateQnt(BusinessInvoiceParticular  $item){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $particular = $item->getBusinessParticular();
 		$productionQnt = $this->getSumTotalProductionItemQuantity($particular);
 		$invoiceQnt = $this->getSumTotalInvoiceItemQuantity($particular);
@@ -748,7 +748,7 @@ class BusinessParticularRepository extends EntityRepository
 
     public function getSalesUpdateBonusQnt(BusinessInvoiceParticular  $item){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $particular = $item->getBusinessParticular();
         $invoiceQnt = $this->getSumTotalInvoiceItemBonusQuantity($particular);
         $particular->setBonusSalesQuantity($invoiceQnt);
@@ -835,6 +835,6 @@ class BusinessParticularRepository extends EntityRepository
     {
         $stockUpdate = "UPDATE business_particular SET openingApprove = 1 WHERE  businessConfig_id = {$config} && openingQuantity IS NOT NULL";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($stockUpdate);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
     }
 }

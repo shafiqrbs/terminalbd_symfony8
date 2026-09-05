@@ -113,7 +113,7 @@ class ExpenditureRepository extends EntityRepository
     {
         $globalOption = $user->getGlobalOption();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\Expenditure::class,'e');
         $qb->select('sum(e.amount) as amount');
         $qb->where('e.process = :process');
@@ -161,7 +161,7 @@ class ExpenditureRepository extends EntityRepository
     public function androidDeviceExpenditureOverview(GlobalOption $option, $data)
     {
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\Expenditure::class,'e');
         $qb->select('sum(e.amount) as amount');
         $qb->where('e.process = :process');
@@ -209,7 +209,7 @@ class ExpenditureRepository extends EntityRepository
     public function lastInsertExpenditure(Expenditure $entity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->findOneBy(
             ['globalOption' => $entity->getGlobalOption(),'expenseCategory' => $entity->getExpenseCategory(),'process'=>'approved'],
             ['id' => 'DESC']
@@ -223,10 +223,10 @@ class ExpenditureRepository extends EntityRepository
 
     public function insertCommissionPayment(DoctorInvoice $doctorInvoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new Expenditure();
         $global = $doctorInvoice->getHospitalConfig()->getGlobalOption();
-        $head = $this->_em->getRepository(\App\Accounting\Entity\AccountHead::class)->find(52);
+        $head = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountHead::class)->find(52);
         $entity->setGlobalOption($global);
         $entity->setDoctorInvoice($doctorInvoice);
         $entity->setAmount($doctorInvoice->getPayment());
@@ -296,8 +296,8 @@ class ExpenditureRepository extends EntityRepository
         $stmt->bindValue('process', 'Approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;
@@ -321,8 +321,8 @@ class ExpenditureRepository extends EntityRepository
         $stmt->bindValue('option', $config);
         $stmt->bindValue('process', 'Approved');
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['month']] = $result;
@@ -332,7 +332,7 @@ class ExpenditureRepository extends EntityRepository
 
     public function accountReverse(Expenditure $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $transaction = $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.globalOption = ".$entity->getGlobalOption()->getId() ." AND e.accountRefNo =".$entity->getAccountRefNo()." AND e.processHead = 'Expenditure'");
         if($transaction){
             $transaction->execute();
@@ -345,7 +345,7 @@ class ExpenditureRepository extends EntityRepository
 
     public function insertApiExpenditure(GlobalOption $option , $data){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $expense = new Expenditure();
         $expense->setGlobalOption($option);
         $expense->setAmount($data['amount']);
@@ -382,7 +382,7 @@ class ExpenditureRepository extends EntityRepository
 
     public function removeDoctorExpenditure(DoctorInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $transaction = $em->createQuery("DELETE AccountingBundle:Expenditure e WHERE  e.doctorInvoice ={$entity->getId()}");
         if($transaction){
             $transaction->execute();
@@ -412,7 +412,7 @@ class ExpenditureRepository extends EntityRepository
 
     public function insertApiExpense(GlobalOption $option, ExpenseAndroidProcess $process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $items = json_decode($process->getJsonItem(),true);
 

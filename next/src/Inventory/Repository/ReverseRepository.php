@@ -27,8 +27,8 @@ class ReverseRepository extends EntityRepository
         $reverse->setProcess('Sales');
         $reverse->setContent($data);
         $reverse->setSales($entity);
-        $this->_em->persist($reverse);
-        $this->_em->flush($reverse);
+        $this->getEntityManager()->persist($reverse);
+        $this->getEntityManager()->flush($reverse);
 
     }
 
@@ -44,8 +44,8 @@ class ReverseRepository extends EntityRepository
         $reverse->setProcess('Purchase');
         $reverse->setContent($data);
         $reverse->setPurchase($entity);
-        $this->_em->persist($reverse);
-        $this->_em->flush($reverse);
+        $this->getEntityManager()->persist($reverse);
+        $this->getEntityManager()->flush($reverse);
 
     }
 

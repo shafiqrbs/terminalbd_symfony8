@@ -2,6 +2,8 @@
 
 namespace App\Tool\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +16,7 @@ class ApplicationPricingController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly ManagerRegistry $doctrine,
     ) {
     }
 
@@ -24,8 +27,7 @@ class ApplicationPricingController extends AbstractController
      */
     public function indexAction()
     {
-        // TODO(migration): AbstractController::getDoctrine() was removed; inject ManagerRegistry.
-        $em = $this->getDoctrine();
+        $em = $this->doctrine;
 
         $apps = $em->getRepository(\App\Tool\Entity\AppModule::class)->findBy(['status'=>1],['name'=>'ASC']);
         $syndicates = $em->getRepository(\App\Tool\Entity\SyndicateModule::class)->findBy(['status'=>1],['name'=>'ASC']);

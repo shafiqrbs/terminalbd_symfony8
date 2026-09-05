@@ -16,17 +16,17 @@ class ItemMeatAttributeRepository extends EntityRepository
     public function insertProductAttribute($reEntity,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i=0;
 
         if(isset($data['attributeId'])){
             foreach ($data['attributeId'] as $value) {
 
-                $metaAttribute = $this->_em->getRepository(\App\Inventory\Entity\ItemMetaAttribute::class)->findOneBy(['purchaseVendorItem'=>$reEntity,'itemAttribute'=>$value]);
+                $metaAttribute = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemMetaAttribute::class)->findOneBy(['purchaseVendorItem'=>$reEntity,'itemAttribute'=>$value]);
                 if(!empty($metaAttribute)){
                     $this->updateMetaAttribute($metaAttribute,$data['value'][$i]);
                 }else{
-                    $itemAttribute= $this->_em->getRepository(\App\Inventory\Entity\ItemAttribute::class)->find($value);
+                    $itemAttribute= $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemAttribute::class)->find($value);
                     $entity = new ItemMetaAttribute();
                     $entity->setValue($data['value'][$i]);
                     $entity->setItemAttribute($itemAttribute);
@@ -43,14 +43,14 @@ class ItemMeatAttributeRepository extends EntityRepository
 
     public function updateMetaAttribute($metaAttribute,$value)
     {
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $metaAttribute->setValue($value);
             $em->flush();
     }
 
     public function insertCopyProductAttribute(PurchaseVendorItem $purchaseVendorItem , PurchaseVendorItem $item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i=0;
 
         if(!empty($item->getItemMetaAttributes())){

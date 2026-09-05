@@ -52,7 +52,7 @@ class BusinessStockHistoryRepository extends EntityRepository
     }
 
     public function getItemOpeningQuantity(BusinessParticular $item){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('(COALESCE(SUM(e.quantity),0) AS openingQuantity');
         $qb->where("e.item = :item")->setParameter('item', $item->getId());
@@ -62,7 +62,7 @@ class BusinessStockHistoryRepository extends EntityRepository
     }
 
     public function OpeningInsertQuantity(BusinessParticular $item){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $this->findOneBy(['process'=>'opening','businessConfig'=>$item->getBusinessConfig(),'item'=>$item]);
         if(empty($exist)){
             $entity = new BusinessStockHistory();
@@ -90,7 +90,7 @@ class BusinessStockHistoryRepository extends EntityRepository
     }
 
     public function updateItemClosingQuantity(BusinessStockHistory $stock){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $closingQnt = ($stock->getOpeningQuantity() + $stock->getQuantity());
         $stock->setClosingQuantity($closingQnt);
         $em->persist($stock);
@@ -100,7 +100,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
     public function processStockQuantity($item , $fieldName = ''){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $openingQnt = 0;
         $openingQnt = $this->getItemOpeningQuantity($item->getBusinessParticular());
 
@@ -220,7 +220,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
     public function stockTransfer(ProductTransfer $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $em->createQuery("DELETE BusinessBundle:BusinessStockHistory e WHERE e.itemTransfer = '{$entity->getId()}'")->execute();
         $this->processStockQuantity($entity,"from-transfer");
         $this->processStockQuantity($entity,"to-transfer");
@@ -228,7 +228,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
     public function processInsertPurchaseItem(BusinessPurchase $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item BusinessPurchaseItem  */
 
@@ -243,7 +243,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
     public function processReversePurchaseItem(BusinessPurchase $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item BusinessPurchaseItem  */
 
@@ -260,7 +260,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
     public function processInsertPurchaseReturnItem(BusinessPurchaseReturn $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item BusinessPurchaseReturnItem  */
 
@@ -277,7 +277,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
     public function processInsertSalesItem(BusinessInvoice $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item BusinessInvoiceParticular  */
 
@@ -294,7 +294,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
     public function processReverseSalesItem(BusinessInvoice $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item BusinessInvoiceParticular  */
 
@@ -307,7 +307,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
     public function processInsertSalesReturnItem(BusinessInvoiceReturn $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item BusinessInvoiceReturnItem  */
 
@@ -323,7 +323,7 @@ class BusinessStockHistoryRepository extends EntityRepository
 
     public function processInsertDamageItem(BusinessInvoice $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var $item BusinessDamage  */
 
@@ -378,8 +378,8 @@ class BusinessStockHistoryRepository extends EntityRepository
         $stmt->bindValue('item', "{$item}");
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;
@@ -420,8 +420,8 @@ class BusinessStockHistoryRepository extends EntityRepository
             $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
             $stmt->bindValue('config', $config);
             $stmt->bindValue('item', "{$item}");
-            $stmt->execute();
-            $results = $stmt->fetchAll();
+            $stmt = $stmt->executeQuery();
+            $results = $stmt->fetchAllAssociative();
             return $results;
         }else{
             $sql = "SELECT e.*,i.invoice as salesInvoice,c.name as customer,p.grn as grn,fu.username as createdBy
@@ -443,8 +443,8 @@ class BusinessStockHistoryRepository extends EntityRepository
             $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
             $stmt->bindValue('config', $config);
             $stmt->bindValue('item', "{$item}");
-            $stmt->execute();
-            $results = $stmt->fetchAll();
+            $stmt = $stmt->executeQuery();
+            $results = $stmt->fetchAllAssociative();
             return $results;
         }
 

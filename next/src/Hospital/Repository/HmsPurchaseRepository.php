@@ -16,7 +16,7 @@ class HmsPurchaseRepository extends EntityRepository
 
     public function updatePurchaseTotalPrice(HmsPurchase $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Hospital\Entity\HmsPurchaseItem::class,'si')
             ->select('sum(si.purchaseSubTotal) as total')

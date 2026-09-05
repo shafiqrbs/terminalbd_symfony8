@@ -16,7 +16,7 @@ class DeliveryItemRepository extends EntityRepository
 
     public function checkItem(User $user,PurchaseItem $purchaseItem,$quantity = 0)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $totalQnt = $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockReceiveSingleItem($user, $purchaseItem->getItem(),$purchaseItem->getBarcode());
         $stockSalesItemHistory =  $em->getRepository(\App\Inventory\Entity\Delivery::class)->stockSalesItemHistory($user,$purchaseItem->getItem(),$purchaseItem->getBarcode());
@@ -38,7 +38,7 @@ class DeliveryItemRepository extends EntityRepository
 
     public function checkTotalReceiveQuantity($user, $purchaseItem)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $receiveQnt = $em->getRepository(\App\Inventory\Entity\DeliveryItem::class)->stockReceiveSinglePurchaseItem($user, $purchaseItem->getId());
         $returnQnt =  $em->getRepository(\App\Inventory\Entity\DeliveryItem::class)->stockReturnSinglePurchaseItem($user,$purchaseItem->getId());
@@ -69,7 +69,7 @@ class DeliveryItemRepository extends EntityRepository
     {
         $inventory = $user->getGlobalOption()->getInventoryConfig();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\DeliveryReturn::class,'e');
         $qb->select('SUM(e.quantity) AS returnQnt ');
         $qb->where("e.inventoryConfig = :inventory");
@@ -87,7 +87,7 @@ class DeliveryItemRepository extends EntityRepository
     {
         $branch = $user->getProfile()->getBranches();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\DeliveryReturn::class,'e');
         $qb->join('e.purchaseItem','purchaseItem');
         $qb->select('SUM(e.quantity) AS returnQnt ');

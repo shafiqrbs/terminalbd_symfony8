@@ -41,8 +41,8 @@ class RestaurantTemporaryRepository extends EntityRepository
 
     public function insertInvoiceItems(User $user, $data)
     {
-        $particular = $this->_em->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
-        $em = $this->_em;
+        $particular = $this->getEntityManager()->getRepository(\App\Restaurant\Entity\Particular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
 
         $entity = new RestaurantTemporary();
         $invoiceParticular = $this->findOneBy(['user' => $user ,'particular' => $particular]);
@@ -149,7 +149,7 @@ class RestaurantTemporaryRepository extends EntityRepository
 
     public function removeInitialParticular(User $user)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $user->getGlobalOption()->getRestaurantConfig()->getId();
         $entity = $em->createQuery('DELETE RestaurantBundle:RestaurantTemporary e WHERE e.restaurantConfig = '.$config.' and e.user = '.$user->getId());
         $entity->execute();

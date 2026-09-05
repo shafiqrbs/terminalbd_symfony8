@@ -30,7 +30,7 @@ class ExpenseAndroidProcessRepository extends EntityRepository
 
     public function insertAndroidProcess(GlobalOption $option,$ipAddress,$device,$process,$data)
     {
-        $em =  $this->_em;
+        $em =  $this->getEntityManager();
 
         $device = $em->getRepository(\App\Tool\Entity\AndroidDeviceSetup::class)->findOneBy(['globalOption'=> $option,'id' => $device]);
 

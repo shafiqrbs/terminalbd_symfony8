@@ -65,7 +65,7 @@ class StockOpeningRepository extends EntityRepository
 
     public function getLastBalance(GlobalOption $global)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('(COALESCE(SUM(e.amount),0)) AS balance');
         $qb->where("e.globalOption = :globalOption");
@@ -95,7 +95,7 @@ class StockOpeningRepository extends EntityRepository
 
     public function insertVendor(MedicineVendor $vendor)
     {
-    	$em = $this->_em;
+    	$em = $this->getEntityManager();
     	$entity = new AccountVendor();
 	    $entity->setCompanyName($vendor->getCompanyName());
 	    $entity->setName($vendor->getName());
@@ -133,7 +133,7 @@ class StockOpeningRepository extends EntityRepository
 
     public function newVendorCreate($globalOption,$mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['companyName'];
         $address = $data['companyAddress'] ?? '';
         $entity = $this->findOneBy(['globalOption' => $globalOption ,'companyName' => $name ,'mobile' => $mobile]);
@@ -156,7 +156,7 @@ class StockOpeningRepository extends EntityRepository
     public function updateVendorCompanyName(AccountVendor $vendor)
     {
         $com = $vendor->getCompanyName();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->update(\App\Accounting\Entity\AccountPurchase::class, 'mg')
             ->set('mg.companyName', ':companyName')
@@ -170,7 +170,7 @@ class StockOpeningRepository extends EntityRepository
 
 
     public function updateCustomerBalance(AccountLoan $accountSales){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $customer = $accountSales->getEmployee()->getId();
         $qb = $this->createQueryBuilder('e');
         $qb->select('(COALESCE(SUM(e.amount),0)) AS balance');

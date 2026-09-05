@@ -16,7 +16,7 @@ class CourseRepository extends EntityRepository {
 
     public function getAdmissionUnderCourse(){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb
 

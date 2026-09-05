@@ -14,7 +14,7 @@ class ItemBrandRepository extends EntityRepository
 {
     public function getLastId($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(cs)');
         $qb->from(\App\Inventory\Entity\ItemBrand::class,'cs');
         $qb->where("cs.inventoryConfig = :inventory");
@@ -32,8 +32,8 @@ class ItemBrandRepository extends EntityRepository
 
         $sql = "SELECT name FROM ItemBrand WHERE  inventoryConfig_id ={$config->getId()}";
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         return $results;
     }
 

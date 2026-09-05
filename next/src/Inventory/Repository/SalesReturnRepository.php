@@ -37,7 +37,7 @@ class SalesReturnRepository extends EntityRepository
 
     public function getRowsCount(InventoryConfig $inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(e.id)');
         $qb->from(\App\Inventory\Entity\SalesReturn::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
@@ -53,7 +53,7 @@ class SalesReturnRepository extends EntityRepository
 
     public function getSalesReturnItemSum($item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $itemQnt = $em->createQueryBuilder()
             ->from(\App\Inventory\Entity\SalesReturnItem::class,'e')
             ->select('sum(e.quantity) as quantity')
@@ -69,7 +69,7 @@ class SalesReturnRepository extends EntityRepository
 
     public function updateSalesReturn(SalesReturn $salesReturn)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->createQueryBuilder()
             ->from(\App\Inventory\Entity\SalesReturnItem::class,'e')
             ->select('sum(e.subTotal) as total , count(e.id) as totalItem, sum(e.quantity) as totalQuantity')
@@ -88,7 +88,7 @@ class SalesReturnRepository extends EntityRepository
 
     public function updateSalesTotalReturnPrice(SalesReturnItem $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $salesReturn =  $entity->getSalesReturn();
         $currentAmount = ($salesReturn->getTotal() - $entity->getSubTotal());
         $currentItem = ($salesReturn->getTotalItem() - 1);

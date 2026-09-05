@@ -26,7 +26,7 @@ class ProductionValueAddedRepository extends EntityRepository
 
     private function initialValueAdded(Particular $item){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $values = $em->getRepository(\App\Restaurant\Entity\Particular::class)->findWithSearch($item->getRestaurantConfig(),['value-added']);
         foreach ($values as $value){
            //$valueAdded = $em->getRepository(\App\Restaurant\Entity\Particular::class)->find($value['id']);
@@ -45,7 +45,7 @@ class ProductionValueAddedRepository extends EntityRepository
     public function insertItemKeyValue(Particular $item , $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i = 0;
         foreach ($data['valueAddedId'] as $value) {
             $amount = $data['amount'][$i];
@@ -70,7 +70,7 @@ class ProductionValueAddedRepository extends EntityRepository
 
     public function totalValues(Particular $item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i = 0;
         $qb = $this->createQueryBuilder('item');
         $qb->select('SUM(item.amount) as amount');
@@ -88,7 +88,7 @@ SET sub.amount = 0)
 WHERE sub.valueAdded_id =:material";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
         $qb1->bindValue('material', $id);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
     }
 
 }

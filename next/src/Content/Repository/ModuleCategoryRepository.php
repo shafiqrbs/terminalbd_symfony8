@@ -14,7 +14,7 @@ class ModuleCategoryRepository extends EntityRepository
 
     public function moduleBaseCategory($globalOption,$module)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $repository = $em->getRepository(\App\Content\Entity\ModuleCategory::class);
         $query = $repository->createQueryBuilder('mc')
@@ -32,7 +32,7 @@ class ModuleCategoryRepository extends EntityRepository
     public function getFeatureModuleCategory($globalOption,$limit)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $repository = $em->getRepository(\App\Content\Entity\ModuleCategory::class);
         $query = $repository->createQueryBuilder('mc')
             ->where('mc.globalOption = :option')

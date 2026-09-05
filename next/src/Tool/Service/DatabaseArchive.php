@@ -35,7 +35,7 @@ class DatabaseArchive {
     {
         $conn = $this->backupDatabaseConnection();
         $stmt = $conn->prepare("SELECT id, amount FROM account_cash WHERE globalOption_id=96 LIMIT 0,10");
-        $result = $stmt->execute();
+        $result = $stmt = $stmt->executeQuery();
         foreach($result->fetchAll() as $row) {
             echo $row['id'];
         }

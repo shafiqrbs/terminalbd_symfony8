@@ -82,7 +82,7 @@ class AccountConditionLedgerRepository extends EntityRepository
 
     public function getLastBalance(GlobalOption $global)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('(COALESCE(SUM(e.amount),0)) AS balance');
         $qb->where("e.globalOption = :globalOption");
@@ -123,7 +123,7 @@ class AccountConditionLedgerRepository extends EntityRepository
     }
 
     public function updateConditionBalance(AccountConditionLedger $accountSales){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $customer = $accountSales->getCondition()->getId();
         $qb = $this->createQueryBuilder('e');
         $qb->select('(COALESCE(SUM(e.debit),0) - COALESCE(SUM(e.credit),0)) AS balance, COALESCE(SUM(e.amount),0) AS receiveAmount, COALESCE(SUM(e.amount),0) AS dueAmount, COALESCE(SUM(e.amount),0) AS returnAmount ');
@@ -148,7 +148,7 @@ class AccountConditionLedgerRepository extends EntityRepository
 
     public function insertBusinessConditionInvoice(BusinessInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $this->findOneBy(['invoice'=>$entity,'process' =>"Sales"]);
         if($exist){
             $accountSales = $exist;
@@ -189,7 +189,7 @@ class AccountConditionLedgerRepository extends EntityRepository
 
     public function insertConditionInvoiceReceive(BusinessInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $this->findOneBy(['invoice'=>$entity,'process' =>"Receive"]);
         if(empty($exist)) {
             $accountSales = new AccountConditionLedger();
@@ -216,7 +216,7 @@ class AccountConditionLedgerRepository extends EntityRepository
 
     public function insertConditionInvoiceReturn(BusinessInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $this->findOneBy(['invoice'=>$entity,'process' =>"Sales-Return"]);
         if(empty($exist)) {
             $accountSales = new AccountConditionLedger();
@@ -243,14 +243,14 @@ class AccountConditionLedgerRepository extends EntityRepository
 
     public function accountLedgerReverse(AccountConditionLedger $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountCash = $em->createQuery("DELETE AccountingBundle:AccountCash e WHERE e.conditionLedger = {$entity->getId()}");
         $accountCash->execute();
     }
 
     public function accountInvoiceReverse(BusinessInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $accountCash = $em->createQuery("DELETE AccountingBundle:AccountConditionLedger e WHERE e.invoice = {$entity->getId()}");
         $accountCash->execute();
     }

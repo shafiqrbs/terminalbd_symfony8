@@ -174,8 +174,8 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
 
     public function updatePurchaseItem($data)
     {
-        $em = $this->_em;
-        $entity = $this->_em->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->find($data['purchaseItemId']);
+        $em = $this->getEntityManager();
+        $entity = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicinePrepurchaseItem::class)->find($data['purchaseItemId']);
         $entity->setQuantity($data['quantity']);
         $entity->setSalesprice($data['salesPrice']);
         $entity->setSubtotal($data['salesPrice'] * $data['quantity']);
@@ -188,7 +188,7 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
 
     public function insertStockPurchaseItems(MedicinePrepurchase $purchase,MedicineStock $item, $quantity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicinePrepurchaseItem();
         $entity->setMedicinePrepurchase($purchase);
         $entity->setMedicineStock($item);
@@ -203,7 +203,7 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
 
 	public function insertShortList(MedicinePrepurchase $purchase,MedicineStock $item)
 	{
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		$entity = new MedicinePrepurchaseItem();
 		$entity->setMedicinePrepurchase($purchase);
 		$entity->setMedicineStock($item);
@@ -218,19 +218,19 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
 	public function checkInsertStockItem(MedicineConfig $config,$data){
 
         if(empty($data['medicineId'])) {
-            $checkStockMedicine = $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config, $data['medicineBrand']);
+            $checkStockMedicine = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config, $data['medicineBrand']);
         }else{
-            $medicine =  $this->_em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
-            $checkStockMedicine =  $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
+            $medicine =  $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
+            $checkStockMedicine =  $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
         }
 
         if (empty($checkStockMedicine)){
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $entity = new MedicineStock();
             $entity->setMedicineConfig($config);
             if(empty($data['medicineId'])){
                 if($data['mode']){
-                    $brandName = $this->_em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['mode']);
+                    $brandName = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['mode']);
                     $entity->setMode($brandName->getParticularType()->getSlug());
                     $entity->setBrandName($brandName->getName());
                 }
@@ -243,7 +243,7 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
                 $entity->setMode('medicine');
             }
             if(!empty($data['rackNo'])){
-                $entity->setRackNo($this->_em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['rackNo']));
+                $entity->setRackNo($this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineParticular::class)->find($data['rackNo']));
             }
             $entity->setSalesPrice($data['salesPrice']);
             $entity->setPurchasePrice($this->stockInstantPurchaseItemPrice($config->getInstantVendorPercentage(),$data['salesPrice']));
@@ -308,7 +308,7 @@ class MedicinePrepurchaseItemRepository extends EntityRepository
     public function mergePurchaseItem(MedicinePurchase $purchase , MedicineVendor $vendor){
 
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('pi');
         $qb->join('pi.medicinePurchase','e');
         $qb->where('e.medicineConfig = :config')->setParameter('config',$purchase->getMedicineConfig()->getId());

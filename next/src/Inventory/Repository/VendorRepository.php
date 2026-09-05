@@ -14,7 +14,7 @@ class VendorRepository extends EntityRepository
 {
     public function getLastId($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(e.id)');
         $qb->from(\App\Inventory\Entity\Vendor::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
@@ -32,8 +32,8 @@ class VendorRepository extends EntityRepository
 
         $sql = "SELECT companyName as name FROM supplier WHERE  inventoryConfig_id ={$config->getId()}";
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         return $results;
     }
 

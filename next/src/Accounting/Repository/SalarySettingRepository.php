@@ -50,7 +50,7 @@ class SalarySettingRepository extends EntityRepository
     {
        $invoice =  $entity->getSalarySetting();
        $invoice->setProcess('completed');
-       $this->_em->persist($invoice);
-       $this->_em->flush();
+       $this->getEntityManager()->persist($invoice);
+       $this->getEntityManager()->flush();
     }
 }

@@ -18,7 +18,7 @@ class MedicineConfigRepository extends EntityRepository
     public function medicineReset(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getMedicineConfig()->getId();
 
         $sales = $em->createQuery('DELETE MedicineBundle:MedicineSales e WHERE e.medicineConfig = '.$config);
@@ -45,7 +45,7 @@ class MedicineConfigRepository extends EntityRepository
         $android = $em->createQuery('DELETE MedicineBundle:MedicineAndroidProcess e WHERE e.medicineConfig = '.$config);
         $android->execute();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $q = $qb->update(\App\Medicine\Entity\MedicineStock::class, 's')
             ->set('s.remainingQuantity', '?1')
             ->set('s.purchaseQuantity', '?2')
@@ -78,7 +78,7 @@ class MedicineConfigRepository extends EntityRepository
     public function medicineDelete(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getMedicineConfig()->getId();
 
         $sales = $em->createQuery('DELETE MedicineBundle:MedicineSales e WHERE e.medicineConfig = '.$config);
@@ -164,7 +164,7 @@ class MedicineConfigRepository extends EntityRepository
 
     public function GenerateStock(GlobalOption $option)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $fromOption = $em->getRepository(GlobalOption::class)->find(126);
         $config = $fromOption->getMedicineConfig();
         if($option and $config){

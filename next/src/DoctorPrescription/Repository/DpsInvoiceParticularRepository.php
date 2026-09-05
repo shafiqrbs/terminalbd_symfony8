@@ -44,10 +44,10 @@ class DpsInvoiceParticularRepository extends EntityRepository
 
     public function fileUpload(DpsInvoice $invoice,$data,$file)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(isset($file['file'])){
             $particular = new DpsInvoiceParticular();
-            $dpsService = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->find($data['dpsService']);
+            $dpsService = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->find($data['dpsService']);
             $particular->setDpsInvoice($invoice);
             $particular->setDpsService($dpsService);
             $img = $file['file'];
@@ -63,8 +63,8 @@ class DpsInvoiceParticularRepository extends EntityRepository
 
     public function insertInvoiceParticularSingle(DpsInvoice $invoice, $data)
     {
-        $em = $this->_em;
-        $service = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->findOneBy(['slug'=>$data['service']]);
+        $em = $this->getEntityManager();
+        $service = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->findOneBy(['slug'=>$data['service']]);
         $entity = new DpsInvoiceParticular();
         $entity->setDpsService($service);
         $entity->setMetaValue($data['procedure']);
@@ -77,7 +77,7 @@ class DpsInvoiceParticularRepository extends EntityRepository
 
     public function getInvoiceServices(DpsInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('ip');
         $qb->join('ip.dpsParticular','p');
         $qb->join('p.service','ds');
@@ -95,8 +95,8 @@ class DpsInvoiceParticularRepository extends EntityRepository
 
     public function insertInvoiceParticularReturn(DpsInvoice $invoice, $data)
     {
-        $em = $this->_em;
-        $service = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->findOneBy(['slug' => $data['service']]);
+        $em = $this->getEntityManager();
+        $service = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->findOneBy(['slug' => $data['service']]);
         $invoiceParticulars = $this->findBy(['dpsInvoice'=>$invoice,'dpsService'=>$service ]);
         $data ='';
         foreach ($invoiceParticulars as $invoiceParticular ):
@@ -116,9 +116,9 @@ class DpsInvoiceParticularRepository extends EntityRepository
 
     public function insertInvoiceInvestigationUpload(DpsInvoice $invoice, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
-        $service = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->find($data['dpsService']);
+        $service = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsService::class)->find($data['dpsService']);
         $invoiceParticulars = $this->findBy(['dpsInvoice'=> $invoice,'dpsService' => $service ]);
         $data ='';
         /* @var $invoiceParticular DpsInvoiceParticular */
@@ -140,13 +140,13 @@ class DpsInvoiceParticularRepository extends EntityRepository
     }
     public function insertInvoiceItems(DpsInvoice $invoice, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(!empty($data['metaKey'])) {
             $this->removeInvoiceParticularPreviousCheck($invoice);
             foreach ($data['metaKey'] as $key => $val) {
-                $particular = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($val);
+                $particular = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsParticular::class)->find($val);
                 $entity = new DpsInvoiceParticular();
-                $invoiceDpsParticular = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->findOneBy(['dpsInvoice' => $invoice, 'dpsParticular' => $particular]);
+                $invoiceDpsParticular = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->findOneBy(['dpsInvoice' => $invoice, 'dpsParticular' => $particular]);
                 if (!empty($invoiceDpsParticular)) {
                     $entity = $invoiceDpsParticular ;
                     $entity->setMetaValue(trim($data['metaValue'][$key]));
@@ -164,11 +164,11 @@ class DpsInvoiceParticularRepository extends EntityRepository
 
     public function updateMetaCheckValue($invoice,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($data['metaKey'] as $key => $val) {
             if(isset($data['metaCheck'][$key]) and $data['metaCheck'][$key] > 0) {
                 $particular = $data['metaCheck'][$key];
-                $invoiceDpsParticular = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->findOneBy(['dpsInvoice' => $invoice, 'dpsParticular' => $particular]);
+                $invoiceDpsParticular = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->findOneBy(['dpsInvoice' => $invoice, 'dpsParticular' => $particular]);
                 $invoiceDpsParticular->setMetaCheck($data['metaCheck'][$key]);
                 $em->flush();
             }
@@ -178,14 +178,14 @@ class DpsInvoiceParticularRepository extends EntityRepository
 
     public function removeInvoiceParticularPreviousCheck(DpsInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $update = $em->createQuery("UPDATE DoctorPrescriptionBundle:DpsInvoiceParticular e SET e.metaCheck = 0 WHERE e.dpsService IS NULL and  e.dpsInvoice = ".$invoice->getId());
         $update->execute();
     }
 
     public function removeInvoiceParticularCheckItem(DpsInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $remove = $em->createQuery("DELETE DoctorPrescriptionBundle:DpsInvoiceParticular e WHERE e.dpsService IS NULL and  e.dpsInvoice = ".$invoice->getId());
         $remove->execute();
     }

@@ -203,7 +203,7 @@ class DpsParticularRepository extends EntityRepository
 
     public function getPurchaseUpdateQnt(DpsPurchase $purchase){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var DpsPurchaseItem $purchaseItem */
 
@@ -222,7 +222,7 @@ class DpsParticularRepository extends EntityRepository
 
     public function getSalesUpdateQnt(DpsInvoiceAccessories  $accessories){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $particular = $accessories->getDpsParticular();
         $qnt = $particular->getSalesQuantity() + $accessories->getQuantity();
         $particular->setSalesQuantity($qnt);

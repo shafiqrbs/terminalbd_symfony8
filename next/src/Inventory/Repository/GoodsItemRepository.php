@@ -22,7 +22,7 @@ class GoodsItemRepository extends EntityRepository
     public function initialInsertSubProduct(PurchaseVendorItem $reEntity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $goods = new GoodsItem();
         $goods->setSalesPrice($reEntity->getSalesPrice());
         $goods->setPurchasePrice($reEntity->getPurchasePrice());
@@ -44,7 +44,7 @@ class GoodsItemRepository extends EntityRepository
 
     public function insertCopySubProduct(PurchaseVendorItem $entity , PurchaseVendorItem $copyEntity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i=0;
 
         if(!empty($copyEntity->getGoodsItems())){
@@ -80,8 +80,8 @@ class GoodsItemRepository extends EntityRepository
     public function initialUpdateSubProduct(PurchaseVendorItem $reEntity)
     {
 
-        $em = $this->_em;
-        $goods = $this->_em->getRepository(\App\Inventory\Entity\GoodsItem::class)->findOneBy(['purchaseVendorItem' => $reEntity, 'masterItem' => 1]);
+        $em = $this->getEntityManager();
+        $goods = $this->getEntityManager()->getRepository(\App\Inventory\Entity\GoodsItem::class)->findOneBy(['purchaseVendorItem' => $reEntity, 'masterItem' => 1]);
         if(empty($goods)){
             $this->initialInsertSubProduct($reEntity);
         }else{
@@ -108,7 +108,7 @@ class GoodsItemRepository extends EntityRepository
      public function insertSubProduct(PurchaseVendorItem $reEntity,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i=0;
 
         if($reEntity->getSubProduct() == 1 and isset($data['salesPrice']) ) {
@@ -131,16 +131,16 @@ class GoodsItemRepository extends EntityRepository
                 if($colors != 'null' and !empty($colors)){
                     $colorIds = explode(',',$colors);
                     foreach ($colorIds as $color ){
-                        $colorObj[] = $this->_em->getRepository(\App\Inventory\Entity\ItemColor::class)->find($color);
+                        $colorObj[] = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemColor::class)->find($color);
                     }
                     $goods->setColors($colorObj);
                 }
                 if(isset($sizeId) and !empty($sizeId)){
-                    $size = $this->_em->getRepository(\App\Inventory\Entity\ItemSize::class)->find($sizeId);
+                    $size = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemSize::class)->find($sizeId);
                     $goods->setSize($size);
                 }
                 if(isset($unitId) and !empty($unitId)){
-                    $unit = $this->_em->getRepository(\App\Tool\Entity\ProductUnit::class)->find($unitId);
+                    $unit = $this->getEntityManager()->getRepository(\App\Tool\Entity\ProductUnit::class)->find($unitId);
                     $goods->setProductUnit($unit);
                 }
                 $goods->setPurchaseVendorItem($reEntity);
@@ -156,7 +156,7 @@ class GoodsItemRepository extends EntityRepository
 
     public function updateSubProduct(GoodsItem $goods,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $colors         = $data['colors'] ?? '';
         $sizeId         = $data['size'] ?? '';
         $quantity       = $data['quantity'] ?? 1;
@@ -172,12 +172,12 @@ class GoodsItemRepository extends EntityRepository
 
                 $colorIds = explode(',',$colors);
                 foreach ($colorIds as $color ){
-                    $colorObj[] = $this->_em->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['inventoryConfig' => $goods->getPurchaseVendorItem()->getInventoryConfig(),'id'=> $color]);
+                    $colorObj[] = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['inventoryConfig' => $goods->getPurchaseVendorItem()->getInventoryConfig(),'id'=> $color]);
                 }
                 $goods->setColors($colorObj);
             }
             if(isset($sizeId) and !empty($sizeId)){
-                $size = $this->_em->getRepository(\App\Inventory\Entity\ItemSize::class)->findOneBy(['inventoryConfig' => $goods->getPurchaseVendorItem()->getInventoryConfig(),'id'=> $sizeId]);
+                $size = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemSize::class)->findOneBy(['inventoryConfig' => $goods->getPurchaseVendorItem()->getInventoryConfig(),'id'=> $sizeId]);
                 $goods->setSize($size);
             }
             $em->flush();
@@ -187,12 +187,12 @@ class GoodsItemRepository extends EntityRepository
 
     public function updateItemGoods(GoodsItem $goods,$updateSubProduct)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $goods->setSalesPrice($updateSubProduct['salesPrice']);
         $goods->setPurchasePrice($updateSubProduct['purchasePrice']);
         $goods->setQuantity($updateSubProduct['quantity']);
         if(isset($updateSubProduct['size']) and !empty($updateSubProduct['size']) ){
-            $size = $this->_em->getRepository(\App\Inventory\Entity\ItemSize::class)->findOneBy(['inventoryConfig' => $goods->getPurchaseVendorItem()->getInventoryConfig(),'id'=> $updateSubProduct['size']]);
+            $size = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemSize::class)->findOneBy(['inventoryConfig' => $goods->getPurchaseVendorItem()->getInventoryConfig(),'id'=> $updateSubProduct['size']]);
             $goods->setSize($size);
             $goods->setName(null);
         }else{
@@ -200,7 +200,7 @@ class GoodsItemRepository extends EntityRepository
         }
         if(isset($updateSubProduct['colors']) and !empty($updateSubProduct['colors'])) {
             foreach ($updateSubProduct['colors'] as $color){
-                $colors[] = $this->_em->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['inventoryConfig' => $goods->getPurchaseVendorItem()->getInventoryConfig(), 'id' => $color]);
+                $colors[] = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['inventoryConfig' => $goods->getPurchaseVendorItem()->getInventoryConfig(), 'id' => $color]);
             }
             $goods->setColors($colors);
 
@@ -210,7 +210,7 @@ class GoodsItemRepository extends EntityRepository
 
     public function subItemDiscountPrice(PurchaseVendorItem $entity ,Discount $discount)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var GoodsItem $item */
         foreach( $entity->getGoodsItems() as $item){
             $discountPrice = $this->getCulculationDiscountPrice($item,$discount);
@@ -240,7 +240,7 @@ class GoodsItemRepository extends EntityRepository
 
     public function webItemQuantityUpdate($calculation, PurchaseVendorItem $purchaseVendorItem , $size, $qnt)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var GoodsItem $item */
 
@@ -329,7 +329,7 @@ class GoodsItemRepository extends EntityRepository
 
     public function insertProductToEcommerce(PurchaseVendorItem $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $rows=[];
         $i = 0;
 
@@ -360,12 +360,12 @@ class GoodsItemRepository extends EntityRepository
                 $goods->setPurchasePrice($row['purchasePrice']);
                 $goods->setQuantity($row['quantity']);
 
-                $sizeObj = $this->_em->getRepository(\App\Inventory\Entity\ItemSize::class)->find($size);
+                $sizeObj = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemSize::class)->find($size);
                 $goods->setSize($sizeObj);
 
                 $colorObjs =[];
                 foreach ($colors as $color){
-                    $colorObjs[] = $this->_em->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['id'=> $color]);
+                    $colorObjs[] = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['id'=> $color]);
                 }
                 if(!empty($colorObjs) && is_array($colorObjs)){
                     $goods->setColors($colorObjs);
@@ -408,7 +408,7 @@ class GoodsItemRepository extends EntityRepository
 
     public function updateProductToEcommerce(PurchaseVendorItem $entity){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $rows=[];
         $i = 0;
         foreach($entity->getPurchaseItems() as $item ) {
@@ -433,17 +433,17 @@ class GoodsItemRepository extends EntityRepository
             foreach($rows as $size => $row )
             {
                 $colors = $row['color'];
-                $goods = $this->_em->getRepository(\App\Inventory\Entity\GoodsItem::class)->findOneBy(['purchaseVendorItem' => $entity->getId(),'size' => $size]);
+                $goods = $this->getEntityManager()->getRepository(\App\Inventory\Entity\GoodsItem::class)->findOneBy(['purchaseVendorItem' => $entity->getId(),'size' => $size]);
                 $goods->setSalesPrice($row['salesPrice']);
                 $goods->setPurchasePrice($row['purchasePrice']);
                 $goods->setQuantity($row['quantity']);
 
-                $sizeObj = $this->_em->getRepository(\App\Inventory\Entity\ItemSize::class)->find($size);
+                $sizeObj = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemSize::class)->find($size);
                 $goods->setSize($sizeObj);
 
                 $colorObjs =[];
                 foreach ($colors as $color){
-                    $colorObjs[] = $this->_em->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['id'=> $color]);
+                    $colorObjs[] = $this->getEntityManager()->getRepository(\App\Inventory\Entity\ItemColor::class)->findOneBy(['id'=> $color]);
                 }
                 if(!empty($colorObjs) && is_array($colorObjs)){
                     $goods->setColors($colorObjs);
@@ -469,7 +469,7 @@ class GoodsItemRepository extends EntityRepository
             foreach($entity->getPurchaseItems() as $item ) {
                 $qunt += $item->getStockItemQuantity();
             }
-            $goods = $this->_em->getRepository(\App\Inventory\Entity\GoodsItem::class)->findOneBy(['purchaseVendorItem' => $entity->getId(),'masterItem'=>1]);
+            $goods = $this->getEntityManager()->getRepository(\App\Inventory\Entity\GoodsItem::class)->findOneBy(['purchaseVendorItem' => $entity->getId(),'masterItem'=>1]);
             $goods->setSalesPrice($entity->getSalesPrice());
             $goods->setPurchasePrice($entity->getPurchasePrice());
             $goods->setQuantity($qunt);
@@ -520,7 +520,7 @@ class GoodsItemRepository extends EntityRepository
 
         $brands =  $array['brand'] ?? [];
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\PurchaseVendorItem::class,'e');
         $qb->join('e.brand','brand');
         $qb->select('brand.id as id');

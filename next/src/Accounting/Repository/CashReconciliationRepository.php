@@ -44,7 +44,7 @@ class CashReconciliationRepository extends EntityRepository
     public function initialUpdate(User $user , CashReconciliation $entity)
     {
 
-        $transactionCashOverview = $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview($user);
+        $transactionCashOverview = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview($user);
         foreach ($transactionCashOverview['result'] as $mod):
 
             if($mod['transactionName'] == 'Cash'){
@@ -70,13 +70,13 @@ class CashReconciliationRepository extends EntityRepository
                 $entity->setSystemMobile($cash);
             }
             endforeach;
-            $this->_em->flush($entity);
+            $this->getEntityManager()->flush($entity);
     }
 
     public function systemCashUpdate(User $user , CashReconciliation $entity)
     {
 
-        $transactionCashOverview = $this->_em->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview($user);
+        $transactionCashOverview = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountCash::class)->transactionWiseOverview($user);
         foreach ($transactionCashOverview['result'] as $mod):
 
             if($mod['transactionName'] == 'Cash'){
@@ -99,7 +99,7 @@ class CashReconciliationRepository extends EntityRepository
                 $entity->setSystemMobile($cash);
             }
         endforeach;
-        $this->_em->flush($entity);
+        $this->getEntityManager()->flush($entity);
     }
 
     public function notesReconciliationInsert(CashReconciliation $reconciliation,$bankCash,$mobileCash)
@@ -112,8 +112,8 @@ class CashReconciliationRepository extends EntityRepository
             $entity->setMetaKey($value);
             $entity->setNoteType($key);
             $entity->setAmount(0);
-            $this->_em->persist($entity);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($entity);
+            $this->getEntityManager()->flush();
         }
         $closing = 0;
 
@@ -128,8 +128,8 @@ class CashReconciliationRepository extends EntityRepository
                 $entity->setAmount($closing);
                 $entity->setSystemAmount($closing);
             }
-            $this->_em->persist($entity);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($entity);
+            $this->getEntityManager()->flush();
         }
 
         foreach ($mobileCash['result'] as $mobile ) {
@@ -144,14 +144,14 @@ class CashReconciliationRepository extends EntityRepository
                 $entity->setAmount($closing);
                 $entity->setSystemAmount($closing);
             }
-            $this->_em->persist($entity);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($entity);
+            $this->getEntityManager()->flush();
         }
     }
 
     public function update(CashReconciliation $cash, $method)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\CashReconciliationMeta::class,'e');
         $qb->join('e.cashReconciliation','t');
         $qb->select('COALESCE(SUM(e.amount),0) AS amount');
@@ -168,8 +168,8 @@ class CashReconciliationRepository extends EntityRepository
         }elseif($method == 'Mobile'){
             $cash->setMobile($result);
         }
-        $this->_em->persist($cash);
-        $this->_em->flush($cash);
+        $this->getEntityManager()->persist($cash);
+        $this->getEntityManager()->flush($cash);
 
     }
 

@@ -98,7 +98,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
     public function insertCopyItems($entity, MedicinePurchase $purchase)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $item MedicinePurchaseItem */
         foreach ($purchase->getMedicinePurchaseItems() as $item){
 
@@ -324,7 +324,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
         $qb = $this->createQueryBuilder('e');
         if($fieldName == 'sales'){
-            $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesPurchaseStockItemUpdate($item);
+            $quantity = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesPurchaseStockItemUpdate($item);
             $qb->select('e.salesQuantity AS quantity');
         }elseif($fieldName == 'sales-return'){
             $qb->select('e.quantity AS quantity');
@@ -345,18 +345,18 @@ class MedicinePurchaseItemRepository extends EntityRepository
     public function updateRemovePurchaseItemQuantity(MedicinePurchaseItem $item,$fieldName='')
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($fieldName == 'sales'){
-	        $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesPurchaseStockItemUpdate($item);
+	        $quantity = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesItem::class)->salesPurchaseStockItemUpdate($item);
             $item->setSalesQuantity($quantity);
         }elseif($fieldName == 'sales-return'){
-	        $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineSalesReturn::class)->salesReturnStockItemUpdate($item);
+	        $quantity = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineSalesReturn::class)->salesReturnStockItemUpdate($item);
             $item->setSalesReturnQuantity($quantity);
         }elseif($fieldName == 'purchase-return'){
-            $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicinePurchaseReturnItem::class)->purchaseReturnStockItemUpdate($item);
+            $quantity = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicinePurchaseReturnItem::class)->purchaseReturnStockItemUpdate($item);
             $item->setPurchaseReturnQuantity($quantity);
         }elseif($fieldName == 'damage'){
-            $quantity = $this->_em->getRepository(\App\Medicine\Entity\MedicineDamage::class)->damagePurchaseStockItemUpdate($item);
+            $quantity = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineDamage::class)->damagePurchaseStockItemUpdate($item);
             $item->setDamageQuantity($quantity);
         }
         $em->persist($item);
@@ -367,7 +367,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
     public function remainingQnt(MedicinePurchaseItem $item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 	    $qnt = ($item->getQuantity()  + $item->getSalesReturnQuantity()) - ($item->getPurchaseReturnQuantity() + $item->getSalesQuantity() + $item->getDamageQuantity());
         $item->setRemainingQuantity($qnt);
         $em->persist($item);
@@ -377,7 +377,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
     public function updatePurchaseItemPrice(MedicinePurchase $purchase)
     {
         /* @var  $item MedicinePurchaseItem */
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $medicinePurchaseItems = $this->findBy(['medicinePurchase' => $purchase]);
         if($medicinePurchaseItems){
             foreach ($medicinePurchaseItems as $item){
@@ -403,7 +403,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
     public function updateManualPurchaseItemAvgPrice(MedicinePurchase $purchase)
     {
         /* @var  $item MedicinePurchaseItem */
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($purchase->getMedicinePurchaseItems()){
             foreach ($purchase->getMedicinePurchaseItems() as $item){
                 if($item and $item->getActualPurchasePrice()){
@@ -449,8 +449,8 @@ class MedicinePurchaseItemRepository extends EntityRepository
     public function updatePurchaseItem($data)
     {
 
-        $em = $this->_em;
-        $entity = $this->_em->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($data['purchaseItemId']);
+        $em = $this->getEntityManager();
+        $entity = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicinePurchaseItem::class)->find($data['purchaseItemId']);
         $quantity = (float)$data['quantity'] ?: 0;
         $salesPrice = (float)$data['salesPrice'] ?: 0;
         $bonusQuantity = (float)$data['bonusQuantity'] ?: 0;
@@ -475,7 +475,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
     public function insertStockPurchaseItems(MedicinePurchase $purchase,MedicineStock $item, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicinePurchaseItem();
         $entity->setMedicinePurchase($purchase);
         $entity->setMedicineStock($item);
@@ -514,14 +514,14 @@ class MedicinePurchaseItemRepository extends EntityRepository
     public function checkInsertStockItem(MedicineConfig $config,$data){
 
         if(empty($data['medicineId'])) {
-            $checkStockMedicine = $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config, $data['medicineBrand']);
+            $checkStockMedicine = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockNonMedicine($config, $data['medicineBrand']);
         }else{
-            $medicine =  $this->_em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
-            $checkStockMedicine =  $this->_em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
+            $medicine =  $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
+            $checkStockMedicine =  $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
         }
 
         if (empty($checkStockMedicine)){
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $entity = new MedicineStock();
             $entity->setMedicineConfig($config);
             if(empty($data['medicineId'])){
@@ -584,7 +584,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
 
         $item = $this->checkInsertStockItem($config,$data);
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicinePurchaseItem();
         $entity->setMedicinePurchase($purchase);
         $entity->setMedicineStock($item);
@@ -666,7 +666,7 @@ class MedicinePurchaseItemRepository extends EntityRepository
     public function mergePurchaseItem(MedicinePurchase $purchase , MedicineVendor $vendor){
 
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('pi');
         $qb->join('pi.medicinePurchase','e');
         $qb->where('e.medicineConfig = :config')->setParameter('config',$purchase->getMedicineConfig()->getId());

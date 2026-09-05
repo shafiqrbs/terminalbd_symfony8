@@ -17,7 +17,7 @@ class DpsServiceRepository extends EntityRepository
     public function setListOrdering($fieldName,$data)
     {
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
 
         foreach ($data as $key => $value){
@@ -34,7 +34,7 @@ class DpsServiceRepository extends EntityRepository
     public function prescriptionServiceUpdate(DpsConfig $entity,$data)
     {
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $this->removeServicePreviousCheck($entity);
         if(isset($data['serviceKey']) and !empty($data['serviceKey'])){
@@ -67,7 +67,7 @@ class DpsServiceRepository extends EntityRepository
 
     public function removeServicePreviousCheck(DpsConfig $config)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $update = $em->createQuery("UPDATE DoctorPrescriptionBundle:DpsService e SET e.serviceShow = 'NULL' , e.serviceHeight = 'NULL' , e.servicePosition = 'NULL' , e.serviceHeaderShow = 'NULL' WHERE e.status = 1 AND e.dpsConfig=".$config->getId());
         $update->execute();
     }
@@ -75,7 +75,7 @@ class DpsServiceRepository extends EntityRepository
     public function setPrescriptionServiceOrdering($data)
     {
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         foreach ($data as $key => $value){
             $qb->update(\App\DoctorPrescription\Entity\DpsService::class, 'mg')
@@ -256,7 +256,7 @@ class DpsServiceRepository extends EntityRepository
 
     public function findDpsExistingCustomer($hospital, $mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $name = $data['referredDoctor']['name'];
         $department = $data['referredDoctor']['department'];
@@ -292,7 +292,7 @@ class DpsServiceRepository extends EntityRepository
 
     public function getPurchaseUpdateQnt(DpsPurchase $purchase){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var DpsPurchaseItem $purchaseItem */
 
@@ -312,9 +312,9 @@ class DpsServiceRepository extends EntityRepository
 
     public function insertAccessories(Invoice $invoice){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var InvoiceParticular $item */
         if(!empty($invoice->getInvoiceParticulars())){
             foreach($invoice->getInvoiceParticulars() as $item ){
@@ -332,7 +332,7 @@ class DpsServiceRepository extends EntityRepository
 
     public function getSalesUpdateQnt(Invoice $invoice){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var InvoiceParticular $item */
 
@@ -353,7 +353,7 @@ class DpsServiceRepository extends EntityRepository
 
     public function admittedPatientAccessories(InvoiceTransaction $transaction){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var InvoiceParticular $item */
         if(!empty($transaction->getAdmissionPatientParticulars())){

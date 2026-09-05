@@ -16,7 +16,7 @@ class MedicineImportRepository extends EntityRepository
 	{
 		var_dump($data['medicine']);
 		exit;
-		$em = $this->_em;
+		$em = $this->getEntityManager();
 		if(isset($file['file'])){
 			$img = $file['file'];
 			$fileName = $img->getClientOriginalName();

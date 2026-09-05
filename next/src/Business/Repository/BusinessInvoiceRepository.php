@@ -171,8 +171,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process',$process);
         $stmt->bindValue('start', $start);
         $stmt->bindValue('end', $end);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $customerSalesSummary = [];
         foreach($result as $row) {
             $id = "{$row['customer']}";
@@ -419,8 +419,8 @@ class BusinessInvoiceRepository extends EntityRepository
 		$stmt->bindValue('config', $config);
 		$stmt->bindValue('process', 'Delivered');
 		$stmt->bindValue('year', $year);
-		$stmt->execute();
-		$result =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+		$result =  $stmt->fetchAllAssociative();
 		return $result;
 	}
 
@@ -442,8 +442,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Delivered');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $salesDays = [];
         foreach ($result as $row):
             $salesDays[$row['day']]=$row;
@@ -456,7 +456,7 @@ class BusinessInvoiceRepository extends EntityRepository
 
     public function updateInvoiceTotalPrice(BusinessInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Business\Entity\BusinessInvoiceParticular::class,'si')
             ->select('sum(si.subTotal) as subTotal')
@@ -505,7 +505,7 @@ class BusinessInvoiceRepository extends EntityRepository
     }
     public function invoiceDistributionTotalPrice(BusinessInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\Business\Entity\BusinessInvoiceParticular::class,'si')
             ->select("sum(si.subTotal) as subTotal","sum(si.tloPrice * si.totalQuantity) as tloPrice","sum(si.quantity) as salesQnt","sum(si.returnQnt) as returnQnt","sum(si.damageQnt) as damageQnt","sum(si.spoilQnt) as spoilQnt","sum(si.totalQuantity) as totalQnt","sum(si.bonusQnt) as bonusQnt")
@@ -518,7 +518,7 @@ class BusinessInvoiceRepository extends EntityRepository
 
     public function updateInvoiceDistributionTotalPrice(BusinessInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from(\App\Business\Entity\BusinessInvoiceParticular::class,'si')
         ->select("sum(si.subTotal) as subTotal","sum(si.tloTotal) as tloPrice","sum(si.srCommissionTotal) as srCommission","sum(si.quantity) as salesQnt","sum(si.returnQnt) as returnQnt","sum(si.damageQnt) as damageQnt","sum(si.spoilQnt) as spoilQnt","sum(si.totalQuantity) as totalQnt","sum(si.bonusQnt) as bonusQnt")
@@ -631,8 +631,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Delivered');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
 
 
@@ -677,7 +677,7 @@ class BusinessInvoiceRepository extends EntityRepository
 
     public function insertApiInvoiceToken(GlobalOption $option , $data){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $conf = $option->getBusinessConfig();
         $sales = new BusinessInvoice();
         $sales->setBusinessConfig($option->getBusinessConfig());
@@ -731,7 +731,7 @@ class BusinessInvoiceRepository extends EntityRepository
 
     public function insertAssociation(Customer $customer)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $invoice = new BusinessInvoice();
         $invoice->setBusinessConfig($customer->getGlobalOption()->getBusinessConfig());
         $invoice->setCustomer($customer);
@@ -745,7 +745,7 @@ class BusinessInvoiceRepository extends EntityRepository
 
     public function deleteAssociationInvoice(Customer $customer)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $sales = $em->createQuery('DELETE BusinessBundle:BusinessInvoice e WHERE e.customer = '.$customer->getId());
         if($sales){
             $sales->execute();
@@ -771,8 +771,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Delivered');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $dailySalesArr = [];
         foreach($result as $row) {
             $id = "{$row['day']}-{$row['stockId']}";
@@ -789,8 +789,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Delivered');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $salesItemTotal = [];
         foreach($result as $row) {
             $salesItemTotal[$row['stockId']] = $row['total'];
@@ -806,8 +806,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Delivered');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $dailyTotalSalesArr = [];
         foreach($result as $row) {
             $dailyTotalSalesArr[$row['day']] = $row['total'];
@@ -833,8 +833,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('config', $config);
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $dailySalesArr = [];
         foreach($result as $row) {
             $id = "{$row['day']}-{$row['stockId']}";
@@ -851,8 +851,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Approved');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $dailyPurchaseArr = [];
         foreach($result as $row) {
             $id = "{$row['day']}-{$row['stockId']}";
@@ -869,8 +869,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Approved');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $dailyPurchaseReturnArr = [];
         foreach($result as $row) {
             $id = "{$row['day']}-{$row['stockId']}";
@@ -887,8 +887,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Approved');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $dailySalesReturnArr = [];
         foreach($result as $row) {
             $id = "{$row['day']}-{$row['stockId']}";
@@ -904,8 +904,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Approved');
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $damageArr = [];
         foreach($result as $row) {
             $id = "{$row['day']}-{$row['stockId']}";
@@ -933,8 +933,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
         $stmt->bindValue('config', $config);
         $stmt->bindValue('rangeMonth', $rangeMonth);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $dailySalesArr = [];
         foreach($result as $row) {
             $id = "{$row['day']}-{$row['stockId']}";
@@ -949,8 +949,8 @@ class BusinessInvoiceRepository extends EntityRepository
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
         $stmt->bindValue('config', $config);
         $stmt->bindValue('rangeMonth', $rangeMonth);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         $salesItemTotal = [];
         foreach($result as $row) {
             $salesItemTotal[$row['stockId']] = $row['total'];
@@ -983,8 +983,8 @@ class BusinessInvoiceRepository extends EntityRepository
             $stmt->bindValue('config', $config);
             $stmt->bindValue('customer', $customer);
             $stmt->bindValue('rangeMonth', $rangeMonth);
-            $stmt->execute();
-            $result =  $stmt->fetchAll();
+            $stmt = $stmt->executeQuery();
+            $result =  $stmt->fetchAllAssociative();
             $dailySalesArr = [];
             foreach($result as $row) {
                 $id = "{$row['day']}-{$row['stockId']}";
@@ -1001,8 +1001,8 @@ class BusinessInvoiceRepository extends EntityRepository
             $stmt->bindValue('config', $config);
             $stmt->bindValue('customer', $customer);
             $stmt->bindValue('rangeMonth', $rangeMonth);
-            $stmt->execute();
-            $result =  $stmt->fetchAll();
+            $stmt = $stmt->executeQuery();
+            $result =  $stmt->fetchAllAssociative();
             $salesItemTotal = [];
             foreach($result as $row1) {
                 $salesItemTotal[$row1['stockId']] = $row1;
@@ -1022,8 +1022,8 @@ class BusinessInvoiceRepository extends EntityRepository
             $stmt->bindValue('config', $config);
             $stmt->bindValue('customer', $customer);
             $stmt->bindValue('rangeMonth', $rangeMonth);
-            $stmt->execute();
-            $result =  $stmt->fetchAll();
+            $stmt = $stmt->executeQuery();
+            $result =  $stmt->fetchAllAssociative();
             $dailySalesSummaryArr = [];
             foreach($result as $row) {
                 $id = "{$row['day']}";
@@ -1044,8 +1044,8 @@ class BusinessInvoiceRepository extends EntityRepository
             $stmt->bindValue('config', $config);
             $stmt->bindValue('customer', $customer);
             $stmt->bindValue('rangeMonth', $rangeMonth);
-            $stmt->execute();
-            $monthlySalesSummary =  $stmt->fetch();
+            $stmt = $stmt->executeQuery();
+            $monthlySalesSummary =  $stmt->fetchAssociative();
             return ['salesItemTotal' => $salesItemTotal,'dailySalesArr' => $dailySalesArr,'dailySalesSummaryArr' => $dailySalesSummaryArr,'monthlySalesSummary'=>$monthlySalesSummary];
 
         }
@@ -1126,7 +1126,7 @@ class BusinessInvoiceRepository extends EntityRepository
 
     public function insertFuelSales(BusinessBatchParticular $particular)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $quantity = ($particular->getQuantity() - $particular->getCustomerSalesQuantity());
         $total = ($particular->getPrice() * $quantity);
 

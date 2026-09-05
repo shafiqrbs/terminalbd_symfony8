@@ -243,7 +243,7 @@ class DoctorInvoiceRepository extends EntityRepository
 
     public function updateCommissionInvoice(Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $this->createQueryBuilder('e')
             ->select('sum(e.payment) as subTotal')
             ->where('e.hmsInvoice = :invoice')
@@ -259,7 +259,7 @@ class DoctorInvoiceRepository extends EntityRepository
         foreach ($entities->getQuery()->getArrayResult() as $row){
             $ids[] = $row['id'];
         }
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('i.id as invoiceId , referred.name as referredName,  particular.id as commissionId');
         $qb->addSelect('SUM(e.payment) as payment');
@@ -286,7 +286,7 @@ class DoctorInvoiceRepository extends EntityRepository
         foreach ($entities->getQuery()->getArrayResult() as $row){
             $ids[] = $row['id'];
         }
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('particular.id as commissionId');
         $qb->addSelect('SUM(e.payment) as payment,particular.name as commissionName , particular.id as comId');
@@ -318,8 +318,8 @@ class DoctorInvoiceRepository extends EntityRepository
         $stmt->bindValue('process', 'Paid');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
             $arrays[$result['date']] = $result;
@@ -353,8 +353,8 @@ class DoctorInvoiceRepository extends EntityRepository
         if(!empty($referred)) {
             $stmt->bindValue('referred',$referred);
         }
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         return $results;
 
     }
@@ -391,8 +391,8 @@ class DoctorInvoiceRepository extends EntityRepository
         if(!empty($referred)) {
             $stmt->bindValue('referred',$referred);
         }
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         return $results;
 
     }
@@ -423,8 +423,8 @@ class DoctorInvoiceRepository extends EntityRepository
         if(!empty($referred)) {
             $stmt->bindValue('referred',$referred);
         }
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $row){
             $uniqueId = $row['date'].'-'.$row['commissionId'];
@@ -434,7 +434,7 @@ class DoctorInvoiceRepository extends EntityRepository
     }
 
     public function monthlyReferredCommissionInvoice(User $user , $data =[]){
-        $this->_em;
+        $this->getEntityManager();
         $config = $user->getGlobalOption()->getHospitalConfig()->getId();
         $month = $data['month'] ?? '';
         $year = $data['year'] ?? '';
@@ -466,7 +466,7 @@ class DoctorInvoiceRepository extends EntityRepository
     }
 
     public function dailyReferredCommissionInvoice(User $user , $data =[]){
-        $this->_em;
+        $this->getEntityManager();
         $config = $user->getGlobalOption()->getHospitalConfig()->getId();
 
         $startDate = $data['startDate'] ?? '';
@@ -499,7 +499,7 @@ class DoctorInvoiceRepository extends EntityRepository
 
     public function monthlyCommissionDetails($user,$data)
     {
-        $this->_em;
+        $this->getEntityManager();
         $config = $user->getGlobalOption()->getHospitalConfig()->getId();
         $month = $data['month'] ?? '';
         $year = $data['year'] ?? '';
@@ -538,7 +538,7 @@ class DoctorInvoiceRepository extends EntityRepository
 
     public function dailyCommissionDetails($user,$data)
     {
-        $this->_em;
+        $this->getEntityManager();
         $config = $user->getGlobalOption()->getHospitalConfig()->getId();
         $startDate = (isset($data['startDate']) and $data['startDate'])? $data['startDate'] : '';
         $endDate = (isset($data['endDate']) and $data['endDate'])? $data['endDate'] : '';
@@ -578,7 +578,7 @@ class DoctorInvoiceRepository extends EntityRepository
 
     public function commissionGroup($user,$data)
     {
-        $this->_em;
+        $this->getEntityManager();
         $config = $user->getGlobalOption()->getHospitalConfig()->getId();
         $startDate = $data['startDate'] ?? '';
         $endDate = $data['endDate'] ?? '';
@@ -609,7 +609,7 @@ class DoctorInvoiceRepository extends EntityRepository
 
     public function commissionReferred($user,$data)
     {
-        $this->_em;
+        $this->getEntityManager();
         $config = $user->getGlobalOption()->getHospitalConfig()->getId();
         $startDate = $data['startDate'] ?? '';
         $endDate = $data['endDate'] ?? '';

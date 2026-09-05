@@ -16,7 +16,7 @@ class GalleryImageRepository extends EntityRepository
 
     public function insertGalleryImage($data,$galleryId)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $galleryEnt = $em->getRepository(\App\Media\Entity\PhotoGallery::class)->find($galleryId);
         if($galleryEnt){
             $i=0;
@@ -46,7 +46,7 @@ class GalleryImageRepository extends EntityRepository
     public function updateGalleryImage($data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $i=0;
         if(!empty($data['removeId'])){
@@ -81,7 +81,7 @@ class GalleryImageRepository extends EntityRepository
 
     public function removeGalleryImage($data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(!empty($data)){
 
             foreach ($data as $key ){

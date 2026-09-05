@@ -27,7 +27,7 @@ class AccountProfitRepository extends EntityRepository
 
     public function insertAccountProfit(GlobalOption $option,$month,$year,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $date = new DateTime($data);
         $entity = new AccountProfit();
         $entity->setGlobalOption($option);
@@ -44,7 +44,7 @@ class AccountProfitRepository extends EntityRepository
 
     public function reportMonthlyProfitLoss(AccountProfit $profit,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $this->removeExistingTransaction($profit);
         $journalAccountPurchase = $this->monthlyPurchaseJournal($profit, $data);
         $journalAccountSales = $this->monthlySalesJournal($profit, $data);
@@ -117,8 +117,8 @@ class AccountProfitRepository extends EntityRepository
         $end = $profit->getGenerateMonth();
         $date['startDate'] = $end->format('Y-m-01 00:00:00');
         $date['endDate'] = $end->format('Y-m-t 23:59:59');
-        $expenditures = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncomeLoss($profit->getGlobalOption(), $accountHeads = [37,23],$date);
-        $operatingRevenue = $this->_em->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncomeLoss($profit->getGlobalOption(), $accountHeads = [20],$date);
+        $expenditures = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncomeLoss($profit->getGlobalOption(), $accountHeads = [37,23],$date);
+        $operatingRevenue = $this->getEntityManager()->getRepository(\App\Accounting\Entity\Transaction::class)->reportTransactionIncomeLoss($profit->getGlobalOption(), $accountHeads = [20],$date);
         $data =  ['sales' => $monthlySalesAccountReceivable['total'] , 'salesReturn' => $salesReturn['debit'] ,'salesAdjustment' => $salesAdjustmentReconcialtion['debit'] ,'purchaseAdjustment' => $salesAdjustmentReconcialtion['credit'] ,'purchase' => $salesPurchaserReconcialtion['credit'], 'operatingRevenue' => $operatingRevenue['amount'], 'expenditure' => $expenditures['amount']];
         return $data;
 
@@ -139,8 +139,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('process', 'approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
     }
 
@@ -158,8 +158,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('process', 'approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
     }
 
@@ -177,8 +177,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('process', 'approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         return $result;
 
        /* $option =  $user->getGlobalOption()->getId();
@@ -207,8 +207,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('process', 'approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         return $result;
     }
 
@@ -226,8 +226,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('process', 'approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         return $result;
 
     }
@@ -248,8 +248,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('process', 'Done');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         return $result;
     }
 
@@ -268,8 +268,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('process', 'approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
     }
 
@@ -287,8 +287,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('process', 'approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
     }
 
@@ -301,8 +301,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
         $stmt->bindValue('config', $config);
         $stmt->bindValue('profit', $profit->getId());
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
     }
 
@@ -316,8 +316,8 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('config', $config);
         $stmt->bindValue('profit', $profit->getId());
         $stmt->bindValue('process', $process);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         return $result;
     }
 
@@ -331,13 +331,13 @@ class AccountProfitRepository extends EntityRepository
         $stmt->bindValue('config', $config);
         $stmt->bindValue('profit', $profit->getId());
         $stmt->bindValue('process', $process);
-        $stmt->execute();
-        $result =  $stmt->fetch();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAssociative();
         return $result;
     }
 
     public function removeExistingTransaction(AccountProfit $profit){
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $transaction = $em->createQuery("DELETE AccountingBundle:Transaction e WHERE e.accountProfit = {$profit->getId()}");
         $transaction->execute();
     }

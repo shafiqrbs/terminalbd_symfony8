@@ -17,7 +17,7 @@ class InvoicePathologicalReportRepository extends EntityRepository
 
     public function insertGroup(InvoiceParticular $invoiceParticular)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i = 0;
         if(empty($invoiceParticular->getInvoicePathologicalReports())) {
             if(empty($invoiceParticular->setInvoicePathologicalGroup()) and $invoiceParticular->getParticular()->getService()->getSlug() == 'diagnostic' and $invoiceParticular->getParticular()->getPathologicalReports()){
@@ -42,7 +42,7 @@ class InvoicePathologicalReportRepository extends EntityRepository
 
     public function insertMetaValue($invoiceParticular , $data){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if ($data and isset($data['metaValue']) and !empty($data['metaValue'])) {
 
             $i = 0;
@@ -69,7 +69,7 @@ class InvoicePathologicalReportRepository extends EntityRepository
 
     public function insertPathologicalReportValue($invoiceParticular , $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         if ($data and isset($data['pathologicalReportId']) and !empty($data['pathologicalReportId'])) {
 

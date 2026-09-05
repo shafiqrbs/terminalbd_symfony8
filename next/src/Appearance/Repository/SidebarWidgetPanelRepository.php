@@ -14,7 +14,7 @@ class SidebarWidgetPanelRepository extends EntityRepository
 {
     public function getSidebarPanel(GlobalOption $option,$sidebarWidget)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Appearance\Entity\SidebarWidgetPanel::class)->findOneBy(['globalOption' => $option,'sidebarWidget' => $sidebarWidget]);
         return $entity;
     }

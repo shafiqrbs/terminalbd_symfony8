@@ -16,7 +16,7 @@ class HmsStockOutRepository extends EntityRepository
 
     public function updateStockOutTotalPrice(HmsStockOut $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Hospital\Entity\HmsStockOutItem::class,'si')
             ->select('sum(si.salesSubTotal) as total')

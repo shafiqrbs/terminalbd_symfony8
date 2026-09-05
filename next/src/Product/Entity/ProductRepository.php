@@ -87,7 +87,7 @@ class ProductRepository extends EntityRepository
 
     public function insertProduct($data,$user)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $user = $em->getRepository(\App\User\Entity\User::class)->find($user);
         if($user){
 
@@ -118,7 +118,7 @@ class ProductRepository extends EntityRepository
     public function multiInsert($data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i=0;
 
         if(!empty($data['removeId'])){
@@ -183,7 +183,7 @@ class ProductRepository extends EntityRepository
 
     public function  updateProductCategories($entity,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $cat = [];
         $categories     = $data['categories'];
         $checkEntity    = $entity->getCategories();
@@ -219,7 +219,7 @@ class ProductRepository extends EntityRepository
 
     public function removeProduct($data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(!empty($data)){
 
             foreach ($data as $key ){
@@ -237,7 +237,7 @@ class ProductRepository extends EntityRepository
 
     public function getLatestProduct(){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Product\Entity\Product::class)->findBy(['status'=>1,'isFeature'=>1],['created'=>'desc']);
         if(!empty($entity)){
 
@@ -249,7 +249,7 @@ class ProductRepository extends EntityRepository
 
     public function getRelatedProduct($cat){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Product\Entity\Product::class)->findBy(['status'=>1,'isFeature'=>1],['created'=>'desc']);
         if(!empty($entity)){
 
@@ -262,7 +262,7 @@ class ProductRepository extends EntityRepository
 
     public function getCategoryProducts($slug){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var EntityManager $em */
 
@@ -318,7 +318,7 @@ class ProductRepository extends EntityRepository
 
         $slug = $options['lowercase'] ? mb_strtolower($str, 'UTF-8') : $str;
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = $em->getRepository(\App\Product\Entity\Product::class)->findOneBy(['slug'=>$slug]);
         if (empty($entity)){
             return $slug;
@@ -333,7 +333,7 @@ class ProductRepository extends EntityRepository
     public function checkExistingProductSlug($productSlug)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $productSlugNew = '';
         for ($i = 1; $i < 100; $i++){
@@ -358,7 +358,7 @@ class ProductRepository extends EntityRepository
 
     public function insertProductCollection($data)
     {
-        $em =$this->_em;
+        $em =$this->getEntityManager();
         $products = $data['productId'];
 
         $i=0;
@@ -417,7 +417,7 @@ class ProductRepository extends EntityRepository
 
     public function updateCollection($entity,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $collection = $data['collection'];
         if(!empty($collection)){
@@ -444,7 +444,7 @@ class ProductRepository extends EntityRepository
 
     public function insertDuplicate($entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var EntityManager $em */
 
@@ -496,7 +496,7 @@ class ProductRepository extends EntityRepository
 
     public function updateDuplicateProduct($entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $productCode    = 'P0'.$entity->getUser()->getVendor()->getThana()->getId().'0'.$entity->getUser()->getId().'0'.$entity->getId();
         $entity->setProductCode($productCode);
         $em->persist($entity);

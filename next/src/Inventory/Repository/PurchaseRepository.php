@@ -207,12 +207,12 @@ class PurchaseRepository extends EntityRepository
             $entity->setTotalItem($row['item']);
             $entity->setTotalAmount($row['total']);
             $entity->setPaymentAmount($row['total']);
-            $entity->setTransactionMethod($this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
-            $this->_em->persist($entity);
+            $entity->setTransactionMethod($this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1));
+            $this->getEntityManager()->persist($entity);
 
         }
 
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
 
         if(!empty($result)){
             return 'imported';
@@ -225,7 +225,7 @@ class PurchaseRepository extends EntityRepository
 	{
 		$global =  $user->getGlobalOption()->getId();
 
-		$qb = $this->_em->createQueryBuilder();
+		$qb = $this->getEntityManager()->createQueryBuilder();
 		$qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
 		$qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
 		$qb->where('e.globalOption = :config');
@@ -252,8 +252,8 @@ class PurchaseRepository extends EntityRepository
         $purchase->setTotalItem($row['item']);
         $purchase->setTotalAmount($row['total']);
         $purchase->setDueAmount($row['total'] - $purchase->getPaymentAmount());
-        $this->_em->persist($purchase);
-        $this->_em->flush($purchase);
+        $this->getEntityManager()->persist($purchase);
+        $this->getEntityManager()->flush($purchase);
         return $purchase;
 
     }
@@ -276,15 +276,15 @@ class PurchaseRepository extends EntityRepository
         $purchase->setTotalItem($row['item']);
         $purchase->setTotalAmount($row['total']);
         $purchase->setPaymentAmount($row['total']);
-        $this->_em->persist($purchase);
-        $this->_em->flush($purchase);
+        $this->getEntityManager()->persist($purchase);
+        $this->getEntityManager()->flush($purchase);
     }
 
 
 
     public  function getPurchaseCount($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(e.id)');
         $qb->from(\App\Inventory\Entity\Purchase::class,'e');
         $qb->where("e.inventoryConfig = :inventory");
@@ -301,8 +301,8 @@ class PurchaseRepository extends EntityRepository
     public function updateProcess($purchase,$process = 'complete')
     {
         $purchase->setProcess($process);
-        $this->_em->persist($purchase);
-        $this->_em->flush($purchase);
+        $this->getEntityManager()->persist($purchase);
+        $this->getEntityManager()->flush($purchase);
     }
 
     public function searchAutoComplete(InventoryConfig $inventory,$q)
@@ -338,8 +338,8 @@ class PurchaseRepository extends EntityRepository
 		$stmt->bindValue('config', $config);
 		$stmt->bindValue('process', 'Approved');
 		$stmt->bindValue('year', $year);
-		$stmt->execute();
-		$result =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+		$result =  $stmt->fetchAllAssociative();
 		return $result;
 
 	}

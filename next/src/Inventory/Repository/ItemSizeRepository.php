@@ -14,7 +14,7 @@ class ItemSizeRepository extends EntityRepository
 {
     public function getLastId($inventory)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(cs)');
         $qb->from(\App\Inventory\Entity\ItemSize::class,'cs');
         $qb->where("cs.inventoryConfig = :inventory");

@@ -66,7 +66,7 @@ class LocationRepository extends MaterializedPathRepository{
     public function getLocationOptions(){
 
         $ret = [];
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $locations = $em->getRepository('ProductProductBundle:Location')->findBy([],['name'=>'asc']);
 
         foreach( $locations as $cat ){
@@ -187,7 +187,7 @@ class LocationRepository extends MaterializedPathRepository{
     public function getUnderChild($parent,$thana)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entities = $em->getRepository(\App\Location\Entity\Location::class)->findBy(['parent'=>$parent],['name'=>'asc']);
         $data = '';
         $data .= '<label>Thana/Upazilla</label>';

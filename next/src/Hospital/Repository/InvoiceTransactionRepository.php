@@ -318,15 +318,15 @@ class InvoiceTransactionRepository extends EntityRepository
         $transactionCode = sprintf("%s", str_pad($entity->getCode(),2, '0', STR_PAD_LEFT));
         $entity->setProcess('Done');
         $entity->setTransactionCode($transactionCode);
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
         return $entity;
 
     }
 
    public function insertDefaultAdmissionParticular(Invoice $invoice){
 
-       $em = $this->_em;
+       $em = $this->getEntityManager();
        $records = $em->getRepository(\App\Hospital\Entity\Particular::class)->findBy(['hospitalConfig'=>$invoice->getHospitalConfig(),'admissionDefault' => 1]);
        if(count($records) > 0){
            $code = $this->getLastCode($invoice);
@@ -338,8 +338,8 @@ class InvoiceTransactionRepository extends EntityRepository
            $entity->setTransactionCode($transactionCode);
            $transactionMethod = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
            $entity->setTransactionMethod($transactionMethod);
-           $this->_em->persist($entity);
-           $this->_em->flush();
+           $this->getEntityManager()->persist($entity);
+           $this->getEntityManager()->flush();
            $em->getRepository(\App\Hospital\Entity\AdmissionPatientParticular::class)->insertDefaultInvoiceItems($entity,$records);
            $em->getRepository(\App\Hospital\Entity\AdmissionPatientParticular::class)->updateInvoiceTransactionTotalPrice($entity);
            return $entity;
@@ -357,8 +357,8 @@ class InvoiceTransactionRepository extends EntityRepository
         $entity->setTransactionCode($transactionCode);
         $entity->setPayment($invoice->getReceive());
         $entity->setTransactionMethod($invoice->getTransactionMethod());
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
         return $entity;
 
     }
@@ -374,10 +374,10 @@ class InvoiceTransactionRepository extends EntityRepository
         $entity->setDiscount($data['discount']);
         $entity->setPayment($data['payment']);
         $entity->setProcess('In-progress');
-        $transactionMethod = $this->_em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
+        $transactionMethod = $this->getEntityManager()->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
         $entity->setTransactionMethod($transactionMethod);
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
         return $entity;
 
     }
@@ -405,8 +405,8 @@ class InvoiceTransactionRepository extends EntityRepository
             $vat = $this->getCulculationVat($invoice, $entity->getPayment());
             $entity->setVat($vat);
         }
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
 
     }
 
@@ -435,8 +435,8 @@ class InvoiceTransactionRepository extends EntityRepository
         $entity->setComment($invoice->getComment());
         $entity->setCreated($invoice->getCreated());
         $entity->setIsMaster(true);
-        $this->_em->persist($entity);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
     }
 
     public function insertTransaction(Invoice $invoice)
@@ -466,10 +466,10 @@ class InvoiceTransactionRepository extends EntityRepository
                 $vat = $this->getCulculationVat($invoice, $entity->getPayment());
                 $entity->setVat($vat);
             }
-            $this->_em->persist($entity);
-            $this->_em->flush($entity);
+            $this->getEntityManager()->persist($entity);
+            $this->getEntityManager()->flush($entity);
             if($invoice->getPayment() > 0){
-                $this->_em->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalAccountInvoice($entity);
+                $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountSales::class)->insertHospitalAccountInvoice($entity);
             }
     }
 
@@ -500,8 +500,8 @@ class InvoiceTransactionRepository extends EntityRepository
             $vat = $this->getCulculationVat($invoice, $entity->getPayment());
             $entity->setVat($vat);
         }
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
 
     }
 
@@ -530,14 +530,14 @@ class InvoiceTransactionRepository extends EntityRepository
             $vat = $this->getCulculationVat($invoice, $entity->getPayment());
             $entity->setVat($vat);
         }
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
 
     }
 
     public function getTransactionSummary($invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $res = $em->createQueryBuilder()
             ->from(\App\Hospital\Entity\InvoiceTransaction::class,'si')
             ->select('sum(si.payment) as payment , sum(si.discount) as discount, sum(si.vat) as vat')
@@ -551,7 +551,7 @@ class InvoiceTransactionRepository extends EntityRepository
 
     public function admissionInvoiceTransactionUpdate(InvoiceTransaction $entity )
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $invoice Invoice */
         $invoice = $entity->getHmsInvoice();
         if ($invoice->getHospitalConfig()->getVatEnable() == 1 && $invoice->getHospitalConfig()->getVatPercentage() > 0) {
@@ -572,7 +572,7 @@ class InvoiceTransactionRepository extends EntityRepository
 
     public function hmsEditInvoiceTransaction(Invoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(!empty($entity->getAccountSales())){
             /* @var AccountSales $sales*/
             foreach ($entity->getAccountSales() as $sales ){
@@ -598,7 +598,7 @@ class InvoiceTransactionRepository extends EntityRepository
 
     public function hmsSalesTransactionReverse(Invoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(!empty($entity->getAccountSales())){
             /* @var AccountSales $sales*/
             foreach ($entity->getAccountSales() as $sales ){
@@ -625,7 +625,7 @@ class InvoiceTransactionRepository extends EntityRepository
     public function hmsAdmissionSalesTransactionReverse(Invoice $entity)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         if(!empty($entity->getAccountSales())){
             /* @var AccountSales $sales*/
@@ -658,14 +658,14 @@ class InvoiceTransactionRepository extends EntityRepository
         foreach ($entity->getInvoiceTransactions() as $transaction) {
 
             $transaction->setDiscount(0);
-            $this->_em->persist($transaction);
-            $this->_em->flush($transaction);
+            $this->getEntityManager()->persist($transaction);
+            $this->getEntityManager()->flush($transaction);
         }
         foreach ($entity->getInvoiceTransactions() as $transaction) {
 
             if( empty($transaction->getPayment()) and empty($transaction->getDiscount())){
 
-                $qb = $this->_em->createQueryBuilder();
+                $qb = $this->getEntityManager()->createQueryBuilder();
                 $qb->delete(\App\Hospital\Entity\InvoiceTransaction::class, 'trans')
                     ->where($qb->expr()->eq('trans.id', ':id'))
                     ->setParameter('id', $transaction->getId());
@@ -676,7 +676,7 @@ class InvoiceTransactionRepository extends EntityRepository
 
     public function removePendingTransaction(Invoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $query = $qb->delete(\App\Hospital\Entity\InvoiceTransaction::class, 'e')
             ->where('e.hmsInvoice = :hmsInvoice')
@@ -726,7 +726,7 @@ class InvoiceTransactionRepository extends EntityRepository
 
     public function getLastCode(Invoice $invoice)
     {
-        $qb = $this->_em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->createQueryBuilder('s');
+        $qb = $this->getEntityManager()->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->createQueryBuilder('s');
         $qb
             ->select('MAX(s.code)')
             ->where('s.hmsInvoice = :invoice')
@@ -762,8 +762,8 @@ class InvoiceTransactionRepository extends EntityRepository
         if($mode){
             $stmt->bindValue('mode', $mode);
         }
-        $stmt->execute();
-        $results =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $results =  $stmt->fetchAllAssociative();
         $arrays = [];
         foreach ($results as $result){
            $arrays[$result['date']] = $result;

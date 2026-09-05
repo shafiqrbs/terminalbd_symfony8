@@ -26,8 +26,8 @@ class MedicineReverseRepository extends EntityRepository
         $reverse->setProcess('Sales');
         $reverse->setContent($data);
         $reverse->setMedicineSales($entity);
-        $this->_em->persist($reverse);
-        $this->_em->flush($reverse);
+        $this->getEntityManager()->persist($reverse);
+        $this->getEntityManager()->flush($reverse);
 
     }
     public function purchase(MedicinePurchase $entity,$data)
@@ -42,8 +42,8 @@ class MedicineReverseRepository extends EntityRepository
         $reverse->setProcess('Purchase');
         $reverse->setContent($data);
         $reverse->setMedicinePurchase($entity);
-        $this->_em->persist($reverse);
-        $this->_em->flush($reverse);
+        $this->getEntityManager()->persist($reverse);
+        $this->getEntityManager()->flush($reverse);
 
     }
 

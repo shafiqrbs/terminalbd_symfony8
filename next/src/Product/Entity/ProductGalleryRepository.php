@@ -15,7 +15,7 @@ class ProductGalleryRepository extends EntityRepository
     public function insertProductGallery($reEntity,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i=0;
         $user = $reEntity->getUser();
         foreach ($data as $key => $value) {
@@ -42,7 +42,7 @@ class ProductGalleryRepository extends EntityRepository
 
     public function removeImage($posts)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($posts as $post ){
            $entity = $em->getRepository(\App\Product\Entity\ProductGallery::class)->find($post);
            $em->remove($entity);
@@ -54,7 +54,7 @@ class ProductGalleryRepository extends EntityRepository
 
     public function insertDuplicateProductGallery($reEntity,$oldEntity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $productGalleries = $oldEntity->getProductGalleries();
 
 

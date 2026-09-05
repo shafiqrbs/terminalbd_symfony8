@@ -304,7 +304,7 @@ class ParticularRepository extends EntityRepository
 
     public function updateRemoveStockQuantity(Particular $stock , $fieldName=''){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($fieldName == 'sales'){
             $qnt = $em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->salesStockItemUpdate($stock);
             $stock->setSalesQuantity($qnt);
@@ -331,7 +331,7 @@ class ParticularRepository extends EntityRepository
 
     public function remainingQnt(Particular $stock)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qnt = ($stock->getOpeningQuantity() + $stock->getPurchaseQuantity()) - ($stock->getSalesQuantity() + $stock->getDamageQuantity() + $stock->getPurchaseReturnQuantity() + $stock->getProductionQuantity());
         $stock->setRemainingQuantity($qnt);
         $em->persist($stock);
@@ -340,7 +340,7 @@ class ParticularRepository extends EntityRepository
 
     public function getPurchaseUpdateQnt(Purchase $purchase){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var PurchaseItem $purchaseItem */
 
@@ -364,7 +364,7 @@ class ParticularRepository extends EntityRepository
 
     public function getDamageQnt(RestaurantDamage $damage){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var Particular  $particular */
 
@@ -378,7 +378,7 @@ class ParticularRepository extends EntityRepository
 
     public function insertAccessories(Invoice $invoice){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $invoiceParticulars = $em->getRepository(\App\Restaurant\Entity\InvoiceParticular::class)->findBy(['invoice'=> $invoice ->getId()]);
 
@@ -405,7 +405,7 @@ class ParticularRepository extends EntityRepository
 
     public function getSalesUpdateQnt(Invoice $invoice){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var InvoiceParticular $item */
 
@@ -466,7 +466,7 @@ class ParticularRepository extends EntityRepository
     public function setParticularSorting($data)
     {
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($data as $key => $value){
             $particular = $this->find($value);
             $particular->setSorting($i);
@@ -478,7 +478,7 @@ class ParticularRepository extends EntityRepository
     public function setProductSorting($data)
     {
         $i = 1;
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($data as $key => $value){
             $sort = sprintf("%s", str_pad($i,3, '0', STR_PAD_LEFT));
             $particular = $this->findOneBy(['status'=> 1,'id' => $value]);
@@ -522,7 +522,7 @@ SET sub.price = $price , sub.subTotal = (sub.quantity * $price)
 WHERE sub.material_id =:material";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
         $qb1->bindValue('material', $id);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
     }
 
     public function updateProductionPrice($config)
@@ -540,7 +540,7 @@ stock.purchasePrice = COALESCE((COALESCE(stock.productionElementAmount,0) + COAL
 WHERE stock.restaurantConfig_id =:config";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('config', $config);
-        $qb->execute();
+        $qb = $qb->executeQuery();
 
     }
 

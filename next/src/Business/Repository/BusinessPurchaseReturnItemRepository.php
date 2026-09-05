@@ -59,7 +59,7 @@ class BusinessPurchaseReturnItemRepository extends EntityRepository
 
     public function insertPurchaseReturnItem(BusinessPurchaseReturn $entity, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $itemIds = $data['itemId'];
         $quantity= $data['quantity'];
@@ -85,7 +85,7 @@ class BusinessPurchaseReturnItemRepository extends EntityRepository
 
     public function insertStockPurchaseReturnItem(BusinessPurchaseReturn $entity,BusinessParticular $particular)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $item = new BusinessPurchaseReturnItem();
         $item->setBusinessPurchaseReturn($entity);
         $item->setBusinessParticular($particular);
@@ -97,7 +97,7 @@ class BusinessPurchaseReturnItemRepository extends EntityRepository
 
     public function deletePurchaseReturnItem(BusinessInvoiceParticular $invoiceParticular)
     {
-       $em = $this->_em;
+       $em = $this->getEntityManager();
        if($invoiceParticular){
            $entity = $this->findOneBy(['salesInvoiceItem' => $invoiceParticular->getId()]);
            if($entity){
@@ -112,7 +112,7 @@ class BusinessPurchaseReturnItemRepository extends EntityRepository
 
     public function removePurchaseReturn(BusinessInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $DistributionReturnItem = $em->createQuery("DELETE BusinessBundle:BusinessDistributionReturnItem e WHERE e.salesInvoice = {$entity->getId()}");
         $DistributionReturnItem->execute();
         foreach ($entity->getBusinessInvoiceParticulars() as $particular){
@@ -122,7 +122,7 @@ class BusinessPurchaseReturnItemRepository extends EntityRepository
 
     public function updatReturnQuantity(BusinessDistributionReturnItem $item)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('SUM(e.quantity) AS quantity');
         $qb->where('e.distributionReturnItem = :businessParticular')->setParameter('businessParticular', $item->getId());

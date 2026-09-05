@@ -95,7 +95,7 @@ class MedicinePurchaseRepository extends EntityRepository
     public function purchaseGenerate($id)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $prepurchase = $em->getRepository(\App\Medicine\Entity\MedicinePrepurchase::class)->find($id);
         $purchase = new MedicinePurchase();
         $purchase->setMedicineConfig($prepurchase->getMedicineConfig());
@@ -109,14 +109,14 @@ class MedicinePurchaseRepository extends EntityRepository
         /* @var $row MedicinePrepurchaseItem */
 
         if($prepurchase->getMedicinePrepurchaseItems()){
-            $em = $this->_em;
+            $em = $this->getEntityManager();
             $elem = "INSERT INTO medicine_purchase_item(`medicinePurchase_id`,`medicineStock_id`,`salesPrice`,`purchasePrice`,`actualPurchasePrice`,`quantity`,purchaseSubTotal)
   SELECT $purchaseId,`medicineStock_id`,`salesPrice`,salesPrice,salesPrice,`quantity`, (salesPrice * quantity) as purchaseSubTotal
   FROM medicine_prepurchase_item
   WHERE medicinePrepurchase_id =:config";
             $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
             $qb1->bindValue('config', $id);
-            $qb1->execute();
+            $qb1 = $qb1->executeQuery();
             $this->updatePurchaseTotalPrice($purchase);
             return $purchase->getId();
         }
@@ -139,7 +139,7 @@ class MedicinePurchaseRepository extends EntityRepository
 
     public function updatePurchaseTotalPrice(MedicinePurchase $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Medicine\Entity\MedicinePurchaseItem::class,'si')
             ->select('sum(si.purchaseSubTotal) as total')
@@ -170,7 +170,7 @@ class MedicinePurchaseRepository extends EntityRepository
 
     public function updateInvoiceMode(MedicinePurchase $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity->setDue(0);
         $entity->setDiscount(0);
         $entity->setDiscountCalculation(0);
@@ -193,8 +193,8 @@ class MedicinePurchaseRepository extends EntityRepository
         $stmt->bindValue('process', 'approved');
         $stmt->bindValue('month', $month);
         $stmt->bindValue('year', $year);
-        $stmt->execute();
-        $result =  $stmt->fetchAll();
+        $stmt = $stmt->executeQuery();
+        $result =  $stmt->fetchAllAssociative();
         return $result;
     }
 
@@ -211,8 +211,8 @@ class MedicinePurchaseRepository extends EntityRepository
 	    $stmt->bindValue('process', 'In-progress');
 	    $stmt->bindValue('receive', $today);
 	    $stmt->bindValue('instantPurchase', 1);
-	    $stmt->execute();
-	    $result =  $stmt->fetch();
+	    $stmt = $stmt->executeQuery();
+	    $result =  $stmt->fetchAssociative();
 	    if(!empty($result['id'])){
 	    	return $data = ['purchase' => $result['id'],'status'=>'valid'];
 	    }else{
@@ -225,7 +225,7 @@ class MedicinePurchaseRepository extends EntityRepository
     {
 
 	    $config = $user->getGlobalOption()->getMedicineConfig();
-	    $em = $this->_em;
+	    $em = $this->getEntityManager();
 
 	    $vendor = $em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->checkInInsert($config,$data['vendor']);
 	    $check = $this->checkInstantPurchaseToday($vendor);
@@ -267,7 +267,7 @@ class MedicinePurchaseRepository extends EntityRepository
     {
         $global =  $user->getGlobalOption()->getId();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->select('sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
         $qb->where('e.globalOption = :config');
@@ -308,8 +308,8 @@ class MedicinePurchaseRepository extends EntityRepository
 		$stmt->bindValue('config', $config);
 		$stmt->bindValue('process', 'Approved');
 		$stmt->bindValue('year', $year);
-		$stmt->execute();
-		$result =  $stmt->fetchAll();
+		$stmt = $stmt->executeQuery();
+		$result =  $stmt->fetchAllAssociative();
 		return $result;
 
 	}
@@ -319,7 +319,7 @@ class MedicinePurchaseRepository extends EntityRepository
 
         $global =  $user->getGlobalOption()->getId();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->join('e.transactionMethod','t');
         $qb->select('t.name as transactionName , sum(e.purchaseAmount) as total ,sum(e.payment) as totalPayment');
@@ -383,7 +383,7 @@ class MedicinePurchaseRepository extends EntityRepository
     public function purchaseVendorReport(User $user , $data = [])
     {
         $global =  $user->getGlobalOption()->getId();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->join('e.medicineVendor','t');
         $qb->select('t.companyName as companyName ,t.name as vendorName ,t.mobile as vendorMobile , sum(e.purchaseAmount) as total ,sum(e.payment) as payment');
@@ -403,7 +403,7 @@ class MedicinePurchaseRepository extends EntityRepository
     {
 
         $global =  $user->getGlobalOption()->getId();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Accounting\Entity\AccountPurchase::class,'e');
         $qb->join('e.medicineVendor','t');
         $qb->join('t.customer','customer');
@@ -447,8 +447,8 @@ class MedicinePurchaseRepository extends EntityRepository
                 ORDER BY sales.id DESC";
         $qb = $this->getEntityManager()->getConnection()->prepare($sql);
         $qb->bindValue('globalOption', $global->getId());
-        $qb->execute();
-        $results =  $qb->fetchAll();
+        $qb = $qb->executeQuery();
+        $results =  $qb->fetchAllAssociative();
         $salesVendors = [];
         foreach ($results as $row){
             $salesVendors[$row['id']] = $row;
@@ -527,7 +527,7 @@ class MedicinePurchaseRepository extends EntityRepository
     {
         $vendors =  $user->getGlobalOption()->getMedicineConfig()->getMedicineVendors();
         $config =  $user->getGlobalOption()->getMedicineConfig()->getId();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Medicine\Entity\MedicineSalesItem::class,'msi');
         $qb->join('msi.medicineSales','e');
         $qb->join('msi.medicinePurchaseItem','mpi');
@@ -590,7 +590,7 @@ class MedicinePurchaseRepository extends EntityRepository
 	    }
 
     	$config =  $user->getGlobalOption()->getMedicineConfig()->getId();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Medicine\Entity\MedicineSales::class,'e');
         $qb->join('e.medicineSalesItems','mpi');
         $qb->join('mpi.medicineStock','ms');
@@ -640,7 +640,7 @@ class MedicinePurchaseRepository extends EntityRepository
 			$ids[]=$y['name'];
 		}
 		$config =  $user->getGlobalOption()->getMedicineConfig()->getId();
-		$qb = $this->_em->createQueryBuilder();
+		$qb = $this->getEntityManager()->createQueryBuilder();
 		$qb->from(\App\Medicine\Entity\MedicineSales::class,'e');
 		$qb->join('e.medicineSalesItems','mpi');
 		$qb->join('mpi.medicineStock','ms');
@@ -715,7 +715,7 @@ class MedicinePurchaseRepository extends EntityRepository
 
     public function insertApiPurchase(GlobalOption $option,MedicineAndroidProcess $process)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $items = json_decode($process->getJsonItem(),true);
 
@@ -767,7 +767,7 @@ class MedicinePurchaseRepository extends EntityRepository
 
     public function insertApiPurchaseItem(GlobalOption $option,MedicineAndroidProcess $process){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $conf = $option->getMedicineConfig();
 
         $items = json_decode($process->getJsonSubItem(),true);
@@ -805,7 +805,7 @@ class MedicinePurchaseRepository extends EntityRepository
 
     public function emptyDelete($config)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $purchase = $em->createQuery("DELETE MedicineBundle:MedicinePurchase e WHERE e.medicineConfig = {$config} AND e.subTotal IS NULL OR  e.subTotal=0");
         $purchase->execute();
     }
@@ -819,8 +819,8 @@ WHERE medicineConfig_id=236
 GROUP BY medicine_purchase.id 
 HAVING COUNT(si.id) = 0";
         $qb = $this->getEntityManager()->getConnection()->prepare($elem1);
-        $qb->execute();
-        $result =  $qb->fetchAll();
+        $qb = $qb->executeQuery();
+        $result =  $qb->fetchAllAssociative();
         $ids = [];
         foreach ($result as $row){
             $ids[] = $row['id'];

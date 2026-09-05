@@ -18,7 +18,7 @@ class AdmissionPatientParticularRepository extends EntityRepository
 
     public function insertDefaultInvoiceItems($transaction,$records)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($records as $record){
             /* @var $record Particular */
             $entity = new AdmissionPatientParticular();
@@ -35,10 +35,10 @@ class AdmissionPatientParticularRepository extends EntityRepository
 
     public function insertInvoiceItems($transaction, $data)
     {
-        $particular = $this->_em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
-        $em = $this->_em;
+        $particular = $this->getEntityManager()->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
         $entity = new AdmissionPatientParticular();
-        $invoiceParticular = $this->_em->getRepository(\App\Hospital\Entity\AdmissionPatientParticular::class)->findOneBy(['invoiceTransaction' => $transaction ,'particular' => $particular]);
+        $invoiceParticular = $this->getEntityManager()->getRepository(\App\Hospital\Entity\AdmissionPatientParticular::class)->findOneBy(['invoiceTransaction' => $transaction ,'particular' => $particular]);
         if(!empty($invoiceParticular)) {
             $entity = $invoiceParticular;
             if ($particular->getService()->getHasQuantity() == 1){
@@ -69,7 +69,7 @@ class AdmissionPatientParticularRepository extends EntityRepository
     public function initialUpdateInvoiceParticulars(Invoice $entity,$transaction)
     {
         /* @var $particular InvoiceParticular */
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         foreach ($entity->getInvoiceParticulars() as $particular ){
 
@@ -116,7 +116,7 @@ class AdmissionPatientParticularRepository extends EntityRepository
 
     public function updateInvoiceTransactionTotalPrice(InvoiceTransaction $transaction)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Hospital\Entity\AdmissionPatientParticular::class,'si')
             ->select('sum(si.subTotal) as subTotal')

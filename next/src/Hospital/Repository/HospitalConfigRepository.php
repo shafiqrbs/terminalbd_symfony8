@@ -17,7 +17,7 @@ class HospitalConfigRepository extends EntityRepository
     public function hospitalReset(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getHospitalConfig()->getId();
 
         $DoctorInvoice = $em->createQuery('DELETE HospitalBundle:DoctorInvoice e WHERE e.hospitalConfig = '.$config);
@@ -43,7 +43,7 @@ class HospitalConfigRepository extends EntityRepository
     public function hospitalDelete(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getHospitalConfig()->getId();
 
         $DoctorInvoice = $em->createQuery('DELETE HospitalBundle:DoctorInvoice e WHERE e.hospitalConfig = '.$config);

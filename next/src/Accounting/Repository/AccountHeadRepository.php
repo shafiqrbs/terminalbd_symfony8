@@ -184,7 +184,7 @@ class AccountHeadRepository extends EntityRepository
         $exist = $this->findOneBy(['accountBank' => $entity]);
         if ($exist) {
             $exist->setName($entity->getName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -194,8 +194,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('bank');
             $head->setParent($parent);
             $head->setAccountBank($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
 
@@ -208,7 +208,7 @@ class AccountHeadRepository extends EntityRepository
         $exist = $this->findOneBy(['accountMobileBank' => $entity]);
         if ($exist) {
             $exist->setName($entity->getName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -218,8 +218,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('mobile');
             $head->setParent($parent);
             $head->setAccountMobileBank($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
 
@@ -233,7 +233,7 @@ class AccountHeadRepository extends EntityRepository
         $exist = $this->findOneBy(['customer' => $entity]);
         if ($exist) {
             $exist->setName($entity->getName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -243,8 +243,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('customer');
             $head->setParent($parent);
             $head->setCustomer($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
     }
@@ -257,7 +257,7 @@ class AccountHeadRepository extends EntityRepository
         $exist = $this->findOneBy(['accountCondition' => $entity]);
         if ($exist) {
             $exist->setName($entity->getName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -267,8 +267,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('condition');
             $head->setParent($parent);
             $head->setAccountCondition($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
     }
@@ -281,7 +281,7 @@ class AccountHeadRepository extends EntityRepository
         $exist = $this->findOneBy(['accountLoanUser' => $entity]);
         if ($exist) {
             $exist->setName($entity->getName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -291,8 +291,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('loan');
             $head->setParent($parent);
             $head->setAccountLoanUser($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
     }
@@ -304,7 +304,7 @@ class AccountHeadRepository extends EntityRepository
         $exist = $this->findOneBy(['accountVendor' => $entity]);
         if ($exist) {
             $exist->setName($entity->getCompanyName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -314,8 +314,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('vendor');
             $head->setParent($parent);
             $head->setAccountVendor($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
     }
@@ -327,7 +327,7 @@ class AccountHeadRepository extends EntityRepository
         $exist = $this->findOneBy(['medicineVendor' => $entity]);
         if ($exist) {
             $exist->setName($entity->getCompanyName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -337,8 +337,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('vendor');
             $head->setParent($parent);
             $head->setMedicineVendor($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
     }
@@ -350,7 +350,7 @@ class AccountHeadRepository extends EntityRepository
         $exist = $this->findOneBy(['inventoryVendor' => $entity]);
         if ($exist) {
             $exist->setName($entity->getCompanyName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -360,8 +360,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('vendor');
             $head->setParent($parent);
             $head->setInventoryVendor($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
     }
@@ -384,7 +384,7 @@ class AccountHeadRepository extends EntityRepository
                 $parent = $this->findOneBy(['slug' => 'capital-investment']);
                 $exist->setParent($parent);
             }
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         }else{
             $head = new AccountHead();
@@ -402,8 +402,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setName($profile->getName());
             $head->setSource('user');
             $head->setEmployee($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
     }
@@ -416,7 +416,7 @@ class AccountHeadRepository extends EntityRepository
         $exist = $this->findOneBy(['assetsItem' => $entity->getItem()]);
         if ($exist) {
             $exist->setName($entity->getItem()->getName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -425,8 +425,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('Assets');
             $head->setAssetsItem($entity->getItem());
             $head->setParent($entity->getItem()->getCategory()->getAccountHead());
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
     }
@@ -435,11 +435,11 @@ class AccountHeadRepository extends EntityRepository
     {
 
         /* @var $exist AccountHead */
-        $entity = $this->_em->getRepository(\App\Accounting\Entity\AccountBank::class)->find($bank);
+        $entity = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountBank::class)->find($bank);
         $exist = $this->findOneBy(['accountBank' => $entity]);
         if ($exist) {
             $exist->setName($entity->getName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -449,8 +449,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('bank');
             $head->setParent($parent);
             $head->setAccountBank($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
 
@@ -459,12 +459,12 @@ class AccountHeadRepository extends EntityRepository
     public function insertMobileSubHead($mobile)
     {
 
-        $entity = $this->_em->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($mobile);
+        $entity = $this->getEntityManager()->getRepository(\App\Accounting\Entity\AccountMobileBank::class)->find($mobile);
         /* @var $exist AccountHead */
         $exist = $this->findOneBy(['accountMobileBank' => $entity]);
         if ($exist) {
             $exist->setName($entity->getName());
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
             return $exist;
         } else {
             $head = new AccountHead();
@@ -474,8 +474,8 @@ class AccountHeadRepository extends EntityRepository
             $head->setSource('mobile');
             $head->setParent($parent);
             $head->setAccountMobileBank($entity);
-            $this->_em->persist($head);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($head);
+            $this->getEntityManager()->flush();
             return $head;
         }
 

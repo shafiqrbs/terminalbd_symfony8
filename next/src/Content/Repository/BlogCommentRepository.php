@@ -16,7 +16,7 @@ class BlogCommentRepository extends EntityRepository
     public function insertMessage($data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $id = $em->getRepository('SettingContentBundle:Blog')->find($data['id']);
 
         if($data){

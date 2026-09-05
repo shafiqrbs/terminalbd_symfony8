@@ -52,7 +52,7 @@ class AccountVendorRepository extends EntityRepository
 
     public function getLastId(GlobalOption $global)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(e.id)');
         $qb->from('AccountingBundle:Vendor','e');
         $qb->andWhere("e.globalOption = :global");
@@ -68,7 +68,7 @@ class AccountVendorRepository extends EntityRepository
 
     public function newExistingCustomerForSales($globalOption,$mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $companyName = $data['companyName'];
         $name = $data['customerName'];
         $address = $data['customerAddress'] ?? '';
@@ -106,7 +106,7 @@ class AccountVendorRepository extends EntityRepository
 
     public function insertVendor(MedicineVendor $vendor)
     {
-    	$em = $this->_em;
+    	$em = $this->getEntityManager();
     	$entity = new AccountVendor();
 	    $entity->setCompanyName($vendor->getCompanyName());
 	    $entity->setName($vendor->getName());
@@ -144,7 +144,7 @@ class AccountVendorRepository extends EntityRepository
 
     public function newVendorCreate($globalOption,$mobile,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['companyName'];
         $address = $data['companyAddress'] ?? '';
         $entity = $this->findOneBy(['globalOption' => $globalOption ,'companyName' => $name ,'mobile' => $mobile]);
@@ -166,7 +166,7 @@ class AccountVendorRepository extends EntityRepository
 
     public function insertSalesReturnVendor(GlobalOption $globalOption)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = "Sales-Return";
         $mobile = $globalOption->getMobile();
         $entity = $this->findOneBy(['globalOption' => $globalOption ,'companyName' => $name ,'mobile' => $mobile]);
@@ -188,7 +188,7 @@ class AccountVendorRepository extends EntityRepository
     public function updateVendorCompanyName(AccountVendor $vendor)
     {
         $com = $vendor->getCompanyName();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->update(\App\Accounting\Entity\AccountPurchase::class, 'mg')
             ->set('mg.companyName', ':companyName')

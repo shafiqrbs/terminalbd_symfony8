@@ -19,7 +19,7 @@ class PurchaseItemSerialRepository extends EntityRepository
 
     public function insertPurchaseItemSerial(Purchase $purchase){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var $item PurchaseItem  */
 
@@ -56,7 +56,7 @@ class PurchaseItemSerialRepository extends EntityRepository
 
     public function updatePurchaseItemSerial(PurchaseItem $item,$value){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var $item PurchaseItem  */
 
@@ -92,7 +92,7 @@ class PurchaseItemSerialRepository extends EntityRepository
 
     public function sysncPurchaseItemSerial(PurchaseItem $item){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /* @var $item PurchaseItem  */
 
@@ -151,7 +151,7 @@ class PurchaseItemSerialRepository extends EntityRepository
 
     public function removeSerialNo(Purchase $purchase){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $item PurchaseItem */
         foreach ($purchase->getPurchaseItems() as $item ){
             if($item->getSerialNo()){

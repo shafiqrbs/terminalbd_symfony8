@@ -17,7 +17,7 @@ class SalesItemSerialRepository extends EntityRepository
 
     public function insertSalesItemSerial($salesItem,PurchaseItemSerial $serial){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $exist = $this->findOneBy(['purchaseItemSerial' => $serial]);
         if(empty($exist)){
             $entity = new SalesItemSerial();
@@ -35,7 +35,7 @@ class SalesItemSerialRepository extends EntityRepository
 
     public function deleteSalesItemSerial(SalesItem $salesItem){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $serial SalesItemSerial */
         if($salesItem->getSalesItemSerials()){
             foreach ($salesItem->getSalesItemSerials() as $serial) {

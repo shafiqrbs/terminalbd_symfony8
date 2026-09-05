@@ -17,7 +17,7 @@ class InventoryConfigRepository extends EntityRepository
     public function inventoryReset(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getInventoryConfig()->getId();
 
         $StockItem = $em->createQuery('DELETE InventoryBundle:StockItem e WHERE e.inventoryConfig = '.$config);
@@ -67,7 +67,7 @@ class InventoryConfigRepository extends EntityRepository
         $ItemBrand = $em->createQuery('DELETE InventoryBundle:ItemBrand e WHERE e.inventoryConfig = '.$config);
       //  $ItemBrand->execute();
 
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $q = $qb->update(\App\Inventory\Entity\Item::class, 's')
             ->set('s.remainingQnt', '?1')
             ->set('s.purchaseQuantity', '?2')
@@ -106,7 +106,7 @@ class InventoryConfigRepository extends EntityRepository
     public function inventoryDelete(GlobalOption $option)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $config = $option->getInventoryConfig()->getId();
 
         $StockItem = $em->createQuery('DELETE InventoryBundle:StockItem e WHERE e.inventoryConfig = '.$config);

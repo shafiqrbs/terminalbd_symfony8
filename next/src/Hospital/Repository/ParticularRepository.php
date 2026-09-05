@@ -203,7 +203,7 @@ class ParticularRepository extends EntityRepository
 
     public function findHmsExistingCustomer($hospital, $mobile, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['referredDoctor']['name'];
         $doctorSignature = $data['referredDoctor']['doctorSignature'];
         $isDoctor = isset($data['referredDoctor']['isDoctor']) ? 1 : 0;
@@ -227,7 +227,7 @@ class ParticularRepository extends EntityRepository
 
     public function findHmsExistingReferred($hospital, $mobile, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['referredDoctor']['name'];
         $doctorSignature = $data['referredDoctor']['doctorSignature'];
         $isDoctor = isset($data['referredDoctor']['isDoctor']) ? 1 : 0;
@@ -251,7 +251,7 @@ class ParticularRepository extends EntityRepository
 
     public function findHmsExistingDoctor($hospital, $mobile, $data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $name = $data['assignDoctor']['name'];
         $doctorSignature = $data['assignDoctor']['doctorSignature'];
         $doctorSignatureBangla = $data['assignDoctor']['doctorSignatureBangla'];
@@ -281,7 +281,7 @@ class ParticularRepository extends EntityRepository
     public function getPurchaseUpdateQnt(HmsPurchase $purchase)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var HmsPurchaseItem $purchaseItem */
         foreach ($purchase->getPurchaseItems() as $purchaseItem) {
             /** @var Particular $particular */
@@ -296,7 +296,7 @@ class ParticularRepository extends EntityRepository
 
     public function insertAccessories(Invoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var InvoiceParticular $item */
         if (!empty($invoice->getInvoiceParticulars())) {
             foreach ($invoice->getInvoiceParticulars() as $item) {
@@ -315,7 +315,7 @@ class ParticularRepository extends EntityRepository
     public function insertIssueItem(HmsStockOut $invoice)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /** @var InvoiceParticular $item */
         if (!empty($invoice->getStockOutItems())) {
             foreach ($invoice->getStockOutItems() as $item) {
@@ -332,7 +332,7 @@ class ParticularRepository extends EntityRepository
     public function getSalesUpdateQnt(Invoice $invoice)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var InvoiceParticular $item */
 
@@ -354,7 +354,7 @@ class ParticularRepository extends EntityRepository
     public function admittedPatientAccessories(InvoiceTransaction $transaction)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         /** @var InvoiceParticular $item */
         if (!empty($transaction->getAdmissionPatientParticulars())) {
@@ -399,7 +399,7 @@ class ParticularRepository extends EntityRepository
     public function processStockMigration($from, $to)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $stock = $em->createQuery("DELETE HospitalBundle:Particular e WHERE e.hospitalConfig={$to}");
         if ($stock) {
             $stock->execute();
@@ -410,7 +410,7 @@ class ParticularRepository extends EntityRepository
   WHERE hospitalConfig_id    =:config";
         $qb1 = $this->getEntityManager()->getConnection()->prepare($elem);
         $qb1->bindValue('config', $from);
-        $qb1->execute();
+        $qb1 = $qb1->executeQuery();
 
     }
 
@@ -460,7 +460,7 @@ class ParticularRepository extends EntityRepository
     public function insertDoctorVisitModes(Particular $doctor, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if (!empty($data['visitMod'])) {
             foreach ($data['visitMod'] as $key => $item) {
                 $entity = new HmsDoctorVisitMode();
@@ -477,7 +477,7 @@ class ParticularRepository extends EntityRepository
     public function updateDoctorVisitModes(Particular $doctor, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if (!empty($data['visitMod'])) {
             foreach ($data['visitMod'] as $key => $item) {
                 $entity = $em->getRepository(HmsDoctorVisitMode::class)->findOneBy(['doctor' => $doctor->getId(), 'service' => $key]);

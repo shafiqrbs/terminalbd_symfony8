@@ -18,8 +18,8 @@ class HmsStockOutItemRepository extends EntityRepository
 
     public function insertStockOutItems($invoice, $data)
     {
-    	$particular = $this->_em->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
-        $em = $this->_em;
+    	$particular = $this->getEntityManager()->getRepository(\App\Hospital\Entity\Particular::class)->find($data['particularId']);
+        $em = $this->getEntityManager();
         $entity = new HmsStockOutItem();
         $entity->setStockOut($invoice);
         $entity->setParticular($particular);

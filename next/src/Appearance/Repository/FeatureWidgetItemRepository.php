@@ -16,7 +16,7 @@ class FeatureWidgetItemRepository extends EntityRepository
 
     public function insert(FeatureWidget $featureWidget,$data)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(!empty($data['feature'])){
             foreach ($data['feature'] as $row){
                 $entity = new FeatureWidgetItem();
@@ -44,7 +44,7 @@ class FeatureWidgetItemRepository extends EntityRepository
     public function remove(FeatureWidget $featureWidget,$data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         foreach ($data['checkId'] as $row){
 
             $entity = $em->getRepository(\App\Appearance\Entity\FeatureWidgetItem::class)->findOneBy(['featureWidget' => $featureWidget,'feature'=>$row]);

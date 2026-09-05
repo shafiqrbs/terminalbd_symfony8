@@ -17,7 +17,7 @@ class ContentRepository extends EntityRepository
     {
 
         $entity = new Menu();
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if($page){
 
             $entity->setMenu($page->getMenu());
@@ -38,7 +38,7 @@ class ContentRepository extends EntityRepository
     public  function updatePageMenu($page)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $entity = $em->getRepository(\App\Appearance\Entity\Menu::class)->findOneBy(['page' => $page->getId()]);
         if(!empty($entity)){

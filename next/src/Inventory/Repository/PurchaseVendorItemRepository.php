@@ -159,7 +159,7 @@ class PurchaseVendorItemRepository extends EntityRepository
 
     public function insertCopyPurchaseItem(PurchaseVendorItem $entity, PurchaseVendorItem $copyEntity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity->setMasterItem($copyEntity->getMasterItem());
         $entity->setName($copyEntity->getName());
         $entity->setWebName($copyEntity->getWebName());
@@ -218,7 +218,7 @@ class PurchaseVendorItemRepository extends EntityRepository
         /**
          * @var PurchaseVendorItem $entity
          */
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $db = $em->createQueryBuilder();
         $db->select('e');
         $db->from(\App\Inventory\Entity\PurchaseVendorItem::class,'e');
@@ -359,7 +359,7 @@ class PurchaseVendorItemRepository extends EntityRepository
             $purchaseVendorItem->setWebPrice($purchaseItem->getPurchasePrice());
             $purchaseVendorItem->setQuantity($purchaseItem->getQuantity());
             $purchaseVendorItem->setMasterQuantity($purchaseItem->getQuantity());
-            $this->_em->persist($purchaseVendorItem);
+            $this->getEntityManager()->persist($purchaseVendorItem);
 
         }else{
 
@@ -372,14 +372,14 @@ class PurchaseVendorItemRepository extends EntityRepository
                 $purchaseVendorItem->setMasterQuantity($result['quantity']);
             }
         }
-        $this->_em->flush($purchaseVendorItem);
+        $this->getEntityManager()->flush($purchaseVendorItem);
 
     }
 
     public function avgPurchasePriceQuantity(Purchase $purchase , PurchaseItem $purchaseItem ){
 
         $masterItem = $purchaseItem->getItem()->getMasterItem();
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->from(\App\Inventory\Entity\PurchaseItem::class,'e');
         $qb->select('sum(pi.quantity) AS quantity , sum(pi.purchasePrice) AS purchasePrice, sum(pi.salesPrice) AS salesPrice');
         $qb->where("e.purchase = :purchase");
@@ -418,8 +418,8 @@ class PurchaseVendorItemRepository extends EntityRepository
         $sum = $qb->getQuery()->getSingleScalarResult();
 
         $entity->setMasterQuantity($sum);
-        $this->_em->persist($entity);
-        $this->_em->flush($entity);
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
 
     }
 
@@ -468,7 +468,7 @@ class PurchaseVendorItemRepository extends EntityRepository
 
     public function getPurchaseVendorQuantitySum($purchase)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('sum(e.quantity)');
         $qb->from(\App\Inventory\Entity\PurchaseVendorItem::class,'e');
         $qb->where("e.purchase = :purchase");
@@ -479,7 +479,7 @@ class PurchaseVendorItemRepository extends EntityRepository
 
     public function getPurchaseVendorItemQuantity($purchase)
     {
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('sum(e.quantity)  as totalQnt' , 'count(e.id)  as totalItem');
         $qb->from(\App\Inventory\Entity\PurchaseVendorItem::class,'e');
         $qb->where("e.purchase = :purchase");
@@ -490,7 +490,7 @@ class PurchaseVendorItemRepository extends EntityRepository
 
     public function insertPurchaseVendorItem($purchase,$data){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $i = 0;
         foreach($data['quantity'] as $row ){
 

@@ -16,7 +16,7 @@ class MedicinePurchaseReturnRepository extends EntityRepository
 
     public function updatePurchaseReturnTotalPrice(MedicinePurchaseReturn $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\Medicine\Entity\MedicinePurchaseReturnItem::class,'si')
             ->select('sum(si.subTotal) as total')
@@ -41,14 +41,14 @@ class MedicinePurchaseReturnRepository extends EntityRepository
     public function updatePurchaseAdjustment(MedicinePurchaseReturn $purchase_return)
     {
 	    $purchase_return->setAdjusted(true);
-	    $this->_em->persist($purchase_return);
-	    $this->_em->flush($purchase_return);
+	    $this->getEntityManager()->persist($purchase_return);
+	    $this->getEntityManager()->flush($purchase_return);
     }
 
 	public function removePurchaseAdjustment(MedicinePurchaseReturn $purchase_return)
 	{
 		$purchase_return->setAdjusted(NULL);
-		$this->_em->persist($purchase_return);
-		$this->_em->flush($purchase_return);
+		$this->getEntityManager()->persist($purchase_return);
+		$this->getEntityManager()->flush($purchase_return);
 	}
 }

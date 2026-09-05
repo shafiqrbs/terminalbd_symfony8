@@ -94,6 +94,10 @@ $PHP migration/bin/fix-associations.php
 # Doctrine 2 defaulted; every schema operation fails without these.
 $PHP migration/bin/fix-decimal-precision.php
 $PHP migration/bin/fix-string-length.php
+# ORM 3 removed EntityRepository::$_em; 2,056 reads of it evaluate to null.
+$PHP migration/bin/fix-repository-internals.php
+# DBAL 4 made Statement::execute() private and renamed the fetch methods.
+$PHP migration/bin/port-dbal-statements.php
 
 echo
 echo "############ 16. drop routes with no controller ############"

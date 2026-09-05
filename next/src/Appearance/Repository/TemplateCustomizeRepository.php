@@ -18,7 +18,7 @@ class TemplateCustomizeRepository extends EntityRepository {
 
     public function updateTemplateCustomize(TemplateCustomize $entity , $data , $file){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $this->fileUploader($entity, $file);
 
@@ -102,7 +102,7 @@ class TemplateCustomizeRepository extends EntityRepository {
 
     public function fileUploader($entity, $file = '')
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         /* @var $entity TemplateCustomize */
         if(isset($file['logoFile'])){
              $img = $file['logoFile'];

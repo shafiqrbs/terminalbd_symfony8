@@ -38,7 +38,7 @@ class PayrollSheetRepository extends EntityRepository
 
     public function insertUpdateParticular(Payroll $payroll)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
 
         $employees = $em->getRepository(\App\HumanResource\Entity\EmployeePayroll::class)->getPayrollEmployeeGroup($payroll);
 
@@ -114,7 +114,7 @@ class PayrollSheetRepository extends EntityRepository
 
     public function updatePayrollGenerateSummary(Payroll $payroll){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $this->createQueryBuilder('e');
         $qb->select('SUM(e.basicAmount) as basicAmount','SUM(e.bonusAmount) as bonusAmount','SUM(e.arearAmount) as arearAmount','SUM(e.loanInstallment) as loanAmount','SUM(e.advanceAmount) as advanceAmount','SUM(e.allowanceAmount) as allowanceAmount','SUM(e.deductionAmount) as deductionAmount');
         $qb->where("e.id ={$payroll->getId()}");
@@ -141,7 +141,7 @@ class PayrollSheetRepository extends EntityRepository
         $allowance = $this->getAllowanceDeduction($payroll->getId(),'allowance');
         $deduction = $this->getAllowanceDeduction($payroll->getId(),'deduction');
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $payroll->setAllowanceAmount($allowance);
         $payroll->setDeductionAmount($deduction);
         $amount = ($payroll->getBasicAmount() + $allowance);

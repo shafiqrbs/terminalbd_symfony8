@@ -321,7 +321,7 @@ class DpsInvoiceRepository extends EntityRepository
 
     public function updateInvoiceTotalPrice(DpsInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $total = $em->createQueryBuilder()
             ->from(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class,'si')
             ->select('sum(si.price) as estimateTotal')
@@ -350,7 +350,7 @@ class DpsInvoiceRepository extends EntityRepository
 
     public function updatePaymentReceive(DpsInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $res = $em->createQueryBuilder()
             ->from(\App\DoctorPrescription\Entity\DpsTreatmentPlan::class,'si')
             ->select('sum(si.price) as subTotal ,sum(si.payment) as payment ,sum(si.discount) as discount')
@@ -373,7 +373,7 @@ class DpsInvoiceRepository extends EntityRepository
 
     public function updateCommissionPayment(DpsInvoice $invoice)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $res = $em->createQueryBuilder()
             ->from('DoctorPrescriptionBundle:DpsDoctorInvoice','si')
             ->select('sum(si.payment) as payment')
@@ -398,7 +398,7 @@ class DpsInvoiceRepository extends EntityRepository
 
     public function getInvoiceDetails(DpsInvoice $invoice){
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->from('DoctorPrescriptionBundle:InvoiceParticular','ip');
         $qb->innerJoin('ip.particular','particular');
@@ -410,8 +410,8 @@ class DpsInvoiceRepository extends EntityRepository
 
     public function updatePatientInfo($invoice,Customer $patient)
     {
-        $em = $this->_em;
-        $invoice = $this->_em->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->find($invoice);
+        $em = $this->getEntityManager();
+        $invoice = $this->getEntityManager()->getRepository(\App\DoctorPrescription\Entity\DpsInvoice::class)->find($invoice);
         $invoice->setCustomer($patient);
         $invoice->setMobile($patient->getMobile());
         $em->persist($invoice);
@@ -421,7 +421,7 @@ class DpsInvoiceRepository extends EntityRepository
 
     public function patientAdmissionUpdate($data,DpsInvoice $entity)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $invoiceInfo = $data['appstore_bundle_configbundle_invoice'];
         if($invoiceInfo['cabin']){
             $cabin = $em->getRepository('DoctorPrescriptionBundle:Particular')->find($invoiceInfo['cabin']);
@@ -448,8 +448,8 @@ class DpsInvoiceRepository extends EntityRepository
 
     public function checkCabinBooking($invoice , $cabin)
     {
-        $invoice = $this->_em->getRepository('DoctorPrescriptionBundle:Invoice')->find($invoice);
-        $cabin = $this->_em->getRepository('DoctorPrescriptionBundle:Particular')->find($cabin);
+        $invoice = $this->getEntityManager()->getRepository('DoctorPrescriptionBundle:Invoice')->find($invoice);
+        $cabin = $this->getEntityManager()->getRepository('DoctorPrescriptionBundle:Particular')->find($cabin);
         $qb = $this->createQueryBuilder('e');
         $qb->select('COUNT(e.cabin) AS cabinCount');
         $qb->where('e.dpsConfig = :config')->setParameter('config', $invoice ->getDpsConfig()->getId());

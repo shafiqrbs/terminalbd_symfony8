@@ -18,7 +18,7 @@ class MedicineDoctorPrescribeRepository extends EntityRepository
 
     public function defaultDmsBeforeMedicine(DmsInvoice $invoice,DmsInvoice $lastObject)
     {
-         $em = $this->_em;
+         $em = $this->getEntityManager();
          if(!empty($lastObject->getMedicineDoctorPrescribes())){
 
             /** @var MedicineDoctorPrescribe $item */
@@ -41,7 +41,7 @@ class MedicineDoctorPrescribeRepository extends EntityRepository
     public function insertDmsInvoiceMedicine(DmsInvoice $invoice, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicineDoctorPrescribe();
 
         if(!empty($data['medicineQuantity']) and $data['medicineQuantity'] != 'NaN'){
@@ -67,7 +67,7 @@ class MedicineDoctorPrescribeRepository extends EntityRepository
         }
         $entity->setDmsInvoice($invoice);
         if(!empty($data['medicineId'])) {
-            $medicine = $this->_em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
+            $medicine = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
             $entity->setMedicine($medicine);
         }elseif($data['medicine']){
             $entity->setMedicineName($data['medicine']);
@@ -112,7 +112,7 @@ class MedicineDoctorPrescribeRepository extends EntityRepository
 
     public function defaultDpsBeforeMedicine(DpsInvoice $invoice,DpsInvoice $lastObject)
     {
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         if(!empty($lastObject->getMedicineDoctorPrescribes())){
 
             /** @var MedicineDoctorPrescribe $item */
@@ -135,7 +135,7 @@ class MedicineDoctorPrescribeRepository extends EntityRepository
     public function insertDpsInvoiceMedicine(DpsInvoice $invoice, $data)
     {
 
-        $em = $this->_em;
+        $em = $this->getEntityManager();
         $entity = new MedicineDoctorPrescribe();
         if(!empty($data['medicineQuantity'])){
             $entity->setMedicineQuantity($data['medicineQuantity']);
@@ -155,7 +155,7 @@ class MedicineDoctorPrescribeRepository extends EntityRepository
 
         $entity->setDpsInvoice($invoice);
         if(!empty($data['medicineId'])) {
-            $medicine = $this->_em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
+            $medicine = $this->getEntityManager()->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
             $entity->setMedicine($medicine);
         }elseif($data['medicine']){
             $entity->setMedicineName($data['medicine']);
