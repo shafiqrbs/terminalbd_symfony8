@@ -1,0 +1,32 @@
+# Files under next/src that are hand-written replacements, not mechanical
+# ports. The pipeline neither deletes nor overwrites them: they live inside
+# module directories it otherwise regenerates from the legacy tree.
+#
+# Paths are relative to next/. Lines starting with # are comments.
+
+# --- FOSUserBundle runtime (the bundle has no Symfony 4+ release) -----------
+src/User/Manager/UserManager.php
+src/User/Manager/GroupManager.php
+src/User/Util/TokenGenerator.php
+src/User/Mailer/ResettingMailer.php
+src/User/Form/Type/AbstractProfileFormType.php
+src/User/Form/Type/ChangePasswordFormType.php
+src/User/Form/Type/ResettingFormType.php
+src/User/Form/Type/GroupFormType.php
+
+# Controllers that used to extend FOSUserBundle's, reimplemented on
+# AbstractController.
+src/User/Controller/ChangePasswordController.php
+src/User/Controller/GroupController.php
+src/User/Controller/ProfileController.php
+src/User/Controller/RegistrationController.php
+src/User/Controller/ResettingController.php
+
+# --- replacements for other abandoned dependencies --------------------------
+src/Tool/Service/SpreadsheetFactory.php    # phpoffice/phpexcel + liuggio/excelbundle
+src/Tool/Service/EasyMailer.php            # swiftmailer
+src/Tool/Image/ImageHandler.php            # gregwar/image-bundle
+src/Tool/Image/ImageHandling.php           # gregwar/image-bundle
+src/Tool/Twig/ImageExtension.php           # gregwar/image-bundle
+src/Tool/Twig/TextExtension.php            # twig/extensions
+src/HumanResource/TwigExtension/DecodeExtension.php   # Twig 1 filter API

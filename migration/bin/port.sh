@@ -6,7 +6,11 @@ cd "$(dirname "$0")/../.."
 PHP=${PHP:-php8.5}
 
 echo "== 1/7 copy entity graph + rewrite namespaces =="
-rm -rf next/src/{Accounting,Appearance,Business,Content,DoctorPrescription,DomainUser,Hospital,HumanResource,Inventory,Location,Media,Medicine,Pos,Product,Report,Restaurant,Tool,User,Customer,Dms,Domain,Bindu}
+# Not `rm -rf`: the replacements for the abandoned bundles live in these same
+# namespaces and must survive a rebuild. See migration/hand-written.txt.
+$PHP migration/bin/clean-generated.php Accounting Appearance Business Content \
+    DoctorPrescription DomainUser Hospital HumanResource Inventory Location \
+    Media Medicine Pos Product Report Restaurant Tool User Customer Dms Domain Bindu
 $PHP migration/bin/port-entities.php | tail -3
 
 echo "== 2/7 repair PHP 8 compile errors carried over from the legacy tree =="

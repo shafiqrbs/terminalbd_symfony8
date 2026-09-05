@@ -11,6 +11,11 @@
 $root   = dirname(__DIR__, 2);
 $dryRun = in_array('--dry-run', $argv, true);
 
+require __DIR__ . '/hand-written.php';
+
+$handWritten = handWrittenFiles();
+$skipped = 0;
+
 // ---- 1. legacy bundle root -> App\<Name> ------------------------------------
 $map = [];
 foreach (new RecursiveIteratorIterator(
@@ -82,6 +87,9 @@ foreach ($files as $p) {
     }
 
     $target = "$root/next/src/" . str_replace('\\', '/', substr($newNs, strlen('App\\'))) . '/' . basename($p);
+
+    if (isset($handWritten[substr($target, strlen("$root/next/"))])) { $skipped++; continue; }
+
     if (!$dryRun) {
         @mkdir(dirname($target), 0775, true);
         file_put_contents($target, $out);
@@ -90,6 +98,7 @@ foreach ($files as $p) {
 }
 
 printf("%s %d files -> next/src/\n", $dryRun ? 'would write' : 'wrote', $written);
+if ($skipped) printf("  kept %d hand-written file(s) - see migration/hand-written.txt\n", $skipped);
 if ($unmapped) {
     printf("\nUNMAPPED namespaces (%d):\n", count(array_unique($unmapped)));
     foreach (array_unique($unmapped) as $u) echo "  $u\n";

@@ -63,6 +63,11 @@ $rewriteNs = static function (string $s) use ($nsMap): string {
     return $s;
 };
 
+require __DIR__ . '/hand-written.php';
+
+$handWritten = handWrittenFiles();
+$skipped = 0;
+
 $stats = ['tpl_refs' => 0, 'ctrl_refs' => 0];
 
 /** "SettingToolBundle:Widget:foo.html.twig" -> "Tool/Widget/foo.html.twig" */
@@ -130,10 +135,15 @@ foreach ($phpFiles as $p) {
     $out = $rewriteTemplateRefs($out);
 
     $target = "$root/next/src/" . str_replace('\\', '/', substr($newNs, strlen('App\\'))) . '/' . basename($p);
+
+    // A hand-written replacement is never overwritten by its ported original.
+    if (isset($handWritten[substr($target, strlen("$root/next/"))])) { $skipped++; continue; }
+
     if (!$dryRun) { @mkdir(dirname($target), 0775, true); file_put_contents($target, $out); }
     $written++;
 }
 printf("%s %d php files (controllers, forms, services, listeners)\n", $dryRun ? 'would write' : 'wrote', $written);
+if ($skipped) printf("  kept %d hand-written file(s) - see migration/hand-written.txt\n", $skipped);
 if ($unmapped) printf("  unmapped namespaces: %s\n", implode(', ', array_keys($unmapped)));
 
 // ---- 2. templates ----------------------------------------------------------
