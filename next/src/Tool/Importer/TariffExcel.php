@@ -4,11 +4,17 @@ namespace App\Tool\Importer;
 
 use Doctrine\Persistence\ManagerRegistry;
 use App\Tool\Entity\TaxTariff;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class TariffExcel
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     private $data = [];
 
@@ -62,7 +68,7 @@ class TariffExcel
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
 

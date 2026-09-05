@@ -72,7 +72,7 @@ class CategoryController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setRestaurantConfig($config);
             $em->persist($entity);
@@ -173,7 +173,7 @@ class CategoryController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setSlug($entity->getName());
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(

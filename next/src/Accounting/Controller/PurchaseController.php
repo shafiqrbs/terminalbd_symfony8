@@ -136,7 +136,7 @@ class PurchaseController extends AbstractController
         /* @var $global GlobalOption */
         $global = $this->getUser()->getGlobalOption();
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if($form->isValid() && empty($method)){
+        if($form->isSubmitted() && $form->isValid() && empty($method)){
             $em = $this->em;
             $entity->setGlobalOption($global);
             if (empty($entity->getAccountVendor()) and !empty($data['companyName']) and !empty($data['customerMobile'])){
@@ -167,9 +167,9 @@ class PurchaseController extends AbstractController
             }else{
                 return $this->redirect($this->generateUrl('account_purchase'));
             }
-        }elseif(($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        }elseif(($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $em = $this->em;
             $entity->setGlobalOption($global);
@@ -308,9 +308,9 @@ class PurchaseController extends AbstractController
         $form = $this->createEditForm($entity);
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if (($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        if (($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $entity->setCompanyName($entity->getAccountVendor()->getCompanyName());
             $entity->upload();

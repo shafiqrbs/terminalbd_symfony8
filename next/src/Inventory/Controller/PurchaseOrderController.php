@@ -46,7 +46,7 @@ class PurchaseOrderController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $user = $this->getUser();
             $inventoryConfig = $user->getGlobalOption()->getInventoryConfig();
@@ -179,7 +179,7 @@ class PurchaseOrderController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
             return $this->redirect($this->generateUrl('purchaseorder_edit', array('id' => $id)));
@@ -200,7 +200,7 @@ class PurchaseOrderController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity = $em->getRepository(\App\Inventory\Entity\PurchaseOrder::class)->find($id);
 

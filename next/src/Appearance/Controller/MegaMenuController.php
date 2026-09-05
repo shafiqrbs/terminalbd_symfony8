@@ -48,7 +48,7 @@ class MegaMenuController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $em->persist($entity);
             $em->flush();
@@ -204,7 +204,7 @@ class MegaMenuController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
             $this->requestStack->getSession()->getFlashBag()->add(

@@ -72,9 +72,9 @@ class ProfitWithdrawalController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if (($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        if (($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ){
             $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
@@ -218,7 +218,7 @@ class ProfitWithdrawalController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
             return $this->redirect($this->generateUrl('account_journal_edit', array('id' => $id)));

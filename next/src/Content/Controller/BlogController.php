@@ -67,7 +67,7 @@ class BlogController extends AbstractController
         $form->handleRequest($request);
 
         $user = $this->getUser();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
 
             $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'blog')));
@@ -201,7 +201,7 @@ class BlogController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             if( $entity->upload() and !empty($entity->getFile())){
                 $entity->removeUpload();

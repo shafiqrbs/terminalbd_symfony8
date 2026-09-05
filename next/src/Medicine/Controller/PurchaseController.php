@@ -156,7 +156,7 @@ class PurchaseController extends AbstractController
         $entity = new MedicinePurchase();
         $form = $this->createOpeningForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity->setMedicineConfig($config);
             $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(array('slug'=>'cash'));
             $entity->setTransactionMethod($method);
@@ -867,7 +867,7 @@ class PurchaseController extends AbstractController
         $invoiceDue = $request->request->get('invoiceDue');
         $data = $request->request->all();
         //$vendorName = (isset($data['medicinepurchase']['medicineVendor']) and $data['medicinepurchase']['medicineVendor']) ? $data['medicinepurchase']['medicineVendor'] :'';
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setProcess('Complete');
             /*if($vendorName){
                 $vendor = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->getExistVendor($entity->getMedicineConfig(),$vendorName);

@@ -84,9 +84,9 @@ class ExpenditureController extends AbstractController
         $em = $this->em;
         $data = $request->request->all();
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if (($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        if (($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $lastBalance = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->lastInsertExpenditure($entity);
             $em = $this->em;

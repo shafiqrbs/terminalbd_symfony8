@@ -90,7 +90,7 @@ class PaymentSalaryController extends AbstractController
         $form = $this->createCreateForm($entity,$user);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setUser($user);
             $entity->setGlobalOption($user->getGlobalOption());

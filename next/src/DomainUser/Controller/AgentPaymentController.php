@@ -58,7 +58,7 @@ class AgentPaymentController extends AbstractController
         $entity = new User();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $em = $this->em;
             $entity->setGlobalOption($globalOption);
@@ -188,7 +188,7 @@ class AgentPaymentController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             return $this->redirect($this->generateUrl('domain_edit', array('id' => $id)));
         }
@@ -271,7 +271,7 @@ class AgentPaymentController extends AbstractController
         $editForm = $this->createEditProfileForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
@@ -315,7 +315,7 @@ class AgentPaymentController extends AbstractController
         );
 
         $dispatcher = $this->container->get('event_dispatcher');
-        $dispatcher->dispatch('setting_tool.post.change_password', new \App\Tool\Event\PasswordChangeSmsEvent($user,'123456'));
+        $dispatcher->dispatch(new \App\Tool\Event\PasswordChangeSmsEvent($user,'123456'), 'setting_tool.post.change_password');
         return $this->redirect($this->generateUrl('domain_edit', array('id' => $user->getId())));
 
 

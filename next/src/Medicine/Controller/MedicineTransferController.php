@@ -82,7 +82,7 @@ class MedicineTransferController extends AbstractController
         $entity = new MedicineTransfer();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
@@ -171,7 +171,7 @@ class MedicineTransferController extends AbstractController
         $medicineTransferItem = new MedicineTransferItem();
         $form = $this->createEditForm($entity,$medicineTransferItem);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $medicineTransferItem->setMedicineTransfer($entity);
 

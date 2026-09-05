@@ -62,7 +62,7 @@ class CabinController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setHospitalConfig($config);
             $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(2);
@@ -161,7 +161,7 @@ class CabinController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $name = $entity->getServiceGroup()->getName().'-'.$entity->getRoom();
             $entity->setName($name);
             $em->flush();

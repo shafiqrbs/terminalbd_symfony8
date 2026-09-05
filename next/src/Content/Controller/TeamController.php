@@ -66,7 +66,7 @@ class TeamController extends AbstractController
         $form->handleRequest($request);
 
         $user = $this->getUser();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setUser($user);
             $entity->setGlobalOption($user->getGlobalOption());
@@ -197,7 +197,7 @@ class TeamController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             if( $entity->upload() and !empty($entity->getFile())){
                 $entity->removeUpload();

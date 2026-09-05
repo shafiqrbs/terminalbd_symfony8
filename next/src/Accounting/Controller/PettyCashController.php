@@ -73,7 +73,7 @@ class PettyCashController extends AbstractController
         $entity = new PettyCash();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $lastBalance = $em->getRepository(\App\Accounting\Entity\PettyCash::class)->lastInsertCash($entity);
             $em = $this->em;
             $entity->setBalance($lastBalance + $entity->getAmount());

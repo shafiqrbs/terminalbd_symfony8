@@ -54,7 +54,7 @@ class AccountBankController extends AbstractController
         $entity = new AccountBank();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
@@ -196,7 +196,7 @@ class AccountBankController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $name = $entity->getServiceName();
             $entity->setName($name);
             if($entity->getWebPath()){

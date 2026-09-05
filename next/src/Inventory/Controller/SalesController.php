@@ -472,7 +472,7 @@ class SalesController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         $data = $request->request->all();
-        if ($editForm->isValid() and $data['paymentTotal'] > 0 ) {
+        if ($editForm->isSubmitted() && $editForm->isValid() and $data['paymentTotal'] > 0 ) {
             if ($entity->getInventoryConfig()->getVatEnable() == 1 && $entity->getInventoryConfig()->getVatPercentage() > 0) {
                 $vat = $em->getRepository(\App\Inventory\Entity\Sales::class)->getCulculationVat($entity,$data['paymentTotal']);
                 $entity->setVat($vat);
@@ -501,7 +501,7 @@ class SalesController extends AbstractController
             if (in_array('CustomerSales', $entity->getInventoryConfig()->getDeliveryProcess())) {
                 if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
                     $dispatcher = $this->container->get('event_dispatcher');
-                    $dispatcher->dispatch('setting_tool.post.posorder_sms', new \App\Tool\Event\PosOrderSmsEvent($entity));
+                    $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.posorder_sms');
                 }
             }
             if ($entity->getTransactionMethod()->getId() == 4) {
@@ -702,19 +702,19 @@ class SalesController extends AbstractController
         if($entity->getProcess() == 'Courier'){
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
                 $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('setting_tool.post.courier_sms', new \App\Tool\Event\PosOrderSmsEvent($entity));
+                $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.courier_sms');
             }
         }
         if($entity->getProcess() == 'Done' or $entity->getProcess() == 'Delivered' ){
             $this->approvedOrder($entity);
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
                 $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('setting_tool.post.process_sms', new \App\Tool\Event\PosOrderSmsEvent($entity));
+                $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.process_sms');
             }
         }elseif($entity->getProcess() == 'Returned'){
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
                 $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('setting_tool.post.process_sms', new \App\Tool\Event\PosOrderSmsEvent($entity));
+                $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.process_sms');
             }
         }
         exit;

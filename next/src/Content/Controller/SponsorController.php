@@ -47,7 +47,7 @@ class SponsorController extends AbstractController
         $entity = new Page();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $user = $this->getUser();
             $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'sponsor')));
@@ -172,7 +172,7 @@ class SponsorController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $data = $request->request->all();
             if( $entity->upload() and !empty($entity->getFile())){
                 $entity->removeUpload();

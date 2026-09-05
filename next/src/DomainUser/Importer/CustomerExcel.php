@@ -5,12 +5,18 @@ namespace App\DomainUser\Importer;
 use Exception;
 use Doctrine\Persistence\ManagerRegistry;
 use App\DomainUser\Entity\Customer;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 
 class CustomerExcel
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     protected $globalOption;
 
@@ -75,7 +81,7 @@ class CustomerExcel
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
 

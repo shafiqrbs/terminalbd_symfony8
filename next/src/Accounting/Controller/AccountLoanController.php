@@ -122,7 +122,7 @@ class AccountLoanController extends AbstractController
                 'entity' => $entity,
                 'form'   => $form->createView(),
             ));
-        }elseif($form->isValid() && empty($method)){
+        }elseif($form->isSubmitted() && $form->isValid() && empty($method)){
             $entity->setGlobalOption($option);
             if($entity->getTransactionType() == 'Credit') {
                 $entity->setAmount("-{$entity->getAmount()}");
@@ -149,9 +149,9 @@ class AccountLoanController extends AbstractController
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_loan'));
-        }elseif(($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        }elseif(($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $entity->setGlobalOption($option);
 	        if($entity->getTransactionType() == 'Credit') {

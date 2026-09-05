@@ -189,7 +189,7 @@ class SiteSettingController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
             $this->requestStack->getSession()->getFlashBag()->add(
@@ -210,7 +210,7 @@ class SiteSettingController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity = $em->getRepository(\App\Tool\Entity\SiteSetting::class)->find($id);
 

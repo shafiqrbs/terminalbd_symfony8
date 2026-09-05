@@ -48,7 +48,7 @@ class InstituteLevelController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $em->persist($entity);
             $em->flush();
@@ -180,7 +180,7 @@ class InstituteLevelController extends AbstractController
         $newForm = $this->createnewForm($entity);
         $newForm->handleRequest($request);
 
-        if ($newForm->isValid()) {
+        if ($newForm->isSubmitted() && $newForm->isValid()) {
             $em->flush();
 
             return $this->redirect($this->generateUrl('institutelevel_new', array('id' => $id)));
@@ -201,7 +201,7 @@ class InstituteLevelController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity = $em->getRepository('SettingToolBundle:InstituteLevel')->find($id);
 

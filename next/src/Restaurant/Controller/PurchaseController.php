@@ -215,7 +215,7 @@ class PurchaseController extends AbstractController
 
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $data = $request->request->all();
             $deliveryDateTime = $data['purchase']['receiveDate'];
             $receiveDate = (new \DateTime($deliveryDateTime));

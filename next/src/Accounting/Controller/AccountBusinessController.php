@@ -141,7 +141,7 @@ class AccountBusinessController extends AbstractController
         $entity = new AccountPurchase();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             if($entity->getPayment() < 0){
@@ -206,7 +206,7 @@ class AccountBusinessController extends AbstractController
         $entity = new AccountSales();
         $form = $this->salesCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setGlobalOption( $this->getUser()->getGlobalOption());
             if(!empty($this->getUser()->getProfile()->getBranches())){
@@ -296,7 +296,7 @@ class AccountBusinessController extends AbstractController
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             return $this->redirect($this->generateUrl('account_sales_business'));
         }

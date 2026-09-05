@@ -79,7 +79,7 @@ class BusinessConfigController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($entity->getRemoveImage() == 1 ){
                 $entity->removeUpload();
             }elseif($entity->getRemoveImage() != 1) {

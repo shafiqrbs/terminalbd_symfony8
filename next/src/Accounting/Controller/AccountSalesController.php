@@ -154,7 +154,7 @@ class AccountSalesController extends AbstractController
         $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
         $data = $request->request->all();
-        if($form->isValid() && empty($method)){
+        if($form->isSubmitted() && $form->isValid() && empty($method)){
             $entity->setGlobalOption($option);
             $customer = $form["customer"]->getData();
             if (empty($customer) and !empty($data['customerMobile'])){
@@ -203,9 +203,9 @@ class AccountSalesController extends AbstractController
             }else{
                 return $this->redirect($this->generateUrl('account_sales'));
             }
-        }elseif(($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        }elseif(($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $entity->setGlobalOption($option);
             $customer = $form["customer"]->getData();
@@ -393,7 +393,7 @@ class AccountSalesController extends AbstractController
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             if ($entity->getSales()->getDue() < $entity->getAmount() ){
                 $this->requestStack->getSession()->getFlashBag()->add(

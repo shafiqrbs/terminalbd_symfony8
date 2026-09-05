@@ -80,7 +80,7 @@ class MedicineDamageController extends AbstractController
         if(empty($stock)){
             $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->find($data['medicineStock']);
         }
-        if ($form->isValid() and !empty($stock) and $stock->getRemainingQuantity() >= $entity->getQuantity()) {
+        if ($form->isSubmitted() && $form->isValid() and !empty($stock) and $stock->getRemainingQuantity() >= $entity->getQuantity()) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);

@@ -8,15 +8,20 @@
 namespace App\Medicine\Importer;
 
 
-use PHPExcel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Doctrine\Persistence\ManagerRegistry;
-use Liuggio\ExcelBundle\Factory;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use App\Tool\Service\SpreadsheetFactory as Factory;
 
 class ExcelDataReader
 {
+    protected ?ManagerRegistry $doctrine = null;
 
-    use ContainerAwareTrait;
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     /**
      * @var Factory
@@ -35,14 +40,14 @@ class ExcelDataReader
     }
 
     /**
-     * @param \PHPExcel $objPHPExcel
+     * @param \Spreadsheet $objPHPExcel
      *
      * @return array
-     * @throws \PHPExcel_Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @internal param $file
      *
      */
-    protected function getNamedArray(PHPExcel $objPHPExcel)
+    protected function getNamedArray(Spreadsheet $objPHPExcel)
     {
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
         $highestRow = $objWorksheet->getHighestRow();
@@ -78,7 +83,7 @@ class ExcelDataReader
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
 

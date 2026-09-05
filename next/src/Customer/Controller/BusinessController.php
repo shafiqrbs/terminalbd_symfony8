@@ -112,9 +112,9 @@ class BusinessController extends AbstractController
         $form->handleRequest($request);
         $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('user'=>$user->getId()));
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if (($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        if (($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
 
             $em = $this->em;

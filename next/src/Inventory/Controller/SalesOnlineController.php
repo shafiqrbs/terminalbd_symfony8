@@ -135,7 +135,7 @@ class SalesOnlineController extends AbstractController
         if($inventory->getSalesMode() == 'stock'){
             $theme = 'stock-item';
             $createItemForm = $this->createItemForm(New SalesItem(),$entity);
-            return $this->render('InventoryBundle:SalesOnline:'.$theme.'.html.twig', array(
+            return $this->render('Inventory/SalesOnline/'.$theme.'.html.twig', array(
                 'entity' => $entity,
                 'todaySales' => $todaySales,
                 'todaySalesOverview' => $todaySalesOverview,
@@ -145,7 +145,7 @@ class SalesOnlineController extends AbstractController
         }else{
             $editForm = $this->createEditForm($entity);
             $theme = 'purchase-item';
-            return $this->render('InventoryBundle:SalesOnline:'.$theme.'.html.twig', array(
+            return $this->render('Inventory/SalesOnline/'.$theme.'.html.twig', array(
                 'entity' => $entity,
                 'todaySales' => $todaySales,
                 'todaySalesOverview' => $todaySalesOverview,
@@ -216,7 +216,7 @@ class SalesOnlineController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         $data = $request->request->all();
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             $globalOption = $this->getUser()->getGlobalOption();
             if (!empty($data['customerMobile'])) {
@@ -340,7 +340,7 @@ class SalesOnlineController extends AbstractController
             $print = 'invoice';
         }
 
-        return $this->render('InventoryBundle:SalesPrint:'.$print.'.html.twig', array(
+        return $this->render('Inventory/SalesPrint/'.$print.'.html.twig', array(
             'entity'      => $entity,
             'inventory'   => $inventory,
             'barcode'     => $barcode,
@@ -864,7 +864,7 @@ class SalesOnlineController extends AbstractController
 
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
                 $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('setting_tool.post.posorder_sms', new \App\Tool\Event\PosOrderSmsEvent($entity));
+                $dispatcher->dispatch(new \App\Tool\Event\PosOrderSmsEvent($entity), 'setting_tool.post.posorder_sms');
             }
         }*/
 

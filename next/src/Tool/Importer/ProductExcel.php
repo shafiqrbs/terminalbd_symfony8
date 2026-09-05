@@ -4,12 +4,18 @@ namespace App\Tool\Importer;
 
 use Doctrine\Persistence\ManagerRegistry;
 use App\Inventory\Entity\Product;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 
 class ProductExcel
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     protected $productImport;
 
@@ -77,7 +83,7 @@ class ProductExcel
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
 

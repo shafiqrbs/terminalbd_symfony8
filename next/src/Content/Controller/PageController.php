@@ -70,7 +70,7 @@ class PageController extends AbstractController
         $form->handleRequest($request);
 
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $em = $this->em;
             $entity->setUser($this->getUser());
@@ -196,7 +196,7 @@ class PageController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         $data = $request->request->all();
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             if($entity->isRemoveImage() == 1 ){
                 $entity->removeUpload();

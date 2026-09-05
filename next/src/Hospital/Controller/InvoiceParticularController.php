@@ -250,7 +250,7 @@ class InvoiceParticularController extends AbstractController
         }
         $form = $this->createGroupReportForm($entity,$invoice->getId());
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity->setHmsInvoice($invoice);
             $entity->setCreatedBy($this->getUser());
             $em->persist($entity);
@@ -469,7 +469,7 @@ class InvoiceParticularController extends AbstractController
         $editForm->handleRequest($request);
         $data = $request->request->all();
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setParticularPreparedBy($this->getUser());
             $entity->upload();
             $em->flush();

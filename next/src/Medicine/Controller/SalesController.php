@@ -446,7 +446,7 @@ class SalesController extends AbstractController
        $editForm = $this->createEditForm($entity);
        $editForm->handleRequest($request);
        $data = $request->request->all();
-       if ($editForm->isValid()) {
+       if ($editForm->isSubmitted() && $editForm->isValid()) {
            if (!empty($data['customerMobile'])) {
                $mobile = $this->toolManager->specialExpClean($data['customerMobile']);
                $customer = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->newExistingCustomerForSales($globalOption,$mobile,$data);

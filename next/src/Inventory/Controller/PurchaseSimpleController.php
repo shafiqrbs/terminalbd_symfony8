@@ -180,7 +180,7 @@ class PurchaseSimpleController extends AbstractController
         $em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->generatePurchaseVendorItem($entity);
         $purchaseItemForm = $this->createPurchaseItemForm($purchaseItem,$entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setDueAmount($entity->getTotalAmount() - $entity->getPaymentAmount());
             $entity->upload();
             $em->flush();
@@ -341,7 +341,7 @@ class PurchaseSimpleController extends AbstractController
         $editForm->handleRequest($request);
 
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             $entity->setApprovedBy($this->getUser());
             $entity->setProcess('approved');

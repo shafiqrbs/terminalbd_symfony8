@@ -114,7 +114,7 @@ class InvoiceReturnController extends AbstractController
         $form->handleRequest($request);
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $particulars = $em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->getCustomerItem($config,$entity->getCustomer());
-        if ($form->isValid() and !empty($particulars)) {
+        if ($form->isSubmitted() && $form->isValid() and !empty($particulars)) {
             $entity->setBusinessConfig($config);
             $time = time();
             $timebd = (string)($time);

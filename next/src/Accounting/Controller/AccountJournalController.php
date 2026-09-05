@@ -81,7 +81,7 @@ class AccountJournalController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if ($form->isValid() && empty($method)) {
+        if ($form->isSubmitted() && $form->isValid() && empty($method)) {
             $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             if(!empty($this->getUser()->getProfile()->getBranches())){
@@ -93,9 +93,9 @@ class AccountJournalController extends AbstractController
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_journal'));
-        }elseif (($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        }elseif (($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());

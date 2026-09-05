@@ -142,7 +142,7 @@ class MemberController extends AbstractController
         $editForm = $this->createEditForm($profile);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $profile->upload();
             $em->flush();
             return $this->redirect($this->generateUrl('member_edit_profile', array('shop' => $user->getGlobalOption()->getSlug())));

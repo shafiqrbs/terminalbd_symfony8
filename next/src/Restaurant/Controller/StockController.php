@@ -81,7 +81,7 @@ class StockController extends AbstractController
         $entity = new Particular();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setRestaurantConfig($config);
             $entity->upload();
@@ -192,7 +192,7 @@ class StockController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($entity->upload() && !empty($entity->getFile())){
                 $entity->removeUpload();
             }

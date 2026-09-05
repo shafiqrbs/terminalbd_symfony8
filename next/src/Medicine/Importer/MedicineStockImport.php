@@ -7,12 +7,18 @@ use App\Medicine\Entity\MedicineStock;
 use App\Medicine\Repository\MedicineParticularRepository;
 use App\Tool\Entity\ProductUnit;
 use App\Tool\Repository\ProductUnitRepository;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 
 class MedicineStockImport
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     private $data = [];
     private $cache = [];
@@ -186,7 +192,7 @@ class MedicineStockImport
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
     public function sentence_case($string) {

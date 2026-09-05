@@ -200,7 +200,7 @@ class MedicineController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         $exist = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->findOneBy(['name'=>$entity->getName(),'medicineForm' => $entity->getMedicineForm(),'strength'=>$entity->getStrength()]);
-        if ($editForm->isValid() and empty($exist)) {
+        if ($editForm->isSubmitted() && $editForm->isValid() and empty($exist)) {
             if($entity->upload()){
                 $entity->removeUpload();
                 $entity->upload();

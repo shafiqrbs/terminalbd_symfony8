@@ -63,7 +63,7 @@ class PathologicalReportController extends AbstractController
         $form = $this->createCreateForm($entity,$pathology);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setParticular($pathology);
             $em->persist($entity);
@@ -150,7 +150,7 @@ class PathologicalReportController extends AbstractController
         $editForm = $this->createEditForm($entity,$pathology);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"

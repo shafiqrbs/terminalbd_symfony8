@@ -102,7 +102,7 @@ class BusinessStoreController extends AbstractController
         $entity = new BusinessStore();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity->setBusinessConfig($option);
             $em->persist($entity);
             $em->flush();
@@ -214,7 +214,7 @@ class BusinessStoreController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
             $this->requestStack->getSession()->getFlashBag()->add(

@@ -74,7 +74,7 @@ class GlobalOptionController extends AbstractController
         $entity->getProfile()->setMobile($mobile);
         $data = $request->request->all();
         $exist = $this->em->getRepository(\App\User\Entity\User::class)->checkExistingUser($mobile);
-        if ($form->isValid() and $exist == false) {
+        if ($form->isSubmitted() && $form->isValid() and $exist == false) {
             $user = $this->getUser();
             $globalOption = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->createGlobalOption($mobile,$data,$user);
             $entity->setPlainPassword("*148148#");
@@ -90,7 +90,7 @@ class GlobalOptionController extends AbstractController
             $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->initialSetup($entity);
             $this->toolManager->createDirectory($entity->getGlobalOption()->getId());
           //  $dispatcher = $this->container->get('event_dispatcher');
-        //    $dispatcher->dispatch('setting_tool.post.user_signup_msg', new \App\Tool\Event\UserSignup($entity));
+        //    $dispatcher->dispatch(new \App\Tool\Event\UserSignup($entity), 'setting_tool.post.user_signup_msg');
             return $this->redirect($this->generateUrl('globaloption_edit', array('id' => $globalOption->getId())));
         }
 
@@ -282,7 +282,7 @@ class GlobalOptionController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->upload();
             $em->flush();
             //$this->em->getRepository(\App\Content\Entity\HomePage::class)->globalOptionHome($user);
@@ -395,7 +395,7 @@ class GlobalOptionController extends AbstractController
         $editForm = $this->createModifyForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->upload();
             $em->flush();
             //$this->em->getRepository(\App\Content\Entity\HomePage::class)->globalOptionHome($user);

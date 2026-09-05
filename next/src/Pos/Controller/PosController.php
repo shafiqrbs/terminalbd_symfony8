@@ -468,7 +468,7 @@ class PosController extends AbstractController
         $entity = $this->em->getRepository(\App\Pos\Entity\Pos::class)->insert($this->getUser());
         $editForm = $this->createTemporaryForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             if($entity->getSalesBy()){
                 $entity->setSalesBy($entity->getSalesBy());

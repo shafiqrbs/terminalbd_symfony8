@@ -70,7 +70,7 @@ class AgentClientController extends AbstractController
         $mobile = $this->toolManager->specialExpClean($intlMobile);
         $entity->getProfile()->setMobile($mobile);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             $globalOption = $this->em->getRepository(\App\Tool\Entity\GlobalOption::class)->createGlobalOption($mobile,$data,$user);
             $entity->setPlainPassword("1234");
@@ -87,7 +87,7 @@ class AgentClientController extends AbstractController
             $this->toolManager->createDirectory($entity->getGlobalOption()->getId());
 
             $dispatcher = $this->container->get('event_dispatcher');
-            $dispatcher->dispatch('setting_tool.post.user_signup_msg', new \App\Tool\Event\UserSignup($entity));
+            $dispatcher->dispatch(new \App\Tool\Event\UserSignup($entity), 'setting_tool.post.user_signup_msg');
             return $this->redirect($this->generateUrl('agentclient'));
         }
 
@@ -182,7 +182,7 @@ class AgentClientController extends AbstractController
         $editForm = $this->createEditProfileForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $intlMobile = $entity->getMobile();
             $mobile = $this->toolManager->specialExpClean($intlMobile);
             $entity->setMobile($mobile);

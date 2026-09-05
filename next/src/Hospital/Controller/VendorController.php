@@ -85,7 +85,7 @@ class VendorController extends AbstractController
         $data = $request->request->all();
         $company = $data['vendor']['companyName'];
         $exitVendor = $this->em->getRepository(\App\Medicine\Entity\MedicineVendor::class)->findOneBy(['medicineConfig'=>$config,'companyName'=>$company]);
-        if ($form->isValid() and empty($exitVendor)) {
+        if ($form->isSubmitted() && $form->isValid() and empty($exitVendor)) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);

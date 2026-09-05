@@ -72,7 +72,7 @@ class BusinessDamageController extends AbstractController
         $entity = new BusinessDamage();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
             $entity->setBusinessConfig($config);
@@ -174,7 +174,7 @@ class BusinessDamageController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"

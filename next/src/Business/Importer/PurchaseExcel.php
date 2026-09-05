@@ -6,12 +6,18 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Business\Entity\BusinessParticular;
 use App\Business\Entity\Category;
 use App\Business\Repository\CategoryRepository;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 
 class PurchaseExcel
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     /* @var $itemImport  ItemImport */
     protected $itemImport;
@@ -137,7 +143,7 @@ class PurchaseExcel
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
     /**

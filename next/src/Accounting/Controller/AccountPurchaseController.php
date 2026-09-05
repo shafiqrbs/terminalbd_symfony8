@@ -112,7 +112,7 @@ class AccountPurchaseController extends AbstractController
         /* @var $global GlobalOption */
 	    $global = $this->getUser()->getGlobalOption();
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if($form->isValid() && empty($method)){
+        if($form->isSubmitted() && $form->isValid() && empty($method)){
             $em = $this->em;
             $entity->setGlobalOption($global);
             if($global->getMainApp()->getSlug() == 'miss'){
@@ -182,9 +182,9 @@ class AccountPurchaseController extends AbstractController
             }else{
                 return $this->redirect($this->generateUrl('account_purchase'));
             }
-        }elseif(($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        }elseif(($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $em = $this->em;
             $entity->setGlobalOption($global);
@@ -372,7 +372,7 @@ class AccountPurchaseController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
             return $this->redirect($this->generateUrl('account_purchase_edit', array('id' => $id)));

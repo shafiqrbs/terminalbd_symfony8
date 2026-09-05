@@ -92,8 +92,8 @@ class ContactMessageController extends AbstractController
         $entity = $this->em->getRepository(\App\Content\Entity\ContactMessage::class)->findOneBy(['user' => $user,'id' => $id]);
 
         $dispatcher = $this->container->get('event_dispatcher');
-        $dispatcher->dispatch('setting_tool.post.sms_message', new SmsEvent($entity));
-        $dispatcher->dispatch('setting_tool.post.email_message', new EmailEvent($entity));
+        $dispatcher->dispatch(new SmsEvent($entity), 'setting_tool.post.sms_message');
+        $dispatcher->dispatch(new EmailEvent($entity), 'setting_tool.post.email_message');
 
 
 

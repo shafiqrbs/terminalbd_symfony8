@@ -69,7 +69,7 @@ class ManageUserController extends AbstractController
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $user->setEnabled(true);
                 $userManager->updateUser($user);
 
@@ -98,7 +98,7 @@ class ManageUserController extends AbstractController
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
 
                 $user->isEnabled();
                 $userManager->updateUser($user);
@@ -234,7 +234,7 @@ class ManageUserController extends AbstractController
 
             $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
 
                 $userManager = $this->getUserManager();
                 $userManager->updateUser($user);

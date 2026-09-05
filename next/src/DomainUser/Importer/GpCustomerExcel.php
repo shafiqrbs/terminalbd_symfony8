@@ -4,12 +4,18 @@ namespace App\DomainUser\Importer;
 
 use Doctrine\Persistence\ManagerRegistry;
 use App\DomainUser\Entity\Customer;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 
 class GpCustomerExcel
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     protected $option;
 
@@ -72,7 +78,7 @@ class GpCustomerExcel
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
 

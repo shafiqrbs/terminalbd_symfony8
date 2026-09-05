@@ -177,7 +177,7 @@ class InvoiceAdmissionController extends AbstractController
         $editForm = $this->createCreateForm($entity);
         $editForm->handleRequest($request);
        // $error = $this->getErrorMessages($editForm);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setHospitalConfig($hospital);
             $entity->getCustomer()->setGlobalOption($user->getGlobalOption());
             $entity->setProcess('Admitted');
@@ -352,7 +352,7 @@ class InvoiceAdmissionController extends AbstractController
         }
         $editForm = $this->createAdmissionForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setProcess('Admitted');
             $em->persist($entity);
             $em->flush();
@@ -473,7 +473,7 @@ class InvoiceAdmissionController extends AbstractController
         $editForm->handleRequest($request);
         $referredId = $request->request->get('referredId');
         $data = $request->request->all()['appstore_bundle_hospitalbundle_invoice'];
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             if (!empty($data['customer']['name'])) {
 
@@ -510,7 +510,7 @@ class InvoiceAdmissionController extends AbstractController
 
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
                  $dispatcher = $this->container->get('event_dispatcher');
-                 $dispatcher->dispatch('setting_tool.post.hms_invoice_sms', new \App\Tool\Event\HmsInvoiceSmsEvent($entity));
+                 $dispatcher->dispatch(new \App\Tool\Event\HmsInvoiceSmsEvent($entity), 'setting_tool.post.hms_invoice_sms');
             }
             if(!empty($entity->getInvoiceParticulars()) and count($entity->getInvoiceParticulars()) > 0){
                 return $this->redirect($this->generateUrl('hms_invoice_admission_confirm', array('id' => $entity->getId())));
@@ -537,7 +537,7 @@ class InvoiceAdmissionController extends AbstractController
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             if($entity->getReceive() > 0 ){
                // $this->em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->initialInsertAdmissionInvoiceTransaction($entity);
@@ -789,7 +789,7 @@ class InvoiceAdmissionController extends AbstractController
         $transaction =  new InvoiceTransaction();
         $transactionForm = $this->createInvoicePaymentForm($entity,$transaction);
         $transactionForm->handleRequest($request);
-        if ($transactionForm->isValid() and (!empty($entity) and !empty($payment)) or (!empty($entity) and !empty($discount))) {
+        if ($transactionForm->isSubmitted() && $transactionForm->isValid() and (!empty($entity) and !empty($payment)) or (!empty($entity) and !empty($discount))) {
             $em = $this->em;
             $code = $this->em->getRepository(InvoiceTransaction::class)->getLastCode($entity);
             $transaction->setHmsInvoice($entity);

@@ -46,7 +46,7 @@ class ServiceController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $user = $this->getUser();
             $entity->setGlobalOption($user->getGlobalOption());
@@ -172,7 +172,7 @@ class ServiceController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $data = $request->request->all();
             if( $entity->upload() and !empty($entity->getFile())){
                 $entity->removeUpload();

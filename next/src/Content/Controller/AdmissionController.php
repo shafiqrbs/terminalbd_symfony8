@@ -65,7 +65,7 @@ class AdmissionController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $user = $this->getUser();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity ->setUser($user);
             $entity->upload();
@@ -221,7 +221,7 @@ class AdmissionController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->upload();
             $em->flush();
 
@@ -243,7 +243,7 @@ class AdmissionController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity = $em->getRepository('SettingContentBundle:Admission')->find($id);
 

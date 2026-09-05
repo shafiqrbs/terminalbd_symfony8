@@ -5,12 +5,18 @@ namespace App\Inventory\Importer;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Inventory\Entity\Sales;
 use App\Inventory\Entity\SalesItem;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 
 class SalesExcel
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     protected $salesImport;
     private $data = [];
@@ -82,7 +88,7 @@ class SalesExcel
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
 

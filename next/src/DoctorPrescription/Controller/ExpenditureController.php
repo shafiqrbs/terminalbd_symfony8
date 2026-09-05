@@ -75,7 +75,7 @@ class ExpenditureController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $em = $this->em;
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $lastBalance = $em->getRepository(\App\Accounting\Entity\Expenditure::class)->lastInsertExpenditure($entity);
             $em = $this->em;
             $entity->setGlobalOption( $this->getUser()->getGlobalOption());

@@ -60,7 +60,7 @@ class DomainUserController extends AbstractController
         $form->handleRequest($request);
        $data = $request->request->all();
        $password = $data['user']['plainPassword']['first'];
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $em = $this->em;
             $entity->setGlobalOption($globalOption);
@@ -217,7 +217,7 @@ class DomainUserController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($entity->getProfile()->upload() && !empty($entity->getProfile()->getFile())){
                 $entity->getProfile()->removeUpload();
             }
@@ -310,7 +310,7 @@ class DomainUserController extends AbstractController
 
         $editForm = $this->createEditProfileForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"
@@ -364,7 +364,7 @@ class DomainUserController extends AbstractController
             'success',"Password reset successfully"
         );
       //  $dispatcher = $this->container->get('event_dispatcher');
-      //  $dispatcher->dispatch('setting_tool.post.change_password', new \App\Tool\Event\PasswordChangeSmsEvent($user,$password));
+      //  $dispatcher->dispatch(new \App\Tool\Event\PasswordChangeSmsEvent($user,$password), 'setting_tool.post.change_password');
         return $this->redirect($this->generateUrl('domain_user'));
     }
 

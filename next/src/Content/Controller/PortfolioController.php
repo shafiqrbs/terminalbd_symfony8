@@ -47,7 +47,7 @@ class PortfolioController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $user = $this->getUser();
             $entity ->setModule($this->em->getRepository(\App\Tool\Entity\Module::class)->findOneBy(array('slug' => 'portfolio')));
@@ -173,7 +173,7 @@ class PortfolioController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $data = $request->request->all();
             if( $entity->upload() and !empty($entity->getFile())){
                 $entity->removeUpload();

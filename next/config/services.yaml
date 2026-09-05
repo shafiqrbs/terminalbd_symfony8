@@ -9,6 +9,7 @@
 
 imports:
     - { resource: services_legacy.yaml }
+    - { resource: services_ported.yaml }
 
 parameters:
     # Was fos_user.resetting.token_ttl; ResettingController still reads it.

@@ -24,12 +24,18 @@ use App\Inventory\Entity\StockItem;
 use App\Inventory\Entity\Vendor;
 use App\Product\Entity\Category;
 use App\Tool\Entity\ProductUnit;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use App\Inventory\Entity\Product;
 
 class Excel
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     protected $inventoryConfig;
     private $data = [];
@@ -637,7 +643,7 @@ class Excel
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
     /**

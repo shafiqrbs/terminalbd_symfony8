@@ -87,7 +87,7 @@ class DeliveryReturnController extends AbstractController
         $barcode = trim($data['appstore_bundle_inventorybundle_delivery_return']['purchaseItem']);
         $purchaseItem = $this->em->getRepository(\App\Inventory\Entity\PurchaseItem::class)->findOneBy(['barcode' => $barcode]);
 
-         if ($form->isValid() and !empty($purchaseItem)) {
+         if ($form->isSubmitted() && $form->isValid() and !empty($purchaseItem)) {
 
              $deliveryItem = $this->em->getRepository(\App\Inventory\Entity\DeliveryItem::class)->checkItem($this->getUser(),$purchaseItem,$entity->getQuantity());
              if(!empty($deliveryItem) and $deliveryItem == 'valid') {

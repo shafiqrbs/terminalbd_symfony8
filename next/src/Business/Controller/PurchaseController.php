@@ -400,7 +400,7 @@ class PurchaseController extends AbstractController
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $data = $request->request->all();
             $entity->setProcess('Done');
             $entity->setNetTotal(round($entity->getNetTotal()));
@@ -641,7 +641,7 @@ class PurchaseController extends AbstractController
         $entity = new BusinessPurchase();
         $form = $this->createOpeningForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity->setBusinessConfig($config);
             $method = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->findOneBy(array('slug'=>'cash'));
             $entity->setTransactionMethod($method);

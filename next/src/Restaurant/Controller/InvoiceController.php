@@ -234,7 +234,7 @@ class InvoiceController extends AbstractController
         $invoiceParticularForm = $this->createInvoiceParticularForm(New InvoiceParticular(),$entity);
         $editForm->handleRequest($request);
         $data = $request->request->all();
-        if($editForm->isValid()) {
+        if($editForm->isSubmitted() && $editForm->isValid()) {
 
             if (isset($data['customerMobile']) and !empty($data['customerMobile'])) {
                 $mobile = $this->toolManager->specialExpClean($data['customerMobile']);

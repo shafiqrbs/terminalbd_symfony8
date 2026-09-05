@@ -95,7 +95,7 @@ class StockHouseController extends AbstractController
         $entities = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(array('medicineConfig' => $config),array('particularType'=>'ASC'));
         $form = $this->createStockInForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
@@ -166,7 +166,7 @@ class StockHouseController extends AbstractController
         $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
         $form = $this->createStockOutForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $stock = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->findOneBy(array('medicineConfig' => $config,'name' => $entity->getStockName()));
             $remainingQnt = $this->em->getRepository(\App\Medicine\Entity\MedicineStockHouse::class)->getStockRemainingQnt($stock,$entity->getWearHouse());
             if($remainingQnt >= $entity->getStockOut()){

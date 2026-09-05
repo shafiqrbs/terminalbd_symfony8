@@ -261,7 +261,7 @@ class MedicineStockController extends AbstractController
             $medicine = $this->em->getRepository(\App\Medicine\Entity\MedicineBrand::class)->find($data['medicineId']);
             $checkStockMedicine = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->checkDuplicateStockMedicine($config, $medicine);
         }
-        if ($form->isValid() and empty($checkStockMedicine)){
+        if ($form->isSubmitted() && $form->isValid() and empty($checkStockMedicine)){
             $entity->setMedicineConfig($config);
             if(empty($data['medicineId'])){
                 if($entity->getAccessoriesBrand()) {
@@ -320,7 +320,7 @@ class MedicineStockController extends AbstractController
         $form = $this->createCreateAccessoriesForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity->setMedicineConfig($config);
             $brand = $entity->getAccessoriesBrand();
             $entity->setBrandName($brand->getName());
@@ -393,7 +393,7 @@ class MedicineStockController extends AbstractController
             $template = 'medicine';
         }
         $brands = $this->em->getRepository(\App\Medicine\Entity\MedicineStock::class)->getBrands($this->getUser()->getGlobalOption()->getMedicineConfig()->getId());
-        return $this->render('MedicineBundle:MedicineStock:'.$template.'.html.twig', array(
+        return $this->render('Medicine/MedicineStock/'.$template.'.html.twig', array(
             'entity'            => $entity,
             'formShow'          => 'show',
             'brands'          => $brands,
@@ -479,7 +479,7 @@ class MedicineStockController extends AbstractController
             $template = 'medicine';
         }
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($entity->upload() && !empty($entity->getFile())){
                 $entity->removeUpload();
             }
@@ -496,7 +496,7 @@ class MedicineStockController extends AbstractController
             return $this->redirect($this->generateUrl('medicine_stock'));
         }
 
-        return $this->render('MedicineBundle:MedicineStock:'.$template.'.html.twig', array(
+        return $this->render('Medicine/MedicineStock/'.$template.'.html.twig', array(
             'entity'            => $entity,
             'form'              => $editForm->createView(),
         ));

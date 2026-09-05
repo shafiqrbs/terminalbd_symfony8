@@ -303,7 +303,7 @@ class PrepurchaseController extends AbstractController
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setProcess('Complete');
             $entity->setDue($entity->getNetTotal() - $entity->getPayment());
             $em->flush();

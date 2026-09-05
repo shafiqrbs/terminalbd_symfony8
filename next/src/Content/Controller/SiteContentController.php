@@ -48,7 +48,7 @@ class SiteContentController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $slug = $this->menuManager-> urlSlug($entity->getName());
             $entity ->setSlug($slug);
@@ -179,7 +179,7 @@ class SiteContentController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             $slug = $this->menuManager->urlSlug($entity->getName());
             $entity ->setSlug($slug);
@@ -204,7 +204,7 @@ class SiteContentController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity = $em->getRepository(\App\Content\Entity\SiteContent::class)->find($id);
 

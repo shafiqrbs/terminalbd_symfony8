@@ -67,7 +67,7 @@ class PayrollController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption();
             $entity->setGlobalOption($config);
@@ -123,7 +123,7 @@ class PayrollController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $em->persist($entity);
             $em->flush();

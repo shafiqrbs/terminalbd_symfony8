@@ -89,7 +89,7 @@ class AccountConfigController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Report has been created successfully"

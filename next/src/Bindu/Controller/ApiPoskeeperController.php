@@ -533,7 +533,7 @@ class ApiPoskeeperController extends AbstractController
             if($user){
                 $login = $this->em->getRepository(\App\User\Entity\User::class)->find($user);
                 $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('setting_tool.post.change_password', new PasswordChangeSmsEvent($login, $login->getAppPassword()));
+                $dispatcher->dispatch(new PasswordChangeSmsEvent($login, $login->getAppPassword()), 'setting_tool.post.change_password');
                 $data = ['status'=>'valid','otp' => $login->getAppPassword(),'apiSecret'=> $login->getGlobalOption()->getUniqueCode()];
             }else{
                 $data = ['status'=>'in-valid','otp' => ''];
@@ -2831,7 +2831,7 @@ class ApiPoskeeperController extends AbstractController
             }
 
          //   $dispatcher = $this->container->get('event_dispatcher');
-         //   $dispatcher->dispatch('setting_tool.post.user_signup_msg', new UserSignup($user));
+         //   $dispatcher->dispatch(new UserSignup($user), 'setting_tool.post.user_signup_msg');
 
 
             $response = new Response();

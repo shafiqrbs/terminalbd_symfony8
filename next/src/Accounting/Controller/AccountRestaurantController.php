@@ -105,7 +105,7 @@ class AccountRestaurantController extends AbstractController
         $entity = new AccountPurchase();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $entity->setProcessHead('Account Purchase');

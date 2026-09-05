@@ -71,7 +71,7 @@ class PurchaseController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
             $purchase = $this->em->getRepository(\App\Inventory\Entity\Purchase::class)->findOneBy(array('inventoryConfig' => $inventory,'vendor' => $entity->getVendor(),'memo' => $entity->getMemo()));
@@ -244,7 +244,7 @@ class PurchaseController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             return $this->redirect($this->generateUrl('purchase_edit', array('id' => $id)));
         }
@@ -420,7 +420,7 @@ class PurchaseController extends AbstractController
         $editForm = $this->createEditApproveForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             $entity->setApprovedBy($this->getUser());
             $entity->setProcess('approved');

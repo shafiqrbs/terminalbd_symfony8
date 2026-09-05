@@ -96,7 +96,7 @@ class ProfileController extends AbstractController
         $editForm = $this->createEditForm($profile);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $profile->upload();
             $em->flush();
             return $this->redirect($this->generateUrl('customerweb_profile', array('shop' => $user->getGlobalOption()->getSlug())));

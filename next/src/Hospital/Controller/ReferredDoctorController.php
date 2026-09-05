@@ -75,7 +75,7 @@ class ReferredDoctorController extends AbstractController
         $form = $this->createCreateForm($entity,$globalOption);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setHospitalConfig($globalOption -> getHospitalConfig());
             $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(6);
@@ -202,7 +202,7 @@ class ReferredDoctorController extends AbstractController
         $editForm = $this->createEditForm($entity,$globalOption);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($entity->getParticularCode()){
                 $entity->setParticularCode($entity->getParticularCode());
             }

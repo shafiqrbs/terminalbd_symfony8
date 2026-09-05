@@ -135,9 +135,9 @@ class InvoiceAssociationController extends AbstractController
         $lastInvoice = $this->em->getRepository(\App\Business\Entity\BusinessInvoice::class)->getLastInvoiceParticular($customer->getId());
 
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if (($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        if (($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $em = $this->em;
             $entity->setBusinessConfig($config);
@@ -226,7 +226,7 @@ class InvoiceAssociationController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         $data = $request->request->all();
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 	        $em->flush();
             $this->em->getRepository(\App\Business\Entity\BusinessInvoiceParticular::class)->insertCustomerInvoiceParticular($entity, $data);
             $this->em->getRepository( \App\Business\Entity\BusinessInvoice::class )->updateInvoiceTotalPrice($entity);

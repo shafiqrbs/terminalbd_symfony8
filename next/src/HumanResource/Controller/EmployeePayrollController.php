@@ -65,7 +65,7 @@ class EmployeePayrollController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $globalOption = $this->getUser()->getGlobalOption();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setGlobalOption($globalOption);
             $entity->setPassword($globalOption);
@@ -160,7 +160,7 @@ class EmployeePayrollController extends AbstractController
         $form = $this->editCreateForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->getProfile()->upload();
             $em->persist($entity);
@@ -222,7 +222,7 @@ class EmployeePayrollController extends AbstractController
         $form = $this->settingCreateForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $em->persist($entity);
             $em->flush();

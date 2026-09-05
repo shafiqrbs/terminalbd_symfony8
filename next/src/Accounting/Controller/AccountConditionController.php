@@ -87,7 +87,7 @@ class AccountConditionController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $option = $this->getUser()->getGlobalOption();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setGlobalOption($option);
@@ -184,7 +184,7 @@ class AccountConditionController extends AbstractController
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
             $em->flush();
@@ -265,7 +265,7 @@ class AccountConditionController extends AbstractController
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
         $em = $this->em;
         $option = $this->getUser()->getGlobalOption();
-        if($form->isValid() && empty($method)){
+        if($form->isSubmitted() && $form->isValid() && empty($method)){
             $entity->setGlobalOption($option);
             if( in_array($entity->getMode(),array("Debit"))){
                 $entity->setDebit(abs($entity->getAmount()));
@@ -290,9 +290,9 @@ class AccountConditionController extends AbstractController
                 'success',"Data has been added successfully"
             );
             return $this->redirect($this->generateUrl('account_condition_ledger'));
-        }elseif(($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        }elseif(($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $entity->setGlobalOption($option);
             if( in_array($entity->getMode(),array("Debit"))){

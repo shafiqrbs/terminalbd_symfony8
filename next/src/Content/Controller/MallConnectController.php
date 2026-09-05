@@ -52,7 +52,7 @@ class MallConnectController extends AbstractController
 
         if($entity->getShopNo())
 
-        if ($form->isValid() and $this->checkDuplicateEntry($entity) == true) {
+        if ($form->isSubmitted() && $form->isValid() and $this->checkDuplicateEntry($entity) == true) {
 
                 $em = $this->em;
                 $globalOption = $this->getUser()->getGlobalOption();

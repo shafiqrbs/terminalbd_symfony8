@@ -71,7 +71,7 @@ class ProfileController extends AbstractController
 
         $editForm = $this->createEditProfileForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been updated successfully"

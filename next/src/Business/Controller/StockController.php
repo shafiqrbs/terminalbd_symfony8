@@ -260,7 +260,7 @@ class StockController extends AbstractController
 			    'name'           => $name
 		    ) );
 	    }
-        if ($form->isValid() and empty($checkName)) {
+        if ($form->isSubmitted() && $form->isValid() and empty($checkName)) {
             $em = $this->em;
             $entity->setBusinessConfig($config);
             if(empty($entity->getUnit())){
@@ -363,7 +363,7 @@ class StockController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($entity->upload() && !empty($entity->getFile())){
                 $entity->removeUpload();
             }

@@ -102,7 +102,7 @@ class BusinessStoreLedgerController extends AbstractController
         $entity = new BusinessStoreLedger();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity->setBusinessConfig($option);
             $transaction = $entity->getTransactionType();
             if($transaction == 'Receive' || $transaction == 'Adjustment') {

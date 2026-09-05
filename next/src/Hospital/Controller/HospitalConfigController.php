@@ -94,7 +94,7 @@ class HospitalConfigController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($entity->HeaderUpload() && !empty($entity->getHeaderFile())){
                 $entity->removeHeaderUpload();
             }

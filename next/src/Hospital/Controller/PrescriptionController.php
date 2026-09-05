@@ -247,7 +247,7 @@ class PrescriptionController extends AbstractController
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setSubTotal($entity->getAssignDoctor()->getPrice());
             $discount = ($entity->getSubTotal() - $entity->getPayment());
             $entity->setDiscount($discount);

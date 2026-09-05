@@ -69,7 +69,7 @@ class ClientController extends AbstractController
         $form->handleRequest($request);
 
         $user = $this->getUser();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $mobile = $entity->getMobile();
             $mobile = $this->toolManager->specialExpClean($mobile);
@@ -203,7 +203,7 @@ class ClientController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             if( $entity->upload() and !empty($entity->getFile())){
                 $entity->removeUpload();

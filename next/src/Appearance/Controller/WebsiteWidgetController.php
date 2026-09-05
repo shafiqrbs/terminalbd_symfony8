@@ -67,7 +67,7 @@ class WebsiteWidgetController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $user = $this->getUser();
             $entity->setGlobalOption($user->getGlobalOption());
@@ -215,7 +215,7 @@ class WebsiteWidgetController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         $data = $request->request->all();
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             $entity->setPageName($entity->getMenu()->getSlug());
             $name = $entity->getPageName().'-'.$entity->getPosition();

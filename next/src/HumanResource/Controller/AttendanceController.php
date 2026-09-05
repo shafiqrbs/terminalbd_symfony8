@@ -128,7 +128,7 @@ class AttendanceController extends AbstractController
         }
 
         $datetime = new \DateTime("now");
-        if ($form->isValid() and $entity->getLeaveSetup()->getOffDay() >= $remaining) {
+        if ($form->isSubmitted() && $form->isValid() and $entity->getLeaveSetup()->getOffDay() >= $remaining) {
             $em = $this->em;
             $entity->setGlobalOption($global);
             $entity->setEmployee($user);

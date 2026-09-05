@@ -51,7 +51,7 @@ class MallShopController extends AbstractController
         $form->handleRequest($request);
         if($entity->getShopNo())
 
-        if ($form->isValid() and $this->checkDuplicateEntry($entity) == true) {
+        if ($form->isSubmitted() && $form->isValid() and $this->checkDuplicateEntry($entity) == true) {
 
                 $em = $this->em;
                 $mall = $this->getUser()->getGlobalOption();

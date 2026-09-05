@@ -187,7 +187,7 @@ class DomainController extends AbstractController
 
         if($entity->getStatus() != 1){
             $dispatcher = $this->container->get('event_dispatcher');
-            $dispatcher->dispatch('setting_tool.post.domain_notification', new DomainNotification($entity));
+            $dispatcher->dispatch(new DomainNotification($entity), 'setting_tool.post.domain_notification');
         }
         exit;
     }
@@ -218,7 +218,7 @@ class DomainController extends AbstractController
             // TODO(migration): AbstractController::get() was removed; inject this service.
             $this->get('fos_user.user_manager')->updateUser($entity);
             $dispatcher = $this->container->get('event_dispatcher');
-            $dispatcher->dispatch('setting_tool.post.change_domain_password', new PasswordChangeDomainSmsEvent($option,$entity->getUsername(),$a));
+            $dispatcher->dispatch(new PasswordChangeDomainSmsEvent($option,$entity->getUsername(),$a), 'setting_tool.post.change_domain_password');
         }
         exit;
     }

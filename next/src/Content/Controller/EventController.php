@@ -49,7 +49,7 @@ class EventController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $user = $this->getUser();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $mobile = $entity->getMobile();
             $mobile = $this->toolManager->specialExpClean($mobile);
@@ -192,7 +192,7 @@ class EventController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $mobile = $entity->getMobile();
             $mobile = $this->toolManager->specialExpClean($mobile);
             $entity->setMobile($mobile);

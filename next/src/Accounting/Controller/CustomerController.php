@@ -102,7 +102,7 @@ class CustomerController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $globalOption = $this->getUser()->getGlobalOption();
             $mobile = $this->toolManager->specialExpClean($entity->getMobile());
@@ -220,7 +220,7 @@ class CustomerController extends AbstractController
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
             $em->flush();

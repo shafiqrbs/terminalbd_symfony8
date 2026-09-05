@@ -235,7 +235,7 @@ class ProductionController extends AbstractController
 		$editForm = $this->updatePreProductionForm($entity);
 		$editForm->handleRequest($request);
 		$data = $request->request->all();
-		if ($editForm->isValid()) {
+		if ($editForm->isSubmitted() && $editForm->isValid()) {
 			$particular = $this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->find($data['particularId']);
             $productionElementPrice = $this->em->getRepository(\App\Business\Entity\BusinessProductionElement::class)->getProductPurchaseSalesPrice($particular);
 			$entity->setBusinessParticular($particular);

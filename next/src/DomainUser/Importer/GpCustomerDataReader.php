@@ -8,8 +8,8 @@
 namespace App\DomainUser\Importer;
 
 
-use PHPExcel;
-use Liuggio\ExcelBundle\Factory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use App\Tool\Service\SpreadsheetFactory as Factory;
 
 class GpCustomerDataReader
 {
@@ -29,14 +29,14 @@ class GpCustomerDataReader
         return $this->getNamedArray($objPHPExcel);
     }
 
-    /**     * @param \PHPExcel $objPHPExcel
+    /**     * @param \Spreadsheet $objPHPExcel
      *
      * @return array
-     * @throws \PHPExcel_Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @internal param $file
      *
      */
-    protected function getNamedArray(PHPExcel $objPHPExcel)
+    protected function getNamedArray(Spreadsheet $objPHPExcel)
     {
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
         $highestRow = $objWorksheet->getHighestRow();

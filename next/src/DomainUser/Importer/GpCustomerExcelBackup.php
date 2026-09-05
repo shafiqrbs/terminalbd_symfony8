@@ -7,13 +7,19 @@ use App\DomainUser\Entity\Customer;
 use App\User\Entity\Profile;
 use App\User\Entity\User;
 use DoctrineExtensions\Query\Sqlite\Date;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Validator\Constraints\DateTime;
 
 
 class GpCustomerExcelBackup
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     protected $gpCustomerImport;
 
@@ -124,7 +130,7 @@ class GpCustomerExcelBackup
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
 

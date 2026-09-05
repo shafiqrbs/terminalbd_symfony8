@@ -51,7 +51,7 @@ class SyndicateContentController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setSlug($this->menuManager->urlSlug($entity->getName()));
             $em->persist($entity);
@@ -197,7 +197,7 @@ class SyndicateContentController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setSlug($this->menuManager->urlSlug($entity->getName()));
             $entity->upload();
             $em->flush();
@@ -225,7 +225,7 @@ class SyndicateContentController extends AbstractController
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity = $em->getRepository(\App\Content\Entity\SyndicateContent::class)->find($id);
 

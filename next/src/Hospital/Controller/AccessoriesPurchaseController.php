@@ -197,7 +197,7 @@ class AccessoriesPurchaseController extends AbstractController
 
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $data = $request->request->all();
             $deliveryDateTime = $data['appstore_bundle_hospitalbundle_hmspurchase']['receiveDate'];
             $receiveDate = (new \DateTime($deliveryDateTime));

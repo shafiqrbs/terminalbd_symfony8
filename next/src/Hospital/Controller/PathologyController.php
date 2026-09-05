@@ -78,7 +78,7 @@ class PathologyController extends AbstractController
         $form = $this->createCreateForm($entity,$globalOption);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setHospitalConfig($globalOption -> getHospitalConfig());
             $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(1);
@@ -204,7 +204,7 @@ class PathologyController extends AbstractController
         $editForm = $this->createEditForm($entity,$globalOption);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
             $this->requestStack->getSession()->getFlashBag()->add(

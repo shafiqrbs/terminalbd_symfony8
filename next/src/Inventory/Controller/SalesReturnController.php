@@ -152,7 +152,7 @@ class SalesReturnController extends AbstractController
         $invoice = $request->request->get('salesAdjustmentInvoice');
 	    $sales = $em->getRepository(\App\Inventory\Entity\Sales::class)->findOneBy(['invoice' => $invoice]);
 
-	    if ($editForm->isValid() and $mode == 'adjustment') {
+	    if ($editForm->isSubmitted() && $editForm->isValid() and $mode == 'adjustment') {
             if(!empty($sales)){
                 $entity->setSalesAdjustmentInvoice($sales);
             }
@@ -161,7 +161,7 @@ class SalesReturnController extends AbstractController
             $em->flush();
             $this->em->getRepository(\App\Inventory\Entity\SalesReturn::class)->updateSalesReturn($entity);
             return $this->redirect($this->generateUrl('inventory_salesreturn_edit', ['id' => $entity->getId()]));
-        }elseif ($editForm->isValid() and $mode == 'payment') {
+        }elseif ($editForm->isSubmitted() && $editForm->isValid() and $mode == 'payment') {
 		    $entity->setMode($mode);
 		    $entity->setProcess('complete');
 		    $em->flush();

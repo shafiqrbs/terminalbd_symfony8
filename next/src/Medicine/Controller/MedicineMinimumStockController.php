@@ -53,7 +53,7 @@ class MedicineMinimumStockController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
@@ -154,7 +154,7 @@ class MedicineMinimumStockController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success',"Data has been changed successfully"

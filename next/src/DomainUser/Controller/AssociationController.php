@@ -83,7 +83,7 @@ class AssociationController extends AbstractController
         $form->handleRequest($request);
         $mobile = $this->toolManager->specialExpClean($entity->getMobile());
         $entity = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption' => $globalOption,'mobile'=>$mobile));
-        if ($form->isValid() and empty($entity)) {
+        if ($form->isSubmitted() && $form->isValid() and empty($entity)) {
             $em = $this->em;
             $entity->setGlobalOption($globalOption);
 	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
@@ -172,7 +172,7 @@ class AssociationController extends AbstractController
             if($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
                 $dispatcher = $this->container->get('event_dispatcher');
                 $msg = "Dear Member, Your registration successfully done!";
-                $dispatcher->dispatch('appstore.customer.post.member_sms', new AssociationSmsEvent($entity,$msg));
+                $dispatcher->dispatch(new AssociationSmsEvent($entity,$msg), 'appstore.customer.post.member_sms');
             }
 
         }
@@ -198,7 +198,7 @@ class AssociationController extends AbstractController
             foreach ($entities as $entity){
                 $msg = "Congratulation! your registration has done.your member ID is {$entity->getCustomerId()}. Please click www.bhaws.org for give your monthly payment info. Thanks BHAWS";
                 $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('appstore.customer.post.member_sms', new AssociationSmsEvent($entity, $msg));
+                $dispatcher->dispatch(new AssociationSmsEvent($entity, $msg), 'appstore.customer.post.member_sms');
             }
         }
         return New Response("success");
@@ -277,7 +277,7 @@ class AssociationController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
             $em->flush();
@@ -529,9 +529,9 @@ class AssociationController extends AbstractController
         $form = $this->createInvoiceCreateForm($entity,$customer);
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if (($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        if (($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $em = $this->em;
             $entity->setBusinessConfig($config);
@@ -554,7 +554,7 @@ class AssociationController extends AbstractController
                 $global = $this->getUser()->getGlobalOption();
                 if($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
                     $dispatcher = $this->container->get('event_dispatcher');
-                    $dispatcher->dispatch('setting_tool.post.association_invoice', new \App\Tool\Event\AssociationInvoiceSmsEvent($entity));
+                    $dispatcher->dispatch(new \App\Tool\Event\AssociationInvoiceSmsEvent($entity), 'setting_tool.post.association_invoice');
                 }
             }
             return $this->redirect($this->generateUrl('domain_association_invoice'));
@@ -641,9 +641,9 @@ class AssociationController extends AbstractController
         $form = $this->editInvoiceCreateForm($entity);
         $form->handleRequest($request);
         $method = empty($entity->getTransactionMethod()) ? '' : $entity->getTransactionMethod()->getSlug();
-        if (($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
+        if (($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getAccountMobileBank())
         ) {
             $em = $this->em;
             $entity->setBusinessConfig($config);

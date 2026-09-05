@@ -69,7 +69,7 @@ class CategoryController extends AbstractController
         $form = $this->createCreateForm($entity,$globalOption);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $em->persist($entity);
             $em->flush();
@@ -190,7 +190,7 @@ class CategoryController extends AbstractController
         $editForm = $this->createEditForm($entity,$globalOption);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setSlug($entity->getName());
             $em->flush();
 

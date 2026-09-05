@@ -10,12 +10,18 @@ use App\Inventory\Entity\Item;
 use App\Inventory\Entity\ItemSize;
 use App\Inventory\Entity\Product;
 use App\Product\Entity\Category;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 
 class ProductExcel
 {
-    use ContainerAwareTrait;
+    protected ?ManagerRegistry $doctrine = null;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoctrine(ManagerRegistry $doctrine): void
+    {
+        $this->doctrine = $doctrine;
+    }
+
 
     /* @var $excelImport  ExcelImporter */
     protected $excelImport;
@@ -207,7 +213,7 @@ class ProductExcel
      */
     private function getDoctrain()
     {
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
     /**

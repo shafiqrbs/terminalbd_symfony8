@@ -48,7 +48,7 @@ class HomeSliderController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $user = $this->getUser();
             $entity->setGlobalOption($user->getGlobalOption());
@@ -181,7 +181,7 @@ class HomeSliderController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($entity->upload()){
                 $entity->removeUpload();
             }

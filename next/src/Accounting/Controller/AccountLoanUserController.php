@@ -69,7 +69,7 @@ class AccountLoanUserController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $option = $this->getUser()->getGlobalOption();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $mobile = $this->toolManager->specialExpClean($entity->getMobile());
             $entity->setGlobalOption($option);
@@ -166,7 +166,7 @@ class AccountLoanUserController extends AbstractController
         }
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $mobile = $this->toolManager->specialExpClean($entity->getMobile());
             $entity->setMobile($mobile);
             $em->flush();

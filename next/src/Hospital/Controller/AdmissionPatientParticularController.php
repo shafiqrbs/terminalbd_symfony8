@@ -145,7 +145,7 @@ class AdmissionPatientParticularController extends AbstractController
         $payment = (float)$data['invoicePayment']['payment'];
         $transactionForm = $this->createInvoicePaymentForm($transaction);
         $transactionForm->handleRequest($request);
-        if ($transactionForm->isValid() and (!empty($transaction)) and count($transaction->getAdmissionPatientParticulars()) > 0) {
+        if ($transactionForm->isSubmitted() && $transactionForm->isValid() and (!empty($transaction)) and count($transaction->getAdmissionPatientParticulars()) > 0) {
             $em = $this->em;
             $transaction->setProcess("In-progress");
             $em->persist($transaction);

@@ -97,7 +97,7 @@ class RestaurantConfigRepository extends EntityRepository
             ->getQuery()->getResult();
 
         $this->createQueryBuilder('product')
-            ->from('RestaurantBundle::InvoiceItem','product')
+            ->from('Restaurant/InvoiceItem','product')
             ->where('product.id in (:ids)')
             ->setParameter('ids', $ids)
             ->delete()

@@ -399,7 +399,7 @@ class InvoiceController extends AbstractController
         $referredId = $request->request->get('referredId');
         $data = $request->request->all()['hospitalInvoice'];
         $referred = $request->request->all()['referred'];
-        if($editForm->isValid() and !empty($entity->getInvoiceParticulars()) and in_array($entity->getProcess(),array('Created','In-progress','Pending','Revised'))) {
+        if($editForm->isSubmitted() && $editForm->isValid() and !empty($entity->getInvoiceParticulars()) and in_array($entity->getProcess(),array('Created','In-progress','Pending','Revised'))) {
             $referred = $request->request->all()['referred'];
             if(!empty($referred['name'])) {
                 $mobile = '';
@@ -429,7 +429,7 @@ class InvoiceController extends AbstractController
             }
             if(!empty($this->getUser()->getGlobalOption()->getNotificationConfig()) and  !empty($this->getUser()->getGlobalOption()->getSmsSenderTotal())) {
                 $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('setting_tool.post.hms_invoice_sms', new \App\Tool\Event\HmsInvoiceSmsEvent($entity));
+                $dispatcher->dispatch(new \App\Tool\Event\HmsInvoiceSmsEvent($entity), 'setting_tool.post.hms_invoice_sms');
             }
             return $this->redirect($this->generateUrl('hms_invoice_confirm', array('id' => $entity->getId())));
         }elseif (in_array($entity->getProcess(),array('In-progress','Done','Cancel'))){
@@ -585,7 +585,7 @@ class InvoiceController extends AbstractController
         $transaction =  new InvoiceTransaction();
         $transactionForm = $this->createInvoicePaymentForm($entity,$transaction);
         $transactionForm->handleRequest($request);
-        if ($transactionForm->isValid() and (!empty($entity) and !empty($payment)) or (!empty($entity) and !empty($discount))) {
+        if ($transactionForm->isSubmitted() && $transactionForm->isValid() and (!empty($entity) and !empty($payment)) or (!empty($entity) and !empty($discount))) {
             $em = $this->em;
             $code = $this->em->getRepository(InvoiceTransaction::class)->getLastCode($entity);
             $transaction->setHmsInvoice($entity);

@@ -70,9 +70,9 @@ class AccountBalanceTransferController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         $method = empty($entity->getFromTransactionMethod()) ? '' : $entity->getFromTransactionMethod()->getSlug();
-        if (($form->isValid() && $method == 'cash') ||
-            ($form->isValid() && $method == 'bank' && $entity->getFromAccountBank()) ||
-            ($form->isValid() && $method == 'mobile' && $entity->getFromAccountMobileBank())
+        if (($form->isSubmitted() && $form->isValid() && $method == 'cash') ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'bank' && $entity->getFromAccountBank()) ||
+            ($form->isSubmitted() && $form->isValid() && $method == 'mobile' && $entity->getFromAccountMobileBank())
         ) {
             $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());

@@ -102,7 +102,7 @@ class PurchaseReturnController extends AbstractController
         $form->handleRequest($request);
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
         $particulars = $this->em->getRepository(\App\Business\Entity\BusinessPurchaseItem::class)->getVendorItem($config,$entity->getVendor());
-        if ($form->isValid() and !empty($particulars)) {
+        if ($form->isSubmitted() && $form->isValid() and !empty($particulars)) {
             $entity->setBusinessConfig($config);
             $em->persist($entity);
             $em->flush();

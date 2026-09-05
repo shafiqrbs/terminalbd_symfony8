@@ -101,7 +101,7 @@ class PrescriptionController extends AbstractController
         $form = $this->createInvoiceCustomerForm(new Customer());
         $form->handleRequest($request);
         $data = $request->request->all();
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity->setDpsConfig($dpsConfig);
             $transactionMethod = $em->getRepository(\App\Tool\Entity\TransactionMethod::class)->find(1);
             $entity->setTransactionMethod($transactionMethod);
@@ -233,7 +233,7 @@ class PrescriptionController extends AbstractController
 
         $this->em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->insertInvoiceItems($entity,$data);
 
-        if($editForm->isValid() and !empty($entity->getInvoiceParticulars())) {
+        if($editForm->isSubmitted() && $editForm->isValid() and !empty($entity->getInvoiceParticulars())) {
 
             if (!empty($data['customer']['name'])) {
 
@@ -604,7 +604,7 @@ class PrescriptionController extends AbstractController
                 $barcode = $this->getBarcode($entity->getInvoice());
             }
             $invoiceServices = $em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->getInvoiceServices($entity);
-            return  $this->render('DoctorPrescriptionBundle:Print:'.$template.'.html.twig',
+            return  $this->render('DoctorPrescription/Print/'.$template.'.html.twig',
                 array(
                     'entity' => $entity,
                     'dpsConfig' => $dpsConfig,
@@ -651,7 +651,7 @@ class PrescriptionController extends AbstractController
                 $barcode = $this->getBarcode($entity->getInvoice());
             }
             $invoiceServices = $em->getRepository(\App\DoctorPrescription\Entity\DpsInvoiceParticular::class)->getInvoiceServices($entity);
-            return  $this->render('DoctorPrescriptionBundle:Preview:'.$template.'.html.twig',
+            return  $this->render('DoctorPrescription/Preview/'.$template.'.html.twig',
                 array(
                     'entity' => $entity,
                     'dpsConfig' => $dpsConfig,

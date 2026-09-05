@@ -198,7 +198,7 @@ class MedicineSalesTemporaryController extends AbstractController
         $tempTotal = $this->em->getRepository(\App\Medicine\Entity\MedicineSalesTemporary::class)->getSubTotalAmount($user);
         $exist = $this->em->getRepository(MedicineSales::class)->findOneBy(array('medicineConfig' => $config, 'invoice' => $invoice));
         $btn = $request->request->get('buttonType');
-        if ($editForm->isValid() and empty($exist) and round($data['salesSubTotal']) > 0 and round($tempTotal['subTotal']) > 0 ) {
+        if ($editForm->isSubmitted() && $editForm->isValid() and empty($exist) and round($data['salesSubTotal']) > 0 and round($tempTotal['subTotal']) > 0 ) {
             $entity->setMedicineConfig($config);
             $customer = $em->getRepository(\App\DomainUser\Entity\Customer::class)->defaultCustomer($user->getGlobalOption());
             $entity->setCustomer($customer);

@@ -178,7 +178,7 @@ class DoctorInvoiceController extends AbstractController
         $commission = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->updateCommissionInvoice($invoice);
         $totalCommission = ($entity->getPayment() + $commission);
         $exits = $this->em->getRepository(\App\Hospital\Entity\DoctorInvoice::class)->findOneBy(array('hmsInvoice'=> $invoice ,'hmsCommission' => $entity->getHmsCommission()));
-        if (empty($exits) and $form->isValid() and $invoice->getPayment() >= $entity -> getPayment() and  $invoice->getPayment() >= $totalCommission) {
+        if (empty($exits) and $form->isSubmitted() && $form->isValid() and $invoice->getPayment() >= $entity -> getPayment() and  $invoice->getPayment() >= $totalCommission) {
             $em = $this->em;
             $hospital = $this->getUser()->getGlobalOption()->getHospitalConfig();
             $entity->setHospitalConfig($hospital);
@@ -191,7 +191,7 @@ class DoctorInvoiceController extends AbstractController
             );
             return $this->redirect($this->generateUrl('hms_doctor_invoice_new', array('id' => $invoice->getId())));
         }
-        if (empty($exits) and $form->isValid() and $invoice->getPayment() >= $entity -> getPayment() and  $invoice->getPayment() >= $totalCommission) {
+        if (empty($exits) and $form->isSubmitted() && $form->isValid() and $invoice->getPayment() >= $entity -> getPayment() and  $invoice->getPayment() >= $totalCommission) {
             $this->requestStack->getSession()->getFlashBag()->add(
                 'notice',"Amount is not valid, amount must be less/equal receive amount"
             );
@@ -344,7 +344,7 @@ class DoctorInvoiceController extends AbstractController
         $barcode = $this->getBarcode($entity->getInvoice());
         $inWords = $this->toolManager->intToWords($entity->getPayment());
 
-        return $this->render('HospitalBundle:Invoice:'.$entity->getPrintFor().'.html.twig', array(
+        return $this->render('Hospital/Invoice/'.$entity->getPrintFor().'.html.twig', array(
             'entity'      => $entity,
             'barcode'     => $barcode,
             'inWords'     => $inWords,

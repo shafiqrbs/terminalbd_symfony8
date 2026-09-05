@@ -80,7 +80,7 @@ class MedicinePurchaseReturnController extends AbstractController
         $entity = new MedicinePurchaseReturn();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getMedicineConfig();
             $entity->setMedicineConfig($config);
@@ -169,7 +169,7 @@ class MedicinePurchaseReturnController extends AbstractController
         $purchaseReturnItem = new MedicinePurchaseReturnItem();
         $form = $this->createEditForm($entity,$purchaseReturnItem);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $purchaseReturnItem->setMedicinePurchaseReturn($entity);
 

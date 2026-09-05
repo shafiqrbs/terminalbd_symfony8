@@ -112,7 +112,7 @@ class InvoiceModuleController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($data['month'] and $data['year']){
                 $billMonth =$data['month'].','.$data['year'];
                 $entity->setBillMonth($billMonth);

@@ -415,7 +415,7 @@ class DpsTreatmentPlanRepository extends EntityRepository
         $transactionOverview = $em->getRepository(\App\Hospital\Entity\InvoiceTransaction::class)->findWithTransactionOverview($user,$data);
         $commissionOverview = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findWithCommissionOverview($user,$data);
 
-        return $this->render('HospitalBundle:Report:salesSumary.html.twig', [
+        return $this->render('Hospital/Report/salesSumary.html.twig', [
 
             'salesTotalTransactionOverview'      => $salesTotalTransactionOverview,
             'salesTransactionOverview'      => $salesTransactionOverview,
@@ -444,7 +444,7 @@ class DpsTreatmentPlanRepository extends EntityRepository
         $services = $em->getRepository(\App\Hospital\Entity\Service::class)->findBy([],['name'=>'ASC']);
         $serviceOverview = $em->getRepository(\App\Hospital\Entity\Invoice::class)->findWithServiceOverview($user,$data);
         $serviceGroup = $em->getRepository(\App\Hospital\Entity\InvoiceParticular::class)->serviceParticularDetails($user,$data);
-        return $this->render('HospitalBundle:Report:serviceBaseSales.html.twig', [
+        return $this->render('Hospital/Report/serviceBaseSales.html.twig', [
             'serviceOverview'       => $serviceOverview,
             'serviceGroup'          => $serviceGroup,
             'services'              => $services,

@@ -87,7 +87,7 @@ class ProductionController extends AbstractController
         $entity = new ProductionBatch();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $config = $this->getUser()->getGlobalOption()->getRestaurantConfig();
             $entity->setRestaurantConfig($config);

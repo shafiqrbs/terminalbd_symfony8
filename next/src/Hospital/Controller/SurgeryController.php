@@ -75,7 +75,7 @@ class SurgeryController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setHospitalConfig($config);
             $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(3);
@@ -174,7 +174,7 @@ class SurgeryController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
             $this->requestStack->getSession()->getFlashBag()->add(

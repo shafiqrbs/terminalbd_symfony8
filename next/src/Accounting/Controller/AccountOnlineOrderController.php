@@ -89,7 +89,7 @@ class AccountOnlineOrderController extends AbstractController
         $entity = new AccountOnlineOrder();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $em = $this->em;
             $lastBalance = $em->getRepository('AccountingBundle:AccountOnlineOrder')->lastInsertOnlineOrder($this->getUser()->getGlobalOption(),$entity);
@@ -221,7 +221,7 @@ class AccountOnlineOrderController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
 
             return $this->redirect($this->generateUrl('account_onlineorder_edit', array('id' => $id)));

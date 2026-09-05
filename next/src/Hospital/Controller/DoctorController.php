@@ -84,7 +84,7 @@ class DoctorController extends AbstractController
                 'notice',"Doctor already existing,Please try again."
             );
         }
-        if ($form->isValid() and $valid == 0) {
+        if ($form->isSubmitted() && $form->isValid() and $valid == 0) {
             $em = $this->em;
             $entity->setHospitalConfig($globalOption->getHospitalConfig());
             $service = $this->em->getRepository(\App\Hospital\Entity\Service::class)->find(5);
@@ -251,7 +251,7 @@ class DoctorController extends AbstractController
         $editForm = $this->createEditForm($entity,$globalOption);
         $editForm->handleRequest($request);
         $data = $request->request->all();
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             if($entity->upload() && !empty($entity->getFile())){
                 $entity->removeUpload();
             }

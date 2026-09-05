@@ -161,7 +161,7 @@ class ReportController extends AbstractController
         $inventory = $this->getUser()->getGlobalOption()->getInventoryConfig();
         $entities = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getGroupStock($inventory,$group);
         $stockOverview = $em->getRepository(\App\Inventory\Entity\StockItem::class)->getStockOverview($inventory,$data);
-        return $this->render('InventoryBundle:Report:'.$group.'.html.twig', [
+        return $this->render('Inventory/Report/'.$group.'.html.twig', [
             'entities' => $entities,
             'stockOverview' => $stockOverview,
             'searchForm' => $data,
@@ -490,7 +490,7 @@ class ReportController extends AbstractController
         }else{
             $twig = $data['group'];
         }
-        return $this->render('InventoryBundle:Report:'.$twig.'.html.twig', [
+        return $this->render('Inventory/Report/'.$twig.'.html.twig', [
             'stockOverview' => $stockOverview,
             'searchForm' => $data
         ]);

@@ -68,7 +68,7 @@ class DoctorController extends AbstractController
         $form = $this->createCreateForm($entity,$globalOption);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setDpsConfig($globalOption ->getDpsConfig());
             $entity->setMode('doctor');
@@ -200,7 +200,7 @@ class DoctorController extends AbstractController
         $editForm = $this->createEditForm($entity,$globalOption);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->setName($entity->getAssignDoctor()->getProfile()->getName());
             $entity->setMobile($entity->getAssignDoctor()->getProfile()->getMobile());
             if(empty($entity->getDesignation())){

@@ -117,7 +117,7 @@ class PhotoGalleryController extends AbstractController
         $form->handleRequest($request);
         $globalOption = $this->getUser()->getGlobalOption();
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
 
             $entity->setGlobalOption($globalOption);
@@ -262,7 +262,7 @@ class PhotoGalleryController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $entity->upload();
             $em->flush();
 

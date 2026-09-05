@@ -74,7 +74,7 @@ class CustomerHmsController extends AbstractController
         $form->handleRequest($request);
         $em = $this->em;
         $invoice = $request->request->get('patientInvoice');
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $globalOption  = $this->getUser()->getGlobalOption();
             $mobile = $entity->getMobile();
             $mobile = $this->toolManager->specialExpClean($mobile);
@@ -201,7 +201,7 @@ class CustomerHmsController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $mobile = $entity->getMobile();
             $mobile = $this->toolManager->specialExpClean($mobile);
             $entity->setMobile($mobile);

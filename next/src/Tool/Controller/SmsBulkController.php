@@ -49,7 +49,7 @@ class SmsBulkController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
             $entity->upload();
@@ -199,7 +199,7 @@ class SmsBulkController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 
             $entity->upload();
             $em->flush();
@@ -294,7 +294,7 @@ class SmsBulkController extends AbstractController
         if ($global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
             if ($entity->getProcess() != "Complete") {
                 $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('setting_tool.post.bulk_sms', new \App\Tool\Event\SmsBulkEvent($entity));
+                $dispatcher->dispatch(new \App\Tool\Event\SmsBulkEvent($entity), 'setting_tool.post.bulk_sms');
                 $entity->setProcess('Complete');
                 $em->flush();
             }

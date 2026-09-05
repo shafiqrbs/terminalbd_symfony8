@@ -91,7 +91,7 @@ class CustomerController extends AbstractController
         $globalOption = $this->getUser()->getGlobalOption();
         $mobile = $this->toolManager->specialExpClean($entity->getMobile());
         $exist = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->findOneBy(array('globalOption'=>$globalOption, 'mobile'=>$mobile));
-        if ($form->isValid() and empty($exist)) {
+        if ($form->isSubmitted() && $form->isValid() and empty($exist)) {
             $em = $this->em;
             $entity->setGlobalOption($globalOption);
 	        $entity->setMobile($mobile);
@@ -255,7 +255,7 @@ class CustomerController extends AbstractController
         $editForm->handleRequest($request);
         $mobile = $this->toolManager->specialExpClean($entity->getMobile());
         $count = $this->em->getRepository(\App\DomainUser\Entity\Customer::class)->customerCount($entity->getGlobalOption()->getId(),$entity->getId(),$mobile);
-        if ($editForm->isValid() and $count == 0) {
+        if ($editForm->isSubmitted() && $editForm->isValid() and $count == 0) {
 	        $mobile = $this->toolManager->specialExpClean($entity->getMobile());
 	        $entity->setMobile($mobile);
             $em->flush();

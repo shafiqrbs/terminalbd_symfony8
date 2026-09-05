@@ -68,7 +68,7 @@ class VendorController extends AbstractController
         $entity = new AccountVendor();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $em = $this->em;
             $entity->setGlobalOption($this->getUser()->getGlobalOption());
@@ -195,7 +195,7 @@ class VendorController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->flush();
             $this->em->getRepository(\App\Accounting\Entity\AccountVendor::class)->updateVendorCompanyName($entity);
             return $this->redirect($this->generateUrl('account_vendor'));

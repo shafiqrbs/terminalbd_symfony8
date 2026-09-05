@@ -219,7 +219,7 @@ class InvoiceController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         $data = $request->request->all();
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $done = array('Done','Delivered');
             $distribution = array('Done','Delivered','Challan');
             if (!empty($data['customerMobile'])){
@@ -1080,7 +1080,7 @@ class InvoiceController extends AbstractController
             $global = $this->getUser()->getGlobalOption();
             if($entity->getBusinessConfig()->getBusinessModel() == 'association' and $global->getSmsSenderTotal() and $global->getSmsSenderTotal()->getRemaining() > 0 and $global->getNotificationConfig()->getSmsActive() == 1) {
                 $dispatcher = $this->container->get('event_dispatcher');
-                $dispatcher->dispatch('setting_tool.post.association_invoice', new \App\Tool\Event\AssociationInvoiceSmsEvent($entity));
+                $dispatcher->dispatch(new \App\Tool\Event\AssociationInvoiceSmsEvent($entity), 'setting_tool.post.association_invoice');
             }
             return new Response("Success");
         }

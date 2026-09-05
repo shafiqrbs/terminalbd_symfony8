@@ -134,7 +134,7 @@ class InvoiceFuelPumpController extends AbstractController
         $editForm = $this->createEditForm($purchaseItem,$invoice);
         $editForm->handleRequest($request);
         $exist = $this->em->getRepository(BusinessBatchParticular::class)->findOneBy(array('businessBatch'=>$invoice,'businessParticular'=> $purchaseItem->getBusinessParticular(),'wearhouse'=>$purchaseItem->getWearhouse(),'salesBy'=>$purchaseItem->getSalesBy()));
-        if ($editForm->isValid() and empty($exist)) {
+        if ($editForm->isSubmitted() && $editForm->isValid() and empty($exist)) {
             $purchaseItem->setBusinessBatch($invoice);
             $purchaseItem->setPrice($purchaseItem->getBusinessParticular()->getSalesPrice());
             $em->persist($purchaseItem);
