@@ -38,7 +38,7 @@ class RestaurantTableInvoice
     private $user;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: Particular::class, inversedBy: 'restaurantTemps')]
+    #[ORM\ManyToOne(targetEntity: Particular::class)]
     private $table;
 
      #[ORM\ManyToOne(targetEntity: Particular::class)]

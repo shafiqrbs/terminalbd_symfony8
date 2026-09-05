@@ -25,10 +25,16 @@ class ColorSize
     #[ORM\ManyToOne(targetEntity: InventoryConfig::class, inversedBy: 'items')]
     private  $inventoryConfig;
 
-    #[ORM\OneToMany(targetEntity: Item::class, mappedBy: 'color')]
+    // Was a OneToMany mappedBy 'color', but that field on the other
+    // side points at App\Inventory\Entity\ItemColor, not at this entity, so the relation could
+    // never load. Left as a plain property. See migration/contract/
+    // broken-associations.md.
     protected $itemColor;
 
-    #[ORM\OneToMany(targetEntity: Item::class, mappedBy: 'size')]
+    // Was a OneToMany mappedBy 'size', but that field on the other
+    // side points at App\Inventory\Entity\ItemSize, not at this entity, so the relation could
+    // never load. Left as a plain property. See migration/contract/
+    // broken-associations.md.
     protected $itemSize;
 
 

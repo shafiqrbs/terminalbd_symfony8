@@ -21,7 +21,7 @@ class DoctorInvoiceParticular
     private $id;
 
 
-    #[ORM\ManyToOne(targetEntity: DoctorInvoice::class, inversedBy: 'doctorInvoiceParticulars')]
+    #[ORM\ManyToOne(targetEntity: DoctorInvoice::class)]
     private $doctorInvoice;
 
     #[ORM\ManyToOne(targetEntity: Particular::class, inversedBy: 'invoiceParticular')]

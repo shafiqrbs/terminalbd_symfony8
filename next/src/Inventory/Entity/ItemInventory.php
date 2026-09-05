@@ -37,7 +37,7 @@ class ItemInventory
     private $itemProcess;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: Item::class, inversedBy: 'itemInventory')]
+    #[ORM\ManyToOne(targetEntity: Item::class)]
     private  $item;
 
 

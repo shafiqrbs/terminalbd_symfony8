@@ -25,24 +25,24 @@ class StockOpening
     private $id;
 
 
-    #[ORM\ManyToOne(targetEntity: GlobalOption::class, inversedBy: 'accountLoan')]
+    #[ORM\ManyToOne(targetEntity: GlobalOption::class)]
     protected $globalOption;
 
 
     #[Gedmo\Blameable(on: 'create')]
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'accountLoan')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private  $createdBy;
 
 
-    #[ORM\ManyToOne(targetEntity: AccountJournal::class, inversedBy: 'accountLoan')]
+    #[ORM\ManyToOne(targetEntity: AccountJournal::class)]
     private  $journal;
 
 
-    #[ORM\ManyToOne(targetEntity: AccountHead::class, inversedBy: 'accountLoan')]
+    #[ORM\ManyToOne(targetEntity: AccountHead::class)]
     private  $accountHead;
 
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'accountLoanApprove')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private  $approvedBy;
 
 

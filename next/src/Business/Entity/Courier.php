@@ -26,7 +26,10 @@ class Courier
     #[ORM\ManyToOne(targetEntity: BusinessConfig::class, inversedBy: 'marketing', cascade: ['detach'])]
     private  $businessConfig;
 
-    #[ORM\OneToMany(targetEntity: BusinessInvoice::class, mappedBy: 'courier')]
+    // Was a OneToMany mappedBy 'courier', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     private $invoices;
 
 

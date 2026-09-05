@@ -105,13 +105,22 @@ class Branches
     private  $expenditure;
 
 
-    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'branches')]
+    // Was a OneToMany mappedBy 'branches', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     private  $transactions;
 
-     #[ORM\OneToMany(targetEntity: AccountJournal::class, mappedBy: 'branches')]
+    // Was a OneToMany mappedBy 'branches', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     private  $accountJournal;
 
-     #[ORM\OneToMany(targetEntity: AccountBalanceTransfer::class, mappedBy: 'branches')]
+    // Was a OneToMany mappedBy 'branches', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     private  $balanceTransfer;
 
     /**

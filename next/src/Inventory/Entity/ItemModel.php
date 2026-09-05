@@ -23,17 +23,26 @@ class ItemModel
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: InventoryConfig::class, inversedBy: 'model')]
+    #[ORM\ManyToOne(targetEntity: InventoryConfig::class)]
     private  $inventoryConfig;
 
 
-    #[ORM\OneToMany(targetEntity: Item::class, mappedBy: 'model')]
+    // Was a OneToMany mappedBy 'model', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     protected $item;
 
-     #[ORM\OneToMany(targetEntity: PurchaseVendorItem::class, mappedBy: 'model')]
+    // Was a OneToMany mappedBy 'model', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     protected $purchaseVendorItems;
 
-    #[ORM\OneToMany(targetEntity: GoodsItem::class, mappedBy: 'model')]
+    // Was a OneToMany mappedBy 'model', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     protected $goodsItems;
 
 

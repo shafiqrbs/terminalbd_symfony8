@@ -23,7 +23,7 @@ class HmsAdmissionPatientRelease
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: Invoice::class, inversedBy: 'admissionInvestigations')]
+    #[ORM\ManyToOne(targetEntity: Invoice::class)]
     private  $admission;
 
 
@@ -36,7 +36,7 @@ class HmsAdmissionPatientRelease
     private  $createdBy;
 
 
-    #[ORM\ManyToOne(targetEntity: Particular::class, inversedBy: 'ipdVisits')]
+    #[ORM\ManyToOne(targetEntity: Particular::class)]
     private  $doctor;
 
 

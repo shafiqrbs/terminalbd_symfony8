@@ -25,14 +25,14 @@ class SmsBulk
     private $id;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: GlobalOption::class, inversedBy: 'smsmBulk')]
+    #[ORM\ManyToOne(targetEntity: GlobalOption::class)]
     protected $globalOption;
 
-    #[ORM\ManyToOne(targetEntity: Location::class, inversedBy: 'smsmBulk')]
+    #[ORM\ManyToOne(targetEntity: Location::class)]
     protected $location;
 
     #[Gedmo\Blameable(on: 'create')]
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'smsmBulk')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private  $createdBy;
 
     /**

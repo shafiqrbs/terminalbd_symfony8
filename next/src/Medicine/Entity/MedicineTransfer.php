@@ -26,7 +26,7 @@ class MedicineTransfer
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: MedicineConfig::class, inversedBy: 'medicineTransfers', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: MedicineConfig::class, cascade: ['detach'])]
     private  $medicineConfig;
 
 
@@ -35,7 +35,7 @@ class MedicineTransfer
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: Customer::class, inversedBy: 'medicineTransfers', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Customer::class, cascade: ['detach'])]
     private  $customer;
 
 
@@ -44,7 +44,7 @@ class MedicineTransfer
     private  $createdBy;
 
 
-	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'medicineTransfersReturnApprovedBy')]
+	#[ORM\ManyToOne(targetEntity: User::class)]
     private  $approvedBy;
 
 

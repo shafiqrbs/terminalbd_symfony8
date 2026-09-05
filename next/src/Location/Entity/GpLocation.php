@@ -26,18 +26,30 @@ class GpLocation
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    #[ORM\OneToMany(targetEntity: Location::class, mappedBy: 'gpLocation', cascade: ['persist', 'remove'])]
+    // Was a OneToMany mappedBy 'gpLocation', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     protected $locations;
 
 
-    #[ORM\OneToMany(targetEntity: Profile::class, mappedBy: 'gpLocation', cascade: ['persist', 'remove'])]
+    // Was a OneToMany mappedBy 'gpLocation', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     protected $profiles;
 
 
-    #[ORM\OneToMany(targetEntity: Customer::class, mappedBy: 'gpLocation', cascade: ['persist', 'remove'])]
+    // Was a OneToMany mappedBy 'gpLocation', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     protected $customers;
 
-    #[ORM\OneToMany(targetEntity: Branches::class, mappedBy: 'gpLocation', cascade: ['persist', 'remove'])]
+    // Was a OneToMany mappedBy 'gpLocation', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     protected $branches;
 
 

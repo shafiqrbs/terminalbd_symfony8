@@ -25,7 +25,7 @@ class Department
     private $id;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: GlobalOption::class, inversedBy: 'departments')]
+    #[ORM\ManyToOne(targetEntity: GlobalOption::class)]
     private $globalOption;
 
 

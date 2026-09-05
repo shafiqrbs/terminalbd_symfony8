@@ -21,16 +21,16 @@ class PayrollSheetParticular
     private $id;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: PayrollSheet::class, inversedBy: 'payrollSheetParticulars')]
+    #[ORM\ManyToOne(targetEntity: PayrollSheet::class)]
     protected $payrollSheet;
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: EmployeePayroll::class, inversedBy: 'payrollSheetParticulars')]
+    #[ORM\ManyToOne(targetEntity: EmployeePayroll::class)]
     private  $employee;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: PayrollSetting::class, inversedBy: 'payrollSheetParticular')]
+    #[ORM\ManyToOne(targetEntity: PayrollSetting::class)]
     private  $particular;
 
 

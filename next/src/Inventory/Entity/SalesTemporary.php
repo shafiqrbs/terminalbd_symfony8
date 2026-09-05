@@ -23,12 +23,12 @@ class SalesTemporary
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: InventoryConfig::class, inversedBy: 'serviceSales')]
+    #[ORM\ManyToOne(targetEntity: InventoryConfig::class)]
     private  $inventoryConfig;
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: PurchaseItem::class, inversedBy: 'medicineSalesTemporary', cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: PurchaseItem::class, cascade: ['persist'])]
     private $purchaseItem;
 
 

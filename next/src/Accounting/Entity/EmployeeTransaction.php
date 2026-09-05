@@ -35,19 +35,22 @@ class EmployeeTransaction
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: GlobalOption::class, inversedBy: 'employeeTransaction')]
+    #[ORM\ManyToOne(targetEntity: GlobalOption::class)]
     protected $globalOption;
 
-    #[ORM\OneToOne(targetEntity: AccountCash::class, mappedBy: 'employeeTransaction')]
+    // Was a OneToMany mappedBy 'employeeTransaction', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     private  $accountCash;
 
-    #[ORM\ManyToOne(targetEntity: AccountBank::class, inversedBy: 'employeeTransaction')]
+    #[ORM\ManyToOne(targetEntity: AccountBank::class)]
     private  $accountBank;
 
-    #[ORM\ManyToOne(targetEntity: AccountMobileBank::class, inversedBy: 'employeeTransaction')]
+    #[ORM\ManyToOne(targetEntity: AccountMobileBank::class)]
     private  $accountMobileBank;
 
-    #[ORM\ManyToOne(targetEntity: TransactionMethod::class, inversedBy: 'employeeTransaction')]
+    #[ORM\ManyToOne(targetEntity: TransactionMethod::class)]
     private  $transactionMethod;
 
 
@@ -71,11 +74,11 @@ class EmployeeTransaction
 
 
     #[Gedmo\Blameable(on: 'create')]
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'employeeTransaction')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private  $createdBy;
 
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'employeeTransactionToUser')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private  $toUser;
 
     /**
@@ -90,7 +93,7 @@ class EmployeeTransaction
     #[ORM\Column(name: 'process', type: 'string', length: 255, nullable: true)]
     private $process;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'employeeTransactionApprove')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private  $approvedBy;
 
 

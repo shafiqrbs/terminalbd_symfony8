@@ -26,7 +26,7 @@ class MedicineTransferItem
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: MedicineStock::class, inversedBy: 'medicineTransferItems')]
+    #[ORM\ManyToOne(targetEntity: MedicineStock::class)]
     private  $medicineStock;
 
 

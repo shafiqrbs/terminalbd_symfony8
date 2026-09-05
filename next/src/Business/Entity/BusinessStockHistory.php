@@ -27,7 +27,7 @@ class BusinessStockHistory
     private  $businessConfig;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: BusinessParticular::class, inversedBy: 'stockHistory')]
+    #[ORM\ManyToOne(targetEntity: BusinessParticular::class)]
     #[ORM\OrderBy(['sorting' => 'ASC'])]
     private $item;
 

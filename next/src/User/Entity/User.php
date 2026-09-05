@@ -167,11 +167,17 @@ class User extends BaseUser
 	/**
      * This part for system customer payment
      */
-    #[ORM\OneToMany(targetEntity: Page::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    // Was a OneToMany mappedBy 'user', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     protected $pages;
 
 
-	#[ORM\OneToMany(targetEntity: HomeSlider::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    // Was a OneToMany mappedBy 'user', a field that does not exist on
+    // the other side - in the legacy tree either, so reading this collection
+    // threw. Left as a plain property, which reads as empty, so callers keep
+    // working. See migration/contract/broken-associations.md.
     protected $homeSliders;
 
 

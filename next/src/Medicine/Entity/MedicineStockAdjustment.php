@@ -25,16 +25,16 @@ class MedicineStockAdjustment
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: MedicineConfig::class, inversedBy: 'stockAdjustment')]
+    #[ORM\ManyToOne(targetEntity: MedicineConfig::class)]
     private $medicineConfig;
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: MedicineStock::class, inversedBy: 'stockAdjustment', cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: MedicineStock::class, cascade: ['persist'])]
     private $medicineStock;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: MedicineParticular::class, inversedBy: 'stockAdjustment', cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: MedicineParticular::class, cascade: ['persist'])]
     private $adjustment;
 
     #[Gedmo\Blameable(on: 'create')]

@@ -25,18 +25,18 @@ class RestaurantStockHistory
     #[ORM\ManyToOne(targetEntity: RestaurantConfig::class, cascade: ['detach'])]
     private  $restaurantConfig;
 
-    #[ORM\ManyToOne(targetEntity: Particular::class, inversedBy: 'stockHistory')]
+    #[ORM\ManyToOne(targetEntity: Particular::class)]
     #[ORM\OrderBy(['sorting' => 'ASC'])]
     private $item;
 
      #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: PurchaseItem::class, inversedBy: 'stockHistory', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: PurchaseItem::class, cascade: ['detach'])]
     #[ORM\OrderBy(['sorting' => 'ASC'])]
     private $purchaseItem;
 
 
     #[ORM\JoinColumn(name: 'salesItem_id', referencedColumnName: 'id', nullable: true, onDelete: 'cascade')]
-    #[ORM\ManyToOne(targetEntity: InvoiceParticular::class, cascade: ['detach'], inversedBy: 'stockHistory')]
+    #[ORM\ManyToOne(targetEntity: InvoiceParticular::class, cascade: ['detach'])]
     #[ORM\OrderBy(['sorting' => 'ASC'])]
     private  $salesItem;
 

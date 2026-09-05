@@ -30,7 +30,7 @@ class MedicineDoctorPrescribe
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: MedicineBrand::class, inversedBy: 'invoiceMedicine')]
+    #[ORM\ManyToOne(targetEntity: MedicineBrand::class)]
     private $medicine;
 
 

@@ -29,7 +29,7 @@ class BusinessDistributionReturnItem
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: BusinessParticular::class, inversedBy: 'businessDistributionReturnItem')]
+    #[ORM\ManyToOne(targetEntity: BusinessParticular::class)]
     private  $businessParticular;
 
      #[ORM\JoinColumn(onDelete: 'CASCADE')]

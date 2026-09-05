@@ -27,7 +27,7 @@ class ItemImport
     private $id;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: RestaurantConfig::class, inversedBy: 'itemImports', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: RestaurantConfig::class, cascade: ['detach'])]
     private  $restaurantConfig;
 
 

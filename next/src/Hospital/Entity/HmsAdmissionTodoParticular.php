@@ -25,7 +25,7 @@ class HmsAdmissionTodoParticular
     private $id;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: Invoice::class, inversedBy: 'medications')]
+    #[ORM\ManyToOne(targetEntity: Invoice::class)]
     private  $admission;
 
     #[ORM\ManyToOne(targetEntity: HmsAdmissionTodo::class, inversedBy: 'todoParticulars')]
@@ -36,7 +36,7 @@ class HmsAdmissionTodoParticular
     private  $patientRelease;
 
 
-    #[ORM\ManyToOne(targetEntity: MedicineBrand::class, inversedBy: 'invoiceMedicine')]
+    #[ORM\ManyToOne(targetEntity: MedicineBrand::class)]
     private $medicine;
 
     #[ORM\ManyToOne(targetEntity: User::class)]

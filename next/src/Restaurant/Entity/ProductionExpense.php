@@ -24,27 +24,27 @@ class ProductionExpense
     private $id;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: Particular::class, inversedBy: 'productionExpense')]
+    #[ORM\ManyToOne(targetEntity: Particular::class)]
     private  $productionItem;
 
 
     #[ORM\JoinColumn(name: 'productionBatch_id', referencedColumnName: 'id', nullable: true, onDelete: 'cascade')]
-    #[ORM\ManyToOne(targetEntity: ProductionBatch::class, inversedBy: 'productionExpense', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: ProductionBatch::class, cascade: ['detach'])]
     private  $productionBatch;
 
 
     #[ORM\JoinColumn(name: 'salesItem_id', referencedColumnName: 'id', nullable: true, onDelete: 'cascade')]
-    #[ORM\ManyToOne(targetEntity: InvoiceParticular::class, inversedBy: 'productionExpense', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: InvoiceParticular::class, cascade: ['detach'])]
     private  $salesItem;
 
 
     #[ORM\JoinColumn(name: 'productionElement_id', referencedColumnName: 'id', nullable: true, onDelete: 'cascade')]
-    #[ORM\ManyToOne(targetEntity: ProductionElement::class, inversedBy: 'productionExpenseItem', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: ProductionElement::class, cascade: ['detach'])]
     private  $productionElement;
 
 
      #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: Particular::class, inversedBy: 'productionExpenseItem')]
+    #[ORM\ManyToOne(targetEntity: Particular::class)]
     private  $particular;
 
      #[ORM\OneToMany(targetEntity: RestaurantStockHistory::class, mappedBy: 'productionExpense', cascade: ['persist', 'remove'])]

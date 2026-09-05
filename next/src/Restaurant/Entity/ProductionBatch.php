@@ -25,7 +25,7 @@ class ProductionBatch
     private $id;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: RestaurantConfig::class, inversedBy: 'productionBatch')]
+    #[ORM\ManyToOne(targetEntity: RestaurantConfig::class)]
     private $restaurantConfig;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]

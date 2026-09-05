@@ -24,7 +24,7 @@ class HmsAdmissionTodo
     private $id;
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: Invoice::class, inversedBy: 'admissionInvestigations')]
+    #[ORM\ManyToOne(targetEntity: Invoice::class)]
     private  $admission;
 
 
@@ -38,7 +38,7 @@ class HmsAdmissionTodo
 
 
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[ORM\ManyToOne(targetEntity: Particular::class, inversedBy: 'ipdVisits')]
+    #[ORM\ManyToOne(targetEntity: Particular::class)]
     private  $doctor;
 
 

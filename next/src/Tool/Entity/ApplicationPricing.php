@@ -19,11 +19,11 @@ class ApplicationPricing
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    #[ORM\OneToOne(targetEntity: AppModule::class, inversedBy: 'applicationPricing')]
+    #[ORM\OneToOne(targetEntity: AppModule::class)]
      #[ORM\OrderBy(['name' => 'DESC'])]
      protected $appModule;
 
-    #[ORM\OneToOne(targetEntity: SyndicateModule::class, inversedBy: 'applicationPricing')]
+    #[ORM\OneToOne(targetEntity: SyndicateModule::class)]
      #[ORM\OrderBy(['name' => 'DESC'])]
      protected $syndicateModule;
 
