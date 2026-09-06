@@ -43,7 +43,7 @@ class ContactMessageRepository extends EntityRepository
                $this->remove($data['remove'][$i]);
             }
 
-            $entity = $em->getRepository('SettingContentBundle:CustomerInbox')->find($id);
+            $entity = $em->getRepository(\App\DomainUser\Entity\CustomerInbox::class)->find($id);
             if(!empty($entity) AND !empty($data['reply'][$i])){
 
                 $entity->setReply($data['reply'][$i]);
@@ -61,7 +61,7 @@ class ContactMessageRepository extends EntityRepository
     private function remove($id){
 
         $em = $this->getEntityManager();
-        $entity = $em->getRepository('SettingContentBundle:CustomerInbox')->find($id);
+        $entity = $em->getRepository(\App\DomainUser\Entity\CustomerInbox::class)->find($id);
         $em->remove($entity);
         $em->flush();
     }

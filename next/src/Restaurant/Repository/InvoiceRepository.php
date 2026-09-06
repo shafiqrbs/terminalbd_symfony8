@@ -317,7 +317,7 @@ class InvoiceRepository extends EntityRepository
             $entity->setAssignDoctor($assignDoctor);
         }
         if($invoiceInfo['department']){
-            $department = $em->getRepository('RestaurantBundle:HmsCategory')->find($invoiceInfo['department']);
+            $department = $em->getRepository(\App\Hospital\Entity\HmsCategory::class)->find($invoiceInfo['department']);
             $entity->setDepartment($department);
         }
         if($invoiceInfo['cabinNo']){

@@ -67,7 +67,7 @@ class DesignationRepository extends MaterializedPathRepository
 
         $ret = [];
         $em = $this->getEntityManager();
-        $designations = $em->getRepository('ProductProductBundle:Designation')->findBy([],['name'=>'asc']);
+        $designations = $em->getRepository(\App\Tool\Entity\Designation::class)->findBy([],['name'=>'asc']);
 
         foreach( $designations as $cat ){
             if( !$cat->getParent() ){

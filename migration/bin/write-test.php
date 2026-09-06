@@ -42,6 +42,7 @@ declare(strict_types=1);
  */
 
 require dirname(__DIR__, 2) . '/next/vendor/autoload.php';
+require_once __DIR__ . '/route-values.php';
 
 use App\Kernel;
 use App\User\Entity\User;
@@ -364,6 +365,11 @@ $send = static function (string $path, string $method, array $parameters, ?strin
     return $request;
 };
 
+// Edit forms live at /thing/{id}/edit, so skipping placeholders skipped most of
+// the writes worth exercising. RouteValues fills them from real rows.
+$withParameters = !in_array('--no-parameters', $argv, true);
+$values = new RouteValues($registry->getManager(), $user->getGlobalOption()?->getId());
+
 $routes = $container->get('router')->getRouteCollection();
 
 $state = ['seen' => [], 'dead' => [], 'failures' => [], 'pending' => null, 'pendingPage' => null];
@@ -424,7 +430,6 @@ foreach ($routes as $name => $route) {
     $methods = $route->getMethods();
 
     if (($methods !== [] && !in_array('GET', $methods, true))
-        || str_contains($path, '{')
         || str_starts_with($path, '/_')
         || str_starts_with($path, '/android-api')
         || str_starts_with($path, '/flutter-api')
@@ -434,6 +439,15 @@ foreach ($routes as $name => $route) {
     ) {
         ++$counts['skipped'];
         continue;
+    }
+
+    if (str_contains($path, '{')) {
+        $path = $withParameters ? $values->fill($name, $route) : null;
+
+        if ($path === null) {
+            ++$counts['skipped'];
+            continue;
+        }
     }
 
     // Render the page the form lives on. Failures here are smoke-test's

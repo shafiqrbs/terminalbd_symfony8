@@ -118,7 +118,7 @@ class SiteSettingRepository extends EntityRepository
             $syndicates = $reEntity->getSyndicates();
             foreach($syndicates as $syndicate ){
                 $id = $syndicate->getId();
-                $syndicate = $em->getRepository('SettingContentBundle:Syndicate')->find($id);
+                $syndicate = $em->getRepository(\App\Tool\Entity\Syndicate::class)->find($id);
 
                 if(!empty($entity)){
 

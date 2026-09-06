@@ -54,7 +54,7 @@ class AccountVendorRepository extends EntityRepository
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('count(e.id)');
-        $qb->from('AccountingBundle:Vendor','e');
+        $qb->from(\App\Inventory\Entity\Vendor::class,'e');
         $qb->andWhere("e.globalOption = :global");
         $qb->setParameter('global', $global->getId());
         $count = $qb->getQuery()->getSingleScalarResult();

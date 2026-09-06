@@ -767,7 +767,7 @@ class PosController extends AbstractController
         $categories = $em->getRepository('InventoryBundle:Category')->findBy(array('inventoryConfig' => $config , 'status' => 1));
         $tables = $em->getRepository('InventoryBundle:Particular')->findBy(array('inventoryConfig' => $config , 'service' => 1),array('id'=>'ASC'));
         $servings = $em->getRepository(\App\User\Entity\User::class)->getEmployeeEntities($user->getGlobalOption());
-        $invoice = $em->getRepository('InventoryBundle:Pos')->updateInvoiceActive($entity);
+        $invoice = $em->getRepository(\App\Pos\Entity\Pos::class)->updateInvoiceActive($entity);
         $html = $this->renderView(
             'Pos/TableInvoice/ajaxTransaction.html.twig', array(
                 'config'                => $config,
@@ -793,7 +793,7 @@ class PosController extends AbstractController
 
     public function returnResultData(Pos $invoice){
 
-        $entity = $this->em->getRepository('InventoryBundle:Pos')->updateInvoiceTotalPrice($invoice);
+        $entity = $this->em->getRepository(\App\Pos\Entity\Pos::class)->updateInvoiceTotalPrice($invoice);
         $process = empty($entity->getProcess()) ? "Free" : $entity->getProcess();
         $htmlProcess = $this->renderView(
             'Pos/TableInvoice/ajaxTableItem.html.twig', array(
@@ -820,7 +820,7 @@ class PosController extends AbstractController
         $em = $this->em;
         $process = $_REQUEST['process'];
         if($process == "Free"){
-            $this->em->getRepository('InventoryBundle:Pos')->resetData($invoice);
+            $this->em->getRepository(\App\Pos\Entity\Pos::class)->resetData($invoice);
             $result = $this->returnResultData($invoice);
             return new Response(json_encode($result));
         }else{
@@ -842,10 +842,10 @@ class PosController extends AbstractController
     public function addProductAction($product)
     {
         $id = $_REQUEST['invoice'];
-        $invoice = $this->em->getRepository('InventoryBundle:Pos')->find($id);
+        $invoice = $this->em->getRepository(\App\Pos\Entity\Pos::class)->find($id);
         $entity = $this->em->getRepository('InventoryBundle:Particular')->find($product);
         $invoiceItems = array('particularId' => $product , 'quantity' => 1,'price' => $entity->getPrice(),'process'=>'create');
-    //    $this->em->getRepository('InventoryBundle:Pos')->insertInvoiceItems($invoice, $invoiceItems);
+    //    $this->em->getRepository(\App\Pos\Entity\Pos::class)->insertInvoiceItems($invoice, $invoiceItems);
         $result = $this->returnResultData($invoice);
         return new Response(json_encode($result));
     }
@@ -856,9 +856,9 @@ class PosController extends AbstractController
         $em = $this->em;
         $quantity = $_REQUEST['quantity'];
         /* @var $entity PosItem */
-        $entity = $this->em->getRepository('InventoryBundle:PosItem')->find($product);
+        $entity = $this->em->getRepository(\App\Pos\Entity\PosItem::class)->find($product);
         $invoiceItems = array('particularId' => $entity->getParticular()->getId() , 'quantity' => $quantity,'price' => $entity->getSalesPrice(),'process' => 'update');
-        $this->em->getRepository('InventoryBundle:Pos')->insertInvoiceItems($entity->getTableInvoice(), $invoiceItems);
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->insertInvoiceItems($entity->getTableInvoice(), $invoiceItems);
         $result = $this->returnResultData($entity->getTableInvoice());
         return new Response(json_encode($result));
     }
@@ -1005,7 +1005,7 @@ class PosController extends AbstractController
     {
 
         $isPrints = $_REQUEST['isPrint'];
-        $this->em->getRepository('InventoryBundle:Pos')->updateKitchenPrint($entity,$isPrints);
+        $this->em->getRepository(\App\Pos\Entity\Pos::class)->updateKitchenPrint($entity,$isPrints);
         $connector = new \Mike42\Escpos\PrintConnectors\DummyPrintConnector();
         $printer = new Printer($connector);
         $printer -> initialize();

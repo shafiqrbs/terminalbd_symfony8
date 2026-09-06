@@ -300,7 +300,7 @@ class AccountVoucherController extends AbstractController
          * Delete Journal & Account Purchase
          */
         $config = $this->getUser()->getGlobalOption()->getBusinessConfig();
-        $purchase = $this->em->getRepository('AccountingBundle:BusinessPurchase')->findOneBy(array('businessConfig' => $config , 'id' => $id));
+        $purchase = $this->em->getRepository(\App\Business\Entity\BusinessPurchase::class)->findOneBy(array('businessConfig' => $config , 'id' => $id));
 
         set_time_limit(0);
         ignore_user_abort(true);
@@ -314,12 +314,12 @@ class AccountVoucherController extends AbstractController
         $purchase->setProcess('created');
         $purchase->setApprovedBy(NULL);
         $em->flush();
-        //$this->em->getRepository('AccountingBundle:BusinessParticular')->getPurchaseUpdateQnt($purchase);
+        //$this->em->getRepository(\App\Business\Entity\BusinessParticular::class)->getPurchaseUpdateQnt($purchase);
         $template = $this->twig->render('Accounting/AccountVoucher/purchaseReverse.html.twig', array(
             'entity' => $purchase,
             'config' => $purchase->getBusinessConfig(),
         ));
-        //$this->em->getRepository('AccountingBundle:BusinessReverse')->purchaseReverse($purchase, $template);
+        //$this->em->getRepository(\App\Business\Entity\BusinessReverse::class)->purchaseReverse($purchase, $template);
         return $this->redirect($this->generateUrl('account_voucher_edit',array('id' => $purchase->getId())));
     }
 

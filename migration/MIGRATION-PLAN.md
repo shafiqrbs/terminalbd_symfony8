@@ -148,15 +148,19 @@ Both lines of that router matter, and §5.36 says why. Log in as
 
 ### Where to start, in order
 
-1. **Writes with parameters, and the destructive half.** `write-test.php` now
-   submits the forms on parameterless GET pages - 187 of them - but an edit
-   form lives at `/thing/{id}/edit`, and the deny-list skips everything whose
-   name suggests it deletes, approves or sends. Those are the two halves still
-   unexercised, and §5.34's 300 broken DELETE and UPDATE statements are exactly
-   what lives in the second one.
-2. **Pages with parameters.** 2,141 routes carry a `{placeholder}` and have
-   never been requested. Feeding real ids from the database would roughly
-   triple the coverage.
+1. **The destructive half of the writes.** `write-test.php` now reaches forms
+   behind `{id}` routes too (229 forms, up from 187), but the deny-list still
+   skips everything whose name suggests it deletes, approves or sends - and
+   §5.34's 300 broken DELETE and UPDATE statements are exactly what lives
+   there. Exercising it needs a database that can be thrown away and restored
+   between runs, since a rollback cannot cover an action that redirects into a
+   second request.
+2. **`mike42/escpos-php` is not installed.** `1.5.*` is in the legacy
+   composer.json and was never carried over, so the two POS print pages die on
+   `Mike42\Escpos\PrintConnectors\DummyPrintConnector`; 12 files reference it.
+   It needs a decision rather than a default: the oldest release that allows
+   PHP 8 is v4, and the current one is v5, four majors past what the legacy
+   pinned. Someone has to say whether the receipt output may change.
 3. **The remaining dead template links** — 134 names, 305 references. Treat
    each as a port defect until proven otherwise. The 320-page block that used
    to sit here was not 320 product decisions: it was one controller whose
@@ -881,6 +885,60 @@ The lesson generalises past this class: a hand-written stand-in that is stricter
 original is a defect, not an improvement, because the calling code was written against the
 original.
 
+### 5.41 Routes with a `{placeholder}` were never requested — 1,783 of them
+
+Both harnesses skipped every route carrying a placeholder, which left most of the application
+unvisited: every show page, every edit form. Feeding invented ids does not help, because a
+wrong id answers 404 and reads like a finding.
+
+`route-values.php` fills them from the database. Finding out *which* entity an id belongs to
+has no single answer, so it uses three:
+
+- 635 actions type-hint the entity, because the legacy application leaned on
+  SensioFrameworkExtraBundle's ParamConverter. Reflection is enough.
+- 765 take a bare `$id` and look the row up themselves. The entity is named in the first
+  `getRepository()` call in the body, which is read out of the source.
+- The rest are tokens, slugs and modes, handled by name where the meaning is obvious and
+  skipped where it is not.
+
+Ids come from the harness user's own tenant wherever the entity has a `globalOption`, since
+most actions filter by it and a row from another tenant arrives as a null the page did not
+expect — which reads exactly like a port defect.
+
+**The limit is the dump, not the resolver.** Of the routes with a placeholder, 468 point at an
+entity that has rows here and 911 at one that does not: 163 distinct entities are empty in this
+tenant's data. That is the same wall §11 already describes, reached from a different direction.
+
+Two defects came out of requesting those pages, below.
+
+### 5.42 `BaseUser` dropped the group half of FOSUserBundle's API
+
+The same gap as §5.38, found the same way and worse in its consequences.
+`FOS\UserBundle\Model\User` implements `GroupableInterface`; the hand-written stand-in
+reproduced neither `getGroups()` nor the four methods around it, while the concrete entity kept
+the mapped `user_user_group` collection.
+
+Two templates read `user.groups`, which is how it surfaced. The real damage is that the ported
+`User::isSuperAdmin()` and `isRoleAdmin()` call `getGroups()` themselves, so **both fatalled on
+every call** — two role checks, in a class the application asks about access.
+
+`check-user-accessors.php` did not catch it: it reads `app.user.*`, and these templates say
+`user.groups` on a row from a list. A guard that only knows one spelling only guards one
+spelling.
+
+### 5.43 27 more legacy DQL aliases, in entities that moved between modules
+
+`fix-dql-aliases.php` resolved `Bundle:Entity` by mapping the bundle to its module and looking
+there. A good number of these cross modules — `BusinessBundle:MedicineParticular` is
+`App\Medicine\Entity\MedicineParticular` — because the port grouped entities by subject rather
+than by the bundle that happened to query them, so the lookup missed them and they stayed as
+strings that ORM 3 rejects outright.
+
+Where the short name is unique across the tree there is only one thing it can mean, and that is
+now used as a fallback; where it is ambiguous the alias is left alone, because a wrong entity
+here is a silent wrong answer rather than an error. 27 converted across 12 files. The 161 that
+remain name entities that exist in neither tree.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -1147,7 +1205,8 @@ not look like they write anything — a legacy application that deletes over GET
 deny-list is deliberately broad. It is resumable, because 110 controllers call `exit;` and take
 the harness with them; every visit is recorded before it is made, so repeated runs converge.
 
-860 pages, and every failure is accounted for (`migration/contract/smoke-test.md`):
+981 pages - 121 of them behind a `{placeholder}`, filled from real rows (§5.41) - and every
+failure is accounted for (`migration/contract/smoke-test.md`):
 
 | pages | cause | |
 |---:|---|---|
@@ -1206,8 +1265,8 @@ posted by curl is rejected, and because the templates render only per-field erro
 rejection appears as a page that looks perfectly fine. In process, the token the page rendered
 is the token the request carries.
 
-**187 forms submitted, 127 saved, 30 rejected by validation, 30 failing.** Every failure was
-checked:
+**229 forms submitted, 128 saved, 61 rejected by validation, 40 failing** - the placeholder
+routes (§5.41) brought the edit forms into reach. Every failure was checked:
 
 | forms | cause | |
 |---:|---|---|

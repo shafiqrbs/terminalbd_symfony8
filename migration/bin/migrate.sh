@@ -128,7 +128,7 @@ done
 n=$(grep -rhoE '[A-Za-z]+Bundle:[A-Za-z0-9_]*:' next/src next/templates 2>/dev/null | wc -l || true)
 echo "leftover Bundle:X: refs   $n"
 n=$(grep -rhoE "['\"][A-Za-z]+Bundle::?[A-Za-z0-9_]+['\"]" next/src --include=*.php 2>/dev/null | wc -l || true)
-echo "leftover DQL short names  $n (99 are refs to entities deleted from the legacy tree)"
+echo "leftover DQL short names  $n (all name entities that exist in neither tree - see §5.43)"
 
 echo
 echo "-- does it actually build? --"

@@ -33,12 +33,38 @@ $bundleToModule['SettinMallShopTypegContentBundle'] = 'Content';
 
 /** class exists in the ported tree? */
 $known = [];
+$byShortName = [];
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator("$root/next/src", FilesystemIterator::SKIP_DOTS)) as $f) {
     if ($f->getExtension() !== 'php') continue;
     if (!str_contains($f->getPathname(), '/Entity/')) continue;
     $rel = substr($f->getPathname(), strlen("$root/next/src/"), -4);
     $known['App\\' . str_replace('/', '\\', $rel)] = true;
+    $byShortName[basename($rel)][] = 'App\\' . str_replace('/', '\\', $rel);
 }
+
+/**
+ * The entity a Bundle:Entity alias names, or null.
+ *
+ * The bundle's own module is tried first, since that is what the alias meant.
+ * A good number of these cross modules, though - BusinessBundle:MedicineParticular
+ * is App\Medicine\Entity\MedicineParticular - because the port grouped entities
+ * by subject rather than by the bundle that happened to query them. Where the
+ * short name is unique in the tree there is only one thing it can mean, so that
+ * is used; where it is ambiguous the alias is left alone, because a wrong entity
+ * here is a silent wrong answer rather than an error.
+ */
+$resolve = static function (?string $module, string $entity) use ($known, $byShortName): ?string {
+    if ($module !== null && isset($known["App\\$module\\Entity\\$entity"])) {
+        return "App\\$module\\Entity\\$entity";
+    }
+
+    $candidates = array_values(array_filter(
+        $byShortName[$entity] ?? [],
+        static fn (string $c): bool => str_contains($c, '\\Entity\\')
+    ));
+
+    return count($candidates) === 1 ? $candidates[0] : null;
+};
 
 $converted = 0; $files = 0; $unresolved = [];
 
@@ -52,15 +78,11 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, File
         // a whole quoted string that is exactly Bundle:Entity (":" or the
         // malformed "::" seen in a couple of legacy files)
         '/([\'"])([A-Za-z]+Bundle)::?([A-Za-z0-9_]+)\1/',
-        static function (array $m) use ($bundleToModule, $known, &$converted, &$unresolved, $path): string {
+        static function (array $m) use ($bundleToModule, $resolve, &$converted, &$unresolved, $path): string {
             $module = $bundleToModule[$m[2]] ?? null;
-            if ($module === null) {
-                $unresolved[] = "$path: unknown bundle {$m[2]}";
-                return $m[0];
-            }
-            $fqcn = "App\\$module\\Entity\\{$m[3]}";
-            if (!isset($known[$fqcn])) {
-                $unresolved[] = "$path: {$m[2]}:{$m[3]} -> $fqcn (class not found)";
+            $fqcn = $resolve($module, $m[3]);
+            if ($fqcn === null) {
+                $unresolved[] = "$path: {$m[2]}:{$m[3]} (no such entity in the ported tree)";
                 return $m[0];
             }
             $converted++;
@@ -89,18 +111,12 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, File
 
         $text = preg_replace_callback(
             '/\b(DELETE|UPDATE|FROM|JOIN)\s+([A-Za-z]+Bundle):([A-Za-z0-9_]+)\b/',
-            static function (array $m) use ($bundleToModule, $known, &$converted, &$unresolved, $path, $doubleQuoted): string {
+            static function (array $m) use ($bundleToModule, $resolve, &$converted, &$unresolved, $path, $doubleQuoted): string {
                 $module = $bundleToModule[$m[2]] ?? null;
+                $fqcn = $resolve($module, $m[3]);
 
-                if ($module === null) {
-                    $unresolved[] = "$path: unknown bundle {$m[2]} in DQL";
-                    return $m[0];
-                }
-
-                $fqcn = "App\\$module\\Entity\\{$m[3]}";
-
-                if (!isset($known[$fqcn])) {
-                    $unresolved[] = "$path: {$m[2]}:{$m[3]} -> $fqcn (class not found, in DQL)";
+                if ($fqcn === null) {
+                    $unresolved[] = "$path: {$m[2]}:{$m[3]} (no such entity in the ported tree, in DQL)";
                     return $m[0];
                 }
 

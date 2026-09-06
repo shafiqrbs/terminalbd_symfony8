@@ -82,7 +82,7 @@ class DefaultController extends AbstractController
 		}
 
 
-		$entities5 = $this->em->getRepository('RestaurantBundle:Vendor')->findAll();
+		$entities5 = $this->em->getRepository(\App\Inventory\Entity\Vendor::class)->findAll();
 		foreach ($entities5 as $vendor ){
 
 			$entity = new AccountVendor();

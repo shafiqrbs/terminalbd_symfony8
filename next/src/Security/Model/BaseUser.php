@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Security\Model;
 
 use Stringable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use DateTimeInterface;
 use DateTime;
@@ -116,6 +118,53 @@ abstract class BaseUser implements UserInterface, PasswordAuthenticatedUserInter
      * `$user->getId()` unresolvable, with nothing to inherit them from.
      */
     public function getId() { return $this->id; }
+
+    /**
+     * The group side of FOSUserBundle's GroupableInterface.
+     *
+     * Like the identifier, the collection is declared and mapped by the
+     * concrete entity - `user_user_group` - while these accessors came from
+     * Model\User. Leaving them out did more than break the two templates that
+     * read `user.groups`: the ported User::isSuperAdmin() and isRoleAdmin()
+     * call getGroups() themselves, so both fatalled on every call.
+     */
+    public function getGroups(): Collection
+    {
+        return $this->groups ??= new ArrayCollection();
+    }
+
+    /** @return list<string> */
+    public function getGroupNames(): array
+    {
+        $names = [];
+
+        foreach ($this->getGroups() as $group) {
+            $names[] = $group->getName();
+        }
+
+        return $names;
+    }
+
+    public function hasGroup(string $name): bool
+    {
+        return in_array($name, $this->getGroupNames(), true);
+    }
+
+    public function addGroup($group): static
+    {
+        if (!$this->getGroups()->contains($group)) {
+            $this->getGroups()->add($group);
+        }
+
+        return $this;
+    }
+
+    public function removeGroup($group): static
+    {
+        $this->getGroups()->removeElement($group);
+
+        return $this;
+    }
 
     public function getUsername() { return $this->username; }
     public function setUsername($username) { $this->username = $username; return $this; }

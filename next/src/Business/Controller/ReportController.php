@@ -716,8 +716,8 @@ class ReportController extends AbstractController
 		$config = $user->getGlobalOption()->getMedicineConfig();
 		$entities = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->productPurchaseStockSalesReport($user,$data);
 		$pagination = $this->paginate($entities);
-		$racks = $this->em->getRepository('BusinessBundle:MedicineParticular')->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
-		$modeFor = $this->em->getRepository('BusinessBundle:MedicineParticularType')->findBy(['modeFor'=>'brand']);
+		$racks = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
+		$modeFor = $this->em->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(['modeFor'=>'brand']);
 		return $this->render('Business/Report/purchase/purchaseVendorStockSales.html.twig', [
 			'option'                => $user->getGlobalOption() ,
 			'pagination'            => $pagination ,
@@ -737,8 +737,8 @@ class ReportController extends AbstractController
 		$config = $user->getGlobalOption()->getMedicineConfig();
 		$entities = $em->getRepository(\App\Business\Entity\BusinessPurchase::class)->productPurchaseStockSalesPriceReport($user,$data);
 		$pagination = $this->paginate($entities);
-		$racks = $this->em->getRepository('BusinessBundle:MedicineParticular')->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
-		$modeFor = $this->em->getRepository('BusinessBundle:MedicineParticularType')->findBy(['modeFor'=>'brand']);
+		$racks = $this->em->getRepository(\App\Medicine\Entity\MedicineParticular::class)->findBy(['medicineConfig'=> $config,'particularType'=>'1']);
+		$modeFor = $this->em->getRepository(\App\Medicine\Entity\MedicineParticularType::class)->findBy(['modeFor'=>'brand']);
 		return $this->render('Business/Report/purchase/purchaseVendorStockSales.html.twig', [
 			'option'                => $user->getGlobalOption() ,
 			'pagination'              => $pagination ,

@@ -67,7 +67,7 @@ class LocationRepository extends MaterializedPathRepository{
 
         $ret = [];
         $em = $this->getEntityManager();
-        $locations = $em->getRepository('ProductProductBundle:Location')->findBy([],['name'=>'asc']);
+        $locations = $em->getRepository(\App\Location\Entity\Location::class)->findBy([],['name'=>'asc']);
 
         foreach( $locations as $cat ){
             if( !$cat->getParent() ){
