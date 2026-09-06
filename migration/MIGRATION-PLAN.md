@@ -105,13 +105,14 @@ zcat bm_db.sql.gz | sudo mysql terminalbd_migration_check
   started as a Symfony 2 salted sha512 hash and was upgraded to bcrypt by
   logging in. Its plaintext is in `next/.env.local`, not here.
 
-### The four commands
+### The five commands
 
 ```bash
 ./migration/bin/migrate.sh      # rebuild everything from the legacy tree, then verify
 ./migration/bin/ci-checks.sh    # the guards, no database needed
-php8.5 migration/bin/smoke-test.php   # request pages; needs the database
-php8.5 migration/bin/write-test.php   # submit forms;  needs the database
+php8.5 migration/bin/smoke-test.php   # request pages;  needs the database
+php8.5 migration/bin/write-test.php   # submit forms;   needs the database
+php8.5 migration/bin/destructive-test.php --confirm   # delete and approve actions
 ```
 
 Both harnesses have to be run in a loop until they report nothing new -
@@ -123,6 +124,11 @@ for the smoke test from cold, about 21 for the write test.
 The write test rolls back every submission, so it is safe to repeat and leaves
 the database as it found it. `--commit` turns that off; do that only against a
 database you can throw away.
+
+The destructive test rolls back too, and has no `--commit` at all. It proves the
+rollback on its own connection before it runs anything - a marker row written,
+rolled back, and its absence checked - and aborts if that does not hold. It
+refuses to start without `--confirm` and prints the database it is pointed at.
 
 ### Serving it in a browser
 
@@ -148,23 +154,20 @@ Both lines of that router matter, and §5.36 says why. Log in as
 
 ### Where to start, in order
 
-1. **The destructive half of the writes.** `write-test.php` now reaches forms
-   behind `{id}` routes too (229 forms, up from 187), but the deny-list still
-   skips everything whose name suggests it deletes, approves or sends - and
-   §5.34's 300 broken DELETE and UPDATE statements are exactly what lives
-   there. Exercising it needs a database that can be thrown away and restored
-   between runs, since a rollback cannot cover an action that redirects into a
-   second request.
+1. **A tenant that uses the other modules.** This is now the binding
+   constraint on all three harnesses, not a nice-to-have. `business_config`,
+   `dps_config` and `restaurant_config` have no rows in this dump, so 176 pages
+   walk into a null that says nothing about the port; 911 of the routes with a
+   placeholder point at an entity with no rows here; and the largest failure
+   bucket in every one of the three reports is the same missing data. Another
+   tenant's dump would say more about the port than any further harness work.
 2. **The remaining dead template links** — 134 names, 305 references. Treat
    each as a port defect until proven otherwise. The 320-page block that used
    to sit here was not 320 product decisions: it was one controller whose
    routes never registered (§5.35), and reading it as "links to routes that
    never existed" is precisely what kept it hidden for three sweeps. Check
    whether the route exists in the legacy tree *first*.
-3. **A tenant that uses the other modules.** `business_config`, `dps_config`
-   and `restaurant_config` have no rows in this dump, so 137 pages walk into a
-   null that says nothing about the port.
-4. **Golden API capture**, once a staging URL and credentials exist (§11).
+3. **Golden API capture**, once a staging URL and credentials exist (§11).
 
 ### What is finished
 
@@ -953,6 +956,22 @@ constant and every method the tree uses, replayed against v5 with the same argum
 Nothing breaks. The two print pages now fail on this tenant having no `inventoryConfig`, which
 is the wall §11 already describes rather than anything to do with printing.
 
+### 5.45 `WEB_PATH` — a constant the front controller used to define
+
+`web/index.php` line 24 defined `WEB_PATH` as the web root, and nine places still build
+filesystem paths out of it: the upload directories on `SiteSlider` and `ItemGallery`, the
+per-tenant directory `GlobalOptionController` creates, the dynamic `sites.yml` the domain
+controller writes. The Symfony 8 front controller is Flex's, which defines nothing, so every
+one of those was an `Undefined constant "App\Tool\Controller\WEB_PATH"` fatal — the
+namespaced name, because an unqualified constant inside a namespace resolves there first.
+
+Found by §5.44's sweep, on delete actions that remove a tenant's upload directory. Nothing
+static could see it: the constant is not a symbol any guard tracks, and the code compiles.
+
+Defined in `App\Kernel` rather than in `public/index.php`, which is where the legacy had it.
+The entity methods that use it also run under `bin/console` and the harnesses, which never go
+through a front controller, and the Kernel is the one thing every context loads first.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -1298,6 +1317,52 @@ a row in `user_profiles`, and `$this->getUser()->getProfile()->getBranches()` is
 that this alone accounted for 9 failures. Seeding one took the sweep from 181 forms and 116
 saved to 187 and 127. A harness user that does not look like a real user reports the fixture,
 not the port.
+
+### Deletes and approvals
+
+`destructive-test.php` requests what the other two refuse to: 171 delete, approve and reverse
+actions. Its safety is the design, not a caveat:
+
+- Every request runs inside a transaction that is rolled back. There is no `--commit`.
+- Nested transactions use savepoints, so an action that opens and commits its own is still
+  discarded by the outer rollback.
+- **The rollback is proved before anything destructive runs**: a marker row is written, rolled
+  back, and its absence checked. The run aborts if that does not hold, because everything after
+  depends on the guarantee.
+- Actions that reach outside the database — sms, mail, payment — are skipped. A rollback does
+  not un-send anything.
+- It refuses to start without `--confirm`, and prints the database it is pointed at.
+
+Verified independently: every row of all **369 tables was counted before and after the sweep.
+100,745 rows, zero tables changed.**
+
+**171 actions: 35 rendered, 53 redirected, 15 refused, 61 failed, 7 exited** - after §5.45,
+which this sweep found and which accounted for three of them. The rest were checked against the
+legacy tree:
+
+| actions | cause | |
+|---:|---|---|
+| 29 | a null the action assumes is there | this tenant's data |
+| 9 | unclassified | null data, and the two pre-existing bugs described below |
+| 7 | the action calls `exit;` | harness limit |
+| 5 | the id the harness filled does not resolve | harness limit |
+| 4 | redirects to a route that does not exist | pre-existing (§5.28) |
+| 4 | the harness user lacks that role | expected |
+| 3 | **DQL that ORM 3 rejects outright** | pre-existing — see below |
+| 2 | a type the action assumes | pre-existing |
+| 2 | queries a field the entity never declared | pre-existing |
+| 2 | a foreign key the delete does not clear first | pre-existing |
+
+The three §5.34-shaped ones are what this sweep was built to find, and all three are
+`TransactionRepository::approvedDeleteRecord()`: a QueryBuilder with a `from()` and a `where()`
+and **no `select()`**, which generates `SELECT  FROM …` and fails at column 7. The legacy is
+character-for-character the same, and Doctrine 2's parser required a select expression too, so
+those delete paths have never worked. Two more of the same kind: `Query::getQuery()` called on
+a `Query` — identical at lines 1261 and 1291 of the legacy controller — and a query filtering
+`Profile.globalOption`, a field neither tree declares.
+
+**No port defect remains here either**, and the class §5.34 predicted would be hiding in the
+delete flows turns out to be an application bug of the same shape rather than a porting one.
 
 **One class deserves separate attention before cutover.** PHP 8 promoted a family of PHP 7
 warnings to fatals - passing a string where an array is required being the one this sweep

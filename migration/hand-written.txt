@@ -39,3 +39,6 @@ src/Migration/Menu/LegacyBuilderProvider.php
 
 # --- fos_user.user_listener: canonical fields + password hashing (§5.39) ----
 src/Security/EventListener/UserListener.php
+
+# --- defines WEB_PATH, which the legacy front controller supplied (§5.45) ---
+src/Kernel.php
