@@ -41,6 +41,20 @@ run "Doctrine mapping" \
 run "route resolution" \
     $PHP migration/bin/check-routes.php --strict
 
+# The inverse, and the one that bites hardest: a controller imported with
+# `type: attribute` that still declares its routes in docblocks. Symfony's
+# attribute loader finds nothing, registers nothing, and reports nothing -
+# 70 routes went missing this way (§5.35). Gate on the docblocks themselves,
+# because the router cannot tell an empty controller from an absent one.
+run "route annotations converted to attributes" \
+    bash -c "! grep -rnE '^[[:space:]]*\*[[:space:]]*@Route\b' next/src --include='*.php'"
+
+# App\Security\Model\BaseUser is hand-written, and a method missing from it
+# surfaces only as a Twig error on whichever page reads that property - never
+# in lint:container or the mapping. getId() went missing exactly that way.
+run "app.user.* accessors resolve" \
+    $PHP migration/bin/check-user-accessors.php
+
 # The 96 wire-locked mobile endpoints still answer at their contract paths.
 run "mobile API contract" \
     $PHP migration/bin/check-api-contract.php --report=migration/contract/api-contract.md
@@ -54,8 +68,10 @@ run "container" \
 run "templates" \
     bash -c "cd next && $PHP bin/console lint:twig templates/ --excludes=_foscomment | tail -2"
 
-# Reports rather than gates: a link to a route that never existed is a product
-# decision, not a port defect. See migration/contract/template-route-links.md.
+# Reports rather than gates, because some of these are genuinely product
+# decisions - but do not assume that, which is the mistake §5.35 records: 59 of
+# these names were a controller whose routes never registered, not links to
+# routes that never existed. Check the legacy tree before writing one off.
 echo
 echo "── template links to routes that do not exist (informational)"
 $PHP migration/bin/check-template-routes.php --report=migration/contract/template-route-links.md || true

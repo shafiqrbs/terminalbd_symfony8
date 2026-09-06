@@ -17,6 +17,12 @@ rm -rf next/config/routes/legacy
 # directories are prefixed with "_" and must survive a rebuild.
 find next/templates -mindepth 1 -maxdepth 1 -type d -not -name '_*' -exec rm -rf {} +
 $PHP migration/bin/port-http.php
+# ReportBundle declared its routes in docblocks, not a routing.yml. Symfony 7
+# removed the annotation loader, so those have to become attributes or the
+# `type: attribute` import port-routing.php writes silently loads nothing.
+# Runs before Rector so the import it rewrites is a live attribute reference
+# rather than a docblock one, which withImportNames would be free to drop.
+$PHP migration/bin/port-route-annotations.php next/src
 
 echo
 echo "############ 3. flag non-mechanical createForm() sites ############"
@@ -80,6 +86,10 @@ echo "############ 13. abandoned dependencies ############"
 $PHP migration/bin/port-phpexcel.php
 $PHP migration/bin/port-assetic.php
 $PHP migration/bin/port-twig-legacy.php
+# KnpMenuBundle 3 dropped the Bundle:Class:method alias the templates use.
+# Rewrites them and generates the matching builder tags; both halves have to
+# be produced together, since port-http.php rebuilds the templates each run.
+$PHP migration/bin/port-knp-menus.php
 
 echo
 echo "############ 14. container config ############"
@@ -111,7 +121,7 @@ fail=0
 while read -r f; do $PHP -l "$f" >/dev/null 2>&1 || { echo "SYNTAX: $f"; fail=1; }; done < <(find next/src -name '*.php')
 [ "$fail" = 0 ] && echo "php syntax: clean" || echo "php syntax: FAILURES"
 
-for pat in '@Secure' '@ORM\\' '@Gedmo\\' 'Types::ARRAY'; do
+for pat in '@Secure' '@Security' '@Route' '@ORM\\' '@Gedmo\\' 'Types::ARRAY'; do
   n=$(grep -rl "$pat" next/src --include=*.php 2>/dev/null | wc -l || true)
   printf "leftover %-14s %s files\n" "$pat" "$n"
 done

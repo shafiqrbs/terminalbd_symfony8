@@ -17,12 +17,10 @@ use App\User\Entity\User;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * @Route("/mis")
- * @Security("is_granted('ROLE_DOMAIN') or is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_ADMIN')")
- */
+#[IsGranted(new Expression("is_granted('ROLE_DOMAIN') or is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_ADMIN')"))]
+#[Route('/mis')]
 class ReportController extends AbstractController
 {
     public function __construct(
@@ -46,10 +44,8 @@ class ReportController extends AbstractController
         return $pagination;
     }
 
-    /**
-     * @Route("/dashboard", methods={"GET", "POST"}, name="report_dashboard")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/dashboard', methods: ['GET', 'POST'], name: 'report_dashboard')]
     public function indexAction()
     {
 
@@ -89,10 +85,8 @@ class ReportController extends AbstractController
 
     }
 
-    /**
-     * @Route("/monthly-statement", methods={"GET", "POST"}, name="accounting_report_monthly_statement")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/monthly-statement', methods: ['GET', 'POST'], name: 'accounting_report_monthly_statement')]
     public function monthlyStatementAction()
     {
         set_time_limit(0);
@@ -107,10 +101,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/monthly-statement-ajax", methods={"GET", "POST"}, name="accounting_report_monthly_statement_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/monthly-statement-ajax', methods: ['GET', 'POST'], name: 'accounting_report_monthly_statement_ajax')]
 
     public function monthlyStatementAjaxAction()
     {
@@ -165,10 +157,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/customer-outstanding", methods={"GET", "POST"}, name="accounting_report_sales_outstanding")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/customer-outstanding', methods: ['GET', 'POST'], name: 'accounting_report_sales_outstanding')]
     public function customerOutstandingAction()
     {
         set_time_limit(0);
@@ -184,10 +174,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/customer-group-outstanding", methods={"GET", "POST"}, name="accounting_report_group_sales_outstanding")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/customer-group-outstanding', methods: ['GET', 'POST'], name: 'accounting_report_group_sales_outstanding')]
     public function customerGroupOutstandingAction()
     {
         set_time_limit(0);
@@ -204,10 +192,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/customer-summary", methods={"GET", "POST"}, name="accounting_report_sales_summary")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/customer-summary', methods: ['GET', 'POST'], name: 'accounting_report_sales_summary')]
 
     public function customerSummaryAction()
     {
@@ -223,10 +209,8 @@ class ReportController extends AbstractController
 
     }
 
-    /**
-     * @Route("/cash-flow", methods={"GET", "POST"}, name="accounting_report_cash_flow")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/cash-flow', methods: ['GET', 'POST'], name: 'accounting_report_cash_flow')]
 
     public function cashFlowAction()
     {
@@ -250,10 +234,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/balanch-sheet", methods={"GET", "POST"}, name="accounting_report_balanch_sheet")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/balanch-sheet', methods: ['GET', 'POST'], name: 'accounting_report_balanch_sheet')]
 
     public function balanchSheetAction()
     {
@@ -277,10 +259,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/trail-balanch", methods={"GET", "POST"}, name="accounting_report_trail_balanch")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/trail-balanch', methods: ['GET', 'POST'], name: 'accounting_report_trail_balanch')]
 
     public function trailBalanchAction()
     {
@@ -304,10 +284,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/account-head", methods={"GET", "POST"}, name="accounting_report_head")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/account-head', methods: ['GET', 'POST'], name: 'accounting_report_head')]
 
     public function journalHeadAction()
     {
@@ -326,10 +304,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/account-head-ajax", methods={"GET", "POST"}, name="accounting_report_head_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/account-head-ajax', methods: ['GET', 'POST'], name: 'accounting_report_head_ajax')]
 
     public function journalHeadAjaxAction()
     {
@@ -351,10 +327,8 @@ class ReportController extends AbstractController
         return new Response('Record Does not found');
     }
 
-   /**
-    * @Route("/account-head-subhead", methods={"GET", "POST"}, name="accounting_report_subhead")
-    */
    #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_DOMAIN')"))]
+   #[Route('/account-head-subhead', methods: ['GET', 'POST'], name: 'accounting_report_subhead')]
 
     public function journalSubheadAction()
     {
@@ -372,10 +346,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/account-subhead-ajax", methods={"GET", "POST"}, name="accounting_report_subhead_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/account-subhead-ajax', methods: ['GET', 'POST'], name: 'accounting_report_subhead_ajax')]
 
     public function journalSubHeadAjaxAction()
     {
@@ -398,10 +370,8 @@ class ReportController extends AbstractController
         return new Response('Record Does not found');
     }
 
-    /**
-     * @Route("/daily-profit", methods={"GET", "POST"}, name="accounting_report_daily_profit")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/daily-profit', methods: ['GET', 'POST'], name: 'accounting_report_daily_profit')]
 
     public function dailyProfitAction()
     {
@@ -417,10 +387,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/daily-profit-ajax", methods={"GET", "POST"}, name="accounting_report_daily_profit_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/daily-profit-ajax', methods: ['GET', 'POST'], name: 'accounting_report_daily_profit_ajax')]
 
     public function dailyProfitAjaxAction()
     {
@@ -441,10 +409,8 @@ class ReportController extends AbstractController
         return new Response('Record Does not found');
     }
 
-    /**
-     * @Route("/monthly-profit", methods={"GET", "POST"}, name="accounting_report_monthly_profit")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/monthly-profit', methods: ['GET', 'POST'], name: 'accounting_report_monthly_profit')]
 
     public function monthlyProfitAction()
     {
@@ -468,10 +434,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/yearly-profit", methods={"GET", "POST"}, name="accounting_report_yearly_profit")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/yearly-profit', methods: ['GET', 'POST'], name: 'accounting_report_yearly_profit')]
 
     public function yearlyProfitAction()
     {
@@ -495,10 +459,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/stakeholder-profit", methods={"GET", "POST"}, name="accounting_report_stakeholder_profit")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/stakeholder-profit', methods: ['GET', 'POST'], name: 'accounting_report_stakeholder_profit')]
 
     public function stakeholderProfitAction()
     {
@@ -527,10 +489,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/customer-ledger", methods={"GET", "POST"}, name="accounting_report_sales_customer_ledger")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/customer-ledger', methods: ['GET', 'POST'], name: 'accounting_report_sales_customer_ledger')]
 
     public function customerLedgerAction()
     {
@@ -561,10 +521,8 @@ class ReportController extends AbstractController
 
     }
 
-    /**
-     * @Route("/user-sales-receive", methods={"GET", "POST"}, name="accounting_report_sales_user_summary")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/user-sales-receive', methods: ['GET', 'POST'], name: 'accounting_report_sales_user_summary')]
 
     public function userSummaryAction()
     {
@@ -582,10 +540,8 @@ class ReportController extends AbstractController
 
     }
 
-    /**
-     * @Route("/customer-sales-receive", methods={"GET", "POST"}, name="accounting_report_sales_customer_summary")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/customer-sales-receive', methods: ['GET', 'POST'], name: 'accounting_report_sales_customer_summary')]
 
     public function userSalesDetailsAction()
     {
@@ -607,10 +563,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/sales-details", methods={"GET", "POST"}, name="accounting_report_sales_details")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/sales-details', methods: ['GET', 'POST'], name: 'accounting_report_sales_details')]
 
    public function salesDetailsAction()
    {
@@ -635,10 +589,8 @@ class ReportController extends AbstractController
         ]);
    }
 
-    /**
-     * @Route("/sales-details-load", methods={"GET", "POST"}, name="accounting_report_sales_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/sales-details-load', methods: ['GET', 'POST'], name: 'accounting_report_sales_ajax')]
 
     public function salesDetailsLoadAction()
     {
@@ -670,10 +622,8 @@ class ReportController extends AbstractController
 
 
 
-    /**
-     * @Route("/purchase-details", methods={"GET", "POST"}, name="accounting_report_purchase_details")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/purchase-details', methods: ['GET', 'POST'], name: 'accounting_report_purchase_details')]
 
     public function purchaseDetailsAction()
     {
@@ -701,10 +651,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/hospital-dashboard", methods={"GET", "POST"}, name="hms_report_dashboard")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-dashboard', methods: ['GET', 'POST'], name: 'hms_report_dashboard')]
 
     public function hmsDashboardAction()
     {
@@ -769,10 +717,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/sales-hospital-invoice", methods={"GET", "POST"}, name="hms_report_hospital_invoice")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/sales-hospital-invoice', methods: ['GET', 'POST'], name: 'hms_report_hospital_invoice')]
 
     public function hmsSalesInvoiceAction()
     {
@@ -804,10 +750,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/sales-hospital-invoice-load", methods={"GET", "POST"}, name="hms_report_hospital_invoice_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/sales-hospital-invoice-load', methods: ['GET', 'POST'], name: 'hms_report_hospital_invoice_ajax')]
 
     public function hmsSalesInvoiceAjaxAction()
     {
@@ -830,10 +774,8 @@ class ReportController extends AbstractController
         return new Response('Record Does not found');
     }
 
-    /**
-     * @Route("/daily-sales-collection", methods={"GET", "POST"}, name="hms_report_daily_sales_collection")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/daily-sales-collection', methods: ['GET', 'POST'], name: 'hms_report_daily_sales_collection')]
 
     public function hmsSalesCollectionAction()
     {
@@ -852,10 +794,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/daily-sales-collection-load", methods={"GET", "POST"}, name="hms_report_daily_sales_collection_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/daily-sales-collection-load', methods: ['GET', 'POST'], name: 'hms_report_daily_sales_collection_ajax')]
 
     public function hmsSalesCollectionAjaxAction()
     {
@@ -880,10 +820,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/daily-sales-collection-commission", methods={"GET", "POST"}, name="hms_report_sales_collection_commission")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/daily-sales-collection-commission', methods: ['GET', 'POST'], name: 'hms_report_sales_collection_commission')]
 
     public function hmsSalesCollectionCommissionAction()
     {
@@ -902,10 +840,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/daily-sales-collection-commission-load", methods={"GET", "POST"}, name="hms_report_daily_sales_collection_commission_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/daily-sales-collection-commission-load', methods: ['GET', 'POST'], name: 'hms_report_daily_sales_collection_commission_ajax')]
 
     public function hmsSalesCollectionCommissionAjaxAction()
     {
@@ -935,10 +871,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/collection-commission-group", methods={"GET", "POST"}, name="hms_report_collection_commission_group")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/collection-commission-group', methods: ['GET', 'POST'], name: 'hms_report_collection_commission_group')]
 
     public function hmsCommissionGroupAction()
     {
@@ -957,10 +891,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/collection-commission-group-load", methods={"GET", "POST"}, name="hms_report_collection_commission_group_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/collection-commission-group-load', methods: ['GET', 'POST'], name: 'hms_report_collection_commission_group_ajax')]
 
     public function  hmsCommissionGroupAjaxAction()
     {
@@ -986,10 +918,8 @@ class ReportController extends AbstractController
 
 
 
-     /**
-      * @Route("/collection-commission-deatils", methods={"GET", "POST"}, name="hms_report_collection_commission_details")
-      */
      #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+     #[Route('/collection-commission-deatils', methods: ['GET', 'POST'], name: 'hms_report_collection_commission_details')]
 
     public function hmsCommissionDetailsAction()
     {
@@ -1008,10 +938,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/collection-commission-deatils-load", methods={"GET", "POST"}, name="hms_report_collection_commission_details_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/collection-commission-deatils-load', methods: ['GET', 'POST'], name: 'hms_report_collection_commission_details_ajax')]
 
     public function  hmsCommissionDetailsAjaxAction()
     {
@@ -1037,10 +965,8 @@ class ReportController extends AbstractController
 
 
 
-    /**
-     * @Route("/hospital-user-sales", methods={"GET", "POST"}, name="hms_report_user_sales")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-user-sales', methods: ['GET', 'POST'], name: 'hms_report_user_sales')]
 
     public function hmsUserSalesAction()
     {
@@ -1098,10 +1024,8 @@ class ReportController extends AbstractController
 
 
 
-    /**
-     * @Route("/hospital-diagnostic-invoice", methods={"GET", "POST"}, name="hms_report_diagnostic_invoice")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-diagnostic-invoice', methods: ['GET', 'POST'], name: 'hms_report_diagnostic_invoice')]
 
     public function hmsDiagnosticInvoiceAction()
     {
@@ -1137,10 +1061,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/hospital-visit-invoice", methods={"GET", "POST"}, name="hms_report_visit_invoice")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-visit-invoice', methods: ['GET', 'POST'], name: 'hms_report_visit_invoice')]
 
     public function hmsVisitInvoiceAction()
     {
@@ -1171,10 +1093,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/hospital-admission-invoice", methods={"GET", "POST"}, name="hms_report_admission_invoice")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-admission-invoice', methods: ['GET', 'POST'], name: 'hms_report_admission_invoice')]
 
     public function hmsAdmissionInvoiceAction()
     {
@@ -1211,10 +1131,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/hospital-admission-invoice-service", methods={"GET", "POST"}, name="hms_report_admission_service")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-admission-invoice-service', methods: ['GET', 'POST'], name: 'hms_report_admission_service')]
 
     public function hmsAdmissionServiceAction()
     {
@@ -1247,10 +1165,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/hospital-admission-surgery-department", methods={"GET", "POST"}, name="hms_report_admission_surgery_department")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-admission-surgery-department', methods: ['GET', 'POST'], name: 'hms_report_admission_surgery_department')]
 
     public function hmsAdmissionSurgeryDepartmentAction()
     {
@@ -1277,10 +1193,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/hospital-admission-surgery-department-details", methods={"GET", "POST"}, name="hms_report_admission_surgery_department_details")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-admission-surgery-department-details', methods: ['GET', 'POST'], name: 'hms_report_admission_surgery_department_details')]
 
     public function hmsAdmissionSurgeryDepartmentDetailsAction()
     {
@@ -1315,10 +1229,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/hospital-diseases", methods={"GET", "POST"}, name="hms_report_diseases")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-diseases', methods: ['GET', 'POST'], name: 'hms_report_diseases')]
 
     public function hmsDiseasesAction()
     {
@@ -1345,10 +1257,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/hospital-diseases-details", methods={"GET", "POST"}, name="hms_report_diseases_details")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/hospital-diseases-details', methods: ['GET', 'POST'], name: 'hms_report_diseases_details')]
 
     public function hmsDiseasesDetailsAction()
     {
@@ -1378,10 +1288,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/monthly-commission-details", methods={"GET", "POST"}, name="hms_report_monthly_commission_details")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/monthly-commission-details', methods: ['GET', 'POST'], name: 'hms_report_monthly_commission_details')]
 
     public function monthlyCommissionDetailsAction()
     {
@@ -1398,10 +1306,8 @@ class ReportController extends AbstractController
 
     }
 
-    /**
-     * @Route("/monthly-commission-details-load", methods={"GET", "POST"}, name="hms_report_monthly_commission_details_ajax")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/monthly-commission-details-load', methods: ['GET', 'POST'], name: 'hms_report_monthly_commission_details_ajax')]
 
     public function monthlyCommissionDetailsLoadAction()
     {
@@ -1432,10 +1338,8 @@ class ReportController extends AbstractController
 
     /* Inventory Report */
 
-    /**
-     * @Route("/inv-system-overview", methods={"GET", "POST"}, name="inv_system_overview")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-system-overview', methods: ['GET', 'POST'], name: 'inv_system_overview')]
 
     public function invSystemOverviewAction()
     {
@@ -1459,10 +1363,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/inv-stock-item-price", methods={"GET", "POST"}, name="inv_stock_item_price")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-stock-item-price', methods: ['GET', 'POST'], name: 'inv_stock_item_price')]
     public function invStockItemAction()
     {
         $em = $this->em;
@@ -1480,10 +1382,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/inv-stock-item-price-ajax-load", methods={"GET", "POST"}, name="inv_stock_item_price_ajax_load")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-stock-item-price-ajax-load', methods: ['GET', 'POST'], name: 'inv_stock_item_price_ajax_load')]
     public function invStockItemAjaxLoadAction()
     {
         set_time_limit(0);
@@ -1500,10 +1400,8 @@ class ReportController extends AbstractController
         return new Response($htmlProcess);
     }
 
-    /**
-     * @Route("/inv-category-stock-item-price", methods={"GET", "POST"}, name="inv_category_stock_item_price")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-category-stock-item-price', methods: ['GET', 'POST'], name: 'inv_category_stock_item_price')]
     public function invCategoryStockItemAction()
     {
         $em = $this->em;
@@ -1515,10 +1413,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/inv-category-stock-item-price-ajax-load", methods={"GET", "POST"}, name="inv_category_stock_item_price_ajax_load")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-category-stock-item-price-ajax-load', methods: ['GET', 'POST'], name: 'inv_category_stock_item_price_ajax_load')]
     public function invCategoryStockItemAjaxLoadAction()
     {
         set_time_limit(0);
@@ -1536,10 +1432,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/inv-brand-stock-item-price", methods={"GET", "POST"}, name="inv_brand_stock_item_price")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-brand-stock-item-price', methods: ['GET', 'POST'], name: 'inv_brand_stock_item_price')]
     public function invBrandStockItemAction()
     {
         $em = $this->em;
@@ -1551,10 +1445,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/inv-brand-stock-item-price-ajax-load", methods={"GET", "POST"}, name="inv_brand_stock_item_price_ajax_load")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-brand-stock-item-price-ajax-load', methods: ['GET', 'POST'], name: 'inv_brand_stock_item_price_ajax_load')]
     public function invBrandStockItemAjaxLoadAction()
     {
         set_time_limit(0);
@@ -1571,10 +1463,8 @@ class ReportController extends AbstractController
         return new Response($htmlProcess);
     }
 
-    /**
-     * @Route("/inv-sales-profit-loss", methods={"GET", "POST"}, name="inv_sales_profit_loss")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-sales-profit-loss', methods: ['GET', 'POST'], name: 'inv_sales_profit_loss')]
     public function invSalesAction()
     {
         $em = $this->em;
@@ -1592,10 +1482,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/inv-sales-profit-loss-ajax-load", methods={"GET", "POST"}, name="inv_sales_profit_loss_ajax_load")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-sales-profit-loss-ajax-load', methods: ['GET', 'POST'], name: 'inv_sales_profit_loss_ajax_load')]
     public function invSalesAjaxLoadAction()
     {
         set_time_limit(0);
@@ -1612,10 +1500,8 @@ class ReportController extends AbstractController
         return new Response($htmlProcess);
     }
 
-    /**
-     * @Route("/inv-salesitem-profit-loss", methods={"GET", "POST"}, name="inv_salesitem_profit_loss")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-salesitem-profit-loss', methods: ['GET', 'POST'], name: 'inv_salesitem_profit_loss')]
     public function invSalesItemAction()
     {
         $em = $this->em;
@@ -1633,10 +1519,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/inv-salesitem-profit-loss-ajax-load", methods={"GET", "POST"}, name="inv_salesitem_profit_loss_ajax_load")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/inv-salesitem-profit-loss-ajax-load', methods: ['GET', 'POST'], name: 'inv_salesitem_profit_loss_ajax_load')]
     public function invSalesItemAjaxLoadAction()
     {
         set_time_limit(0);
@@ -1653,10 +1537,8 @@ class ReportController extends AbstractController
         return new Response($htmlProcess);
     }
 
-    /**
-     * @Route("/miss-system-dashboard", methods={"GET", "POST"}, name="miss_system_overview")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/miss-system-dashboard', methods: ['GET', 'POST'], name: 'miss_system_overview')]
     public function missDashboardAction()
     {
         $em = $this->em;
@@ -1674,10 +1556,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/miss-stock-report", methods={"GET", "POST"}, name="miss_stock_report")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/miss-stock-report', methods: ['GET', 'POST'], name: 'miss_stock_report')]
     public function missStockReportAction()
     {
         $em = $this->em;
@@ -1688,10 +1568,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/miss-stock-report-ajax-load", methods={"GET", "POST"}, name="miss_stock_report_ajax_load")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/miss-stock-report-ajax-load', methods: ['GET', 'POST'], name: 'miss_stock_report_ajax_load')]
     public function missStockReportAjaxLoadAction()
     {
         set_time_limit(0);
@@ -1710,10 +1588,8 @@ class ReportController extends AbstractController
 
 
 
-    /**
-     * @Route("/business-system-report", methods={"GET", "POST"}, name="busi_system_overview")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/business-system-report', methods: ['GET', 'POST'], name: 'busi_system_overview')]
     public function businessSystemReportAction()
     {
         $em = $this->em;
@@ -1746,10 +1622,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/business-daily-sales-purchase-report", methods={"GET", "POST"}, name="busi_daily_report")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/business-daily-sales-purchase-report', methods: ['GET', 'POST'], name: 'busi_daily_report')]
     public function businessDailyStatementReportAction()
     {
         $em = $this->em;
@@ -1761,10 +1635,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/business-daily-sales-purchase-report-ajax-load", methods={"GET", "POST"}, name="busi_daily_report_ajax_load")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/business-daily-sales-purchase-report-ajax-load', methods: ['GET', 'POST'], name: 'busi_daily_report_ajax_load')]
     public function businessDailyStatementReportAjaxLoadAction()
     {
         set_time_limit(0);
@@ -1784,10 +1656,8 @@ class ReportController extends AbstractController
         return new Response($htmlProcess);
     }
 
-    /**
-     * @Route("/business-monthly-sales-purchase-report", methods={"GET", "POST"}, name="busi_monthly_report")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/business-monthly-sales-purchase-report', methods: ['GET', 'POST'], name: 'busi_monthly_report')]
     public function businessMonthlyStatementReportAction()
     {
         $em = $this->em;
@@ -1800,10 +1670,8 @@ class ReportController extends AbstractController
     }
 
 
-    /**
-     * @Route("/miss-marketing-executive-report", methods={"GET", "POST"}, name="miss_marketing_executive_report")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/miss-marketing-executive-report', methods: ['GET', 'POST'], name: 'miss_marketing_executive_report')]
     public function missMarketingExecutiveReportAction()
     {
         $em = $this->em;
@@ -1814,10 +1682,8 @@ class ReportController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/miss-marketing-executive-report-ajax-load", methods={"GET", "POST"}, name="miss_marketing_executive_report_ajax_load")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT') or is_granted('ROLE_REPORT_OPERATION_SALES') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/miss-marketing-executive-report-ajax-load', methods: ['GET', 'POST'], name: 'miss_marketing_executive_report_ajax_load')]
     public function missMarketingExecutiveAjaxLoadAction()
     {
         set_time_limit(0);
@@ -1836,10 +1702,8 @@ class ReportController extends AbstractController
         return new Response($htmlProcess);
     }
 
-    /**
-     * @Route("/miss-customer-invoice", methods={"GET", "POST"}, name="miss_customer_invoice_report")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/miss-customer-invoice', methods: ['GET', 'POST'], name: 'miss_customer_invoice_report')]
     public function customerInvoiceReportAction()
     {
         set_time_limit(0);
@@ -1862,10 +1726,8 @@ class ReportController extends AbstractController
 
     }
 
-     /**
-      * @Route("/miss-customer-invoice-ledger", methods={"GET", "POST"}, name="miss_customer_invoice_ledger_report")
-      */
      #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+     #[Route('/miss-customer-invoice-ledger', methods: ['GET', 'POST'], name: 'miss_customer_invoice_ledger_report')]
     public function customerInvoiceLedgerReportAction()
     {
         set_time_limit(0);
@@ -1893,10 +1755,8 @@ class ReportController extends AbstractController
 
     }
 
-    /**
-     * @Route("/miss-business-product", methods={"GET", "POST"}, name="miss_business_product_report")
-     */
     #[IsGranted(new Expression("is_granted('ROLE_REPORT_FINANCIAL') or is_granted('ROLE_REPORT') or is_granted('ROLE_DOMAIN')"))]
+    #[Route('/miss-business-product', methods: ['GET', 'POST'], name: 'miss_business_product_report')]
     public function businessProductReportAction()
     {
         set_time_limit(0);

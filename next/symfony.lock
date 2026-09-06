@@ -38,6 +38,9 @@
     "friendsofsymfony/jsrouting-bundle": {
         "version": "3.6.1"
     },
+    "knplabs/knp-menu-bundle": {
+        "version": "v3.7.0"
+    },
     "knplabs/knp-paginator-bundle": {
         "version": "v6.10.0"
     },

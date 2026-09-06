@@ -33,3 +33,9 @@ src/HumanResource/TwigExtension/DecodeExtension.php   # Twig 1 filter API
 
 # --- answers the routes with no controller (see check-routes.php) -----------
 src/Migration/Controller/UnresolvableRouteController.php
+
+# --- supplies the factory the ported menu builders still expect (§5.37) -----
+src/Migration/Menu/LegacyBuilderProvider.php
+
+# --- fos_user.user_listener: canonical fields + password hashing (§5.39) ----
+src/Security/EventListener/UserListener.php

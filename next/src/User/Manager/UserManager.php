@@ -72,7 +72,12 @@ class UserManager
         $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
         // The legacy salt belongs to the sha512 hash that was just replaced.
         // Leaving it set would feed a stale salt to the new hash's verify.
-        $user->setSalt(null);
+        //
+        // Empty rather than null: `salt` is NOT NULL in the fos_user table, and
+        // that table is still being read and written by the Symfony 2
+        // application, so the column cannot be relaxed while both are live.
+        // setSalt(null) made every password write fail on the constraint.
+        $user->setSalt('');
         $user->eraseCredentials();
     }
 

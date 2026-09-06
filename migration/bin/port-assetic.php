@@ -221,6 +221,17 @@ foreach ($bundleDirs as $class => $info) {
     $copy($public, $next . '/public/bundles/' . $info['web']);
 }
 
+// The application's own assets, which assets:install never touched: it only
+// ever published bundle Resources/public. app/Resources/assets reached web/
+// by a deploy-time copy, and web/assets is gitignored - so the tree is in the
+// repository but the published copy is not, in either application. 1,532
+// asset('assets/...') calls resolve here; without it every page renders with
+// no stylesheet at all, which reads as "the design is gone" rather than as a
+// missing build step.
+if (is_dir($appAssets = $root . '/app/Resources/assets')) {
+    $copy($appAssets, $next . '/public/assets');
+}
+
 foreach ($stats as $label => $count) {
     printf("%-16s %d\n", $label, $count);
 }

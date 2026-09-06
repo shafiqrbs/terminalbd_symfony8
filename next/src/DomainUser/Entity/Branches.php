@@ -64,10 +64,10 @@ class Branches
     #[ORM\OneToMany(targetEntity: MedicineSales::class, mappedBy: 'branch')]
     private  $medicineSales;
 
-    #[ORM\OneToMany(targetEntity: \App\User\Entity\profile::class, mappedBy: 'branches')]
+    #[ORM\OneToMany(targetEntity: \App\User\Entity\Profile::class, mappedBy: 'branches')]
     private  $profiles;
 
-     #[ORM\OneToMany(targetEntity: \App\User\Entity\profile::class, mappedBy: 'employeeBranch')]
+     #[ORM\OneToMany(targetEntity: \App\User\Entity\Profile::class, mappedBy: 'employeeBranch')]
     private  $employeeProfiles;
 
     #[ORM\OneToMany(targetEntity: Sales::class, mappedBy: 'branches')]

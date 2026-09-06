@@ -419,7 +419,7 @@ class GlobalOption
     private $siteSetting;
     #[ORM\OneToOne(targetEntity: AdsTool::class, mappedBy: 'globalOption', cascade: ['remove'])]
     private $adsTool;
-    #[ORM\OneToOne(targetEntity: \App\Content\Entity\Homepage::class, mappedBy: 'globalOption', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: \App\Content\Entity\HomePage::class, mappedBy: 'globalOption', cascade: ['persist', 'remove'])]
     private $homePage;
     #[ORM\OneToOne(targetEntity: ContactPage::class, mappedBy: 'globalOption', cascade: ['remove'])]
     private $contactPage;

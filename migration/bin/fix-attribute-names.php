@@ -47,7 +47,16 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/
     }
 }
 
-$stats = ['empty repositoryClass' => 0, 'attribute names' => 0, 'targetEntity' => 0, 'ambiguous' => 0, 'files' => 0];
+// FQCN, lowercased -> the real FQCN, for correcting the case of a reference.
+$byLowerName = [];
+
+foreach ($index as $fqcns) {
+    foreach ($fqcns as $fqcn) {
+        $byLowerName[strtolower($fqcn)] = $fqcn;
+    }
+}
+
+$stats = ['empty repositoryClass' => 0, 'attribute names' => 0, 'targetEntity' => 0, 'targetEntity case' => 0, 'ambiguous' => 0, 'files' => 0];
 $ambiguous = [];
 
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/src')) as $file) {
@@ -78,6 +87,31 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/
     // 3. Entity(repositoryClass: '') -> Entity()
     $code = preg_replace('/#\[ORM\\\\Entity\(repositoryClass: \'\'\)\]/', '#[ORM\\Entity]', $code, -1, $n);
     $stats['empty repositoryClass'] += $n;
+
+    // 4. targetEntity: \App\Content\Entity\Homepage::class, where the class is
+    //    really HomePage. PHP matches class names case-insensitively but PSR-4
+    //    resolves the file case-sensitively, so a reference like this loads only
+    //    when something else has already pulled the real class in. It therefore
+    //    works under a full metadata load and fails when one entity is loaded on
+    //    its own - which is the worst way for it to fail, since it depends on
+    //    load order rather than on anything in the code. Inherited from the
+    //    legacy annotations, and harmless there only because the whole tree was
+    //    loaded eagerly.
+    $code = preg_replace_callback(
+        '/targetEntity:\s*\\\\(App\\\\[A-Za-z0-9_\\\\]+)::class/',
+        static function (array $m) use ($byLowerName, &$stats): string {
+            $real = $byLowerName[strtolower($m[1])] ?? null;
+
+            if ($real === null || $real === $m[1]) {
+                return $m[0];
+            }
+
+            ++$stats['targetEntity case'];
+
+            return 'targetEntity: \\' . $real . '::class';
+        },
+        $code,
+    );
 
     // 2. targetEntity: \Foo::class -> the class the annotation meant
     $code = preg_replace_callback(

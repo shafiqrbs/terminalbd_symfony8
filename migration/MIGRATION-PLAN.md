@@ -117,6 +117,28 @@ The smoke test has to be run in a loop until it reports `visited 0 pages this
 run`: 110 controllers call `exit;` and take the process with them, and each run
 resumes from `next/var/smoke-state.json`. Roughly 15 runs from a cold start.
 
+### Serving it in a browser
+
+The smoke test drives the kernel in-process and never fetches an asset, so it
+says nothing about whether a page *looks* right. To open one:
+
+```php
+<?php // router.php - static files from public/, everything else to Symfony
+$root = __DIR__ . '/next/public';
+$path = urldecode((string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+if ($path !== '/' && is_file($root . $path)) return false;
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['SCRIPT_FILENAME'] = $root . '/index.php';  // Symfony's runtime
+require $root . '/index.php';                        // re-requires this
+```
+
+```bash
+php8.5 -S 127.0.0.1:8899 -t next/public router.php
+```
+
+Both lines of that router matter, and §5.36 says why. Log in as
+`migration_check` with `SMOKE_TEST_PASSWORD` from `next/.env.local`.
+
 ### Where to start, in order
 
 1. **Exercise writes.** Every sweep so far is read-only — GET, no parameters,
@@ -127,9 +149,12 @@ resumes from `next/var/smoke-state.json`. Roughly 15 runs from a cold start.
 2. **Pages with parameters.** 2,141 routes carry a `{placeholder}` and have
    never been requested. Feeding real ids from the database would roughly
    triple the coverage.
-3. **The 320 dead template links** (§5.28). One product decision per link:
-   restore the controller or remove the link. It is the largest single block of
-   failing pages.
+3. **The remaining dead template links** — 134 names, 305 references. Treat
+   each as a port defect until proven otherwise. The 320-page block that used
+   to sit here was not 320 product decisions: it was one controller whose
+   routes never registered (§5.35), and reading it as "links to routes that
+   never existed" is precisely what kept it hidden for three sweeps. Check
+   whether the route exists in the legacy tree *first*.
 4. **A tenant that uses the other modules.** `business_config`, `dps_config`
    and `restaurant_config` have no rows in this dump, so 137 pages walk into a
    null that says nothing about the port.
@@ -665,6 +690,171 @@ flows. The rewrite goes through PHP's tokenizer rather than a plain regex, becau
 inside a double-quoted string is an escape: writing `"App\Tool\Entity\X"` unescaped would
 embed a tab character.
 
+### 5.35 Routes declared in docblocks, imported as attributes — 70 routes lost in silence
+
+ReportBundle is the only bundle in the legacy tree that declared its routes by annotation.
+Its whole routing.yml is one import:
+
+```yaml
+report_controllers:
+    resource: '@ReportBundle/Controller/ReportController.php'
+    type: annotation
+```
+
+`port-routing.php` rewrote `type: annotation` to `type: attribute`, correctly — Symfony 7
+removed the annotation loader. Nothing rewrote the controller's docblocks to match: Rector's
+`ANNOTATIONS_TO_ATTRIBUTES` carries no `@Route` rule, and no other pass looked at them.
+
+The result is the worst shape a porting defect can take. The attribute loader read the file,
+found no attributes, registered nothing, and raised no error. 70 routes disappeared without a
+warning — and because `report_dashboard` is linked from `Tool/Widget/common.html.twig`, which
+is included on nearly every backend page, **320 of the 791 smoke-tested pages died at render
+time**, the single largest failure bucket in §11. It cost 59 of the 193 dead template links
+(91 references) catalogued in `template-route-links.md`, which had been read as product
+decisions rather than as one mechanical bug.
+
+`port-route-annotations.php` converts the docblocks and runs before Rector, so the import it
+rewrites is a live attribute reference rather than a docblock one that `withImportNames` would
+be free to drop. It exits non-zero on anything it cannot convert, and `ci-checks.sh` gates on
+a leftover `@Route` docblock anywhere under `next/src` — the router cannot tell an empty
+controller from an absent one, so the docblocks themselves are what has to be checked.
+
+The same file carried the other half of the bug. Its class-level Sensio
+`@Security("is_granted('ROLE_DOMAIN') or ...")` was equally inert, and the legacy application
+applied it *in addition to* each method's `@Secure` — an AND. Registering the routes would
+have made 69 actions reachable under only their own method-level check, letting
+`ROLE_REPORT_OPERATION_SALES` into the financial reports. `secure-to-isgranted.php` now
+converts `@Security` as well, and refuses anything that is not a plain role expression.
+
+**The general lesson, and the reason both guards exist:** an annotation nobody translates does
+not fail — it evaporates. Every remaining docblock annotation in the tree is a candidate for
+the same defect, which is why `migrate.sh` now counts leftover `@Route` and `@Security`
+alongside `@Secure`, `@ORM` and `@Gedmo`.
+
+### 5.36 The application's own assets were never published — every page unstyled
+
+`assets:install` only ever published bundle `Resources/public` directories, which is what
+`port-assetic.php` reproduces into `next/public/bundles/`. The application's own asset tree
+lives in `app/Resources/assets` — 125 MB, 4,174 files tracked in git — and reached `web/assets`
+by a deploy-time copy. `web/assets` is gitignored, and so is `next/public/assets`, so the
+published copy is absent from both trees and nothing in the port recreated it.
+
+1,532 `asset('assets/...')` calls resolve there. Without it every page in the application
+renders with no stylesheet, which reads as a broken design rather than as a missing build
+step — and because the request falls through to the framework, a missing file answers 302 to
+/login rather than 404, which hides it further. `port-assetic.php` now publishes that tree
+alongside the bundle assets.
+
+This was never a regression; the login page has rendered unstyled in this checkout from the
+first request. It stayed invisible because the pages anyone would have opened to notice it
+were the 320 that §5.35 was killing before they rendered at all.
+
+**Serving it locally:** PHP's built-in server runs `public/index.php` for *every* request when
+that file is passed as the router, so static files never reach the disk. A dev server needs a
+router that returns false for real files — and one that repoints `SCRIPT_FILENAME` at
+`index.php`, since Symfony's runtime resolves the application by re-requiring it.
+
+### 5.37 KnpMenuBundle: a missing dependency, a dead alias form, and block-scoped macros
+
+`knplabs/knp-menu-bundle: ~2` was in the legacy composer.json and never carried over, so
+`knp_menu_render` was an unknown Twig function in `sidebar.html.twig` — which `base.html.twig`
+includes, so it took out every backend page. `knplabs/knp-menu-bundle:^3.7` is the first
+release to allow Symfony 8; installing it is necessary but nowhere near sufficient, because
+the port then failed twice more, each time a layer deeper.
+
+**The alias form.** Templates address menus the way version 2 allowed:
+
+```twig
+{{ knp_menu_render('SettingAppearanceBundle:Builder:mainMenu', ...) }}
+```
+
+Version 2's `BundleMenuProvider` resolved that to `<Bundle>\Menu\<Class>::<method>`. Version 3
+dropped the provider, and there are no bundles left to look up regardless.
+`port-knp-menus.php` rewrites each alias to a flat name and generates the matching service
+registration, both from the same map — they cannot drift, because `port-http.php` rebuilds the
+templates on every run. The map is read from the *legacy* templates, which always carry the
+version 2 form; deriving it from the ported ones would work exactly once, and the second run
+would find every alias already rewritten and generate an empty map.
+
+**The calling convention.** The obvious registration — a `knp_menu.menu_builder` tag — calls
+`$builder->mainMenu($options)`, while the ported builders keep version 2's
+`mainMenu($factory, $options)`. `App\Appearance\Menu\Builder` is 2,100 lines that thread
+`$factory` through every method, and it is regenerated from the legacy tree on each run, so
+rewriting the signature is the wrong trade. `App\Migration\Menu\LegacyBuilderProvider`
+supplies the factory instead and the builders stay byte-for-byte what the legacy application
+had.
+
+**Block-scoped macro imports.** The menu templates import knp_menu.html.twig's macros inside
+`{% block item %}` and then call `macros.attributes()` from `linkElement`, `spanElement` and
+`dropdownElement` too. Twig keeps an import local to the block that made it, so each of those
+is an undefined variable — KnpMenu's own template imports inside *every* block for exactly
+this reason. 21 blocks across 7 templates; the same script adds the missing imports.
+
+Worth noting how this was found: three defects stacked behind one another, each invisible
+until the one in front was fixed, and none of them reachable by the smoke test — it drives the
+kernel in-process and would have rendered the same 500 at the first layer.
+
+### 5.38 `BaseUser::getId()` — one method missing from the hand-written FOSUser layer
+
+`App\Security\Model\BaseUser` stands in for `FOS\UserBundle\Model\User`, which has no
+Symfony 5+ release. It reproduces that class's whole API — 48 methods — except `getId()`.
+
+The identifier is declared and mapped by the concrete entity, exactly as FOSUserBundle had it:
+`Model\User` supplied the getter while the application's entity owned the `#[ORM\Id]` column.
+`Core\UserBundle\Entity\User` therefore declares `protected $id` and no getter, because it
+never needed one. Reproducing the property and not the getter left nothing to inherit it from,
+so `app.user.id` and every `$user->getId()` resolved to nothing.
+
+It failed nowhere near the omission — as a Twig error on whichever page read the property,
+which included `/backend`, `/user-admin` and `/admin/domain/`, three of the first pages anyone
+opens. `lint:container`, the router and the mapping validator all reported themselves healthy
+throughout, because none of them can see a missing method on a hand-written class.
+
+`check-user-accessors.php` now gates on it: every `app.user.*` a template reads must resolve on
+the entity. `app.user.name` is allowlisted, being an application bug older than the migration —
+`getName()` exists in neither tree, so that page was broken under Symfony 2 as well.
+
+The guard is narrow on purpose. `app.user.` is the one template expression whose type is known
+without inference, and the hand-written layer is where this class of gap lives.
+
+### 5.39 The first write path exercised — `fos_user.user_listener` was never replaced
+
+`/domain/globaloption/create` died on `Column 'username_canonical' cannot be null`. This is the
+first *write* anyone had run, and it found what every read-only sweep structurally could not.
+
+FOSUserBundle registered a Doctrine listener on prePersist and preUpdate. It canonicalised the
+username and email and hashed any pending `plainPassword` on the way to the database, which is
+why the application can write a user with a bare `$em->persist($user); $em->flush();` — and it
+does, in **14 files**, never through the user manager. `App\User\Manager\UserManager` reproduced
+`updateCanonicalFields()` and `updatePassword()`, but nothing called them: the class that used
+to was FOSUserBundle's own, so it was never in the tree to port.
+
+The visible failure was the NOT NULL violation. The quieter half is worse — any path that got
+past it would have stored a user whose password was never hashed at all.
+`App\Security\EventListener\UserListener` restores both.
+
+**A second defect sat directly behind it.** `UserManager::updatePassword()` set `salt` to null,
+correct for a self-salting hash, except `salt` is NOT NULL in `fos_user` — and that table is
+still read and written by the Symfony 2 application, so the column cannot be relaxed while both
+are live. Every password write failed on the constraint. It is now written as `''`.
+
+Verified end to end over HTTP: a user is created with both canonical fields populated, `salt`
+empty and the password hashed to bcrypt, and an update rehashes correctly through preUpdate's
+`recomputeSingleEntityChangeSet`.
+
+**What the same request then exposed, both pre-existing:**
+
+- `GlobalOptionRepository::createGlobalOption()` reads `$data['user_name']`, a key the signup
+  form has never posted — identical in the legacy tree, and absent from both templates.
+- `GlobalOption#homePage` and `User#profile` named their target entities `Homepage` and
+  `profile`, where the classes are `HomePage` and `Profile`. PHP matches class names
+  case-insensitively but PSR-4 resolves the *file* case-sensitively, so these resolve only when
+  something else has already loaded the real class. They therefore work under a full metadata
+  load and fail when one entity is loaded on its own — a failure that depends on load order
+  rather than on anything in the code. Inherited from the legacy annotations, and harmless
+  there only because the whole tree was loaded eagerly. `fix-attribute-names.php` now corrects
+  the case.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -909,9 +1099,10 @@ the legacy build is reproducible only from `composer.lock`, not from `composer.j
 ## 11. What still needs a running system
 
 The application has been run against real data: `bm_db.sql.gz` loaded into a scratch database,
-the schema completed from the mapping, and **791 pages requested**. That found twelve defects
+the schema completed from the mapping, and **860 pages requested**. That found twelve defects
 every static check had passed over (§5.20-§5.32), including three that were fatal on every
-affected page.
+affected page - and later, once the application was driven through a browser rather than the
+harness, four more (§5.35-§5.38).
 
 What works, end to end:
 
@@ -930,32 +1121,56 @@ not look like they write anything — a legacy application that deletes over GET
 deny-list is deliberately broad. It is resumable, because 110 controllers call `exit;` and take
 the harness with them; every visit is recorded before it is made, so repeated runs converge.
 
-791 pages, and every failure is now accounted for (`migration/contract/smoke-test.md`):
+860 pages, and every failure is accounted for (`migration/contract/smoke-test.md`):
 
 | pages | cause | |
 |---:|---|---|
-| 320 | a template links to a route that does not exist | pre-existing (§5.28) |
-| 137 | a null the page assumes is there | this tenant's data |
-| 117 | **rendered (HTTP 200)** | |
+| 465 | **rendered (HTTP 200)** | |
+| 167 | a null the page assumes is there | this tenant's data |
 | 81 | 404 | mostly the routes with no controller (§5.12) |
 | 34 | this tenant has no config for that module | data |
-| 20 | dead entity aliases | pre-existing (§5.11) |
-| 15 | the controller calls `exit;` | harness limit |
+| 26 | dead entity aliases | pre-existing (§5.11) |
+| 16 | the controller calls `exit;` | harness limit |
 | 13 | calls a repository method that does not exist | pre-existing |
+| 10 | **unexplained** | all ten verified pre-existing or data |
 | 9 | wkhtmltopdf is not installed here | environment |
 | 9 | needs a request parameter the harness does not send | harness limit |
 | 6 | a template that exists in neither tree | pre-existing |
 | 5 | DQL built by interpolating a null config | data |
 | 4 | the smoke-test user lacks that role | expected |
 | 3 | queries a field the entity never declared | pre-existing |
-| 3 | **unexplained** | all three verified pre-existing |
+| 1 | a template links to a route that does not exist | pre-existing (§5.28) |
+| 1 | a service id that exists in neither tree | pre-existing (§5.16) |
+| 1 | the barcode dependency cannot be downloaded | (§5.32) |
 
-The three unexplained were checked line by line against the legacy tree and are identical there:
-`array_intersect()` on a string, `getResult()` on an array, and a call to
-`AccountSales::getHotelInvoice()`, which exists in neither tree.
+Against the previous sweep, which ran before §5.35-5.38 were fixed: **791 pages and 117 that
+rendered, against 860 and 465 now.** The extra 69 pages are ReportBundle's routes, which had
+never been registered. The 320-page "dead route linked from a template" bucket is down to 1.
+
+The ten unexplained were each checked against the legacy tree:
+
+- `MedicineSalesItem.salesQuantity`, `AccountSales::getHotelInvoice()` and
+  `TemplateCustomize.name` are referenced by code that ships in both trees, and the field or
+  method exists in neither. Broken under Symfony 2 as well.
+- `TransactionRepository::getGroupByAccountHead()` takes three arguments in both trees and is
+  called with one in both.
+- `globaloption_vendor_search` is `public function vendorSearchAction() { echo 'Test'; }` in
+  the legacy source - debug scaffolding that never returned a Response.
+- `array_intersect()` on a string is line-for-line identical in both trees: `$blackoutdate`
+  is initialised to `''` and only becomes an array when the tenant has a weekend configured.
+  **PHP 7.4 raised a warning and returned null here; PHP 8 makes it fatal.** The port did not
+  introduce it, but the upgrade does turn it into a 500 - see below.
+- The remainder are this tenant's rows: an empty string where a template expects an object,
+  and `site_setting` pointing at user 5659, which is not in the dump (`max(id)` is 5690).
 
 **No port defect remains in what this sweep can reach.** What is left is either data this
 tenant does not have, a pre-existing defect, or a limit of the harness.
+
+**One class deserves separate attention before cutover.** PHP 8 promoted a family of PHP 7
+warnings to fatals - passing a string where an array is required being the one this sweep
+caught. Such a page returned a partial render under Symfony 2 and returns a 500 now. The code
+is unchanged and the guards cannot see it, because there is nothing wrong with the port; only
+running the pages finds them, and only on data that takes the branch.
 
 The 137 nulls need re-checking on a tenant that uses those modules: `business_config`,
 `dps_config` and `restaurant_config` have no rows in this dump, so every page in those modules

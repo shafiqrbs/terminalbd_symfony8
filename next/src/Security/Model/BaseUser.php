@@ -108,6 +108,15 @@ abstract class BaseUser implements UserInterface, PasswordAuthenticatedUserInter
 
     // --- FOSUser API surface still called across the app --------------------
 
+    /**
+     * The identifier is declared and mapped by the concrete entity, not here -
+     * which is how FOSUserBundle had it too: Model\User supplied the getter
+     * while the application's entity owned the #[ORM\Id] column. Reproducing
+     * only the property and not the getter left `app.user.id` and every
+     * `$user->getId()` unresolvable, with nothing to inherit them from.
+     */
+    public function getId() { return $this->id; }
+
     public function getUsername() { return $this->username; }
     public function setUsername($username) { $this->username = $username; return $this; }
 

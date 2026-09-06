@@ -8,8 +8,8 @@ carrying them are 500s in production today. Fixing one means deciding whether to
 restore its controller or remove the link, which is a product decision, so this file
 reports rather than gates.
 
-- route names: **193**
-- references: **396**
+- route names: **134**
+- references: **305**
 
 ```
 account_bank_delete                    1 reference(s)  e.g. templates/Accounting/BankAccount/new.html.twig
@@ -18,26 +18,6 @@ account_purchase_business_outstanding  1 reference(s)  e.g. templates/Accounting
 account_sales_business_reverse         1 reference(s)  e.g. templates/Accounting/AccountBusiness/sales.html.twig
 account_sales_hotel_reverse            1 reference(s)  e.g. templates/Accounting/AccountHotel/sales.html.twig
 account_sales_show                     13 reference(s)  e.g. templates/Accounting/BankAccount/show.html.twig
-accounting_report_balanch_sheet        1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_cash_flow            1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_daily_profit         1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_group_sales_outstanding 1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_head                 2 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_head_ajax            1 reference(s)  e.g. templates/Report/Accounting/Financial/account-head.html.twig
-accounting_report_monthly_profit       1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_monthly_statement    1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_sales_ajax           3 reference(s)  e.g. templates/Report/Inventory/Stock/stock.html.twig
-accounting_report_sales_customer_ledger 1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_sales_customer_summary 1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_sales_details        1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_sales_outstanding    1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_sales_summary        1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_sales_user_summary   1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_stakeholder_profit   1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_subhead              2 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_subhead_ajax         1 reference(s)  e.g. templates/Report/Accounting/Financial/account-subhead.html.twig
-accounting_report_trail_balanch        1 reference(s)  e.g. templates/report/menu.html.twig
-accounting_report_yearly_profit        1 reference(s)  e.g. templates/report/menu.html.twig
 android_inventory_process              1 reference(s)  e.g. templates/Inventory/Android/index.html.twig
 android_inventory_sales_duplicate_delete 1 reference(s)  e.g. templates/Inventory/Android/index.html.twig
 applicationpricing_delete              2 reference(s)  e.g. templates/Tool/Domain/new.html.twig
@@ -74,10 +54,6 @@ branch_import                          3 reference(s)  e.g. templates/Content/Br
 branch_pdf                             2 reference(s)  e.g. templates/Content/Branch/new.html.twig
 branch_pdf_list                        1 reference(s)  e.g. templates/Content/Branch/index.html.twig
 branch_print                           2 reference(s)  e.g. templates/Content/Branch/new.html.twig
-busi_daily_report                      1 reference(s)  e.g. templates/report/menu.html.twig
-busi_daily_report_ajax_load            1 reference(s)  e.g. templates/Report/Business/Calendar/Day/index.html.twig
-busi_monthly_report                    1 reference(s)  e.g. templates/report/menu.html.twig
-busi_system_overview                   1 reference(s)  e.g. templates/report/menu.html.twig
 business_report_sales_courier_details  2 reference(s)  e.g. templates/Business/Report/condition/salesCourierDetails.html.twig
 customer_order                         4 reference(s)  e.g. templates/User/Default/website.html.twig
 customer_order_add_item                2 reference(s)  e.g. templates/Customer/Domain/invoice.html.twig
@@ -133,34 +109,7 @@ hms_medicine_inline                    4 reference(s)  e.g. templates/HumanResou
 hms_medicine_new                       1 reference(s)  e.g. templates/HumanResource/Leave/new.html.twig
 hms_medicine_status                    2 reference(s)  e.g. templates/HumanResource/Leave/index.html.twig
 hms_purchase_return_show               1 reference(s)  e.g. templates/Hospital/Purchase/index.html.twig
-hms_report_admission_invoice           4 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_admission_service           1 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_admission_surgery_department 3 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_admission_surgery_department_details 1 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_collection_commission_details 1 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_collection_commission_details_ajax 1 reference(s)  e.g. templates/Report/Hospital/Sales/sales-commission-details.html.twig
-hms_report_collection_commission_group 1 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_collection_commission_group_ajax 1 reference(s)  e.g. templates/Report/Hospital/Sales/collection-commission-group.html.twig
-hms_report_daily_sales_collection      1 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_daily_sales_collection_ajax 1 reference(s)  e.g. templates/Report/Hospital/Sales/sales-collection.html.twig
-hms_report_daily_sales_collection_commission_ajax 1 reference(s)  e.g. templates/Report/Hospital/Sales/sales-collection-commission.html.twig
-hms_report_dashboard                   8 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_diagnostic_invoice          4 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_diseases                    1 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_diseases_details            1 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_hospital_invoice            1 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_hospital_invoice_ajax       1 reference(s)  e.g. templates/Report/Hospital/Sales/invoice.html.twig
-hms_report_sales_collection_commission 1 reference(s)  e.g. templates/report/menu.html.twig
-hms_report_visit_invoice               4 reference(s)  e.g. templates/report/menu.html.twig
 hms_reverse_purchase_show              1 reference(s)  e.g. templates/Hospital/Purchase/index.html.twig
-inv_brand_stock_item_price             1 reference(s)  e.g. templates/report/menu.html.twig
-inv_category_stock_item_price          1 reference(s)  e.g. templates/report/menu.html.twig
-inv_sales_profit_loss                  1 reference(s)  e.g. templates/report/menu.html.twig
-inv_sales_profit_loss_ajax_load        3 reference(s)  e.g. templates/Report/Inventory/Sales/index.html.twig
-inv_salesitem_profit_loss              1 reference(s)  e.g. templates/report/menu.html.twig
-inv_salesitem_profit_loss_ajax_load    3 reference(s)  e.g. templates/Report/Inventory/SalesItem/index.html.twig
-inv_stock_item_price                   1 reference(s)  e.g. templates/report/menu.html.twig
-inv_system_overview                    3 reference(s)  e.g. templates/report/menu.html.twig
 inventory_salesimport_show             1 reference(s)  e.g. templates/Inventory/SalesImport/new.html.twig
 inventory_salesmanual_add              2 reference(s)  e.g. templates/Inventory/SalesManual/busket.html.twig
 inventory_salesmanual_busket           1 reference(s)  e.g. templates/Inventory/SalesManual/purchaseItem.html.twig
@@ -179,13 +128,6 @@ medicine_reverse_show                  1 reference(s)  e.g. templates/Medicine/M
 medicine_show                          2 reference(s)  e.g. templates/Medicine/MedicineCompany/index.html.twig
 medicine_user_edit                     1 reference(s)  e.g. templates/Medicine/MedicineBrand/new.html.twig
 menu_edit                              1 reference(s)  e.g. templates/Appearance/Menu/show.html.twig
-miss_business_product_report           2 reference(s)  e.g. templates/Report/Business/MarketingExecutive/ajax-data.html.twig
-miss_customer_invoice_ledger_report    2 reference(s)  e.g. templates/Report/Default/Ledger/customer.html.twig
-miss_customer_invoice_report           1 reference(s)  e.g. templates/Report/Business/MarketingExecutive/ajax-data.html.twig
-miss_marketing_executive_report        1 reference(s)  e.g. templates/report/menu.html.twig
-miss_marketing_executive_report_ajax_load 1 reference(s)  e.g. templates/Report/Business/MarketingExecutive/index.html.twig
-miss_stock_report                      1 reference(s)  e.g. templates/report/menu.html.twig
-miss_system_overview                   2 reference(s)  e.g. templates/report/menu.html.twig
 mobile_contact                         2 reference(s)  e.g. templates/frontend/template/mobile/mobile.html.twig
 mobile_home                            4 reference(s)  e.g. templates/frontend/template/mobile/mobile.html.twig
 noticeboard_export                     2 reference(s)  e.g. templates/Content/NoticeBoard/new.html.twig
@@ -196,7 +138,6 @@ noticeboard_pdf_list                   1 reference(s)  e.g. templates/Content/No
 noticeboard_print                      2 reference(s)  e.g. templates/Content/NoticeBoard/new.html.twig
 noticeboard_print_list                 1 reference(s)  e.g. templates/Content/NoticeBoard/index.html.twig
 purchase_order_delete                  2 reference(s)  e.g. templates/Inventory/Purchase/new-backup.html.twig
-report_dashboard                       2 reference(s)  e.g. templates/Tool/Widget/common.html.twig
 salesitem                              3 reference(s)  e.g. templates/Inventory/SalesItem/new.html.twig
 salesitem_edit                         2 reference(s)  e.g. templates/Inventory/SalesItem/index.html.twig
 salesitem_new                          1 reference(s)  e.g. templates/Inventory/SalesItem/index.html.twig

@@ -1,6 +1,7 @@
 <?php
 /**
- * Converts JMS @Secure(roles="...") docblocks to Symfony 8 #[IsGranted].
+ * Converts JMS @Secure(roles="...") and Sensio @Security("...") docblocks to
+ * Symfony 8 #[IsGranted].
  *
  * SEMANTICS - this is a security boundary, so the reasoning is recorded here:
  * JMSSecurityExtraBundle's MethodSecurityInterceptor calls
@@ -14,6 +15,18 @@
  * AND - which would lock users out. Multi-role checks are emitted as an
  * expression instead, preserving OR.
  *
+ * Sensio's @Security carries an expression rather than a role list, and the
+ * legacy application applied it at class level *in addition to* the method's
+ * @Secure - so the two are an AND, which is what stacked #[IsGranted] gives.
+ * Leaving it behind is not harmless: SensioFrameworkExtraBundle is not
+ * installed, so the docblock is inert, and the class-level gate simply stops
+ * being enforced. On ReportController that is the difference between
+ * ROLE_REPORT_OPERATION_SALES reaching the financial reports and not.
+ *
+ * Only expressions built from is_granted(), and/or/not and parentheses are
+ * converted. Anything referencing `subject`, `object` or `request` is left in
+ * place and reported, because those need a per-site reading.
+ *
  * usage: php migration/bin/secure-to-isgranted.php <dir> [--dry-run]
  */
 $dir    = $argv[1] ?? null;
@@ -23,21 +36,22 @@ if (!$dir || !is_dir($dir)) { fwrite(STDERR, "usage: secure-to-isgranted.php <di
 $GLOBALS['IS_GRANTED'] = 'Symfony\\Component\\Security\\Http\\Attribute\\IsGranted';
 $GLOBALS['EXPRESSION'] = 'Symfony\\Component\\ExpressionLanguage\\Expression';
 
-$files = 0; $single = 0; $multi = 0; $roleSet = [];
+$files = 0; $single = 0; $multi = 0; $expressions = 0; $roleSet = []; $skipped = [];
 
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)) as $f) {
     if ($f->getExtension() !== 'php') continue;
     $src = (string) file_get_contents($f->getPathname());
-    if (!str_contains($src, '@Secure')) continue;
+    if (!str_contains($src, '@Secure') && !str_contains($src, '@Security')) continue;
 
     $needsExpression = false;
+    $path = $f->getPathname();
 
     $out = preg_replace_callback(
         '#(?<indent>[ \t]*)/\*\*.*?\*/#s',
-        static function (array $m) use (&$single, &$multi, &$needsExpression, &$roleSet): string {
+        static function (array $m) use (&$single, &$multi, &$expressions, &$needsExpression, &$roleSet, &$skipped, $path): string {
             $block  = $m[0];
             $indent = $m['indent'];
-            if (!str_contains($block, '@Secure')) return $block;
+            if (!str_contains($block, '@Secure') && !str_contains($block, '@Security')) return $block;
 
             $attrs = [];
             $stripped = preg_replace_callback(
@@ -61,6 +75,34 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, File
                     return '';
                 },
                 $block
+            );
+
+            // Sensio @Security("<expression>"), the class-level gate.
+            $stripped = preg_replace_callback(
+                '/^[ \t]*\*[ \t]*@Security\(\s*"(?<expr>(?:[^"\\\\]|\\\\.)*)"\s*\)[ \t]*\R?/m',
+                static function (array $mm) use (&$attrs, &$expressions, &$needsExpression, &$roleSet, &$skipped, $path): string {
+                    $expr = stripslashes($mm['expr']);
+
+                    // Only role checks. `subject`/`object`/`request` change
+                    // meaning between the two bundles and need a human.
+                    $bare = preg_replace('/is_granted\(\s*\'[A-Z0-9_]+\'\s*\)/', '', $expr);
+                    if (trim(preg_replace('/\b(and|or|not)\b|[()\s]/', '', $bare)) !== '') {
+                        $skipped[] = "$path: $expr";
+
+                        return $mm[0];
+                    }
+
+                    foreach (preg_match_all('/is_granted\(\s*\'([A-Z0-9_]+)\'\s*\)/', $expr, $rm) ? $rm[1] : [] as $r) {
+                        $roleSet[$r] = true;
+                    }
+
+                    $expressions++;
+                    $needsExpression = true;
+                    $attrs[] = '#[IsGranted(new Expression("' . $expr . '"))]';
+
+                    return '';
+                },
+                $stripped
             );
 
             if (!$attrs) return $block;
@@ -98,6 +140,11 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, File
     if (!$dryRun) file_put_contents($f->getPathname(), $out);
 }
 
-printf("%s %d files: %d single-role #[IsGranted], %d multi-role expressions\n",
-    $dryRun ? 'would convert' : 'converted', $files, $single, $multi);
+printf("%s %d files: %d single-role #[IsGranted], %d multi-role expressions, %d @Security expressions\n",
+    $dryRun ? 'would convert' : 'converted', $files, $single, $multi, $expressions);
 printf("distinct roles referenced: %d\n", count($roleSet));
+
+if ($skipped) {
+    fwrite(STDERR, "!! @Security left in place - not a plain role check, so it needs reading:\n");
+    foreach ($skipped as $s) fwrite(STDERR, "   $s\n");
+}
