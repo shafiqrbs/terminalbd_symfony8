@@ -105,17 +105,24 @@ zcat bm_db.sql.gz | sudo mysql terminalbd_migration_check
   started as a Symfony 2 salted sha512 hash and was upgraded to bcrypt by
   logging in. Its plaintext is in `next/.env.local`, not here.
 
-### The three commands
+### The four commands
 
 ```bash
 ./migration/bin/migrate.sh      # rebuild everything from the legacy tree, then verify
 ./migration/bin/ci-checks.sh    # the guards, no database needed
 php8.5 migration/bin/smoke-test.php   # request pages; needs the database
+php8.5 migration/bin/write-test.php   # submit forms;  needs the database
 ```
 
-The smoke test has to be run in a loop until it reports `visited 0 pages this
-run`: 110 controllers call `exit;` and take the process with them, and each run
-resumes from `next/var/smoke-state.json`. Roughly 15 runs from a cold start.
+Both harnesses have to be run in a loop until they report nothing new -
+`visited 0 pages this run` and `submitted 0 form(s)` respectively. Controllers
+call `exit;` and take the process with them, and each run resumes from its state
+file (`next/var/smoke-state.json`, `next/var/write-state.json`). Roughly 15 runs
+for the smoke test from cold, about 21 for the write test.
+
+The write test rolls back every submission, so it is safe to repeat and leaves
+the database as it found it. `--commit` turns that off; do that only against a
+database you can throw away.
 
 ### Serving it in a browser
 
@@ -141,11 +148,12 @@ Both lines of that router matter, and §5.36 says why. Log in as
 
 ### Where to start, in order
 
-1. **Exercise writes.** Every sweep so far is read-only — GET, no parameters,
-   nothing whose name looks like it changes data. That is how 300 broken DELETE
-   and UPDATE statements (§5.34) survived to be found by reading rather than by
-   testing. There may be more of that class. A harness that submits the forms
-   it finds would be the single most valuable next step.
+1. **Writes with parameters, and the destructive half.** `write-test.php` now
+   submits the forms on parameterless GET pages - 187 of them - but an edit
+   form lives at `/thing/{id}/edit`, and the deny-list skips everything whose
+   name suggests it deletes, approves or sends. Those are the two halves still
+   unexercised, and §5.34's 300 broken DELETE and UPDATE statements are exactly
+   what lives in the second one.
 2. **Pages with parameters.** 2,141 routes carry a `{placeholder}` and have
    never been requested. Feeding real ids from the database would roughly
    triple the coverage.
@@ -855,6 +863,24 @@ empty and the password hashed to bcrypt, and an update rehashes correctly throug
   there only because the whole tree was loaded eagerly. `fix-attribute-names.php` now corrects
   the case.
 
+### 5.40 `Canonicalizer::canonicalize()` narrowed a signature the application leans on
+
+Found by building the write harness, which is the point of having one: it runs on data the
+sweeps never reached.
+
+`App\Security\Canonicalizer` stands in for `FOS\UserBundle\Util\Canonicalizer`, whose method
+was untyped. The port declared `canonicalize(?string $string)`. Usernames in this application
+are mobile numbers, and enough call sites hand over an int that the narrower hint turns what
+used to work into a TypeError.
+
+Harmless while nothing called it - and then §5.39 put a listener on prePersist and preUpdate,
+so it now runs on *every* user write. A save with nothing to do with usernames crashed on the
+signature. Widened to `int|string|null`, which is what the class it replaces accepted.
+
+The lesson generalises past this class: a hand-written stand-in that is stricter than the
+original is a defect, not an improvement, because the calling code was written against the
+original.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -1165,6 +1191,40 @@ The ten unexplained were each checked against the legacy tree:
 
 **No port defect remains in what this sweep can reach.** What is left is either data this
 tenant does not have, a pre-existing defect, or a limit of the harness.
+
+### Writes
+
+`write-test.php` renders each page, parses every form out of it, invents a value for every
+field and posts it back through the kernel. Every submission runs inside a transaction that is
+rolled back, so the sweep repeats cleanly and leaves nothing behind; the statements still
+execute, so constraint violations and broken DQL still surface. Destructive actions are skipped
+by name, on the same deny-list the smoke test uses.
+
+In process rather than over HTTP, and not only for speed. Form CSRF tokens render as stateless
+double-submit tokens that a browser's Stimulus controller rewrites before submit: a token
+posted by curl is rejected, and because the templates render only per-field errors, the
+rejection appears as a page that looks perfectly fine. In process, the token the page rendered
+is the token the request carries.
+
+**187 forms submitted, 127 saved, 30 rejected by validation, 30 failing.** Every failure was
+checked:
+
+| forms | cause | |
+|---:|---|---|
+| 18 | a null the action assumes is there | this tenant's data |
+| 5 | a type the action assumes it was given | 3 are null module config; `initialSetup()` is passed a `User` in both trees |
+| 4 | the harness's own limits | an upload field and an empty entity choice, both labelled HARNESS in the report |
+| 2 | a NOT NULL column the form never collects | pre-existing |
+| 2 | a template reads `form.processHead` | the form type has no such field in *either* tree |
+
+**No port defect remains in what this sweep can reach either.** Building it did find one,
+though - see §5.40 - and it found the fixture gap below.
+
+**The seeded user needs a profile.** `migration_check` was the only one of 1,088 users without
+a row in `user_profiles`, and `$this->getUser()->getProfile()->getBranches()` is common enough
+that this alone accounted for 9 failures. Seeding one took the sweep from 181 forms and 116
+saved to 187 and 127. A harness user that does not look like a real user reports the fixture,
+not the port.
 
 **One class deserves separate attention before cutover.** PHP 8 promoted a family of PHP 7
 warnings to fatals - passing a string where an array is required being the one this sweep
