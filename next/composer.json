@@ -17,6 +17,7 @@
         "knplabs/knp-menu-bundle": "^3.7",
         "knplabs/knp-paginator-bundle": "*",
         "knplabs/knp-snappy": "^1.6",
+        "mike42/escpos-php": "^5.0",
         "nelmio/cors-bundle": "^2.6",
         "phpdocumentor/reflection-docblock": "^6.0",
         "phpoffice/phpspreadsheet": "^5.1",

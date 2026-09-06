@@ -155,22 +155,16 @@ Both lines of that router matter, and §5.36 says why. Log in as
    there. Exercising it needs a database that can be thrown away and restored
    between runs, since a rollback cannot cover an action that redirects into a
    second request.
-2. **`mike42/escpos-php` is not installed.** `1.5.*` is in the legacy
-   composer.json and was never carried over, so the two POS print pages die on
-   `Mike42\Escpos\PrintConnectors\DummyPrintConnector`; 12 files reference it.
-   It needs a decision rather than a default: the oldest release that allows
-   PHP 8 is v4, and the current one is v5, four majors past what the legacy
-   pinned. Someone has to say whether the receipt output may change.
-3. **The remaining dead template links** — 134 names, 305 references. Treat
+2. **The remaining dead template links** — 134 names, 305 references. Treat
    each as a port defect until proven otherwise. The 320-page block that used
    to sit here was not 320 product decisions: it was one controller whose
    routes never registered (§5.35), and reading it as "links to routes that
    never existed" is precisely what kept it hidden for three sweeps. Check
    whether the route exists in the legacy tree *first*.
-4. **A tenant that uses the other modules.** `business_config`, `dps_config`
+3. **A tenant that uses the other modules.** `business_config`, `dps_config`
    and `restaurant_config` have no rows in this dump, so 137 pages walk into a
    null that says nothing about the port.
-5. **Golden API capture**, once a staging URL and credentials exist (§11).
+4. **Golden API capture**, once a staging URL and credentials exist (§11).
 
 ### What is finished
 
@@ -938,6 +932,26 @@ Where the short name is unique across the tree there is only one thing it can me
 now used as a fallback; where it is ambiguous the alias is left alone, because a wrong entity
 here is a silent wrong answer rather than an error. 27 converted across 12 files. The 161 that
 remain name entities that exist in neither tree.
+
+### 5.44 `mike42/escpos-php` — a fourth missing dependency, and it just works
+
+The receipt printer library was in the legacy composer.json at `1.5.*` and never carried over,
+so `Mike42\Escpos\PrintConnectors\DummyPrintConnector` was a fatal on the POS print pages.
+Found by §5.41, once routes with a `{placeholder}` could be requested at all.
+
+The version gap looked like the risk: `^5.0` is four majors past what the legacy pinned, and v5
+types its parameters where 1.5 did not. It was checked rather than assumed - every class, every
+constant and every method the tree uses, replayed against v5 with the same argument shapes:
+
+- 4 classes: all present.
+- 11 `Printer::` constants: all present. (A first pass reported `BARCODE_JAN` missing; that was
+  a regex stopping at `[A-Z_]+` and truncating `BARCODE_JAN13`, which exists. The call sites
+  are what settled it.)
+- 19 method calls, from `initialize()` through `barcode(..., BARCODE_JAN13)` to `cut()`: all
+  accepted, producing real ESC/POS output.
+
+Nothing breaks. The two print pages now fail on this tenant having no `inventoryConfig`, which
+is the wall §11 already describes rather than anything to do with printing.
 
 ## 6. Phases
 
