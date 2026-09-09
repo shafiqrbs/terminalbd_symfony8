@@ -129,6 +129,12 @@ assumed:
 - the three DQL functions — five repositories call `GROUP_CONCAT` and DQL rejects
   an unregistered function.
 
+**Where `core/` comes from: `next/`, not the legacy tree.** This work continues
+from the Symfony 8 / PHP 8.5 project rather than re-deriving anything. `core/` is
+lifted out of `next/src` as it stands — already ported, already verified, already
+running — and from that moment it is **source, not an artifact**: an entity change
+is an ordinary edit, not a new pipeline step.
+
 Copying all that into a second project forks it on day one. Instead it becomes a
 Composer path package that both `next/` and `api/` require:
 
@@ -313,7 +319,7 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 
 | # | module | screens | why here |
 |---|---|---:|---|
-| 0 | — | — | `core/` extracted, `api/` and `web-ui/` skeletons, auth, **geometry tokens harvested from the existing CSS**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
+| 0 | — | — | **`core/` lifted out of `next/` and owned**, pipeline switched to verify-only, `api/` and `web-ui/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
 | 1 | **Tool** | 28 | settings and `GlobalOption`; everything else reads it |
 | 2 | **User** + **DomainUser** | 20 | login, roles, branches — the 122 nav role checks need them |
 | 3 | **Medicine** | 56 | best evidence here: 82% of visited pages render, 38% reach |
@@ -323,7 +329,7 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 | 7 | the small modules | 25 | Product, Content, Appearance, Media, Location, Pos |
 | 8 | **Customer**, **Restaurant**, **DoctorPrescription** | 28 | blocked: no `business_config`, `restaurant_config` or `dps_config` rows in this dump |
 | 9 | **the mobile API moves** | — | the 96 wire-locked endpoints leave `next/` for `api/`, byte-compatible |
-| 10 | **`next/` deleted, pipeline frozen** | — | see §7 |
+| 10 | **`next/` deleted** | — | the presentation half of the upgrade; `core/` already carries the rest (§7) |
 | 11 | **offline** | — | see §8 |
 
 Phase 0 is the one that decides everything after it — it is where the component
@@ -359,41 +365,34 @@ This is phase 9 and not phase 0 on purpose. Moving them early means maintaining
 one surface across two projects for the whole migration; moving them last means
 one careful, gated lift when everything else has already stopped changing.
 
-### The freeze point: when generated code becomes owned code
+### The pipeline becomes a verifier, in phase 0
 
-This is the decision that "`next/` gone entirely" really forces, and it deserves
-to be deliberate rather than discovered.
+`core/` stops being a generated artifact the moment it is lifted, so entity work
+is normal development from day one. But `migrate.sh` is not retired — it changes
+job.
 
-Today `migrate.sh` regenerates every line of `next/src` from the untouched
-legacy tree and `git diff` comes back empty. That invariant is why this port is
-verifiable at all: nothing is hand-edited, so every fix is a pipeline step and
-every rerun reproduces it. It is also why `core/` should stay generated while the
-legacy application still serves traffic — both read the same database, so the
-entity layer must have exactly one source.
+Today it regenerates `next/src` from the untouched legacy tree and `git diff`
+comes back empty. That invariant is why this port is verifiable at all. Losing it
+outright would also lose the guards that read the legacy tree, and four of the
+eleven in `ci-checks.sh` do: **column names vs the legacy annotations**, **route
+resolution**, **route annotations converted to attributes**, and the **mobile API
+contract**. Those are the ones that catch a whole construct evaporating — the
+§5.35 and §5.46 failure mode.
 
-But once the legacy is decommissioned, there is no tree left to regenerate
-*from* — only a frozen copy in git. Regenerating then buys nothing and costs
-plenty: you could not add a column without adding a pipeline step to do it.
+So the pipeline keeps running, into a scratch directory instead of into the tree,
+and diffs its output against `core/`. It no longer *produces* `core/`; it
+*checks* it, and answers one question on every CI run: does `core/` still agree
+with what the legacy tree implies? A deliberate divergence is recorded the way
+`hand-written.txt` already records the 24 files that are not mechanical ports.
 
-So there is a single moment when `core/` stops being an artifact and becomes
-source. Its checklist:
+That costs one scratch build and buys the four guards for as long as the legacy
+tree exists. When the legacy is finally decommissioned there is nothing left to
+check against, and at that point `migration/bin/` is archived rather than
+deleted — it is the provenance of every line in `core/`, and the only explanation
+of why the mapping looks the way it does.
 
-1. Every module has moved; `next/` has no controllers or templates left.
-2. Phase 9 is done and `compare.php` is green on `api/`.
-3. `ci-checks.sh` passes, and `verify-columns.php` reports zero differences.
-4. The legacy PHP 7.4 pool is off and its proxy rules are gone.
-5. **Then**: one last `migrate.sh` run, `core/` committed as ordinary source,
-   `migration/bin/` archived rather than deleted — it is the provenance of every
-   line in `core/`, and the only explanation of why the mapping looks the way it
-   does.
-6. `next/` deleted.
-
-Until step 5, `core/` keeps its `hand-written.txt` discipline: no hand edits, or
-the next pipeline run silently reverts them.
-
-After it, `core/` is just a package the API owns, and the guards that still earn
-their place — `verify-columns.php`, `schema-diff.php`, `validate-mapping.php` —
-keep running against the database rather than against the legacy tree.
+`schema-diff.php` and `validate-mapping.php` never needed the legacy tree; they
+read the database and the mapping, and keep working unchanged either way.
 
 ## 8. Built so offline can be added later
 
@@ -464,5 +463,6 @@ the source construct, not the router.
    cannot be verified without one.
 4. **Browser offline or Electron offline** (§8). Answering this early decides
    whether phase 11 is mostly new work or mostly sale-pos's existing work.
-5. **Who owns `core/` after the freeze** (§7) — the checklist is written, the
-   moment it is executed is a judgement call about how settled the schema is.
+5. **When the legacy tree is finally retired**, the four guards that read it go
+   with it (§7). Worth knowing which of them you would miss before that day
+   arrives rather than after.
