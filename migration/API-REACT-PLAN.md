@@ -95,18 +95,53 @@ The end state is three of those five: `core/`, `api/`, `web-ui/`. `next/` and th
 legacy tree are both gone, which is what makes `core/` worth extracting rather
 than copying — it is the only part of this migration that survives it.
 
-**`core/` is the point of the shared-entity decision.** 687 of `next/src`'s 1,578
-files — 362 entities and 325 repositories — are the part this migration spent its
-whole verification budget on: the mapping validates, `verify-columns.php` reports
-zero differences against the legacy annotations, and the schema diff is
-accounted for. Copying that into a second project forks it on day one. Instead it
-becomes a Composer path package that both `next/` and `api/` require:
+**`core/` is the upgrade itself, and that is a bigger set than "the entities".**
+
+`next/` *is* the Symfony 2.8 → 8.1 and PHP 7.4 → 8.5 upgrade. Nothing else in this
+repository is on Symfony 8. So the question "what does `core/` carry" is really
+"what of the upgrade survives `next/` being deleted", and the answer is
+**875 of the 1,578 files in `next/src`** — everything that is not presentation.
+The other 703 (337 controllers, 361 form types, 5 Twig extensions) die with Twig.
+
+| what moves to `core/` | files | why it cannot be left behind |
+|---|---:|---|
+| Entity + Repository | 687 | the mapping this migration spent its whole verification budget on |
+| EventListener + Event | 103 | Gedmo, tenancy and domain listeners |
+| Importer | 29 | bulk import paths the API still exposes |
+| Service + Manager | 23 | domain services |
+| Security | 8 | `UserProvider`, `Canonicalizer`, `TenantRoutingListener`, and both halves of the session bridge |
+| Permission | 4 | the role checks the 365 nav items are gated on |
+| Command | 4 | the four console commands |
+| Doctrine `Type` | 2 | `LegacyArrayType`, `LegacyJsonArrayType` |
+| DQL | 3 | `GroupConcat`, `DateFormat`, `Random` |
+
+**Four pieces of configuration move with them, and each one fails silently if it
+is forgotten** — which is exactly the §5.46 shape, so they are listed rather than
+assumed:
+
+- `naming_strategy: doctrine.orm.naming_strategy.default` — the live schema was
+  written by Doctrine 2, so columns are `globalOption_id` and `receiveDate`. The
+  Flex default would look for `global_option_id` and find nothing.
+- `array: App\Doctrine\Type\LegacyArrayType` and the JSON variant — 24 live
+  columns hold `serialize()` output. Without these they are unreadable.
+- `migrate_from: [legacy_sha512]` and the `legacy_sha512` hasher — 1,088 users
+  hold Symfony 2 salted sha512 hashes. Without it none of them can log in.
+- the three DQL functions — five repositories call `GROUP_CONCAT` and DQL rejects
+  an unregistered function.
+
+Copying all that into a second project forks it on day one. Instead it becomes a
+Composer path package that both `next/` and `api/` require:
 
 ```json
 { "repositories": [{ "type": "path", "url": "../core" }] }
 ```
 
 The namespace stays `App\` so nothing in the ported tree has to be rewritten.
+
+Put the other way round: **`api/` is a thin new front on the existing upgrade,
+not a new application.** It supplies HTTP — routing, serialization, request
+validation — over a domain layer that is already ported, already verified, and
+already running.
 
 **This changes the pipeline, and that has to be designed, not discovered.**
 `migrate.sh` currently regenerates all of `next/src` from the legacy tree and
