@@ -68,13 +68,13 @@ run "container" \
 run "templates" \
     bash -c "cd next && $PHP bin/console lint:twig templates/ --excludes=_foscomment | tail -2"
 
-# Reports rather than gates, because some of these are genuinely product
-# decisions - but do not assume that, which is the mistake §5.35 records: 59 of
-# these names were a controller whose routes never registered, not links to
-# routes that never existed. Check the legacy tree before writing one off.
-echo
-echo "── template links to routes that do not exist (informational)"
-$PHP migration/bin/check-template-routes.php --report=migration/contract/template-route-links.md || true
+# Gates on one bucket only: a route the legacy router registers and this one
+# does not. The rest of the dead links are product decisions and only report.
+# The script computes that split rather than assuming it, which is the mistake
+# §5.35 records - 59 of these names were a controller whose routes never
+# registered, not links to routes that never existed.
+run "template links" \
+    $PHP migration/bin/check-template-routes.php --report=migration/contract/template-route-links.md
 
 run "tests" \
     bash -c "cd next && $PHP vendor/bin/phpunit | tail -3"

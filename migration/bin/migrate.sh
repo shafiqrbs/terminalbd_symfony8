@@ -159,7 +159,7 @@ $PHP migration/bin/check-api-contract.php --report=migration/contract/api-contra
 # Two templates are FOSCommentBundle's own and need its Twig extension; the
 # comment API is not ported. See §5 of the plan.
 (cd next && $PHP bin/console lint:twig templates/ 2>&1 | tail -1) || true
-$PHP migration/bin/check-template-routes.php --report=migration/contract/template-route-links.md 2>&1 | tail -2 || true
+$PHP migration/bin/check-template-routes.php --report=migration/contract/template-route-links.md 2>&1 | tail -5 || true
 
 # Only when a dump is present: it is gitignored, being tenant data.
 if [ -f bm_db.sql.gz ]; then

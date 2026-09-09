@@ -161,12 +161,12 @@ Both lines of that router matter, and §5.36 says why. Log in as
    placeholder point at an entity with no rows here; and the largest failure
    bucket in every one of the three reports is the same missing data. Another
    tenant's dump would say more about the port than any further harness work.
-2. **The remaining dead template links** — 134 names, 305 references. Treat
-   each as a port defect until proven otherwise. The 320-page block that used
-   to sit here was not 320 product decisions: it was one controller whose
-   routes never registered (§5.35), and reading it as "links to routes that
-   never existed" is precisely what kept it hidden for three sweeps. Check
-   whether the route exists in the legacy tree *first*.
+2. ~~**The remaining dead template links**~~ — done (§5.46). All 134 were
+   checked against the legacy route set, resolved through its imports rather
+   than grepped: 0 port defects, 63 already dead in the legacy tree, 71 in
+   templates nothing renders. `check-template-routes.php` now computes that
+   split and gates on the first bucket, so it does not need doing again by
+   hand.
 3. **Golden API capture**, once a staging URL and credentials exist (§11).
 
 ### What is finished
@@ -972,6 +972,58 @@ Defined in `App\Kernel` rather than in `public/index.php`, which is where the le
 The entity methods that use it also run under `bin/console` and the harnesses, which never go
 through a front controller, and the Kernel is the one thing every context loads first.
 
+### 5.46 The 134 dead template links — none of them a port defect, now proven
+
+The dead-link report claimed, in its own header, that none of its 134 route names was
+defined in the legacy tree either. Nothing had ever checked. That is the §5.35 sentence
+almost word for word — the 320-page ReportBundle block sat behind the same claim for three
+sweeps — so the claim is now computed per name rather than asserted, and `check-template-routes.php`
+resolves the legacy route set the way Symfony 2 resolved it: follow `app/config/routing.yml`
+through every `resource:` import, YAML **and XML**, instead of grepping for definitions.
+
+The distinction is not academic. A grep for definitions reports 11 of the 134 as present in
+the legacy tree, which looks like 11 port defects. All 11 are in files nothing imports —
+`HospitalBundle/Resources/config/routing/medicine.yml` is never named by that bundle's
+`routing.yml`, and `BinduBundle` has no `routing.yml` at all. A route defined in an orphaned
+file is not a route. Conversely the resolver has to read XML or it misses
+`Core/UserBundle/Resources/config/user/group.xml`, imported by a relative `resource: "group.xml"`,
+which is where the four real `fos_user_group_*` routes live.
+
+Resolved that way the legacy router registers 3,470 names across 347 files. Validated against
+this application's 3,554: only 15 are unaccounted for, every one from a vendor bundle that is
+not on disk here — FOSUser's four XML files, FOSJsRouting's one — and all 19 of their names
+are reproduced in `config/routes/auth.yaml`.
+
+Against that set, **all 134 split into two buckets and neither is a port defect**:
+
+| | names | what it means |
+|---|---|---|
+| port defect | **0** | registered in legacy, missing here |
+| dead in legacy too | 63 | the legacy template carries the same call, and no router registers it |
+| only in unrendered templates | 71 | no controller renders the template and no template pulls it in |
+
+The 63 are 500s in production today, unchanged by the port. The 71 cannot 500 anything: they
+are mostly the 42 templates vendored from FOSUserBundle and FOSCommentBundle, kept beside the
+application's own copies. `fos_user_group_show` is the clearest case — FOSUserBundle's own
+`Group/list_content.html.twig` links to it, but legacy used *its* `group.xml`, which defines
+list, new, edit and delete and no show. The template the `GroupController` actually renders is
+`templates/User/Group/list_content.html.twig`, copied faithfully from the legacy tree, and it
+links to none of them. The old report counted the vendored copy and inflated its own total.
+
+Reachability is computed from the templates named in `next/src` and closed transitively over
+`extends`/`include`/`embed`/`use`/`import`/`from`/`source`. That is sound here because the
+tree has no dynamic template names at all: no computed `render()` argument in any controller,
+and no `{% extends %}` or `{% include %}` on a variable in any of the 1,862 templates. 649 of
+those templates are reachable from nothing, which sounds wrong until you check one against the
+legacy tree — `Business/Particular/index.html.twig` has a `routing/particular.yml` naming
+`BusinessBundle:Particular:index`, no `ParticularController` anywhere, and no import of that
+routing file. Orphaned in the legacy tree, faithfully copied, still orphaned.
+
+The script now gates on the port-defect bucket and reports the other two, so this stops being
+a question anyone has to re-litigate by hand. Verified the gate fires: dropping
+`fos_user_group_new` from `auth.yaml` — a route legacy registers and a rendered template links
+to — moves it into the port-defect bucket and exits 1.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -1378,8 +1430,9 @@ walks into a null — which the legacy application does too.
 
 - [ ] **Golden API capture** — `capture.php` needs a staging base URL and API credentials. The
       mobile contract is verified structurally, not by response shape
-- [ ] **The 296 dead template links and 20 dead aliases** — restoring a controller or removing a
-      link is a product decision, per case
+- [ ] **The 63 dead template links that a rendered template carries, and 20 dead aliases** —
+      dead in the legacy tree too, so restoring a controller or removing a link is a product
+      decision, per case. The port-defect bucket is empty and gated (§5.46)
 - [ ] **The 26 unexplained pages**, per module
 - [ ] **A tenant with the other modules configured**, to cover the 134 nulls
 - [ ] **The session bridge deploy step** — `migration/session-bridge.md`
