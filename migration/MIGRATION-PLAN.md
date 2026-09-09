@@ -1596,7 +1596,14 @@ walks into a null — which the legacy application does too.
       and throws on 7.4 and 8.5 alike - `DateMalformedStringException` extends `\Exception`,
       so it is not the §5.47 class
 - [ ] **A tenant with the other modules configured**, to cover the 134 nulls
-- [ ] **The session bridge deploy step** — `migration/session-bridge.md`
+- [~] **The session bridge deploy step** — `migration/session-bridge.md`. Still a deploy step,
+      but no longer an unverified one: exercised end to end with both applications on one
+      database, and it needed three fixes to work at all. The load-bearing one is that the
+      legacy listener returned early whenever `getToken()` was not null, and Symfony 2's
+      firewall always leaves an `AnonymousToken`, so it adopted nothing. **Enabling it is now
+      ordering-critical rather than optional**: the legacy application encodes `sha512` and
+      this one rewrites to bcrypt on first login, so a user who logs in here can never
+      authenticate there again
 - [ ] **Decommissioning** the PHP 7.4 pool and collapsing the proxy rules
 
 ### Verified against the dump

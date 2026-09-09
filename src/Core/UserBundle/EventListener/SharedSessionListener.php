@@ -4,6 +4,7 @@ namespace Core\UserBundle\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -71,7 +72,13 @@ class SharedSessionListener
             return;
         }
 
-        if (null !== $this->tokenStorage->getToken()) {
+        // Not `!== null`: Symfony 2's firewall registers its own kernel.request
+        // listener at priority 8 and it always leaves an AnonymousToken behind,
+        // so a null check one priority later never passes and the bridge never
+        // adopts anything. Only a real token means "already authenticated here".
+        $token = $this->tokenStorage->getToken();
+
+        if (null !== $token && !$token instanceof AnonymousToken) {
             return;
         }
 
