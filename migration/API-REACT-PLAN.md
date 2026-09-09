@@ -179,7 +179,7 @@ be: Vite, React 19, Mantine 8, Redux Toolkit with RTK Query, React Router,
 `react-i18next`, Tabler icons, `mantine-datatable`.
 
 ```
-web-ui/src/
+terminalbd_web/src/
   app/         store, App shell
   common/      components/{form-builders,modals,drawers,layout,skeletons}, hooks, utils
   modules/     one folder per terminalbd module, mirroring sale-pos's modules/
@@ -284,8 +284,8 @@ Primary is sale-pos's, unchanged:
 
 `createTheme({ primaryColor: "indigo" })` and Open Sans. sale-pos's extra
 `fontSizes` steps come across as well — but **not its `spacing` scale as the
-layout rhythm**: spacing is skeleton, so it comes from the harvested tokens
-above. sale-pos's steps stay available for spacing *within* a widget, where they
+layout rhythm**: spacing is skeleton, so it comes from the metrics measured off
+the running app, above. sale-pos's steps stay available for spacing *within* a widget, where they
 do not affect the page geometry.
 
 Everything else is a **lighter variation of the primary** rather than a new hue:
