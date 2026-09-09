@@ -1486,7 +1486,7 @@ posted by curl is rejected, and because the templates render only per-field erro
 rejection appears as a page that looks perfectly fine. In process, the token the page rendered
 is the token the request carries.
 
-**229 forms submitted, 128 saved, 61 rejected by validation, 40 failing** - the placeholder
+**233 forms submitted, 128 saved, 63 rejected by validation, 42 failing** - the placeholder
 routes (§5.41) brought the edit forms into reach. Every failure was checked:
 
 | forms | cause | |
@@ -1496,6 +1496,15 @@ routes (§5.41) brought the edit forms into reach. Every failure was checked:
 | 4 | the harness's own limits | an upload field and an empty entity choice, both labelled HARNESS in the report |
 | 2 | a NOT NULL column the form never collects | pre-existing |
 | 2 | a template reads `form.processHead` | the form type has no such field in *either* tree |
+| 2 | a template reads `salesItem` | `updateAction` passes `salesItemForm` in *both* trees |
+
+Re-run after §5.47 and §5.48, the sweep was 229/128/61/40 before and 233/128/63/42 now.
+The four extra forms are 45 `medicine_sales` rows that appeared in the scratch database
+after the first sweep, which `route-values.php` now resolves; the two extra failures are
+both the `salesItem` row above, identical in both trees. **Nothing the port did moved:
+`saved` is unchanged.** The smoke sweep re-run against the same code is byte-identical to
+its previous report. The rollback held either way - not one row in the database was created
+during either re-run.
 
 **No port defect remains in what this sweep can reach either.** Building it did find one,
 though - see §5.40 - and it found the fixture gap below.
