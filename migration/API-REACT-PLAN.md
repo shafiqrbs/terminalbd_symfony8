@@ -13,6 +13,8 @@ The four decisions this plan is built on, taken 2026-09-10:
 | sequencing | module by module, behind the strangler proxy that already exists |
 | authentication | the sale-pos header scheme, `X-Api-Key` + `X-Api-User` |
 | scope | what the navigation tree reaches |
+| `next/` | retired entirely — the plan ends with it deleted |
+| offline | not now, but eventually; the last phase, and it constrains today |
 
 ---
 
@@ -81,12 +83,17 @@ that carries validation, tenancy and business rules.
 
 ```
 terminalbd/
-  src/, app/, web/     legacy Symfony 2.8 — unchanged, still proxied to
-  next/                Symfony 8, server-rendered — shrinks as modules move
-  core/                NEW: the shared domain package
+  src/, app/, web/     legacy Symfony 2.8 — unchanged, still proxied to, then retired
+  next/                Symfony 8, server-rendered — TRANSITIONAL: shrinks each
+                       phase and is deleted in phase 10 (§7)
+  core/                NEW: the shared domain package — outlives both
   api/                 NEW: Symfony 8, JSON only, no Twig ever installed
   web-ui/              NEW: React + Vite, modelled on sale-pos
 ```
+
+The end state is three of those five: `core/`, `api/`, `web-ui/`. `next/` and the
+legacy tree are both gone, which is what makes `core/` worth extracting rather
+than copying — it is the only part of this migration that survives it.
 
 **`core/` is the point of the shared-entity decision.** 687 of `next/src`'s 1,578
 files — 362 entities and 325 repositories — are the part this migration spent its
@@ -107,6 +114,10 @@ leaves `git diff` empty — the invariant every guard rests on. It gains a step
 that emits entities and repositories into `core/` and the rest into `next/`. The
 guards (`verify-columns.php`, `check-routes.php`, `validate-mapping.php`) move
 with the code they check.
+
+Because `next/` is going away entirely, that split is worth doing properly rather
+than cheaply: `core/` is the half that outlives the pipeline, and §7 sets out the
+single moment it stops being generated and becomes owned source.
 
 ---
 
@@ -215,6 +226,9 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 | 6 | **Business**, **Hospital** | 92 | large, moderate coverage |
 | 7 | the small modules | 25 | Product, Content, Appearance, Media, Location, Pos |
 | 8 | **Customer**, **Restaurant**, **DoctorPrescription** | 28 | blocked: no `business_config`, `restaurant_config` or `dps_config` rows in this dump |
+| 9 | **the mobile API moves** | — | the 96 wire-locked endpoints leave `next/` for `api/`, byte-compatible |
+| 10 | **`next/` deleted, pipeline frozen** | — | see §7 |
+| 11 | **offline** | — | see §8 |
 
 Phase 0 is the one that decides everything after it — it is where the component
 library, the API conventions, the form-to-DTO pattern and the theme are settled.
@@ -228,7 +242,102 @@ one proxy rule.
 
 ---
 
-## 7. What carries over from this migration
+## 7. Retiring `next/` entirely
+
+`next/` is deleted at the end, and two things have to happen first.
+
+### The mobile API moves before the lights go out
+
+`next/src/Bindu/` holds the 96 endpoints the Android and Flutter clients in the
+field depend on. Those clients do not update in lockstep with a deploy, so the
+move has to be byte-compatible or it breaks phones.
+
+The good news, checked rather than assumed: all three controllers —
+`ApiController`, `ApiPortalController`, `ApiPoskeeperController`, 197 KB — contain
+**no `render()` call at all**. They build JSON by hand and return a plain
+`Response`. So they lift into `api/` as-is, and `capture-both.sh` gates the move
+exactly as it gated the port: capture from `next/`, capture from `api/`, and
+`compare.php` fails on any drift outside the seven accepted entries.
+
+This is phase 9 and not phase 0 on purpose. Moving them early means maintaining
+one surface across two projects for the whole migration; moving them last means
+one careful, gated lift when everything else has already stopped changing.
+
+### The freeze point: when generated code becomes owned code
+
+This is the decision that "`next/` gone entirely" really forces, and it deserves
+to be deliberate rather than discovered.
+
+Today `migrate.sh` regenerates every line of `next/src` from the untouched
+legacy tree and `git diff` comes back empty. That invariant is why this port is
+verifiable at all: nothing is hand-edited, so every fix is a pipeline step and
+every rerun reproduces it. It is also why `core/` should stay generated while the
+legacy application still serves traffic — both read the same database, so the
+entity layer must have exactly one source.
+
+But once the legacy is decommissioned, there is no tree left to regenerate
+*from* — only a frozen copy in git. Regenerating then buys nothing and costs
+plenty: you could not add a column without adding a pipeline step to do it.
+
+So there is a single moment when `core/` stops being an artifact and becomes
+source. Its checklist:
+
+1. Every module has moved; `next/` has no controllers or templates left.
+2. Phase 9 is done and `compare.php` is green on `api/`.
+3. `ci-checks.sh` passes, and `verify-columns.php` reports zero differences.
+4. The legacy PHP 7.4 pool is off and its proxy rules are gone.
+5. **Then**: one last `migrate.sh` run, `core/` committed as ordinary source,
+   `migration/bin/` archived rather than deleted — it is the provenance of every
+   line in `core/`, and the only explanation of why the mapping looks the way it
+   does.
+6. `next/` deleted.
+
+Until step 5, `core/` keeps its `hand-written.txt` discipline: no hand edits, or
+the next pipeline run silently reverts them.
+
+After it, `core/` is just a package the API owns, and the guards that still earn
+their place — `verify-columns.php`, `schema-diff.php`, `validate-mapping.php` —
+keep running against the database rather than against the legacy tree.
+
+## 8. Built so offline can be added later
+
+Offline is not in this plan's scope, and it is the last phase. But "eventually"
+is a design constraint now, because the difference between an app that can grow
+an offline mode and one that cannot is decided in the data layer on day one — and
+retrofitting it means rewriting every screen.
+
+sale-pos is already the proof: it is offline-first, with `better-sqlite3` behind
+an IPC bridge, and its React code reads through `window.dbAPI` rather than the
+network. A browser SPA cannot do that, but it can be built so the seam exists.
+
+Cheap now, expensive later — adopt all four from the start:
+
+- **No component ever calls the network.** Every read and write goes through an
+  RTK Query endpoint in `services/`. That is already sale-pos's convention, and
+  it is the seam a sync layer is inserted at. One `fetch()` in a component is one
+  screen that will not work offline.
+- **Every table carries `updated_at` and a soft-delete flag.** Sync needs to know
+  what changed and what was removed; a hard `DELETE` is invisible to a client
+  that was offline when it happened. Adding these columns to 362 entities later
+  is a migration across the whole schema — adding them as each module moves is
+  nearly free.
+- **Writes carry a client-generated idempotency key.** A queued offline write
+  will be retried, and without a key a retry is a duplicate invoice.
+- **Server time, not client time.** Offline devices have wrong clocks. Every
+  `created`/`updated` value is the server's.
+
+What is deliberately *not* done now: no local store, no queue, no conflict
+resolution, no service worker. Those are phase 11, and by then the shape of the
+data is right for them.
+
+One open question for that phase, worth answering before it starts: offline in a
+**browser** (IndexedDB, service worker, background sync) and offline in
+**Electron** (sale-pos's model, `better-sqlite3`, a real local database) are
+different products. sale-pos already solves the second. If the eventual answer is
+"package `web-ui/` with Electron", much of phase 11 is already written and the
+browser work is wasted.
+
+## 9. What carries over from this migration
 
 Not starting from nothing:
 
@@ -249,17 +358,15 @@ the source construct, not the router.
 
 ---
 
-## 8. Open questions
+## 10. Open questions
 
-1. **Does `next/` survive?** This plan shrinks it to nothing over 8 phases. If the
-   answer is "it should be gone entirely", the last phase deletes it and the
-   pipeline stops regenerating a web tier — worth deciding now, because it
-   changes how much effort the `migrate.sh` split deserves.
-2. **The 107 dead menu items** — delete or restore, per case.
-3. **The 96 mobile endpoints** — do the Android/Flutter clients move to `/api/v1`
-   eventually, or is the old surface frozen forever?
-4. **Another tenant's dump** is still the binding constraint. Modules in phase 8
+1. **The 107 dead menu items** — delete or restore, per case.
+2. **The 96 mobile endpoints** — phase 9 moves them unchanged. Separately: do the
+   Android and Flutter clients ever adopt `/api/v1`, or is that surface frozen for
+   good? It costs nothing to freeze it, but it means two API styles forever.
+3. **Another tenant's dump** is still the binding constraint. Modules in phase 8
    cannot be verified without one.
-5. **Offline.** sale-pos is offline-first with local SQLite. A browser SPA is not.
-   If any screen must work offline, it needs a different design and should be
-   named now.
+4. **Browser offline or Electron offline** (§8). Answering this early decides
+   whether phase 11 is mostly new work or mostly sale-pos's existing work.
+5. **Who owns `core/` after the freeze** (§7) — the checklist is written, the
+   moment it is executed is a judgement call about how settled the schema is.
