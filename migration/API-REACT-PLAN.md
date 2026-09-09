@@ -172,16 +172,28 @@ segments" this is meant to look like:
 
 ### The skeleton does not change — and the skeleton is more than the shell
 
-**Skeleton means the whole layout geometry, not just the chrome.** The shell,
-yes — fixed header, collapsible left sidebar, content area, the sidebar-collapsed
-state the tenant's `isSidebar` flag controls. But also the content grid, how a
-page divides into sections, and the spacing rhythm between them. All of that is
-terminalbd's and stays.
+**This is a re-skin at constant geometry, not a redesign.** The test to apply to
+any screen: overlay the new one on the old and every element is in the same
+place, at the same size. What changes is the *surface* of those elements — the
+input's border and focus ring, the box's frame and header, the segment's tab
+strip — not where any of it sits.
 
-sale-pos supplies **what goes in the slots** — inputs, selects, date pickers,
-modals, tables, notifications, and its coding conventions. It does not supply
-where the slots are, how wide they are, or how far apart. Where the two
-disagree, the skeleton wins.
+So: the shell, the content grid, how a page divides into sections, the spacing
+between them, and the position and size of every control are terminalbd's and do
+not move. sale-pos supplies how the things in those positions *look*, plus its
+coding conventions.
+
+**The one real tension, and the rule that resolves it.** Restyled controls carry
+their own metrics: Mantine's `TextInput` has its own height, padding and font
+size, and dropping it in unchanged moves everything below it down the page. The
+rule is that the widget's **footprint is preserved and the restyle happens inside
+it** — Mantine's look, terminalbd's box. Mechanically that means the harvested
+metrics are applied as Mantine theme overrides
+(`theme.components.TextInput.defaultProps` and `styles`), set once in phase 0, so
+every screen inherits the right size without per-screen fiddling.
+
+Where a sale-pos widget genuinely cannot fit the old footprint, the footprint
+wins and the widget is adjusted — not the other way round.
 
 What that geometry actually is, measured across the 1,862 templates: a
 Bootstrap 2 / Metronic system, not Bootstrap 3 and not Mantine's.
@@ -195,18 +207,35 @@ Bootstrap 2 / Metronic system, not Bootstrap 3 and not Mantine's.
 | `container-fluid` | 1,180 | the page content wrapper | the layout's content region |
 
 The mapping is unusually clean because both grids are 12-column: `span4` becomes
-`<Grid.Col span={4}>` and the page divides exactly as it does today. The
+`<Grid.Col span={4}>` and the page divides exactly as it does today.
+
+`overwrite.css` also gives portlets colour variants — `.box.blue`, `.silver`,
+`.sky-blue`, `.bottle-green` — that pages use to tell section types apart. Since
+positions and structure are preserved, the variants are preserved too, restyled
+as tints from the primary ramp rather than as four unrelated hues. If a screen
+turns out to depend on those hues carrying meaning, that screen is the argument
+for keeping one of them literal. The
 Bootstrap 3 leakage (`col-md-*`, `form-group` — a few hundred uses) normalises to
 the same grid on the way through.
 
-**Phase 0 harvests the geometry into tokens rather than eyeballing it.** The real
-values live in `public/assets/css/style.css` and `overwrite.css` (733 lines of
-app-specific tuning). Grid gutters, portlet padding and margins, `control-group`
-rhythm, table row height, tab strip metrics: extracted into CSS custom properties
-that `web-ui/` consumes, so the rhythm is inherited from measurement rather than
-reinvented per screen. This is the single most leverage-heavy task in phase 0 — a
-wrong spacing scale is invisible in the first screen and unfixable by the
-fiftieth.
+**Phase 0 harvests the geometry, and it must be measured from the running app,
+not read out of the CSS.** Six stylesheets cascade here — `style.css`,
+`components.css`, `plugins.css`, `overwrite.css`, `custom.css`,
+`style-responsive.css` — and the app's own tuning is thin and scattered
+(`custom.css` sets `.form-control { border: 1px solid #666 }` and little else, so
+control heights come from the Metronic base several files up). Grepping for a
+value gives you one declaration, not the one that wins.
+
+The reliable method is to read **computed styles from the rendered page**, which
+costs nothing now that both applications are served locally: load a representative
+list screen and a representative form screen, and record, for each of the
+constructs in the table above, the computed box metrics — width, height, padding,
+margin, border, font-size, line-height. Those become the CSS custom properties
+`web-ui/` consumes and the Mantine component overrides described above.
+
+This is the highest-leverage task in phase 0. A wrong control height is invisible
+on the first screen and unfixable by the fiftieth, and it is the one error that
+breaks the overlay test everywhere at once.
 
 The navigation tree is ported from the inventory: 365 items, their grouping, and
 the 122 role checks that decide who sees what.
