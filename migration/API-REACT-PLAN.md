@@ -19,7 +19,7 @@ The four decisions this plan is built on, taken 2026-09-10:
 
 ---
 
-## 1. Read this before anything else: the auth decision needs one change
+## 1. Authentication — decided
 
 The sale-pos scheme is `X-Api-Key` from `VITE_API_KEY`, plus `X-Api-User`
 carrying the user id, both set by the client in `prepareHeaders`. That is sound
@@ -46,12 +46,7 @@ The fix keeps the decision and costs almost nothing:
   (desktop POS, web SPA, Android), not *who*. It can stay public because it no
   longer grants anything.
 
-Everything below assumes that adjustment. If you want the header trusted as-is,
-say so and I will write it that way — but not without this paragraph in the
-plan.
-
-**This is the one open item that blocks work.** Phase 0.3 cannot be built until
-it is settled; every other part of phase 0 can proceed without it.
+**Agreed 2026-09-10.** This is the scheme; §0.3 builds it.
 
 ---
 
@@ -368,8 +363,50 @@ legacy tree.
 
 #### 0.3 — Authentication
 
-Blocked on the §1 decision. Build it once that is settled; everything else in
-phase 0 can proceed without it.
+The scheme from §1, in full.
+
+**Login.** React posts credentials to the API. The API verifies them through the
+`UserProvider` and hashers it already copied — which is why `legacy_sha512` and
+`migrate_from` had to come across, and why a user's hash is still upgraded to
+bcrypt on first login exactly as it is today. On success the API sets a
+**signed, `httpOnly`, `SameSite=Lax`, `Secure` cookie** holding a short-lived
+token. React never sees it and never stores a credential.
+
+**Every request afterwards.** Identity comes from that cookie and only from
+there.
+
+- `X-Api-Key` identifies *which client* is calling — web, desktop, Android. It is
+  public, it is in the JS bundle, and it grants nothing.
+- `X-Api-User` is a **hint**. The API compares it to the cookie's identity and
+  rejects the request on mismatch. It is a tamper signal, never a credential.
+- Tenancy is derived server-side from the authenticated user. The SPA never sends
+  a tenant id, exactly as the Twig application never trusted one.
+
+**CSRF.** A cookie is sent automatically, so state-changing requests need more
+than the cookie. `SameSite=Lax` plus the required `X-Api-Key` header covers it:
+a cross-site form post cannot set a custom header, and a cross-site
+`fetch` cannot read the response without CORS approval. If any endpoint must
+accept a plain cross-site form post, it needs a real CSRF token — none should.
+
+**CORS.** `terminalbd_web` runs on a different origin in development (Vite on
+:3000). The API allows that origin explicitly, with credentials, and an
+allowlist — never `*`, which cannot carry credentials anyway.
+
+**The session bridge — do not skip this.** While the proxy still routes some
+paths to the legacy application, an API login has to be visible to it, and there
+is a hard reason: the legacy encodes `sha512` and cannot verify a bcrypt hash, so
+**an upgraded user can never log in there again** (§`session-bridge.md`). The
+bridge is the only way they reach an unported route.
+
+So the API does what `next/`'s `SharedSessionListener` already does on
+`InteractiveLoginEvent`: write the user identifier to `_migration_user` in the
+**shared `sessions` table**, and remove it on logout. That listener is among the
+875 files copied, so this is wiring rather than new code. The legacy half adopts
+it — verified end to end, after the anonymous-token fix.
+
+Consequence worth stating plainly: **the API's own cookie is not enough on its
+own.** Until `next/` and the legacy application are both gone, a login has to
+land in two places — the API's cookie and the shared session row.
 
 #### 0.4 — Measure the geometry
 
@@ -440,7 +477,10 @@ better than a nav that grows a new shape per module.
 - the geometry tokens and Mantine overrides are committed, and that screen uses
   them rather than any local value;
 - `migrate.sh` runs in checking-only mode (§7) and reports no unexplained
-  difference against the API's copy.
+  difference against the API's copy;
+- a user logs in through React and is **also** authenticated on a legacy route
+  through the proxy — proving the bridge wiring in 0.3, which is the thing that
+  silently rots if it is left until later.
 
 The last one matters most. If `designation` needed a single hand-tuned pixel
 outside the tokens, 0.4 is not finished, and every screen after it inherits the
@@ -561,6 +601,8 @@ the source construct, not the router.
 ---
 
 ## 10. Open questions
+
+*(Authentication was one of these; settled 2026-09-10, §1.)*
 
 1. **The 107 dead menu items** — delete or restore, per case.
 2. **The 96 mobile endpoints** — phase 9 moves them unchanged. Separately: do the
