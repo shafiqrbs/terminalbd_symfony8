@@ -66,10 +66,22 @@ if (is_file($localCfg)) {
     }
     fwrite(STDERR, "merged migration/capture-config.local.json\n");
 }
+// Shape-only fixtures are the committed contract. --with-body writes this
+// tenant's rows, so it goes to a separate gitignored directory rather than
+// quietly turning the committed ones into a data leak.
 $outDir    = "$root/migration/fixtures/$target";
 
 // base_url is either one string or a map keyed by target, because the two apps
 // are served side by side on different ports.
+if ($withBody) {
+    $outDir .= '-with-body';
+}
+
+if (!is_dir($outDir) && !mkdir($outDir, 0775, true) && !is_dir($outDir)) {
+    fwrite(STDERR, "could not create $outDir\n");
+    exit(1);
+}
+
 $base = is_array($cfg['base_url']) ? ($cfg['base_url'][$target] ?? '') : $cfg['base_url'];
 $base = rtrim((string) $base, '/');
 if ($base === '' || str_contains($base, 'CHANGE-ME')) {
@@ -104,9 +116,11 @@ foreach ($endpoints as $r) {
         }
     }
 
-    $method = strtoupper($r['methods'][0]);
     $recipe = $cfg['per_endpoint'][$key] ?? [];
-    $path   = $r['path'];
+    // These routes declare no `methods:`, so any verb reaches them; the recipe
+    // picks the one the action's input source actually needs.
+    $method = strtoupper($recipe['method'] ?? $r['methods'][0]);
+    $path = $r['path'];
     foreach (($recipe['path_params'] ?? []) as $k => $v) {
         $path = str_replace('{' . $k . '}', rawurlencode((string) $v), $path);
     }
