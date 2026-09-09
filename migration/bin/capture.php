@@ -4,7 +4,21 @@
  * wire-compatible. Run once against the legacy app, once against the new one,
  * then diff with compare.php.
  *
- * usage: php migration/bin/capture.php <legacy|next> [--only=substring]
+ * Real values - a base URL, the API key pair, a tenant's X-API-SECRET - go in
+ * migration/capture-config.local.json, which is gitignored and merged over the
+ * tracked capture-config.json. Nothing secret belongs in the tracked file.
+ *
+ * What is written is the response *shape*: keys and value types, plus the
+ * status. That is what compare.php checks and it is schema rather than tenant
+ * data, so the fixtures are safe to commit. --with-body adds the decoded body
+ * for local debugging, and is why migration/fixtures/ is gitignored.
+ *
+ * --read-only skips every endpoint that might write, on the same deny-list
+ * smoke-test.php uses. It matters here more than there: both apps share one
+ * database, so a write during the legacy capture changes what the next capture
+ * sees, and the diff then reports the harness rather than the port.
+ *
+ * usage: php migration/bin/capture.php <legacy|next> [--only=substring] [--with-body] [--read-only]
  */
 $target = $argv[1] ?? null;
 if (!in_array($target, ['legacy', 'next'], true)) {
@@ -12,18 +26,54 @@ if (!in_array($target, ['legacy', 'next'], true)) {
     exit(1);
 }
 $only = null;
+$withBody = false;
+$readOnly = false;
 foreach (array_slice($argv, 2) as $a) {
     if (str_starts_with($a, '--only=')) $only = substr($a, 7);
+    if ($a === '--with-body') $withBody = true;
+    if ($a === '--read-only') $readOnly = true;
 }
+
+/**
+ * Anything that might write - copied from smoke-test.php, where the same list
+ * keeps a legacy app that deletes over GET from doing so.
+ */
+const UNSAFE = [
+    'delete', 'remove', 'destroy', 'truncate', 'drop', 'purge', 'clear',
+    'create', 'new', 'add', 'insert', 'save', 'store', 'update', 'edit',
+    'approve', 'reject', 'confirm', 'cancel', 'reverse', 'revert', 'reset',
+    'install', 'migrate', 'import', 'upload', 'send', 'sms', 'mail', 'email',
+    'pay', 'payment', 'invoice-process', 'generate', 'sync', 'switch', 'login',
+    'logout', 'register', 'signup', 'password', 'process', 'status', 'active',
+    'inactive', 'publish', 'copy', 'clone', 'merge', 'assign', 'apply', 'post',
+];
 
 $root      = dirname(__DIR__, 2);
 $endpoints = json_decode(file_get_contents("$root/migration/contract/api-endpoints.json"), true);
 $cfg       = json_decode(file_get_contents("$root/migration/capture-config.json"), true);
+
+// The gitignored overlay wins, key by key, so the tracked file keeps its
+// placeholders and the real values never enter git.
+$localCfg = "$root/migration/capture-config.local.json";
+if (is_file($localCfg)) {
+    $local = json_decode((string) file_get_contents($localCfg), true);
+    if (!is_array($local)) {
+        fwrite(STDERR, "capture-config.local.json is not valid JSON\n");
+        exit(1);
+    }
+    foreach ($local as $k => $v) {
+        $cfg[$k] = is_array($v) && is_array($cfg[$k] ?? null) ? array_merge($cfg[$k], $v) : $v;
+    }
+    fwrite(STDERR, "merged migration/capture-config.local.json\n");
+}
 $outDir    = "$root/migration/fixtures/$target";
 
-$base = rtrim($cfg['base_url'], '/');
-if (str_contains($base, 'CHANGE-ME')) {
-    fwrite(STDERR, "Set base_url in migration/capture-config.json first.\n");
+// base_url is either one string or a map keyed by target, because the two apps
+// are served side by side on different ports.
+$base = is_array($cfg['base_url']) ? ($cfg['base_url'][$target] ?? '') : $cfg['base_url'];
+$base = rtrim((string) $base, '/');
+if ($base === '' || str_contains($base, 'CHANGE-ME')) {
+    fwrite(STDERR, "Set base_url for '$target' in migration/capture-config.local.json first.\n");
     exit(1);
 }
 
@@ -34,6 +84,15 @@ foreach ($endpoints as $r) {
     $key = $r['prefix'] . $r['path'];
     if ($only !== null && !str_contains($key, $only)) continue;
     if (in_array($key, $cfg['skip'] ?? [], true)) { $skipped++; continue; }
+
+    if ($readOnly) {
+        $haystack = strtolower($r['name'] . ' ' . $key);
+        $writes = strtoupper($r['methods'][0]) !== 'GET';
+        foreach (UNSAFE as $word) {
+            if (str_contains($haystack, $word)) { $writes = true; break; }
+        }
+        if ($writes) { $skipped++; continue; }
+    }
 
     // Routes with placeholders need explicit values before they can be called.
     if (preg_match('/\{[^}]+\}/', $r['path'])) {
@@ -79,15 +138,23 @@ foreach ($endpoints as $r) {
 
     $decoded = json_decode((string) $raw, true);
     $record  = [
-        'endpoint'    => $key,
-        'method'      => $method,
-        'url'         => $url,
-        'status'      => $status,
-        'json_valid'  => json_last_error() === JSON_ERROR_NONE,
-        'shape'       => $decoded === null ? null : shape($decoded),
-        'body'        => $decoded,
-        'raw_excerpt' => $decoded === null ? substr((string) $raw, 0, 500) : null,
+        'endpoint'   => $key,
+        'method'     => $method,
+        // The host is the one thing here that differs between two captures of
+        // the same endpoint, and recording it would diff every fixture.
+        'path'       => '/' . $r['prefix'] . $path,
+        'status'     => $status,
+        'json_valid' => json_last_error() === JSON_ERROR_NONE,
+        'shape'      => $decoded === null ? null : shape($decoded),
     ];
+
+    // Response bodies and raw excerpts are this tenant's rows, so they are
+    // opt-in and land only in the gitignored fixtures directory.
+    if ($withBody) {
+        $record['url']         = $url;
+        $record['body']        = $decoded;
+        $record['raw_excerpt'] = $decoded === null ? substr((string) $raw, 0, 500) : null;
+    }
 
     $file = $outDir . '/' . str_replace('/', '__', $key) . '.json';
     file_put_contents($file, json_encode($record, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));

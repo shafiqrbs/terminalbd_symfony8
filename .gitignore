@@ -41,3 +41,7 @@ Thumbs.db
 *.sql.gz
 *.sql.bz2
 *.dump
+
+# Golden API capture: the overlay holds real credentials, and --with-body
+# fixtures hold tenant rows. The shape-only fixtures are committed by hand.
+/migration/capture-config.local.json
