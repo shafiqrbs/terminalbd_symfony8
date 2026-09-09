@@ -1,0 +1,10 @@
+{
+  "_comment": "Drift that compare.php reports but does not fail on. Each entry names an endpoint and why its difference is not a port defect. Anything not listed here fails the build - that is the point of the file. Established by \u00a75.47/\u00a75.48; re-check an entry before extending it.",
+  "android-api-portal/app-user-register": "Route whose controller action exists in neither tree (one of the six in api-contract.md). The legacy 500s on the missing controller; this application redirects to /. Both are broken, differently.",
+  "android-api/purchase-item": "As above - BinduBundle:Api:apiPurchaseItem exists in neither tree.",
+  "android-api/sales-item": "As above - BinduBundle:Api:apiSalesItem exists in neither tree.",
+  "flutter-api/poskeeper-instant-purchase-item": "As above - ApiPoskeeper:instantPurchase exists in neither tree.",
+  "flutter-api/poskeeper-sales-update": "As above - ApiPoskeeper:apiOnlineSalesUpdate exists in neither tree.",
+  "flutter-api/poskeeper-customer-create": "Legacy-side schema drift, not a port difference: the scratch database carries this application's schema, so a column the port renamed fails on the legacy side only. The legacy error is InvalidFieldNameException.",
+  "flutter-api/poskeeper-online-sales": "As above - InvalidFieldNameException on the legacy side, from the same schema caveat."
+}

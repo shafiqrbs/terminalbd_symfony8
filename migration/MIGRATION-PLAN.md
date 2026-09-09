@@ -1240,7 +1240,11 @@ build their JSON by hand and return a plain `Response`, which is what they still
 - [x] `check-api-contract.php` gates that, and fails on any regression
 - [x] Record golden responses: `migration/bin/capture-both.sh` — no staging host needed; both
       applications run locally against the scratch database (§5.47)
-- [ ] Gate every deploy on `compare.php` once a baseline exists
+- [x] Gate every deploy on `compare.php` — the baseline exists and is committed.
+      `compare.php` now fails on any drift outside `migration/contract/api-drift-accepted.json`,
+      which names the seven differences and why each is not a port defect, and fails just as
+      loudly on an accepted entry that has stopped drifting, so a stale excuse cannot hide the
+      next regression. Wired into `ci-checks.sh`; it needs no database, only the two captures
 
 ### Phase 4 — Shared presentation layer ✅ done
 
@@ -1301,8 +1305,15 @@ Every module's controllers, forms, services and listeners are ported, load and r
       appears in the production dump either. The controllers that reference them are dead code
       whose routes still resolve; deleting a customer-facing controller is a product decision, so
       they are catalogued rather than removed
-- [ ] Verify behaviour against real data, module by module, before flipping each proxy route
-      (§8 gives the order)
+- [~] Verify behaviour against real data, module by module, before flipping each proxy route
+      (§8 gives the order). `module-summary.php` rolls the two sweeps up per module into
+      `migration/contract/module-verification.md`, which is the granularity the decision is made
+      at. It is deliberately blunt about its own limits: **`reach%` is the column to read first**,
+      because a module shows a high `ok%` either from being exercised or from this tenant having
+      no rows for it. `Report` is the one module at 100% reach. `Customer` is 15 pages, all 5xx,
+      on missing config; `Restaurant` and `DoctorPrescription` are 19% and 18% ok for the same
+      reason. **Those three cannot be signed off from this dump, and no amount of harness work
+      changes that** - it is the same binding constraint as everywhere else
 
 ### Phase 6 — Decommission — needs production
 
@@ -1578,7 +1589,12 @@ walks into a null — which the legacy application does too.
 - [ ] **The 63 dead template links that a rendered template carries, and 20 dead aliases** —
       dead in the legacy tree too, so restoring a controller or removing a link is a product
       decision, per case. The port-defect bucket is empty and gated (§5.46)
-- [ ] **The 26 unexplained pages**, per module
+- [x] **The unexplained pages** — down to 15, and every one now checked against the legacy
+      tree: three templates reading a property the entity has in neither tree, a controller
+      calling `getResult()` on a repository method that returns an array in both, and the rest
+      already catalogued in §11. `new DateTime("9 2026")` is the harness inventing a month,
+      and throws on 7.4 and 8.5 alike - `DateMalformedStringException` extends `\Exception`,
+      so it is not the §5.47 class
 - [ ] **A tenant with the other modules configured**, to cover the 134 nulls
 - [ ] **The session bridge deploy step** — `migration/session-bridge.md`
 - [ ] **Decommissioning** the PHP 7.4 pool and collapsing the proxy rules

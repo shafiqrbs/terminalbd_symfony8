@@ -76,6 +76,14 @@ run "templates" \
 run "template links" \
     $PHP migration/bin/check-template-routes.php --report=migration/contract/template-route-links.md
 
+# The mobile contract by response shape, not just by route resolution: the
+# committed fixtures are what the applications in the field parse. Seven
+# endpoints differ for reasons that are not port defects and are listed with
+# them in api-drift-accepted.json; anything else fails. Needs no database - it
+# compares two recorded captures.
+run "api shapes" \
+    bash -c "set -o pipefail; $PHP migration/bin/compare.php | tail -1"
+
 run "tests" \
     bash -c "cd next && $PHP vendor/bin/phpunit | tail -3"
 
