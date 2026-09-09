@@ -169,10 +169,11 @@ Both lines of that router matter, and §5.36 says why. Log in as
    hand.
 3. ~~**Golden API capture**~~ — done (§5.47), and it needed no staging host:
    both applications run locally against the scratch database.
-   `migration/bin/capture-both.sh` is the whole protocol. 88 of 96 endpoints are
-   wire-compatible and none of the remaining 8 is a regression: the one that was
-   - a `catch (\Exception)` that no longer catches Doctrine 3's `TypeError` - is
-   fixed in the pipeline.
+   `migration/bin/capture-both.sh` is the whole protocol. 89 of 96 endpoints are
+   wire-compatible and none of the remaining 7 is a regression; the two that were
+   - a `catch (\Exception)` that no longer catches Doctrine 3's `TypeError`, and a
+   DQL `COUNT()` that changed type on the wire - are fixed in the pipeline
+   (§5.47, §5.48).
 
 ### What is finished
 
@@ -1095,7 +1096,7 @@ not a new `return` in the guard - that would answer `{"status":"failed"}` where
 the legacy answered `{"status":"invalid"}`, trading a 500 for a quieter wire
 change. The application bug is left exactly as it is. Both applications now
 return `{"status":"invalid"}` with a 200, and the capture is **88 compatible, 8
-drifted, no regressions**.
+drifted, no regressions**; §5.48 takes the last type drift out, leaving 89 and 7.
 
 One wire change with no status change: `android-api/dashboard` returns
 `salesVoucher` as an **int where the legacy returned a string**. The controller is
@@ -1118,6 +1119,46 @@ error is read. Both of them are `InvalidFieldNameException`.
 Fixtures record status and shape only - key names and value types, which is
 schema rather than rows - so they are committed as the contract. `--with-body`
 writes this tenant's data and goes to a gitignored directory instead.
+
+### 5.48 `salesVoucher` — a DQL COUNT() that changed type on the wire
+
+The other thing the capture found, and the only one with no status change:
+`android-api/dashboard` returned `"salesVoucher":"0"` from the legacy and
+`"salesVoucher":0` here. The controller is identical in both trees, so nothing in
+the port did it.
+
+Measured on both stacks, against the same row:
+
+| DQL | Doctrine 2 / PHP 7.4 | Doctrine 3 / PHP 8.5 |
+|---|---|---|
+| `COUNT(u.id)` | `'11'` | `11` |
+| `MAX(u.id)` | `'5690'` | `5690` |
+| `SUM(u.id)` | `'51111'` | `'51111'` |
+
+Two different causes sit behind that. PHP 8.1 made PDO MySQL return native ints
+and floats where it used to return strings, which is `MAX()` and every raw SQL
+scalar. `COUNT()` is not that: Doctrine ORM 3 hydrates it through its own integer
+type, above the driver, so `PDO::ATTR_STRINGIFY_FETCHES` does not reach it.
+
+**`PDO::ATTR_STRINGIFY_FETCHES` was tried and rejected.** It does restore the old
+behaviour for `MAX()` and raw SQL, and it leaves entity fields alone - Doctrine
+casts those through the mapping on both stacks. But no `MAX()`/`MIN()` alias
+reaches the mobile API at all, a full re-capture with it enabled was byte-identical
+at 88/8, and it changes the result of every query in the application. A global
+change buying nothing measurable is not worth its risk.
+
+The exposure is genuinely one field. Of the 107 repository methods the Bindu API
+controllers call, exactly one selects a `COUNT()` alias, and of the three places
+that alias reaches a response the other two go through `number_format()`, which
+returns a string on both stacks. So `port-api-aggregate-types.php` casts the one
+that reaches the wire raw, and gates: it resolves each API response value back to
+the repository method that produced it, and a new `COUNT()` alias arriving uncast
+fails the run rather than shipping a wire change no test would catch.
+
+**89 of 96 endpoints are now wire-compatible, with no regressions and no type
+drift.** The remaining seven are the five routes whose controller exists in
+neither tree, where the legacy 500s and this one redirects, and the two legacy-side
+`InvalidFieldNameException` that the schema caveat above explains.
 
 ## 6. Phases
 
@@ -1524,7 +1565,7 @@ walks into a null — which the legacy application does too.
 ### Still open
 
 - [x] **Golden API capture** — done (§5.47). 96 endpoints captured from both applications
-      from the same database state; 88 wire-compatible, no regressions, one type change
+      from the same database state; 89 wire-compatible, no regressions, no type drift
 - [ ] **The 63 dead template links that a rendered template carries, and 20 dead aliases** —
       dead in the legacy tree too, so restoring a controller or removing a link is a product
       decision, per case. The port-defect bucket is empty and gated (§5.46)

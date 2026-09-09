@@ -84,6 +84,9 @@ $PHP migration/bin/port-container-aware.php
 # catch (Exception) does not see (§5.47). Runs before the dead-import prune so
 # the \TypeError it adds is fully qualified and needs no import.
 $PHP migration/bin/port-doctrine-typed-remove.php next/src
+# ORM 3 hydrates a DQL COUNT() through its own integer type, so an aggregate the
+# mobile clients received as "0" now arrives as 0 (§5.48).
+$PHP migration/bin/port-api-aggregate-types.php
 $PHP migration/bin/prune-dead-imports.php
 
 echo

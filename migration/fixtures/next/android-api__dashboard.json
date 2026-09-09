@@ -10,7 +10,7 @@
         "purchasePayment": "null",
         "purchaseTotal": "null",
         "salesReceive": "null",
-        "salesVoucher": "int",
+        "salesVoucher": "string",
         "totalSales": "null"
     }
 }

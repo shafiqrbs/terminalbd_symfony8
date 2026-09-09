@@ -477,7 +477,7 @@ class ApiController extends AbstractController
                 'expenditureOverview'       => $expenditureOverview ,
                 'totalSales'                => $salesCashOverview['total'] ,
                 'salesReceive'              => $salesCashOverview['salesReceive'] ,
-                'salesVoucher'              => $salesCashOverview['voucher'] ,
+                'salesVoucher'              => (string) $salesCashOverview['voucher'] ,
                 'purchaseTotal'             => $purchaseCashOverview['total'] ,
                 'purchasePayment'           => $purchaseCashOverview['payment'] ,
             ];
