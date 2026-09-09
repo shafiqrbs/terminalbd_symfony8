@@ -50,6 +50,9 @@ Everything below assumes that adjustment. If you want the header trusted as-is,
 say so and I will write it that way — but not without this paragraph in the
 plan.
 
+**This is the one open item that blocks work.** Phase 0.3 cannot be built until
+it is settled; every other part of phase 0 can proceed without it.
+
 ---
 
 ## 2. Scope: 365 screens, not 3,462 routes
@@ -325,6 +328,123 @@ Phase 0 is the one that decides everything after it — it is where the componen
 library, the API conventions, the form-to-DTO pattern and the theme are settled.
 Treat module 1 as still part of it: if Tool needs a convention invented, that
 convention is wrong and belongs in phase 0.
+
+### Phase 0 in detail
+
+Everything after this copies phase 0. A convention that is wrong here is wrong
+365 times, so it is written out rather than left to be improvised.
+
+#### 0.1 — Two repositories
+
+`terminalbd_api` and `terminalbd_web` in `/home/sreejon/projects/personal/`, each
+`git init`ed like every sibling there. Nothing is added to the `terminalbd` repo;
+it only shrinks from here.
+
+#### 0.2 — The API reads the database
+
+1. Symfony 8.1 skeleton, `"php": ">=8.5"`, **Twig never installed** — that is the
+   boundary, and it holds only if the package is absent.
+2. Copy the 875 non-presentation files from `next/src` (§3). Namespace stays
+   `App\`, so nothing inside them is edited.
+3. Copy the four settings that fail silently (§3): the Doctrine 2 naming
+   strategy, `LegacyArrayType` + `LegacyJsonArrayType`, `legacy_sha512` +
+   `migrate_from`, and the three DQL functions.
+4. Point `DATABASE_URL` at `terminalbd_migration_check`, the scratch database the
+   whole migration was verified against.
+
+**Proof it worked, in this order** — each catches a different one of the four:
+
+| check | catches |
+|---|---|
+| `doctrine:schema:validate` | mapping copied wrong |
+| a repository read returning real rows (`GlobalOption`, 6 rows) | naming strategy — wrong columns find nothing |
+| read a row whose column holds `serialize()` output | the legacy array types |
+| authenticate `migration_check` | `legacy_sha512` — 1,088 users depend on it |
+| a repository calling `GROUP_CONCAT` | the DQL functions |
+
+Copy `verify-columns.php`, `schema-diff.php` and `validate-mapping.php` across
+and wire them into the new project's CI. They are the guards that do not need the
+legacy tree.
+
+#### 0.3 — Authentication
+
+Blocked on the §1 decision. Build it once that is settled; everything else in
+phase 0 can proceed without it.
+
+#### 0.4 — Measure the geometry
+
+The highest-leverage task here, and the one thing that must not be eyeballed.
+**Measured from the rendered page, never read out of the CSS** — six stylesheets
+cascade and the winning declaration is rarely the one grep finds (§5).
+
+Two screens, chosen because between them they carry every construct, and because
+both render 200 against the scratch database today:
+
+| screen | route | carries |
+|---|---|---|
+| `/admin/designation/` | `designation` | list, table, 4 portlets, tab strip |
+| `/domain/invoicemodule/{id}/modify` | `invoicemodule_modify` | **12 `control-group` form rows**, 7 portlets, tab strip |
+
+For each construct in §5's table, record the computed box: `width`, `height`,
+`padding`, `margin`, `border`, `border-radius`, `font-size`, `line-height`. At
+minimum: the grid gutter, portlet margin/padding and title metrics, the
+`control-group` label and control heights and the gap between rows, table header
+and row heights, and the tab strip.
+
+Two outputs, and both are needed:
+
+- **CSS custom properties** — `--tbd-grid-gutter`, `--tbd-portlet-margin-bottom`,
+  `--tbd-control-height` and so on, in `terminalbd_web`'s global stylesheet.
+- **Mantine component overrides** — `theme.components.TextInput.defaultProps` and
+  `styles`, and the same for `Select`, `Textarea`, `Button`, `Table`, `Tabs`.
+  This is the mechanism that makes the re-skin work: sale-pos's *look* rendering
+  at terminalbd's *metrics*, set once instead of fought per screen.
+
+#### 0.5 — The React skeleton
+
+Vite + React 19 + Mantine 8 + Redux Toolkit + React Router + `react-i18next`,
+laid out exactly as sale-pos is (§5), including its `@components` / `@services`
+aliases, ESLint and Prettier config.
+
+Then the four components every screen is built from:
+
+- **`<AppShell>`** — fixed header, collapsible left sidebar, content region,
+  honouring the tenant's `isSidebar` flag.
+- **`<Portlet>`** — the box: title, tools, body, and the colour variants
+  (`blue`, `silver`, `sky-blue`, `bottle-green`) as tints of the primary ramp.
+- **`<ControlGroup>`** — the label-and-control row, 7,174 uses in the old tree.
+  sale-pos's inputs render *inside* it.
+- **Grid** — Mantine's, 12 columns, gutter from 0.4. `span4` → `<Grid.Col
+  span={4}>`.
+
+Plus the theme: `primaryColor: "indigo"`, Open Sans, sale-pos's `fontSizes`, and
+the primary ramp from §5 — but **not** sale-pos's `spacing` scale as the layout
+rhythm.
+
+#### 0.6 — The navigation
+
+Port the tree from `migration/contract/nav-scope.md`: 365 items, their grouping,
+and the 122 role checks that decide who sees what. Roles come from the API, so
+this is the first thing that needs 0.3.
+
+Screens that do not exist yet render a placeholder. A visibly incomplete nav is
+better than a nav that grows a new shape per module.
+
+#### 0.7 — Done when
+
+- the API boots, and all five checks in 0.2 pass;
+- `terminalbd_web` renders the shell and the full nav against the API;
+- one screen — `/admin/designation/` — is rebuilt in React and **passes the
+  overlay test** against the Twig original: same positions, same sizes, new
+  surface;
+- the geometry tokens and Mantine overrides are committed, and that screen uses
+  them rather than any local value;
+- `migrate.sh` runs in checking-only mode (§7) and reports no unexplained
+  difference against the API's copy.
+
+The last one matters most. If `designation` needed a single hand-tuned pixel
+outside the tokens, 0.4 is not finished, and every screen after it inherits the
+gap.
 
 Each module ships the same way the strangler already works: its API endpoints and
 its React screens land, the module's proxy routes flip from `next/` to `terminalbd_web/`,
