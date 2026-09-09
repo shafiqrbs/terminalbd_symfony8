@@ -1025,7 +1025,7 @@ class ApiPoskeeperController extends AbstractController
                 $em->persist($entity);
                 $em->flush();
                 $status = 'warning';
-            }catch (Exception) {
+            }catch (\TypeError | Exception) {
                 $status = 'invalid';
             }
             $ipAddress = $_SERVER['REMOTE_ADDR'];

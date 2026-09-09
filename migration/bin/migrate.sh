@@ -79,6 +79,11 @@ echo
 echo "############ 12. Symfony 2 controller idioms ############"
 $PHP migration/bin/port-controller-api.php
 $PHP migration/bin/port-container-aware.php
+# Doctrine 3 types remove()/persist(), so where the legacy relied on catching
+# ORMInvalidArgumentException the same condition now throws a TypeError that
+# catch (Exception) does not see (§5.47). Runs before the dead-import prune so
+# the \TypeError it adds is fully qualified and needs no import.
+$PHP migration/bin/port-doctrine-typed-remove.php next/src
 $PHP migration/bin/prune-dead-imports.php
 
 echo

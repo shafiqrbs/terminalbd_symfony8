@@ -169,9 +169,10 @@ Both lines of that router matter, and §5.36 says why. Log in as
    hand.
 3. ~~**Golden API capture**~~ — done (§5.47), and it needed no staging host:
    both applications run locally against the scratch database.
-   `migration/bin/capture-both.sh` is the whole protocol. 87 of 96 endpoints are
-   wire-compatible; the one regression is a `catch (\Exception)` that no longer
-   catches Doctrine 3's `TypeError`, and 12 more places share its shape.
+   `migration/bin/capture-both.sh` is the whole protocol. 88 of 96 endpoints are
+   wire-compatible and none of the remaining 8 is a regression: the one that was
+   - a `catch (\Exception)` that no longer catches Doctrine 3's `TypeError` - is
+   fixed in the pipeline.
 
 ### What is finished
 
@@ -1057,7 +1058,8 @@ Getting a trustworthy comparison took three corrections, and the first run's
    a dead endpoint that 500s on one application and 302s to the homepage on the
    other recorded as "500 -> 200" and read as a fix.
 
-Then 96 endpoints, **87 compatible and 9 drifted**. The recipes matter as much as
+Then 96 endpoints, **87 compatible and 9 drifted** - 88 and 8 once the one
+regression below was fixed. The recipes matter as much as
 the protocol: every action reads its input from `$request->request->all()` or
 `$_REQUEST`, so before `api-recipes.php` filled the bodies from real rows, ~60 of
 them returned a matching pair of 500s, which proves nothing.
@@ -1071,9 +1073,29 @@ so it was caught and the endpoint answered `{"status":"invalid"}` with a 200.
 Doctrine 3 types the parameter `object`, so PHP throws a **`TypeError`, which
 extends `\Error` and not `\Exception`** - the existing catch does not see it and
 the endpoint 500s. The application bug is pre-existing; the upgrade is what makes
-it fatal, exactly the shape §5.34 predicted. **12 places in `next/src` have the
-same shape**: a `remove()`/`persist()` of a value a `find()` can leave null,
-guarded by an `empty()` that does not return, inside `catch (\Exception)`.
+it fatal, exactly the shape §5.34 predicted.
+
+**It is the only site.** Twelve places in `next/src` match the outer shape - a
+`remove()`/`persist()` of a value a `find()` can leave null, inside
+`catch (\Exception)` - but eleven of them guard with
+`throw $this->createNotFoundException(...)` and never reach the call with a null.
+Only this one sets a status and falls through. A first count said twelve because
+it treated a guard as safe when it `return`ed and not when it `throw`s; the
+number to trust is one, and the golden capture had already found exactly that one.
+
+Fixed in the pipeline by `port-doctrine-typed-remove.php`, which widens the catch
+by the single error type the new signature introduces:
+
+```php
+}catch (\TypeError | Exception) {
+```
+
+Not `\Throwable`, which would swallow errors the legacy never caught either, and
+not a new `return` in the guard - that would answer `{"status":"failed"}` where
+the legacy answered `{"status":"invalid"}`, trading a 500 for a quieter wire
+change. The application bug is left exactly as it is. Both applications now
+return `{"status":"invalid"}` with a 200, and the capture is **88 compatible, 8
+drifted, no regressions**.
 
 One wire change with no status change: `android-api/dashboard` returns
 `salesVoucher` as an **int where the legacy returned a string**. The controller is
@@ -1502,7 +1524,7 @@ walks into a null — which the legacy application does too.
 ### Still open
 
 - [x] **Golden API capture** — done (§5.47). 96 endpoints captured from both applications
-      from the same database state; 87 wire-compatible, one regression, one type change
+      from the same database state; 88 wire-compatible, no regressions, one type change
 - [ ] **The 63 dead template links that a rendered template carries, and 20 dead aliases** —
       dead in the legacy tree too, so restoring a controller or removing a link is a product
       decision, per case. The port-defect bucket is empty and gated (§5.46)
