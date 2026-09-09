@@ -170,6 +170,8 @@ $PHP migration/bin/check-api-contract.php --report=migration/contract/api-contra
 $PHP migration/bin/check-template-routes.php --report=migration/contract/template-route-links.md 2>&1 | tail -5 || true
 # Per-module rollup of the two sweeps, which is the unit §8 flips the proxy at.
 $PHP migration/bin/module-summary.php --report=migration/contract/module-verification.md 2>&1 | tail -3 || true
+# The navigation tree is the scope of the React port (migration/API-REACT-PLAN.md).
+$PHP migration/bin/nav-inventory.php --report=migration/contract/nav-scope.md 2>&1 | tail -3 || true
 
 # Only when a dump is present: it is gitignored, being tenant data.
 if [ -f bm_db.sql.gz ]; then
