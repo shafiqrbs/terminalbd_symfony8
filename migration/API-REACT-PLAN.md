@@ -170,14 +170,43 @@ segments" this is meant to look like:
 - RTK Query per resource with `injectEndpoints`, paths in `APP_APIS`;
 - every user-facing string through `t()`, keys added to `en` and `bn` together.
 
-### The skeleton does not change
+### The skeleton does not change — and the skeleton is more than the shell
 
-The current shell stays: fixed header, collapsible left sidebar, content area —
-`page-header-fixed`, `page-sidebar`, `page-content` in today's `base.html.twig`,
-including the sidebar-collapsed state the tenant's `isSidebar` flag controls.
-sale-pos supplies the *contents* of that shell — its inputs, tables, modals and
-spacing — not its geometry. Where sale-pos's own layout disagrees with this
-skeleton, the skeleton wins.
+**Skeleton means the whole layout geometry, not just the chrome.** The shell,
+yes — fixed header, collapsible left sidebar, content area, the sidebar-collapsed
+state the tenant's `isSidebar` flag controls. But also the content grid, how a
+page divides into sections, and the spacing rhythm between them. All of that is
+terminalbd's and stays.
+
+sale-pos supplies **what goes in the slots** — inputs, selects, date pickers,
+modals, tables, notifications, and its coding conventions. It does not supply
+where the slots are, how wide they are, or how far apart. Where the two
+disagree, the skeleton wins.
+
+What that geometry actually is, measured across the 1,862 templates: a
+Bootstrap 2 / Metronic system, not Bootstrap 3 and not Mantine's.
+
+| construct | uses | what it does | React equivalent |
+|---|---:|---|---|
+| `row-fluid` + `span1`–`span12` | 7,719 rows, ~15,000 spans | the 12-column fluid content grid | Mantine `<Grid>` / `<Grid.Col span={n}>` — also 12-column, so the mapping is 1:1 and the column divisions carry over exactly |
+| `portlet` / `portlet-title` / `portlet-body` | 3,924 / 2,348 | the card every content section sits in | one `<Portlet>` component, geometry copied: `margin-bottom: 25px`, title `margin-bottom: 15px` over `1px solid #eee`, caption `18px/400` |
+| `control-group` + `controls` | 3,666 / 3,508 | the label-and-control form row | one `<ControlGroup>` wrapper that keeps the label placement, gutter and row height — **sale-pos's inputs render inside it**, they do not replace it |
+| `tabbable` | 1,122 | tabbed sections within a page | Mantine `<Tabs>`, restyled to this geometry |
+| `container-fluid` | 1,180 | the page content wrapper | the layout's content region |
+
+The mapping is unusually clean because both grids are 12-column: `span4` becomes
+`<Grid.Col span={4}>` and the page divides exactly as it does today. The
+Bootstrap 3 leakage (`col-md-*`, `form-group` — a few hundred uses) normalises to
+the same grid on the way through.
+
+**Phase 0 harvests the geometry into tokens rather than eyeballing it.** The real
+values live in `public/assets/css/style.css` and `overwrite.css` (733 lines of
+app-specific tuning). Grid gutters, portlet padding and margins, `control-group`
+rhythm, table row height, tab strip metrics: extracted into CSS custom properties
+that `web-ui/` consumes, so the rhythm is inherited from measurement rather than
+reinvented per screen. This is the single most leverage-heavy task in phase 0 — a
+wrong spacing scale is invisible in the first screen and unfixable by the
+fiftieth.
 
 The navigation tree is ported from the inventory: 365 items, their grouping, and
 the 122 role checks that decide who sees what.
@@ -194,8 +223,11 @@ Primary is sale-pos's, unchanged:
 --theme-primary-color-4  #6366f1               -9  #1e3a8a
 ```
 
-`createTheme({ primaryColor: "indigo" })`, Open Sans, and sale-pos's extra
-`fontSizes`/`spacing` steps.
+`createTheme({ primaryColor: "indigo" })` and Open Sans. sale-pos's extra
+`fontSizes` steps come across as well — but **not its `spacing` scale as the
+layout rhythm**: spacing is skeleton, so it comes from the harvested tokens
+above. sale-pos's steps stay available for spacing *within* a widget, where they
+do not affect the page geometry.
 
 Everything else is a **lighter variation of the primary** rather than a new hue:
 the semantic tokens sale-pos maps to green/red/yellow/blue keep their *roles*,
@@ -217,7 +249,7 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 
 | # | module | screens | why here |
 |---|---|---:|---|
-| 0 | — | — | `core/` extracted, `api/` and `web-ui/` skeletons, auth, layout shell, nav tree, theme |
+| 0 | — | — | `core/` extracted, `api/` and `web-ui/` skeletons, auth, **geometry tokens harvested from the existing CSS**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
 | 1 | **Tool** | 28 | settings and `GlobalOption`; everything else reads it |
 | 2 | **User** + **DomainUser** | 20 | login, roles, branches — the 122 nav role checks need them |
 | 3 | **Medicine** | 56 | best evidence here: 82% of visited pages render, 38% reach |
