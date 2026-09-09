@@ -9,7 +9,7 @@ The four decisions this plan is built on, taken 2026-09-10:
 
 | | decision |
 |---|---|
-| where the API lives | `/home/sreejon/projects/personal/terminalbd_api` — its own repo |
+| where the API lives | `/home/sreejon/projects/personal/terminalbd_api` — its own repo, **PHP 8.5** |
 | where the React app lives | `/home/sreejon/projects/personal/terminalbd_web` — its own repo |
 | sequencing | module by module, behind the strangler proxy that already exists |
 | authentication | the sale-pos header scheme, `X-Api-Key` + `X-Api-User` |
@@ -85,12 +85,24 @@ that carries validation, tenancy and business rules.
 ```
 /home/sreejon/projects/personal/
   terminalbd/        legacy Symfony 2.8 + next/ (Symfony 8) — both shrink, both go
-  terminalbd_api/    NEW repo: Symfony 8, JSON only, no Twig ever installed
+  terminalbd_api/    NEW repo: Symfony 8 on PHP 8.5, JSON only, no Twig ever installed
   terminalbd_web/    NEW repo: React + Vite, modelled on sale-pos
   sale-pos/          the reference, unchanged
 ```
 
 Each is its own git repo, like every other project in that directory.
+
+### PHP 8.5, pinned
+
+`terminalbd_api/composer.json` declares `"php": ">=8.5"`, not the `>=8.4` that
+`next/` carries. That is a tightening, not a jump: the local runtime is already
+PHP 8.5.6, and every harness this migration was verified with — the smoke sweep,
+the write sweep, the destructive sweep and both sides of the golden capture — has
+been running the ported code under 8.5 all along. So the code is already proven
+there; `next/`'s `>=8.4` simply understated its floor.
+
+Pinning the floor at 8.5 in a fresh project costs nothing and means the deploy
+target cannot quietly drift below what the code has actually been exercised on.
 
 ### What the API starts from
 
