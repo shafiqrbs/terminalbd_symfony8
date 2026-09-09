@@ -9,7 +9,8 @@ The four decisions this plan is built on, taken 2026-09-10:
 
 | | decision |
 |---|---|
-| where the API lives | a new `api/` project; the entity layer is shared, not copied |
+| where the API lives | `/home/sreejon/projects/personal/terminalbd_api` — its own repo |
+| where the React app lives | `/home/sreejon/projects/personal/terminalbd_web` — its own repo |
 | sequencing | module by module, behind the strangler proxy that already exists |
 | authentication | the sale-pos header scheme, `X-Api-Key` + `X-Api-User` |
 | scope | what the navigation tree reaches |
@@ -79,88 +80,64 @@ that carries validation, tenancy and business rules.
 
 ---
 
-## 3. Three projects, one entity layer
+## 3. Two new projects, beside the old one
 
 ```
-terminalbd/
-  src/, app/, web/     legacy Symfony 2.8 — unchanged, still proxied to, then retired
-  next/                Symfony 8, server-rendered — TRANSITIONAL: shrinks each
-                       phase and is deleted in phase 10 (§7)
-  core/                NEW: the shared domain package — outlives both
-  api/                 NEW: Symfony 8, JSON only, no Twig ever installed
-  web-ui/              NEW: React + Vite, modelled on sale-pos
+/home/sreejon/projects/personal/
+  terminalbd/        legacy Symfony 2.8 + next/ (Symfony 8) — both shrink, both go
+  terminalbd_api/    NEW repo: Symfony 8, JSON only, no Twig ever installed
+  terminalbd_web/    NEW repo: React + Vite, modelled on sale-pos
+  sale-pos/          the reference, unchanged
 ```
 
-The end state is three of those five: `core/`, `api/`, `web-ui/`. `next/` and the
-legacy tree are both gone, which is what makes `core/` worth extracting rather
-than copying — it is the only part of this migration that survives it.
+Each is its own git repo, like every other project in that directory.
 
-**`core/` is the upgrade itself, and that is a bigger set than "the entities".**
+### What the API starts from
 
-`next/` *is* the Symfony 2.8 → 8.1 and PHP 7.4 → 8.5 upgrade. Nothing else in this
-repository is on Symfony 8. So the question "what does `core/` carry" is really
-"what of the upgrade survives `next/` being deleted", and the answer is
-**875 of the 1,578 files in `next/src`** — everything that is not presentation.
-The other 703 (337 controllers, 361 form types, 5 Twig extensions) die with Twig.
+`next/` is the Symfony 2.8 → 8.1 and PHP 7.4 → 8.5 upgrade — nothing else here is
+on Symfony 8 — so the API does not start from scratch. It starts by **copying the
+875 files in `next/src` that are not about rendering HTML**: the classes that
+describe your tables and the rules around them.
 
-| what moves to `core/` | files | why it cannot be left behind |
-|---|---:|---|
-| Entity + Repository | 687 | the mapping this migration spent its whole verification budget on |
-| EventListener + Event | 103 | Gedmo, tenancy and domain listeners |
-| Importer | 29 | bulk import paths the API still exposes |
-| Service + Manager | 23 | domain services |
-| Security | 8 | `UserProvider`, `Canonicalizer`, `TenantRoutingListener`, and both halves of the session bridge |
-| Permission | 4 | the role checks the 365 nav items are gated on |
-| Command | 4 | the four console commands |
-| Doctrine `Type` | 2 | `LegacyArrayType`, `LegacyJsonArrayType` |
-| DQL | 3 | `GroupConcat`, `DateFormat`, `Random` |
+| copied into `terminalbd_api` | files |
+|---|---:|
+| Entity + Repository | 687 |
+| EventListener + Event | 103 |
+| Importer | 29 |
+| Service + Manager | 23 |
+| Security (`UserProvider`, `Canonicalizer`, session bridge, tenancy) | 8 |
+| Permission | 4 |
+| Command | 4 |
+| Doctrine `Type` + DQL functions | 5 |
 
-**Four pieces of configuration move with them, and each one fails silently if it
-is forgotten** — which is exactly the §5.46 shape, so they are listed rather than
-assumed:
+The other 703 files — 337 controllers, 361 form types, 5 Twig extensions — are
+about rendering HTML and are not copied. React replaces them.
+
+**A copy, not a shared package.** `next/` keeps the copy it already has. That is
+the simplest arrangement and it is honest about the situation: `next/` is frozen
+and being deleted module by module, so there is no ongoing development in it to
+drift away from. The one cost is that while both run, a schema change has to be
+applied in both places — in practice you change it in the API and let `next/` run
+on its slightly older mapping until it is gone.
+
+### Four settings that must be copied too
+
+Each fails **silently** if forgotten, which is the §5.46 shape, so they are listed
+rather than assumed:
 
 - `naming_strategy: doctrine.orm.naming_strategy.default` — the live schema was
   written by Doctrine 2, so columns are `globalOption_id` and `receiveDate`. The
-  Flex default would look for `global_option_id` and find nothing.
-- `array: App\Doctrine\Type\LegacyArrayType` and the JSON variant — 24 live
-  columns hold `serialize()` output. Without these they are unreadable.
-- `migrate_from: [legacy_sha512]` and the `legacy_sha512` hasher — 1,088 users
-  hold Symfony 2 salted sha512 hashes. Without it none of them can log in.
-- the three DQL functions — five repositories call `GROUP_CONCAT` and DQL rejects
-  an unregistered function.
+  Symfony default looks for `global_option_id` and finds nothing.
+- `LegacyArrayType` and `LegacyJsonArrayType` — 24 live columns hold
+  `serialize()` output. Without these they are unreadable.
+- `legacy_sha512` and `migrate_from` — 1,088 users hold Symfony 2 salted sha512
+  hashes. Without it none of them can log in.
+- the three DQL functions — five repositories call `GROUP_CONCAT`, and DQL
+  rejects an unregistered function.
 
-**Where `core/` comes from: `next/`, not the legacy tree.** This work continues
-from the Symfony 8 / PHP 8.5 project rather than re-deriving anything. `core/` is
-lifted out of `next/src` as it stands — already ported, already verified, already
-running — and from that moment it is **source, not an artifact**: an entity change
-is an ordinary edit, not a new pipeline step.
-
-Copying all that into a second project forks it on day one. Instead it becomes a
-Composer path package that both `next/` and `api/` require:
-
-```json
-{ "repositories": [{ "type": "path", "url": "../core" }] }
-```
-
-The namespace stays `App\` so nothing in the ported tree has to be rewritten.
-
-Put the other way round: **`api/` is a thin new front on the existing upgrade,
-not a new application.** It supplies HTTP — routing, serialization, request
-validation — over a domain layer that is already ported, already verified, and
-already running.
-
-**This changes the pipeline, and that has to be designed, not discovered.**
-`migrate.sh` currently regenerates all of `next/src` from the legacy tree and
-leaves `git diff` empty — the invariant every guard rests on. It gains a step
-that emits entities and repositories into `core/` and the rest into `next/`. The
-guards (`verify-columns.php`, `check-routes.php`, `validate-mapping.php`) move
-with the code they check.
-
-Because `next/` is going away entirely, that split is worth doing properly rather
-than cheaply: `core/` is the half that outlives the pipeline, and §7 sets out the
-single moment it stops being generated and becomes owned source.
-
----
+Put simply: **`terminalbd_api` is a thin new HTTP front on an upgrade that is
+already done, ported and verified.** It supplies routing, serialization and
+request validation over classes that already work.
 
 ## 4. The API
 
@@ -179,7 +156,7 @@ Only what the 365 screens need, and only when their module's turn comes.
 - **Tenancy stays server-side.** Every query is already scoped by
   `GlobalOption`. The SPA never sends a tenant id; the API derives it from the
   session, exactly as the Twig application does today.
-- **No Twig.** `api/` never installs it, so the boundary cannot rot.
+- **No Twig.** `terminalbd_api/` never installs it, so the boundary cannot rot.
 
 ---
 
@@ -272,7 +249,7 @@ costs nothing now that both applications are served locally: load a representati
 list screen and a representative form screen, and record, for each of the
 constructs in the table above, the computed box metrics — width, height, padding,
 margin, border, font-size, line-height. Those become the CSS custom properties
-`web-ui/` consumes and the Mantine component overrides described above.
+`terminalbd_web/` consumes and the Mantine component overrides described above.
 
 This is the highest-leverage task in phase 0. A wrong control height is invisible
 on the first screen and unfixable by the fiftieth, and it is the one error that
@@ -319,7 +296,7 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 
 | # | module | screens | why here |
 |---|---|---:|---|
-| 0 | — | — | **`core/` lifted out of `next/` and owned**, pipeline switched to verify-only, `api/` and `web-ui/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
+| 0 | — | — | **the 875 files copied into `terminalbd_api`**, pipeline switched to checking-only, `terminalbd_api/` and `terminalbd_web/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
 | 1 | **Tool** | 28 | settings and `GlobalOption`; everything else reads it |
 | 2 | **User** + **DomainUser** | 20 | login, roles, branches — the 122 nav role checks need them |
 | 3 | **Medicine** | 56 | best evidence here: 82% of visited pages render, 38% reach |
@@ -328,8 +305,8 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 | 6 | **Business**, **Hospital** | 92 | large, moderate coverage |
 | 7 | the small modules | 25 | Product, Content, Appearance, Media, Location, Pos |
 | 8 | **Customer**, **Restaurant**, **DoctorPrescription** | 28 | blocked: no `business_config`, `restaurant_config` or `dps_config` rows in this dump |
-| 9 | **the mobile API moves** | — | the 96 wire-locked endpoints leave `next/` for `api/`, byte-compatible |
-| 10 | **`next/` deleted** | — | the presentation half of the upgrade; `core/` already carries the rest (§7) |
+| 9 | **the mobile API moves** | — | the 96 wire-locked endpoints leave `next/` for `terminalbd_api/`, byte-compatible |
+| 10 | **`next/` deleted** | — | the presentation half of the upgrade; the API already has the rest (§7) |
 | 11 | **offline** | — | see §8 |
 
 Phase 0 is the one that decides everything after it — it is where the component
@@ -338,7 +315,7 @@ Treat module 1 as still part of it: if Tool needs a convention invented, that
 convention is wrong and belongs in phase 0.
 
 Each module ships the same way the strangler already works: its API endpoints and
-its React screens land, the module's proxy routes flip from `next/` to `web-ui/`,
+its React screens land, the module's proxy routes flip from `next/` to `terminalbd_web/`,
 and its Twig templates and web controllers are deleted from `next/`. Rollback is
 one proxy rule.
 
@@ -357,42 +334,40 @@ move has to be byte-compatible or it breaks phones.
 The good news, checked rather than assumed: all three controllers —
 `ApiController`, `ApiPortalController`, `ApiPoskeeperController`, 197 KB — contain
 **no `render()` call at all**. They build JSON by hand and return a plain
-`Response`. So they lift into `api/` as-is, and `capture-both.sh` gates the move
-exactly as it gated the port: capture from `next/`, capture from `api/`, and
+`Response`. So they lift into `terminalbd_api/` as-is, and `capture-both.sh` gates the move
+exactly as it gated the port: capture from `next/`, capture from `terminalbd_api/`, and
 `compare.php` fails on any drift outside the seven accepted entries.
 
 This is phase 9 and not phase 0 on purpose. Moving them early means maintaining
 one surface across two projects for the whole migration; moving them last means
 one careful, gated lift when everything else has already stopped changing.
 
-### The pipeline becomes a verifier, in phase 0
+### The pipeline keeps checking, even after the copy
 
-`core/` stops being a generated artifact the moment it is lifted, so entity work
-is normal development from day one. But `migrate.sh` is not retired — it changes
-job.
+Once the API has its own copy, those files are ordinary source: an entity change
+is a normal edit, not a pipeline step.
 
-Today it regenerates `next/src` from the untouched legacy tree and `git diff`
-comes back empty. That invariant is why this port is verifiable at all. Losing it
-outright would also lose the guards that read the legacy tree, and four of the
-eleven in `ci-checks.sh` do: **column names vs the legacy annotations**, **route
-resolution**, **route annotations converted to attributes**, and the **mobile API
-contract**. Those are the ones that catch a whole construct evaporating — the
-§5.35 and §5.46 failure mode.
+But `migrate.sh` is not retired. Today it rebuilds `next/src` from the untouched
+legacy tree and `git diff` comes back empty, and four of the eleven guards in
+`ci-checks.sh` depend on reading that legacy tree: **column names vs the legacy
+annotations**, **route resolution**, **route annotations converted to
+attributes**, and the **mobile API contract**. Those are the four that catch a
+whole construct evaporating — the §5.35 and §5.46 failure mode, which is what has
+bitten this project hardest.
 
-So the pipeline keeps running, into a scratch directory instead of into the tree,
-and diffs its output against `core/`. It no longer *produces* `core/`; it
-*checks* it, and answers one question on every CI run: does `core/` still agree
-with what the legacy tree implies? A deliberate divergence is recorded the way
-`hand-written.txt` already records the 24 files that are not mechanical ports.
+So the pipeline keeps running, into a scratch directory, and diffs its output
+against the API's copy. It no longer produces anything; it answers one question
+per CI run: does the copy still agree with what the legacy tree implies?
+Deliberate differences are recorded the way `hand-written.txt` already records
+the 24 files that were never mechanical ports.
 
-That costs one scratch build and buys the four guards for as long as the legacy
-tree exists. When the legacy is finally decommissioned there is nothing left to
-check against, and at that point `migration/bin/` is archived rather than
-deleted — it is the provenance of every line in `core/`, and the only explanation
-of why the mapping looks the way it does.
+That costs one scratch build and keeps those four guards working for as long as
+the legacy tree exists. When the legacy is finally decommissioned there is
+nothing left to check against, and `migration/bin/` is archived rather than
+deleted — it is the provenance of every line that was copied.
 
-`schema-diff.php` and `validate-mapping.php` never needed the legacy tree; they
-read the database and the mapping, and keep working unchanged either way.
+`schema-diff.php` and `validate-mapping.php` never needed the legacy tree. They
+read the database and the mapping, and are unaffected either way.
 
 ## 8. Built so offline can be added later
 
@@ -429,7 +404,7 @@ One open question for that phase, worth answering before it starts: offline in a
 **browser** (IndexedDB, service worker, background sync) and offline in
 **Electron** (sale-pos's model, `better-sqlite3`, a real local database) are
 different products. sale-pos already solves the second. If the eventual answer is
-"package `web-ui/` with Electron", much of phase 11 is already written and the
+"package `terminalbd_web/` with Electron", much of phase 11 is already written and the
 browser work is wasted.
 
 ## 9. What carries over from this migration
@@ -445,7 +420,7 @@ Not starting from nothing:
   across the proxy boundary and is verified. The SPA is a third participant in
   the same arrangement.
 - **The schema guards** — `verify-columns.php`, `schema-diff.php`,
-  `validate-mapping.php` — move to `core/` and keep working.
+  `validate-mapping.php` — keep working against the copy.
 
 And the standing lesson from §5.46 applies to every screen here: a menu item, an
 endpoint or a field that nobody translates does not fail, it evaporates. Check
