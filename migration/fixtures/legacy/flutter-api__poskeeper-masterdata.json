@@ -1,0 +1,128 @@
+{
+    "endpoint": "flutter-api/poskeeper-masterdata",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-masterdata",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "brands": [
+            {
+                "brand_id": "int",
+                "name": "null",
+                "slug": "string"
+            }
+        ],
+        "categories": [],
+        "customers": [
+            {
+                "address": "string",
+                "balance": "int",
+                "credit": "int",
+                "customer_id": "int",
+                "debit": "int",
+                "email": "null",
+                "global_id": "int",
+                "mobile": "string",
+                "name": "string"
+            }
+        ],
+        "expense_category": [],
+        "setup": [
+            {
+                "address": "string",
+                "analytic": "string",
+                "appAnchorColor": "string",
+                "appAnchorHoverColor": "string",
+                "appBarColor": "string",
+                "appBorderActiveColor": "string",
+                "appBorderColor": "string",
+                "appBorderInactiveColor": "string",
+                "appCartColor": "string",
+                "appCloseColor": "string",
+                "appDiscountColor": "string",
+                "appFooterBgColor": "string",
+                "appFooterIconBgColor": "string",
+                "appFooterIconColor": "string",
+                "appFooterIconColorHover": "string",
+                "appHeaderBg": "string",
+                "appIconColor": "string",
+                "appMoreColor": "string",
+                "appNegativeColor": "string",
+                "appNoticeColor": "string",
+                "appPositiveColor": "string",
+                "appPrimaryColor": "string",
+                "appSecondaryColor": "string",
+                "appSuccessColor": "string",
+                "appTextColor": "string",
+                "appTextTitle": "string",
+                "appsManual": "string",
+                "bodyBg": "string",
+                "currency": "string",
+                "deviceId": "int",
+                "email": "string",
+                "inputBgColor": "string",
+                "inputBgFocusColor": "string",
+                "intro": "string",
+                "locationId": "int",
+                "locationName": "string",
+                "logo": "string",
+                "mainApp": "int",
+                "mainAppName": "string",
+                "messenger": "string",
+                "mobile": "string",
+                "morePageBgColor": "string",
+                "name": "string",
+                "pixel": "string",
+                "printFooter": "string",
+                "searchPageBgColor": "string",
+                "setupId": "int",
+                "symbol": "string",
+                "tawk": "string",
+                "uniqueCode": "string",
+                "vatEnable": "int",
+                "vatPercentage": "int",
+                "vatRegNo": "string",
+                "website": "string"
+            }
+        ],
+        "transaction_methods": [
+            {
+                "image_path": "string",
+                "is_default": "int",
+                "method_id": "int",
+                "method_mode": "string",
+                "method_name": "string",
+                "service_charge": "int"
+            }
+        ],
+        "units": [
+            {
+                "name": "string",
+                "unit_id": "int"
+            }
+        ],
+        "users": [
+            {
+                "email": "string",
+                "full_name": "string",
+                "password": "string",
+                "roles": "string",
+                "user_id": "int",
+                "user_name": "string"
+            }
+        ],
+        "vendors": [
+            {
+                "address": "null",
+                "balance": "float",
+                "credit": "int",
+                "debit": "float",
+                "email": "null",
+                "global_id": "int",
+                "mobile": "null",
+                "name": "string",
+                "vendor_id": "int"
+            }
+        ]
+    }
+}

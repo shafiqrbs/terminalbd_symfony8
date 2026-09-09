@@ -1,0 +1,24 @@
+{
+    "endpoint": "android-api/stock-item",
+    "method": "GET",
+    "path": "/android-api/stock-item",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "categoryName": "string",
+            "category_id": "int",
+            "global_id": "int",
+            "imagePath": "string",
+            "item_id": "int",
+            "name": "string",
+            "printHidden": "null",
+            "printName": "string",
+            "purchasePrice": "float",
+            "quantity": "int",
+            "salesPrice": "int",
+            "unit": "string",
+            "unit_id": "string"
+        }
+    ]
+}

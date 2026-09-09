@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api/expense-category",
+    "method": "GET",
+    "path": "/android-api/expense-category",
+    "status": 200,
+    "json_valid": true,
+    "shape": []
+}

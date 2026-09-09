@@ -1,0 +1,13 @@
+{
+    "endpoint": "android-api/product-unit",
+    "method": "GET",
+    "path": "/android-api/product-unit",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "name": "string",
+            "unit_id": "int"
+        }
+    ]
+}

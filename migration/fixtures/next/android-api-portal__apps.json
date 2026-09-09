@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api-portal/apps",
+    "method": "GET",
+    "path": "/android-api-portal/apps",
+    "status": 302,
+    "json_valid": false,
+    "shape": null
+}

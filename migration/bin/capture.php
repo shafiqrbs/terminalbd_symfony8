@@ -134,6 +134,12 @@ foreach ($endpoints as $r) {
         'method'        => $method,
         'ignore_errors' => true,
         'timeout'       => 30,
+        // A redirect is the response, not a step on the way to it. Following
+        // one records the destination's 200 and hides the difference: a dead
+        // endpoint that 500s on one app and 302s to the homepage on the other
+        // would otherwise read as "500 -> 200", which looks like a fix.
+        'follow_location' => 0,
+        'max_redirects'   => 0,
     ]];
     if ($body && $method !== 'GET') {
         $payload = http_build_query($body);

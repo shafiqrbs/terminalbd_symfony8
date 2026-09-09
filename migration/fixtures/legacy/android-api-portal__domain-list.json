@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api-portal/domain-list",
+    "method": "GET",
+    "path": "/android-api-portal/domain-list",
+    "status": 200,
+    "json_valid": true,
+    "shape": []
+}

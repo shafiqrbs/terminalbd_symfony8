@@ -1,0 +1,8 @@
+{
+    "endpoint": "flutter-api/poskeeper-color-plate",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-color-plate",
+    "status": 200,
+    "json_valid": true,
+    "shape": []
+}

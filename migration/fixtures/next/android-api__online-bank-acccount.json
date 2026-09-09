@@ -1,0 +1,15 @@
+{
+    "endpoint": "android-api/online-bank-acccount",
+    "method": "GET",
+    "path": "/android-api/online-bank-acccount",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "global_id": "int",
+            "item_id": "int",
+            "name": "string",
+            "service_charge": "int"
+        }
+    ]
+}

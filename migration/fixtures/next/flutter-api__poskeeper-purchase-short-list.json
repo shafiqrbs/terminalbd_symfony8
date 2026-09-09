@@ -1,0 +1,8 @@
+{
+    "endpoint": "flutter-api/poskeeper-purchase-short-list",
+    "method": "GET",
+    "path": "/flutter-api/poskeeper-purchase-short-list",
+    "status": 500,
+    "json_valid": false,
+    "shape": null
+}

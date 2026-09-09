@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api-portal/app-customer",
+    "method": "GET",
+    "path": "/android-api-portal/app-customer",
+    "status": 200,
+    "json_valid": true,
+    "shape": []
+}

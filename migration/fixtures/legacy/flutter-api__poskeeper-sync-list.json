@@ -1,0 +1,8 @@
+{
+    "endpoint": "flutter-api/poskeeper-sync-list",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-sync-list",
+    "status": 200,
+    "json_valid": true,
+    "shape": []
+}

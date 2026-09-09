@@ -1,0 +1,10 @@
+{
+    "endpoint": "flutter-api/poskeeper-stock-delete",
+    "method": "GET",
+    "path": "/flutter-api/poskeeper-stock-delete",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "status": "string"
+    }
+}

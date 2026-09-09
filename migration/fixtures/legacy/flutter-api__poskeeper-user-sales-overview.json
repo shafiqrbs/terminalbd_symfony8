@@ -1,0 +1,11 @@
+{
+    "endpoint": "flutter-api/poskeeper-user-sales-overview",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-user-sales-overview",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "globalOption": "int",
+        "user_sales": []
+    }
+}

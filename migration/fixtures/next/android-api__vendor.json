@@ -1,0 +1,13 @@
+{
+    "endpoint": "android-api/vendor",
+    "method": "GET",
+    "path": "/android-api/vendor",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "name": "string",
+            "vendor_id": "int"
+        }
+    ]
+}

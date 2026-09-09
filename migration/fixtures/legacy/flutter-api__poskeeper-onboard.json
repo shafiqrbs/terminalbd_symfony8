@@ -1,0 +1,25 @@
+{
+    "endpoint": "flutter-api/poskeeper-onboard",
+    "method": "GET",
+    "path": "/flutter-api/poskeeper-onboard",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "aboutus": "string",
+        "demo": [
+            {
+                "active_key": "string",
+                "app_slug": "string",
+                "content": "string",
+                "license_no": "string",
+                "name": "string",
+                "password": "string",
+                "title": "string",
+                "username": "string"
+            }
+        ],
+        "onboard": "int",
+        "terms_condition": "string",
+        "video_url": "string"
+    }
+}

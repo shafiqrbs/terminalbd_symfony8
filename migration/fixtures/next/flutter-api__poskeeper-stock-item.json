@@ -1,0 +1,25 @@
+{
+    "endpoint": "flutter-api/poskeeper-stock-item",
+    "method": "GET",
+    "path": "/flutter-api/poskeeper-stock-item",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "barcode": "string",
+            "brand_name": "string",
+            "category_id": "int",
+            "category_name": "string",
+            "global_id": "int",
+            "image_path": "string",
+            "item_id": "int",
+            "name": "string",
+            "print_hidden": "string",
+            "print_name": "string",
+            "purchase_price": "float",
+            "quantity": "int",
+            "sales_price": "int",
+            "unit": "string"
+        }
+    ]
+}

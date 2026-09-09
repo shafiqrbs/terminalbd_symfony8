@@ -1,0 +1,8 @@
+{
+    "endpoint": "flutter-api/poskeeper-stock-update",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-stock-update",
+    "status": 200,
+    "json_valid": true,
+    "shape": "string"
+}

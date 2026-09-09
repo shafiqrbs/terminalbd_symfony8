@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api/medicine-dims",
+    "method": "GET",
+    "path": "/android-api/medicine-dims",
+    "status": 200,
+    "json_valid": true,
+    "shape": []
+}

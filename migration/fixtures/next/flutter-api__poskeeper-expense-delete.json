@@ -1,0 +1,10 @@
+{
+    "endpoint": "flutter-api/poskeeper-expense-delete",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-expense-delete",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "status": "string"
+    }
+}

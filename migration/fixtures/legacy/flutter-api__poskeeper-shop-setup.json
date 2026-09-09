@@ -1,0 +1,14 @@
+{
+    "endpoint": "flutter-api/poskeeper-shop-setup",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-shop-setup",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "active_key": "string",
+        "license_no": "string",
+        "message": "string",
+        "name": "string",
+        "status": "string"
+    }
+}

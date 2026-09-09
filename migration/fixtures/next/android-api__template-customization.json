@@ -1,0 +1,16 @@
+{
+    "endpoint": "android-api/template-customization",
+    "method": "GET",
+    "path": "/android-api/template-customization",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "androidAnchorColor": "null",
+        "androidAnchorHoverColor": "null",
+        "androidHeaderBg": "null",
+        "androidLogo": "string",
+        "androidMenuBg": "null",
+        "androidMenuBgHover": "null",
+        "globalOption": "int"
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api/sales-item",
+    "method": "POST",
+    "path": "/android-api/sales-item",
+    "status": 302,
+    "json_valid": false,
+    "shape": null
+}

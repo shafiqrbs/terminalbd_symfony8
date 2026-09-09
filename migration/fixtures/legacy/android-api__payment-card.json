@@ -1,0 +1,13 @@
+{
+    "endpoint": "android-api/payment-card",
+    "method": "GET",
+    "path": "/android-api/payment-card",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "item_id": "int",
+            "name": "string"
+        }
+    ]
+}

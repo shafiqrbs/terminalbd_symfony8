@@ -1,0 +1,15 @@
+{
+    "endpoint": "android-api/anonymiuse-customer",
+    "method": "GET",
+    "path": "/android-api/anonymiuse-customer",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "customer_id": "int",
+            "global_id": "int",
+            "mobile": "string",
+            "name": "string"
+        }
+    ]
+}

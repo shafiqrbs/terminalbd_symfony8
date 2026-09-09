@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api/purchase-item",
+    "method": "POST",
+    "path": "/android-api/purchase-item",
+    "status": 302,
+    "json_valid": false,
+    "shape": null
+}

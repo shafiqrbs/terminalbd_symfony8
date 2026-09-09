@@ -1,0 +1,17 @@
+{
+    "endpoint": "android-api/system-user",
+    "method": "GET",
+    "path": "/android-api/system-user",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "email": "string",
+            "fullName": "string",
+            "password": "string",
+            "roles": "string",
+            "user_id": "int",
+            "username": "string"
+        }
+    ]
+}

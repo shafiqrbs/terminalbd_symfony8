@@ -1,0 +1,8 @@
+{
+    "endpoint": "flutter-api/poskeeper-online-sales-details",
+    "method": "GET",
+    "path": "/flutter-api/poskeeper-online-sales-details",
+    "status": 200,
+    "json_valid": true,
+    "shape": null
+}

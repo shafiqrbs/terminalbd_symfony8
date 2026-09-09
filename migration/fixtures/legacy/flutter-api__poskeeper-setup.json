@@ -1,0 +1,25 @@
+{
+    "endpoint": "flutter-api/poskeeper-setup",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-setup",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "address": "string",
+        "appsManual": "string",
+        "deviceId": "int",
+        "email": "null",
+        "locationId": "int",
+        "locationName": "string",
+        "main_app": "int",
+        "main_app_name": "string",
+        "mobile": "string",
+        "name": "string",
+        "setupId": "int",
+        "uniqueCode": "string",
+        "vatEnable": "bool",
+        "vatPercentage": "null",
+        "vatRegNo": "null",
+        "website": "null"
+    }
+}

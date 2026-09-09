@@ -1,0 +1,138 @@
+{
+    "endpoint": "android-api/splash",
+    "method": "POST",
+    "path": "/android-api/splash",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "bank_accounts": [
+            {
+                "global_id": "int",
+                "item_id": "int",
+                "name": "string",
+                "service_charge": "int"
+            }
+        ],
+        "categories": [
+            {
+                "category_id": "int",
+                "name": "string",
+                "slug": "string"
+            }
+        ],
+        "customers": [
+            {
+                "address": "null",
+                "balance": "int",
+                "credit": "int",
+                "customer_id": "int",
+                "debit": "int",
+                "email": "null",
+                "global_id": "int",
+                "mobile": "string",
+                "name": "string"
+            }
+        ],
+        "mobile_accounts": [],
+        "payment_cards": [
+            {
+                "item_id": "int",
+                "name": "string"
+            }
+        ],
+        "setup": {
+            "address": "string",
+            "analytic": "string",
+            "appAnchorColor": "string",
+            "appAnchorHoverColor": "string",
+            "appBarColor": "string",
+            "appBorderActiveColor": "string",
+            "appBorderColor": "string",
+            "appBorderInactiveColor": "string",
+            "appCartColor": "string",
+            "appCloseColor": "string",
+            "appDiscountColor": "string",
+            "appFooterBgColor": "string",
+            "appFooterIconBgColor": "string",
+            "appFooterIconColor": "string",
+            "appFooterIconColorHover": "string",
+            "appHeaderBg": "string",
+            "appIconColor": "string",
+            "appMoreColor": "string",
+            "appNegativeColor": "string",
+            "appNoticeColor": "string",
+            "appPositiveColor": "string",
+            "appPrimaryColor": "string",
+            "appSecondaryColor": "string",
+            "appSuccessColor": "string",
+            "appTextColor": "string",
+            "appTextTitle": "string",
+            "appsManual": "string",
+            "bodyBg": "string",
+            "deviceId": "int",
+            "email": "string",
+            "inputBgColor": "string",
+            "inputBgFocusColor": "string",
+            "intro": "string",
+            "locationId": "int",
+            "locationName": "string",
+            "logo": "string",
+            "mainApp": "int",
+            "mainAppName": "string",
+            "main_app": "int",
+            "main_app_name": "string",
+            "messenger": "string",
+            "mobile": "string",
+            "morePageBgColor": "string",
+            "name": "string",
+            "pixel": "string",
+            "searchPageBgColor": "string",
+            "setupId": "int",
+            "tawk": "string",
+            "uniqueCode": "string",
+            "vatEnable": "bool",
+            "vatPercentage": "int",
+            "vatRegNo": "string",
+            "website": "string"
+        },
+        "stocks": [
+            {
+                "barcode": "string",
+                "categoryName": "string",
+                "category_id": "int",
+                "global_id": "int",
+                "imagePath": "string",
+                "item_id": "int",
+                "name": "string",
+                "printHidden": "string",
+                "printName": "string",
+                "purchasePrice": "float",
+                "quantity": "int",
+                "salesPrice": "int",
+                "unit": "string"
+            }
+        ],
+        "transaction_methods": [
+            {
+                "item_id": "int",
+                "name": "string"
+            }
+        ],
+        "users": [
+            {
+                "email": "string",
+                "fullName": "string",
+                "password": "string",
+                "roles": "string",
+                "user_id": "int",
+                "username": "string"
+            }
+        ],
+        "vendors": [
+            {
+                "name": "string",
+                "vendor_id": "int"
+            }
+        ]
+    }
+}

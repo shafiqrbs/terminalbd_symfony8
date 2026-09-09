@@ -1,0 +1,8 @@
+{
+    "endpoint": "flutter-api/poskeeper-bank-account",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-bank-account",
+    "status": 200,
+    "json_valid": true,
+    "shape": []
+}

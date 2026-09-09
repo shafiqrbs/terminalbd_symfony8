@@ -1,0 +1,26 @@
+{
+    "endpoint": "flutter-api/poskeeper-account-sales",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-account-sales",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "account_bank": "string",
+            "amount": "int",
+            "approved_by": "string",
+            "balance": "int",
+            "created": "string",
+            "created_by": "string",
+            "customer_id": "int",
+            "id": "int",
+            "invoice": "string",
+            "method": "string",
+            "mobile": "string",
+            "name": "string",
+            "source_invoice": "int",
+            "total": "int",
+            "updated": "string"
+        }
+    ]
+}

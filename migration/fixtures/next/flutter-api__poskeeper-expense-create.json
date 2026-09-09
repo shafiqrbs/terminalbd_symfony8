@@ -1,0 +1,10 @@
+{
+    "endpoint": "flutter-api/poskeeper-expense-create",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-expense-create",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "status": "string"
+    }
+}

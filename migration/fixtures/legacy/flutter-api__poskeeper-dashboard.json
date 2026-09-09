@@ -1,0 +1,23 @@
+{
+    "endpoint": "flutter-api/poskeeper-dashboard",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-dashboard",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "balance_amount": "string",
+        "due": "string",
+        "expenditure": "string",
+        "globalOption": "int",
+        "payment": "string",
+        "payment_amount": "string",
+        "purchase": "string",
+        "receive": "string",
+        "receive_amount": "string",
+        "sales": "string",
+        "transaction_overview": [],
+        "update_url": "string",
+        "version": "int",
+        "voucher": "string"
+    }
+}

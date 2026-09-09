@@ -1,0 +1,16 @@
+{
+    "endpoint": "android-api/dashboard",
+    "method": "GET",
+    "path": "/android-api/dashboard",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "expenditureOverview": "null",
+        "globalOption": "int",
+        "purchasePayment": "null",
+        "purchaseTotal": "null",
+        "salesReceive": "null",
+        "salesVoucher": "string",
+        "totalSales": "null"
+    }
+}

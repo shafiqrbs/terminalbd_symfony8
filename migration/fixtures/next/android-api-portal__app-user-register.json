@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api-portal/app-user-register",
+    "method": "POST",
+    "path": "/android-api-portal/app-user-register",
+    "status": 302,
+    "json_valid": false,
+    "shape": null
+}

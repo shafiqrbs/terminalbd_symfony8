@@ -1,0 +1,13 @@
+{
+    "endpoint": "android-api/tarnsaction-method",
+    "method": "GET",
+    "path": "/android-api/tarnsaction-method",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "item_id": "int",
+            "name": "string"
+        }
+    ]
+}

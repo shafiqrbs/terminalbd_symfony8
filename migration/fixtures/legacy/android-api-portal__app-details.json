@@ -1,0 +1,13 @@
+{
+    "endpoint": "android-api-portal/app-details",
+    "method": "GET",
+    "path": "/android-api-portal/app-details",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "content": "null",
+        "id": "int",
+        "imagePath": "string",
+        "name": "null"
+    }
+}

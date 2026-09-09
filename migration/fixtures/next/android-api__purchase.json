@@ -1,0 +1,11 @@
+{
+    "endpoint": "android-api/purchase",
+    "method": "POST",
+    "path": "/android-api/purchase",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "ipAddress": "string",
+        "message": "string"
+    }
+}

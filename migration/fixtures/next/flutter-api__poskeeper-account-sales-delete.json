@@ -1,0 +1,10 @@
+{
+    "endpoint": "flutter-api/poskeeper-account-sales-delete",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-account-sales-delete",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "status": "string"
+    }
+}

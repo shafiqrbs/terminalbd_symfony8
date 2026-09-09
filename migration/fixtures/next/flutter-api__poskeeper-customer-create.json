@@ -1,0 +1,18 @@
+{
+    "endpoint": "flutter-api/poskeeper-customer-create",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-customer-create",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "address": "string",
+        "balance": "int",
+        "credit": "int",
+        "customer_id": "int",
+        "debit": "int",
+        "email": "string",
+        "global_id": "int",
+        "mobile": "string",
+        "name": "string"
+    }
+}

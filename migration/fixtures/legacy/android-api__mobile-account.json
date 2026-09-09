@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api/mobile-account",
+    "method": "GET",
+    "path": "/android-api/mobile-account",
+    "status": 200,
+    "json_valid": true,
+    "shape": []
+}

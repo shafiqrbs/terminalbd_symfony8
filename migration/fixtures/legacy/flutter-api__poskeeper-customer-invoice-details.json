@@ -1,0 +1,8 @@
+{
+    "endpoint": "flutter-api/poskeeper-customer-invoice-details",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-customer-invoice-details",
+    "status": 200,
+    "json_valid": true,
+    "shape": null
+}

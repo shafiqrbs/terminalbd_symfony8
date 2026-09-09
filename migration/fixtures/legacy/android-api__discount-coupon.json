@@ -1,0 +1,8 @@
+{
+    "endpoint": "android-api/discount-coupon",
+    "method": "GET",
+    "path": "/android-api/discount-coupon",
+    "status": 500,
+    "json_valid": false,
+    "shape": null
+}

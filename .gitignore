@@ -46,3 +46,4 @@ Thumbs.db
 # fixtures hold tenant rows. The shape-only fixtures are committed by hand.
 /migration/capture-config.local.json
 /migration/fixtures/*-with-body/
+/migration/.capture-work/

@@ -1,0 +1,16 @@
+{
+    "endpoint": "android-api-portal/information",
+    "method": "GET",
+    "path": "/android-api-portal/information",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "address": "string",
+        "email": "string",
+        "lat": "string",
+        "lon": "string",
+        "mobile": "string",
+        "name": "string",
+        "website": "string"
+    }
+}

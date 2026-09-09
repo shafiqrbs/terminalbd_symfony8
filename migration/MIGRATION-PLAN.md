@@ -167,7 +167,11 @@ Both lines of that router matter, and §5.36 says why. Log in as
    templates nothing renders. `check-template-routes.php` now computes that
    split and gates on the first bucket, so it does not need doing again by
    hand.
-3. **Golden API capture**, once a staging URL and credentials exist (§11).
+3. ~~**Golden API capture**~~ — done (§5.47), and it needed no staging host:
+   both applications run locally against the scratch database.
+   `migration/bin/capture-both.sh` is the whole protocol. 87 of 96 endpoints are
+   wire-compatible; the one regression is a `catch (\Exception)` that no longer
+   catches Doctrine 3's `TypeError`, and 12 more places share its shape.
 
 ### What is finished
 
@@ -1024,6 +1028,75 @@ a question anyone has to re-litigate by hand. Verified the gate fires: dropping
 `fos_user_group_new` from `auth.yaml` — a route legacy registers and a rendered template links
 to — moves it into the port-defect bucket and exits 1.
 
+### 5.47 Golden API capture — one regression, and it is the §5.34 family
+
+The capture needed neither a staging host nor credentials anyone had to find.
+`x-api-key`/`x-api-value` are application parameters, so both applications can be
+given the same pair, and the third header the mobile API checks is a tenant's
+`GlobalOption.uniqueCode`, which is in the scratch database. The legacy tree runs
+on PHP 7.4 against that same database - `composer install` works minus the two
+barcode packages, which are gone from their hosts (§5.32) and which no API
+endpoint uses - so both applications serve the mobile API side by side.
+
+Getting a trustworthy comparison took three corrections, and the first run's
+"27 regressions" were almost entirely the first two:
+
+1. **The two applications were not comparable.** The legacy front controller
+   defaults to prod; next was serving dev, where Symfony turns PHP warnings into
+   500s. `android-api-portal/app-details` looked like a regression - a 500 on
+   "array offset on null" - which under PHP 8 is a warning. In prod both return
+   the same 200 and the same JSON.
+2. **They share one database, and half the API writes.** Capturing one after the
+   other shows the second a database the first changed. `poskeeper-vendor-create`
+   read as "every field dropped" purely because the legacy run had already
+   created the vendor. `capture-both.sh` dumps once and restores between the two
+   captures; the dump excludes `TemplateCustomize`, which cannot be recreated
+   unless `innodb_strict_mode` is off (§5.29), so the restore runs as the
+   application's own database user.
+3. **A redirect is the response.** `file_get_contents` follows one by default, so
+   a dead endpoint that 500s on one application and 302s to the homepage on the
+   other recorded as "500 -> 200" and read as a fix.
+
+Then 96 endpoints, **87 compatible and 9 drifted**. The recipes matter as much as
+the protocol: every action reads its input from `$request->request->all()` or
+`$_REQUEST`, so before `api-recipes.php` filled the bodies from real rows, ~60 of
+them returned a matching pair of 500s, which proves nothing.
+
+**The one regression is `flutter-api/poskeeper-stock-delete`, 200 to 500.** The
+action is character-for-character identical in both trees: it sets
+`$status = 'failed'` when `find()` returns nothing and then calls
+`$em->remove($entity)` anyway, inside `try { } catch (\Exception $e)`. Under
+Doctrine 2 that throws `ORMInvalidArgumentException`, which extends `\Exception`,
+so it was caught and the endpoint answered `{"status":"invalid"}` with a 200.
+Doctrine 3 types the parameter `object`, so PHP throws a **`TypeError`, which
+extends `\Error` and not `\Exception`** - the existing catch does not see it and
+the endpoint 500s. The application bug is pre-existing; the upgrade is what makes
+it fatal, exactly the shape §5.34 predicted. **12 places in `next/src` have the
+same shape**: a `remove()`/`persist()` of a value a `find()` can leave null,
+guarded by an `empty()` that does not return, inside `catch (\Exception)`.
+
+One wire change with no status change: `android-api/dashboard` returns
+`salesVoucher` as an **int where the legacy returned a string**. The controller is
+identical in both trees, so this is the driver layer returning native types under
+PHP 8 - invisible to every static check, and the kind of thing a typed mobile
+client breaks on.
+
+The remaining seven are not regressions. Five are `500 -> 302`: routes whose
+controller action exists in neither tree - the six already reported dead in
+`api-contract.md` - where the legacy 500s and this application redirects to `/`.
+Two are `500 -> 200`, and both are the caveat below rather than an improvement.
+
+**The caveat worth carrying: the legacy application is running against the port's
+schema.** The scratch database was completed from the current mapping, so
+wherever the port renamed a column the legacy query fails and this one does not -
+24 `Unknown column 't0.accountHead_id'` in the last run alone. That biases every
+comparison toward "legacy fails", so a `500 -> 200` says nothing until the legacy
+error is read. Both of them are `InvalidFieldNameException`.
+
+Fixtures record status and shape only - key names and value types, which is
+schema rather than rows - so they are committed as the contract. `--with-body`
+writes this tenant's data and goes to a gitignored directory instead.
+
 ## 6. Phases
 
 ### Phase 1 — Skeleton and entity graph ✅ done
@@ -1102,8 +1175,8 @@ build their JSON by hand and return a plain `Response`, which is what they still
 
 - [x] Every endpoint resolves to a controller and action that exist
 - [x] `check-api-contract.php` gates that, and fails on any regression
-- [ ] Record golden responses: `php migration/bin/capture.php legacy` — **needs a staging URL and
-      API credentials** (§11)
+- [x] Record golden responses: `migration/bin/capture-both.sh` — no staging host needed; both
+      applications run locally against the scratch database (§5.47)
 - [ ] Gate every deploy on `compare.php` once a baseline exists
 
 ### Phase 4 — Shared presentation layer ✅ done
@@ -1428,8 +1501,8 @@ walks into a null — which the legacy application does too.
 
 ### Still open
 
-- [ ] **Golden API capture** — `capture.php` needs a staging base URL and API credentials. The
-      mobile contract is verified structurally, not by response shape
+- [x] **Golden API capture** — done (§5.47). 96 endpoints captured from both applications
+      from the same database state; 87 wire-compatible, one regression, one type change
 - [ ] **The 63 dead template links that a rendered template carries, and 20 dead aliases** —
       dead in the legacy tree too, so restoring a controller or removing a link is a product
       decision, per case. The port-defect bucket is empty and gated (§5.46)

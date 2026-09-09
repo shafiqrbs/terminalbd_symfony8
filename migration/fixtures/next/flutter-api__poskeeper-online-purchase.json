@@ -1,0 +1,36 @@
+{
+    "endpoint": "flutter-api/poskeeper-online-purchase",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-online-purchase",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "address": "null",
+            "approved_by": "string",
+            "comment": "string",
+            "created_at": "string",
+            "created_by": "string",
+            "discount": "int",
+            "discount_calculation": "float",
+            "discount_type": "string",
+            "due": "int",
+            "invoice": "null",
+            "is_online": "int",
+            "method_id": "int",
+            "method_mode": "string",
+            "method_name": "string",
+            "mobile": "null",
+            "name": "string",
+            "net_total": "int",
+            "process": "string",
+            "purchase_id": "string",
+            "received": "int",
+            "sd": "int",
+            "sub_total": "int",
+            "updated_at": "string",
+            "vat": "int",
+            "vendor_id": "int"
+        }
+    ]
+}

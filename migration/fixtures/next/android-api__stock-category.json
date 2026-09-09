@@ -1,0 +1,14 @@
+{
+    "endpoint": "android-api/stock-category",
+    "method": "GET",
+    "path": "/android-api/stock-category",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "category_id": "int",
+            "name": "string",
+            "slug": "string"
+        }
+    ]
+}

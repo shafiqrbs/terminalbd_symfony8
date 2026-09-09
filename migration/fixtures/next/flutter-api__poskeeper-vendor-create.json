@@ -1,0 +1,8 @@
+{
+    "endpoint": "flutter-api/poskeeper-vendor-create",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-vendor-create",
+    "status": 200,
+    "json_valid": true,
+    "shape": []
+}

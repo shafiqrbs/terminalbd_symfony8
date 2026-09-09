@@ -1,0 +1,20 @@
+{
+    "endpoint": "flutter-api/poskeeper-vendor",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-vendor",
+    "status": 200,
+    "json_valid": true,
+    "shape": [
+        {
+            "address": "null",
+            "balance": "int",
+            "credit": "int",
+            "debit": "int",
+            "email": "null",
+            "global_id": "int",
+            "mobile": "null",
+            "name": "string",
+            "vendor_id": "int"
+        }
+    ]
+}

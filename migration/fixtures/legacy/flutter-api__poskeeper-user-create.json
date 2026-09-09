@@ -1,0 +1,15 @@
+{
+    "endpoint": "flutter-api/poskeeper-user-create",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-user-create",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "email": "string",
+        "full_name": "null",
+        "password": "string",
+        "roles": "null",
+        "user_id": "int",
+        "user_name": "string"
+    }
+}

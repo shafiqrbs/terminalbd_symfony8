@@ -1,0 +1,11 @@
+{
+    "endpoint": "android-api/expense",
+    "method": "POST",
+    "path": "/android-api/expense",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "ipAddress": "string",
+        "message": "string"
+    }
+}

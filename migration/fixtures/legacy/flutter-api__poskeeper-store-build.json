@@ -1,0 +1,27 @@
+{
+    "endpoint": "flutter-api/poskeeper-store-build",
+    "method": "POST",
+    "path": "/flutter-api/poskeeper-store-build",
+    "status": 200,
+    "json_valid": true,
+    "shape": {
+        "address": "null",
+        "appsManual": "string",
+        "country": "string",
+        "currency": "string",
+        "deviceId": "int",
+        "email": "null",
+        "main_app": "int",
+        "main_app_name": "string",
+        "mobile": "string",
+        "name": "string",
+        "posPrint": "string",
+        "setupId": "int",
+        "symbol": "string",
+        "uniqueCode": "string",
+        "vatEnable": "null",
+        "vatPercentage": "null",
+        "vatRegNo": "null",
+        "website": "null"
+    }
+}
