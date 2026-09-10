@@ -64,6 +64,13 @@ run "app.user.* accessors resolve" \
 run "template aliases converted" \
     $PHP migration/bin/check-template-aliases.php
 
+# The API holds a copy of every screen's role guard, and two copies of a fact
+# drift. This one drifts silently: the harness signs in holding every role there
+# is, so a resource that guards too loosely answers 200 there and would answer
+# 200 for anyone. Stricter than the menu is allowed; looser is the defect.
+run "resource guards match the navigation" \
+    $PHP migration/bin/check-resource-roles.php
+
 # The 96 wire-locked mobile endpoints still answer at their contract paths.
 run "mobile API contract" \
     $PHP migration/bin/check-api-contract.php --report=migration/contract/api-contract.md

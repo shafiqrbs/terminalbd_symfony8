@@ -424,6 +424,34 @@ $screens = [
     'hms_surgery' => ['path' => '/hms/surgery-operation/'],
     'hms_vendor' => ['path' => '/hms/vendor/', 'pageSize' => 25],
 
+    // --- phase 7: the small modules, and Human Resource -----------------------
+    'collection' => ['path' => '/admin/collection/', 'rowsPerRecord' => 3],
+    'category_sorting' => ['path' => '/admin/category/sorting', 'pageSize' => 25, 'noTbody' => true, 'note' => 'Not a table on either side: the Twig screen is a drag-and-drop tree of nested <ul>, 302 <li> deep, so it has no rows to count. The API answers with the 1,691 top-level categories in sorting order.'],
+    'contactpage_modify' => ['path' => '/website/contactpage/modify', 'singleton' => true],
+    'page' => ['path' => '/website/page/', 'pageSize' => 25, 'rowsPerRecord' => 3],
+    'sitecontent' => ['path' => '/admin/sitecontent/', 'rowsPerRecord' => 3],
+    'siteslider' => ['path' => '/admin/siteslider/', 'rowsPerRecord' => 3],
+    'siteteam' => ['path' => '/admin/site-team/', 'rowsPerRecord' => 3],
+    'sitetestimonial' => ['path' => '/admin/site-testimonial/', 'rowsPerRecord' => 3],
+    'templatecustomize_edit' => ['path' => '/appearance/templatecustomize/edit', 'singleton' => true],
+    'menucustom' => ['path' => '/admin/menucustom/'],
+    'menugrouping' => ['path' => '/appearance/menugrouping/'],
+    'menu_manage' => ['path' => '/appearance/menu/manage', 'rowsPerRecord' => 7],
+    'appearancewebsitewidget' => ['path' => '/appearance/website-widget/'],
+    'gallery' => ['path' => '/website/gallery/'],
+    'location' => ['path' => '/admin/location/', 'pageSize' => 30],
+    'pos_android_sales' => ['path' => '/app-pos/android/', 'pageSize' => 25, 'noTbody' => true, 'note' => 'Twig 500: pos-base.html.twig reads an invoiceMode the android controller never sets - PosController sets it, PosAndroidController does not. Presentation, so no counterpart in the API.'],
+    'pos_desktop' => ['path' => '/app-pos/desktop/', 'noTbody' => true, 'note' => 'A point-of-sale terminal, not a list: the Twig screen shows the cart this user has open, and creates a row to hold it on GET. What the API answers with is the tenant POS invoices, which is why the counts are not comparable. The item entry and the invoice behind it stay with Twig, as Medicine\'s Add Sales does.'],
+    'weekend' => ['path' => '/human-resource/weekend-leave/', 'singleton' => true],
+    'daily_attendance' => ['path' => '/human-resource/daily-attendance/'],
+    'attendance' => ['path' => '/human-resource/attendance/'],
+    'hrdepartment' => ['path' => '/human-resource/payroll-department/'],
+    'leavepolicy' => ['path' => '/human-resource/leave-policy/'],
+    'leave_setup' => ['path' => '/human-resource/leave-setup/'],
+    'employee_payroll' => ['path' => '/human-resource/employee-payroll/'],
+    'payroll' => ['path' => '/human-resource/payroll-generate/', 'pageSize' => 25],
+    'payrollsetting' => ['path' => '/human-resource/payroll-setting/'],
+
 ];
 
 /** Like http(), but stops at the redirect and reports where it points. */

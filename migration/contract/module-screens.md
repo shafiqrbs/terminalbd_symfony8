@@ -24,7 +24,7 @@ at all. So its 42 rows below say the screens execute, the queries resolve, the g
 hold and both sides agree - at zero rows. They do NOT say the two agree on real data,
 and no harness here can say that until a dump with inventory in it exists.
 
-**278 screens, 278 agree, 0 differ.**
+**304 screens, 304 agree, 0 differ.**
 
 | screen | path | twig | api page | api total | page size | |
 |---|---|---:|---:|---:|---:|---|
@@ -69,7 +69,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `medicine_minimum` | /medicine/medicine-minimum-stock/ | 0 | 0 | 0 | all | ok |
 | `medicine_particular` | /medicine/particular/ | 53 | 200 | 464 | all | ok |
 | `medicine_prepurchase` | /medicine/pre-purchase/ | 25 | 25 | 59 | 25 | ok |
-| `medicine_purchase` | /medicine/purchase/ | 25 | 25 | 98 | 25 | ok |
+| `medicine_purchase` | /medicine/purchase/ | 25 | 25 | 100 | 25 | ok |
 | `medicine_purchase_android` | /medicine/purchase/android | 0 | 0 | 0 | all | ok |
 | `medicine_purchase_item` | /medicine/purchase/stock-item-details | 25 | 25 | 2378 | 25 | ok |
 | `medicine_purchase_new` | /medicine/purchase/new | 3 | 0 | 0 | all | ok |
@@ -144,7 +144,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `inventory_purchaseitem` | /inventory/purchaseitem/ | 0 | 0 | 0 | 25 | ok |
 | `inventory_purchasereturn` | /inventory/purchase/return/ | 0 | 0 | 0 | 25 | ok |
 | `inventory_report_purchase` | /inventory/report/purchase | 0 | 0 | 0 | all | ok |
-| `inventory_salesonline` | /inventory/sales-online/ | 15 | 15 | 15 | 25 | ok |
+| `inventory_salesonline` | /inventory/sales-online/ | 19 | 19 | 19 | 25 | ok |
 | `inventory_salesimport` | /inventory/sales-improt/ | 0 | 0 | 0 | all | ok |
 | `inventory_report_sales_item_details` | /inventory/report/sales-item-details | 52 | 0 | 0 | all | ok |
 | `inventory_report_sales_overview` | /inventory/report/sales-transaction-overview | 0 | 3 | 3 | all | ok |
@@ -255,11 +255,11 @@ and no harness here can say that until a dump with inventory in it exists.
 | `business_production` | /business/product-production/ | 0 | 0 | 0 | 25 | ok |
 | `business_stock_ledger` | /business/stock/stock-ledger | 56 | 0 | 0 | all | ok |
 | `business_report_sales_stock` | /business/report/sales-stock | 1 | 0 | 0 | all | ok |
-| `business_purchase` | /business/purchase/ | 4 | 4 | 4 | 25 | ok |
+| `business_purchase` | /business/purchase/ | 6 | 6 | 6 | 25 | ok |
 | `business_purchase_item` | /business/purchase/purchase-item | 0 | 0 | 0 | 25 | ok |
 | `business_purchase_return` | /business/purchase-return/ | 0 | 0 | 0 | 25 | ok |
 | `business_report_purchase_summary` | /business/report/purchase-overview | 0 | 3 | 3 | all | ok |
-| `business_invoice` | /business/invoice/ | 3 | 3 | 3 | 25 | ok |
+| `business_invoice` | /business/invoice/ | 5 | 5 | 5 | 25 | ok |
 | `business_report_sales_area` | /business/report/sales-area | 0 | 0 | 0 | all | ok |
 | `business_report_sales_dsr` | /business/report/sales-dsr | 0 | 0 | 0 | all | ok |
 | `business_report_commission_stock` | /business/report/commission-stock-item | 0 | 0 | 0 | 25 | ok |
@@ -309,7 +309,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `hms_pathology` | /hms/pathology/ | 0 | 0 | 0 | 25 | ok |
 | `hms_invoice_patient_group_test` | /hms/report-process/patient-group-test | 0 | 0 | 0 | 25 | ok |
 | `hms_invoice_patient_test` | /hms/report-process/patient-test | 0 | 0 | 0 | 25 | ok |
-| `hms_purchase` | /hms/purchase/ | 25 | 25 | 99 | 25 | ok |
+| `hms_purchase` | /hms/purchase/ | 25 | 25 | 101 | 25 | ok |
 | `hms_referreddoctor` | /hms/referred-doctor/ | 0 | 0 | 0 | 25 | ok |
 | `hms_report_monthly_referred_commission` | /hms/report/monthly-commission-details | 0 | 0 | 0 | all | ok |
 | `hms_invoice_particular` | /hms/report-process/ | 0 | 0 | 0 | 25 | ok |
@@ -321,6 +321,35 @@ and no harness here can say that until a dump with inventory in it exists.
 | `hms_other_service` | /hms/other-service/ | 0 | 0 | 0 | all | ok |
 | `hms_surgery` | /hms/surgery-operation/ | 0 | 0 | 0 | all | ok |
 | `hms_vendor` | /hms/vendor/ | 25 | 25 | 43 | 25 | ok |
+| `collection` | /admin/collection/ | 0 | 0 | 0 | all | ok |
+| `category_sorting` | /admin/category/sorting | 0 | 25 | 1691 | 25 | ok |
+| `contactpage_modify` | /website/contactpage/modify | - | - | - | all | ok |
+| | settings row with 4 fields | | | | | |
+| `page` | /website/page/ | 0 | 0 | 0 | 25 | ok |
+| `sitecontent` | /admin/sitecontent/ | 0 | 0 | 0 | all | ok |
+| `siteslider` | /admin/siteslider/ | 0 | 0 | 0 | all | ok |
+| `siteteam` | /admin/site-team/ | 0 | 0 | 0 | all | ok |
+| `sitetestimonial` | /admin/site-testimonial/ | 0 | 0 | 0 | all | ok |
+| `templatecustomize_edit` | /appearance/templatecustomize/edit | - | - | - | all | ok |
+| | settings row with 4 fields | | | | | |
+| `menucustom` | /admin/menucustom/ | 0 | 0 | 0 | all | ok |
+| `menugrouping` | /appearance/menugrouping/ | 0 | 0 | 0 | all | ok |
+| `menu_manage` | /appearance/menu/manage | 0 | 0 | 0 | all | ok |
+| `appearancewebsitewidget` | /appearance/website-widget/ | 0 | 0 | 0 | all | ok |
+| `gallery` | /website/gallery/ | 0 | 0 | 0 | all | ok |
+| `location` | /admin/location/ | 30 | 30 | 1469 | 30 | ok |
+| `pos_android_sales` | /app-pos/android/ | 81 | 0 | 0 | 25 | ok |
+| `pos_desktop` | /app-pos/desktop/ | 0 | 1 | 1 | all | ok |
+| `weekend` | /human-resource/weekend-leave/ | - | - | - | all | ok |
+| | settings row with 7 fields | | | | | |
+| `daily_attendance` | /human-resource/daily-attendance/ | 0 | 0 | 0 | all | ok |
+| `attendance` | /human-resource/attendance/ | 6 | 6 | 6 | all | ok |
+| `hrdepartment` | /human-resource/payroll-department/ | 0 | 0 | 0 | all | ok |
+| `leavepolicy` | /human-resource/leave-policy/ | 0 | 0 | 0 | all | ok |
+| `leave_setup` | /human-resource/leave-setup/ | 0 | 0 | 0 | all | ok |
+| `employee_payroll` | /human-resource/employee-payroll/ | 6 | 6 | 6 | all | ok |
+| `payroll` | /human-resource/payroll-generate/ | 0 | 0 | 0 | 25 | ok |
+| `payrollsetting` | /human-resource/payroll-setting/ | 0 | 0 | 0 | all | ok |
 
 **`color`** - Twig 500 in both trees: ColorController does findBy(['isValid' => 1]) and ProductColor has no such field. The port answers what the screen meant - name ASC - rather than reproducing the exception.
 
@@ -375,6 +404,12 @@ and no harness here can say that until a dump with inventory in it exists.
 **`business_report_purchase_vendor_details`** - Twig 500 on page=1, same shape.
 
 **`hms_report_sales_summary`** - Twig 500 on page=1: reads $data[startDate] after filling it only for an empty request. Twelve queries run behind it and the API answers all twelve.
+
+**`category_sorting`** - Not a table on either side: the Twig screen is a drag-and-drop tree of nested <ul>, 302 <li> deep, so it has no rows to count. The API answers with the 1,691 top-level categories in sorting order.
+
+**`pos_android_sales`** - Twig 500: pos-base.html.twig reads an invoiceMode the android controller never sets - PosController sets it, PosAndroidController does not. Presentation, so no counterpart in the API.
+
+**`pos_desktop`** - A point-of-sale terminal, not a list: the Twig screen shows the cart this user has open, and creates a row to hold it on GET. What the API answers with is the tenant POS invoices, which is why the counts are not comparable. The item entry and the invoice behind it stay with Twig, as Medicine's Add Sales does.
 
 A screen with 0 rows on both sides is agreement, not evidence: this dump's tenant
 has no rows for several of these tables. That is the same constraint every other
