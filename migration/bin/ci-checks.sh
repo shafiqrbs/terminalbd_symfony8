@@ -87,6 +87,21 @@ run "api shapes" \
 run "tests" \
     bash -c "cd next && $PHP vendor/bin/phpunit | tail -3"
 
+# terminalbd_api has its own copy of the 874 non-presentation files. This asks
+# whether it still agrees with what this tree implies, and every difference it
+# does have is recorded with a reason in api-copy-differences.txt. Skipped when
+# the API is not checked out beside this repository - a job that has only this
+# one can still run everything above.
+api_src=${API_SRC:-../terminalbd_api/src}
+
+if [ -d "$api_src" ]; then
+    run "api copy" \
+        bash -c "set -o pipefail; $PHP migration/bin/check-api-copy.php --api='$api_src' | head -1"
+else
+    echo
+    echo "── api copy: skipped, no checkout at $api_src"
+fi
+
 # Only when a dump is present: it is gitignored, being tenant data. Reports
 # rather than gates - a dump is one tenant at one point in time, and columns it
 # predates are not port defects.
