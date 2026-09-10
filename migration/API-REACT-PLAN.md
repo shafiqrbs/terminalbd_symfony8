@@ -318,8 +318,8 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 
 | # | module | screens | why here |
 |---|---|---:|---|
-| 0 | — | — | **the 875 files copied into `terminalbd_api`**, pipeline switched to checking-only, `terminalbd_api/` and `terminalbd_react/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
-| 1 | **Tool** | 18 | settings; `GlobalOption` is here as an API resource even though its own menu entry is commented out, because everything else reads it |
+| 0 | ~~—~~ | — | **done 2026-09-10.** the 874 files copied into `terminalbd_api`, pipeline switched to checking-only, `terminalbd_api/` and `terminalbd_react/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
+| 1 | ~~**Tool**~~ | 18 | **done 2026-09-10.** All 18 agree with the Twig originals row for row — `migration/contract/tool-module-screens.md` |
 | 2 | **User** + **DomainUser** | 13 | login, roles, branches — the 334 nav role guards need them |
 | 3 | **Medicine** | 54 | best evidence here: 82% of visited pages render, 38% reach |
 | 4 | **Inventory** | 42 | large, well exercised |
@@ -498,10 +498,44 @@ The last one matters most. If `designation` needed a single hand-tuned pixel
 outside the tokens, 0.4 is not finished, and every screen after it inherits the
 gap.
 
+**Phase 0 closed 2026-09-10.** What proves each part, so a later change can be
+checked rather than argued about:
+
+| | proof |
+|---|---|
+| the API reads the database | `terminalbd_api/tools/verify-copy.php` — 5/5 |
+| the mapping, without a database | `terminalbd_api/tools/validate-mapping.php` — 339 entities |
+| the geometry | `terminalbd_react/tools/overlay-test.mjs` — identical |
+| the nav and its guards | 335 screens, 334 guarded, generated from `nav-scope.json` |
+| the pipeline still agrees | `migration/bin/migrate.sh --check` — tree identical, 36 recorded differences |
+| the session bridge | `terminalbd_react/tools/bridge-check.mjs`, through the proxy |
+
+The proxy is `migration/bin/strangler-proxy.mjs`: the production nginx
+arrangement on one port, reading the ported screens out of the React app's
+generated route table so a module is routed there by having landed. It is not a
+convenience — three applications on three ports are three origins, and a browser
+will not lend one origin's cookie to another, so the bridge cannot be tested in a
+browser without it.
+
 Each module ships the same way the strangler already works: its API endpoints and
 its React screens land, the module's proxy routes flip from `next/` to `terminalbd_react/`,
 and its Twig templates and web controllers are deleted from `next/`. Rollback is
 one proxy rule.
+
+Two harnesses decide whether a module has landed, and Tool established both:
+
+- `migration/bin/compare-module-screens.php` renders every Twig screen and reads
+  the API resource that replaces it, comparing row counts under the same paging
+  and the same tenancy. Not markup — the two render different HTML by design —
+  but they must be looking at the same rows. A screen that quietly lost its
+  tenant filter shows the whole database here.
+- `terminalbd_react/tools/module-check.mjs` opens every ported screen in a
+  browser and round-trips a write through the form's own endpoints.
+
+Between them they found, in one module: a screen that lists three tables and not
+the entity it is named after, a screen that is a 500 in both trees, an invoice
+list missing its `process != 'Created'` filter, and the whole role hierarchy
+missing from the API.
 
 ---
 
