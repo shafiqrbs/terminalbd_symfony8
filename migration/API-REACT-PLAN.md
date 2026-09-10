@@ -323,8 +323,8 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 | 2 | ~~**User** + **DomainUser**~~ | 13 | **done 2026-09-10.** 31 of 335 screens built; `migration/contract/module-screens.md` |
 | 3 | ~~**Medicine**~~ | 54 | **done 2026-09-10.** 85 of 335 screens built; 24 of these are reports |
 | 4 | ~~**Inventory**~~ | 42 | **done 2026-09-10.** 127 of 335 screens built; 17 of these are reports. **The reason given here was wrong**: this dump has no Inventory data at all - no config, no items, no stock - so the module is verified running and agreeing at zero rows, on a seeded config row, and not on real data. `migration/contract/inventory-module-screens.md` |
-| 5 | **Accounting** | 59 | largest, and depends on 1–4 |
-| 6 | **Business**, **Hospital** | 92 | large, moderate coverage |
+| 5 | ~~**Accounting**~~ | 59 | **done 2026-09-11.** 186 of 335 screens built; 17 reports, 20 lists with overviews, 5 money-writing forms left with Twig. **This phase found the harness had been running as a user of the PLATFORM tenant, not the tenant that owns the dump's data** - so phases 1-4 were re-verified against real rows here for the first time, and one phase 3 defect fell out. `migration/contract/accounting-module-screens.md` |
+| 6 | **Business**, **Hospital** | 92 | large, moderate coverage — check their row counts for tenant 322 before starting |
 | 7 | the small modules | 18 | Product, Content, Appearance, Media, Location, Pos, Migration |
 | 8 | **Restaurant**, **DoctorPrescription** | 25 | blocked: no `restaurant_config` or `dps_config` rows in this dump - as Inventory turned out to be, so read a module's row count before trusting its place in this order. Customer is gone from the scope entirely — both its items are commented out |
 | 9 | **the mobile API moves** | — | the 96 wire-locked endpoints leave `next/` for `terminalbd_api/`, byte-compatible |

@@ -52,7 +52,14 @@ foreach (file($root . '/next/.env.local', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPT
 
 $twigBase = getenv('TWIG_BASE') ?: 'http://127.0.0.1:8802';
 $apiBase = getenv('API_BASE') ?: 'http://127.0.0.1:8810';
-$user = 'migration_check';
+// The tenant that owns this dump's data is 322, "Bengal Mart", and not the
+// platform tenant `migration_check` was seeded in. Running as a user of tenant 1
+// compared 16,571 medicine stock rows against zero and called it agreement, so
+// the default is the tenant's own harness user; HARNESS_USER overrides it.
+//
+//   php8.5 migration/bin/seed-harness-user.php --tenant=322 \
+//       --username=migration_check_322 --roles-from=siddhartha
+$user = getenv('HARNESS_USER') ?: 'migration_check_322';
 $password = $env['SMOKE_TEST_PASSWORD'] ?? '';
 
 /**
@@ -79,6 +86,30 @@ $password = $env['SMOKE_TEST_PASSWORD'] ?? '';
  * `draft` is a screen that CREATES a row and redirects: Inventory's New Invoice.
  * Both sides are asked to make one and the two are compared by the shape of the
  * path they hand back, never by the invoice number - each side makes its own.
+ *
+ * `tbodyIndex` says which tbody on the page is the LIST. The default is the
+ * first, which held until Accounting: almost every screen there puts a totals
+ * panel above its table, and that panel is a tbody of its own. Counting it
+ * compares an overview against a list and reports a defect that is not there.
+ *
+ * `deferred` is a screen the port has deliberately NOT taken over: the five
+ * "Add Expense / Add Receive / Add Payment / Loan / Ledger Voucher" forms create
+ * money movements with accounting side effects, the same piece of work Medicine's
+ * Add Sales and Inventory's New Invoice left alone, and the proxy still sends
+ * them to the Twig application. There is nothing to compare, so what is checked
+ * is that the Twig screen still answers and that the API knows the key exists -
+ * which is what keeps a deferred screen countable instead of quietly missing.
+ *
+ * `plusOverview` adds the resource's OVERVIEW row count to the API's page count.
+ * Account Head is the one screen that needs it: its Twig table walks the seven
+ * parent heads and prints each one's children in the same tbody, so the page
+ * shows 45 rows for 7 records, and the API returns the parents as the list and
+ * the children as the overview beside it.
+ *
+ * `query` is a query string given to BOTH sides. Accounting's cash screens apply
+ * a date range whether or not one is asked for, defaulting both ends to TODAY -
+ * so with no query they show nothing, agree at nothing, and prove nothing. A
+ * range wide enough to hold the data is what makes them a real comparison.
  */
 $screens = [
     'designation' => ['path' => '/admin/designation/'],
@@ -139,7 +170,7 @@ $screens = [
     'medicine_expiry_item' => ['path' => '/medicine/purchase/medicine-expiration-item', 'pageSize' => 25],
     'medicine_instantpurchase' => ['path' => '/medicine/instant-purchase/', 'pageSize' => 25],
     'medicine_minimum' => ['path' => '/medicine/medicine-minimum-stock/'],
-    'medicine_particular' => ['path' => '/medicine/particular/'],
+    'medicine_particular' => ['path' => '/medicine/particular/', 'note' => 'Twig 500 on real data: index.html.twig line 93 reads .name on a null relation. A template defect the platform tenant had no rows to expose; presentation only, so the API is unaffected.'],
     'medicine_prepurchase' => ['path' => '/medicine/pre-purchase/', 'pageSize' => 25],
     'medicine_purchase' => ['path' => '/medicine/purchase/', 'pageSize' => 25],
     'medicine_purchase_android' => ['path' => '/medicine/purchase/android', 'report' => true],
@@ -208,7 +239,7 @@ $screens = [
     'inventory_product' => ['path' => '/inventory/product/', 'pageSize' => 25],
     'inventory_report_monthly_sales_profit' => ['path' => '/inventory/report/monthly-sales-profit', 'report' => true],
     'inventory_report_monthly_sales' => ['path' => '/inventory/report/monthly-sales', 'report' => true],
-    'inventory_salesonline_new' => ['path' => '/inventory/sales-online/new', 'draft' => true, 'apiPath' => '/api/v1/inventory/sales-online/draft'],
+    'inventory_salesonline_new' => ['path' => '/inventory/sales-online/new', 'draft' => true, 'apiPath' => '/api/v1/inventory/sales-online/draft', 'note' => 'Twig 500: newAction reads the profile branches of the signed-in user before persisting.'],
     'inventory_report_operational_stock' => ['path' => '/inventory/report/operational-stock', 'report' => true],
     'inventory_report_sales_item' => ['path' => '/inventory/report/sales-item', 'report' => true],
     'inventory_report_periodic_stock' => ['path' => '/inventory/report/periodic-stock', 'report' => true],
@@ -221,11 +252,11 @@ $screens = [
     'inventory_purchaseitem' => ['path' => '/inventory/purchaseitem/', 'pageSize' => 25],
     'inventory_purchasereturn' => ['path' => '/inventory/purchase/return/', 'pageSize' => 25, 'rowsPerRecord' => 2],
     'inventory_report_purchase' => ['path' => '/inventory/report/purchase', 'report' => true],
-    'inventory_salesonline' => ['path' => '/inventory/sales-online/', 'pageSize' => 25],
+    'inventory_salesonline' => ['path' => '/inventory/sales-online/', 'pageSize' => 25, 'note' => 'Twig 500 on real data, same shape: SalesOnline/index.html.twig line 129 reads .name on a null relation.'],
     'inventory_salesimport' => ['path' => '/inventory/sales-improt/', 'staticRows' => 1],
     'inventory_report_sales_item_details' => ['path' => '/inventory/report/sales-item-details', 'report' => true, 'note' => 'The Twig screen branches on the salesMode of the config and, at "stock", calls Sales::reportSalesItemDetails - a method that exists in NEITHER tree. Pre-existing, not a port defect; the API runs the branch that works.'],
     'inventory_report_sales_overview' => ['path' => '/inventory/report/sales-transaction-overview', 'report' => true],
-    'inventory_salesreturn' => ['path' => '/inventory/salesreturn/', 'pageSize' => 25, 'rowsPerRecord' => 2],
+    'inventory_salesreturn' => ['path' => '/inventory/salesreturn/', 'pageSize' => 25, 'rowsPerRecord' => 2, 'note' => 'Fatal in both trees: SalesReturnRepository reaches getBranches() through a profile this tenant has not set.'],
     'inventory_report_sales_user' => ['path' => '/inventory/report/sales-user-overview', 'report' => true],
     'inventory_report_sales' => ['path' => '/inventory/report/sales-transaction', 'report' => true],
     'itemsize_group' => ['path' => '/inventory/item-size/size-group', 'apiPath' => '/api/v1/inventory/size-group', 'noTbody' => true, 'note' => 'Twig 500, and identical in the legacy: ItemSizeController writes $entities only inside if($sizes), so with no ItemSize rows the template reads a variable that was never assigned. A notice on PHP 5, a fatal on 8.5.'],
@@ -237,6 +268,67 @@ $screens = [
     'inventory_report_till_stock' => ['path' => '/inventory/report/till-stock', 'report' => true],
     'inventory_report_sales_user_target' => ['path' => '/inventory/report/user-sales-mothly-target', 'report' => true],
     'inventory_vendor' => ['path' => '/inventory/vendor/'],
+
+    // --- phase 5: Accounting -----------------------------------------------
+    'report_expenditure_summary' => ['path' => '/accounting/report/expenditure-account-head-summary', 'report' => true, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'accounthead' => ['path' => '/accounting/accounthead/', 'noTbody' => false, 'note' => 'A three-level tree in one tbody, not a list: the template walks 7 parent heads and prints children and grandchildren from a map keyed by parent id, so its 45 rows are not a row count. The API returns the parents as the list and the map beside them.'],
+    'account_user' => ['path' => '/accounting/account-user/', 'pageSize' => 25],
+    'account_vendor' => ['path' => '/accounting/vendor/', 'pageSize' => 25],
+    'account_expenditure_new' => ['path' => '/accounting/expenditure/new', 'deferred' => true],
+    'account_purchase_new' => ['path' => '/accounting/purchase/new', 'deferred' => true],
+    'account_sales_new' => ['path' => '/accounting/sales/new', 'deferred' => true],
+    'account_transaction_accountcash' => ['path' => '/accounting/transaction/all-account-cash', 'pageSize' => 25, 'tbodyIndex' => 1, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_expenditure_android' => ['path' => '/accounting/expenditure/android', 'noTbody' => true],
+    'account_balance_sheet' => ['path' => '/accounting/transaction/balance-sheet', 'report' => true],
+    'accountbank' => ['path' => '/accounting/bank-account/'],
+    'account_transaction_bank' => ['path' => '/accounting/transaction/bank-cash', 'pageSize' => 25, 'tbodyIndex' => 1, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_expense_purchase' => ['path' => '/accounting/expense-purchase/', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_transaction_cash_overview' => ['path' => '/accounting/transaction/cash-overview', 'report' => true, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_cashreconciliation' => ['path' => '/accounting/cash-reconciliation/', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_transaction_cash' => ['path' => '/accounting/transaction/hand-cash', 'pageSize' => 25, 'tbodyIndex' => 1, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'report_expenditure_category' => ['path' => '/accounting/report/expenditure-category', 'report' => true, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_transaction_cash_summary' => ['path' => '/accounting/transaction/cash-summary', 'report' => true, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_purchasecommission' => ['path' => '/accounting/purchase-commission/', 'pageSize' => 25, 'query' => 'startDate=2000-01-01&endDate=2030-12-31'],
+    'account_condition' => ['path' => '/accounting/account-condition/'],
+    'account_condition_ledger' => ['path' => '/accounting/account-condition/ledger', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_config_manage' => ['path' => '/accounting/manage-config/manage', 'singleton' => true, 'note' => 'Twig 500, and presentation only: the form template renders businessMode twice and Symfony 8 throws where 2.8 re-rendered. The API has no form templates.'],
+    'account_balancetransfer' => ['path' => '/accounting/balance-transfer/', 'pageSize' => 25, 'tbodyIndex' => 1, 'note' => 'Given a date range this screen fatals in BOTH trees - AccountBalanceTransferRepository builds the datetime by splitting the string itself and produces \'1 00:00:00\' - so it is compared without one. Pre-existing, and the reason there is no single range format the module accepts.'],
+    'report_expenditure_details' => ['path' => '/accounting/report/expenditure', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_double_entry' => ['path' => '/accounting/double-entry-journal/', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_expenditure' => ['path' => '/accounting/expenditure/', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'expensecategory' => ['path' => '/accounting/expense-category/', 'pageSize' => 25],
+    'report_income' => ['path' => '/accounting/report/income', 'report' => true],
+    'hms_report_income' => ['path' => '/accounting/report-hms/income', 'report' => true],
+    'account_medicine_income' => ['path' => '/accounting/medicine/medicine-income', 'report' => true],
+    'account_business_income' => ['path' => '/accounting/business/income', 'report' => true, 'note' => 'Fatal in both trees, inside the copied repository: reportBusinessIncome reaches through a null.'],
+    'account_transaction' => ['path' => '/accounting/transaction/', 'report' => true, 'note' => 'Fatal in both trees: TransactionController passes one argument to getGroupByAccountHead(), which declares three. The API fails identically, in the copied code.'],
+    'account_journal' => ['path' => '/accounting/journal/', 'pageSize' => 25, 'tbodyIndex' => 1, 'query' => 'startDate=01-01-2000&endDate=31-12-2030', 'rowsPerRecord' => 3],
+    'journal_voucher' => ['path' => '/accounting/journal-voucher/', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'report_customer_ledger' => ['path' => '/accounting/customer/ledger', 'report' => true],
+    'report_vendor_ledger' => ['path' => '/accounting/vendor/ledger', 'report' => true],
+    'account_loan_new' => ['path' => '/accounting/loan/new', 'deferred' => true],
+    'account_loan' => ['path' => '/accounting/loan/', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'accountmobilebank' => ['path' => '/accounting/mobile-bank-account/'],
+    'account_transaction_mobilebank' => ['path' => '/accounting/transaction/mobile-cash', 'pageSize' => 25, 'tbodyIndex' => 1, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_transaction_monthly' => ['path' => '/accounting/transaction/transaction-monthly', 'apiPath' => '/api/v1/accounting/cash-book/monthly', 'noTbody' => true, 'query' => 'month=01&year=2025'],
+    'report_monthly_income' => ['path' => '/accounting/report/monthly-income', 'report' => true],
+    'hms_report_monthly_income' => ['path' => '/accounting/report-hms/monthly-income', 'report' => true],
+    'account_medicine_income_monthly' => ['path' => '/accounting/medicine/medicine-income-monthly', 'report' => true],
+    'account_business_income_monthly' => ['path' => '/accounting/business/income-monthly', 'report' => true],
+    'account_condition_ledger_new' => ['path' => '/accounting/account-condition/ledger/new', 'deferred' => true],
+    'report_customer_outstanding' => ['path' => '/accounting/customer/outstanding', 'pageSize' => 25, 'tbodyIndex' => 1],
+    'report_vendor_outstanding' => ['path' => '/accounting/vendor/outstanding', 'pageSize' => 25, 'tbodyIndex' => 1],
+    'account_profit' => ['path' => '/accounting/profit-loss/', 'pageSize' => 25],
+    'account_profit_withdrawal' => ['path' => '/accounting/profit-withdrawal/', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'account_purchase' => ['path' => '/accounting/purchase/', 'pageSize' => 25, 'tbodyIndex' => 1, 'query' => 'startDate=01-01-2000&endDate=31-12-2030', 'rowsPerRecord' => 4],
+    'account_transaction_purchase_expense' => ['path' => '/accounting/transaction/transaction-purchase-expense', 'report' => true, 'query' => 'startDate=01-01-2000&endDate=31-12-2030', 'note' => 'Twig 500 whenever the screen is given any parameter other than date: the controller fills $data[date] only when $data is entirely empty, then reads it unconditionally. Pre-existing; the API passes the query through and answers.'],
+    'account_paymentsalary' => ['path' => '/accounting/payment-salary/', 'pageSize' => 25, 'query' => 'startDate=2000-01-01&endDate=2030-12-31'],
+    'account_sales' => ['path' => '/accounting/sales/', 'pageSize' => 25, 'tbodyIndex' => 1, 'query' => 'startDate=01-01-2000&endDate=31-12-2030', 'rowsPerRecord' => 3],
+    'account_salesadjustment' => ['path' => '/accounting/sales-adjustment/', 'pageSize' => 25, 'query' => 'startDate=01-01-2000&endDate=31-12-2030'],
+    'report_customer_summary' => ['path' => '/accounting/customer/summary', 'pageSize' => 25, 'tbodyIndex' => 1],
+    'report_vendor_summary' => ['path' => '/accounting/vendor/summary', 'pageSize' => 25, 'tbodyIndex' => 1],
+    'account_trail_balance' => ['path' => '/accounting/transaction/trail-balance'],
+    'account_transaction_yearly' => ['path' => '/accounting/transaction/transaction-yearly', 'apiPath' => '/api/v1/accounting/cash-book/yearly', 'noTbody' => true, 'query' => 'year=2025'],
 
 ];
 
@@ -255,6 +347,12 @@ function httpNoFollow(string $url, array $options = []): array
     curl_close($ch);
 
     return [$status, $body, $location];
+}
+
+/** A query string for a path that may already have one. */
+function qs(string $path, string $extra): string
+{
+    return $extra === '' ? '' : (str_contains($path, '?') ? '&' : '?') . $extra;
 }
 
 function http(string $url, array $options = []): array
@@ -326,6 +424,36 @@ foreach ($screens as $key => $screen) {
     $apiPath = $screen['apiPath'] ?? null;
     $noTbody = $screen['noTbody'] ?? false;
     $isDraft = $screen['draft'] ?? false;
+    $tbodyIndex = $screen['tbodyIndex'] ?? 0;
+    $isDeferred = $screen['deferred'] ?? false;
+    $plusOverview = $screen['plusOverview'] ?? false;
+
+    if ($isDeferred) {
+        [$twigStatus] = http($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
+        [$apiStatus, $json] = http($apiBase . '/api/v1/resources', [
+            CURLOPT_COOKIEFILE => $jarApi,
+            CURLOPT_HTTPHEADER => ['X-Api-Key: harness'],
+        ]);
+        $known = in_array($key, array_column(json_decode($json, true)['data'] ?? [], 'key'), true);
+        $ok = $twigStatus === 200 && $apiStatus === 200 && $known;
+
+        if (!$ok) {
+            $failures++;
+        }
+
+        $rows[] = [
+            'key' => $key, 'path' => $path, 'twigStatus' => $twigStatus, 'apiStatus' => $apiStatus,
+            'twigRows' => null, 'apiPage' => null, 'apiTotal' => null, 'pageSize' => null,
+            'ok' => $ok, 'note' => $note,
+            'detail' => 'deferred: the Twig screen still owns this write',
+        ];
+
+        printf("  %-44s twig %d | api knows the key: %s   %s\n", $key, $twigStatus,
+            $known ? 'yes' : 'NO', $ok ? 'ok (deferred)' : 'DIFFERS');
+
+        continue;
+    }
+    $extra = $screen['query'] ?? '';
 
     // A screen that creates a row and redirects. The Twig one does it on GET,
     // which is why it is not followed; the API does it on POST, which is why it
@@ -396,7 +524,7 @@ foreach ($screens as $key => $screen) {
     // the API's. Most compute nothing until a date range is chosen, and then
     // both sides show nothing, which is agreement.
     if ($isReport) {
-        [$twigStatus, $html] = http($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
+        [$twigStatus, $html] = http($twigBase . $path . qs($path, $extra), [CURLOPT_COOKIEFILE => $jarTwig]);
         $twigRows = 0;
 
         if (preg_match_all('/<tbody[^>]*>(.*?)<\/tbody>/is', $html, $tm) > 0) {
@@ -405,7 +533,7 @@ foreach ($screens as $key => $screen) {
             }
         }
 
-        [$apiStatus, $json] = http($apiBase . '/api/v1/reports/' . $key, [
+        [$apiStatus, $json] = http($apiBase . '/api/v1/reports/' . $key . ($extra !== '' ? '?' . $extra : ''), [
             CURLOPT_COOKIEFILE => $jarApi,
             CURLOPT_HTTPHEADER => ['X-Api-Key: harness'],
         ]);
@@ -452,6 +580,12 @@ foreach ($screens as $key => $screen) {
         $fields = json_decode($json, true)['data'] ?? null;
         $ok = $twigStatus === 200 && $apiStatus === 200 && is_array($fields) && $fields !== [];
 
+        if ($note !== null) {
+            // Broken on the Twig side, and named as such: the API answering is
+            // the result, exactly as for a list.
+            $ok = $apiStatus === 200 && is_array($fields) && $fields !== [];
+        }
+
         if (!$ok) {
             $failures++;
         }
@@ -464,7 +598,8 @@ foreach ($screens as $key => $screen) {
         ];
 
         printf("  %-24s twig %d settings   | api %d %d field(s)          %s\n", $key, $twigStatus,
-            $apiStatus, is_array($fields) ? count($fields) - 1 : 0, $ok ? 'ok' : 'DIFFERS');
+            $apiStatus, is_array($fields) ? count($fields) - 1 : 0,
+            $note !== null ? 'ok (twig broken)' : ($ok ? 'ok' : 'DIFFERS'));
 
         continue;
     }
@@ -473,14 +608,15 @@ foreach ($screens as $key => $screen) {
     // named - /medicine/sales/ shows nothing and /medicine/sales/?page=1 shows
     // its first 25 - and comparing against the empty one would be comparing
     // against a quirk rather than against the screen.
-    $listUrl = $twigBase . $path . (str_contains($path, '?') ? '&' : '?') . 'page=1';
+    $listUrl = $twigBase . $path . (str_contains($path, '?') ? '&' : '?') . 'page=1'
+        . ($extra !== '' ? '&' . $extra : '');
     [$twigStatus, $html] = http($listUrl, [CURLOPT_COOKIEFILE => $jarTwig]);
 
     // The first tbody is the list; a page may carry filter tables after it.
     $twigRows = null;
 
-    if (preg_match('/<tbody[^>]*>(.*?)<\/tbody>/is', $html, $tm) === 1) {
-        $twigRows = intdiv(preg_match_all('/<tr[\s>]/i', $tm[1]) - $staticRows, $rowsPerRecord);
+    if (preg_match_all('/<tbody[^>]*>(.*?)<\/tbody>/is', $html, $tm) > $tbodyIndex) {
+        $twigRows = intdiv(preg_match_all('/<tr[\s>]/i', $tm[1][$tbodyIndex]) - $staticRows, $rowsPerRecord);
     } elseif ($noTbody && $twigStatus === 200) {
         // The table this screen prints was built by a repository method as a
         // string and has no <tbody> at all, so its rows are counted from the
@@ -498,8 +634,9 @@ foreach ($screens as $key => $screen) {
     foreach (explode(',', $key) as $resourceKey) {
         [$status, $json] = http(
             $apiPath !== null
-                ? $apiBase . $apiPath
-                : $apiBase . '/api/v1/resources/' . $resourceKey . '?perPage=' . ($pageSize ?? 200),
+                ? $apiBase . $apiPath . ($extra !== '' ? '?' . $extra : '')
+                : $apiBase . '/api/v1/resources/' . $resourceKey . '?perPage=' . ($pageSize ?? 200)
+                    . ($extra !== '' ? '&' . $extra : ''),
             [CURLOPT_COOKIEFILE => $jarApi, CURLOPT_HTTPHEADER => ['X-Api-Key: harness']]
         );
         $payload = json_decode($json, true);
@@ -514,6 +651,16 @@ foreach ($screens as $key => $screen) {
 
         $total += (int) $payload['meta']['total'];
         $page += count($payload['data']);
+    }
+
+    if ($plusOverview && $page !== null) {
+        [, $json] = http($apiBase . '/api/v1/reports/' . $key . ($extra !== '' ? '?' . $extra : ''), [
+            CURLOPT_COOKIEFILE => $jarApi,
+            CURLOPT_HTTPHEADER => ['X-Api-Key: harness'],
+        ]);
+        $extraRows = (int) (json_decode($json, true)['meta']['total'] ?? 0);
+        $page += $extraRows;
+        $total += $extraRows;
     }
 
     $expected = $pageSize === null ? $total : min($pageSize, (int) $total);

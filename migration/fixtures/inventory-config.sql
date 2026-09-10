@@ -1,10 +1,14 @@
 -- Phase 4 fixture: the tenant's InventoryConfig row.
 --
 -- The verification dump has no Inventory data at all - no config, no items, no
--- stock - and without a config row every Inventory screen fatals on
--- getInventoryConfig()->getId() in BOTH trees. Two applications failing
+-- stock, for ANY tenant - and without a config row every Inventory screen fatals
+-- on getInventoryConfig()->getId() in BOTH trees. Two applications failing
 -- identically is not evidence of a faithful port, so this row exists to make
 -- the 42 screens run at all; what they then agree on is zero rows.
+--
+-- Seeded for both harness tenants: 1 (Terminal BD, the platform tenant the
+-- harness used to run as) and 322 (Bengal Mart, the tenant that actually owns
+-- this dump's data and that it runs as now).
 --
 -- Its values are the form type's own defaults (InventoryConfigType empty_data),
 -- not invented settings: usingBarcode "item", vatMode "including",
@@ -21,5 +25,7 @@
 -- See migration/contract/inventory-module-screens.md.
 
 INSERT INTO InventoryConfig (globalOption_id, isPos, removeImage, usingBarcode, vatMode, salesMode, deliveryProcess, printer, shopName, address)
-SELECT 1, 0, 0, 'item', 'including', 'stock', 'manual-sales', 'save', 'Terminal BD', 'Seeded for migration verification'
-WHERE NOT EXISTS (SELECT 1 FROM (SELECT * FROM InventoryConfig) c WHERE c.globalOption_id = 1);
+SELECT g.id, 0, 0, 'item', 'including', 'stock', 'manual-sales', 'save', g.name, 'Seeded for migration verification'
+FROM GlobalOption g
+WHERE g.id IN (1, 322)
+  AND NOT EXISTS (SELECT 1 FROM (SELECT * FROM InventoryConfig) c WHERE c.globalOption_id = g.id);

@@ -24,7 +24,7 @@ at all. So its 42 rows below say the screens execute, the queries resolve, the g
 hold and both sides agree - at zero rows. They do NOT say the two agree on real data,
 and no harness here can say that until a dump with inventory in it exists.
 
-**127 screens, 127 agree, 0 differ.**
+**186 screens, 186 agree, 0 differ.**
 
 | screen | path | twig | api page | api total | page size | |
 |---|---|---:|---:|---:|---:|---|
@@ -52,10 +52,10 @@ and no harness here can say that until a dump with inventory in it exists.
 | `restaurant_customer` | /restaurant/customer/ | 3 | 3 | 3 | 20 | ok |
 | `hms_customer` | /hms/patient/ | 3 | 3 | 3 | 20 | ok |
 | `domain_association` | /crm/association/member | 0 | 0 | 0 | 20 | ok |
-| `domain_user` | /hr/employee/ | 2 | 2 | 2 | all | ok |
-| `business_sales_user` | /business/sales-user/ | 2 | 2 | 2 | all | ok |
-| `inventory_sales_user` | /inventory/sales-user/ | 2 | 2 | 2 | all | ok |
-| `medicine_sales_user` | /medicine/sales-user/ | 2 | 2 | 2 | all | ok |
+| `domain_user` | /hr/employee/ | 7 | 7 | 7 | all | ok |
+| `business_sales_user` | /business/sales-user/ | 7 | 7 | 7 | all | ok |
+| `inventory_sales_user` | /inventory/sales-user/ | 7 | 7 | 7 | all | ok |
+| `medicine_sales_user` | /medicine/sales-user/ | 7 | 7 | 7 | all | ok |
 | `domain_notepad` | /notepad/ | 0 | 0 | 0 | 20 | ok |
 | `domain_notificationconfig` | /sms/notification/ | - | - | - | all | ok |
 | | settings row with 5 fields | | | | | |
@@ -67,53 +67,53 @@ and no harness here can say that until a dump with inventory in it exists.
 | `medicine_expiry_item` | /medicine/purchase/medicine-expiration-item | 0 | 0 | 0 | 25 | ok |
 | `medicine_instantpurchase` | /medicine/instant-purchase/ | 0 | 0 | 0 | 25 | ok |
 | `medicine_minimum` | /medicine/medicine-minimum-stock/ | 0 | 0 | 0 | all | ok |
-| `medicine_particular` | /medicine/particular/ | 0 | 0 | 0 | all | ok |
-| `medicine_prepurchase` | /medicine/pre-purchase/ | 25 | 25 | 284 | 25 | ok |
-| `medicine_purchase` | /medicine/purchase/ | 25 | 25 | 66 | 25 | ok |
+| `medicine_particular` | /medicine/particular/ | 53 | 200 | 464 | all | ok |
+| `medicine_prepurchase` | /medicine/pre-purchase/ | 25 | 25 | 59 | 25 | ok |
+| `medicine_purchase` | /medicine/purchase/ | 25 | 25 | 95 | 25 | ok |
 | `medicine_purchase_android` | /medicine/purchase/android | 0 | 0 | 0 | all | ok |
-| `medicine_purchase_item` | /medicine/purchase/stock-item-details | 0 | 0 | 0 | 25 | ok |
-| `medicine_purchase_new` | /medicine/purchase/new | 53 | 0 | 0 | all | ok |
+| `medicine_purchase_item` | /medicine/purchase/stock-item-details | 25 | 25 | 2378 | 25 | ok |
+| `medicine_purchase_new` | /medicine/purchase/new | 3 | 0 | 0 | all | ok |
 | `medicine_purchase_return` | /medicine/purchase-return/ | 0 | 0 | 0 | all | ok |
-| `medicine_report_brand_stock` | /medicine/report/brand-stock | 0 | 0 | 0 | all | ok |
-| `medicine_report_daily_hourly_sales` | /medicine/report/daily-sales-chart | 0 | 0 | 0 | all | ok |
+| `medicine_report_brand_stock` | /medicine/report/brand-stock | 228 | 228 | 228 | all | ok |
+| `medicine_report_daily_hourly_sales` | /medicine/report/daily-sales-chart | 41 | 41 | 41 | all | ok |
 | `medicine_report_low_sales_item` | /medicine/report/low-sales-item | 0 | 0 | 0 | all | ok |
 | `medicine_report_monthly_sales_purchase` | /medicine/report/monthly-sales-purchase-chart | 0 | 0 | 0 | all | ok |
-| `medicine_report_product_stock_sales` | /medicine/report/product-vendor-stock-sales | 0 | 0 | 0 | all | ok |
-| `medicine_report_purchase_brand_sales` | /medicine/report/purchase-brand-sales | 0 | 0 | 0 | all | ok |
-| `medicine_report_purchase_brand_sales_details` | /medicine/report/purchase-brand-sales-details | 0 | 0 | 0 | all | ok |
-| `medicine_report_purchase_item` | /medicine/report/purchase-item-report | 0 | 0 | 0 | all | ok |
-| `medicine_report_purchase_stock` | /medicine/report/purchase-vendor | 0 | 0 | 0 | all | ok |
-| `medicine_report_purchase_summary` | /medicine/report/purchase-overview | 0 | 1 | 1 | all | ok |
-| `medicine_report_purchase_vendor` | /medicine/report/purchase-vendor-outstanding | 0 | 0 | 0 | all | ok |
-| `medicine_report_purchase_vendor_details` | /medicine/report/purchase-vendor-details | 52 | 65 | 65 | all | ok |
-| `medicine_report_remaining_stock` | /medicine/report/remaining-stock-report | 0 | 0 | 0 | all | ok |
+| `medicine_report_product_stock_sales` | /medicine/report/product-vendor-stock-sales | 25 | 2022 | 2022 | all | ok |
+| `medicine_report_purchase_brand_sales` | /medicine/report/purchase-brand-sales | 25 | 228 | 228 | all | ok |
+| `medicine_report_purchase_brand_sales_details` | /medicine/report/purchase-brand-sales-details | 25 | 2022 | 2022 | all | ok |
+| `medicine_report_purchase_item` | /medicine/report/purchase-item-report | 0 | 2436 | 2436 | all | ok |
+| `medicine_report_purchase_stock` | /medicine/report/purchase-vendor | 41 | 41 | 41 | all | ok |
+| `medicine_report_purchase_summary` | /medicine/report/purchase-overview | 0 | 4 | 4 | all | ok |
+| `medicine_report_purchase_vendor` | /medicine/report/purchase-vendor-outstanding | 41 | 41 | 41 | all | ok |
+| `medicine_report_purchase_vendor_details` | /medicine/report/purchase-vendor-details | 80 | 65 | 65 | all | ok |
+| `medicine_report_remaining_stock` | /medicine/report/remaining-stock-report | 0 | 16571 | 16571 | all | ok |
 | `medicine_report_sales_daily` | /medicine/report/sales-daily-wise | 30 | 0 | 0 | all | ok |
 | `medicine_report_sales_details` | /medicine/report/sales-details | 0 | 2 | 2 | all | ok |
-| `medicine_report_sales_stock` | /medicine/report/sales-stock | 0 | 2 | 2 | all | ok |
+| `medicine_report_sales_stock` | /medicine/report/sales-stock | 25 | 862 | 862 | all | ok |
 | `medicine_report_sales_summary` | /medicine/report/sales-overview | 0 | 3 | 3 | all | ok |
 | `medicine_report_sales_user` | /medicine/report/sales-user | 0 | 0 | 0 | all | ok |
 | `medicine_report_sales_user_monthly` | /medicine/report/sales-user-monthly | 12 | 0 | 0 | all | ok |
-| `medicine_report_sales_vendor_customer` | /medicine/report/vendor-base-sales | 0 | 0 | 0 | all | ok |
+| `medicine_report_sales_vendor_customer` | /medicine/report/vendor-base-sales | 0 | 1 | 1 | all | ok |
 | `medicine_report_top_sales_item` | /medicine/report/top-sales-item | 0 | 0 | 0 | all | ok |
 | `medicine_report_vendor_sales` | /medicine/vendor-purchase-sales | 0 | 0 | 0 | all | ok |
 | `medicine_report_vendor_sales_medicine` | /medicine/vendor-purchase-sales-medicine | 0 | 1 | 1 | all | ok |
-| `medicine_sales` | /medicine/sales/ | 25 | 25 | 45 | 25 | ok |
+| `medicine_sales` | /medicine/sales/ | 25 | 25 | 2117 | 25 | ok |
 | `medicine_sales_android` | /medicine/sales/android | 0 | 0 | 0 | all | ok |
-| `medicine_sales_customer_item` | /medicine/sales-return/customer-sales-item | - | 0 | 0 | 25 | ok |
+| `medicine_sales_customer_item` | /medicine/sales-return/customer-sales-item | - | 25 | 3491 | 25 | ok |
 | `medicine_sales_customer_return_invoice` | /medicine/sales-return/sales-return-invoice | 0 | 0 | 0 | 25 | ok |
 | `medicine_sales_hold` | /medicine/sales/hold | 0 | 0 | 0 | 25 | ok |
-| `medicine_sales_item` | /medicine/sales/sales-item | 0 | 0 | 0 | 25 | ok |
-| `medicine_sales_return` | /medicine/sales-return/ | 0 | 0 | 0 | 25 | ok |
+| `medicine_sales_item` | /medicine/sales/sales-item | 25 | 25 | 3491 | 25 | ok |
+| `medicine_sales_return` | /medicine/sales-return/ | 15 | 15 | 15 | 25 | ok |
 | `medicine_sales_temporary_new` | /medicine/sales-temporary/new | 51 | 0 | 0 | all | ok |
-| `medicine_stock` | /medicine/stock/ | 0 | 0 | 0 | 25 | ok |
-| `medicine_stock_current_short_item` | /medicine/stock/daily-item-short-list | 0 | 0 | 0 | 25 | ok |
+| `medicine_stock` | /medicine/stock/ | 25 | 25 | 16570 | 25 | ok |
+| `medicine_stock_current_short_item` | /medicine/stock/daily-item-short-list | 1 | 1 | 1 | 25 | ok |
 | `medicine_stock_item_history` | /medicine/stock/item-history | 0 | 0 | 0 | all | ok |
-| `medicine_stock_short_item` | /medicine/stock/item-short-list | 0 | 0 | 0 | 25 | ok |
+| `medicine_stock_short_item` | /medicine/stock/item-short-list | 25 | 25 | 1602 | 25 | ok |
 | `medicine_stockhouse` | /medicine/stock-wear-house/ | 0 | 0 | 0 | 25 | ok |
-| `medicine_system_overview` | /medicine/report/system-overview | 52 | - | - | all | ok |
+| `medicine_system_overview` | /medicine/report/system-overview | 0 | 5 | 5 | all | ok |
 | `medicine_transfer` | /medicine/medicine-transfer/ | 0 | 0 | 0 | all | ok |
-| `medicine_vendor` | /medicine/vendor/ | 0 | 0 | 0 | 25 | ok |
-| `medicinestock_import` | /medicine/medicine-stock-import/ | 0 | 0 | 0 | 25 | ok |
+| `medicine_vendor` | /medicine/vendor/ | 25 | 25 | 43 | 25 | ok |
+| `medicinestock_import` | /medicine/medicine-stock-import/ | 1 | 1 | 1 | 25 | ok |
 | `stock_adjustment` | /medicine/stock-adjustment/ | 0 | 0 | 0 | 25 | ok |
 | `stock_adjustment_summary` | /medicine/stock-adjustment/summary | 0 | 0 | 0 | 25 | ok |
 | `item_new` | /inventory/item/new | 51 | - | - | all | ok |
@@ -144,7 +144,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `inventory_purchaseitem` | /inventory/purchaseitem/ | 0 | 0 | 0 | 25 | ok |
 | `inventory_purchasereturn` | /inventory/purchase/return/ | 0 | 0 | 0 | 25 | ok |
 | `inventory_report_purchase` | /inventory/report/purchase | 0 | 0 | 0 | all | ok |
-| `inventory_salesonline` | /inventory/sales-online/ | 8 | 8 | 8 | 25 | ok |
+| `inventory_salesonline` | /inventory/sales-online/ | 9 | 9 | 9 | 25 | ok |
 | `inventory_salesimport` | /inventory/sales-improt/ | 0 | 0 | 0 | all | ok |
 | `inventory_report_sales_item_details` | /inventory/report/sales-item-details | 52 | 0 | 0 | all | ok |
 | `inventory_report_sales_overview` | /inventory/report/sales-transaction-overview | 0 | 3 | 3 | all | ok |
@@ -160,8 +160,75 @@ and no harness here can say that until a dump with inventory in it exists.
 | `inventory_report_till_stock` | /inventory/report/till-stock | 0 | 1 | 1 | all | ok |
 | `inventory_report_sales_user_target` | /inventory/report/user-sales-mothly-target | 12 | 0 | 0 | all | ok |
 | `inventory_vendor` | /inventory/vendor/ | 0 | 0 | 0 | all | ok |
+| `report_expenditure_summary` | /accounting/report/expenditure-account-head-summary | 0 | 0 | 0 | all | ok |
+| `accounthead` | /accounting/accounthead/ | 45 | 7 | 7 | all | ok |
+| `account_user` | /accounting/account-user/ | 6 | 6 | 6 | 25 | ok |
+| `account_vendor` | /accounting/vendor/ | 25 | 25 | 3278 | 25 | ok |
+| `account_expenditure_new` | /accounting/expenditure/new | - | - | - | all | ok |
+| | deferred: the Twig screen still owns this write | | | | | |
+| `account_purchase_new` | /accounting/purchase/new | - | - | - | all | ok |
+| | deferred: the Twig screen still owns this write | | | | | |
+| `account_sales_new` | /accounting/sales/new | - | - | - | all | ok |
+| | deferred: the Twig screen still owns this write | | | | | |
+| `account_transaction_accountcash` | /accounting/transaction/all-account-cash | 25 | 25 | 2168 | 25 | ok |
+| `account_expenditure_android` | /accounting/expenditure/android | 1 | 1 | 1 | all | ok |
+| `account_balance_sheet` | /accounting/transaction/balance-sheet | 6 | 4 | 4 | all | ok |
+| `accountbank` | /accounting/bank-account/ | 4 | 4 | 4 | all | ok |
+| `account_transaction_bank` | /accounting/transaction/bank-cash | 2 | 2 | 2 | 25 | ok |
+| `account_expense_purchase` | /accounting/expense-purchase/ | 0 | 0 | 0 | 25 | ok |
+| `account_transaction_cash_overview` | /accounting/transaction/cash-overview | 12 | 6 | 6 | all | ok |
+| `account_cashreconciliation` | /accounting/cash-reconciliation/ | 0 | 0 | 0 | 25 | ok |
+| `account_transaction_cash` | /accounting/transaction/hand-cash | 25 | 25 | 2165 | 25 | ok |
+| `report_expenditure_category` | /accounting/report/expenditure-category | 0 | 0 | 0 | all | ok |
+| `account_transaction_cash_summary` | /accounting/transaction/cash-summary | 62 | 56 | 56 | all | ok |
+| `account_purchasecommission` | /accounting/purchase-commission/ | 0 | 0 | 0 | 25 | ok |
+| `account_condition` | /accounting/account-condition/ | 0 | 0 | 0 | all | ok |
+| `account_condition_ledger` | /accounting/account-condition/ledger | 0 | 0 | 0 | 25 | ok |
+| `account_config_manage` | /accounting/manage-config/manage | - | - | - | all | ok |
+| | settings row with 3 fields | | | | | |
+| `account_balancetransfer` | /accounting/balance-transfer/ | - | 0 | 0 | 25 | ok |
+| `report_expenditure_details` | /accounting/report/expenditure | 0 | 0 | 0 | 25 | ok |
+| `account_double_entry` | /accounting/double-entry-journal/ | 0 | 0 | 0 | 25 | ok |
+| `account_expenditure` | /accounting/expenditure/ | 0 | 0 | 0 | 25 | ok |
+| `expensecategory` | /accounting/expense-category/ | 0 | 0 | 0 | 25 | ok |
+| `report_income` | /accounting/report/income | 7 | 1 | 1 | all | ok |
+| `hms_report_income` | /accounting/report-hms/income | 5 | 1 | 1 | all | ok |
+| `account_medicine_income` | /accounting/medicine/medicine-income | 9 | 1 | 1 | all | ok |
+| `account_business_income` | /accounting/business/income | 52 | - | - | all | ok |
+| `account_transaction` | /accounting/transaction/ | 57 | - | - | all | ok |
+| `account_journal` | /accounting/journal/ | 13 | 13 | 13 | 25 | ok |
+| `journal_voucher` | /accounting/journal-voucher/ | 0 | 0 | 0 | 25 | ok |
+| `report_customer_ledger` | /accounting/customer/ledger | 0 | 0 | 0 | all | ok |
+| `report_vendor_ledger` | /accounting/vendor/ledger | 0 | 0 | 0 | all | ok |
+| `account_loan_new` | /accounting/loan/new | - | - | - | all | ok |
+| | deferred: the Twig screen still owns this write | | | | | |
+| `account_loan` | /accounting/loan/ | 0 | 0 | 0 | 25 | ok |
+| `accountmobilebank` | /accounting/mobile-bank-account/ | 0 | 0 | 0 | all | ok |
+| `account_transaction_mobilebank` | /accounting/transaction/mobile-cash | 1 | 1 | 1 | 25 | ok |
+| `account_transaction_monthly` | /accounting/transaction/transaction-monthly | 31 | 6 | 31 | all | ok |
+| `report_monthly_income` | /accounting/report/monthly-income | 6 | 1 | 1 | all | ok |
+| `hms_report_monthly_income` | /accounting/report-hms/monthly-income | 5 | 1 | 1 | all | ok |
+| `account_medicine_income_monthly` | /accounting/medicine/medicine-income-monthly | 11 | 1 | 1 | all | ok |
+| `account_business_income_monthly` | /accounting/business/income-monthly | 11 | 1 | 1 | all | ok |
+| `account_condition_ledger_new` | /accounting/account-condition/ledger/new | - | - | - | all | ok |
+| | deferred: the Twig screen still owns this write | | | | | |
+| `report_customer_outstanding` | /accounting/customer/outstanding | 0 | 0 | 0 | 25 | ok |
+| `report_vendor_outstanding` | /accounting/vendor/outstanding | 21 | 21 | 21 | 25 | ok |
+| `account_profit` | /accounting/profit-loss/ | 0 | 0 | 0 | 25 | ok |
+| `account_profit_withdrawal` | /accounting/profit-withdrawal/ | 0 | 0 | 0 | 25 | ok |
+| `account_purchase` | /accounting/purchase/ | 25 | 25 | 124 | 25 | ok |
+| `account_transaction_purchase_expense` | /accounting/transaction/transaction-purchase-expense | 52 | 0 | 0 | all | ok |
+| `account_paymentsalary` | /accounting/payment-salary/ | 0 | 0 | 0 | 25 | ok |
+| `account_sales` | /accounting/sales/ | 25 | 25 | 2118 | 25 | ok |
+| `account_salesadjustment` | /accounting/sales-adjustment/ | 0 | 0 | 0 | 25 | ok |
+| `report_customer_summary` | /accounting/customer/summary | 3 | 3 | 3 | 25 | ok |
+| `report_vendor_summary` | /accounting/vendor/summary | 25 | 25 | 41 | 25 | ok |
+| `account_trail_balance` | /accounting/transaction/trail-balance | 3 | 3 | 3 | all | ok |
+| `account_transaction_yearly` | /accounting/transaction/transaction-yearly | 12 | 6 | 12 | all | ok |
 
 **`color`** - Twig 500 in both trees: ColorController does findBy(['isValid' => 1]) and ProductColor has no such field. The port answers what the screen meant - name ASC - rather than reproducing the exception.
+
+**`medicine_particular`** - Twig 500 on real data: index.html.twig line 93 reads .name on a null relation. A template defect the platform tenant had no rows to expose; presentation only, so the API is unaffected.
 
 **`medicine_purchase_new`** - Twig 500: PurchaseController::newAction asks getAccountingConfig()->isAccountClose() and this tenant has no accounting config. Data, not a port defect - and the API answers with the cart.
 
@@ -175,9 +242,25 @@ and no harness here can say that until a dump with inventory in it exists.
 
 **`item_new`** - Twig 500, from source identical in the legacy: ItemType passes data: 4 to an EntityType, and Symfony 8 types IdReader::getIdValue() as ?object where 2.8 took the int. A form type is presentation and has no counterpart in the API.
 
+**`inventory_salesonline_new`** - Twig 500: newAction reads the profile branches of the signed-in user before persisting.
+
+**`inventory_salesonline`** - Twig 500 on real data, same shape: SalesOnline/index.html.twig line 129 reads .name on a null relation.
+
 **`inventory_report_sales_item_details`** - The Twig screen branches on the salesMode of the config and, at "stock", calls Sales::reportSalesItemDetails - a method that exists in NEITHER tree. Pre-existing, not a port defect; the API runs the branch that works.
 
+**`inventory_salesreturn`** - Fatal in both trees: SalesReturnRepository reaches getBranches() through a profile this tenant has not set.
+
 **`itemsize_group`** - Twig 500, and identical in the legacy: ItemSizeController writes $entities only inside if($sizes), so with no ItemSize rows the template reads a variable that was never assigned. A notice on PHP 5, a fatal on 8.5.
+
+**`accounthead`** - A three-level tree in one tbody, not a list: the template walks 7 parent heads and prints children and grandchildren from a map keyed by parent id, so its 45 rows are not a row count. The API returns the parents as the list and the map beside them.
+
+**`account_balancetransfer`** - Given a date range this screen fatals in BOTH trees - AccountBalanceTransferRepository builds the datetime by splitting the string itself and produces '1 00:00:00' - so it is compared without one. Pre-existing, and the reason there is no single range format the module accepts.
+
+**`account_business_income`** - Fatal in both trees, inside the copied repository: reportBusinessIncome reaches through a null.
+
+**`account_transaction`** - Fatal in both trees: TransactionController passes one argument to getGroupByAccountHead(), which declares three. The API fails identically, in the copied code.
+
+**`account_transaction_purchase_expense`** - Twig 500 whenever the screen is given any parameter other than date: the controller fills $data[date] only when $data is entirely empty, then reads it unconditionally. Pre-existing; the API passes the query through and answers.
 
 A screen with 0 rows on both sides is agreement, not evidence: this dump's tenant
 has no rows for several of these tables. That is the same constraint every other
