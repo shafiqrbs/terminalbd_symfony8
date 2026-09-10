@@ -7,6 +7,18 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 PHP=${PHP:-php8.5}
 
+# --check does not build anything here. It builds into a scratch tree and asks
+# whether this tree, and terminalbd_api's copy, still agree with what the legacy
+# source implies (§7 of migration/API-REACT-PLAN.md).
+if [ "${1:-}" = "--check" ]; then
+    exec ./migration/bin/check-pipeline.sh "${@:2}"
+fi
+
+# Set by check-pipeline.sh inside the scratch tree. The comparison is of source,
+# so publishing 125MB of assets and booting the kernel are skipped: neither
+# produces anything the comparison reads, and both are slow.
+CHECK=${PIPELINE_CHECK:-0}
+
 echo "############ 1. entity graph ############"
 ./migration/bin/port.sh
 
@@ -92,7 +104,11 @@ $PHP migration/bin/prune-dead-imports.php
 echo
 echo "############ 13. abandoned dependencies ############"
 $PHP migration/bin/port-phpexcel.php
-$PHP migration/bin/port-assetic.php
+if [ "$CHECK" = 1 ]; then
+    echo "(skipped in --check: publishes assets, which the source comparison does not read)"
+else
+    $PHP migration/bin/port-assetic.php
+fi
 $PHP migration/bin/port-twig-legacy.php
 # KnpMenuBundle 3 dropped the Bundle:Class:method alias the templates use.
 # Rewrites them and generates the matching builder tags; both halves have to
@@ -122,6 +138,12 @@ $PHP migration/bin/port-dbal-statements.php
 echo
 echo "############ 16. drop routes with no controller ############"
 $PHP migration/bin/check-routes.php --prune --report=migration/contract/unresolvable-routes.md | tail -3
+
+if [ "$CHECK" = 1 ]; then
+    echo
+    echo "############ scratch build complete ############"
+    exit 0
+fi
 
 echo
 echo "############ verify ############"
