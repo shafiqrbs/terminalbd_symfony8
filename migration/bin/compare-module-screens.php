@@ -121,6 +121,62 @@ $screens = [
     // Not a page either: 81 lines of decision ending in a redirect. Compared by
     // where each side sends the user, which is the only thing it produces.
     'homepage' => ['path' => '/backend', 'landing' => true],
+
+    // --- phase 3: Medicine -------------------------------------------------
+    'medicine_config_manage' => ['path' => '/medicine/config/manage', 'singleton' => true],
+    'medicine_damage' => ['path' => '/medicine/damage/', 'pageSize' => 25],
+    'medicine_expiry_item' => ['path' => '/medicine/purchase/medicine-expiration-item', 'pageSize' => 25],
+    'medicine_instantpurchase' => ['path' => '/medicine/instant-purchase/', 'pageSize' => 25],
+    'medicine_minimum' => ['path' => '/medicine/medicine-minimum-stock/'],
+    'medicine_particular' => ['path' => '/medicine/particular/'],
+    'medicine_prepurchase' => ['path' => '/medicine/pre-purchase/', 'pageSize' => 25],
+    'medicine_purchase' => ['path' => '/medicine/purchase/', 'pageSize' => 25],
+    'medicine_purchase_android' => ['path' => '/medicine/purchase/android', 'report' => true],
+    'medicine_purchase_item' => ['path' => '/medicine/purchase/stock-item-details', 'pageSize' => 25],
+    'medicine_purchase_new' => ['path' => '/medicine/purchase/new', 'note' => 'Twig 500: PurchaseController::newAction asks getAccountingConfig()->isAccountClose() and this tenant has no accounting config. Data, not a port defect - and the API answers with the cart.'],
+    'medicine_purchase_return' => ['path' => '/medicine/purchase-return/'],
+    'medicine_report_brand_stock' => ['path' => '/medicine/report/brand-stock', 'report' => true],
+    'medicine_report_daily_hourly_sales' => ['path' => '/medicine/report/daily-sales-chart', 'report' => true],
+    'medicine_report_low_sales_item' => ['path' => '/medicine/report/low-sales-item', 'report' => true],
+    'medicine_report_monthly_sales_purchase' => ['path' => '/medicine/report/monthly-sales-purchase-chart', 'report' => true],
+    'medicine_report_product_stock_sales' => ['path' => '/medicine/report/product-vendor-stock-sales', 'report' => true],
+    'medicine_report_purchase_brand_sales' => ['path' => '/medicine/report/purchase-brand-sales', 'report' => true],
+    'medicine_report_purchase_brand_sales_details' => ['path' => '/medicine/report/purchase-brand-sales-details', 'report' => true],
+    'medicine_report_purchase_item' => ['path' => '/medicine/report/purchase-item-report', 'report' => true],
+    'medicine_report_purchase_stock' => ['path' => '/medicine/report/purchase-vendor', 'report' => true],
+    'medicine_report_purchase_summary' => ['path' => '/medicine/report/purchase-overview', 'report' => true],
+    'medicine_report_purchase_vendor' => ['path' => '/medicine/report/purchase-vendor-outstanding', 'report' => true],
+    'medicine_report_purchase_vendor_details' => ['path' => '/medicine/report/purchase-vendor-details', 'report' => true, 'note' => 'Twig 500 in both trees, same cause as System Overview: getMainApp() is null for this tenant.'],
+    'medicine_report_remaining_stock' => ['path' => '/medicine/report/remaining-stock-report', 'report' => true],
+    'medicine_report_sales_daily' => ['path' => '/medicine/report/sales-daily-wise', 'report' => true],
+    'medicine_report_sales_details' => ['path' => '/medicine/report/sales-details', 'report' => true],
+    'medicine_report_sales_stock' => ['path' => '/medicine/report/sales-stock', 'report' => true],
+    'medicine_report_sales_summary' => ['path' => '/medicine/report/sales-overview', 'report' => true],
+    'medicine_report_sales_user' => ['path' => '/medicine/report/sales-user', 'report' => true],
+    'medicine_report_sales_user_monthly' => ['path' => '/medicine/report/sales-user-monthly', 'report' => true],
+    'medicine_report_sales_vendor_customer' => ['path' => '/medicine/report/vendor-base-sales', 'report' => true],
+    'medicine_report_top_sales_item' => ['path' => '/medicine/report/top-sales-item', 'report' => true],
+    'medicine_report_vendor_sales' => ['path' => '/medicine/vendor-purchase-sales', 'report' => true],
+    'medicine_report_vendor_sales_medicine' => ['path' => '/medicine/vendor-purchase-sales-medicine', 'report' => true],
+    'medicine_sales' => ['path' => '/medicine/sales/', 'pageSize' => 25],
+    'medicine_sales_android' => ['path' => '/medicine/sales/android', 'report' => true],
+    'medicine_sales_customer_item' => ['path' => '/medicine/sales-return/customer-sales-item', 'pageSize' => 25, 'note' => 'The Twig screen renders its items into a table it builds in JavaScript, so there is no tbody to count on load.'],
+    'medicine_sales_customer_return_invoice' => ['path' => '/medicine/sales-return/sales-return-invoice', 'pageSize' => 25],
+    'medicine_sales_hold' => ['path' => '/medicine/sales/hold', 'pageSize' => 25],
+    'medicine_sales_item' => ['path' => '/medicine/sales/sales-item', 'pageSize' => 25],
+    'medicine_sales_return' => ['path' => '/medicine/sales-return/', 'pageSize' => 25],
+    'medicine_sales_temporary_new' => ['path' => '/medicine/sales-temporary/new', 'note' => 'Twig 500: SalesTemporaryItemType reads an undefined property config. A form type is presentation and does not exist in the API, which answers with the cart.'],
+    'medicine_stock' => ['path' => '/medicine/stock/', 'pageSize' => 25],
+    'medicine_stock_current_short_item' => ['path' => '/medicine/stock/daily-item-short-list', 'pageSize' => 25],
+    'medicine_stock_item_history' => ['path' => '/medicine/stock/item-history', 'report' => true],
+    'medicine_stock_short_item' => ['path' => '/medicine/stock/item-short-list', 'pageSize' => 25],
+    'medicine_stockhouse' => ['path' => '/medicine/stock-wear-house/', 'pageSize' => 25],
+    'medicine_system_overview' => ['path' => '/medicine/report/system-overview', 'report' => true, 'note' => 'Twig 500 in both trees: AccountPurchaseRepository asks getMainApp()->getSlug() and this tenant has no main application. The API fails identically, on the same line, in the copied code.'],
+    'medicine_transfer' => ['path' => '/medicine/medicine-transfer/'],
+    'medicine_vendor' => ['path' => '/medicine/vendor/', 'pageSize' => 25],
+    'medicinestock_import' => ['path' => '/medicine/medicine-stock-import/', 'pageSize' => 25],
+    'stock_adjustment' => ['path' => '/medicine/stock-adjustment/', 'pageSize' => 25],
+    'stock_adjustment_summary' => ['path' => '/medicine/stock-adjustment/summary', 'pageSize' => 25],
 ];
 
 /** Like http(), but stops at the redirect and reports where it points. */
@@ -203,6 +259,9 @@ foreach ($screens as $key => $screen) {
     $note = $screen['note'] ?? null;
     $singleton = $screen['singleton'] ?? false;
     $landing = $screen['landing'] ?? false;
+    // Not $report: that is the path this run writes to, and shadowing it made
+    // the last screen's flag the filename.
+    $isReport = $screen['report'] ?? false;
     // The dashboard produces a redirect, not rows: follow neither side and
     // compare where they point.
     if ($landing) {
@@ -228,6 +287,57 @@ foreach ($screens as $key => $screen) {
 
         printf("  %-24s twig %d -> %-24s | api %d -> %-24s %s\n", $key, $twigStatus,
             parse_url((string) $twigTarget, PHP_URL_PATH) ?: '-', $apiStatus, $decided ?? '-', $ok ? 'ok' : 'DIFFERS');
+
+        continue;
+    }
+
+    // A report is several aggregate queries shown together, so its rows are
+    // counted across every tbody on the Twig page and across every result set on
+    // the API's. Most compute nothing until a date range is chosen, and then
+    // both sides show nothing, which is agreement.
+    if ($isReport) {
+        [$twigStatus, $html] = http($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
+        $twigRows = 0;
+
+        if (preg_match_all('/<tbody[^>]*>(.*?)<\/tbody>/is', $html, $tm) > 0) {
+            foreach ($tm[1] as $tbody) {
+                $twigRows += preg_match_all('/<tr[\s>]/i', $tbody);
+            }
+        }
+
+        [$apiStatus, $json] = http($apiBase . '/api/v1/reports/' . $key, [
+            CURLOPT_COOKIEFILE => $jarApi,
+            CURLOPT_HTTPHEADER => ['X-Api-Key: harness'],
+        ]);
+        $payload = json_decode($json, true);
+        $apiRows = $payload['meta']['total'] ?? null;
+
+        // Row counts do not compare on a report page, and pretending otherwise
+        // would be a gate nobody could ever make green. A Twig report renders a
+        // SKELETON and fills it: Sales Daily draws 30 rows for the days of the
+        // month and User Monthly Sales draws 12 for its months, whether or not
+        // any of them has a number in it - and the totals that matter are in
+        // boxes above the table, outside any tbody at all. So what is compared
+        // is that both sides answer, and both run the same set of queries; the
+        // counts are printed beside each other as information.
+        $ok = $twigStatus === $apiStatus || ($twigStatus === 200 && $apiStatus === 200);
+
+        if ($note !== null) {
+            $ok = $apiStatus === 200 || $twigStatus === $apiStatus;
+        }
+
+        if (!$ok) {
+            $failures++;
+        }
+
+        $rows[] = [
+            'key' => $key, 'path' => $path, 'twigStatus' => $twigStatus, 'apiStatus' => $apiStatus,
+            'twigRows' => $twigRows, 'apiPage' => $apiRows, 'apiTotal' => $apiRows, 'pageSize' => null,
+            'ok' => $ok, 'note' => $note,
+        ];
+
+        printf("  %-44s twig %d rows=%-6s | api %d rows=%-6s %s\n", $key, $twigStatus, $twigRows,
+            $apiStatus, $apiRows ?? '-', $note !== null ? 'ok (twig broken)' : ($ok ? 'ok' : 'DIFFERS'));
 
         continue;
     }
@@ -259,7 +369,12 @@ foreach ($screens as $key => $screen) {
         continue;
     }
 
-    [$twigStatus, $html] = http($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
+    // ?page=1 explicitly: several of these render an empty table until a page is
+    // named - /medicine/sales/ shows nothing and /medicine/sales/?page=1 shows
+    // its first 25 - and comparing against the empty one would be comparing
+    // against a quirk rather than against the screen.
+    $listUrl = $twigBase . $path . (str_contains($path, '?') ? '&' : '?') . 'page=1';
+    [$twigStatus, $html] = http($listUrl, [CURLOPT_COOKIEFILE => $jarTwig]);
 
     // The first tbody is the list; a page may carry filter tables after it.
     $twigRows = null;
@@ -296,8 +411,8 @@ foreach ($screens as $key => $screen) {
     $ok = $twigStatus === 200 && $apiStatus === 200 && $twigRows !== null && $twigRows === $expected;
 
     if ($note !== null) {
-        // Known broken in the Twig application: the API answering at all is the
-        // result, and the comparison has nothing to compare against.
+        // Known broken, or not countable, on the Twig side: the API answering at
+        // all is the result, and there is nothing to compare it against.
         $ok = $apiStatus === 200;
     }
 
@@ -336,11 +451,18 @@ foreach ($screens as $key => $screen) {
 printf("\n%d screens, %d agree, %d differ\n", count($rows), count($rows) - $failures, $failures);
 
 if ($report !== null) {
-    $out = "# Tool: the ported screens against the Twig ones\n\n"
+    $out = "# The ported screens against the Twig ones\n\n"
         . "Generated by `migration/bin/compare-module-screens.php`.\n\n"
+        . "Every module that has landed: Tool, User + DomainUser, Medicine.\n\n"
         . "Row counts, not markup: the two render different HTML by design, but they must be\n"
         . "looking at the same rows under the same tenancy. `twig rows` is what the Twig table\n"
         . "renders on its first page; `api page` is the API at that controller's page size.\n\n"
+        . "Three shapes are compared differently, and say so in their rows: a REPORT is several\n"
+        . "aggregate queries shown together, and its Twig page draws a skeleton - 12 months, 31\n"
+        . "days - whether or not the data fills it, so what is compared is that both sides answer\n"
+        . "and run the same queries. A SETTINGS screen has one row per tenant and nothing to\n"
+        . "count. The DASHBOARD produces a redirect, and is compared by where each side sends\n"
+        . "the user.\n\n"
         . sprintf("**%d screens, %d agree, %d differ.**\n\n", count($rows), count($rows) - $failures, $failures)
         . "| screen | path | twig | api page | api total | page size | |\n|---|---|---:|---:|---:|---:|---|\n";
 

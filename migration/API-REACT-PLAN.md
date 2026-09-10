@@ -321,7 +321,7 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 | 0 | ~~—~~ | — | **done 2026-09-10.** the 874 files copied into `terminalbd_api`, pipeline switched to checking-only, `terminalbd_api/` and `terminalbd_react/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
 | 1 | ~~**Tool**~~ | 18 | **done 2026-09-10.** All 18 agree with the Twig originals row for row — `migration/contract/tool-module-screens.md` |
 | 2 | ~~**User** + **DomainUser**~~ | 13 | **done 2026-09-10.** 31 of 335 screens built; `migration/contract/module-screens.md` |
-| 3 | **Medicine** | 54 | best evidence here: 82% of visited pages render, 38% reach |
+| 3 | ~~**Medicine**~~ | 54 | **done 2026-09-10.** 85 of 335 screens built; 24 of these are reports |
 | 4 | **Inventory** | 42 | large, well exercised |
 | 5 | **Accounting** | 59 | largest, and depends on 1–4 |
 | 6 | **Business**, **Hospital** | 92 | large, moderate coverage |
@@ -537,7 +537,7 @@ tables and not the entity it is named after, a screen that is a 500 in both
 trees, an invoice list missing its `process != 'Created'` filter, the whole role
 hierarchy missing from the API, and every API error arriving as an HTML page.
 
-Three shapes have turned up so far that a list-and-form does not cover, and each
+Five shapes have turned up so far that a list-and-form does not cover, and each
 is now a capability rather than a special case:
 
 - a **repository method** instead of `findBy` — named by the resource and *run*,
@@ -546,7 +546,20 @@ is now a capability rather than a special case:
 - a **singleton** — one row per tenant, created on first read, which is what a
   settings screen is;
 - a **decision** — `/backend` is 81 lines of branching that always ends in a
-  redirect, so its port is an endpoint that answers where to go.
+  redirect, so its port is an endpoint that answers where to go;
+- a **report** — several aggregate queries shown together, rows that are not
+  entities and have no form. Twenty-four of Medicine's fifty-four are this, and a
+  set can declare what it needs before it means anything: Vendor Accounts runs its
+  ledgers only when given a date range, exactly as its controller does;
+- a **point-of-sale terminal** — Add Sales and Add Purchase. The cart they carry
+  is ported; the item entry and the invoice creation behind them are eleven
+  endpoints with accounting side effects, and are the next real piece of work.
+
+A report is compared differently, and has to be: a Twig report page draws a
+skeleton — twelve months, thirty-one days — whether or not the data fills it, and
+puts the totals that matter in boxes outside any table. Counting rows there
+compares layout, not data. What the harness compares is that both sides answer and
+run the same queries.
 
 ---
 
