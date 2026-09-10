@@ -1,0 +1,4649 @@
+{
+    "screens": 335,
+    "modules": {
+        "Accounting": [
+            {
+                "label": "Account Head",
+                "route": "report_expenditure_summary",
+                "path": "/accounting/report/expenditure-account-head-summary",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Account Head",
+                "route": "accounthead",
+                "path": "/accounting/accounthead/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "Account User",
+                "route": "account_user",
+                "path": "/accounting/account-user/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "Account Vendor",
+                "route": "account_vendor",
+                "path": "/accounting/vendor/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Add Expense",
+                "route": "account_expenditure_new",
+                "path": "/accounting/expenditure/new",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ]
+                ]
+            },
+            {
+                "label": "Add Payment",
+                "route": "account_purchase_new",
+                "path": "/accounting/purchase/new",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ]
+                ]
+            },
+            {
+                "label": "Add Receive",
+                "route": "account_sales_new",
+                "path": "/accounting/sales/new",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ]
+                ]
+            },
+            {
+                "label": "All Cash Flow",
+                "route": "account_transaction_accountcash",
+                "path": "/accounting/transaction/all-account-cash",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ]
+                ]
+            },
+            {
+                "label": "Android Process",
+                "route": "account_expenditure_android",
+                "path": "/accounting/expenditure/android",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE"
+                    ]
+                ]
+            },
+            {
+                "label": "Balance Sheet",
+                "route": "account_balance_sheet",
+                "path": "/accounting/transaction/balance-sheet",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Bank Account",
+                "route": "accountbank",
+                "path": "/accounting/bank-account/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "Bank Transaction",
+                "route": "account_transaction_bank",
+                "path": "/accounting/transaction/bank-cash",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ]
+                ]
+            },
+            {
+                "label": "Bill Voucher",
+                "route": "account_expense_purchase",
+                "path": "/accounting/expense-purchase/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Cash Overview",
+                "route": "account_transaction_cash_overview",
+                "path": "/accounting/transaction/cash-overview",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ]
+                ]
+            },
+            {
+                "label": "Cash Reconciliation",
+                "route": "account_cashreconciliation",
+                "path": "/accounting/cash-reconciliation/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_RECONCILIATION"
+                    ]
+                ]
+            },
+            {
+                "label": "Cash Transaction",
+                "route": "account_transaction_cash",
+                "path": "/accounting/transaction/hand-cash",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ]
+                ]
+            },
+            {
+                "label": "Category",
+                "route": "report_expenditure_category",
+                "path": "/accounting/report/expenditure-category",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Collection & Payment",
+                "route": "account_transaction_cash_summary",
+                "path": "/accounting/transaction/cash-summary",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ]
+                ]
+            },
+            {
+                "label": "Commission",
+                "route": "account_purchasecommission",
+                "path": "/accounting/purchase-commission/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Condition Account",
+                "route": "account_condition",
+                "path": "/accounting/account-condition/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_CONDITION"
+                    ]
+                ]
+            },
+            {
+                "label": "Condition Ledger",
+                "route": "account_condition_ledger",
+                "path": "/accounting/account-condition/ledger",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_CONDITION"
+                    ]
+                ]
+            },
+            {
+                "label": "Configuration",
+                "route": "account_config_manage",
+                "path": "/accounting/manage-config/manage",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "Contra Account",
+                "route": "account_balancetransfer",
+                "path": "/accounting/balance-transfer/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_JOURNAL"
+                    ]
+                ]
+            },
+            {
+                "label": "Details",
+                "route": "report_expenditure_details",
+                "path": "/accounting/report/expenditure",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Double Entry",
+                "route": "account_double_entry",
+                "path": "/accounting/double-entry-journal/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_JOURNAL"
+                    ]
+                ]
+            },
+            {
+                "label": "Expense",
+                "route": "account_expenditure",
+                "path": "/accounting/expenditure/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE"
+                    ]
+                ]
+            },
+            {
+                "label": "Expense Category",
+                "route": "expensecategory",
+                "path": "/accounting/expense-category/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_EXPENDITURE"
+                    ]
+                ]
+            },
+            {
+                "label": "Income",
+                "route": "report_income",
+                "path": "/accounting/report/income",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Income",
+                "route": "hms_report_income",
+                "path": "/accounting/report-hms/income",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Income",
+                "route": "account_medicine_income",
+                "path": "/accounting/medicine/medicine-income",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Income",
+                "route": "account_business_income",
+                "path": "/accounting/business/income",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Journal",
+                "route": "account_transaction",
+                "path": "/accounting/transaction/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_JOURNAL"
+                    ]
+                ]
+            },
+            {
+                "label": "Journal",
+                "route": "account_journal",
+                "path": "/accounting/journal/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_JOURNAL"
+                    ]
+                ]
+            },
+            {
+                "label": "Journal Voucher",
+                "route": "journal_voucher",
+                "path": "/accounting/journal-voucher/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_JOURNAL"
+                    ]
+                ]
+            },
+            {
+                "label": "Ledger",
+                "route": "report_customer_ledger",
+                "path": "/accounting/customer/ledger",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Ledger",
+                "route": "report_vendor_ledger",
+                "path": "/accounting/vendor/ledger",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Loan New",
+                "route": "account_loan_new",
+                "path": "/accounting/loan/new",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_LOAN"
+                    ]
+                ]
+            },
+            {
+                "label": "Manage Loan",
+                "route": "account_loan",
+                "path": "/accounting/loan/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_LOAN"
+                    ]
+                ]
+            },
+            {
+                "label": "Mobile Account",
+                "route": "accountmobilebank",
+                "path": "/accounting/mobile-bank-account/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "Mobile Transaction",
+                "route": "account_transaction_mobilebank",
+                "path": "/accounting/transaction/mobile-cash",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Cash",
+                "route": "account_transaction_monthly",
+                "path": "/accounting/transaction/transaction-monthly",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Income",
+                "route": "report_monthly_income",
+                "path": "/accounting/report/monthly-income",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Income",
+                "route": "hms_report_monthly_income",
+                "path": "/accounting/report-hms/monthly-income",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Income",
+                "route": "account_medicine_income_monthly",
+                "path": "/accounting/medicine/medicine-income-monthly",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Income",
+                "route": "account_business_income_monthly",
+                "path": "/accounting/business/income-monthly",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "New Ledger Voucher",
+                "route": "account_condition_ledger_new",
+                "path": "/accounting/account-condition/ledger/new",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_CONDITION"
+                    ]
+                ]
+            },
+            {
+                "label": "Outstanding",
+                "route": "report_customer_outstanding",
+                "path": "/accounting/customer/outstanding",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Outstanding",
+                "route": "report_vendor_outstanding",
+                "path": "/accounting/vendor/outstanding",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Profit Generate",
+                "route": "account_profit",
+                "path": "/accounting/profit-loss/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_JOURNAL"
+                    ]
+                ]
+            },
+            {
+                "label": "Profit Withdrawal",
+                "route": "account_profit_withdrawal",
+                "path": "/accounting/profit-withdrawal/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_JOURNAL"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase",
+                "route": "account_purchase",
+                "path": "/accounting/purchase/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase & Expense",
+                "route": "account_transaction_purchase_expense",
+                "path": "/accounting/transaction/transaction-purchase-expense",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ]
+                ]
+            },
+            {
+                "label": "Salary Transaction",
+                "route": "account_paymentsalary",
+                "path": "/accounting/payment-salary/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_PAYROLL_SALARY"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales",
+                "route": "account_sales",
+                "path": "/accounting/sales/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Adjustment",
+                "route": "account_salesadjustment",
+                "path": "/accounting/sales-adjustment/",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES_ADJUSTMENT"
+                    ]
+                ]
+            },
+            {
+                "label": "Summary",
+                "route": "report_customer_summary",
+                "path": "/accounting/customer/summary",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_SALES_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Summary",
+                "route": "report_vendor_summary",
+                "path": "/accounting/vendor/summary",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE",
+                        "ROLE_DOMAIN_ACCOUNTING_OPERATOR"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_PURCHASE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Trail Balance",
+                "route": "account_trail_balance",
+                "path": "/accounting/transaction/trail-balance",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Yearly Cash",
+                "route": "account_transaction_yearly",
+                "path": "/accounting/transaction/transaction-yearly",
+                "roles": [
+                    [
+                        "ROLE_ACCOUNTING"
+                    ],
+                    [
+                        "ROLE_DOMAIN_ACCOUNTING_TRANSACTION",
+                        "ROLE_DOMAIN_ACCOUNTING_CASH"
+                    ]
+                ]
+            }
+        ],
+        "Appearance": [
+            {
+                "label": "Customize Template",
+                "route": "templatecustomize_edit",
+                "path": "/appearance/templatecustomize/edit",
+                "roles": [
+                    [
+                        "ROLE_WEBSITE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_SETTING"
+                    ]
+                ]
+            },
+            {
+                "label": "Manage Mega Menu",
+                "route": "megamenu",
+                "path": "/appearance/mega-menu/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Menu Custom",
+                "route": "menucustom",
+                "path": "/admin/menucustom/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Menu Grouping",
+                "route": "menugrouping",
+                "path": "/appearance/menugrouping/",
+                "roles": [
+                    [
+                        "ROLE_WEBSITE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_SETTING"
+                    ]
+                ]
+            },
+            {
+                "label": "Website Menu",
+                "route": "menu_manage",
+                "path": "/appearance/menu/manage",
+                "roles": [
+                    [
+                        "ROLE_WEBSITE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_SETTING"
+                    ]
+                ]
+            },
+            {
+                "label": "Widget",
+                "route": "appearancewebsitewidget",
+                "path": "/appearance/website-widget/",
+                "roles": [
+                    [
+                        "ROLE_WEBSITE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_MANAGER"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_WEDGET",
+                        "ROLE_WEBSITE"
+                    ]
+                ]
+            }
+        ],
+        "Business": [
+            {
+                "label": "Add Purchase",
+                "route": "business_purchase_new",
+                "path": "/business/purchase/new",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Add Sales",
+                "route": "business_invoice_new",
+                "path": "/business/invoice/new",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ]
+                ]
+            },
+            {
+                "label": "Android Sales",
+                "route": "business_android_sales",
+                "path": "/business/android/sales",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ]
+                ]
+            },
+            {
+                "label": "Area",
+                "route": "business_area",
+                "path": "/business/area/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Brand",
+                "route": "business_brand",
+                "path": "/business/brand/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Category",
+                "route": "business_category",
+                "path": "/business/category/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Condition",
+                "route": "business_report_condition",
+                "path": "/business/report/sales-condition",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Condition Customer",
+                "route": "business_report_condition_customer",
+                "path": "/business/report/sales-condition-customer",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Condition Details",
+                "route": "business_report_condition_details",
+                "path": "/business/report/sales-condition-details",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Condition Sales",
+                "route": "business_invoice_condition",
+                "path": "/business/invoice/condition",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ]
+                ]
+            },
+            {
+                "label": "Configuration",
+                "route": "business_config_manage",
+                "path": "/business/config/manage",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Courier",
+                "route": "business_courier",
+                "path": "/business/courier/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Customer Daily Item Sales",
+                "route": "business_report_customer_monthly_sales_stock",
+                "path": "/business/report/customer-monthly-item-sales",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Daily Item Sales Price",
+                "route": "business_report_monthly_sales_price",
+                "path": "/business/report/monthly-item-sales-price",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Daily Sales Stock",
+                "route": "business_report_monthly_sales_stock",
+                "path": "/business/report/monthly-item-sales",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Damage Return",
+                "route": "business_distribution_return",
+                "path": "/business/distribution-return/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Fuel Station",
+                "route": "business_fuelstation",
+                "path": "/business/fuelpump/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ]
+                ]
+            },
+            {
+                "label": "Invoice Details",
+                "route": "business_report_sales_details",
+                "path": "/business/report/sales-details",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_CRM",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_ASSOCIATION_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Invoice Summary",
+                "route": "business_report_sales_summary",
+                "path": "/business/report/sales-overview",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_CRM",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_ASSOCIATION_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Item Ledger",
+                "route": "business_report_stock_ledger",
+                "path": "/business/report/stock-item-ledger",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Item Monthly Ledger",
+                "route": "business_report_monthly_stock_ledger",
+                "path": "/business/report/monthly-stock-ledger",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Manage Damage",
+                "route": "business_damage",
+                "path": "/business/damage/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Marketing",
+                "route": "business_marketing",
+                "path": "/business/marketing/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Stock Summary",
+                "route": "business_report_monthly_stock_summary",
+                "path": "/business/report/monthly-item-summary",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Pre-production",
+                "route": "business_production",
+                "path": "/business/product-production/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Product Ledger",
+                "route": "business_stock_ledger",
+                "path": "/business/stock/stock-ledger",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Product Wise Invoice",
+                "route": "business_report_sales_stock",
+                "path": "/business/report/sales-stock",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_CRM",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_ASSOCIATION_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase",
+                "route": "business_purchase",
+                "path": "/business/purchase/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Item",
+                "route": "business_purchase_item",
+                "path": "/business/purchase/purchase-item",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Return",
+                "route": "business_purchase_return",
+                "path": "/business/purchase-return/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Summary",
+                "route": "business_report_purchase_summary",
+                "path": "/business/report/purchase-overview",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales",
+                "route": "business_invoice",
+                "path": "/business/invoice/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Area",
+                "route": "business_report_sales_area",
+                "path": "/business/report/sales-area",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales DSR",
+                "route": "business_report_sales_dsr",
+                "path": "/business/report/sales-dsr",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Item Details",
+                "route": "business_report_commission_stock",
+                "path": "/business/report/commission-stock-item",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Return",
+                "route": "business_invoice_return",
+                "path": "/business/invoice-return/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Return Item",
+                "route": "business_invoice_return_item",
+                "path": "/business/invoice-return/sales-return-item",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales SR",
+                "route": "business_report_sales_sr",
+                "path": "/business/report/sales-sr",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Adjustment",
+                "route": "business_stock_adjustment",
+                "path": "/business/stock-adjustment/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock History",
+                "route": "business_stock_history",
+                "path": "/business/stock/stock-history",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Import",
+                "route": "business_itemimporter",
+                "path": "/business/item-import/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Item",
+                "route": "business_stock",
+                "path": "/business/stock/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Price",
+                "route": "business_report_stock_price",
+                "path": "/business/report/stock-price",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Report",
+                "route": "business_report_stock_report",
+                "path": "/business/report/stock-item-report",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Shortlist",
+                "route": "business_stock_shortlist",
+                "path": "/business/stock/short-list",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Transfer",
+                "route": "business_stock_transfer",
+                "path": "/business/stock-transfer/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Store",
+                "route": "business_store",
+                "path": "/business/store/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ]
+                ]
+            },
+            {
+                "label": "Store Ledger",
+                "route": "business_store_ledger",
+                "path": "/business/store-ledger/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ]
+                ]
+            },
+            {
+                "label": "System Overview",
+                "route": "business_report_system_overview",
+                "path": "/business/report/system-overview",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "User Monthly Invoice",
+                "route": "business_report_sales_user_monthly",
+                "path": "/business/report/sales-user-monthly",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_CRM",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_ASSOCIATION_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "User wise Invoice",
+                "route": "business_report_sales_user",
+                "path": "/business/report/sales-user",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_CRM",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_ASSOCIATION_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor",
+                "route": "business_vendor",
+                "path": "/business/vendor/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor Details",
+                "route": "business_report_purchase_vendor_details",
+                "path": "/business/report/purchase-vendor-details",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor Ledger",
+                "route": "business_report_purchase_ledger",
+                "path": "/business/report/purchase-vendor-outstanding",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor Stock",
+                "route": "business_vendor_stock",
+                "path": "/business/vendor-stock/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor Stock Item",
+                "route": "business_vendor_stock_item",
+                "path": "/business/vendor-stock/item",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor base Sales",
+                "route": "business_report_vendor_commission_sales",
+                "path": "/business/report/vendor-commission-sales",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Wear House",
+                "route": "business_wearhouse",
+                "path": "/business/wear-house/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_MANAGER"
+                    ]
+                ]
+            }
+        ],
+        "Content": [
+            {
+                "label": "Contact",
+                "route": "contactpage_modify",
+                "path": "/website/contactpage/modify",
+                "roles": [
+                    [
+                        "ROLE_WEBSITE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Page",
+                "route": "page",
+                "path": "/website/page/",
+                "roles": [
+                    [
+                        "ROLE_WEBSITE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Site Content",
+                "route": "sitecontent",
+                "path": "/admin/sitecontent/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Site Slider",
+                "route": "siteslider",
+                "path": "/admin/siteslider/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Team",
+                "route": "siteteam",
+                "path": "/admin/site-team/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Testimonial",
+                "route": "sitetestimonial",
+                "path": "/admin/site-testimonial/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            }
+        ],
+        "DoctorPrescription": [
+            {
+                "label": "Configuration",
+                "route": "dps_config_manage",
+                "path": "/doctor-prescription/config/manage",
+                "roles": [
+                    [
+                        "ROLE_DPS"
+                    ],
+                    [
+                        "ROLE_DOMAIN_DMS_MANAGER"
+                    ],
+                    [
+                        "ROLE_DOMAIN_DMS_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "Diseases",
+                "route": "dps_diseases",
+                "path": "/doctor-prescription/diseases/",
+                "roles": [
+                    [
+                        "ROLE_DPS"
+                    ],
+                    [
+                        "ROLE_DOMAIN_DMS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Doctor",
+                "route": "dps_doctor",
+                "path": "/doctor-prescription/doctor/",
+                "roles": [
+                    [
+                        "ROLE_DPS"
+                    ],
+                    [
+                        "ROLE_DOMAIN_DMS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Expenditure",
+                "route": "dps_account_expenditure",
+                "path": "/doctor-prescription/dps-expense/",
+                "roles": [
+                    [
+                        "ROLE_DPS"
+                    ]
+                ]
+            },
+            {
+                "label": "Expense Category",
+                "route": "dps_expensecategory",
+                "path": "/doctor-prescription/dps-expense-category/",
+                "roles": [
+                    [
+                        "ROLE_DPS"
+                    ]
+                ]
+            },
+            {
+                "label": "Particular",
+                "route": "dps_particular",
+                "path": "/doctor-prescription/particular/",
+                "roles": [
+                    [
+                        "ROLE_DPS"
+                    ],
+                    [
+                        "ROLE_DOMAIN_DMS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Patient",
+                "route": "dps_invoice",
+                "path": "/doctor-prescription/invoice/",
+                "roles": [
+                    [
+                        "ROLE_DPS"
+                    ]
+                ]
+            },
+            {
+                "label": "Prescription",
+                "route": "dps_prescription",
+                "path": "/doctor-prescription/prescription/",
+                "roles": [
+                    [
+                        "ROLE_DPS"
+                    ],
+                    [
+                        "ROLE_DPS_DOCTOR"
+                    ]
+                ]
+            },
+            {
+                "label": "Service",
+                "route": "dps_service",
+                "path": "/doctor-prescription/service/",
+                "roles": [
+                    [
+                        "ROLE_DPS"
+                    ],
+                    [
+                        "ROLE_DOMAIN_DMS_MANAGER"
+                    ]
+                ]
+            }
+        ],
+        "DomainUser": [
+            {
+                "label": "Branch",
+                "route": "domain_branches",
+                "path": "/hr/branch/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ]
+                ]
+            },
+            {
+                "label": "Branch Shop",
+                "route": "appsetting_branchshop",
+                "path": "/inventory/branch-shop/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Customer",
+                "route": "restaurant_customer",
+                "path": "/restaurant/customer/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ]
+                ]
+            },
+            {
+                "label": "Customer ",
+                "route": "domain_customer",
+                "path": "/crm/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_INVOICE"
+                    ],
+                    [
+                        "ROLE_CRM",
+                        "ROLE_DOMAIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Manage Member",
+                "route": "domain_association",
+                "path": "/crm/association/member",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_CRM",
+                        "ROLE_DOMAIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Notepad",
+                "route": "domain_notepad",
+                "path": "/notepad/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Notification Setup",
+                "route": "domain_notificationconfig",
+                "path": "/sms/notification/",
+                "roles": [
+                    [
+                        "ROLE_DOMAIN",
+                        "ROLE_SMS"
+                    ],
+                    [
+                        "ROLE_SMS_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "Patient",
+                "route": "hms_customer",
+                "path": "/hms/patient/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MANAGER",
+                        "ROLE_DOMAIN_HOSPITAL_ADMISSION"
+                    ]
+                ]
+            },
+            {
+                "label": "System Users",
+                "route": "domain_user",
+                "path": "/hr/employee/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_HR_EMPLOYEE"
+                    ]
+                ]
+            },
+            {
+                "label": "User Sales Setup",
+                "route": "business_sales_user",
+                "path": "/business/sales-user/",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "User Sales Setup",
+                "route": "inventory_sales_user",
+                "path": "/inventory/sales-user/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "User Sales Setup",
+                "route": "medicine_sales_user",
+                "path": "/medicine/sales-user/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_ADMIN"
+                    ]
+                ]
+            }
+        ],
+        "Hospital": [
+            {
+                "label": "Admission",
+                "route": "hms_invoice_admission",
+                "path": "/hms/invoice-admission/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_ADMISSION"
+                    ]
+                ]
+            },
+            {
+                "label": "Cabin/Ward",
+                "route": "hms_cabin",
+                "path": "/hms/cabin-ward/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Cabin/Wrad Booking",
+                "route": "hms_invoice_admission_booking",
+                "path": "/hms/invoice-admission/booking-cabin",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_ADMISSION"
+                    ]
+                ]
+            },
+            {
+                "label": "Commission",
+                "route": "hms_doctor_commission_invoice",
+                "path": "/hms/doctor-invoice/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MANAGER",
+                        "ROLE_DOMAIN_HOSPITAL_COMMISSION"
+                    ]
+                ]
+            },
+            {
+                "label": "Commission",
+                "route": "hms_commission",
+                "path": "/hms/commission/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Commission Payment",
+                "route": "hms_doctor_invoice",
+                "path": "/hms/doctor-invoice/doctor",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MANAGER",
+                        "ROLE_DOMAIN_HOSPITAL_COMMISSION"
+                    ]
+                ]
+            },
+            {
+                "label": "Commission Summary",
+                "route": "hms_report_commission_group",
+                "path": "/hms/report/commission-group",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Configuration",
+                "route": "hms_config_manage",
+                "path": "/hms/config/manage",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "Daily Commission",
+                "route": "hms_report_daily_referred_commission",
+                "path": "/hms/report/daily-commission-details",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Diagnostic",
+                "route": "hms_invoice",
+                "path": "/hms/invoice/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_OPERATOR"
+                    ]
+                ]
+            },
+            {
+                "label": "Doctor",
+                "route": "hms_doctor",
+                "path": "/hms/doctor/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Doctor Visit",
+                "route": "hms_prescription",
+                "path": "/hms/prescription/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_VISIT"
+                    ]
+                ]
+            },
+            {
+                "label": "Hospital Category",
+                "route": "hms_category",
+                "path": "/admin/hms-category/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Lab User",
+                "route": "hms_labuser",
+                "path": "/hms/lab-user/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Manage Stock",
+                "route": "hms_stock",
+                "path": "/hms/stock/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Marketing Executive",
+                "route": "hms_marketing_executive",
+                "path": "/hms/marketing-executive/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Commission",
+                "route": "hms_report_monthly_commission",
+                "path": "/hms/report/monthly-commission",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Sales & Cash",
+                "route": "hms_report_monthly_cash",
+                "path": "/hms/report/monthly-cash",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Pathological & Process",
+                "route": "hms_invoice_report_process",
+                "path": "/hms/report-process/collection-process",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_LAB",
+                        "ROLE_DOMAIN_HOSPITAL_DOCTOR"
+                    ]
+                ]
+            },
+            {
+                "label": "Pathology Test",
+                "route": "hms_pathology",
+                "path": "/hms/pathology/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Patient Group Test",
+                "route": "hms_invoice_patient_group_test",
+                "path": "/hms/report-process/patient-group-test",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_LAB",
+                        "ROLE_DOMAIN_HOSPITAL_DOCTOR"
+                    ]
+                ]
+            },
+            {
+                "label": "Patient Test",
+                "route": "hms_invoice_patient_test",
+                "path": "/hms/report-process/patient-test",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_LAB",
+                        "ROLE_DOMAIN_HOSPITAL_DOCTOR"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase",
+                "route": "hms_purchase",
+                "path": "/hms/purchase/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Referred",
+                "route": "hms_referreddoctor",
+                "path": "/hms/referred-doctor/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Referred Commission",
+                "route": "hms_report_monthly_referred_commission",
+                "path": "/hms/report/monthly-commission-details",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Report Delivery",
+                "route": "hms_invoice_particular",
+                "path": "/hms/report-process/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_OPERATOR"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Details",
+                "route": "hms_report_sales_details",
+                "path": "/hms/report/sales-details",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Discount",
+                "route": "hms_report_sales_discount_details",
+                "path": "/hms/report/sales-discount-details",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Summary",
+                "route": "hms_report_sales_summary",
+                "path": "/hms/report/sales-summary",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Service Group",
+                "route": "hms_service_group",
+                "path": "/hms/service-group/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Service Wise Sales",
+                "route": "hms_report_sales_service",
+                "path": "/hms/report/service-wise-sales",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Services/Procedure",
+                "route": "hms_other_service",
+                "path": "/hms/other-service/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Surgery",
+                "route": "hms_surgery",
+                "path": "/hms/surgery-operation/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_MASTERDATA"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor/Supplier",
+                "route": "hms_vendor",
+                "path": "/hms/vendor/",
+                "roles": [
+                    [
+                        "ROLE_HOSPITAL"
+                    ],
+                    [
+                        "ROLE_DOMAIN_HOSPITAL_PURCHASE"
+                    ]
+                ]
+            }
+        ],
+        "HumanResource": [
+            {
+                "label": "Calendar Weekend",
+                "route": "weekend",
+                "path": "/human-resource/weekend-leave/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_HR_ATTENDANCE"
+                    ]
+                ]
+            },
+            {
+                "label": "Daily Attendance",
+                "route": "daily_attendance",
+                "path": "/human-resource/daily-attendance/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_HR_ATTENDANCE"
+                    ]
+                ]
+            },
+            {
+                "label": "Daily Sheet",
+                "route": "attendance",
+                "path": "/human-resource/attendance/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_HR_ATTENDANCE"
+                    ]
+                ]
+            },
+            {
+                "label": "Department",
+                "route": "hrdepartment",
+                "path": "/human-resource/payroll-department/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_PAYROLL_SETTING"
+                    ]
+                ]
+            },
+            {
+                "label": "Leave Policy",
+                "route": "leavepolicy",
+                "path": "/human-resource/leave-policy/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_PAYROLL_SETTING"
+                    ]
+                ]
+            },
+            {
+                "label": "Leave Setup",
+                "route": "leave_setup",
+                "path": "/human-resource/leave-setup/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_PAYROLL_SETTING"
+                    ]
+                ]
+            },
+            {
+                "label": "Manage Employee",
+                "route": "employee_payroll",
+                "path": "/human-resource/employee-payroll/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_PAYROLL_SALARY"
+                    ]
+                ]
+            },
+            {
+                "label": "Payroll Generate",
+                "route": "payroll",
+                "path": "/human-resource/payroll-generate/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_PAYROLL_SALARY"
+                    ]
+                ]
+            },
+            {
+                "label": "Payroll Setting",
+                "route": "payrollsetting",
+                "path": "/human-resource/payroll-setting/",
+                "roles": [
+                    [
+                        "ROLE_HR",
+                        "ROLE_PAYROLL"
+                    ],
+                    [
+                        "ROLE_PAYROLL_SETTING"
+                    ]
+                ]
+            }
+        ],
+        "Inventory": [
+            {
+                "label": "Add Item",
+                "route": "item_new",
+                "path": "/inventory/item/new",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Barcode Print",
+                "route": "inventory_barcode",
+                "path": "/inventory/barcode/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Barcode Stock Details",
+                "route": "inventory_barcode_stock",
+                "path": "/inventory/stockitem/barcode-wise-stock",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Barcode wise Stock",
+                "route": "inventory_barcode_branch_stock",
+                "path": "/inventory/stockitem/barcode-wise-branch-stock",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Brand",
+                "route": "itembrand",
+                "path": "/inventory/brand/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Category",
+                "route": "inventory_category",
+                "path": "/inventory/category/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Configuration",
+                "route": "inventoryconfig_edit",
+                "path": "/inventory/config/manage",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_CONFIG"
+                    ]
+                ]
+            },
+            {
+                "label": "Daily  Sales & Profit",
+                "route": "inventory_report_daily_sales_profit",
+                "path": "/inventory/report/daily-sales-profit",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Daily Sales",
+                "route": "inventory_report_daily_sales",
+                "path": "/inventory/report/daily-sales",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Damage",
+                "route": "inventory_damage",
+                "path": "/inventory/damage/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Group Stock",
+                "route": "inventory_report_group_stock",
+                "path": "/inventory/report/group-stock",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Item Overview",
+                "route": "inventory_report_stock_item",
+                "path": "/inventory/report/stock-item",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Manage Purchase",
+                "route": "purchase",
+                "path": "/inventory/purchase/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Master Item",
+                "route": "inventory_product",
+                "path": "/inventory/product/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly  Sales & Profit",
+                "route": "inventory_report_monthly_sales_profit",
+                "path": "/inventory/report/monthly-sales-profit",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Sales",
+                "route": "inventory_report_monthly_sales",
+                "path": "/inventory/report/monthly-sales",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "New Invoice",
+                "route": "inventory_salesonline_new",
+                "path": "/inventory/sales-online/new",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Operational Stock",
+                "route": "inventory_report_operational_stock",
+                "path": "/inventory/report/operational-stock",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Periodic Sales Item",
+                "route": "inventory_report_sales_item",
+                "path": "/inventory/report/sales-item",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Periodic Stock",
+                "route": "inventory_report_periodic_stock",
+                "path": "/inventory/report/periodic-stock",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Pre-purchase",
+                "route": "prepurchaseitem",
+                "path": "/inventory/pre-purchase-item/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase",
+                "route": "inventory_purchasesimple",
+                "path": "/inventory/purchase-simple/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Import",
+                "route": "inventory_excelimproter",
+                "path": "/inventory/excelimproter/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Item",
+                "route": "inventory_purchaseitem",
+                "path": "/inventory/purchaseitem/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Return",
+                "route": "inventory_purchasereturn",
+                "path": "/inventory/purchase/return/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase with price",
+                "route": "inventory_report_purchase",
+                "path": "/inventory/report/purchase",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_PURCHASE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales",
+                "route": "inventory_salesonline",
+                "path": "/inventory/sales-online/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Import",
+                "route": "inventory_salesimport",
+                "path": "/inventory/sales-improt/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Item Details",
+                "route": "inventory_report_sales_item_details",
+                "path": "/inventory/report/sales-item-details",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Overview",
+                "route": "inventory_report_sales_overview",
+                "path": "/inventory/report/sales-transaction-overview",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Return",
+                "route": "inventory_salesreturn",
+                "path": "/inventory/salesreturn/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales by User",
+                "route": "inventory_report_sales_user",
+                "path": "/inventory/report/sales-user-overview",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales with price",
+                "route": "inventory_report_sales",
+                "path": "/inventory/report/sales-transaction",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Size Group",
+                "route": "itemsize_group",
+                "path": "/inventory/item-size/size-group",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Adjustment",
+                "route": "inv_stock_adjustment",
+                "path": "/inventory/stock-adjustment/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Item",
+                "route": "inventory_item",
+                "path": "/inventory/item/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Item Details",
+                "route": "inventory_stockitem",
+                "path": "/inventory/stockitem/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Short List",
+                "route": "inventory_stockitem_short_list",
+                "path": "/inventory/stockitem/item-short-list",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "System Overview",
+                "route": "inventory_report_overview",
+                "path": "/inventory/report/overview",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Till Stock",
+                "route": "inventory_report_till_stock",
+                "path": "/inventory/report/till-stock",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "User Sales Target",
+                "route": "inventory_report_sales_user_target",
+                "path": "/inventory/report/user-sales-mothly-target",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor",
+                "route": "inventory_vendor",
+                "path": "/inventory/vendor/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_PURCHASE"
+                    ]
+                ]
+            }
+        ],
+        "Location": [
+            {
+                "label": "Location",
+                "route": "location",
+                "path": "/admin/location/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            }
+        ],
+        "Media": [
+            {
+                "label": "Galleries",
+                "route": "gallery",
+                "path": "/website/gallery/",
+                "roles": [
+                    [
+                        "ROLE_WEBSITE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_MANAGER"
+                    ]
+                ]
+            }
+        ],
+        "Medicine": [
+            {
+                "label": "Add Invoice Return",
+                "route": "medicine_sales_customer_item",
+                "path": "/medicine/sales-return/customer-sales-item",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Add Item Return",
+                "route": "medicine_sales_item",
+                "path": "/medicine/sales/sales-item",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Add Purchase",
+                "route": "medicine_purchase_new",
+                "path": "/medicine/purchase/new",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Add Sales",
+                "route": "medicine_sales_temporary_new",
+                "path": "/medicine/sales-temporary/new",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Android",
+                "route": "medicine_purchase_android",
+                "path": "/medicine/purchase/android",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Android Sales",
+                "route": "medicine_sales_android",
+                "path": "/medicine/sales/android",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Brand",
+                "route": "medicine_report_purchase_brand_sales",
+                "path": "/medicine/report/purchase-brand-sales",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Brand Details",
+                "route": "medicine_report_purchase_brand_sales_details",
+                "path": "/medicine/report/purchase-brand-sales-details",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Brand Stock Price",
+                "route": "medicine_report_brand_stock",
+                "path": "/medicine/report/brand-stock",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Configuration",
+                "route": "medicine_config_manage",
+                "path": "/medicine/config/manage",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Current Short List",
+                "route": "medicine_stock_current_short_item",
+                "path": "/medicine/stock/daily-item-short-list",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Daily Sales Chart",
+                "route": "medicine_report_daily_hourly_sales",
+                "path": "/medicine/report/daily-sales-chart",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Damage",
+                "route": "medicine_damage",
+                "path": "/medicine/damage/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ],
+                    [
+                        "ROLE_MEDICINE_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Hold Sales",
+                "route": "medicine_sales_hold",
+                "path": "/medicine/sales/hold",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Import",
+                "route": "medicinestock_import",
+                "path": "/medicine/medicine-stock-import/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ],
+                    [
+                        "ROLE_MEDICINE_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Instant Purchase",
+                "route": "medicine_instantpurchase",
+                "path": "/medicine/instant-purchase/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Invoice Return",
+                "route": "medicine_sales_customer_return_invoice",
+                "path": "/medicine/sales-return/sales-return-invoice",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Item Return",
+                "route": "medicine_sales_return",
+                "path": "/medicine/sales-return/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Low Sales Item",
+                "route": "medicine_report_low_sales_item",
+                "path": "/medicine/report/low-sales-item",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Medicine Expiration",
+                "route": "medicine_expiry_item",
+                "path": "/medicine/purchase/medicine-expiration-item",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Medicine Transfer",
+                "route": "medicine_transfer",
+                "path": "/medicine/medicine-transfer/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ],
+                    [
+                        "ROLE_MEDICINE_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Minimum Stock Setup",
+                "route": "medicine_minimum",
+                "path": "/medicine/medicine-minimum-stock/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Monthly Sales Chart",
+                "route": "medicine_report_monthly_sales_purchase",
+                "path": "/medicine/report/monthly-sales-purchase-chart",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Pre-purchase",
+                "route": "medicine_prepurchase",
+                "path": "/medicine/pre-purchase/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Product Wise Sales",
+                "route": "medicine_report_sales_stock",
+                "path": "/medicine/report/sales-stock",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase",
+                "route": "medicine_purchase",
+                "path": "/medicine/purchase/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Item",
+                "route": "medicine_report_purchase_item",
+                "path": "/medicine/report/purchase-item-report",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Return",
+                "route": "medicine_purchase_return",
+                "path": "/medicine/purchase-return/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Summary",
+                "route": "medicine_report_purchase_summary",
+                "path": "/medicine/report/purchase-overview",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase Wise Sales",
+                "route": "medicine_report_purchase_stock",
+                "path": "/medicine/report/purchase-vendor",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Remaining Stock",
+                "route": "medicine_report_remaining_stock",
+                "path": "/medicine/report/remaining-stock-report",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales",
+                "route": "medicine_sales",
+                "path": "/medicine/sales/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_SALES"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Daily",
+                "route": "medicine_report_sales_daily",
+                "path": "/medicine/report/sales-daily-wise",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Details",
+                "route": "medicine_report_sales_details",
+                "path": "/medicine/report/sales-details",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Summary",
+                "route": "medicine_report_sales_summary",
+                "path": "/medicine/report/sales-overview",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Setting",
+                "route": "medicine_particular",
+                "path": "/medicine/particular/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Short List",
+                "route": "medicine_stock_short_item",
+                "path": "/medicine/stock/item-short-list",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Adjustment",
+                "route": "stock_adjustment",
+                "path": "/medicine/stock-adjustment/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ],
+                    [
+                        "ROLE_MEDICINE_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Adjustment",
+                "route": "stock_adjustment_summary",
+                "path": "/medicine/stock-adjustment/summary",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock House",
+                "route": "medicine_stockhouse",
+                "path": "/medicine/stock-wear-house/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ],
+                    [
+                        "ROLE_MEDICINE_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Item",
+                "route": "medicine_stock",
+                "path": "/medicine/stock/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Item Details",
+                "route": "medicine_purchase_item",
+                "path": "/medicine/purchase/stock-item-details",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Item History",
+                "route": "medicine_stock_item_history",
+                "path": "/medicine/stock/item-history",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ]
+                ]
+            },
+            {
+                "label": "System Overview",
+                "route": "medicine_system_overview",
+                "path": "/medicine/report/system-overview",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Top Sales Item",
+                "route": "medicine_report_top_sales_item",
+                "path": "/medicine/report/top-sales-item",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "User Monthly Sales",
+                "route": "medicine_report_sales_user_monthly",
+                "path": "/medicine/report/sales-user-monthly",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "User Wise Sales",
+                "route": "medicine_report_sales_user",
+                "path": "/medicine/report/sales-user",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor Accounts",
+                "route": "medicine_report_vendor_sales",
+                "path": "/medicine/vendor-purchase-sales",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ],
+                    [
+                        "ROLE_MEDICINE_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor Details",
+                "route": "medicine_report_purchase_vendor_details",
+                "path": "/medicine/report/purchase-vendor-details",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor Ledger",
+                "route": "medicine_report_purchase_vendor",
+                "path": "/medicine/report/purchase-vendor-outstanding",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor Medicine",
+                "route": "medicine_report_vendor_sales_medicine",
+                "path": "/medicine/vendor-purchase-sales-medicine",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_STOCK"
+                    ],
+                    [
+                        "ROLE_MEDICINE_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor Stock",
+                "route": "medicine_report_product_stock_sales",
+                "path": "/medicine/report/product-vendor-stock-sales",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor base Sales",
+                "route": "medicine_report_sales_vendor_customer",
+                "path": "/medicine/report/vendor-base-sales",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor/Supplier",
+                "route": "medicine_vendor",
+                "path": "/medicine/vendor/",
+                "roles": [
+                    [
+                        "ROLE_MEDICINE"
+                    ],
+                    [
+                        "ROLE_MEDICINE_PURCHASE"
+                    ]
+                ]
+            }
+        ],
+        "Migration": [
+            {
+                "label": "Customer Invoice",
+                "route": "business_report_customer_sales_item",
+                "path": "/business/report/customer-monthly-sales-item",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_CRM",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_ASSOCIATION_REPORT"
+                    ]
+                ]
+            },
+            {
+                "label": "Feature",
+                "route": "appearancefeature",
+                "path": "/appearance/feature/",
+                "roles": [
+                    [
+                        "ROLE_WEBSITE"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_MANAGER"
+                    ],
+                    [
+                        "ROLE_DOMAIN_WEBSITE_WEDGET",
+                        "ROLE_WEBSITE"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Item",
+                "route": "business_report_item_stock",
+                "path": "/business/report/purchase-stock-price",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Item Price",
+                "route": "business_report_item_stock_price",
+                "path": "/business/report/purchase-stock-price",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Price",
+                "route": "business_report_purchase_stock_price",
+                "path": "/business/report/purchase-stock-price",
+                "roles": [
+                    [
+                        "ROLE_BUSINESS",
+                        "ROLE_DOMAIN"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT"
+                    ],
+                    [
+                        "ROLE_BUSINESS_REPORT",
+                        "ROLE_BUSINESS_PURCHASE"
+                    ]
+                ]
+            }
+        ],
+        "Pos": [
+            {
+                "label": "Android Sales",
+                "route": "pos_android_sales",
+                "path": "/app-pos/android/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_POS_ANDROID"
+                    ]
+                ]
+            },
+            {
+                "label": "Pos",
+                "route": "pos_desktop",
+                "path": "/app-pos/desktop/",
+                "roles": [
+                    [
+                        "ROLE_INVENTORY"
+                    ],
+                    [
+                        "ROLE_DOMAIN_INVENTORY_SALES"
+                    ],
+                    [
+                        "ROLE_POS"
+                    ]
+                ]
+            }
+        ],
+        "Product": [
+            {
+                "label": "Collection",
+                "route": "collection",
+                "path": "/admin/collection/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Feature Category",
+                "route": "category_sorting",
+                "path": "/admin/category/sorting",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            }
+        ],
+        "Restaurant": [
+            {
+                "label": "Android Sales",
+                "route": "restaurant_invoice_android",
+                "path": "/restaurant/invoice/android",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ]
+                ]
+            },
+            {
+                "label": "Category",
+                "route": "restaurant_category",
+                "path": "/restaurant/category/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Configuration",
+                "route": "restaurant_config_manage",
+                "path": "/restaurant/config/manage",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Item Damage",
+                "route": "restaurant_damage",
+                "path": "/restaurant/damage/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Manage Sales",
+                "route": "restaurant_invoice",
+                "path": "/restaurant/invoice/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ]
+                ]
+            },
+            {
+                "label": "Particular",
+                "route": "restaurant_particular",
+                "path": "/restaurant/particular/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Point of Sales ",
+                "route": "restaurant_invoice_new",
+                "path": "/restaurant/invoice/new",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ]
+                ]
+            },
+            {
+                "label": "Pre-production",
+                "route": "restaurant_production",
+                "path": "/restaurant/production/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Product Sorting",
+                "route": "restaurant_product_sorting",
+                "path": "/restaurant/product/product-sorting",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Product Wise Sales",
+                "route": "restaurant_report_sales_product",
+                "path": "/restaurant/report/product-wise-sales",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Purchase",
+                "route": "restaurant_purchase",
+                "path": "/restaurant/purchase/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Sales Summary",
+                "route": "restaurant_report_sales_summary",
+                "path": "/restaurant/report/sales-summary",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Import",
+                "route": "restaurant_itemimporter",
+                "path": "/restaurant/item-import/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Stock Item",
+                "route": "restaurant_stock",
+                "path": "/restaurant/stock/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "User Wise Sales",
+                "route": "restaurant_report_sales_user",
+                "path": "/restaurant/report/user-wise-sales",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Vendor",
+                "route": "restaurant_vendor",
+                "path": "/restaurant/vendor/",
+                "roles": [
+                    [
+                        "ROLE_RESTAURANT"
+                    ],
+                    [
+                        "ROLE_DOMAIN_RESTAURANT_MANAGER"
+                    ]
+                ]
+            }
+        ],
+        "Tool": [
+            {
+                "label": "Application",
+                "route": "applicationpricing",
+                "path": "/admin/applicationpricing/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Application ",
+                "route": "appmodule",
+                "path": "/admin/appmodule/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Application Testimonial",
+                "route": "applicationtestimonial",
+                "path": "/admin/testimonial/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Bulk Sms",
+                "route": "smsbulk",
+                "path": "/sms/bulk-sms/",
+                "roles": [
+                    [
+                        "ROLE_DOMAIN",
+                        "ROLE_SMS"
+                    ],
+                    [
+                        "ROLE_SMS_BULK"
+                    ]
+                ]
+            },
+            {
+                "label": "Business Sector",
+                "route": "syndicate",
+                "path": "/admin/syndicate/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Color",
+                "route": "color",
+                "path": "/admin/color/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Designation",
+                "route": "designation",
+                "path": "/admin/designation/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Domain Operation",
+                "route": "tools_domain",
+                "path": "/admin/domain/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Invoice Application",
+                "route": "invoicemodule_domain",
+                "path": "/domain/invoicemodule/domain-invoice",
+                "roles": [
+                    [
+                        "ROLE_DOMAIN",
+                        "ROLE_SMS"
+                    ],
+                    [
+                        "ROLE_SMS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Medicine",
+                "route": "medicinebrand",
+                "path": "/admin/medicine-brand/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Medicine Import",
+                "route": "medicine_import",
+                "path": "/admin/medicine-import/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Module",
+                "route": "module",
+                "path": "/admin/module/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "SMS/Email",
+                "route": "smspricing",
+                "path": "/admin/smspricing/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Size",
+                "route": "size",
+                "path": "/admin/size/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Sms Bundle",
+                "route": "invoicesmsemail",
+                "path": "/sms/invoice-sms-email/",
+                "roles": [
+                    [
+                        "ROLE_DOMAIN",
+                        "ROLE_SMS"
+                    ],
+                    [
+                        "ROLE_SMS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Sms Logs",
+                "route": "smssender",
+                "path": "/sms/sender-sms/",
+                "roles": [
+                    [
+                        "ROLE_DOMAIN",
+                        "ROLE_SMS"
+                    ],
+                    [
+                        "ROLE_SMS_MANAGER"
+                    ]
+                ]
+            },
+            {
+                "label": "Theme",
+                "route": "theme",
+                "path": "/admin/theme/",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            },
+            {
+                "label": "Transaction Method",
+                "route": "transactionmethod_new",
+                "path": "/admin/transaction-method/new",
+                "roles": [
+                    [
+                        "ROLE_SUPER_ADMIN"
+                    ]
+                ]
+            }
+        ],
+        "User": [
+            {
+                "label": "Dashboard",
+                "route": "homepage",
+                "path": "/backend",
+                "roles": []
+            }
+        ]
+    }
+}

@@ -50,7 +50,7 @@ The fix keeps the decision and costs almost nothing:
 
 ---
 
-## 2. Scope: 365 screens, not 3,462 routes
+## 2. Scope: 335 screens, not 3,462 routes
 
 `migration/bin/nav-inventory.php` reads `Appearance\Menu\Builder` — 2,146 lines,
 the single place navigation is declared — and resolves every item to a route and
@@ -58,19 +58,31 @@ a module. It is read statically on purpose: the builder branches on the signed-i
 user's roles and the tenant's enabled modules, so booting it shows one tenant's
 slice, and the union is what has to be built.
 
-- **472** menu items link to a route; 142 more are headings and dropdown parents.
-- **365** resolve to a controller, across **19 modules**. That is the scope.
-- **107** name a route that exists in neither tree. Checked against the legacy
+- **383** menu items link to a route; 135 more are headings and dropdown parents.
+- **335** resolve to a controller, across **18 modules**. That is the scope.
+- **48** name a route that exists in neither tree. Checked against the legacy
   router, not assumed — none of them is a port defect. They are dead menu entries
   and a product decision, catalogued in `migration/contract/nav-scope.md`.
 
+**Corrected on 2026-09-10, from 365.** The first count read the file with a regex,
+which cannot tell live code from dead. Two kinds of declaration look exactly like
+navigation and are not: **22 items inside comments** (including all of Customer),
+and **67 items in 11 builder methods that nothing calls** — live code, never
+invoked from `mainMenu`, `megaMenu` or `footerMenu`. Both are now listed in the
+report rather than silently dropped. The inventory is tokenised and walks the call
+graph, which is also what makes the role guards readable: `businessMenu()` is *not*
+dead, because it is called as `BusinessMenu()`, and PHP does not care about case.
+
 | module | screens | | module | screens |
 |---|---:|---|---|---:|
-| Accounting | 59 | | Hospital | 34 |
-| Business | 58 | | Tool | 28 |
-| Medicine | 56 | | DomainUser | 18 |
-| Inventory | 45 | | Restaurant | 17 |
-| | | | the other 11 | 50 |
+| Accounting | 59 | | Medicine | 54 |
+| Business | 58 | | Inventory | 42 |
+| | | | the other 14 | 122 |
+
+Every screen but one — the dashboard — sits behind a role guard, and the inventory
+now carries them: 334 of 335. They are read from the braces *and* the call graph,
+because the whole Tools tree is super-admin-only and says so nowhere inside
+`toolsMenu()` — the guard is on the call.
 
 Behind those screens sit **361 form types** and **325 repositories**, which is
 where the real work is: a screen is a table and a form, and the form is the part
@@ -151,7 +163,7 @@ request validation over classes that already work.
 
 ## 4. The API
 
-Only what the 365 screens need, and only when their module's turn comes.
+Only what the 335 screens need, and only when their module's turn comes.
 
 - **Shape.** One resource per screen family: a list endpoint with filters,
   pagination and sort; a show; a create; an update; a delete. The 96 existing
@@ -265,7 +277,7 @@ This is the highest-leverage task in phase 0. A wrong control height is invisibl
 on the first screen and unfixable by the fiftieth, and it is the one error that
 breaks the overlay test everywhere at once.
 
-The navigation tree is ported from the inventory: 365 items, their grouping, and
+The navigation tree is ported from the inventory: 335 items, their grouping, and
 the 122 role checks that decide who sees what.
 
 ### Colour
@@ -307,14 +319,14 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 | # | module | screens | why here |
 |---|---|---:|---|
 | 0 | — | — | **the 875 files copied into `terminalbd_api`**, pipeline switched to checking-only, `terminalbd_api/` and `terminalbd_react/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
-| 1 | **Tool** | 28 | settings and `GlobalOption`; everything else reads it |
-| 2 | **User** + **DomainUser** | 20 | login, roles, branches — the 122 nav role checks need them |
-| 3 | **Medicine** | 56 | best evidence here: 82% of visited pages render, 38% reach |
-| 4 | **Inventory** | 45 | large, well exercised |
+| 1 | **Tool** | 18 | settings; `GlobalOption` is here as an API resource even though its own menu entry is commented out, because everything else reads it |
+| 2 | **User** + **DomainUser** | 13 | login, roles, branches — the 334 nav role guards need them |
+| 3 | **Medicine** | 54 | best evidence here: 82% of visited pages render, 38% reach |
+| 4 | **Inventory** | 42 | large, well exercised |
 | 5 | **Accounting** | 59 | largest, and depends on 1–4 |
 | 6 | **Business**, **Hospital** | 92 | large, moderate coverage |
-| 7 | the small modules | 25 | Product, Content, Appearance, Media, Location, Pos |
-| 8 | **Customer**, **Restaurant**, **DoctorPrescription** | 28 | blocked: no `business_config`, `restaurant_config` or `dps_config` rows in this dump |
+| 7 | the small modules | 18 | Product, Content, Appearance, Media, Location, Pos, Migration |
+| 8 | **Restaurant**, **DoctorPrescription** | 25 | blocked: no `restaurant_config` or `dps_config` rows in this dump. Customer is gone from the scope entirely — both its items are commented out |
 | 9 | **the mobile API moves** | — | the 96 wire-locked endpoints leave `next/` for `terminalbd_api/`, byte-compatible |
 | 10 | **`next/` deleted** | — | the presentation half of the upgrade; the API already has the rest (§7) |
 | 11 | **offline** | — | see §8 |
@@ -327,7 +339,7 @@ convention is wrong and belongs in phase 0.
 ### Phase 0 in detail
 
 Everything after this copies phase 0. A convention that is wrong here is wrong
-365 times, so it is written out rather than left to be improvised.
+335 times, so it is written out rather than left to be improvised.
 
 #### 0.1 — Two repositories
 
@@ -460,9 +472,9 @@ rhythm.
 
 #### 0.6 — The navigation
 
-Port the tree from `migration/contract/nav-scope.md`: 365 items, their grouping,
-and the 122 role checks that decide who sees what. Roles come from the API, so
-this is the first thing that needs 0.3.
+Port the tree from `migration/contract/nav-scope.json`: 335 items, their grouping,
+and the role guard on each — 334 of 335 have one. Roles come from the API, so this
+is the first thing that needs 0.3.
 
 Screens that do not exist yet render a placeholder. A visibly incomplete nav is
 better than a nav that grows a new shape per module.
