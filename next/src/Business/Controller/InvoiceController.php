@@ -74,7 +74,7 @@ class InvoiceController extends AbstractController
         $entities = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->invoiceLists( $config->getId(),$data);
         $pagination = $this->paginate($entities);
         $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'new';
-        return $this->render("BusinessBundle:Invoice/{$view}:index.html.twig", array(
+        return $this->render("Business/Invoice/{$view}/index.html.twig", array(
             'entities' => $pagination,
             'salesTransactionOverview' => '',
             'previousSalesTransactionOverview' => '',
@@ -92,7 +92,7 @@ class InvoiceController extends AbstractController
         $entities = $em->getRepository( \App\Business\Entity\BusinessInvoice::class )->invoiceConditionLists( $config->getId(),$data);
         $pagination = $this->paginate($entities);
         $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'new';
-        return $this->render("BusinessBundle:Invoice/{$view}:condition.html.twig", array(
+        return $this->render("Business/Invoice/{$view}/condition.html.twig", array(
             'entities' => $pagination,
             'couriers' => $couriers,
             'salesTransactionOverview' => '',
@@ -188,7 +188,7 @@ class InvoiceController extends AbstractController
         $wearhouses = $this->em->getRepository(WearHouse::class)->findBy(array('businessConfig' => $config),array('name'=>'ASC'));
         $batchItems = $this->em->getRepository(BusinessBatchParticular::class)->getFindBatchParticular($config->getId());
 
-        return $this->render("BusinessBundle:Invoice/{$view}:new.html.twig", array(
+        return $this->render("Business/Invoice/{$view}/new.html.twig", array(
             'config' => $config,
             'entity' => $entity,
             'wearhouses' => $wearhouses,
@@ -345,7 +345,7 @@ class InvoiceController extends AbstractController
             $outstanding = $this->em->getRepository(\App\Accounting\Entity\AccountSales::class)->customerSingleOutstanding($this->getUser()->getGlobalOption(),$entity->getCustomer());
             $balance = empty($outstanding) ? 0 : $outstanding;
         }
-        return $this->render("BusinessBundle:Invoice/{$view}:new.html.twig", array(
+        return $this->render("Business/Invoice/{$view}/new.html.twig", array(
             'config' => $config,
             'entity' => $entity,
             'vendors' => $vendors,
@@ -449,7 +449,7 @@ class InvoiceController extends AbstractController
         if ($config->getId() == $entity->getBusinessConfig()->getId()) {
 
             $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'default';
-            return $this->render("BusinessBundle:Invoice/{$view}:show.html.twig", array(
+            return $this->render("Business/Invoice/{$view}/show.html.twig", array(
                 'entity' => $entity,
             ));
         } else {

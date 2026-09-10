@@ -24,7 +24,7 @@ at all. So its 42 rows below say the screens execute, the queries resolve, the g
 hold and both sides agree - at zero rows. They do NOT say the two agree on real data,
 and no harness here can say that until a dump with inventory in it exists.
 
-**186 screens, 186 agree, 0 differ.**
+**278 screens, 278 agree, 0 differ.**
 
 | screen | path | twig | api page | api total | page size | |
 |---|---|---:|---:|---:|---:|---|
@@ -69,7 +69,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `medicine_minimum` | /medicine/medicine-minimum-stock/ | 0 | 0 | 0 | all | ok |
 | `medicine_particular` | /medicine/particular/ | 53 | 200 | 464 | all | ok |
 | `medicine_prepurchase` | /medicine/pre-purchase/ | 25 | 25 | 59 | 25 | ok |
-| `medicine_purchase` | /medicine/purchase/ | 25 | 25 | 95 | 25 | ok |
+| `medicine_purchase` | /medicine/purchase/ | 25 | 25 | 98 | 25 | ok |
 | `medicine_purchase_android` | /medicine/purchase/android | 0 | 0 | 0 | all | ok |
 | `medicine_purchase_item` | /medicine/purchase/stock-item-details | 25 | 25 | 2378 | 25 | ok |
 | `medicine_purchase_new` | /medicine/purchase/new | 3 | 0 | 0 | all | ok |
@@ -99,7 +99,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `medicine_report_vendor_sales_medicine` | /medicine/vendor-purchase-sales-medicine | 0 | 1 | 1 | all | ok |
 | `medicine_sales` | /medicine/sales/ | 25 | 25 | 2117 | 25 | ok |
 | `medicine_sales_android` | /medicine/sales/android | 0 | 0 | 0 | all | ok |
-| `medicine_sales_customer_item` | /medicine/sales-return/customer-sales-item | - | 25 | 3491 | 25 | ok |
+| `medicine_sales_customer_item` | /medicine/sales-return/customer-sales-item | 3491 | 25 | 3491 | 25 | ok |
 | `medicine_sales_customer_return_invoice` | /medicine/sales-return/sales-return-invoice | 0 | 0 | 0 | 25 | ok |
 | `medicine_sales_hold` | /medicine/sales/hold | 0 | 0 | 0 | 25 | ok |
 | `medicine_sales_item` | /medicine/sales/sales-item | 25 | 25 | 3491 | 25 | ok |
@@ -144,7 +144,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `inventory_purchaseitem` | /inventory/purchaseitem/ | 0 | 0 | 0 | 25 | ok |
 | `inventory_purchasereturn` | /inventory/purchase/return/ | 0 | 0 | 0 | 25 | ok |
 | `inventory_report_purchase` | /inventory/report/purchase | 0 | 0 | 0 | all | ok |
-| `inventory_salesonline` | /inventory/sales-online/ | 9 | 9 | 9 | 25 | ok |
+| `inventory_salesonline` | /inventory/sales-online/ | 15 | 15 | 15 | 25 | ok |
 | `inventory_salesimport` | /inventory/sales-improt/ | 0 | 0 | 0 | all | ok |
 | `inventory_report_sales_item_details` | /inventory/report/sales-item-details | 52 | 0 | 0 | all | ok |
 | `inventory_report_sales_overview` | /inventory/report/sales-transaction-overview | 0 | 3 | 3 | all | ok |
@@ -194,7 +194,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `report_income` | /accounting/report/income | 7 | 1 | 1 | all | ok |
 | `hms_report_income` | /accounting/report-hms/income | 5 | 1 | 1 | all | ok |
 | `account_medicine_income` | /accounting/medicine/medicine-income | 9 | 1 | 1 | all | ok |
-| `account_business_income` | /accounting/business/income | 52 | - | - | all | ok |
+| `account_business_income` | /accounting/business/income | 6 | 1 | 1 | all | ok |
 | `account_transaction` | /accounting/transaction/ | 57 | - | - | all | ok |
 | `account_journal` | /accounting/journal/ | 13 | 13 | 13 | 25 | ok |
 | `journal_voucher` | /accounting/journal-voucher/ | 0 | 0 | 0 | 25 | ok |
@@ -225,6 +225,102 @@ and no harness here can say that until a dump with inventory in it exists.
 | `report_vendor_summary` | /accounting/vendor/summary | 25 | 25 | 41 | 25 | ok |
 | `account_trail_balance` | /accounting/transaction/trail-balance | 3 | 3 | 3 | all | ok |
 | `account_transaction_yearly` | /accounting/transaction/transaction-yearly | 12 | 6 | 12 | all | ok |
+| `business_purchase_new` | /business/purchase/new | - | - | - | all | ok |
+| | deferred: the Twig screen still owns this write | | | | | |
+| `business_invoice_new` | /business/invoice/new | - | - | - | all | ok |
+| | deferred: the Twig screen still owns this write | | | | | |
+| `business_android_sales` | /business/android/sales | 0 | 0 | 0 | 25 | ok |
+| `business_area` | /business/area/ | 0 | 0 | 0 | all | ok |
+| `business_brand` | /business/brand/ | 0 | 0 | 0 | all | ok |
+| `business_category` | /business/category/ | 0 | 0 | 0 | all | ok |
+| `business_report_condition` | /business/report/sales-condition | 0 | 0 | 0 | all | ok |
+| `business_report_condition_customer` | /business/report/sales-condition-customer | 0 | 0 | 0 | all | ok |
+| `business_report_condition_details` | /business/report/sales-condition-details | 0 | 0 | 0 | all | ok |
+| `business_invoice_condition` | /business/invoice/condition | 79 | 0 | 0 | 25 | ok |
+| `business_config_manage` | /business/config/manage | - | - | - | all | ok |
+| | settings row with 3 fields | | | | | |
+| `business_courier` | /business/courier/ | 0 | 0 | 0 | all | ok |
+| `business_report_customer_monthly_sales_stock` | /business/report/customer-monthly-item-sales | 5 | 1 | 1 | all | ok |
+| `business_report_monthly_sales_price` | /business/report/monthly-item-sales-price | 1 | 1 | 1 | all | ok |
+| `business_report_monthly_sales_stock` | /business/report/monthly-item-sales | 0 | 1 | 1 | all | ok |
+| `business_distribution_return` | /business/distribution-return/ | 0 | 0 | 0 | all | ok |
+| `business_fuelstation` | /business/fuelpump/ | 0 | 0 | 0 | 25 | ok |
+| `business_report_sales_details` | /business/report/sales-details | 1 | 0 | 0 | 25 | ok |
+| `business_report_sales_summary` | /business/report/sales-overview | 0 | 2 | 2 | all | ok |
+| `business_report_stock_ledger` | /business/report/stock-item-ledger | 0 | 0 | 0 | all | ok |
+| `business_report_monthly_stock_ledger` | /business/report/monthly-stock-ledger | 56 | 0 | 0 | all | ok |
+| `business_damage` | /business/damage/ | 0 | 0 | 0 | 25 | ok |
+| `business_marketing` | /business/marketing/ | 0 | 0 | 0 | all | ok |
+| `business_report_monthly_stock_summary` | /business/report/monthly-item-summary | 0 | 1 | 1 | all | ok |
+| `business_production` | /business/product-production/ | 0 | 0 | 0 | 25 | ok |
+| `business_stock_ledger` | /business/stock/stock-ledger | 56 | 0 | 0 | all | ok |
+| `business_report_sales_stock` | /business/report/sales-stock | 1 | 0 | 0 | all | ok |
+| `business_purchase` | /business/purchase/ | 4 | 4 | 4 | 25 | ok |
+| `business_purchase_item` | /business/purchase/purchase-item | 0 | 0 | 0 | 25 | ok |
+| `business_purchase_return` | /business/purchase-return/ | 0 | 0 | 0 | 25 | ok |
+| `business_report_purchase_summary` | /business/report/purchase-overview | 0 | 3 | 3 | all | ok |
+| `business_invoice` | /business/invoice/ | 3 | 3 | 3 | 25 | ok |
+| `business_report_sales_area` | /business/report/sales-area | 0 | 0 | 0 | all | ok |
+| `business_report_sales_dsr` | /business/report/sales-dsr | 0 | 0 | 0 | all | ok |
+| `business_report_commission_stock` | /business/report/commission-stock-item | 0 | 0 | 0 | 25 | ok |
+| `business_invoice_return` | /business/invoice-return/ | 0 | 0 | 0 | 25 | ok |
+| `business_invoice_return_item` | /business/invoice-return/sales-return-item | 0 | 0 | 0 | 25 | ok |
+| `business_report_sales_sr` | /business/report/sales-sr | 0 | 0 | 0 | all | ok |
+| `business_stock_adjustment` | /business/stock-adjustment/ | 0 | 0 | 0 | 25 | ok |
+| `business_stock_history` | /business/stock/stock-history | 59 | 0 | 0 | all | ok |
+| `business_itemimporter` | /business/item-import/ | 0 | 0 | 0 | all | ok |
+| `business_stock` | /business/stock/ | 84 | 0 | 0 | 25 | ok |
+| `business_report_stock_price` | /business/report/stock-price | 0 | 0 | 0 | all | ok |
+| `business_report_stock_report` | /business/report/stock-item-report | 0 | 0 | 0 | 25 | ok |
+| `business_stock_shortlist` | /business/stock/short-list | 0 | 0 | 0 | 25 | ok |
+| `business_stock_transfer` | /business/stock-transfer/ | 0 | 0 | 0 | 25 | ok |
+| `business_store` | /business/store/ | 0 | 0 | 0 | 25 | ok |
+| `business_store_ledger` | /business/store-ledger/ | 0 | 0 | 0 | 25 | ok |
+| `business_report_system_overview` | /business/report/system-overview | 0 | 0 | 0 | all | ok |
+| `business_report_sales_user_monthly` | /business/report/sales-user-monthly | 12 | 0 | 0 | all | ok |
+| `business_report_sales_user` | /business/report/sales-user | 0 | 0 | 0 | all | ok |
+| `business_vendor` | /business/vendor/ | 3278 | 200 | 3278 | all | ok |
+| `business_report_purchase_vendor_details` | /business/report/purchase-vendor-details | 1 | 25 | 124 | 25 | ok |
+| `business_report_purchase_ledger` | /business/report/purchase-vendor-outstanding | 41 | 41 | 41 | all | ok |
+| `business_vendor_stock` | /business/vendor-stock/ | 0 | 0 | 0 | 25 | ok |
+| `business_vendor_stock_item` | /business/vendor-stock/item | 0 | 0 | 0 | 25 | ok |
+| `business_report_vendor_commission_sales` | /business/report/vendor-commission-sales | 0 | 0 | 0 | 25 | ok |
+| `business_wearhouse` | /business/wear-house/ | 0 | 0 | 0 | all | ok |
+| `hms_invoice_admission` | /hms/invoice-admission/ | 0 | 0 | 0 | 25 | ok |
+| `hms_cabin` | /hms/cabin-ward/ | 0 | 0 | 0 | all | ok |
+| `hms_invoice_admission_booking` | /hms/invoice-admission/booking-cabin | 0 | 0 | 0 | all | ok |
+| `hms_doctor_commission_invoice` | /hms/doctor-invoice/ | 0 | 0 | 0 | 25 | ok |
+| `hms_commission` | /hms/commission/ | 0 | 0 | 0 | all | ok |
+| `hms_doctor_invoice` | /hms/doctor-invoice/doctor | 0 | 0 | 0 | 25 | ok |
+| `hms_report_commission_group` | /hms/report/commission-group | 0 | 0 | 0 | all | ok |
+| `hms_config_manage` | /hms/config/manage | - | - | - | all | ok |
+| | settings row with 2 fields | | | | | |
+| `hms_report_daily_referred_commission` | /hms/report/daily-commission-details | 0 | 0 | 0 | all | ok |
+| `hms_invoice` | /hms/invoice/ | 0 | 0 | 0 | 25 | ok |
+| `hms_doctor` | /hms/doctor/ | 0 | 0 | 0 | 25 | ok |
+| `hms_prescription` | /hms/prescription/ | 0 | 0 | 0 | 25 | ok |
+| `hms_category` | /admin/hms-category/ | 1 | 1 | 1 | 25 | ok |
+| `hms_labuser` | /hms/lab-user/ | 0 | 0 | 0 | 25 | ok |
+| `hms_stock` | /hms/stock/ | 25 | 25 | 16570 | 25 | ok |
+| `hms_marketing_executive` | /hms/marketing-executive/ | 0 | 0 | 0 | all | ok |
+| `hms_report_monthly_commission` | /hms/report/monthly-commission | 30 | 0 | 0 | all | ok |
+| `hms_report_monthly_cash` | /hms/report/monthly-cash | 30 | 0 | 0 | all | ok |
+| `hms_invoice_report_process` | /hms/report-process/collection-process | 0 | 0 | 0 | 25 | ok |
+| `hms_pathology` | /hms/pathology/ | 0 | 0 | 0 | 25 | ok |
+| `hms_invoice_patient_group_test` | /hms/report-process/patient-group-test | 0 | 0 | 0 | 25 | ok |
+| `hms_invoice_patient_test` | /hms/report-process/patient-test | 0 | 0 | 0 | 25 | ok |
+| `hms_purchase` | /hms/purchase/ | 25 | 25 | 99 | 25 | ok |
+| `hms_referreddoctor` | /hms/referred-doctor/ | 0 | 0 | 0 | 25 | ok |
+| `hms_report_monthly_referred_commission` | /hms/report/monthly-commission-details | 0 | 0 | 0 | all | ok |
+| `hms_invoice_particular` | /hms/report-process/ | 0 | 0 | 0 | 25 | ok |
+| `hms_report_sales_details` | /hms/report/sales-details | 0 | 0 | 0 | all | ok |
+| `hms_report_sales_discount_details` | /hms/report/sales-discount-details | 0 | 0 | 0 | all | ok |
+| `hms_report_sales_summary` | /hms/report/sales-summary | 54 | 5 | 5 | all | ok |
+| `hms_service_group` | /hms/service-group/ | 0 | 0 | 0 | all | ok |
+| `hms_report_sales_service` | /hms/report/service-wise-sales | 0 | 0 | 0 | all | ok |
+| `hms_other_service` | /hms/other-service/ | 0 | 0 | 0 | all | ok |
+| `hms_surgery` | /hms/surgery-operation/ | 0 | 0 | 0 | all | ok |
+| `hms_vendor` | /hms/vendor/ | 25 | 25 | 43 | 25 | ok |
 
 **`color`** - Twig 500 in both trees: ColorController does findBy(['isValid' => 1]) and ProductColor has no such field. The port answers what the screen meant - name ASC - rather than reproducing the exception.
 
@@ -261,6 +357,24 @@ and no harness here can say that until a dump with inventory in it exists.
 **`account_transaction`** - Fatal in both trees: TransactionController passes one argument to getGroupByAccountHead(), which declares three. The API fails identically, in the copied code.
 
 **`account_transaction_purchase_expense`** - Twig 500 whenever the screen is given any parameter other than date: the controller fills $data[date] only when $data is entirely empty, then reads it unconditionally. Pre-existing; the API passes the query through and answers.
+
+**`business_invoice_condition`** - Twig 500 once any parameter is present, the harness page=1 included: the controller fills its own date defaults only when the request is entirely empty, then reads them. Pre-existing; the API passes the query through and answers.
+
+**`business_report_sales_details`** - Twig 500 on page=1, same shape: reads $data[startDate] after filling it only for an empty request.
+
+**`business_report_monthly_stock_ledger`** - Twig 500 on page=1, same shape as the ledger it copies.
+
+**`business_stock_ledger`** - Twig 500 on page=1: reads $data[month] after filling it only for an empty request.
+
+**`business_report_sales_stock`** - Twig 500 on page=1, same shape.
+
+**`business_stock_history`** - Twig 500: the controller assigns $particulars only inside a branch and the template reads it unconditionally. Presentation, so no counterpart in the API.
+
+**`business_stock`** - Fatal in both trees, and the query is malformed in both: BusinessStockHistoryRepository selects "(COALESCE(SUM(e.quantity),0) AS quantity" - an opening parenthesis that is never closed. Doctrine 3 rejects it; the string is byte-identical in the legacy.
+
+**`business_report_purchase_vendor_details`** - Twig 500 on page=1, same shape.
+
+**`hms_report_sales_summary`** - Twig 500 on page=1: reads $data[startDate] after filling it only for an empty request. Twelve queries run behind it and the API answers all twelve.
 
 A screen with 0 rows on both sides is agreement, not evidence: this dump's tenant
 has no rows for several of these tables. That is the same constraint every other

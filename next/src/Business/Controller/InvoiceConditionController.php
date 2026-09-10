@@ -127,7 +127,7 @@ class InvoiceConditionController extends AbstractController
         $marketings = $this->em->getRepository(\App\Business\Entity\Marketing::class)->findBy(array('businessConfig' => $config,'status'=>1),array('name'=>"ASC"));
         $particulars = $em->getRepository(\App\Business\Entity\BusinessParticular::class)->getFindWithParticular($config, $type = array('production','stock','service','virtual','pre-production','post-production'));
         $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'new';
-        return $this->render("BusinessBundle:Invoice/{$view}:new.html.twig", array(
+        return $this->render("Business/Invoice/{$view}/new.html.twig", array(
             'entity' => $entity,
             'vendors' => $vendors,
             'areas' => $areas,
@@ -239,7 +239,7 @@ class InvoiceConditionController extends AbstractController
         $areas = $this->em->getRepository(\App\Business\Entity\BusinessArea::class)->findBy(array('businessConfig' => $config,'status'=>1),array('name'=>"ASC"));
         $marketings = $this->em->getRepository(\App\Business\Entity\Marketing::class)->findBy(array('businessConfig' => $config,'status'=>1),array('name'=>"ASC"));
         $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'new';
-        return $this->render("BusinessBundle:Invoice/{$view}:new.html.twig", array(
+        return $this->render("Business/Invoice/{$view}/new.html.twig", array(
             'entity' => $entity,
             'vendors' => $vendors,
             'areas' => $areas,
@@ -330,7 +330,7 @@ class InvoiceConditionController extends AbstractController
 
             $view = !empty($config->getBusinessModel()) ? $config->getBusinessModel() : 'default';
 
-            return $this->render("BusinessBundle:Invoice/{$view}:show.html.twig", array(
+            return $this->render("Business/Invoice/{$view}/show.html.twig", array(
                 'entity' => $entity,
             ));
         } else {

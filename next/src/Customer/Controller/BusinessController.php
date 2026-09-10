@@ -56,7 +56,7 @@ class BusinessController extends AbstractController
             $this->requestStack->getSession()->getFlashBag()->add(
                 'success', "Data has been inserted successfully"
             );
-            return $this->render("CustomerBundle:{$template}:dashboard.html.twig", array(
+            return $this->render("Customer/{$template}/dashboard.html.twig", array(
                 'user'         => $user,
                 'globalOption' => $globalOption,
                 'customer' => $customer,
@@ -67,7 +67,7 @@ class BusinessController extends AbstractController
             ));
         }else{
             $template =  "Customer";
-            return $this->render("CustomerBundle:{$template}:dashboard.html.twig", array(
+            return $this->render("Customer/{$template}/dashboard.html.twig", array(
                 'user'         => $user,
                 'globalOption' => $globalOption,
             ));

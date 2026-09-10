@@ -345,7 +345,7 @@ class PrescriptionController extends AbstractController
         }else{
             $template = "Print:{$entity->getPrintFor()}";
         }
-        return $this->render("HospitalBundle:{$template}.html.twig", array(
+        return $this->render("Hospital/{$template}.html.twig", array(
             'entity'                => $entity,
             'config'                => $entity->getHospitalConfig(),
             'global'                => $entity->getHospitalConfig()->getGlobalOption(),
@@ -374,7 +374,7 @@ class PrescriptionController extends AbstractController
             $template = "Print:prescription";
         }
         $barcode = $this->getBarcode($entity->getInvoice());
-        return $this->render("HospitalBundle:{$template}.html.twig", array(
+        return $this->render("Hospital/{$template}.html.twig", array(
             'entity'                => $entity,
             'config'                => $entity->getHospitalConfig(),
             'global'                => $entity->getHospitalConfig()->getGlobalOption(),

@@ -550,7 +550,7 @@ class InvoiceParticularController extends AbstractController
         }else{
             $template = "InvoiceParticular:pathologicalReportPrint";
         }
-        return $this->render("HospitalBundle:{$template}.html.twig", array(
+        return $this->render("Hospital/{$template}.html.twig", array(
             'entity'            => $entity,
             'global'            => $global,
             'printUser'         => $this->getUser(),
@@ -636,7 +636,7 @@ class InvoiceParticularController extends AbstractController
         }else{
             $template = "InvoiceParticular:pathologicalGroupReportPrint";
         }
-        return $this->render("HospitalBundle:{$template}.html.twig", array(
+        return $this->render("Hospital/{$template}.html.twig", array(
              'reportGroup'            => $entity,
             'global'            => $global,
             'printUser'         => $this->getUser(),

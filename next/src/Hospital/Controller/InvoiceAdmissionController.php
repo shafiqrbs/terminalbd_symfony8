@@ -735,7 +735,7 @@ class InvoiceAdmissionController extends AbstractController
                 $template = "Print";
             }
             $barcode = $this->getBarcode($entity->getCustomer()->getPatientId());
-            return $this->render("HospitalBundle:{$template}:admission-card.html.twig", array(
+            return $this->render("Hospital/{$template}/admission-card.html.twig", array(
                 'config' => $hospital,
                 'barcode' => $barcode,
                 'entity' => $entity,
@@ -955,7 +955,7 @@ class InvoiceAdmissionController extends AbstractController
                 $template = "Print:dead";
             }
         }
-        return $this->render("HospitalBundle:{$template}.html.twig", array(
+        return $this->render("Hospital/{$template}.html.twig", array(
             'entity'             => $entity,
             'invoiceDetails'     => $invoiceDetails,
             'invoiceBarcode'     => $barcode,

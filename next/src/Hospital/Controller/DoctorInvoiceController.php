@@ -265,7 +265,7 @@ class DoctorInvoiceController extends AbstractController
             $template = "DoctorInvoice:print";
         }
         $entity = $invoice->getHmsInvoice();
-        return $this->render("HospitalBundle:{$template}.html.twig", array(
+        return $this->render("Hospital/{$template}.html.twig", array(
             'invoice'               => $invoice,
             'entity'                => $entity,
             'config'                => $entity->getHospitalConfig(),

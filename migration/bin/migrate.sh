@@ -35,6 +35,13 @@ $PHP migration/bin/port-http.php
 # Runs before Rector so the import it rewrites is a live attribute reference
 # rather than a docblock one, which withImportNames would be free to drop.
 $PHP migration/bin/port-route-annotations.php next/src
+# Nineteen render() calls still name their template the Symfony 2 way,
+# "Bundle:Path:file.html.twig". port-http.php converts the fully literal ones;
+# these carry an interpolated variable in the middle, so a converter matching a
+# plain string walked past them. All nineteen are in Business, Hospital and
+# Customer - modules this dump has no data for, which is why nothing had reached
+# one in five phases of sweeps.
+$PHP migration/bin/port-template-aliases.php
 
 echo
 echo "############ 3. flag non-mechanical createForm() sites ############"

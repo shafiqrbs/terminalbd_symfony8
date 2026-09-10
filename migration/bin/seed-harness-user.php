@@ -23,14 +23,23 @@ declare(strict_types=1);
  * empty salt, and a profile row.
  *
  *   php8.5 migration/bin/seed-harness-user.php --tenant=322 --username=migration_check_322 \
- *       --roles-from=siddhartha
+ *       --roles-from=siddhartha --roles-from-nav
  *
- * `--roles-from` matters more than it looks. **ROLE_SUPER_ADMIN is not a
- * superset of the domain roles**: the hierarchy grants a super admin 148 roles
- * and ROLE_DOMAIN_ACCOUNTING_SALES_REPORT is not among them, so six Accounting
+ * The roles matter more than they look. **ROLE_SUPER_ADMIN is not a superset of
+ * the domain roles**: the hierarchy grants a super admin 148 roles and
+ * ROLE_DOMAIN_ACCOUNTING_SALES_REPORT is not among them, so six Accounting
  * screens answered 403 for a super admin and 200 for the tenant's own operator.
- * Copying a real user's roles and adding ROLE_SUPER_ADMIN on top gives a harness
- * user that can reach everything either of them can.
+ *
+ * `--roles-from` copies a real user's roles, which is the honest way to see what
+ * that person sees. `--roles-from-nav` adds every role the NAVIGATION INVENTORY
+ * names - 334 of 335 screens carry a guard - so a harness user can reach every
+ * screen there is. That is what a comparison harness needs and what a real
+ * account should never have: the API still enforces each guard per request, this
+ * user simply satisfies all of them.
+ *
+ * Without it, phase 6 opened with 34 screens answering 403 because no user in
+ * this tenant holds ROLE_BUSINESS_REPORT or ROLE_DOMAIN_HOSPITAL_MASTERDATA -
+ * which says nothing about the port, only about who was asking.
  *
  * Two things it must get right, both learned the hard way:
  *
@@ -50,6 +59,7 @@ $tenant = null;
 $username = null;
 
 $rolesFrom = null;
+$rolesFromNav = false;
 
 foreach (array_slice($argv, 1) as $arg) {
     if (str_starts_with($arg, '--tenant=')) {
@@ -58,6 +68,8 @@ foreach (array_slice($argv, 1) as $arg) {
         $username = substr($arg, 11);
     } elseif (str_starts_with($arg, '--roles-from=')) {
         $rolesFrom = substr($arg, 13);
+    } elseif ($arg === '--roles-from-nav') {
+        $rolesFromNav = true;
     }
 }
 
@@ -124,6 +136,22 @@ if ($rolesFrom !== null) {
 
     $copied = unserialize((string) $found, ['allowed_classes' => false]);
     $granted = array_values(array_unique([...$granted, ...(is_array($copied) ? $copied : [])]));
+}
+
+if ($rolesFromNav) {
+    $scope = json_decode(file_get_contents($root . '/migration/contract/nav-scope.json'), true);
+
+    foreach ($scope['modules'] ?? [] as $screens) {
+        foreach ($screens as $screen) {
+            foreach ($screen['roles'] ?? [] as $choice) {
+                foreach ($choice as $role) {
+                    $granted[] = $role;
+                }
+            }
+        }
+    }
+
+    $granted = array_values(array_unique($granted));
 }
 
 $roles = serialize($granted);

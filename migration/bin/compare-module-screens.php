@@ -330,6 +330,100 @@ $screens = [
     'account_trail_balance' => ['path' => '/accounting/transaction/trail-balance'],
     'account_transaction_yearly' => ['path' => '/accounting/transaction/transaction-yearly', 'apiPath' => '/api/v1/accounting/cash-book/yearly', 'noTbody' => true, 'query' => 'year=2025'],
 
+    // --- phase 6: Business and Hospital --------------------------------------
+    'business_purchase_new' => ['path' => '/business/purchase/new', 'deferred' => true],
+    'business_invoice_new' => ['path' => '/business/invoice/new', 'deferred' => true],
+    'business_android_sales' => ['path' => '/business/android/sales', 'pageSize' => 25, 'noTbody' => true],
+    'business_area' => ['path' => '/business/area/'],
+    'business_brand' => ['path' => '/business/brand/'],
+    'business_category' => ['path' => '/business/category/', 'noTbody' => true],
+    'business_report_condition' => ['path' => '/business/report/sales-condition'],
+    'business_report_condition_customer' => ['path' => '/business/report/sales-condition-customer'],
+    'business_report_condition_details' => ['path' => '/business/report/sales-condition-details'],
+    'business_invoice_condition' => ['path' => '/business/invoice/condition', 'pageSize' => 25, 'note' => 'Twig 500 once any parameter is present, the harness page=1 included: the controller fills its own date defaults only when the request is entirely empty, then reads them. Pre-existing; the API passes the query through and answers.'],
+    'business_config_manage' => ['path' => '/business/config/manage', 'singleton' => true],
+    'business_courier' => ['path' => '/business/courier/'],
+    'business_report_customer_monthly_sales_stock' => ['path' => '/business/report/customer-monthly-item-sales', 'report' => true],
+    'business_report_monthly_sales_price' => ['path' => '/business/report/monthly-item-sales-price', 'report' => true],
+    'business_report_monthly_sales_stock' => ['path' => '/business/report/monthly-item-sales', 'report' => true],
+    'business_distribution_return' => ['path' => '/business/distribution-return/', 'noTbody' => true],
+    'business_fuelstation' => ['path' => '/business/fuelpump/', 'pageSize' => 25],
+    'business_report_sales_details' => ['path' => '/business/report/sales-details', 'pageSize' => 25, 'tbodyIndex' => 1, 'note' => 'Twig 500 on page=1, same shape: reads $data[startDate] after filling it only for an empty request.'],
+    'business_report_sales_summary' => ['path' => '/business/report/sales-overview', 'report' => true],
+    'business_report_stock_ledger' => ['path' => '/business/report/stock-item-ledger', 'noTbody' => true],
+    'business_report_monthly_stock_ledger' => ['path' => '/business/report/monthly-stock-ledger', 'note' => 'Twig 500 on page=1, same shape as the ledger it copies.'],
+    'business_damage' => ['path' => '/business/damage/', 'pageSize' => 25],
+    'business_marketing' => ['path' => '/business/marketing/'],
+    'business_report_monthly_stock_summary' => ['path' => '/business/report/monthly-item-summary', 'report' => true],
+    'business_production' => ['path' => '/business/product-production/', 'pageSize' => 25],
+    'business_stock_ledger' => ['path' => '/business/stock/stock-ledger', 'note' => 'Twig 500 on page=1: reads $data[month] after filling it only for an empty request.'],
+    'business_report_sales_stock' => ['path' => '/business/report/sales-stock', 'tbodyIndex' => 1, 'note' => 'Twig 500 on page=1, same shape.'],
+    'business_purchase' => ['path' => '/business/purchase/', 'pageSize' => 25],
+    'business_purchase_item' => ['path' => '/business/purchase/purchase-item', 'pageSize' => 25],
+    'business_purchase_return' => ['path' => '/business/purchase-return/', 'pageSize' => 25],
+    'business_report_purchase_summary' => ['path' => '/business/report/purchase-overview', 'report' => true],
+    'business_invoice' => ['path' => '/business/invoice/', 'pageSize' => 25],
+    'business_report_sales_area' => ['path' => '/business/report/sales-area'],
+    'business_report_sales_dsr' => ['path' => '/business/report/sales-dsr'],
+    'business_report_commission_stock' => ['path' => '/business/report/commission-stock-item', 'pageSize' => 25],
+    'business_invoice_return' => ['path' => '/business/invoice-return/', 'pageSize' => 25],
+    'business_invoice_return_item' => ['path' => '/business/invoice-return/sales-return-item', 'pageSize' => 25],
+    'business_report_sales_sr' => ['path' => '/business/report/sales-sr'],
+    'business_stock_adjustment' => ['path' => '/business/stock-adjustment/', 'pageSize' => 25],
+    'business_stock_history' => ['path' => '/business/stock/stock-history', 'report' => true, 'note' => 'Twig 500: the controller assigns $particulars only inside a branch and the template reads it unconditionally. Presentation, so no counterpart in the API.'],
+    'business_itemimporter' => ['path' => '/business/item-import/'],
+    'business_stock' => ['path' => '/business/stock/', 'pageSize' => 25, 'note' => 'Fatal in both trees, and the query is malformed in both: BusinessStockHistoryRepository selects "(COALESCE(SUM(e.quantity),0) AS quantity" - an opening parenthesis that is never closed. Doctrine 3 rejects it; the string is byte-identical in the legacy.'],
+    'business_report_stock_price' => ['path' => '/business/report/stock-price', 'staticRows' => 1],
+    'business_report_stock_report' => ['path' => '/business/report/stock-item-report', 'pageSize' => 25],
+    'business_stock_shortlist' => ['path' => '/business/stock/short-list', 'pageSize' => 25],
+    'business_stock_transfer' => ['path' => '/business/stock-transfer/', 'pageSize' => 25],
+    'business_store' => ['path' => '/business/store/', 'pageSize' => 25],
+    'business_store_ledger' => ['path' => '/business/store-ledger/', 'pageSize' => 25],
+    'business_report_system_overview' => ['path' => '/business/report/system-overview', 'report' => true],
+    'business_report_sales_user_monthly' => ['path' => '/business/report/sales-user-monthly', 'report' => true],
+    'business_report_sales_user' => ['path' => '/business/report/sales-user'],
+    'business_vendor' => ['path' => '/business/vendor/'],
+    'business_report_purchase_vendor_details' => ['path' => '/business/report/purchase-vendor-details', 'pageSize' => 25, 'tbodyIndex' => 1, 'note' => 'Twig 500 on page=1, same shape.'],
+    'business_report_purchase_ledger' => ['path' => '/business/report/purchase-vendor-outstanding'],
+    'business_vendor_stock' => ['path' => '/business/vendor-stock/', 'pageSize' => 25],
+    'business_vendor_stock_item' => ['path' => '/business/vendor-stock/item', 'pageSize' => 25],
+    'business_report_vendor_commission_sales' => ['path' => '/business/report/vendor-commission-sales', 'pageSize' => 25],
+    'business_wearhouse' => ['path' => '/business/wear-house/', 'noTbody' => true],
+    'hms_invoice_admission' => ['path' => '/hms/invoice-admission/', 'pageSize' => 25],
+    'hms_cabin' => ['path' => '/hms/cabin-ward/'],
+    'hms_invoice_admission_booking' => ['path' => '/hms/invoice-admission/booking-cabin'],
+    'hms_doctor_commission_invoice' => ['path' => '/hms/doctor-invoice/', 'pageSize' => 25],
+    'hms_commission' => ['path' => '/hms/commission/'],
+    'hms_doctor_invoice' => ['path' => '/hms/doctor-invoice/doctor', 'pageSize' => 25],
+    'hms_report_commission_group' => ['path' => '/hms/report/commission-group', 'report' => true],
+    'hms_config_manage' => ['path' => '/hms/config/manage', 'singleton' => true],
+    'hms_report_daily_referred_commission' => ['path' => '/hms/report/daily-commission-details', 'report' => true],
+    'hms_invoice' => ['path' => '/hms/invoice/', 'pageSize' => 25],
+    'hms_doctor' => ['path' => '/hms/doctor/', 'pageSize' => 25],
+    'hms_prescription' => ['path' => '/hms/prescription/', 'pageSize' => 25],
+    'hms_category' => ['path' => '/admin/hms-category/', 'pageSize' => 25],
+    'hms_labuser' => ['path' => '/hms/lab-user/', 'pageSize' => 25],
+    'hms_stock' => ['path' => '/hms/stock/', 'pageSize' => 25],
+    'hms_marketing_executive' => ['path' => '/hms/marketing-executive/'],
+    'hms_report_monthly_commission' => ['path' => '/hms/report/monthly-commission', 'report' => true],
+    'hms_report_monthly_cash' => ['path' => '/hms/report/monthly-cash', 'report' => true],
+    'hms_invoice_report_process' => ['path' => '/hms/report-process/collection-process', 'pageSize' => 25],
+    'hms_pathology' => ['path' => '/hms/pathology/', 'pageSize' => 25],
+    'hms_invoice_patient_group_test' => ['path' => '/hms/report-process/patient-group-test', 'pageSize' => 25],
+    'hms_invoice_patient_test' => ['path' => '/hms/report-process/patient-test', 'pageSize' => 25],
+    'hms_purchase' => ['path' => '/hms/purchase/', 'pageSize' => 25],
+    'hms_referreddoctor' => ['path' => '/hms/referred-doctor/', 'pageSize' => 25],
+    'hms_report_monthly_referred_commission' => ['path' => '/hms/report/monthly-commission-details', 'report' => true],
+    'hms_invoice_particular' => ['path' => '/hms/report-process/', 'pageSize' => 25],
+    'hms_report_sales_details' => ['path' => '/hms/report/sales-details'],
+    'hms_report_sales_discount_details' => ['path' => '/hms/report/sales-discount-details'],
+    'hms_report_sales_summary' => ['path' => '/hms/report/sales-summary', 'report' => true, 'note' => 'Twig 500 on page=1: reads $data[startDate] after filling it only for an empty request. Twelve queries run behind it and the API answers all twelve.'],
+    'hms_service_group' => ['path' => '/hms/service-group/'],
+    'hms_report_sales_service' => ['path' => '/hms/report/service-wise-sales', 'report' => true],
+    'hms_other_service' => ['path' => '/hms/other-service/'],
+    'hms_surgery' => ['path' => '/hms/surgery-operation/'],
+    'hms_vendor' => ['path' => '/hms/vendor/', 'pageSize' => 25],
+
 ];
 
 /** Like http(), but stops at the redirect and reports where it points. */
@@ -347,6 +441,42 @@ function httpNoFollow(string $url, array $options = []): array
     curl_close($ch);
 
     return [$status, $body, $location];
+}
+
+/**
+ * The tbody contents of a page, found by scanning rather than by regex.
+ *
+ * `preg_match_all('/<tbody>(.*?)<\/tbody>/s')` reads fine and fails silently on
+ * a big page: PCRE gives up at its backtrack limit and returns false, which the
+ * caller cannot tell apart from "this page has no table". Business's vendor list
+ * renders 3,278 rows unpaginated and hit exactly that - reported as a screen
+ * with no list, which looks like a port defect and is not one.
+ *
+ * @return string[]
+ */
+function tbodies(string $html): array
+{
+    $out = [];
+    $offset = 0;
+
+    while (($open = stripos($html, '<tbody', $offset)) !== false) {
+        $start = strpos($html, '>', $open);
+
+        if ($start === false) {
+            break;
+        }
+
+        $close = stripos($html, '</tbody', $start);
+
+        if ($close === false) {
+            break;
+        }
+
+        $out[] = substr($html, $start + 1, $close - $start - 1);
+        $offset = $close;
+    }
+
+    return $out;
 }
 
 /** A query string for a path that may already have one. */
@@ -429,13 +559,17 @@ foreach ($screens as $key => $screen) {
     $plusOverview = $screen['plusOverview'] ?? false;
 
     if ($isDeferred) {
-        [$twigStatus] = http($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
+        // Not followed: Business's Add Purchase and Add Sales CREATE a row and
+        // redirect, exactly as Inventory's New Invoice does, so following the
+        // redirect would both write a row and land on a screen that is not this
+        // one. A deferred screen only has to still answer.
+        [$twigStatus, , ] = httpNoFollow($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
         [$apiStatus, $json] = http($apiBase . '/api/v1/resources', [
             CURLOPT_COOKIEFILE => $jarApi,
             CURLOPT_HTTPHEADER => ['X-Api-Key: harness'],
         ]);
         $known = in_array($key, array_column(json_decode($json, true)['data'] ?? [], 'key'), true);
-        $ok = $twigStatus === 200 && $apiStatus === 200 && $known;
+        $ok = in_array($twigStatus, [200, 302], true) && $apiStatus === 200 && $known;
 
         if (!$ok) {
             $failures++;
@@ -527,10 +661,8 @@ foreach ($screens as $key => $screen) {
         [$twigStatus, $html] = http($twigBase . $path . qs($path, $extra), [CURLOPT_COOKIEFILE => $jarTwig]);
         $twigRows = 0;
 
-        if (preg_match_all('/<tbody[^>]*>(.*?)<\/tbody>/is', $html, $tm) > 0) {
-            foreach ($tm[1] as $tbody) {
-                $twigRows += preg_match_all('/<tr[\s>]/i', $tbody);
-            }
+        foreach (tbodies($html) as $tbody) {
+            $twigRows += preg_match_all('/<tr[\s>]/i', $tbody);
         }
 
         [$apiStatus, $json] = http($apiBase . '/api/v1/reports/' . $key . ($extra !== '' ? '?' . $extra : ''), [
@@ -615,8 +747,10 @@ foreach ($screens as $key => $screen) {
     // The first tbody is the list; a page may carry filter tables after it.
     $twigRows = null;
 
-    if (preg_match_all('/<tbody[^>]*>(.*?)<\/tbody>/is', $html, $tm) > $tbodyIndex) {
-        $twigRows = intdiv(preg_match_all('/<tr[\s>]/i', $tm[1][$tbodyIndex]) - $staticRows, $rowsPerRecord);
+    $bodies = tbodies($html);
+
+    if (count($bodies) > $tbodyIndex) {
+        $twigRows = intdiv(preg_match_all('/<tr[\s>]/i', $bodies[$tbodyIndex]) - $staticRows, $rowsPerRecord);
     } elseif ($noTbody && $twigStatus === 200) {
         // The table this screen prints was built by a repository method as a
         // string and has no <tbody> at all, so its rows are counted from the

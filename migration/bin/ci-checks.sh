@@ -55,6 +55,15 @@ run "route annotations converted to attributes" \
 run "app.user.* accessors resolve" \
     $PHP migration/bin/check-user-accessors.php
 
+# Twenty-one render() calls still named their template "Bundle:Path:file", which
+# Symfony 8 reads literally and cannot find. They survived five phases because
+# most interpolate a variable - so the converter that handled the literal names
+# walked past them - and because all of them are in modules this dump has no data
+# for. Same shape as the docblock routes above: gate on the source construct,
+# because a page that is never opened never reports.
+run "template aliases converted" \
+    $PHP migration/bin/check-template-aliases.php
+
 # The 96 wire-locked mobile endpoints still answer at their contract paths.
 run "mobile API contract" \
     $PHP migration/bin/check-api-contract.php --report=migration/contract/api-contract.md

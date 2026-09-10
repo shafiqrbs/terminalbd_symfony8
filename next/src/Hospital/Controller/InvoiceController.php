@@ -795,7 +795,7 @@ class InvoiceController extends AbstractController
         }else{
             $template = "Print:{$entity->getPrintFor()}";
         }
-        return $this->render("HospitalBundle:{$template}.html.twig", array(
+        return $this->render("Hospital/{$template}.html.twig", array(
             'entity'                => $entity,
             'invoiceDetails'        => $invoiceDetails,
             'invoiceBarcode'        => $barcode,
@@ -825,7 +825,7 @@ class InvoiceController extends AbstractController
         }else{
             $template = "Print:{$entity->getPrintFor()}";
         }
-        return $this->render("HospitalBundle:{$template}.html.twig", array(
+        return $this->render("Hospital/{$template}.html.twig", array(
             'entity'                => $entity,
             'config'                => $entity->getHospitalConfig(),
             'global'                => $entity->getHospitalConfig()->getGlobalOption(),

@@ -305,7 +305,7 @@ class ReportController extends AbstractController
         $entities = $em->getRepository(\App\Hospital\Entity\Invoice::class)->invoiceDetailReporets($user, $mode = 'diagnostic', $data);
         $pagination = $entities->getQuery()->getResult();
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [5, 6]);
-        return $this->render('HospitalBundle:Report/sales-discount:details.html.twig', [
+        return $this->render('Hospital/Report/sales-discount/details.html.twig', [
             'entities' => $pagination,
             'referredDoctors' => $referredDoctors,
             'salesTodayUser' => $salesTodayUser,
@@ -330,7 +330,7 @@ class ReportController extends AbstractController
         $pagination = $entities->getQuery()->getResult();
         $referredDoctors = $this->em->getRepository(\App\Hospital\Entity\Particular::class)->getFindWithParticular($hospital, [6]);
         $html = $this->renderView(
-            'HospitalBundle:Report/sales-discount:detailsPdf.html.twig', [
+            'Hospital/Report/sales-discount/detailsPdf.html.twig', [
                 'globalOption' => $user->getGlobalOption(),
                 'entities' => $pagination,
                 'referredDoctors' => $referredDoctors,
