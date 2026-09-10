@@ -68,6 +68,17 @@ $password = $env['SMOKE_TEST_PASSWORD'] ?? '';
  * `note` records a screen that is broken in the Twig application itself. Those
  * are not port defects and the comparison cannot pass them, so they are named
  * here rather than left looking like regressions.
+ *
+ * `apiPath` is for a screen the API serves from its own endpoint rather than
+ * from /resources/{key}. Inventory has three: their Twig originals printed a
+ * table a REPOSITORY METHOD built in PHP, so there is no resource definition
+ * behind them and - since that markup carries no <tbody> - nothing for the
+ * counter to find on the Twig side either. Those also take `noTbody`, which
+ * says the zero is the template's shape and not a lost list.
+ *
+ * `draft` is a screen that CREATES a row and redirects: Inventory's New Invoice.
+ * Both sides are asked to make one and the two are compared by the shape of the
+ * path they hand back, never by the invoice number - each side makes its own.
  */
 $screens = [
     'designation' => ['path' => '/admin/designation/'],
@@ -177,6 +188,56 @@ $screens = [
     'medicinestock_import' => ['path' => '/medicine/medicine-stock-import/', 'pageSize' => 25],
     'stock_adjustment' => ['path' => '/medicine/stock-adjustment/', 'pageSize' => 25],
     'stock_adjustment_summary' => ['path' => '/medicine/stock-adjustment/summary', 'pageSize' => 25],
+
+    // --- phase 4: Inventory ------------------------------------------------
+    // A create form, not a list. The API answers with the fields on the
+    // resource and the four datalists on /inventory/item-form.
+    'item_new' => ['path' => '/inventory/item/new', 'apiPath' => '/api/v1/inventory/item-form', 'noTbody' => true, 'note' => 'Twig 500, from source identical in the legacy: ItemType passes data: 4 to an EntityType, and Symfony 8 types IdReader::getIdValue() as ?object where 2.8 took the int. A form type is presentation and has no counterpart in the API.'],
+    'inventory_barcode' => ['path' => '/inventory/barcode/', 'pageSize' => 25],
+    'inventory_barcode_stock' => ['path' => '/inventory/stockitem/barcode-wise-stock', 'apiPath' => '/api/v1/inventory/barcode-stock', 'noTbody' => true],
+    'inventory_barcode_branch_stock' => ['path' => '/inventory/stockitem/barcode-wise-branch-stock', 'apiPath' => '/api/v1/inventory/barcode-branch-stock', 'noTbody' => true],
+    'itembrand' => ['path' => '/inventory/brand/'],
+    'inventory_category' => ['path' => '/inventory/category/', 'pageSize' => 25],
+    'inventoryconfig_edit' => ['path' => '/inventory/config/manage', 'singleton' => true],
+    'inventory_report_daily_sales_profit' => ['path' => '/inventory/report/daily-sales-profit', 'report' => true],
+    'inventory_report_daily_sales' => ['path' => '/inventory/report/daily-sales', 'report' => true],
+    'inventory_damage' => ['path' => '/inventory/damage/', 'pageSize' => 25, 'rowsPerRecord' => 2],
+    'inventory_report_group_stock' => ['path' => '/inventory/report/group-stock', 'report' => true],
+    'inventory_report_stock_item' => ['path' => '/inventory/report/stock-item', 'report' => true],
+    'purchase' => ['path' => '/inventory/purchase/', 'pageSize' => 25, 'rowsPerRecord' => 2],
+    'inventory_product' => ['path' => '/inventory/product/', 'pageSize' => 25],
+    'inventory_report_monthly_sales_profit' => ['path' => '/inventory/report/monthly-sales-profit', 'report' => true],
+    'inventory_report_monthly_sales' => ['path' => '/inventory/report/monthly-sales', 'report' => true],
+    'inventory_salesonline_new' => ['path' => '/inventory/sales-online/new', 'draft' => true, 'apiPath' => '/api/v1/inventory/sales-online/draft'],
+    'inventory_report_operational_stock' => ['path' => '/inventory/report/operational-stock', 'report' => true],
+    'inventory_report_sales_item' => ['path' => '/inventory/report/sales-item', 'report' => true],
+    'inventory_report_periodic_stock' => ['path' => '/inventory/report/periodic-stock', 'report' => true],
+    'prepurchaseitem' => ['path' => '/inventory/pre-purchase-item/'],
+    'inventory_purchasesimple' => ['path' => '/inventory/purchase-simple/', 'pageSize' => 25],
+    // One static row inside the tbody: a "System / sample file" link the
+    // template hard-codes above the loop, the same house style Application
+    // Pricing has.
+    'inventory_excelimproter' => ['path' => '/inventory/excelimproter/', 'staticRows' => 1],
+    'inventory_purchaseitem' => ['path' => '/inventory/purchaseitem/', 'pageSize' => 25],
+    'inventory_purchasereturn' => ['path' => '/inventory/purchase/return/', 'pageSize' => 25, 'rowsPerRecord' => 2],
+    'inventory_report_purchase' => ['path' => '/inventory/report/purchase', 'report' => true],
+    'inventory_salesonline' => ['path' => '/inventory/sales-online/', 'pageSize' => 25],
+    'inventory_salesimport' => ['path' => '/inventory/sales-improt/', 'staticRows' => 1],
+    'inventory_report_sales_item_details' => ['path' => '/inventory/report/sales-item-details', 'report' => true, 'note' => 'The Twig screen branches on the salesMode of the config and, at "stock", calls Sales::reportSalesItemDetails - a method that exists in NEITHER tree. Pre-existing, not a port defect; the API runs the branch that works.'],
+    'inventory_report_sales_overview' => ['path' => '/inventory/report/sales-transaction-overview', 'report' => true],
+    'inventory_salesreturn' => ['path' => '/inventory/salesreturn/', 'pageSize' => 25, 'rowsPerRecord' => 2],
+    'inventory_report_sales_user' => ['path' => '/inventory/report/sales-user-overview', 'report' => true],
+    'inventory_report_sales' => ['path' => '/inventory/report/sales-transaction', 'report' => true],
+    'itemsize_group' => ['path' => '/inventory/item-size/size-group', 'apiPath' => '/api/v1/inventory/size-group', 'noTbody' => true, 'note' => 'Twig 500, and identical in the legacy: ItemSizeController writes $entities only inside if($sizes), so with no ItemSize rows the template reads a variable that was never assigned. A notice on PHP 5, a fatal on 8.5.'],
+    'inv_stock_adjustment' => ['path' => '/inventory/stock-adjustment/', 'pageSize' => 25],
+    'inventory_item' => ['path' => '/inventory/item/', 'pageSize' => 25],
+    'inventory_stockitem' => ['path' => '/inventory/stockitem/', 'pageSize' => 25, 'rowsPerRecord' => 2],
+    'inventory_stockitem_short_list' => ['path' => '/inventory/stockitem/item-short-list', 'pageSize' => 25],
+    'inventory_report_overview' => ['path' => '/inventory/report/overview', 'report' => true],
+    'inventory_report_till_stock' => ['path' => '/inventory/report/till-stock', 'report' => true],
+    'inventory_report_sales_user_target' => ['path' => '/inventory/report/user-sales-mothly-target', 'report' => true],
+    'inventory_vendor' => ['path' => '/inventory/vendor/'],
+
 ];
 
 /** Like http(), but stops at the redirect and reports where it points. */
@@ -262,6 +323,45 @@ foreach ($screens as $key => $screen) {
     // Not $report: that is the path this run writes to, and shadowing it made
     // the last screen's flag the filename.
     $isReport = $screen['report'] ?? false;
+    $apiPath = $screen['apiPath'] ?? null;
+    $noTbody = $screen['noTbody'] ?? false;
+    $isDraft = $screen['draft'] ?? false;
+
+    // A screen that creates a row and redirects. The Twig one does it on GET,
+    // which is why it is not followed; the API does it on POST, which is why it
+    // is asked explicitly. What is compared is where each says to go.
+    if ($isDraft) {
+        [$twigStatus, , $twigTarget] = httpNoFollow($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
+        [$apiStatus, $json] = http($apiBase . $apiPath, [
+            CURLOPT_COOKIEFILE => $jarApi,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => '',
+            CURLOPT_HTTPHEADER => ['X-Api-Key: harness', 'Content-Type: application/json'],
+        ]);
+        $decided = json_decode($json, true)['data']['path'] ?? null;
+        // The invoice differs by construction - two drafts, two numbers - so the
+        // comparison is on the shape either side routes to.
+        $shape = static fn (?string $p): string => preg_replace('#/[^/]+/online$#', '/{code}/online', (string) $p);
+        $twigPath = (string) parse_url((string) $twigTarget, PHP_URL_PATH);
+        $ok = $twigStatus === 302 && $apiStatus === 201 && $decided !== null
+            && $shape($twigPath) === $shape($decided);
+
+        if (!$ok) {
+            $failures++;
+        }
+
+        $rows[] = [
+            'key' => $key, 'path' => $path, 'twigStatus' => $twigStatus, 'apiStatus' => $apiStatus,
+            'twigRows' => null, 'apiPage' => null, 'apiTotal' => null, 'pageSize' => null,
+            'ok' => $ok, 'note' => $note,
+            'detail' => sprintf('twig -> %s | api -> %s', $shape($twigPath) ?: '-', $shape($decided) ?: '-'),
+        ];
+
+        printf("  %-44s twig %d -> %-30s | api %d -> %-30s %s\n", $key, $twigStatus,
+            $shape($twigPath) ?: '-', $apiStatus, $shape($decided) ?: '-', $ok ? 'ok' : 'DIFFERS');
+
+        continue;
+    }
     // The dashboard produces a redirect, not rows: follow neither side and
     // compare where they point.
     if ($landing) {
@@ -381,6 +481,13 @@ foreach ($screens as $key => $screen) {
 
     if (preg_match('/<tbody[^>]*>(.*?)<\/tbody>/is', $html, $tm) === 1) {
         $twigRows = intdiv(preg_match_all('/<tr[\s>]/i', $tm[1]) - $staticRows, $rowsPerRecord);
+    } elseif ($noTbody && $twigStatus === 200) {
+        // The table this screen prints was built by a repository method as a
+        // string and has no <tbody> at all, so its rows are counted from the
+        // <tr>s of that table, less its one header row. Reporting null here
+        // would read as "the list vanished" when the markup simply never had
+        // the element the counter looks for.
+        $twigRows = max(0, preg_match_all('/<tr[\s>]/i', $html) - 1);
     }
 
     // A screen may be served by more than one resource - see applicationpricing.
@@ -390,7 +497,9 @@ foreach ($screens as $key => $screen) {
 
     foreach (explode(',', $key) as $resourceKey) {
         [$status, $json] = http(
-            $apiBase . '/api/v1/resources/' . $resourceKey . '?perPage=' . ($pageSize ?? 200),
+            $apiPath !== null
+                ? $apiBase . $apiPath
+                : $apiBase . '/api/v1/resources/' . $resourceKey . '?perPage=' . ($pageSize ?? 200),
             [CURLOPT_COOKIEFILE => $jarApi, CURLOPT_HTTPHEADER => ['X-Api-Key: harness']]
         );
         $payload = json_decode($json, true);
@@ -453,16 +562,24 @@ printf("\n%d screens, %d agree, %d differ\n", count($rows), count($rows) - $fail
 if ($report !== null) {
     $out = "# The ported screens against the Twig ones\n\n"
         . "Generated by `migration/bin/compare-module-screens.php`.\n\n"
-        . "Every module that has landed: Tool, User + DomainUser, Medicine.\n\n"
+        . "Every module that has landed: Tool, User + DomainUser, Medicine, Inventory.\n\n"
         . "Row counts, not markup: the two render different HTML by design, but they must be\n"
         . "looking at the same rows under the same tenancy. `twig rows` is what the Twig table\n"
         . "renders on its first page; `api page` is the API at that controller's page size.\n\n"
-        . "Three shapes are compared differently, and say so in their rows: a REPORT is several\n"
+        . "Four shapes are compared differently, and say so in their rows: a REPORT is several\n"
         . "aggregate queries shown together, and its Twig page draws a skeleton - 12 months, 31\n"
         . "days - whether or not the data fills it, so what is compared is that both sides answer\n"
         . "and run the same queries. A SETTINGS screen has one row per tenant and nothing to\n"
         . "count. The DASHBOARD produces a redirect, and is compared by where each side sends\n"
-        . "the user.\n\n"
+        . "the user. A DRAFT screen - Inventory's New Invoice - creates a row and redirects, so\n"
+        . "both sides are asked to make one and compared on the shape of the path, never the\n"
+        . "invoice number.\n\n"
+        . "**Inventory carries a caveat the first three modules do not.** This dump has no\n"
+        . "Inventory data at all: no items, no stock, no purchase items, and the InventoryConfig\n"
+        . "row is a fixture (`migration/fixtures/inventory-config.sql`) seeded so the screens run\n"
+        . "at all. So its 42 rows below say the screens execute, the queries resolve, the guards\n"
+        . "hold and both sides agree - at zero rows. They do NOT say the two agree on real data,\n"
+        . "and no harness here can say that until a dump with inventory in it exists.\n\n"
         . sprintf("**%d screens, %d agree, %d differ.**\n\n", count($rows), count($rows) - $failures, $failures)
         . "| screen | path | twig | api page | api total | page size | |\n|---|---|---:|---:|---:|---:|---|\n";
 

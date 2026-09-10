@@ -322,11 +322,11 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 | 1 | ~~**Tool**~~ | 18 | **done 2026-09-10.** All 18 agree with the Twig originals row for row — `migration/contract/tool-module-screens.md` |
 | 2 | ~~**User** + **DomainUser**~~ | 13 | **done 2026-09-10.** 31 of 335 screens built; `migration/contract/module-screens.md` |
 | 3 | ~~**Medicine**~~ | 54 | **done 2026-09-10.** 85 of 335 screens built; 24 of these are reports |
-| 4 | **Inventory** | 42 | large, well exercised |
+| 4 | ~~**Inventory**~~ | 42 | **done 2026-09-10.** 127 of 335 screens built; 17 of these are reports. **The reason given here was wrong**: this dump has no Inventory data at all - no config, no items, no stock - so the module is verified running and agreeing at zero rows, on a seeded config row, and not on real data. `migration/contract/inventory-module-screens.md` |
 | 5 | **Accounting** | 59 | largest, and depends on 1–4 |
 | 6 | **Business**, **Hospital** | 92 | large, moderate coverage |
 | 7 | the small modules | 18 | Product, Content, Appearance, Media, Location, Pos, Migration |
-| 8 | **Restaurant**, **DoctorPrescription** | 25 | blocked: no `restaurant_config` or `dps_config` rows in this dump. Customer is gone from the scope entirely — both its items are commented out |
+| 8 | **Restaurant**, **DoctorPrescription** | 25 | blocked: no `restaurant_config` or `dps_config` rows in this dump - as Inventory turned out to be, so read a module's row count before trusting its place in this order. Customer is gone from the scope entirely — both its items are commented out |
 | 9 | **the mobile API moves** | — | the 96 wire-locked endpoints leave `next/` for `terminalbd_api/`, byte-compatible |
 | 10 | **`next/` deleted** | — | the presentation half of the upgrade; the API already has the rest (§7) |
 | 11 | **offline** | — | see §8 |
