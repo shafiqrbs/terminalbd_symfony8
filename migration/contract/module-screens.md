@@ -6,7 +6,7 @@ Row counts, not markup: the two render different HTML by design, but they must b
 looking at the same rows under the same tenancy. `twig rows` is what the Twig table
 renders on its first page; `api page` is the API at that controller's page size.
 
-**18 screens, 18 agree, 0 differ.**
+**31 screens, 31 agree, 0 differ.**
 
 | screen | path | twig | api page | api total | page size | |
 |---|---|---:|---:|---:|---:|---|
@@ -28,6 +28,21 @@ renders on its first page; `api page` is the API at that controller's page size.
 | `smssender` | /sms/sender-sms/ | 0 | 0 | 0 | all | ok |
 | `invoicesmsemail` | /sms/invoice-sms-email/ | 0 | 0 | 0 | 20 | ok |
 | `invoicemodule_domain` | /domain/invoicemodule/domain-invoice | 0 | 0 | 0 | 20 | ok |
+| `domain_branches` | /hr/branch/ | 0 | 0 | 0 | all | ok |
+| `appsetting_branchshop` | /inventory/branch-shop/ | 0 | 0 | 0 | all | ok |
+| `domain_customer` | /crm/ | 3 | 3 | 3 | 20 | ok |
+| `restaurant_customer` | /restaurant/customer/ | 3 | 3 | 3 | 20 | ok |
+| `hms_customer` | /hms/patient/ | 3 | 3 | 3 | 20 | ok |
+| `domain_association` | /crm/association/member | 0 | 0 | 0 | 20 | ok |
+| `domain_user` | /hr/employee/ | 2 | 2 | 2 | all | ok |
+| `business_sales_user` | /business/sales-user/ | 2 | 2 | 2 | all | ok |
+| `inventory_sales_user` | /inventory/sales-user/ | 2 | 2 | 2 | all | ok |
+| `medicine_sales_user` | /medicine/sales-user/ | 2 | 2 | 2 | all | ok |
+| `domain_notepad` | /notepad/ | 0 | 0 | 0 | 20 | ok |
+| `domain_notificationconfig` | /sms/notification/ | - | - | - | all | ok |
+| | settings row with 5 fields | | | | | |
+| `homepage` | /backend | - | - | - | all | ok |
+| | twig -> /admin/domain/ | api -> /admin/domain/ | | | | | |
 
 **`color`** - Twig 500 in both trees: ColorController does findBy(['isValid' => 1]) and ProductColor has no such field. The port answers what the screen meant - name ASC - rather than reproducing the exception.
 

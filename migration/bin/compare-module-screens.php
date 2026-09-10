@@ -5,6 +5,9 @@ declare(strict_types=1);
 /**
  * Screen for screen, does the ported module show what the Twig one showed?
  *
+ * Covers the modules that have landed: Tool (phase 1), User and DomainUser
+ * (phase 2).
+ *
  * Phase 1 onwards, this is what "the module landed" means. For each screen in
  * the module it renders the Twig page and reads the API resource that replaces
  * it, and compares the number of rows: what the Twig table renders on its first
@@ -97,7 +100,45 @@ $screens = [
     'smssender' => ['path' => '/sms/sender-sms/'],
     'invoicesmsemail' => ['path' => '/sms/invoice-sms-email/', 'pageSize' => 20],
     'invoicemodule_domain' => ['path' => '/domain/invoicemodule/domain-invoice', 'pageSize' => 20],
+
+    // --- phase 2: User + DomainUser ---------------------------------------
+    'domain_branches' => ['path' => '/hr/branch/'],
+    'appsetting_branchshop' => ['path' => '/inventory/branch-shop/'],
+    'domain_customer' => ['path' => '/crm/', 'pageSize' => 20],
+    'restaurant_customer' => ['path' => '/restaurant/customer/', 'pageSize' => 20],
+    'hms_customer' => ['path' => '/hms/patient/', 'pageSize' => 20],
+    'domain_association' => ['path' => '/crm/association/member', 'pageSize' => 20],
+    // Nine <tr> per record: the row, plus a detail panel of seven facts and a
+    // roles list, all inside the same tbody.
+    'domain_user' => ['path' => '/hr/employee/', 'rowsPerRecord' => 9],
+    'business_sales_user' => ['path' => '/business/sales-user/'],
+    'inventory_sales_user' => ['path' => '/inventory/sales-user/'],
+    'medicine_sales_user' => ['path' => '/medicine/sales-user/'],
+    'domain_notepad' => ['path' => '/notepad/', 'pageSize' => 20],
+    // Not a list on either side: one row per tenant, edited in place. There is
+    // nothing to count, so the check is that both answer at all.
+    'domain_notificationconfig' => ['path' => '/sms/notification/', 'singleton' => true],
+    // Not a page either: 81 lines of decision ending in a redirect. Compared by
+    // where each side sends the user, which is the only thing it produces.
+    'homepage' => ['path' => '/backend', 'landing' => true],
 ];
+
+/** Like http(), but stops at the redirect and reports where it points. */
+function httpNoFollow(string $url, array $options = []): array
+{
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => false,
+        CURLOPT_TIMEOUT => 120,
+    ] + $options);
+    $body = (string) curl_exec($ch);
+    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $location = (string) curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+    curl_close($ch);
+
+    return [$status, $body, $location];
+}
 
 function http(string $url, array $options = []): array
 {
@@ -160,6 +201,64 @@ foreach ($screens as $key => $screen) {
     $rowsPerRecord = $screen['rowsPerRecord'] ?? 1;
     $staticRows = $screen['staticRows'] ?? 0;
     $note = $screen['note'] ?? null;
+    $singleton = $screen['singleton'] ?? false;
+    $landing = $screen['landing'] ?? false;
+    // The dashboard produces a redirect, not rows: follow neither side and
+    // compare where they point.
+    if ($landing) {
+        [$twigStatus, , $twigTarget] = httpNoFollow($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
+        [$apiStatus, $json] = http($apiBase . '/api/v1/landing', [
+            CURLOPT_COOKIEFILE => $jarApi,
+            CURLOPT_HTTPHEADER => ['X-Api-Key: harness'],
+        ]);
+        $decided = json_decode($json, true)['data']['path'] ?? null;
+        $ok = $twigStatus === 302 && $apiStatus === 200 && $decided !== null
+            && rtrim((string) parse_url($twigTarget, PHP_URL_PATH), '/') === rtrim($decided, '/');
+
+        if (!$ok) {
+            $failures++;
+        }
+
+        $rows[] = [
+            'key' => $key, 'path' => $path, 'twigStatus' => $twigStatus, 'apiStatus' => $apiStatus,
+            'twigRows' => null, 'apiPage' => null, 'apiTotal' => null, 'pageSize' => null,
+            'ok' => $ok, 'note' => null,
+            'detail' => sprintf('twig -> %s | api -> %s', parse_url((string) $twigTarget, PHP_URL_PATH) ?: '-', $decided ?? '-'),
+        ];
+
+        printf("  %-24s twig %d -> %-24s | api %d -> %-24s %s\n", $key, $twigStatus,
+            parse_url((string) $twigTarget, PHP_URL_PATH) ?: '-', $apiStatus, $decided ?? '-', $ok ? 'ok' : 'DIFFERS');
+
+        continue;
+    }
+
+    // A settings screen has one row per tenant and no table on either side.
+    if ($singleton) {
+        [$twigStatus] = http($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
+        [$apiStatus, $json] = http($apiBase . '/api/v1/resources/' . $key . '/single', [
+            CURLOPT_COOKIEFILE => $jarApi,
+            CURLOPT_HTTPHEADER => ['X-Api-Key: harness'],
+        ]);
+        $fields = json_decode($json, true)['data'] ?? null;
+        $ok = $twigStatus === 200 && $apiStatus === 200 && is_array($fields) && $fields !== [];
+
+        if (!$ok) {
+            $failures++;
+        }
+
+        $rows[] = [
+            'key' => $key, 'path' => $path, 'twigStatus' => $twigStatus, 'apiStatus' => $apiStatus,
+            'twigRows' => null, 'apiPage' => null, 'apiTotal' => null, 'pageSize' => null,
+            'ok' => $ok, 'note' => null,
+            'detail' => sprintf('settings row with %d fields', is_array($fields) ? count($fields) - 1 : 0),
+        ];
+
+        printf("  %-24s twig %d settings   | api %d %d field(s)          %s\n", $key, $twigStatus,
+            $apiStatus, is_array($fields) ? count($fields) - 1 : 0, $ok ? 'ok' : 'DIFFERS');
+
+        continue;
+    }
+
     [$twigStatus, $html] = http($twigBase . $path, [CURLOPT_COOKIEFILE => $jarTwig]);
 
     // The first tbody is the list; a page may carry filter tables after it.
@@ -256,6 +355,10 @@ if ($report !== null) {
             $r['pageSize'] ?? 'all',
             $r['ok'] ? 'ok' : '**differs**'
         );
+
+        if (isset($r['detail'])) {
+            $out .= sprintf("| | %s | | | | | |\n", $r['detail']);
+        }
     }
 
     foreach ($rows as $r) {

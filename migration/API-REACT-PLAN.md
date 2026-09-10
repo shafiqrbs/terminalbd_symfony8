@@ -320,7 +320,7 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 |---|---|---:|---|
 | 0 | ~~—~~ | — | **done 2026-09-10.** the 874 files copied into `terminalbd_api`, pipeline switched to checking-only, `terminalbd_api/` and `terminalbd_react/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
 | 1 | ~~**Tool**~~ | 18 | **done 2026-09-10.** All 18 agree with the Twig originals row for row — `migration/contract/tool-module-screens.md` |
-| 2 | **User** + **DomainUser** | 13 | login, roles, branches — the 334 nav role guards need them |
+| 2 | ~~**User** + **DomainUser**~~ | 13 | **done 2026-09-10.** 31 of 335 screens built; `migration/contract/module-screens.md` |
 | 3 | **Medicine** | 54 | best evidence here: 82% of visited pages render, 38% reach |
 | 4 | **Inventory** | 42 | large, well exercised |
 | 5 | **Accounting** | 59 | largest, and depends on 1–4 |
@@ -524,7 +524,7 @@ one proxy rule.
 
 Two harnesses decide whether a module has landed, and Tool established both:
 
-- `migration/bin/compare-module-screens.php` renders every Twig screen and reads
+- `migration/bin/compare-module-screens.php` renders every Twig screen in every landed module and reads
   the API resource that replaces it, comparing row counts under the same paging
   and the same tenancy. Not markup — the two render different HTML by design —
   but they must be looking at the same rows. A screen that quietly lost its
@@ -532,10 +532,21 @@ Two harnesses decide whether a module has landed, and Tool established both:
 - `terminalbd_react/tools/module-check.mjs` opens every ported screen in a
   browser and round-trips a write through the form's own endpoints.
 
-Between them they found, in one module: a screen that lists three tables and not
-the entity it is named after, a screen that is a 500 in both trees, an invoice
-list missing its `process != 'Created'` filter, and the whole role hierarchy
-missing from the API.
+Between them they found, in the first two modules: a screen that lists three
+tables and not the entity it is named after, a screen that is a 500 in both
+trees, an invoice list missing its `process != 'Created'` filter, the whole role
+hierarchy missing from the API, and every API error arriving as an HTML page.
+
+Three shapes have turned up so far that a list-and-form does not cover, and each
+is now a capability rather than a special case:
+
+- a **repository method** instead of `findBy` — named by the resource and *run*,
+  not re-implemented, so conditions nobody would think to copy (Customer excludes
+  the row named "Default" and requires a mobile number) come across intact;
+- a **singleton** — one row per tenant, created on first read, which is what a
+  settings screen is;
+- a **decision** — `/backend` is 81 lines of branching that always ends in a
+  redirect, so its port is an endpoint that answers where to go.
 
 ---
 
