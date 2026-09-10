@@ -9,8 +9,8 @@ The four decisions this plan is built on, taken 2026-09-10:
 
 | | decision |
 |---|---|
-| where the API lives | `/home/sreejon/projects/personal/terminalbd_api` — its own repo, **PHP 8.5** |
-| where the React app lives | `/home/sreejon/projects/personal/terminalbd_web` — its own repo |
+| where the API lives | `/home/sreejon/projects/personal/terminalbd_api` — its own repo `PosKeeper-ERP/terminalbd_api`, **PHP 8.5** |
+| where the React app lives | `/home/sreejon/projects/personal/terminalbd_react` — its own repo `PosKeeper-ERP/terminalbd_react` |
 | sequencing | module by module, behind the strangler proxy that already exists |
 | authentication | the sale-pos header scheme, `X-Api-Key` + `X-Api-User` |
 | scope | what the navigation tree reaches |
@@ -84,7 +84,7 @@ that carries validation, tenancy and business rules.
 /home/sreejon/projects/personal/
   terminalbd/        legacy Symfony 2.8 + next/ (Symfony 8) — both shrink, both go
   terminalbd_api/    NEW repo: Symfony 8 on PHP 8.5, JSON only, no Twig ever installed
-  terminalbd_web/    NEW repo: React + Vite, modelled on sale-pos
+  terminalbd_react/    NEW repo: React + Vite, modelled on sale-pos
   sale-pos/          the reference, unchanged
 ```
 
@@ -177,7 +177,7 @@ be: Vite, React 19, Mantine 8, Redux Toolkit with RTK Query, React Router,
 `react-i18next`, Tabler icons, `mantine-datatable`.
 
 ```
-terminalbd_web/src/
+terminalbd_react/src/
   app/         store, App shell
   common/      components/{form-builders,modals,drawers,layout,skeletons}, hooks, utils
   modules/     one folder per terminalbd module, mirroring sale-pos's modules/
@@ -259,7 +259,7 @@ costs nothing now that both applications are served locally: load a representati
 list screen and a representative form screen, and record, for each of the
 constructs in the table above, the computed box metrics — width, height, padding,
 margin, border, font-size, line-height. Those become the CSS custom properties
-`terminalbd_web/` consumes and the Mantine component overrides described above.
+`terminalbd_react/` consumes and the Mantine component overrides described above.
 
 This is the highest-leverage task in phase 0. A wrong control height is invisible
 on the first screen and unfixable by the fiftieth, and it is the one error that
@@ -306,7 +306,7 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 
 | # | module | screens | why here |
 |---|---|---:|---|
-| 0 | — | — | **the 875 files copied into `terminalbd_api`**, pipeline switched to checking-only, `terminalbd_api/` and `terminalbd_web/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
+| 0 | — | — | **the 875 files copied into `terminalbd_api`**, pipeline switched to checking-only, `terminalbd_api/` and `terminalbd_react/` skeletons, auth, **geometry tokens measured from the running app**, layout shell, grid, `Portlet`/`ControlGroup`, nav tree, theme |
 | 1 | **Tool** | 28 | settings and `GlobalOption`; everything else reads it |
 | 2 | **User** + **DomainUser** | 20 | login, roles, branches — the 122 nav role checks need them |
 | 3 | **Medicine** | 56 | best evidence here: 82% of visited pages render, 38% reach |
@@ -331,7 +331,7 @@ Everything after this copies phase 0. A convention that is wrong here is wrong
 
 #### 0.1 — Two repositories
 
-`terminalbd_api` and `terminalbd_web` in `/home/sreejon/projects/personal/`, each
+`terminalbd_api` and `terminalbd_react` in `/home/sreejon/projects/personal/`, each
 `git init`ed like every sibling there. Nothing is added to the `terminalbd` repo;
 it only shrinks from here.
 
@@ -388,7 +388,7 @@ a cross-site form post cannot set a custom header, and a cross-site
 `fetch` cannot read the response without CORS approval. If any endpoint must
 accept a plain cross-site form post, it needs a real CSRF token — none should.
 
-**CORS.** `terminalbd_web` runs on a different origin in development (Vite on
+**CORS.** `terminalbd_react` runs on a different origin in development (Vite on
 :3000). The API allows that origin explicitly, with credentials, and an
 allowlist — never `*`, which cannot carry credentials anyway.
 
@@ -431,7 +431,7 @@ and row heights, and the tab strip.
 Two outputs, and both are needed:
 
 - **CSS custom properties** — `--tbd-grid-gutter`, `--tbd-portlet-margin-bottom`,
-  `--tbd-control-height` and so on, in `terminalbd_web`'s global stylesheet.
+  `--tbd-control-height` and so on, in `terminalbd_react`'s global stylesheet.
 - **Mantine component overrides** — `theme.components.TextInput.defaultProps` and
   `styles`, and the same for `Select`, `Textarea`, `Button`, `Table`, `Tabs`.
   This is the mechanism that makes the re-skin work: sale-pos's *look* rendering
@@ -470,7 +470,7 @@ better than a nav that grows a new shape per module.
 #### 0.7 — Done when
 
 - the API boots, and all five checks in 0.2 pass;
-- `terminalbd_web` renders the shell and the full nav against the API;
+- `terminalbd_react` renders the shell and the full nav against the API;
 - one screen — `/admin/designation/` — is rebuilt in React and **passes the
   overlay test** against the Twig original: same positions, same sizes, new
   surface;
@@ -487,7 +487,7 @@ outside the tokens, 0.4 is not finished, and every screen after it inherits the
 gap.
 
 Each module ships the same way the strangler already works: its API endpoints and
-its React screens land, the module's proxy routes flip from `next/` to `terminalbd_web/`,
+its React screens land, the module's proxy routes flip from `next/` to `terminalbd_react/`,
 and its Twig templates and web controllers are deleted from `next/`. Rollback is
 one proxy rule.
 
@@ -576,7 +576,7 @@ One open question for that phase, worth answering before it starts: offline in a
 **browser** (IndexedDB, service worker, background sync) and offline in
 **Electron** (sale-pos's model, `better-sqlite3`, a real local database) are
 different products. sale-pos already solves the second. If the eventual answer is
-"package `terminalbd_web/` with Electron", much of phase 11 is already written and the
+"package `terminalbd_react/` with Electron", much of phase 11 is already written and the
 browser work is wasted.
 
 ## 9. What carries over from this migration
