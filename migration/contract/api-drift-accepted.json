@@ -6,5 +6,12 @@
   "flutter-api/poskeeper-instant-purchase-item": "As above - ApiPoskeeper:instantPurchase exists in neither tree.",
   "flutter-api/poskeeper-sales-update": "As above - ApiPoskeeper:apiOnlineSalesUpdate exists in neither tree.",
   "flutter-api/poskeeper-customer-create": "Legacy-side schema drift, not a port difference: the scratch database carries this application's schema, so a column the port renamed fails on the legacy side only. The legacy error is InvalidFieldNameException.",
-  "flutter-api/poskeeper-online-sales": "As above - InvalidFieldNameException on the legacy side, from the same schema caveat."
+  "flutter-api/poskeeper-online-sales": "As above - InvalidFieldNameException on the legacy side, from the same schema caveat.",
+  "android-api-portal/apps": {
+    "targets": [
+      "api"
+    ],
+    "reason": "Route whose controller action exists in neither tree: ApiPortalController::appsAction is named by the routing and declared nowhere. next/ answers 302 because check-routes.php repointed it at UnresolvableRouteController; terminalbd_api does not declare the route at all and answers 404, which is the correct answer for a path with no controller and the only one of the three that says so. The legacy also answers 302, so this is a wire change - recorded rather than hidden, and it affects an endpoint that has never been able to return data."
+  },
+  "_targets": "An entry may be a plain string, meaning it applies to every comparison, or an object with `targets` naming the ones it applies to. android-api-portal/apps drifts only when the API is the target: next/ and the legacy both answer 302 there, and only terminalbd_api answers 404."
 }

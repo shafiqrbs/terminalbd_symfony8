@@ -12,26 +12,73 @@
  * already in the field.
  *
  * usage: php migration/bin/compare.php [--only=substring]
+ *            [--baseline=legacy|next|next-live] [--target=next|api]
  * exit 0 = wire-compatible, 1 = drift outside the accepted list
  */
 $only = null;
+// Which capture is held against which. The default is the recorded contract:
+// legacy against next.
+//
+// `--baseline=next --target=api` is phase 9's gate, and it is the one that
+// means something now. The committed legacy fixtures were taken before five
+// module config rows were seeded into the scratch database (phases 4 to 8), so
+// legacy-against-anything now reports drift that is the DATABASE moving, not
+// the port. Capturing next and api in one run and comparing those two is immune
+// to that: same data, same moment, two applications.
+$target = 'next';
+$baseline = 'legacy';
+
 foreach (array_slice($argv, 1) as $a) {
     if (str_starts_with($a, '--only=')) $only = substr($a, 7);
+    if (str_starts_with($a, '--target=')) $target = substr($a, 9);
+    if (str_starts_with($a, '--baseline=')) $baseline = substr($a, 11);
+}
+
+foreach (['target' => $target, 'baseline' => $baseline] as $what => $value) {
+    if (!in_array($value, ['legacy', 'next', 'next-live', 'api'], true)) {
+        fwrite(STDERR, "unknown {$what} '{$value}': expected legacy, next or api\n");
+        exit(2);
+    }
+}
+
+if ($target === $baseline) {
+    fwrite(STDERR, "baseline and target are both '{$target}'\n");
+    exit(2);
 }
 
 $root = dirname(__DIR__, 2);
-$legacyFiles = glob("$root/migration/fixtures/legacy/*.json") ?: [];
+$legacyFiles = glob("$root/migration/fixtures/$baseline/*.json") ?: [];
 
 if (!$legacyFiles) {
-    fwrite(STDERR, "No legacy fixtures. Run: php migration/bin/capture.php legacy\n");
+    fwrite(STDERR, "No $baseline fixtures. Run: php migration/bin/capture.php $baseline\n");
     exit(1);
 }
 
 $acceptedPath = "$root/migration/contract/api-drift-accepted.json";
-$accepted = is_file($acceptedPath)
+$acceptedRaw = is_file($acceptedPath)
     ? array_filter(json_decode((string) file_get_contents($acceptedPath), true) ?: [],
         static fn (string $k): bool => !str_starts_with($k, '_'), ARRAY_FILTER_USE_KEY)
     : [];
+
+// An entry is either a reason, or a reason scoped to particular targets. Scoping
+// exists because a difference can be real for one comparison and absent from
+// another: android-api-portal/apps drifts only when the API is the target, since
+// the legacy and next/ both answer 302 there and only the API answers 404.
+$accepted = [];
+
+foreach ($acceptedRaw as $endpoint => $entry) {
+    if (is_array($entry) && isset($entry['targets'])) {
+        if (!in_array($target, $entry['targets'], true)) {
+            continue;
+        }
+
+        $accepted[$endpoint] = $entry['reason'] ?? '';
+
+        continue;
+    }
+
+    $accepted[$endpoint] = $entry;
+}
 
 $drift = 0; $matched = 0; $missing = 0; $known = 0; $staleAccepted = $accepted;
 
@@ -40,7 +87,7 @@ foreach ($legacyFiles as $lf) {
     $old  = json_decode(file_get_contents($lf), true);
     if ($only !== null && !str_contains($old['endpoint'], $only)) continue;
 
-    $nf = "$root/migration/fixtures/next/$name";
+    $nf = "$root/migration/fixtures/$target/$name";
     if (!is_file($nf)) {
         printf("MISSING  %s  (not yet ported)\n", $old['endpoint']);
         $missing++;
@@ -84,7 +131,13 @@ printf(
 
 // An accepted entry that no longer drifts has been fixed, and leaving it listed
 // would hide the next regression on that endpoint behind a stale excuse.
-if ($only === null && $staleAccepted !== []) {
+//
+// Only when the baseline is the legacy capture, because that is what the entries
+// describe. Two of them are legacy-side schema drift, and comparing next-live
+// against api - neither of which is the legacy - naturally does not reproduce
+// them; reporting those as fixed would be telling somebody to delete a reason
+// that still applies.
+if ($only === null && $baseline === 'legacy' && $staleAccepted !== []) {
     fwrite(STDERR, "\naccepted drift that no longer happens - remove from api-drift-accepted.json:\n  "
         . implode("\n  ", array_keys($staleAccepted)) . "\n");
     exit(1);

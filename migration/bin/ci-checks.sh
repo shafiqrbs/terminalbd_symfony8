@@ -75,6 +75,15 @@ run "resource guards match the navigation" \
 run "mobile API contract" \
     $PHP migration/bin/check-api-contract.php --report=migration/contract/api-contract.md
 
+# Phase 9 moved those endpoints to terminalbd_api. This needs no database and no
+# server: it asks whether the API still DECLARES every live one. The capture
+# proves the shapes; a route lost to a re-copy would make that capture pass with
+# one fewer endpoint in it, and nothing else would notice.
+if [ -d "${API_SRC:-../terminalbd_api/src}" ]; then
+    run "mobile API routes declared" \
+        $PHP migration/bin/port-mobile-api.php --check
+fi
+
 # Services can be built and their arguments type-check.
 run "container" \
     bash -c "cd next && $PHP bin/console lint:container"

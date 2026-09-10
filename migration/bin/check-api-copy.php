@@ -67,6 +67,14 @@ if (!is_dir($source) || !is_dir($api)) {
  */
 function isPresentation(string $path): bool
 {
+    // Bindu's controllers are the exception, and they are the opposite of
+    // presentation: they ARE the mobile API, 96 endpoints that applications in
+    // the field call. Phase 9 moved them, so the API is expected to carry them
+    // and their absence would be the defect.
+    if (str_starts_with($path, 'Bindu/Controller/')) {
+        return false;
+    }
+
     return str_contains($path, '/Controller/')
         || str_ends_with($path, 'Controller.php')
         || str_starts_with($path, 'Form/')

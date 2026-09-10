@@ -53,3 +53,10 @@ Thumbs.db
 /migration/capture-config.local.json
 /migration/fixtures/*-with-body/
 /migration/.capture-work/
+
+# The phase 9 working captures. legacy/ and next/ are the committed contract, a
+# pair taken from one database state; these two are re-taken together whenever
+# the API is checked against the ported monolith, and would otherwise go stale
+# the moment the scratch database changes.
+migration/fixtures/api/
+migration/fixtures/next-live/

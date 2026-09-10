@@ -27,7 +27,13 @@
 # Symfony's runtime as if it were the application, and every static asset answers
 # 500 with its own content as the body - which a browser silently drops.
 #
+# Phase 9 added a third target. The same 96 endpoints are served by
+# terminalbd_api now, so `--targets=api` captures that one alone and holds it
+# against the committed legacy fixtures - which needs no php7.4 server, because
+# the legacy side of the contract is already recorded.
+#
 # usage: migration/bin/capture-both.sh [--read-only] [--keep-baseline]
+#                                      [--targets=legacy,next,api]
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
@@ -37,10 +43,12 @@ mkdir -p "$work"
 
 extra=()
 keep=0
+targets="legacy,next"
 for a in "$@"; do
     case "$a" in
         --read-only) extra+=(--read-only) ;;
         --keep-baseline) keep=1 ;;
+        --targets=*) targets="${a#--targets=}" ;;
         *) echo "unknown option: $a" >&2; exit 1 ;;
     esac
 done
@@ -73,20 +81,20 @@ restore() {
     mysql --defaults-extra-file="$cnf" "$DB_NAME" < "$baseline"
 }
 
-echo
-echo "── capturing legacy"
-php8.5 migration/bin/capture.php legacy "${extra[@]+"${extra[@]}"}" | tail -1
+IFS=',' read -ra list <<< "$targets"
 
-restore
+for t in "${list[@]}"; do
+    echo
+    echo "── capturing $t"
+    php8.5 migration/bin/capture.php "$t" "${extra[@]+"${extra[@]}"}" | tail -1
+    restore
+done
 
-echo
-echo "── capturing next"
-php8.5 migration/bin/capture.php next "${extra[@]+"${extra[@]}"}" | tail -1
-
-restore
-
-echo
-echo "── comparing"
-php8.5 migration/bin/compare.php || true
+for t in "${list[@]}"; do
+    [ "$t" = "legacy" ] && continue
+    echo
+    echo "── comparing legacy against $t"
+    php8.5 migration/bin/compare.php --target="$t" || true
+done
 
 [ "$keep" -eq 1 ] || rm -f "$baseline" "$cnf"

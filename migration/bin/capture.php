@@ -21,7 +21,16 @@
  * usage: php migration/bin/capture.php <legacy|next> [--only=substring] [--with-body] [--read-only]
  */
 $target = $argv[1] ?? null;
-if (!in_array($target, ['legacy', 'next'], true)) {
+// 'api' is phase 9: the same 96 endpoints, served by terminalbd_api instead of
+// next/. Captured the same way and compared against the same legacy fixtures,
+// because what has to hold is the wire, not which application answers.
+// `next-live` is next/ captured into a directory of its own. The committed
+// legacy/ and next/ fixtures are a PAIR, taken from the same database before
+// phases 4 to 8 seeded five module config rows into it; re-capturing next/ alone
+// would leave half a pair from one state and half from another. So the phase 9
+// gate captures next-live and api in one run and compares those two, and the
+// recorded contract stays where it is.
+if (!in_array($target, ['legacy', 'next', 'next-live', 'api'], true)) {
     fwrite(STDERR, "usage: capture.php <legacy|next> [--only=substring]\n");
     exit(1);
 }
