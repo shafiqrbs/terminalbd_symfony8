@@ -16,7 +16,9 @@ declare(strict_types=1);
  * Three ways they can disagree, and only the third is ever expected:
  *
  * 1. A non-presentation file the API does not have. The copy missed it, or the
- *    legacy tree grew one.
+ *    legacy tree grew one. A file the API deliberately does NOT carry is recorded
+ *    with an `ABSENT:` reason - the presentation rule here is a path rule, and
+ *    some presentation does not live in a Controller or Form directory.
  * 2. A file the API has that the pipeline does not produce, outside its own
  *    Api\ namespace.
  * 3. A file whose content differs. Some of those are deliberate - the API drops
@@ -113,7 +115,9 @@ foreach ($sourceFiles as $path) {
     }
 
     if (!isset($apiFiles[$path])) {
-        $missing[] = $path;
+        if (!str_starts_with($baseline[$path] ?? '', 'ABSENT:')) {
+            $missing[] = $path;
+        }
 
         continue;
     }
@@ -142,6 +146,12 @@ if ($update) {
         '',
     ];
 
+    foreach ($baseline as $path => $reason) {
+        if (str_starts_with($reason, 'ABSENT:')) {
+            $lines[] = $path . "\t" . $reason;
+        }
+    }
+
     foreach ($differing as $path) {
         $reason = $baseline[$path] ?? 'REVIEW - no reason recorded';
         $lines[] = $path . "\t" . $reason;
@@ -154,7 +164,22 @@ if ($update) {
 }
 
 $unrecorded = array_values(array_filter($differing, static fn (string $p): bool => !isset($baseline[$p])));
-$stale = array_values(array_diff(array_keys($baseline), $differing));
+$absent = [];
+$backAgain = [];
+
+foreach ($baseline as $path => $reason) {
+    if (!str_starts_with($reason, 'ABSENT:')) {
+        continue;
+    }
+
+    $absent[] = $path;
+
+    if (isset($apiFiles[$path])) {
+        $backAgain[] = $path;
+    }
+}
+
+$stale = array_values(array_diff(array_keys($baseline), $differing, $absent));
 $unreasoned = array_values(array_filter(
     $differing,
     static fn (string $p): bool => str_starts_with($baseline[$p] ?? '', 'REVIEW')
@@ -175,6 +200,7 @@ foreach ([
     ['in the API but not produced by the pipeline', $extra],
     ['differ with no recorded reason', $unrecorded],
     ['recorded as differing but identical now - prune them', $stale],
+    ['recorded as deliberately absent but present again', $backAgain],
     ['recorded with REVIEW instead of a reason', $unreasoned],
 ] as [$label, $list]) {
     if ($list === []) {

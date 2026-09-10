@@ -3,6 +3,10 @@
 # written by hand, and a line without one is not a baseline, it is a shrug.
 #
 # An entry that has stopped differing fails the check. Prune it.
+#
+# A reason starting with ABSENT: means the API deliberately does not carry the
+# file at all. The presentation rule is a path rule - Controller/, Form/, Twig -
+# and some presentation does not live in any of those.
 
 Accounting/Entity/AccountCash.php	ORM 3.7 validates the inverse side: 1 association(s) named an inversedBy field targeting another entity. tools/fix-inverse-side-targets.php drops the unusable back-reference, as the pipeline already does 48 times. next/ needs the same when its ORM moves.
 Accounting/Entity/AccountVendor.php	ORM 3.7 validates the inverse side: 1 association(s) named an inversedBy field targeting another entity. tools/fix-inverse-side-targets.php drops the unusable back-reference, as the pipeline already does 48 times. next/ needs the same when its ORM moves.
@@ -40,3 +44,4 @@ Restaurant/Entity/RestaurantStockAdjustment.php	ORM 3.7 validates the inverse si
 Restaurant/Entity/RestaurantTableInvoice.php	ORM 3.7 validates the inverse side: 1 association(s) named an inversedBy field targeting another entity. tools/fix-inverse-side-targets.php drops the unusable back-reference, as the pipeline already does 48 times. next/ needs the same when its ORM moves.
 Restaurant/Entity/RestaurantTableInvoiceItem.php	ORM 3.7 validates the inverse side: 1 association(s) named an inversedBy field targeting another entity. tools/fix-inverse-side-targets.php drops the unusable back-reference, as the pipeline already does 48 times. next/ needs the same when its ORM moves.
 User/Mailer/ResettingMailer.php	Rewritten without Twig - the API never installs it. Translates the two strings directly, reproducing today's behaviour including the untranslated subject key.
+User/EventListener/Redirect404ToHomepageListener.php	ABSENT: presentation. It turned every 404 into a redirect to the `home` route; the API has no such route, so it threw while handling the 404 and every miss - including /api ones - came back as a 500. Its service definition is commented out in config/services_ported.yaml.
