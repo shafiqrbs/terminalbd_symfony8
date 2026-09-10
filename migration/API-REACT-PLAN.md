@@ -14,7 +14,7 @@ The four decisions this plan is built on, taken 2026-09-10:
 | sequencing | module by module, behind the strangler proxy that already exists |
 | authentication | the sale-pos header scheme, `X-Api-Key` + `X-Api-User` |
 | scope | what the navigation tree reaches |
-| `next/` | retired entirely — the plan ends with it deleted |
+| `next/` | **kept** — decision reversed 2026-09-11; it stays as a running fallback, see §7 |
 | offline | not now, but eventually; the last phase, and it constrains today |
 
 ---
@@ -136,11 +136,14 @@ The other 703 files — 337 controllers, 361 form types, 5 Twig extensions — a
 about rendering HTML and are not copied. React replaces them.
 
 **A copy, not a shared package.** `next/` keeps the copy it already has. That is
-the simplest arrangement and it is honest about the situation: `next/` is frozen
-and being deleted module by module, so there is no ongoing development in it to
-drift away from. The one cost is that while both run, a schema change has to be
-applied in both places — in practice you change it in the API and let `next/` run
-on its slightly older mapping until it is gone.
+the simplest arrangement and it is honest about the situation: `next/` is frozen,
+so there is no ongoing development in it to drift away from.
+
+The cost is now permanent rather than temporary. `next/` is not being deleted
+(§7), so a schema change has to be applied in **both** places for as long as both
+run — and "let `next/` run on its slightly older mapping until it is gone" no
+longer has an end date. `check-api-copy.php` is what keeps the two copies
+honest about their differences; there are 39 recorded today.
 
 ### Four settings that must be copied too
 
@@ -328,7 +331,7 @@ Dependencies first, then evidence, then the modules this dump cannot prove.
 | 7 | ~~the small modules~~ + **Human Resource** | 18 + 9 | **done 2026-09-11.** 304 of 335 screens built. **Human Resource was in no phase at all** — this table covered 326 of 335 — so its nine screens are built here. "Migration, 5" is not a module: it is the pipeline's bucket for routes whose controller exists in neither tree, and those five plus Mega Menu cannot be built by anyone. `migration/contract/small-modules-screens.md` |
 | 8 | ~~**Restaurant**, **DoctorPrescription**~~ | 25 | **done 2026-09-11.** 329 of 335 screens built - the screen work is finished. **The only phase since 3 whose stated premise survived contact**: both configs really were the blocker. Verified at zero rows on seeded configs. `migration/contract/restaurant-dps-screens.md`. Customer is gone from the scope entirely — both its items are commented out |
 | 9 | ~~**the mobile API moves**~~ | — | **done 2026-09-11.** The 96 endpoints are served by `terminalbd_api`, copied verbatim with only their routing rewritten from YAML to attributes. **90 of 96 answer identically to `next/`**; the other 6 are routes with no controller in either tree, where the API answers 404 rather than next's 302. `migration/contract/mobile-api-move.md` |
-| 10 | **`next/` deleted** | — | the presentation half of the upgrade; the API already has the rest (§7). **Note what goes with it**: the golden capture compares `next/` against `terminalbd_api`, so deleting `next/` removes the only way to re-check the mobile wire against a working reference. Capture and record before, not after |
+| 10 | ~~**`next/` deleted**~~ | — | **cancelled 2026-09-11: `next/` is kept.** It stays behind the strangler proxy as a running fallback, which is also what keeps two gates re-runnable — the mobile wire and the 329-screen comparison both need a Twig side to compare against. The cost is two applications on one database permanently; see §7 |
 | 11 | **offline** | — | see §8 |
 
 Phase 0 is the one that decides everything after it — it is where the component
@@ -518,9 +521,10 @@ will not lend one origin's cookie to another, so the bridge cannot be tested in 
 browser without it.
 
 Each module ships the same way the strangler already works: its API endpoints and
-its React screens land, the module's proxy routes flip from `next/` to `terminalbd_react/`,
-and its Twig templates and web controllers are deleted from `next/`. Rollback is
-one proxy rule.
+its React screens land, and the module's proxy routes flip from `next/` to
+`terminalbd_react/`. The Twig templates and web controllers stay where they are —
+`next/` is kept (§7), so a flipped route is the whole of the change and rollback
+is one proxy rule in both directions.
 
 Two harnesses decide whether a module has landed, and Tool established both:
 
@@ -563,11 +567,35 @@ run the same queries.
 
 ---
 
-## 7. Retiring `next/` entirely
+## 7. Keeping `next/`
 
-`next/` is deleted at the end, and two things have to happen first.
+**Decision reversed 2026-09-11: `next/` is not deleted.** The plan was written to
+end with it gone; it now ends with it running beside the API and the SPA, behind
+the strangler proxy, indefinitely.
 
-### The mobile API moves before the lights go out
+What that buys, and what it costs, are both worth stating plainly.
+
+It keeps a working reference. The mobile-wire gate compares `next/` against
+`terminalbd_api` on the same data in the same run (§9 of the contract), and that
+comparison only exists while both serve — deleting `next/` would have removed the
+only way to re-check 96 endpoints against something known to work. The same is
+true of `compare-module-screens.php`, which renders every Twig screen and reads
+the API resource that replaces it: 329 screens agree today, and they can only go
+on agreeing while there is a Twig side to ask.
+
+It also keeps the ten deferred screens working. Invoice and voucher creation with
+accounting side effects was never ported, and with `next/` kept it does not have
+to be on any deadline.
+
+The cost is that two applications now share one database permanently. A schema
+change lands in both, the mapping copies must not drift, and `next/` carries 704
+presentation files that nothing renders any more except those ten screens and
+whatever the proxy still points at it. `check-api-copy.php` is the guard that
+makes the drift visible rather than silent.
+
+One thing that was going to happen first still should.
+
+### The mobile API moved anyway
 
 `next/src/Bindu/` holds the 96 endpoints the Android and Flutter clients in the
 field depend on. Those clients do not update in lockstep with a deploy, so the
@@ -583,6 +611,9 @@ exactly as it gated the port: capture from `next/`, capture from `terminalbd_api
 This is phase 9 and not phase 0 on purpose. Moving them early means maintaining
 one surface across two projects for the whole migration; moving them last means
 one careful, gated lift when everything else has already stopped changing.
+
+Done 2026-09-11. `next/` still serves them too, and now always will — which is
+what makes the gate re-runnable rather than a one-time measurement.
 
 ### The pipeline keeps checking, even after the copy
 
@@ -607,6 +638,9 @@ That costs one scratch build and keeps those four guards working for as long as
 the legacy tree exists. When the legacy is finally decommissioned there is
 nothing left to check against, and `migration/bin/` is archived rather than
 deleted — it is the provenance of every line that was copied.
+
+(That paragraph is about the **legacy** Symfony 2.8 tree, which is a separate
+question from `next/` and is not affected by the decision above.)
 
 `schema-diff.php` and `validate-mapping.php` never needed the legacy tree. They
 read the database and the mapping, and are unaffected either way.
@@ -678,10 +712,19 @@ the source construct, not the router.
 2. **The 96 mobile endpoints** — phase 9 moves them unchanged. Separately: do the
    Android and Flutter clients ever adopt `/api/v1`, or is that surface frozen for
    good? It costs nothing to freeze it, but it means two API styles forever.
-3. **Another tenant's dump** is still the binding constraint. Modules in phase 8
-   cannot be verified without one.
+3. ~~**Another tenant's dump** is still the binding constraint.~~ **Answered
+   2026-09-11, and the answer was not another dump.** The dump already held the
+   tenant with the data — 322, "Bengal Mart" — and the harnesses were signing in
+   as a user of tenant 1, the platform tenant, which owns almost nothing. What
+   remains genuinely blocked is narrower: Inventory, Business, Hospital,
+   Restaurant and DoctorPrescription have no rows for **any** tenant here, so
+   those 159 screens are verified running and agreeing at zero rows.
 4. **Browser offline or Electron offline** (§8). Answering this early decides
    whether phase 11 is mostly new work or mostly sale-pos's existing work.
 5. **When the legacy tree is finally retired**, the four guards that read it go
    with it (§7). Worth knowing which of them you would miss before that day
    arrives rather than after.
+6. **`next/` is kept (§7), so how long do two applications share one database?**
+   Every schema change now lands twice, indefinitely. That is a maintenance
+   decision rather than a migration one, but it is the standing cost of the
+   fallback and nothing in the plan resolves it.
