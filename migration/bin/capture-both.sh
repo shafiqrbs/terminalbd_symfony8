@@ -19,8 +19,13 @@
 # defaults to prod; Symfony's dev environment turns PHP warnings into 500s,
 # which on PHP 8 makes ordinary legacy code look like a regression.
 #
-#   legacy  php7.4 -S 127.0.0.1:8801 -t web        <legacy router>
-#   next    php8.5 -S 127.0.0.1:8802 -t next/public <next router, APP_ENV=prod>
+#   legacy  php7.4 -S 127.0.0.1:8801 -t web        migration/bin/serve-router.php
+#   next    php8.5 -S 127.0.0.1:8802 -t next/public migration/bin/serve-router.php
+#                                                   (APP_ENV=prod)
+#
+# The router is not optional. Without it php -S hands the requested file to
+# Symfony's runtime as if it were the application, and every static asset answers
+# 500 with its own content as the body - which a browser silently drops.
 #
 # usage: migration/bin/capture-both.sh [--read-only] [--keep-baseline]
 set -euo pipefail
