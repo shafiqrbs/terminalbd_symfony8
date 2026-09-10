@@ -24,7 +24,7 @@ at all. So its 42 rows below say the screens execute, the queries resolve, the g
 hold and both sides agree - at zero rows. They do NOT say the two agree on real data,
 and no harness here can say that until a dump with inventory in it exists.
 
-**304 screens, 304 agree, 0 differ.**
+**329 screens, 329 agree, 0 differ.**
 
 | screen | path | twig | api page | api total | page size | |
 |---|---|---:|---:|---:|---:|---|
@@ -69,7 +69,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `medicine_minimum` | /medicine/medicine-minimum-stock/ | 0 | 0 | 0 | all | ok |
 | `medicine_particular` | /medicine/particular/ | 53 | 200 | 464 | all | ok |
 | `medicine_prepurchase` | /medicine/pre-purchase/ | 25 | 25 | 59 | 25 | ok |
-| `medicine_purchase` | /medicine/purchase/ | 25 | 25 | 100 | 25 | ok |
+| `medicine_purchase` | /medicine/purchase/ | 25 | 25 | 103 | 25 | ok |
 | `medicine_purchase_android` | /medicine/purchase/android | 0 | 0 | 0 | all | ok |
 | `medicine_purchase_item` | /medicine/purchase/stock-item-details | 25 | 25 | 2378 | 25 | ok |
 | `medicine_purchase_new` | /medicine/purchase/new | 3 | 0 | 0 | all | ok |
@@ -144,7 +144,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `inventory_purchaseitem` | /inventory/purchaseitem/ | 0 | 0 | 0 | 25 | ok |
 | `inventory_purchasereturn` | /inventory/purchase/return/ | 0 | 0 | 0 | 25 | ok |
 | `inventory_report_purchase` | /inventory/report/purchase | 0 | 0 | 0 | all | ok |
-| `inventory_salesonline` | /inventory/sales-online/ | 19 | 19 | 19 | 25 | ok |
+| `inventory_salesonline` | /inventory/sales-online/ | 25 | 25 | 25 | 25 | ok |
 | `inventory_salesimport` | /inventory/sales-improt/ | 0 | 0 | 0 | all | ok |
 | `inventory_report_sales_item_details` | /inventory/report/sales-item-details | 52 | 0 | 0 | all | ok |
 | `inventory_report_sales_overview` | /inventory/report/sales-transaction-overview | 0 | 3 | 3 | all | ok |
@@ -255,11 +255,11 @@ and no harness here can say that until a dump with inventory in it exists.
 | `business_production` | /business/product-production/ | 0 | 0 | 0 | 25 | ok |
 | `business_stock_ledger` | /business/stock/stock-ledger | 56 | 0 | 0 | all | ok |
 | `business_report_sales_stock` | /business/report/sales-stock | 1 | 0 | 0 | all | ok |
-| `business_purchase` | /business/purchase/ | 6 | 6 | 6 | 25 | ok |
+| `business_purchase` | /business/purchase/ | 9 | 9 | 9 | 25 | ok |
 | `business_purchase_item` | /business/purchase/purchase-item | 0 | 0 | 0 | 25 | ok |
 | `business_purchase_return` | /business/purchase-return/ | 0 | 0 | 0 | 25 | ok |
 | `business_report_purchase_summary` | /business/report/purchase-overview | 0 | 3 | 3 | all | ok |
-| `business_invoice` | /business/invoice/ | 5 | 5 | 5 | 25 | ok |
+| `business_invoice` | /business/invoice/ | 8 | 8 | 8 | 25 | ok |
 | `business_report_sales_area` | /business/report/sales-area | 0 | 0 | 0 | all | ok |
 | `business_report_sales_dsr` | /business/report/sales-dsr | 0 | 0 | 0 | all | ok |
 | `business_report_commission_stock` | /business/report/commission-stock-item | 0 | 0 | 0 | 25 | ok |
@@ -309,7 +309,7 @@ and no harness here can say that until a dump with inventory in it exists.
 | `hms_pathology` | /hms/pathology/ | 0 | 0 | 0 | 25 | ok |
 | `hms_invoice_patient_group_test` | /hms/report-process/patient-group-test | 0 | 0 | 0 | 25 | ok |
 | `hms_invoice_patient_test` | /hms/report-process/patient-test | 0 | 0 | 0 | 25 | ok |
-| `hms_purchase` | /hms/purchase/ | 25 | 25 | 101 | 25 | ok |
+| `hms_purchase` | /hms/purchase/ | 25 | 25 | 104 | 25 | ok |
 | `hms_referreddoctor` | /hms/referred-doctor/ | 0 | 0 | 0 | 25 | ok |
 | `hms_report_monthly_referred_commission` | /hms/report/monthly-commission-details | 0 | 0 | 0 | all | ok |
 | `hms_invoice_particular` | /hms/report-process/ | 0 | 0 | 0 | 25 | ok |
@@ -350,6 +350,34 @@ and no harness here can say that until a dump with inventory in it exists.
 | `employee_payroll` | /human-resource/employee-payroll/ | 6 | 6 | 6 | all | ok |
 | `payroll` | /human-resource/payroll-generate/ | 0 | 0 | 0 | 25 | ok |
 | `payrollsetting` | /human-resource/payroll-setting/ | 0 | 0 | 0 | all | ok |
+| `restaurant_invoice_android` | /restaurant/invoice/android | 0 | 0 | 0 | 25 | ok |
+| `restaurant_category` | /restaurant/category/ | 51 | 0 | 0 | 25 | ok |
+| `restaurant_config_manage` | /restaurant/config/manage | - | - | - | all | ok |
+| | settings row with 3 fields | | | | | |
+| `restaurant_damage` | /restaurant/damage/ | 0 | 0 | 0 | 25 | ok |
+| `restaurant_invoice` | /restaurant/invoice/ | 2 | 2 | 2 | 25 | ok |
+| `restaurant_particular` | /restaurant/particular/ | 0 | 0 | 0 | 25 | ok |
+| `restaurant_invoice_new` | /restaurant/invoice/new | - | - | - | all | ok |
+| | deferred: the Twig screen still owns this write | | | | | |
+| `restaurant_production` | /restaurant/production/ | 0 | 0 | 0 | 25 | ok |
+| `restaurant_product_sorting` | /restaurant/product/product-sorting | 51 | 0 | 0 | all | ok |
+| `restaurant_report_sales_product` | /restaurant/report/product-wise-sales | 0 | 0 | 0 | all | ok |
+| `restaurant_purchase` | /restaurant/purchase/ | 0 | 0 | 0 | 25 | ok |
+| `restaurant_report_sales_summary` | /restaurant/report/sales-summary | 4 | 3 | 3 | all | ok |
+| `restaurant_itemimporter` | /restaurant/item-import/ | 0 | 0 | 0 | all | ok |
+| `restaurant_stock` | /restaurant/stock/ | 84 | 0 | 0 | 25 | ok |
+| `restaurant_report_sales_user` | /restaurant/report/user-wise-sales | 0 | 0 | 0 | all | ok |
+| `restaurant_vendor` | /restaurant/vendor/ | 3278 | 200 | 3278 | all | ok |
+| `dps_config_manage` | /doctor-prescription/config/manage | - | - | - | all | ok |
+| | settings row with 2 fields | | | | | |
+| `dps_diseases` | /doctor-prescription/diseases/ | 0 | 0 | 0 | all | ok |
+| `dps_doctor` | /doctor-prescription/doctor/ | 0 | 0 | 0 | all | ok |
+| `dps_account_expenditure` | /doctor-prescription/dps-expense/ | 0 | 0 | 0 | 25 | ok |
+| `dps_expensecategory` | /doctor-prescription/dps-expense-category/ | 0 | 0 | 0 | 25 | ok |
+| `dps_particular` | /doctor-prescription/particular/ | 0 | 0 | 0 | 25 | ok |
+| `dps_invoice` | /doctor-prescription/invoice/ | 53 | - | - | 25 | ok |
+| `dps_prescription` | /doctor-prescription/prescription/ | 53 | - | - | 25 | ok |
+| `dps_service` | /doctor-prescription/service/ | 0 | 0 | 0 | all | ok |
 
 **`color`** - Twig 500 in both trees: ColorController does findBy(['isValid' => 1]) and ProductColor has no such field. The port answers what the screen meant - name ASC - rather than reproducing the exception.
 
@@ -410,6 +438,16 @@ and no harness here can say that until a dump with inventory in it exists.
 **`pos_android_sales`** - Twig 500: pos-base.html.twig reads an invoiceMode the android controller never sets - PosController sets it, PosAndroidController does not. Presentation, so no counterpart in the API.
 
 **`pos_desktop`** - A point-of-sale terminal, not a list: the Twig screen shows the cart this user has open, and creates a row to hold it on GET. What the API answers with is the tenant POS invoices, which is why the counts are not comparable. The item entry and the invoice behind it stay with Twig, as Medicine's Add Sales does.
+
+**`restaurant_category`** - Twig 500: CategoryType declares an option "emCategory" its caller does not pass, and Symfony 8 resolves options strictly where 2.8 did not. A form type is presentation and has no counterpart in the API.
+
+**`restaurant_product_sorting`** - Twig 500: ProductType reads an undefined property $config - the same shape as Medicine's SalesTemporaryItemType, recorded in phase 3. Presentation only.
+
+**`restaurant_stock`** - Twig 500: StockType reads an undefined property $config, same shape again. Presentation only.
+
+**`dps_invoice`** - Fatal in both trees: DpsInvoiceRepository::invoiceLists calls User::getParticularDoctor(), which exists in NEITHER tree, for any user holding ROLE_DOMAIN_HOSPITAL_DOCTOR. The harness user holds every role the navigation names, so it takes that branch where most users would not - which is how a pre-existing fatal surfaced here rather than in production.
+
+**`dps_prescription`** - Fatal in both trees, same cause: invoiceHospitalLists reaches User::getParticularDoctor().
 
 A screen with 0 rows on both sides is agreement, not evidence: this dump's tenant
 has no rows for several of these tables. That is the same constraint every other

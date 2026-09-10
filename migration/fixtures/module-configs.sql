@@ -1,4 +1,7 @@
--- Phase 6 fixture: the tenant's BusinessConfig and HospitalConfig rows.
+-- Phase 6 and 8 fixture: the per-module config rows this dump does not have.
+--
+-- BusinessConfig, HospitalConfig, RestaurantConfig and DpsConfig - four modules,
+-- one story. Each table is empty for EVERY tenant here.
 --
 -- Same situation as Inventory's, and found the same way. `business_config` and
 -- `hms_config` are empty for EVERY tenant in this dump, and the 323
@@ -36,3 +39,20 @@ SELECT g.id
 FROM GlobalOption g
 WHERE g.id IN (1, 322)
   AND NOT EXISTS (SELECT 1 FROM (SELECT * FROM hms_config) c WHERE c.globalOption_id = g.id);
+
+-- Phase 8. Restaurant and DoctorPrescription are the two modules §6 of the plan
+-- described accurately from the start: blocked for want of a config row. The 135
+-- restaurant_purchase rows that exist were written by the smoke sweep between
+-- 2026-09-06 and 2026-09-09, every one createdBy_id 5690.
+
+INSERT INTO restaurant_config (globalOption_id)
+SELECT g.id
+FROM GlobalOption g
+WHERE g.id IN (1, 322)
+  AND NOT EXISTS (SELECT 1 FROM (SELECT * FROM restaurant_config) c WHERE c.globalOption_id = g.id);
+
+INSERT INTO dps_config (globalOption_id)
+SELECT g.id
+FROM GlobalOption g
+WHERE g.id IN (1, 322)
+  AND NOT EXISTS (SELECT 1 FROM (SELECT * FROM dps_config) c WHERE c.globalOption_id = g.id);
