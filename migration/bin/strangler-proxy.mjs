@@ -77,6 +77,11 @@ const bespoke = (() => {
 })();
 
 const ported = new Set([
+	// The application's front door belongs to the SPA. `/` is not a screen in
+	// any inventory, so it fell to next/ - which meant the first thing anyone
+	// saw was the Twig login, and after signing in there the SPA asked again.
+	"/",
+
 	...Object.values(NAV).flat().filter((i) => IMPLEMENTED.has(i.route)).map((i) => i.path),
 	...routeOnly.map((i) => i.path),
 	...bespoke.map((i) => i.path),

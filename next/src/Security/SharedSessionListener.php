@@ -5,20 +5,25 @@ declare(strict_types=1);
 namespace App\Security;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
- * Writes the neutral session key SharedSessionAuthenticator reads, and clears
- * it on logout so signing out of one application signs the user out of both.
+ * Publishes the neutral session key the other two applications read.
+ *
+ * This tree already had the READING half - SharedSessionAuthenticator - and not
+ * the writing half, so the bridge only ever worked in one direction. Signing in
+ * through the API carried into next/, and signing in through next/ carried
+ * nowhere: the API found no key, showed its own login, and the user logged in
+ * twice. Landing on `/` made that the normal path, because `/` is not a ported
+ * screen and the proxy hands it here.
+ *
+ * The API's listener is the same code; legacy's is
+ * Core\UserBundle\EventListener\SharedSessionListener. All three write the same
+ * key so that any one of them can start the session.
  */
 final class SharedSessionListener
 {
-    public function __construct(private readonly TokenStorageInterface $tokenStorage)
-    {
-    }
-
     #[AsEventListener(event: InteractiveLoginEvent::class)]
     public function onLogin(InteractiveLoginEvent $event): void
     {
@@ -37,8 +42,6 @@ final class SharedSessionListener
     #[AsEventListener(event: LogoutEvent::class)]
     public function onLogout(LogoutEvent $event): void
     {
-        $session = $event->getRequest()?->getSession();
-
-        $session?->remove(SharedSessionAuthenticator::SESSION_KEY);
+        $event->getRequest()?->getSession()?->remove(SharedSessionAuthenticator::SESSION_KEY);
     }
 }

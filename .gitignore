@@ -60,3 +60,6 @@ Thumbs.db
 # the moment the scratch database changes.
 migration/fixtures/api/
 migration/fixtures/next-live/
+
+# Runtime tenant file cache, created by ToolManager::createMasterDirectory.
+next/public/cache/

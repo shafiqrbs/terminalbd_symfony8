@@ -22,7 +22,11 @@ $path = urldecode((string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 $file = realpath($root . $path);
 
 // A real file inside the docroot, and not the front controller itself, is static.
-if ($file !== false && is_file($file) && str_starts_with($file, $root . DIRECTORY_SEPARATOR)
+// strpos rather than str_starts_with: this router also serves the SYMFONY 2 tree
+// under PHP 7.4, where str_starts_with does not exist. It fatalled on every
+// static request there - so legacy served no stylesheet, no script and no image,
+// and every screenshot and measurement taken of it was of an unstyled page.
+if ($file !== false && is_file($file) && strpos($file, $root . DIRECTORY_SEPARATOR) === 0
     && basename($file) !== 'index.php') {
     return false;
 }
