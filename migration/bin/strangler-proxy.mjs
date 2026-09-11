@@ -39,9 +39,48 @@ const nav = readFileSync(navPath, "utf8");
 // The generated table is JS; the two things needed from it are plain JSON.
 const NAV = JSON.parse(nav.match(/export const NAV = (\{[\s\S]*?\n\});/)[1]);
 const IMPLEMENTED = new Set(JSON.parse(nav.match(/export const IMPLEMENTED = new Set\(([\s\S]*?)\);/)[1]));
-const ported = new Set(
-	Object.values(NAV).flat().filter((i) => IMPLEMENTED.has(i.route)).map((i) => i.path)
-);
+
+// The navigation is no longer the only source of screens. 91 of them are reached
+// by URL alone - their originals are not in the menu either - and they live in
+// route-only.js. Reading nav.js on its own sent every one of them to next/, so a
+// screen that had been ported went on being served by the tree it replaced.
+const routeOnlyPath = "/home/sreejon/projects/personal/terminalbd_react/src/routes/route-only.js";
+const routeOnly = (() => {
+	try {
+		const source = readFileSync(routeOnlyPath, "utf8");
+
+		return JSON.parse(source.match(/export const ROUTE_ONLY = (\[[\s\S]*?\n\]);/)[1]);
+	} catch (error) {
+		// Loudly. A silent [] here routes screens that HAVE been ported back to
+		// the tree they replaced, and the only symptom is the old page loading.
+		console.warn(`  could not read ROUTE_ONLY (%s) - those screens will go to next/`, "%s", error.message);
+		return [];
+	}
+})();
+
+// Hand-written screens are a third source. They are in neither the navigation
+// nor the generated route table, and leaving them out sends a screen that HAS
+// been ported back to the tree it replaced - which is what happened to all 91
+// route-only screens until the proxy learned about them.
+const bespokePath = "/home/sreejon/projects/personal/terminalbd_react/src/routes/bespoke.js";
+const bespoke = (() => {
+	try {
+		const source = readFileSync(bespokePath, "utf8");
+
+		return JSON.parse(source.match(/export const BESPOKE = (\[[\s\S]*?\n\]);/)[1]);
+	} catch (error) {
+		// Loudly. A silent [] here routes screens that HAVE been ported back to
+		// the tree they replaced, and the only symptom is the old page loading.
+		console.warn(`  could not read BESPOKE (%s) - those screens will go to next/`, "%s", error.message);
+		return [];
+	}
+})();
+
+const ported = new Set([
+	...Object.values(NAV).flat().filter((i) => IMPLEMENTED.has(i.route)).map((i) => i.path),
+	...routeOnly.map((i) => i.path),
+	...bespoke.map((i) => i.path),
+]);
 
 // Paths deliberately left with the Symfony 2 application, to exercise the
 // bridge: a user who logged in through React has to arrive here authenticated.
@@ -98,7 +137,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, "127.0.0.1", () => {
 	console.log(`strangler proxy on http://127.0.0.1:${PORT}`);
-	console.log(`  ${ported.size} ported screens -> react`);
+	console.log(`  ${ported.size} ported screens -> react (${routeOnly.length} of them reached by URL only)`);
 	console.log(`  ${legacyPaths.size} path(s) -> the Symfony 2 application`);
 	console.log("  everything else -> next/");
 });
