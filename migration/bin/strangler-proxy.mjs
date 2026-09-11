@@ -90,6 +90,15 @@ const VITE = ["/@vite", "/@react-refresh", "/@fs", "/src/", "/node_modules/", "/
 
 function target(url) {
 	if (url.startsWith("/api/")) return { upstream: API, name: "api" };
+
+	// Anything under /__legacy/ goes to the Symfony 2 tree with the prefix
+	// stripped. The harness needs to read ARBITRARY legacy screens, and it
+	// cannot log into that tree directly: legacy encodes sha512 and cannot
+	// verify the bcrypt hash a user gets by signing in through the API. Reaching
+	// it through the proxy means the shared session row carries the login, which
+	// is the same bridge bridge-check.mjs proves. LEGACY_PATHS stays for pinning
+	// individual paths; this is for sweeping all of them.
+	if (url.startsWith("/__legacy/")) return { upstream: LEGACY, name: "legacy", rewrite: url.slice(9) };
 	if (VITE.some((p) => url.startsWith(p))) return { upstream: REACT, name: "react" };
 
 	const path = url.split("?")[0];
@@ -101,13 +110,13 @@ function target(url) {
 }
 
 const server = http.createServer((req, res) => {
-	const { upstream, name } = target(req.url);
+	const { upstream, name, rewrite } = target(req.url);
 	const proxied = http.request(
 		{
 			host: upstream.host,
 			port: upstream.port,
 			method: req.method,
-			path: req.url,
+			path: rewrite ?? req.url,
 			headers: { ...req.headers, host: `${upstream.host}:${upstream.port}` },
 		},
 		(upstreamRes) => {
