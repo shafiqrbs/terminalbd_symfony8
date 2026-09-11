@@ -28,9 +28,13 @@ declare(strict_types=1);
  *   - only where the render's list variable traces to exactly ONE repository
  *     call. Two candidates means the screen shows two lists and a person picks.
  *   - only where the entity class resolves to a real file.
- *   - the roles come from the navigation inventory where the screen is in it,
- *     and are left EMPTY otherwise, which the registry treats as deny. A guessed
- *     role guard is an access-control defect, not a cosmetic one.
+ *   - roles are NOT derived here at all. This was originally documented as
+ *     "left empty, which the registry treats as deny", and that was wrong:
+ *     ResourceController::guard() loops over the role list, so an empty one
+ *     restricts nothing. Generating resources from these drafts without a guard
+ *     would have published every one of them to any signed-in user.
+ *     app:generate-resources establishes the guard and refuses to emit without
+ *     one.
  *
  * usage: php8.5 migration/bin/derive-resources.php --inventory=<route-inventory.json> [--out=draft.json]
  */
@@ -105,7 +109,7 @@ function methodBody(string $source, string $method): ?string
  * tenant, and a Medicine query scoped by GlobalOption would show another
  * tenant's stock.
  */
-function argumentName(string $argument, array $locals = []): ?string
+function argumentName(string $argument, array $locals = [], ?string &$configKey = null): ?string
 {
     $argument = trim($argument);
 
@@ -122,7 +126,15 @@ function argumentName(string $argument, array $locals = []): ?string
         $argument === '$user' => 'user',
         (bool) preg_match('/^\$(data|_REQUEST|request)$/', $argument) => 'search',
         (bool) preg_match('/getGlobalOption\(\)$/', $argument) => 'tenant',
-        (bool) preg_match('/get[A-Za-z]*Config\(\)$/', $argument) => 'config',
+        (bool) preg_match('/get([A-Za-z]*Config)\(\)$/', $argument, $cm) => (static function () use (&$configKey, $cm): string {
+            // WHICH config, not just that it is one. ApiResource defaults
+            // configKey to medicineConfig, so a DPS screen asking for `config`
+            // was handed the medicine config - null for this tenant - and the
+            // repository refused it as a type error.
+            $configKey = lcfirst($cm[1]);
+
+            return 'config';
+        })(),
         (bool) preg_match('/getGlobalOption\(\)->getId\(\)$/', $argument) => 'tenantId',
         (bool) preg_match('/get[A-Za-z]*Config\(\)->getId\(\)$/', $argument) => 'configId',
         (bool) preg_match("/^'[^']*'$/", $argument) => 'literal:' . trim($argument, "'"),
@@ -212,6 +224,7 @@ foreach ($screens as $screen) {
 
     $parsed = [];
     $unknown = false;
+    $configKey = null;
 
     // What each local in this action was assigned, so an argument that is a
     // variable can be read as the expression behind it.
@@ -224,7 +237,7 @@ foreach ($screens as $screen) {
     }
 
     foreach (array_filter(array_map('trim', explode(',', $arguments)), static fn (string $a): bool => $a !== '') as $argument) {
-        $name = argumentName($argument, $locals);
+        $name = argumentName($argument, $locals, $configKey);
 
         if ($name === null) {
             $unknown = true;
@@ -251,6 +264,7 @@ foreach ($screens as $screen) {
         'queryMethod' => $method,
         'queryArgs' => $parsed,
         'template' => $tm[1] ?? null,
+        'configKey' => $configKey,
     ];
 }
 
