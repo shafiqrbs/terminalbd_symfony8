@@ -1,8 +1,0 @@
-home:
-    path:     /
-    defaults: { _controller: UserBundle:Security:login }
-
-bindu_login:
-    path:     /login
-    defaults: { _controller: "UserBundle:Security:login" }
-

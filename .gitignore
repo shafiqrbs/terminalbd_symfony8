@@ -1,40 +1,40 @@
-# Bootstrap
-app/bootstrap*
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
 
-# Symfony directories
-/vendor
-*/logs/*
-*/cache/*
-web/uploads/*
-web/bundles/*
-web/css/*
-web/img/*
-web/images/*
-web/js/*
-web/assets
-web/fonts/*
-web/nano.save
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
 
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
 
+# Runtime tenant file cache, created by ToolManager::createMasterDirectory.
+/public/cache/
 
-# Configuration files
-app/config/parameters.yml
-#src/Core/UserBundle/Resources/views/Security/login.html.twig
-#src/Core/UserBundle/Resources/views/Security/Mobile/login.html.twig
-#src/Setting/Bundle/ToolBundle/Controller/DomainController.php
-web/.htaccess
+# The Symfony 2.8 application's working state: vendor/, app/cache, app/logs,
+# app/config/parameters.yml (real credentials) and web/'s compiled assets. The
+# legacy application itself is no longer on this branch - it is on
+# symfony8-migration and at the tag legacy-symfony2-final - but all of this is
+# gitignored, so checking that branch out cannot restore any of it. Kept here
+# under a name nothing collides with. To run the legacy application again:
+#
+#     git switch symfony8-migration
+#     mv .legacy-runtime/app/cache .legacy-runtime/app/logs app/
+#     mv .legacy-runtime/app/config/parameters.yml app/config/
+#     mv .legacy-runtime/vendor .
+#     php7.4 -S 127.0.0.1:8801 -t web migration/bin/serve-router.php
+/.legacy-runtime/
 
-# Composer
-composer.phar
-
-
-# IDE
-.idea/*
-.nbproject/*
-
-# OS
-.DS_Store
-Thumbs.db
 # Database dumps - this is a multi-tenant medical/pharmacy SaaS, dumps carry
 # patient and customer data and must never reach the repository.
 *.sql
@@ -58,8 +58,13 @@ Thumbs.db
 # pair taken from one database state; these two are re-taken together whenever
 # the API is checked against the ported monolith, and would otherwise go stale
 # the moment the scratch database changes.
-migration/fixtures/api/
-migration/fixtures/next-live/
+/migration/fixtures/api/
+/migration/fixtures/next-live/
 
-# Runtime tenant file cache, created by ToolManager::createMasterDirectory.
-next/public/cache/
+# IDE
+.idea/*
+.nbproject/*
+
+# OS
+.DS_Store
+Thumbs.db

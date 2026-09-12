@@ -1,0 +1,65 @@
+# Guards for the Symfony 8.1 application, which is now the repository root.
+#
+# This replaces migration-checks.yml, which ran the Symfony 2.8 -> 8.1 pipeline
+# and cannot run here: it reads the legacy source in src/ and app/, and those are
+# on the symfony8-migration branch now. The pipeline and its harnesses still run
+# there, against a checkout that has both trees.
+name: checks
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.5
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ctype, dom, gd, iconv, intl, mbstring, simplexml, xml, zip
+          coverage: none
+          ini-values: memory_limit=-1
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      # --no-scripts: the auto-scripts warm the cache and install assets, which
+      # the checks below do for themselves.
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --no-scripts
+
+      - name: Services can be built and their arguments type-check
+        run: php bin/console lint:container
+
+      # No database: it loads metadata only. 339 entities have to resolve their
+      # associations, which is what ORM 3's stricter inverse-side validation made
+      # non-trivial.
+      - name: Doctrine mapping
+        run: php bin/validate-mapping.php
+
+      - name: Tests
+        run: php vendor/bin/phpunit
+
+      # NOT gated yet, and deliberately reported rather than failed: 14 templates
+      # still carry Twig 1 / Symfony 2 tags (`spaceless`, `render`). They have
+      # been broken since the port and went unnoticed because the check that
+      # covered them piped to `tail`, which returns tail's exit status - so
+      # lint:twig's failure never reached CI. Fix the 14, then drop the `|| true`.
+      - name: Templates (reporting only - see the note above)
+        run: php bin/console lint:twig templates/ --excludes=_foscomment || true

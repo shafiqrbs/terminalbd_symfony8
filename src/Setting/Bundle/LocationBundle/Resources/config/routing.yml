@@ -1,8 +1,0 @@
-setting_location_location:
-    resource: "@SettingLocationBundle/Resources/config/routing/location.yml"
-    prefix:   /location
-
-setting_location_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: SettingLocationBundle:Default:index }
-
