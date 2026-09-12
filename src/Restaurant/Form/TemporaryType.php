@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class TemporaryType extends AbstractType
 {
     protected $globalOption;
+    private $config;
 
 
     /**
@@ -30,6 +31,8 @@ class TemporaryType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->globalOption = $options['globalOption'];
+        // Derived by the Symfony 2 constructor; options replaced it and the derivation went too.
+        $this->config = $options['globalOption']->getRestaurantConfig()->getId();
 
         $builder
 

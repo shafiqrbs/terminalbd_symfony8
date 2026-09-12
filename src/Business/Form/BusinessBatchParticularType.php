@@ -30,6 +30,8 @@ class BusinessBatchParticularType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->globalOption = $options['globalOption'];
+        // Derived by the Symfony 2 constructor; options replaced it and the derivation went too.
+        $this->config = $options['globalOption']->getBusinessConfig();
 
         $builder
 

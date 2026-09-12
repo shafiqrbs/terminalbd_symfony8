@@ -43,6 +43,8 @@ class InvoiceType extends AbstractType
         $this->globalOption = $options['globalOption'];
         $this->emCategory = $options['emCategory'];
         $this->location = $options['location'];
+        // Derived by the Symfony 2 constructor; options replaced it and the derivation went too.
+        $this->config = $options['globalOption']->getHospitalConfig();
 
         $builder
 

@@ -17,6 +17,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 class SidebarWidgetPanelType extends AbstractType
 {
     protected $globalOption;
+    private $globalId;
+    private $modules;
 
 
     /**
@@ -26,6 +28,9 @@ class SidebarWidgetPanelType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->globalOption = $options['globalOption'];
+        // Derived by the Symfony 2 constructor; options replaced it and the derivation went too.
+        $this->globalId = $options['globalOption']->getId();
+        $this->modules = $options['globalOption']->getSiteSetting()->getModuleIds();
 
         $builder
 

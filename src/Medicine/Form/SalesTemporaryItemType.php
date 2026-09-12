@@ -19,6 +19,7 @@ class SalesTemporaryItemType extends AbstractType
 
     /** @var  $globalOption GlobalOption */
     private $globalOption;
+    private $config;
 
     /**
      * @param FormBuilderInterface $builder
@@ -28,6 +29,8 @@ class SalesTemporaryItemType extends AbstractType
     {
         $this->glodbalOption = $options['globalOption'];
         $this->em = $options['em'];
+        // Derived by the Symfony 2 constructor; options replaced it and the derivation went too.
+        $this->config = $options['globalOption']->getMedicineConfig();
 
         $builder
 
