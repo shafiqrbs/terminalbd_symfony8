@@ -19,7 +19,7 @@
 --
 --   mysql terminalbd_migration_check < migration/fixtures/module-configs.sql
 --
--- See migration/contract/business-hospital-module-screens.md.
+-- See terminalbd_api/docs/contract/business-hospital-module-screens.md.
 
 -- businessModel is not decoration: InvoiceController reads it to choose which
 -- Invoice template directory to render, defaulting to "new" - and there is no

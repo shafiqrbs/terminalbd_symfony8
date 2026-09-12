@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# The pipeline as a verifier rather than a producer (§7 of API-REACT-PLAN.md).
+# The pipeline as a verifier rather than a producer (§7 of the API/React plan,
+# which lives in terminalbd_api/docs/API-REACT-PLAN.md now).
 #
 # terminalbd_api has its own copy of the 874 non-presentation files now, so an
 # entity change there is an ordinary edit rather than a pipeline step. But the
@@ -106,8 +107,17 @@ echo "############ 2. does terminalbd_api's copy agree? ############"
 copy_ok=1
 api=${API_SRC:-$(dirname "$root")/terminalbd_api/src}
 
-if [ -d "$api" ]; then
-    $PHP "$root/migration/bin/check-api-copy.php" --source="$work/next/src" --api="$api" || copy_ok=0
+# The check itself moved to the API repository with the rest of the API/React
+# port - it is that project's copy being checked. It is still driven from here,
+# and only from here, because the comparison is worth having against a FRESHLY
+# REBUILT scratch tree rather than against the committed one: that is what makes
+# it a question about the legacy source and not about what someone edited.
+checker="$(dirname "$api")/tools/check-api-copy.php"
+
+if [ -d "$api" ] && [ -f "$checker" ]; then
+    $PHP "$checker" --legacy-root="$root" --source="$work/next/src" --api="$api" || copy_ok=0
+elif [ -d "$api" ]; then
+    echo "SKIPPED: API checkout at $api has no tools/check-api-copy.php"
 else
     # A CI job that checks out only this repository can still answer question 1,
     # which is the one that needs the legacy tree. Say what was skipped rather

@@ -64,25 +64,9 @@ run "app.user.* accessors resolve" \
 run "template aliases converted" \
     $PHP migration/bin/check-template-aliases.php
 
-# The API holds a copy of every screen's role guard, and two copies of a fact
-# drift. This one drifts silently: the harness signs in holding every role there
-# is, so a resource that guards too loosely answers 200 there and would answer
-# 200 for anyone. Stricter than the menu is allowed; looser is the defect.
-run "resource guards match the navigation" \
-    $PHP migration/bin/check-resource-roles.php
-
 # The 96 wire-locked mobile endpoints still answer at their contract paths.
 run "mobile API contract" \
     $PHP migration/bin/check-api-contract.php --report=migration/contract/api-contract.md
-
-# Phase 9 moved those endpoints to terminalbd_api. This needs no database and no
-# server: it asks whether the API still DECLARES every live one. The capture
-# proves the shapes; a route lost to a re-copy would make that capture pass with
-# one fewer endpoint in it, and nothing else would notice.
-if [ -d "${API_SRC:-../terminalbd_api/src}" ]; then
-    run "mobile API routes declared" \
-        $PHP migration/bin/port-mobile-api.php --check
-fi
 
 # Services can be built and their arguments type-check.
 run "container" \
@@ -112,20 +96,19 @@ run "api shapes" \
 run "tests" \
     bash -c "cd next && $PHP vendor/bin/phpunit | tail -3"
 
-# terminalbd_api has its own copy of the 874 non-presentation files. This asks
-# whether it still agrees with what this tree implies, and every difference it
-# does have is recorded with a reason in api-copy-differences.txt. Skipped when
-# the API is not checked out beside this repository - a job that has only this
-# one can still run everything above.
-api_src=${API_SRC:-../terminalbd_api/src}
-
-if [ -d "$api_src" ]; then
-    run "api copy" \
-        bash -c "set -o pipefail; $PHP migration/bin/check-api-copy.php --api='$api_src' | head -1"
-else
-    echo
-    echo "── api copy: skipped, no checkout at $api_src"
-fi
+# Three gates used to run here and no longer do: the API's copy of the
+# non-presentation files, its copy of every screen's role guard, and its
+# declaration of the 96 mobile routes. All three compare THIS tree against
+# terminalbd_api, and all three moved there with the rest of the API/React port -
+# they are `tools/check-api-copy.php`, `tools/check-resource-roles.php` and
+# `tools/port-mobile-api.php --check`, run by that repository's own CI against a
+# checkout of this one. They still read this tree, so a change here can still
+# break them; this repository simply is not where that gets reported.
+#
+# What stays here is the port itself, and the gate above it that matters most:
+# `migrate.sh --check` still asks the API whether its copy agrees, because that
+# comparison is only strong against a freshly rebuilt scratch tree, which only
+# exists here.
 
 # Only when a dump is present: it is gitignored, being tenant data. Reports
 # rather than gates - a dump is one tenant at one point in time, and columns it

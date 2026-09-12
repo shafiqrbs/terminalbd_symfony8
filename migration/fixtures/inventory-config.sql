@@ -22,7 +22,7 @@
 --
 --   mysql terminalbd_migration_check < migration/fixtures/inventory-config.sql
 --
--- See migration/contract/inventory-module-screens.md.
+-- See terminalbd_api/docs/contract/inventory-module-screens.md.
 
 INSERT INTO InventoryConfig (globalOption_id, isPos, removeImage, usingBarcode, vatMode, salesMode, deliveryProcess, printer, shopName, address)
 SELECT g.id, 0, 0, 'item', 'including', 'stock', 'manual-sales', 'save', g.name, 'Seeded for migration verification'

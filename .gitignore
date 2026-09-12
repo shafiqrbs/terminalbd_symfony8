@@ -44,7 +44,7 @@ Thumbs.db
 # The one exception, and it is not a dump: the seeded fixtures the verification
 # harnesses need, which carry no tenant data at all - one InventoryConfig row of
 # form-type defaults, so that phase 4's 42 screens can run against a dump that
-# has no Inventory in it. Read migration/contract/inventory-module-screens.md
+# has no Inventory in it. Read terminalbd_api/docs/contract/inventory-module-screens.md
 # before adding another; anything with a real row in it belongs above this line.
 !migration/fixtures/*.sql
 

@@ -16,6 +16,33 @@ response shapes are **locked** (shipped Android + Flutter clients), and there is
 
 Companion summary (charts, tables, roadmap): https://claude.ai/code/artifact/be69c7c3-6440-412d-b00b-3bdbbb30a06f
 
+### Scope of this document, and what is no longer in this repository
+
+This plan covers **one thing: getting the application onto PHP 8.5 and Symfony 8.1**,
+as the `next/` tree, with the legacy Symfony 2.8 source beside it and the pipeline in
+`migration/bin/` rebuilding one from the other. That is what `migration/` is for now.
+
+The work that followed — splitting `next/` into a JSON API and a React SPA — moved to its
+own repositories on 2026-09-12 and is planned and tracked there, not here:
+
+| | |
+|---|---|
+| `terminalbd_api/docs/API-REACT-PLAN.md` | the API + React plan, phases 0–11 |
+| `terminalbd_api/docs/LEGACY-PARITY-PLAN.md` | full legacy parity in React, phases A–G |
+| `terminalbd_api/docs/contract/` | the screen inventories and per-module reports |
+| `terminalbd_api/tools/` | the tools that produce them |
+
+Those tools still **read this tree** — the navigation inventory, the column maps and the
+screen comparisons are all derived from `next/` and from the legacy source, and they take a
+`--legacy-root=` (or `$LEGACY_ROOT`) pointing at this checkout. So a change here can still
+break them; it is simply reported over there. The one gate that runs in both directions is
+`./migration/bin/migrate.sh --check`, which rebuilds this tree into a scratch directory and
+then asks the API repository whether its copy still agrees with it.
+
+`next/` is **not** being deleted. It stays as the running fallback behind the strangler
+proxy, which means two applications share one database permanently and every schema change
+lands twice.
+
 ---
 
 ## 1. Status

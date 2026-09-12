@@ -139,7 +139,27 @@ if ($rolesFrom !== null) {
 }
 
 if ($rolesFromNav) {
-    $scope = json_decode(file_get_contents($root . '/migration/contract/nav-scope.json'), true);
+    // The navigation inventory moved to the API repository with the rest of the
+    // API/React port. It is still generated from THIS tree, and it is still the
+    // only list of every role the menu names - which is what --roles-from-nav
+    // grants, so that a harness sweep is never stopped by a 403 it invented.
+    $navScope = getenv('NAV_SCOPE')
+        ?: dirname($root) . '/terminalbd_api/docs/contract/nav-scope.json';
+
+    if (!is_file($navScope)) {
+        fwrite(STDERR, sprintf(
+            "--roles-from-nav needs the navigation inventory, and there is none at %s.\n\n"
+            . "It lives in the API repository now. Check terminalbd_api out beside this\n"
+            . "one, or point NAV_SCOPE at its docs/contract/nav-scope.json. Regenerate it\n"
+            . "with: php8.5 tools/nav-inventory.php --legacy-root=%s\n",
+            $navScope,
+            $root,
+        ));
+
+        exit(2);
+    }
+
+    $scope = json_decode((string) file_get_contents($navScope), true);
 
     foreach ($scope['modules'] ?? [] as $screens) {
         foreach ($screens as $screen) {
