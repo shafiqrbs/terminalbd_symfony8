@@ -22,7 +22,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class WebsiteWidgetType extends AbstractType
 {
     protected $globalOption;
-    private $globalId;
+    protected $globalId;
 
 
     /**
@@ -32,8 +32,7 @@ class WebsiteWidgetType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->globalOption = $options['globalOption'];
-        // Derived by the Symfony 2 constructor; options replaced it and the derivation went too.
-        $this->globalId = $options['globalOption']->getId();
+        $this->globalId = $this->globalOption->getId();
 
         $builder
 

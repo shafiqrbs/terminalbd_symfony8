@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class ProductType extends AbstractType
 {
     protected $globalOption;
-    private $config;
+    protected $config;
 
 
     /**
@@ -28,8 +28,7 @@ class ProductType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->globalOption = $options['globalOption'];
-        // Derived by the Symfony 2 constructor; options replaced it and the derivation went too.
-        $this->config = $options['globalOption']->getRestaurantConfig()->getId();
+        $this->config = $this->globalOption->getRestaurantConfig()->getId();
 
         $builder
 

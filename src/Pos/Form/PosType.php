@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class PosType extends AbstractType
 {
     protected $globalOption;
+    protected $config;
 
 
     /**
@@ -30,6 +31,7 @@ class PosType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->globalOption = $options['globalOption'];
+        $this->config = $this->globalOption->getInventoryConfig()->getId();
 
         $builder
 

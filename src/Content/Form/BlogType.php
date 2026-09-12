@@ -31,6 +31,8 @@ class BlogType extends AbstractType
     {
         $this->globalOption = $options['globalOption'];
         $this->module = $options['module'];
+        $this->globalOption = $options['globalOption']->getId();
+        $this->module = $options['module']->getId();
 
         $builder
             ->add('name',TextType::class, ['attr'=>['class'=>'m-wrap span12','placeholder'=>'Enter title name'],

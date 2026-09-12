@@ -28,6 +28,7 @@ class MedicineMinimumStockType extends AbstractType
     {
         $this->em = $options['em'];
         $this->config = $options['config'];
+        $this->config = $options['config']->getId();
 
 
         $builder

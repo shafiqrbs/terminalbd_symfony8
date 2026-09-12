@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class TableInvoiceType extends AbstractType
 {
     protected $globalOption;
+    protected $config;
 
 
     /**
@@ -29,6 +30,7 @@ class TableInvoiceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->globalOption = $options['globalOption'];
+        $this->config = $this->globalOption->getRestaurantConfig()->getId();
 
         $builder
 

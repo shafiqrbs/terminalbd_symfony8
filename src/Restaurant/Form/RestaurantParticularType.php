@@ -29,6 +29,7 @@ class RestaurantParticularType extends AbstractType
     {
         $this->restaurantConfig = $options['restaurantConfig'];
         $this->particular = $options['particular'];
+        $this->restaurantConfig = $options['restaurantConfig']->getId();
 
         $builder
 
