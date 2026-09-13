@@ -3,7 +3,10 @@
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
+# Only the vendor bundle assets:install regenerates. The application's own
+# bundle assets under public/bundles/<name> are committed: Assetic is gone, so
+# every file is served from the path it already had and there is no build step.
+/public/bundles/fosjsrouting/
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
@@ -14,7 +17,10 @@
 ###< phpunit/phpunit ###
 
 ###> symfony/asset-mapper ###
-/public/assets/
+# /public/assets/ is deliberately NOT ignored: it holds the application's own
+# asset tree (formerly app/Resources/assets), referenced by ~1,500 asset()
+# calls. Asset mapper is not in use; never run asset-map:compile, it writes
+# into the same directory.
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
