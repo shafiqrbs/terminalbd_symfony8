@@ -11,7 +11,10 @@ set -eux
 export APP_ENV=prod
 export APP_DEBUG=0
 
-php bin/console assets:install public --no-interaction
-php bin/console importmap:install --no-interaction
-php bin/console cache:clear --no-interaction
-php bin/console cache:warmup --no-interaction
+# -d memory_limit=-1: warming this app's large Twig template set exceeds the
+# 512M runtime limit from prod.ini. The override is build-time only (these are
+# one-off CLI invocations); the runtime FPM/Apache limit is unaffected.
+php -d memory_limit=-1 bin/console assets:install public --no-interaction
+php -d memory_limit=-1 bin/console importmap:install --no-interaction
+php -d memory_limit=-1 bin/console cache:clear --no-interaction
+php -d memory_limit=-1 bin/console cache:warmup --no-interaction
