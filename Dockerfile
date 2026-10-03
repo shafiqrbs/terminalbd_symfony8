@@ -26,11 +26,10 @@ RUN set -eux; \
         libzip-dev \
         libpng-dev \
         libjpeg-dev \
-        libfreetype6-dev \
-        libonig-dev \
-        libsqlite3-dev; \
+        libfreetype6-dev; \
     docker-php-ext-configure gd --with-freetype --with-jpeg; \
-    docker-php-ext-install pdo_mysql pdo_sqlite intl gd zip mbstring opcache bcmath exif; \
+    docker-php-ext-install pdo_mysql intl gd zip bcmath exif; \
+    docker-php-ext-enable opcache; \
     rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------------------------
