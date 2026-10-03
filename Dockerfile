@@ -29,8 +29,11 @@ RUN set -eux; \
         libfreetype6-dev; \
     docker-php-ext-configure gd --with-freetype --with-jpeg; \
     docker-php-ext-install pdo_mysql intl gd zip bcmath exif; \
-    docker-php-ext-enable opcache; \
     rm -rf /var/lib/apt/lists/*
+# NOTE: on php:8.5 opcache/mbstring/pdo_sqlite are compiled into the PHP binary
+# (not shared modules) — don't install or enable them, they're already loaded.
+# The prod.ini opcache.* settings apply on their own. On older PHP (<8.4) add
+# mbstring pdo_sqlite (+ libonig-dev libsqlite3-dev) back to the install line.
 
 # ---------------------------------------------------------------------------
 # Apache: enable rewrite + headers, custom vhost (docroot -> public/, AllowOverride All)
