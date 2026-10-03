@@ -1,0 +1,36 @@
+# VCS / IDE
+.git
+.gitignore
+.github
+.idea
+
+# Build outputs regenerated in the image
+vendor
+var
+assets/vendor
+public/bundles/fosjsrouting
+
+# Dev-only env (real values come from Coolify env vars at runtime)
+.env.local
+.env.*.local
+.env.test
+
+# Tests / CI / dev tooling — not needed at runtime
+tests
+.phpunit.cache
+.phpunit.result.cache
+phpunit.dist.xml
+rector.php
+rector-http.php
+
+# Local compose files (the image is standalone)
+compose.yaml
+compose.override.yaml
+
+# Legacy tree and heavy artifacts that must not ship in the image
+.legacy-runtime
+migration
+bm_db.sql.gz
+google.pdf
+*.sql
+*.sql.gz
