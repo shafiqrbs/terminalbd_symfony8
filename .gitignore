@@ -53,6 +53,9 @@
 # has no Inventory in it. Read terminalbd_api/docs/contract/inventory-module-screens.md
 # before adding another; anything with a real row in it belongs above this line.
 !migration/fixtures/*.sql
+# Also not a dump: one CREATE TABLE with no rows, run at container start by
+# docker/entrypoint.sh. Named exactly, so no other .sql gets in beside it.
+!/docker/sql/sessions.sql
 
 # Golden API capture: the overlay holds real credentials, and --with-body
 # fixtures hold tenant rows. The shape-only fixtures are committed by hand.

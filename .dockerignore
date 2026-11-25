@@ -34,3 +34,5 @@ bm_db.sql.gz
 google.pdf
 *.sql
 *.sql.gz
+# Needed at container start by docker/entrypoint.sh
+!docker/sql/sessions.sql
