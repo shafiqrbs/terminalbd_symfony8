@@ -11,7 +11,7 @@ Each entry is written in English first, then in Bangla.
 - `assets:install` no longer deletes the committed files in `public/bundles`. `--no-cleanup` is now set in the Composer auto-scripts, `docker/build.sh` and `bin/build.sh`.
 
 #### Added
-- `bin/build.sh`, the local build script. It dumps the JS routes, installs assets, clears the cache and stops at the first error.
+- `bin/build.sh`, the local build script, and its template `bin/build.sh.dist`. It dumps the JS routes, installs assets, clears the cache and stops at the first error.
 - This changelog, in English and Bangla.
 
 #### Safety
@@ -29,7 +29,7 @@ Each entry is written in English first, then in Bangla.
 - `assets:install` এখন আর `public/bundles`-এ কমিট করা ফাইলগুলো মুছে ফেলে না। Composer auto-scripts, `docker/build.sh` এবং `bin/build.sh`-এ `--no-cleanup` যোগ করা হয়েছে।
 
 #### সংযোজন
-- লোকাল বিল্ড স্ক্রিপ্ট `bin/build.sh`। এটি JS রাউট ডাম্প করে, অ্যাসেট ইনস্টল করে, ক্যাশ পরিষ্কার করে এবং প্রথম ত্রুটিতেই থেমে যায়।
+- লোকাল বিল্ড স্ক্রিপ্ট `bin/build.sh` এবং এর টেমপ্লেট `bin/build.sh.dist`। এটি JS রাউট ডাম্প করে, অ্যাসেট ইনস্টল করে, ক্যাশ পরিষ্কার করে এবং প্রথম ত্রুটিতেই থেমে যায়।
 - ইংরেজি ও বাংলায় এই পরিবর্তন তালিকা।
 
 #### নিরাপত্তা
