@@ -1,0 +1,2 @@
+# Keys the ported templates inherited from FOSUserBundle.
+security.login.submit: 'Login'

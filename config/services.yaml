@@ -31,6 +31,10 @@ services:
     Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
     Psr\Container\ContainerInterface: '@service_container'
 
+    App\Asset\FileVersionStrategy:
+        arguments:
+            $publicDir: '%kernel.project_dir%/public'
+
     # Replaces fos_user.mailer. The from address was a FOSUserBundle default,
     # never set in app/config/bundles/fos_user.yml, so it stays configurable.
     App\User\Mailer\ResettingMailer:
